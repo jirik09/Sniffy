@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/graphics">
+        <file>graphics/logo_sniffy.png</file>
+        <file>graphics/icon_scope.png</file>
+        <file>graphics/status_pause.png</file>
+        <file>graphics/status_play.png</file>
+        <file>graphics/status_stop.png</file>
+        <file>graphics/separator.png</file>
+        <file>graphics/panel_settings.png</file>
+        <file>graphics/panel_size.png</file>
+        <file>graphics/NUCLEO_F303RE.png</file>
+    </qresource>
+</RCC>
