@@ -73,7 +73,7 @@ void WidgetDialRange::dialValueChanged(int in){
     //dial change is marginal so do the action
     if(abs(realValue)>getRealValueFromDial(in+1.5) || abs(realValue)<getRealValueFromDial(in-1.5) ){
         realValue = getRealValueFromDial(in);
-        qDebug ("dial action real:%f in:%d step:%f",realValue,in, dialStep);
+        //qDebug ("dial action real:%f in:%d step:%f",realValue,in, dialStep);
         updateControls(0);
     }
 }

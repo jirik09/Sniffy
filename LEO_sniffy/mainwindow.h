@@ -8,6 +8,7 @@
 #include "widgetseparator.h"
 #include "widgetfooter.h"
 #include "windowscope.h"
+#include "device.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,6 +25,7 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    Device *dev;
     WidgetFeature *WidgetFeature_scope = NULL;
     QDockWidget *dockWidget_scope = NULL;
     WindowScope *scp;
@@ -33,5 +35,6 @@ private:
 private slots:
    void setMenuSize();
    void openScope();
+
 };
 #endif // MAINWINDOW_H

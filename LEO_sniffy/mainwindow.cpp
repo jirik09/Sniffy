@@ -73,6 +73,59 @@ MainWindow::MainWindow(QWidget *parent)
     connect(WidgetFeature_scope->getPushButton(),SIGNAL(clicked()),this,SLOT(openScope()));
 
 
+
+
+
+    QSerialPortInfo *portInfo = new QSerialPortInfo();
+    QSerialPort *sPort;
+    sPort=new QSerialPort(this);
+    QList<device_descriptor> list = *new QList<device_descriptor>;
+
+    QList<QSerialPortInfo> ports;
+    ports = portInfo->availablePorts();
+
+    QSerialPortInfo tmpPort;
+    int numberOfDevices = 0;
+    QByteArray received;
+    device_descriptor desc;
+
+    foreach (tmpPort, ports){
+        sPort = new QSerialPort(this);
+        sPort->setPort(tmpPort);
+        sPort->setPortName(tmpPort.portName());
+        sPort->setBaudRate(460800);
+
+        sPort->setDataBits(QSerialPort::DataBits::Data8);
+        sPort->setParity(QSerialPort::Parity::NoParity);
+        sPort->setStopBits(QSerialPort::StopBits::OneStop);
+        sPort->setFlowControl(QSerialPort::FlowControl::NoFlowControl);
+
+        if(sPort->open(QIODevice::ReadWrite)){
+            sPort->write("IDN?;");
+            QThread::msleep(150);
+            received = sPort->readAll();
+            if (received.length()>1){
+                desc.port = tmpPort.portName();
+                desc.speed = 460800;
+                desc.connType = Connection::SERIAL;
+                desc.index = 0 + numberOfDevices;
+                desc.deviceName = received;
+                list.append(desc);
+                numberOfDevices++;
+            }
+            sPort->close();
+        }
+
+    }
+
+
+
+    device_descriptor devStr;
+    foreach(devStr, list){
+        ui->comboBox->addItem(devStr.deviceName + "(" + devStr.port+")");
+    }
+
+
 }
 
 MainWindow::~MainWindow()

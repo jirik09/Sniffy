@@ -1,2 +1,11 @@
 # user files
 *.user
+
+
+#C build files
+moc_*.*
+ui_*.*
+*.o
+
+#executables
+*.exe
