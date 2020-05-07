@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>80</height>
+    <width>222</width>
+    <height>91</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -62,6 +62,9 @@ background-color: rgb(48, 48, 48);
       </sizepolicy>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>4</number>
+      </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -127,6 +130,7 @@ background-color: rgb(48, 48, 48);
 QPushButton{border: none;
 	background-color: rgb(24, 154, 224);
 	color: rgb(214,214,214);
+	font: 99 14pt &quot;MS Shell Dlg 2&quot;;
 }</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -182,7 +186,7 @@ QPushButton{border: none;
                </size>
               </property>
               <property name="text">
-               <string>-</string>
+               <string>–</string>
               </property>
               <property name="autoRepeat">
                <bool>true</bool>
