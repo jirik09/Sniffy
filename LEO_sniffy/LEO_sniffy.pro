@@ -16,58 +16,68 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    comms.cpp \
-    connectiontype.cpp \
-    customdial.cpp \
+    GUI/customdial.cpp \
+    GUI/widgetbuttons.cpp \
+    GUI/widgetdial.cpp \
+    GUI/widgetdialrange.cpp \
+    GUI/widgetfeature.cpp \
+    GUI/widgetfooter.cpp \
+    GUI/widgetlabel.cpp \
+    GUI/widgetselection.cpp \
+    GUI/widgetseparator.cpp \
+    GUI/widgetswitch.cpp \
+    GUI/widgettop.cpp \
+    GUI/windowscope.cpp \
+    communication/comms.cpp \
+    communication/serialline.cpp \
     device.cpp \
+    features/scope/scope.cpp \
+    features/scope/scopeconfig.cpp \
+    features/scope/scopespec.cpp \
     main.cpp \
     mainwindow.cpp \
-    serial.cpp \
-    widgetbuttons.cpp \
-    widgetdial.cpp \
-    widgetdialrange.cpp \
-    widgetfeature.cpp \
-    widgetfooter.cpp \
-    widgetlabel.cpp \
-    widgetselection.cpp \
-    widgetseparator.cpp \
-    widgetswitch.cpp \
-    widgettop.cpp \
-    windowscope.cpp
+
 
 HEADERS += \
-    comms.h \
-    connectiontype.h \
-    customdial.h \
+    GUI/customdial.h \
+    GUI/widgetbuttons.h \
+    GUI/widgetdial.h \
+    GUI/widgetdialrange.h \
+    GUI/widgetfeature.h \
+    GUI/widgetfooter.h \
+    GUI/widgetlabel.h \
+    GUI/widgetselection.h \
+    GUI/widgetseparator.h \
+    GUI/widgetswitch.h \
+    GUI/widgettop.h \
+    GUI/windowscope.h \
+    communication/comms.h \
+    communication/connectiontype.h \
+    communication/serialline.h \
     device.h \
+    features/scope/scope.h \
+    features/scope/scopeconfig.h \
+    features/scope/scopedefs.h \
+    features/scope/scopespec.h \
     graphics/colors.h \
     mainwindow.h \
-    serial.h \
-    widgetbuttons.h \
-    widgetdial.h \
-    widgetdialrange.h \
-    widgetfeature.h \
-    widgetfooter.h \
-    widgetlabel.h \
-    widgetselection.h \
-    widgetseparator.h \
-    widgetswitch.h \
-    widgettop.h \
-    windowscope.h
+
+
 
 FORMS += \
+    GUI/widgetbuttons.ui \
+    GUI/widgetdial.ui \
+    GUI/widgetdialrange.ui \
+    GUI/widgetfeature.ui \
+    GUI/widgetfooter.ui \
+    GUI/widgetlabel.ui \
+    GUI/widgetselection.ui \
+    GUI/widgetseparator.ui \
+    GUI/widgetswitch.ui \
+    GUI/widgettop.ui \
+    GUI/windowscope.ui \
     mainwindow.ui \
-    widgetbuttons.ui \
-    widgetdial.ui \
-    widgetdialrange.ui \
-    widgetfeature.ui \
-    widgetfooter.ui \
-    widgetlabel.ui \
-    widgetselection.ui \
-    widgetseparator.ui \
-    widgetswitch.ui \
-    widgettop.ui \
-    windowscope.ui
+
 
 TRANSLATIONS += \
     LEO_sniffy_en_GB.ts

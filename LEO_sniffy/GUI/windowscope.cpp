@@ -16,6 +16,7 @@ WindowScope::WindowScope(QWidget *parent) :
 {
     ui->setupUi(this);
 
+
     //********************* insert top options *********************
     WidgetTopSelection = new WidgetTop(ui->widget_settings,4);
     WidgetTopSelection->setText("Set",0);
@@ -194,7 +195,7 @@ WindowScope::WindowScope(QWidget *parent) :
 
 
     WidgetDialRange *valb = new WidgetDialRange(WidgetMeas ,"Freq");
-    valb->setRange(10,10000000,"Hz",1,1,1000,true);
+    valb->setRange(1000,10000000,"Hz",1,1000,10000,true);
     verticalLayoutMeas->addWidget(valb);
 
 

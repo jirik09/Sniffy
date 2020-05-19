@@ -3,21 +3,22 @@
 
 #include <QObject>
 #include "connectiontype.h"
-#include "serial.h"
+#include "serialline.h"
 
 class Comms : public QObject
 {
     Q_OBJECT
 public:
     explicit Comms(QObject *parent = nullptr);
-    QList<device_descriptor>* scanForDevices();
+    QList<device_descriptor> * scanForDevices();
+    bool open(int deviceIndex);
 
 
 signals:
 
 private:
     QList<device_descriptor> *listDevices;
-    Serial *ser;
+    SerialLine *serial;
 
 };
 

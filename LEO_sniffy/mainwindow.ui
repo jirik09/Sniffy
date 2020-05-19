@@ -172,7 +172,7 @@ border: none</string>
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>27</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -237,6 +237,12 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
         <number>3</number>
        </property>
        <widget class="QWidget" name="widget_2" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
+        </property>
         <property name="styleSheet">
          <string notr="true">image: url(:/graphics/graphics/NUCLEO_F303RE.png);</string>
         </property>

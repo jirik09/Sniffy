@@ -3,11 +3,14 @@
 
 #include <QMainWindow>
 #include <QDebug>
+#include <QLabel>
+#include <QSpacerItem>
+#include <QMessageBox>
 
-#include "widgetfeature.h"
-#include "widgetseparator.h"
-#include "widgetfooter.h"
-#include "windowscope.h"
+#include "GUI/widgetfeature.h"
+#include "GUI/widgetseparator.h"
+#include "GUI/widgetfooter.h"
+#include "GUI/windowscope.h"
 #include "device.h"
 
 QT_BEGIN_NAMESPACE
@@ -31,6 +34,8 @@ private:
     WindowScope *scp;
 
     WidgetFeature *WidgetFeature_gen = NULL;
+
+    Device *device;
 
 private slots:
    void setMenuSize();

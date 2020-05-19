@@ -232,7 +232,7 @@ QPushButton{border: none;
              <number>5</number>
             </property>
             <property name="leftMargin">
-             <number>0</number>
+             <number>5</number>
             </property>
             <property name="topMargin">
              <number>0</number>
@@ -281,7 +281,7 @@ QPushButton{border: none;
                 <number>5</number>
                </property>
                <property name="leftMargin">
-                <number>0</number>
+                <number>10</number>
                </property>
                <property name="topMargin">
                 <number>0</number>

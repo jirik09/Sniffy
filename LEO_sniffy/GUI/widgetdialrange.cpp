@@ -165,7 +165,7 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
         unitMult = units->last().mult;
     }
 
-    if(max>9){
+    if(max>9 && max<1000){
         addOption(baseUnit,1);
         ui->comboBox->setCurrentIndex(units->length()-1);
         // unitString = units->last().unit;
@@ -173,7 +173,7 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     }
 
 
-    if(max>1000){
+    if(max>=1000){
         addOption("k"+baseUnit,1000);
     }if(max>1000000){
         addOption("M"+baseUnit,1000000);

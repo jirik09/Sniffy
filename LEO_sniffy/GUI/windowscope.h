@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <QToolButton>
 #include "widgetfeature.h"
 #include "widgettop.h"
 #include "widgetseparator.h"

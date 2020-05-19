@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>WindowScope</class>
  <widget class="QWidget" name="WindowScope">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,6 +18,9 @@
     <width>400</width>
     <height>350</height>
    </size>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::DefaultContextMenu</enum>
   </property>
   <property name="windowTitle">
    <string>Form</string>
