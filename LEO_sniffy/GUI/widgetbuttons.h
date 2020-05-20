@@ -30,7 +30,7 @@ class WidgetButtons : public QWidget
 public:
     explicit WidgetButtons(QWidget *parent = nullptr, int num = 1, ButtonTypes type = ButtonTypes::NORMAL, QString name = "", int defaultSelectedIndex = 0);
     ~WidgetButtons();
-    void setText(QString text, int index);
+    void setText(QString text, int index = 0);
     void setColor(QString text, int index);
     void clicked (int index);
     bool isChecked (int index);

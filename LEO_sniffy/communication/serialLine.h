@@ -6,7 +6,10 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QThread>
+#include <QBuffer>
 #include "connectiontype.h"
+
+#include <QDebug>
 
 
 
@@ -20,8 +23,10 @@ public:
     static int getAvailableDevices(QList<device_descriptor> *list, int setFirstIndex);
 
     bool openLine(device_descriptor desc);
+    void write(const char *data);
 
 signals:
+        void newMessage(QByteArray message);
 
 private slots:
         void handleError(void);
@@ -31,7 +36,13 @@ private:
 
     //QSerialPortInfo *portInfo;
     QSerialPort *serPort;
+    QByteArray *buffer;
+    QDataStream *bufferReadStream;
 
+    QByteArray *message;
+
+    const char delimiterRaw[4] = { '\xCA', '\xFE', '\xFA', '\xDE'};
+    const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
 
 };
 

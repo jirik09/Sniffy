@@ -13,8 +13,18 @@ public:
     QList<device_descriptor> * scanForDevices();
     bool open(int deviceIndex);
 
+    void write(const char *data);
+    void write(QByteArray data);
+    void write(QString data);
+    void writeUint32(int data);
+    void writeUint16(int data);
+
 
 signals:
+        void newData(QByteArray message);
+
+private slots:
+    void parseMessage(QByteArray message);
 
 private:
     QList<device_descriptor> *listDevices;

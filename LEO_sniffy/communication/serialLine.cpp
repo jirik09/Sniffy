@@ -22,14 +22,6 @@ int SerialLine::getAvailableDevices(QList<device_descriptor> *list, int setFirst
 
         QSerialPortInfo portIn (tmpPort.portName());
 
-       /* qDebug("%s",portIn.description().toStdString().c_str());
-        qDebug("%s",portIn.manufacturer().toStdString().c_str());
-        qDebug("%s",portIn.serialNumber().toStdString().c_str());
-        qDebug("%s",portIn.systemLocation().toStdString().c_str());
-        qDebug("%d",portIn.vendorIdentifier());
-        qDebug("%d",portIn.productIdentifier());*/
-
-
         sPort = new QSerialPort(portIn,nullptr);
 
         sPort->setBaudRate(921600);
@@ -39,9 +31,7 @@ int SerialLine::getAvailableDevices(QList<device_descriptor> *list, int setFirst
 
         if(sPort->open(QIODevice::ReadWrite)){
 
-
             sPort->write("IDN?;");
-            //sPort->flush();
             sPort->waitForBytesWritten();
 
             QThread::msleep(50);
@@ -78,7 +68,9 @@ bool SerialLine::openLine(device_descriptor desc){
 
     if(serPort->open(QIODevice::ReadWrite)){
         ret=true;
-        connect(serPort, SIGNAL(errorOccurred()), this, SLOT(handleError()));
+        buffer = new QByteArray();
+        message = new QByteArray();
+      //  connect(serPort, SIGNAL(errorOccurred()), this, SLOT(handleError()));
         connect(serPort, SIGNAL(readyRead()), this, SLOT(receiveData()));
     }
     return ret;
@@ -90,7 +82,42 @@ void SerialLine::handleError(void){
 }
 
 void SerialLine::receiveData(void){
-    //QMessageBox(this, "Error","Serial line received some error");
 
+    //qDebug() << "Incomming" << serPort->bytesAvailable();
+
+    //append data to buffer
+    if(serPort->bytesAvailable()) {
+        buffer->append(serPort->readAll());
+    }
+
+    //qDebug() << buffer->length() << ":" << *buffer;
+
+    //find delimiter
+    int i = buffer->indexOf(delimiter);
+    while(i>0){
+
+        message = new QByteArray(buffer->left(i));
+
+        //qDebug() << "Received:" << *message;
+        emit newMessage(*message);
+
+        //remove message and delimiter from buffer
+        buffer->remove(0,i+4);
+
+        //example how to read the int from serial line
+        /*  QDataStream ds(message);
+        int j;
+        ds>>j;*/
+
+
+        //try to find new delimiter and message
+        i = buffer->indexOf(delimiter);
+    }
+}
+
+void SerialLine::write(const char *data){
+    qDebug() << "Sent:" << data;
+    serPort->write(data);
+    serPort->waitForBytesWritten();
 }
 

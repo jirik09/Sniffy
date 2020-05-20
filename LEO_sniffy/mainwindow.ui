@@ -172,7 +172,7 @@ border: none</string>
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>22</height>
+     <height>27</height>
     </rect>
    </property>
   </widget>
@@ -236,7 +236,7 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
        <property name="handleWidth">
         <number>3</number>
        </property>
-       <widget class="QWidget" name="widget_2" native="true">
+       <widget class="QWidget" name="widget_device" native="true">
         <property name="minimumSize">
          <size>
           <width>100</width>
@@ -247,7 +247,7 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
          <string notr="true">image: url(:/graphics/graphics/NUCLEO_F303RE.png);</string>
         </property>
        </widget>
-       <widget class="QWidget" name="widget_4" native="true">
+       <widget class="QWidget" name="widget_specification" native="true">
         <property name="minimumSize">
          <size>
           <width>200</width>
@@ -261,8 +261,23 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
          </size>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+         <property name="leftMargin">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
          <item>
-          <widget class="QComboBox" name="comboBox"/>
+          <layout class="QVBoxLayout" name="verticalLayout_specification"/>
          </item>
         </layout>
        </widget>

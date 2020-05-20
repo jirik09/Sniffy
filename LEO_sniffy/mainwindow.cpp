@@ -88,21 +88,61 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
+    //********************* Insert buttons and labels into central widget **************************
+    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);  //horizontal , vertical
+    scrollAreaSpecification = new QScrollArea();
+    scrollAreaSpecification->setWidgetResizable(true);
+    scrollAreaSpecification->setSizePolicy(sizePolicy);
+
+    WidgetSpecification = new QWidget();
+    WidgetSpecification->setSizePolicy(sizePolicy);
+    verticalLayoutSpecification = new QVBoxLayout(WidgetSpecification);
+
+    scrollAreaSpecification->setContentsMargins(0,0,0,0);
+    verticalLayoutSpecification->setSpacing(3);
+    verticalLayoutSpecification->setContentsMargins(10,0,10,0);
+
+    scrollAreaSpecification->setWidget(WidgetSpecification);
+    ui->verticalLayout_specification->addWidget(scrollAreaSpecification);
+
+    //add items - only specified widgets like buttons, dials, labels, separators....
+    WidgetSeparator *availableDevices = new WidgetSeparator(WidgetSpecification,"Available devices");
+    verticalLayoutSpecification->addWidget(availableDevices);
+
+    WidgetSelection *deviceSelection  = new WidgetSelection(WidgetSpecification);
+    verticalLayoutSpecification->addWidget(deviceSelection);
+
+    WidgetButtons *deviceConnectButton = new WidgetButtons(WidgetSpecification,1);
+    deviceConnectButton->setText("Connect");
+    verticalLayoutSpecification->addWidget(deviceConnectButton);
+
+    WidgetSeparator *scopeParameters = new WidgetSeparator(WidgetSpecification,"Scope Parameters");
+    verticalLayoutSpecification->addWidget(scopeParameters);
+
+
+
+    verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    verticalLayoutSpecification->addItem(verticalSpacer);
+    //*************************** end adding widgets to specification area *************************
+
+
 
     Comms *communication = new Comms();
     QList<device_descriptor> list = *communication->scanForDevices();
 
     device_descriptor devStr;
+    int i = 0;
     foreach(devStr, list){
-        ui->comboBox->addItem(devStr.deviceName + " (" + devStr.port+ /*":"+QString::number(devStr.speed)+*/ ")");
+        deviceSelection->addOption(devStr.deviceName + " (" + devStr.port+ /*":"+QString::number(devStr.speed)+*/ ")",i);
+        i++;
     }
 
-    if(ui->comboBox->count()==1){
-        device = new Device(this,communication,0);
-    }else{
-        device = new Device(this,communication);
-    }
+    device = new Device(this,communication);
 
+    if(deviceSelection->count()==1){
+        device->open(0);
+        device->loadHWSpecification();
+    }
 }
 
 MainWindow::~MainWindow()

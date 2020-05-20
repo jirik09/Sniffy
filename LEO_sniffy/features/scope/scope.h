@@ -2,6 +2,7 @@
 #define SCOPE_H
 
 #include <QObject>
+#include <QDebug>
 
 #include "scopeconfig.h"
 #include "scopespec.h"
@@ -13,6 +14,9 @@ public:
     explicit Scope(QObject *parent = nullptr);
 
 signals:
+
+public slots:
+    void parseData(QByteArray);
 
 };
 

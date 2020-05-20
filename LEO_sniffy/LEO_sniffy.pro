@@ -31,6 +31,7 @@ SOURCES += \
     communication/comms.cpp \
     communication/serialline.cpp \
     device.cpp \
+    devicespec.cpp \
     features/scope/scope.cpp \
     features/scope/scopeconfig.cpp \
     features/scope/scopespec.cpp \
@@ -51,10 +52,12 @@ HEADERS += \
     GUI/widgetswitch.h \
     GUI/widgettop.h \
     GUI/windowscope.h \
+    communication/commands.h \
     communication/comms.h \
     communication/connectiontype.h \
     communication/serialline.h \
     device.h \
+    devicespec.h \
     features/scope/scope.h \
     features/scope/scopeconfig.h \
     features/scope/scopedefs.h \

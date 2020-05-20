@@ -37,3 +37,7 @@ void WidgetSelection::setSelected(int index){
     ui->comboBox->setCurrentIndex(index);
     selectedIndex = index;
 }
+
+int WidgetSelection::count(){
+    return ui->comboBox->count();
+}

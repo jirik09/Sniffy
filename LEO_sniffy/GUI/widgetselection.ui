@@ -63,7 +63,7 @@ background-color: rgb(48, 48, 48);
    <item>
     <widget class="QComboBox" name="comboBox">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>

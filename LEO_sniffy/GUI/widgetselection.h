@@ -29,6 +29,7 @@ private:
 public:
     void addOption (QString shownValue, float realValue);
     void setSelected(int index);
+    int count();
 };
 
 #endif // WIDGETSELECTION_H

@@ -37,6 +37,10 @@ private:
 
     Device *device;
 
+    QScrollArea *scrollAreaSpecification;
+    QWidget *WidgetSpecification;
+    QVBoxLayout *verticalLayoutSpecification;
+
 private slots:
    void setMenuSize();
    void openScope();
