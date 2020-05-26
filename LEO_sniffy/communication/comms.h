@@ -12,6 +12,7 @@ public:
     explicit Comms(QObject *parent = nullptr);
     QList<device_descriptor> * scanForDevices();
     bool open(int deviceIndex);
+    void close();
 
     void write(const char *data);
     void write(QByteArray data);

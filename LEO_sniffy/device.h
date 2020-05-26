@@ -14,9 +14,13 @@ class Device : public QObject
 public:
     explicit Device(QObject *parent = nullptr, Comms *comm = nullptr);
     void open(int deviceIndex);
+    void close();
     void loadHWSpecification(void);
+    DeviceSpec* getDeviceSpecification();
     void write(const char *data);
 
+    bool getIsConnected() const;
+    bool getIsSpecificationLoaded();
 
 signals:
     void scopeNewData(QByteArray);
@@ -26,6 +30,7 @@ private slots:
     void parseData(QByteArray data);
     void parseSystemData(QByteArray data);
 
+
 private:
 
     Comms *communication;
@@ -33,7 +38,7 @@ private:
     bool isConnected = false;
 
     Commands commands;
-    DeviceSpec specification;
+    DeviceSpec *deviceSpec;
 
 };
 

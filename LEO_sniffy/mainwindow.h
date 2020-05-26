@@ -26,6 +26,17 @@ public:
     ~MainWindow();
 
 private:
+    void findDevices();
+    void connectDevice(int index);
+    void disconnectDevice();
+    void updateSpecGUI();
+
+    Comms *communication;
+    Device *device;
+
+    WidgetSelection *deviceSelection;
+    WidgetButtons *deviceConnectButton;
+
     Ui::MainWindow *ui;
 
     Device *dev;
@@ -35,15 +46,25 @@ private:
 
     WidgetFeature *WidgetFeature_gen = NULL;
 
-    Device *device;
+
 
     QScrollArea *scrollAreaSpecification;
     QWidget *WidgetSpecification;
     QVBoxLayout *verticalLayoutSpecification;
 
+
+    WidgetSeparator *deviceParameters;
+    WidgetLabel *labelMCU;
+    WidgetLabel *labelCoreFreq;
+    WidgetLabel *labelFWVer;
+    WidgetLabel *labelRTOSVer;
+    WidgetLabel *labelHALVer;
+
+
 private slots:
    void setMenuSize();
    void openScope();
+   void deviceConnection(int buttonIndex);
 
 };
 #endif // MAINWINDOW_H

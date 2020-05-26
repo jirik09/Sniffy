@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    communication = new Comms();
+
     //setup left menu with features separators etc
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_features->addWidget(sep);
@@ -109,12 +111,28 @@ MainWindow::MainWindow(QWidget *parent)
     WidgetSeparator *availableDevices = new WidgetSeparator(WidgetSpecification,"Available devices");
     verticalLayoutSpecification->addWidget(availableDevices);
 
-    WidgetSelection *deviceSelection  = new WidgetSelection(WidgetSpecification);
+    deviceSelection  = new WidgetSelection(WidgetSpecification);
     verticalLayoutSpecification->addWidget(deviceSelection);
 
-    WidgetButtons *deviceConnectButton = new WidgetButtons(WidgetSpecification,1);
-    deviceConnectButton->setText("Connect");
+    deviceConnectButton = new WidgetButtons(WidgetSpecification,2);
+    deviceConnectButton->setText("Connect",0);
+    deviceConnectButton->setText("Scan",1);
+    connect(deviceConnectButton,SIGNAL(clicked(int)),this,SLOT(deviceConnection(int)));
     verticalLayoutSpecification->addWidget(deviceConnectButton);
+
+    deviceParameters = new WidgetSeparator(WidgetSpecification,"Device Parameters");
+    verticalLayoutSpecification->addWidget(deviceParameters);
+    labelMCU = new WidgetLabel(WidgetSpecification,"MCU");
+    verticalLayoutSpecification->addWidget(labelMCU);
+    labelCoreFreq = new WidgetLabel(WidgetSpecification,"Core Frequency");
+    verticalLayoutSpecification->addWidget(labelCoreFreq);
+    labelFWVer = new WidgetLabel(WidgetSpecification,"FW");
+    verticalLayoutSpecification->addWidget(labelFWVer);
+    labelRTOSVer = new WidgetLabel(WidgetSpecification,"Free RTOS");
+    verticalLayoutSpecification->addWidget(labelRTOSVer);
+    labelHALVer = new WidgetLabel(WidgetSpecification,"ST HAL");
+    verticalLayoutSpecification->addWidget(labelHALVer);
+
 
     WidgetSeparator *scopeParameters = new WidgetSeparator(WidgetSpecification,"Scope Parameters");
     verticalLayoutSpecification->addWidget(scopeParameters);
@@ -127,22 +145,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    Comms *communication = new Comms();
-    QList<device_descriptor> list = *communication->scanForDevices();
+    findDevices();
 
-    device_descriptor devStr;
-    int i = 0;
-    foreach(devStr, list){
-        deviceSelection->addOption(devStr.deviceName + " (" + devStr.port+ /*":"+QString::number(devStr.speed)+*/ ")",i);
-        i++;
-    }
 
-    device = new Device(this,communication);
 
-    if(deviceSelection->count()==1){
-        device->open(0);
-        device->loadHWSpecification();
-    }
 }
 
 MainWindow::~MainWindow()
@@ -169,4 +175,98 @@ void MainWindow::openScope(){
     }
 
 }
+
+void MainWindow::deviceConnection(int buttonIndex){
+    if(buttonIndex==1){
+        qDebug() << "scan clicked";
+        findDevices();
+    }else if(buttonIndex == 0){
+        QString btnText = deviceConnectButton->getText(buttonIndex);
+        if(btnText.compare("Connect")==0){
+            connectDevice(deviceSelection->getSelected());
+            qDebug() << "connect clicked";
+        }else if (btnText.compare("Disconnect")==0){
+            disconnectDevice();
+            qDebug() << "disconnect clicked";
+        }
+    }
+}
+
+void MainWindow::findDevices(){
+    deviceConnectButton->disableAll();
+    deviceSelection->clear();
+    QList<device_descriptor> list = *communication->scanForDevices();
+    device_descriptor devStr;
+    int i = 0;
+    foreach(devStr, list){
+        deviceSelection->addOption(devStr.deviceName + " (" + devStr.port + ")",i);
+        i++;
+    }
+
+    device = new Device(this,communication);
+
+    if(deviceSelection->count()==0){
+        deviceSelection->addOption("No devices were found",0);
+        deviceConnectButton->setDisabledButton(false,1); //enable scan button
+    }else if(deviceSelection->count()==1){
+        connectDevice(0);
+        deviceConnectButton->setText("Disconnect",0);
+        deviceConnectButton->setDisabledButton(false,0); //enable disconnect button
+    }else{
+        deviceConnectButton->setDisabledButton(false,0); //enable both
+        deviceConnectButton->setDisabledButton(false,1);
+    }
+}
+
+void MainWindow::connectDevice(int index){
+    device->open(index);
+    device->loadHWSpecification();
+    deviceConnectButton->setText("Disconnect",0);
+    deviceConnectButton->setDisabledButton(true,1);//disable scan
+    QThread::msleep(5000);
+    qDebug() << "when it appears";
+ //   updateSpecGUI();
+}
+
+void MainWindow::disconnectDevice(){
+    device->close();
+    deviceConnectButton->setText("Connect",0);
+    deviceConnectButton->setDisabledButton(false,1);//enable scan
+   // updateSpecGUI();
+}
+
+void MainWindow::updateSpecGUI(){
+    if (device->getIsConnected()){
+
+        int i = 0;
+        while (!device->getIsSpecificationLoaded()) {
+            QThread::msleep(10);
+            if(i++==1000){
+                qDebug() << "ERROR : specification was not laoded";
+                return;
+            }
+        }
+        //if(device->getIsSpecificationLoaded())
+        deviceParameters->show();
+        labelMCU->show();
+        labelMCU->setValue(device->getDeviceSpecification()->MCU);
+        labelFWVer->show();
+        labelFWVer->setValue(device->getDeviceSpecification()->FW_Version);
+        labelHALVer->show();
+        labelHALVer->setValue(device->getDeviceSpecification()->HAL_Version);
+        labelRTOSVer->show();
+        labelRTOSVer->setValue(device->getDeviceSpecification()->FREE_RTOS_Version);
+        labelCoreFreq->show();
+        labelCoreFreq->setValue(QString::number(device->getDeviceSpecification()->CoreClock/1000000) + "MHz");
+    }else{
+        deviceParameters->hide();
+        labelMCU->hide();
+        labelFWVer->hide();
+        labelHALVer->hide();
+        labelRTOSVer->hide();
+        labelCoreFreq->hide();
+    }
+}
+
+
 

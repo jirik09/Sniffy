@@ -22,6 +22,18 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
         ui->label->hide();
     }
 
+    pushButtonsList = new QList<QPushButton*>();
+
+    pushButtonsList->append(ui->pushButton_1);
+    pushButtonsList->append(ui->pushButton_2);
+    pushButtonsList->append(ui->pushButton_3);
+    pushButtonsList->append(ui->pushButton_4);
+    pushButtonsList->append(ui->pushButton_5);
+    pushButtonsList->append(ui->pushButton_6);
+    pushButtonsList->append(ui->pushButton_7);
+    pushButtonsList->append(ui->pushButton_8);
+
+
     if(num<=1)
         ui->pushButton_2->hide();
     if(num<=2)
@@ -77,32 +89,12 @@ WidgetButtons::~WidgetButtons()
 }
 
 void WidgetButtons::setText(QString text, int index){
-    switch (index){
-    case 0:
-        ui->pushButton_1->setText(" "+text+" ");
-        break;
-    case 1:
-        ui->pushButton_2->setText(" "+text+" ");
-        break;
-    case 2:
-        ui->pushButton_3->setText(" "+text+" ");
-        break;
-    case 3:
-        ui->pushButton_4->setText(" "+text+" ");
-        break;
-    case 4:
-        ui->pushButton_5->setText(" "+text+" ");
-        break;
-    case 5:
-        ui->pushButton_6->setText(" "+text+" ");
-        break;
-    case 6:
-        ui->pushButton_7->setText(" "+text+" ");
-        break;
-    case 7:
-        ui->pushButton_8->setText(" "+text+" ");
-        break;
-    }
+    pushButtonsList->at(index)->setText(text);
+}
+
+QString WidgetButtons::getText(int index){
+    return pushButtonsList->at(index)->text();
+
 }
 
 void WidgetButtons::setColor(QString text, int index){
@@ -114,126 +106,54 @@ void WidgetButtons::setColor(QString text, int index){
             tempStyleSheet += "QPushButton:disabled{background-color: rgb(48,48,48);color: rgb(128,128,128);} QPushButton:pressed{border: 2px solid rgb(48,48,48)} QPushButton{border: none;"+text +"}";
         }
 
-        switch (index){
-        case 0:
-            ui->pushButton_1->setStyleSheet(tempStyleSheet);
-            break;
-        case 1:
-            ui->pushButton_2->setStyleSheet(tempStyleSheet);
-            break;
-        case 2:
-            ui->pushButton_3->setStyleSheet(tempStyleSheet);
-            break;
-        case 3:
-            ui->pushButton_4->setStyleSheet(tempStyleSheet);
-            break;
-        case 4:
-            ui->pushButton_5->setStyleSheet(tempStyleSheet);
-            break;
-        case 5:
-            ui->pushButton_6->setStyleSheet(tempStyleSheet);
-            break;
-        case 6:
-            ui->pushButton_7->setStyleSheet(tempStyleSheet);
-            break;
-        case 7:
-            ui->pushButton_8->setStyleSheet(tempStyleSheet);
-            break;
-        }
+        pushButtonsList->at(index)->setStyleSheet(tempStyleSheet);
     }
 }
 
-void WidgetButtons::clicked (int index){
+void WidgetButtons::clickedInternal (int index){
     if(type==ButtonTypes::RADIO){
         uncheckAll();
         setChecked(true, index);
     }
-
+    emit clicked(index);
 }
 
 bool WidgetButtons::isChecked (int index){
-    switch (index){
-    case 0:
-        ui->pushButton_1->isChecked();
-        break;
-    case 1:
-        ui->pushButton_2->isChecked();
-        break;
-    case 2:
-        ui->pushButton_3->isChecked();
-        break;
-    case 3:
-        ui->pushButton_4->isChecked();
-        break;
-    case 4:
-        ui->pushButton_5->isChecked();
-        break;
-    case 5:
-        ui->pushButton_6->isChecked();
-        break;
-    case 6:
-        ui->pushButton_7->isChecked();
-        break;
-    case 7:
-        ui->pushButton_8->isChecked();
-        break;
-    }
-    return false;
+    return pushButtonsList->at(index)->isChecked();
 }
 
 void WidgetButtons::setDisabledButton(bool state, int index){
-    switch (index){
-    case 0:
-        ui->pushButton_1->setDisabled(state);
-        break;
-    case 1:
-        ui->pushButton_2->setDisabled(state);
-        break;
-    case 2:
-        ui->pushButton_3->setDisabled(state);
-        break;
-    case 3:
-        ui->pushButton_4->setDisabled(state);
-        break;
-    case 4:
-        ui->pushButton_5->setDisabled(state);
-        break;
-    case 5:
-        ui->pushButton_6->setDisabled(state);
-        break;
-    case 6:
-        ui->pushButton_7->setDisabled(state);
-        break;
-    case 7:
-        ui->pushButton_8->setDisabled(state);
-        break;
+    pushButtonsList->at(index)->setDisabled(state);
+}
+void WidgetButtons::disableAll(){
+    for (int i=0;i<8;i++) {
+        setDisabledButton(true, i);
     }
-
 }
 
 void WidgetButtons::button_1_Clicked(){
-    clicked(0);
+    clickedInternal(0);
 }
 void WidgetButtons::button_2_Clicked(){
-    clicked(1);
+    clickedInternal(1);
 }
 void WidgetButtons::button_3_Clicked(){
-    clicked(2);
+    clickedInternal(2);
 }
 void WidgetButtons::button_4_Clicked(){
-    clicked(3);
+    clickedInternal(3);
 }
 void WidgetButtons::button_5_Clicked(){
-    clicked(4);
+    clickedInternal(4);
 }
 void WidgetButtons::button_6_Clicked(){
-    clicked(5);
+    clickedInternal(5);
 }
 void WidgetButtons::button_7_Clicked(){
-    clicked(6);
+    clickedInternal(6);
 }
 void WidgetButtons::button_8_Clicked(){
-    clicked(7);
+    clickedInternal(7);
 }
 
 void WidgetButtons::uncheckAll(){
@@ -247,32 +167,6 @@ void WidgetButtons::uncheckAll(){
     ui->pushButton_8->setChecked(false);
 }
 
-bool WidgetButtons::setChecked (bool checked, int index){
-    switch (index){
-    case 0:
-        ui->pushButton_1->setChecked(checked);
-        break;
-    case 1:
-        ui->pushButton_2->setChecked(checked);
-        break;
-    case 2:
-        ui->pushButton_3->setChecked(checked);
-        break;
-    case 3:
-        ui->pushButton_4->setChecked(checked);
-        break;
-    case 4:
-        ui->pushButton_5->setChecked(checked);
-        break;
-    case 5:
-        ui->pushButton_6->setChecked(checked);
-        break;
-    case 6:
-        ui->pushButton_7->setChecked(checked);
-        break;
-    case 7:
-        ui->pushButton_8->setChecked(checked);
-        break;
-    }
-    return false;
+void WidgetButtons::setChecked (bool checked, int index){
+    pushButtonsList->at(index)->setChecked(checked);
 }

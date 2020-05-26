@@ -2,6 +2,8 @@
 #define WIDGETBUTTONS_H
 
 #include <QWidget>
+#include <QList>
+#include <QPushButton>
 
 namespace Ui {
 class WidgetButtons;
@@ -31,16 +33,20 @@ public:
     explicit WidgetButtons(QWidget *parent = nullptr, int num = 1, ButtonTypes type = ButtonTypes::NORMAL, QString name = "", int defaultSelectedIndex = 0);
     ~WidgetButtons();
     void setText(QString text, int index = 0);
+    QString getText(int index);
     void setColor(QString text, int index);
-    void clicked (int index);
+    void clickedInternal (int index);
     bool isChecked (int index);
     void setDisabledButton(bool state, int index);
-    bool setChecked (bool checked, int index);
+    void disableAll();
+    void setChecked (bool checked, int index);
 
 private:
     Ui::WidgetButtons *ui;
     QString buttonColors[8] = {BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE};
     ButtonTypes type = ButtonTypes::NORMAL;
+
+    QList<QPushButton*> *pushButtonsList;
 
     void uncheckAll();
 
@@ -53,6 +59,10 @@ private slots:
     void button_6_Clicked();
     void button_7_Clicked();
     void button_8_Clicked();
+
+
+signals:
+    void clicked(int index);
 };
 
 #endif // WIDGETBUTTONS_H

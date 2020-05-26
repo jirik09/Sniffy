@@ -38,6 +38,14 @@ void WidgetSelection::setSelected(int index){
     selectedIndex = index;
 }
 
+int WidgetSelection::getSelected(){
+    return ui->comboBox->currentIndex();
+}
+
 int WidgetSelection::count(){
     return ui->comboBox->count();
+}
+
+void WidgetSelection::clear(){
+    ui->comboBox->clear();
 }

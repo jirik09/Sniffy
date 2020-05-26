@@ -30,6 +30,10 @@ bool Comms::open(int deviceIndex){
     return ret;
 }
 
+void Comms::close(){
+    serial->closeLine();
+}
+
 void Comms::write(const char *data){
     serial->write(data);
 }

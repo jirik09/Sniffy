@@ -28,7 +28,9 @@ private:
 
 public:
     void addOption (QString shownValue, float realValue);
+    void clear();
     void setSelected(int index);
+    int getSelected();
     int count();
 };
 

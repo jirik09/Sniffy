@@ -60,24 +60,33 @@ bool SerialLine::openLine(device_descriptor desc){
 
     bool ret=false;
 
-    serPort = new QSerialPort(desc.port);
+    serPort = new QSerialPort(desc.port,this);
     serPort->setBaudRate(desc.speed);
     serPort->setDataBits(QSerialPort::DataBits::Data8);
     serPort->setParity(QSerialPort::Parity::NoParity);
     serPort->setStopBits(QSerialPort::StopBits::OneStop);
 
+
     if(serPort->open(QIODevice::ReadWrite)){
         ret=true;
         buffer = new QByteArray();
         message = new QByteArray();
-      //  connect(serPort, SIGNAL(errorOccurred()), this, SLOT(handleError()));
-        connect(serPort, SIGNAL(readyRead()), this, SLOT(receiveData()));
+       // connect(serPort, SIGNAL(errorOccurred()), this, SLOT(handleError()));
+       // connect(serPort, SIGNAL(readyRead()), this, SLOT(receiveData()));
+        connect(serPort, &QSerialPort::readyRead, this, &SerialLine::receiveData);
+        connect(serPort, &QSerialPort::errorOccurred, this, &SerialLine::handleError);
+
+
     }
     return ret;
 }
 
-void SerialLine::handleError(void){
+void SerialLine::closeLine(){
+    serPort->close();
+}
 
+void SerialLine::handleError(QSerialPort::SerialPortError error){
+    qDebug()<<"Error occured on serial line" << error;
 
 }
 
@@ -118,6 +127,6 @@ void SerialLine::receiveData(void){
 void SerialLine::write(const char *data){
     qDebug() << "Sent:" << data;
     serPort->write(data);
-    serPort->waitForBytesWritten();
+   // serPort->waitForBytesWritten();
 }
 

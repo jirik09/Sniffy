@@ -23,13 +23,14 @@ public:
     static int getAvailableDevices(QList<device_descriptor> *list, int setFirstIndex);
 
     bool openLine(device_descriptor desc);
+    void closeLine();
     void write(const char *data);
 
 signals:
         void newMessage(QByteArray message);
 
 private slots:
-        void handleError(void);
+        void handleError(QSerialPort::SerialPortError error);
         void receiveData(void);
 
 private:
