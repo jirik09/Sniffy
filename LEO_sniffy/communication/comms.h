@@ -5,31 +5,39 @@
 #include "connectiontype.h"
 #include "serialline.h"
 
-class Comms : public QObject
+class Comms : public QThread
 {
     Q_OBJECT
 public:
     explicit Comms(QObject *parent = nullptr);
-    QList<device_descriptor> * scanForDevices();
-    bool open(int deviceIndex);
+    void run();
     void close();
+    void open(DeviceDescriptor device);
+    bool getIsOpen() const;
+    void scanForDevices();
 
-    void write(const char *data);
-    void write(QByteArray data);
-    void write(QString data);
-    void writeUint32(int data);
-    void writeUint16(int data);
 
 
 signals:
-        void newData(QByteArray message);
+
+
+    void newData(QByteArray message);
+    void devicesScaned(QList<DeviceDescriptor> deviceList);
 
 private slots:
     void parseMessage(QByteArray message);
 
+public slots:
+    void write(QByteArray data);
+    void writeUint32(int data);
+    void writeUint16(int data);
+    void writeString(QString data);
+
 private:
-    QList<device_descriptor> *listDevices;
+
     SerialLine *serial;
+    bool isOpen = false;
+    bool requestToScan = false;
 
 };
 

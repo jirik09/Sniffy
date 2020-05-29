@@ -26,12 +26,11 @@ public:
     ~MainWindow();
 
 private:
-    void findDevices();
     void connectDevice(int index);
     void disconnectDevice();
-    void updateSpecGUI();
 
-    Comms *communication;
+
+  //  Comms *communication;
     Device *device;
 
     WidgetSelection *deviceSelection;
@@ -65,6 +64,8 @@ private slots:
    void setMenuSize();
    void openScope();
    void deviceConnection(int buttonIndex);
+   void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
+   void updateSpecGUI();
 
 };
 #endif // MAINWINDOW_H

@@ -11,14 +11,4 @@ enum class Connection
   USB,
 };
 
-typedef struct
-{
-    QString deviceName;
-    QString port;
-    int speed;
-    Connection connType;
-    int index;
-
-} device_descriptor;
-
 #endif // CONNECTIONTYPE_H

@@ -20,8 +20,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    communication = new Comms();
-
     //setup left menu with features separators etc
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_features->addWidget(sep);
@@ -143,11 +141,16 @@ MainWindow::MainWindow(QWidget *parent)
     verticalLayoutSpecification->addItem(verticalSpacer);
     //*************************** end adding widgets to specification area *************************
 
+    device = new Device(this);
+    device->startCommunication();
+    connect(device,SIGNAL(updateDeviceList(QList<DeviceDescriptor>)),this,SLOT(updateGUIDeviceList(QList<DeviceDescriptor>)));
+    connect(device,SIGNAL(updateSpecfication()),this,SLOT(updateSpecGUI()));
 
+    device->ScanDevices();
+    deviceConnectButton->disableAll();
+    deviceSelection->addOption("Scanning...",0);
 
-    findDevices();
-
-
+  //  deviceConnectButton->setDisabledButton(true,0); //disable connect button
 
 }
 
@@ -179,12 +182,17 @@ void MainWindow::openScope(){
 void MainWindow::deviceConnection(int buttonIndex){
     if(buttonIndex==1){
         qDebug() << "scan clicked";
-        findDevices();
+        device->ScanDevices();
+        deviceConnectButton->disableAll();
+        deviceSelection->addOption("Scanning...",0);
+
     }else if(buttonIndex == 0){
         QString btnText = deviceConnectButton->getText(buttonIndex);
+
         if(btnText.compare("Connect")==0){
             connectDevice(deviceSelection->getSelected());
             qDebug() << "connect clicked";
+
         }else if (btnText.compare("Disconnect")==0){
             disconnectDevice();
             qDebug() << "disconnect clicked";
@@ -192,18 +200,16 @@ void MainWindow::deviceConnection(int buttonIndex){
     }
 }
 
-void MainWindow::findDevices(){
-    deviceConnectButton->disableAll();
-    deviceSelection->clear();
-    QList<device_descriptor> list = *communication->scanForDevices();
-    device_descriptor devStr;
+void MainWindow::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
+    QList<DeviceDescriptor> list = deviceList;
+    DeviceDescriptor devStr;
     int i = 0;
+
+    deviceSelection->clear();
     foreach(devStr, list){
         deviceSelection->addOption(devStr.deviceName + " (" + devStr.port + ")",i);
         i++;
     }
-
-    device = new Device(this,communication);
 
     if(deviceSelection->count()==0){
         deviceSelection->addOption("No devices were found",0);
@@ -216,15 +222,15 @@ void MainWindow::findDevices(){
         deviceConnectButton->setDisabledButton(false,0); //enable both
         deviceConnectButton->setDisabledButton(false,1);
     }
+
 }
+
 
 void MainWindow::connectDevice(int index){
     device->open(index);
     device->loadHWSpecification();
     deviceConnectButton->setText("Disconnect",0);
     deviceConnectButton->setDisabledButton(true,1);//disable scan
-    QThread::msleep(5000);
-    qDebug() << "when it appears";
  //   updateSpecGUI();
 }
 
@@ -232,10 +238,12 @@ void MainWindow::disconnectDevice(){
     device->close();
     deviceConnectButton->setText("Connect",0);
     deviceConnectButton->setDisabledButton(false,1);//enable scan
-   // updateSpecGUI();
+    updateSpecGUI();
 }
 
 void MainWindow::updateSpecGUI(){
+     qDebug() << "update specification got to GUI";
+
     if (device->getIsConnected()){
 
         int i = 0;

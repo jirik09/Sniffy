@@ -12,26 +12,34 @@ class Device : public QObject
 {
     Q_OBJECT
 public:
-    explicit Device(QObject *parent = nullptr, Comms *comm = nullptr);
+    explicit Device(QObject *parent = nullptr);
     void open(int deviceIndex);
     void close();
     void loadHWSpecification(void);
     DeviceSpec* getDeviceSpecification();
-    void write(const char *data);
+    void write(QByteArray data);
 
     bool getIsConnected() const;
     bool getIsSpecificationLoaded();
+    void startCommunication();
+    void ScanDevices();
 
 signals:
     void scopeNewData(QByteArray);
     void systemNewData(QByteArray);
+    void writeData (QByteArray data);
+
+    void updateDeviceList(QList<DeviceDescriptor> deviceList);
+    void updateSpecfication();
 
 private slots:
     void parseData(QByteArray data);
     void parseSystemData(QByteArray data);
+    void newDeviceList(QList<DeviceDescriptor> deviceList);
 
 
 private:
+    QList<DeviceDescriptor> deviceList;
 
     Comms *communication;
     Scope *scope;

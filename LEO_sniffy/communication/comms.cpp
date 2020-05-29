@@ -1,48 +1,60 @@
 #include "comms.h"
 
-Comms::Comms(QObject *parent) : QObject(parent)
+Comms::Comms(QObject *parent)
 {
 
 }
 
-QList<device_descriptor> * Comms::scanForDevices(){
 
-    listDevices = new QList<device_descriptor>;
+void Comms::run(){
+//    qDebug() << "devices scanned in a thread";
 
-    SerialLine::getAvailableDevices(listDevices,0);
+    forever{
+        if(isOpen){
+            serial->receiveData();
 
-    return  listDevices;
-}
+        }else{
+            thread()->msleep(100);
+        }
 
-bool Comms::open(int deviceIndex){
-    bool ret = false;
+        if(requestToScan){
+            QList<DeviceDescriptor> listDevices = *new QList<DeviceDescriptor>;
+            serial = new SerialLine();
+            serial->getAvailableDevices(&listDevices,0);   //scan fo available devices on serial port
+            emit devicesScaned(listDevices);
+            requestToScan = false;
+        }
 
-    switch (listDevices->at(deviceIndex).connType) {
-    case Connection::SERIAL:
-         serial = new SerialLine();
-         ret = serial->openLine(listDevices->at(deviceIndex));
-         connect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
-        break;
-    default:
-        break;
     }
-
-    return ret;
+    exec();
 }
+
+void Comms::open(DeviceDescriptor device){
+        switch (device.connType) {
+        case Connection::SERIAL:
+            isOpen = serial->openLine(device);
+            connect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
+            break;
+        default:
+            break;
+    }
+}
+
+void Comms::scanForDevices(){
+    requestToScan = true;
+}
+
 
 void Comms::close(){
+    isOpen = false;
     serial->closeLine();
-}
-
-void Comms::write(const char *data){
-    serial->write(data);
 }
 
 void Comms::write(QByteArray data){
     serial->write(data);
 }
 
-void Comms::write(QString data){
+void Comms::writeString(QString data){
     QByteArray tmp = data.toUtf8();
     serial->write(tmp);
 }
@@ -67,6 +79,12 @@ void Comms::writeUint16(int data){
 void Comms::parseMessage(QByteArray message){
     //CRC can be checked here but it is not implemented
     //just pass the data
+    qDebug() << "parse massage in coms.cpp";
     emit newData(message);
+}
+
+bool Comms::getIsOpen() const
+{
+    return isOpen;
 }
 

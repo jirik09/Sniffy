@@ -5,18 +5,23 @@ SerialLine::SerialLine(QObject *parent) : QObject(parent)
 
 }
 
-int SerialLine::getAvailableDevices(QList<device_descriptor> *list, int setFirstIndex){
+int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstIndex){
+
 
     QSerialPortInfo *portInfo = new QSerialPortInfo();
     QSerialPort *sPort;
 
     QList<QSerialPortInfo> ports;
+
+  //  connect(serPort, SIGNAL(readyRead()), this, SLOT(receiveData()));
+  //  connect(serPort, &QSerialPort::errorOccurred, this, &SerialLine::handleError);
+
     ports = portInfo->availablePorts();
 
     QSerialPortInfo tmpPort;
     int numberOfDevices = 0;
     QByteArray received;
-    device_descriptor desc;
+    DeviceDescriptor desc;
 
     foreach (tmpPort, ports){
 
@@ -34,7 +39,7 @@ int SerialLine::getAvailableDevices(QList<device_descriptor> *list, int setFirst
             sPort->write("IDN?;");
             sPort->waitForBytesWritten();
 
-            QThread::msleep(50);
+            QThread::msleep(100);
             sPort->waitForReadyRead(50);
 
             received = sPort->readAll();
@@ -50,33 +55,31 @@ int SerialLine::getAvailableDevices(QList<device_descriptor> *list, int setFirst
             }
             sPort->close();
         }
-
     }
-
     return numberOfDevices;
 }
 
-bool SerialLine::openLine(device_descriptor desc){
+bool SerialLine::openLine(DeviceDescriptor desc){
 
     bool ret=false;
-
-    serPort = new QSerialPort(desc.port,this);
+    serPort = new QSerialPort();
+  //  connect(serPort, &QSerialPort::readyRead, this, &SerialLine::receiveData);
+    serPort->setPortName(desc.port);
     serPort->setBaudRate(desc.speed);
     serPort->setDataBits(QSerialPort::DataBits::Data8);
     serPort->setParity(QSerialPort::Parity::NoParity);
     serPort->setStopBits(QSerialPort::StopBits::OneStop);
-
 
     if(serPort->open(QIODevice::ReadWrite)){
         ret=true;
         buffer = new QByteArray();
         message = new QByteArray();
        // connect(serPort, SIGNAL(errorOccurred()), this, SLOT(handleError()));
-       // connect(serPort, SIGNAL(readyRead()), this, SLOT(receiveData()));
-        connect(serPort, &QSerialPort::readyRead, this, &SerialLine::receiveData);
-        connect(serPort, &QSerialPort::errorOccurred, this, &SerialLine::handleError);
+       // connect(serPort, SIGNAL(readyRead()), this, SLOT(receiveData()),Qt::QueuedConnection);
+       // connect(serPort, &QSerialPort::errorOccurred, this, &SerialLine::handleError);
 
-
+    }else{
+        qDebug () << "Serial port error opening";
     }
     return ret;
 }
@@ -90,43 +93,45 @@ void SerialLine::handleError(QSerialPort::SerialPortError error){
 
 }
 
-void SerialLine::receiveData(void){
+void SerialLine::receiveData(){
 
-    //qDebug() << "Incomming" << serPort->bytesAvailable();
+    serPort->waitForReadyRead(10);
+    //
 
     //append data to buffer
-    if(serPort->bytesAvailable()) {
+    if(serPort->bytesAvailable()>0) {
+        qDebug() << "Incomming" << serPort->bytesAvailable();
         buffer->append(serPort->readAll());
-    }
-
-    //qDebug() << buffer->length() << ":" << *buffer;
-
-    //find delimiter
-    int i = buffer->indexOf(delimiter);
-    while(i>0){
-
-        message = new QByteArray(buffer->left(i));
-
-        //qDebug() << "Received:" << *message;
-        emit newMessage(*message);
-
-        //remove message and delimiter from buffer
-        buffer->remove(0,i+4);
-
-        //example how to read the int from serial line
-        /*  QDataStream ds(message);
-        int j;
-        ds>>j;*/
 
 
-        //try to find new delimiter and message
-        i = buffer->indexOf(delimiter);
-    }
+        //qDebug() << buffer->length() << ":" << *buffer;
+
+        //find delimiter
+        int i = buffer->indexOf(delimiter);
+        while(i>0){
+
+            message = new QByteArray(buffer->left(i));
+
+            qDebug() << "Received:" << *message;
+            emit newMessage(*message);
+
+            //remove message and delimiter from buffer
+            buffer->remove(0,i+4);
+
+            //example how to read the int from serial line
+            /*  QDataStream ds(message);
+            int j;
+            ds>>j;*/
+
+
+            //try to find new delimiter and message
+            i = buffer->indexOf(delimiter);
+        } }
 }
 
 void SerialLine::write(const char *data){
     qDebug() << "Sent:" << data;
     serPort->write(data);
-   // serPort->waitForBytesWritten();
+    serPort->waitForBytesWritten();
 }
 

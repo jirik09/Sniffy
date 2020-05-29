@@ -31,6 +31,7 @@ SOURCES += \
     communication/comms.cpp \
     communication/serialline.cpp \
     device.cpp \
+    devicedescriptor.cpp \
     devicespec.cpp \
     features/scope/scope.cpp \
     features/scope/scopeconfig.cpp \
@@ -57,6 +58,7 @@ HEADERS += \
     communication/connectiontype.h \
     communication/serialline.h \
     device.h \
+    devicedescriptor.h \
     devicespec.h \
     features/scope/scope.h \
     features/scope/scopeconfig.h \

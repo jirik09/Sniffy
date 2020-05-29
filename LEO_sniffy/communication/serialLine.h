@@ -8,6 +8,7 @@
 #include <QThread>
 #include <QBuffer>
 #include "connectiontype.h"
+#include "devicedescriptor.h"
 
 #include <QDebug>
 
@@ -20,18 +21,19 @@ class SerialLine : public QObject
 public:
     explicit SerialLine(QObject *parent = nullptr);
 
-    static int getAvailableDevices(QList<device_descriptor> *list, int setFirstIndex);
+    int getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstIndex);
 
-    bool openLine(device_descriptor desc);
+    bool openLine(DeviceDescriptor desc);
     void closeLine();
     void write(const char *data);
+    void receiveData(void);
 
 signals:
         void newMessage(QByteArray message);
 
 private slots:
         void handleError(QSerialPort::SerialPortError error);
-        void receiveData(void);
+
 
 private:
 
