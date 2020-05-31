@@ -27,6 +27,7 @@ SOURCES += \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
     GUI/widgettop.cpp \
+    GUI/windowcounter.cpp \
     GUI/windowscope.cpp \
     communication/comms.cpp \
     communication/serialline.cpp \
@@ -52,6 +53,7 @@ HEADERS += \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
     GUI/widgettop.h \
+    GUI/windowcounter.h \
     GUI/windowscope.h \
     communication/commands.h \
     communication/comms.h \
@@ -80,6 +82,7 @@ FORMS += \
     GUI/widgetseparator.ui \
     GUI/widgetswitch.ui \
     GUI/widgettop.ui \
+    GUI/windowcounter.ui \
     GUI/windowscope.ui \
     mainwindow.ui \
 

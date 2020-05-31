@@ -11,6 +11,7 @@
 #include "GUI/widgetseparator.h"
 #include "GUI/widgetfooter.h"
 #include "GUI/windowscope.h"
+#include "GUI/windowcounter.h"
 #include "device.h"
 
 QT_BEGIN_NAMESPACE
@@ -43,9 +44,11 @@ private:
     QDockWidget *dockWidget_scope = NULL;
     WindowScope *scp;
 
+    WidgetFeature *WidgetFeature_counter = NULL;
+    QDockWidget *dockWidget_counter = NULL;
+    WindowCounter *cnt;
+
     WidgetFeature *WidgetFeature_gen = NULL;
-
-
 
     QScrollArea *scrollAreaSpecification;
     QWidget *WidgetSpecification;

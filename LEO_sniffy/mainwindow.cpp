@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_features->addWidget(sep);
 
+    /* BUDE HROMADA DUPLICIT - REFACTOR */
+
     WidgetFeature_scope = new WidgetFeature(ui->centralwidget,FeatureIcon::SCOPE,"Oscilloscope");
     ui->verticalLayout_features->addWidget(WidgetFeature_scope);
     WidgetFeature_scope->setStatus(FeatureStatus::STOP);
@@ -32,6 +34,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->verticalLayout_features->addWidget(WidgetFeature_gen);
     WidgetFeature_gen->setStatus(FeatureStatus::STOP);
 
+    WidgetFeature_counter = new WidgetFeature(ui->centralwidget,FeatureIcon::SCOPE,"Counter");
+    ui->verticalLayout_features->addWidget(WidgetFeature_counter);
+    WidgetFeature_counter->setStatus(FeatureStatus::STOP);
 
     QSpacerItem *verticalSpacer;
     verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -57,20 +62,35 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_scope);
     scp = new WindowScope(dockWidget_scope);
 
-    QWidget *title_bar = new QWidget();
-    QHBoxLayout* layout = new QHBoxLayout();
-    title_bar->setLayout(layout);
-
+    dockWidget_counter=new QDockWidget(this);
+    dockWidget_counter->setObjectName("dockWidget_counter");
+    dockWidget_counter->setWindowTitle("Counter");
+    dockWidget_counter->setMinimumSize(QSize(250, 250));
+    dockWidget_counter->setFloating(false);
+    dockWidget_counter->setAllowedAreas(Qt::RightDockWidgetArea);
+    addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_counter);
+    cnt = new WindowCounter(dockWidget_counter);
 
     //customized title bar widget
-    layout->addWidget(new QLabel("scope window"));
-    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    layout->addWidget(new QPushButton("up"));
-    layout->addWidget(new QPushButton("down"));
-    layout->addWidget(new QPushButton("Exit"));
+    QWidget *title_bar = new QWidget();
+
+    QHBoxLayout* layoutScope = new QHBoxLayout();
+    title_bar->setLayout(layoutScope);
+    layoutScope->addWidget(new QLabel("Scope window"));
+    layoutScope->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+    layoutScope->addWidget(new QPushButton("up"));
+    layoutScope->addWidget(new QPushButton("down"));
+    layoutScope->addWidget(new QPushButton("Exit"));
     dockWidget_scope->setTitleBarWidget(title_bar);
 
-
+//    QHBoxLayout* layoutCounter = new QHBoxLayout();
+//    title_bar->setLayout(layoutCounter);
+//    layoutCounter->addWidget(new QLabel("Counter window"));
+//    layoutCounter->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+//    layoutCounter->addWidget(new QPushButton("up"));
+//    layoutCounter->addWidget(new QPushButton("down"));
+//    layoutCounter->addWidget(new QPushButton("Exit"));
+//    dockWidget_counter->setTitleBarWidget(title_bar);
 
 
 
@@ -79,13 +99,17 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout(dockWidget_scope);
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+
     horizontalLayout->addWidget(scp);
     dockWidget_scope->setWidget(scp);
     dockWidget_scope->raise();
 
+    horizontalLayout->addWidget(cnt);
+    dockWidget_counter->setWidget(cnt);
+    dockWidget_counter->raise();
+
 
     connect(WidgetFeature_scope->getPushButton(),SIGNAL(clicked()),this,SLOT(openScope()));
-
 
 
     //********************* Insert buttons and labels into central widget **************************

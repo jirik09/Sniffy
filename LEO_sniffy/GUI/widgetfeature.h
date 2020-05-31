@@ -19,7 +19,8 @@ enum class FeatureIcon
   {
     NONE,
     SCOPE,
-    GENERATOR
+    GENERATOR,
+    COUNTER
   };
 
 class WidgetFeature : public QWidget
