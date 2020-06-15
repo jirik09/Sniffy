@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     WidgetFeature_scope = new WidgetFeature(ui->centralwidget,FeatureIcon::SCOPE,"Oscilloscope");
     ui->verticalLayout_features->addWidget(WidgetFeature_scope);
     WidgetFeature_scope->setStatus(FeatureStatus::STOP);
+    WidgetFeature_scope->hide();
 
     WidgetFeature_gen = new WidgetFeature(ui->centralwidget,FeatureIcon::SCOPE,"Signal generator");
     ui->verticalLayout_features->addWidget(WidgetFeature_gen);
@@ -71,16 +72,37 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_counter);
     cnt = new WindowCounter(dockWidget_counter);
 
-    //customized title bar widget
+/*    //customized title bar widget
     QWidget *title_bar = new QWidget();
+ //   title_bar->setStyleSheet(QString::fromUtf8("margin:0px"));
+
+    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
+    effect->setBlurRadius(50);
+    dockWidget_scope->setGraphicsEffect(effect);
 
     QHBoxLayout* layoutScope = new QHBoxLayout();
+    layoutScope->setContentsMargins(5, 5, 5, 5);
     title_bar->setLayout(layoutScope);
     layoutScope->addWidget(new QLabel("Scope window"));
     layoutScope->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    layoutScope->addWidget(new QPushButton("up"));
-    layoutScope->addWidget(new QPushButton("down"));
-    layoutScope->addWidget(new QPushButton("Exit"));
+
+    QPushButton *up = new QPushButton();
+    up->resize(10,10);
+    up->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/unDock.png);}QPushButton:hover{background-color: rgb(71, 76, 94);}"));
+    layoutScope->addWidget(up);
+    QPushButton *down = new QPushButton();
+    down->resize(10,10);
+    down->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/dock.png);}QPushButton:hover{background-color: rgb(71, 76, 94);}"));
+    layoutScope->addWidget(down);
+    QPushButton *exit = new QPushButton();
+    exit->resize(10,10);
+    exit->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/exit.png);}QPushButton:hover{background-color: rgb(120, 50, 50);}"));
+    layoutScope->addWidget(exit);
+
+    connect(up,SIGNAL(clicked()),this,SLOT(unDockScope()));
+    connect(down,SIGNAL(clicked()),this,SLOT(dockScope()));
+    connect(exit,SIGNAL(clicked()),this,SLOT(stopScope()));
+   // connect(layoutScope.)
     dockWidget_scope->setTitleBarWidget(title_bar);
 
 //    QHBoxLayout* layoutCounter = new QHBoxLayout();
@@ -91,7 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    layoutCounter->addWidget(new QPushButton("down"));
 //    layoutCounter->addWidget(new QPushButton("Exit"));
 //    dockWidget_counter->setTitleBarWidget(title_bar);
-
+*/
 
 
 
@@ -102,7 +124,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     horizontalLayout->addWidget(scp);
     dockWidget_scope->setWidget(scp);
-    dockWidget_scope->raise();
+    dockWidget_scope->hide();
 
     horizontalLayout->addWidget(cnt);
     dockWidget_counter->setWidget(cnt);
@@ -110,6 +132,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(WidgetFeature_scope->getPushButton(),SIGNAL(clicked()),this,SLOT(openScope()));
+
+
 
 
     //********************* Insert buttons and labels into central widget **************************
@@ -165,14 +189,43 @@ MainWindow::MainWindow(QWidget *parent)
     verticalLayoutSpecification->addItem(verticalSpacer);
     //*************************** end adding widgets to specification area *************************
 
+
+ /*  WidgetButtons *buttonsTriggerEdge = new WidgetButtons(ui->scrollArea,2,ButtonTypes::RADIO,"Edge");
+    ui->verticalLayout_4->addWidget(buttonsTriggerEdge);
+    buttonsTriggerEdge->setText("Rise",0);
+    buttonsTriggerEdge->setText("Fall",1);
+
+    WidgetDialRange *dialPretrigger = new WidgetDialRange(ui->scrollArea ,"Pretrigger");
+    dialPretrigger->setRange(0,100,"%",1,1,50);
+    dialPretrigger->hideUnitSelection();
+    ui->verticalLayout_4->addWidget(dialPretrigger);
+
+    QSpacerItem *verticalSpacera;
+    verticalSpacera = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    ui->verticalLayout_4->addItem(verticalSpacera);*/
+
+
+
+
+
+
+
+
     device = new Device(this);
     device->startCommunication();
     connect(device,SIGNAL(updateDeviceList(QList<DeviceDescriptor>)),this,SLOT(updateGUIDeviceList(QList<DeviceDescriptor>)));
     connect(device,SIGNAL(updateSpecfication()),this,SLOT(updateSpecGUI()));
 
-    device->ScanDevices();
+  /*  device->ScanDevices();
     deviceConnectButton->disableAll();
     deviceSelection->addOption("Scanning...",0);
+*/
+
+
+    //pass scope pointer and pointer to module widget into scope window
+    scp->setScope(device->getScope());
+    scp->setModuleWidget(WidgetFeature_scope);
+    connect(dockWidget_scope,SIGNAL(visibilityChanged(bool)),scp,SLOT(visibilityChanged(bool)));
 
   //  deviceConnectButton->setDisabledButton(true,0); //disable connect button
 
@@ -298,6 +351,18 @@ void MainWindow::updateSpecGUI(){
         labelRTOSVer->hide();
         labelCoreFreq->hide();
     }
+}
+
+void MainWindow::unDockScope(){
+    dockWidget_scope->setFloating(true);
+}
+
+void MainWindow::dockScope(){
+    dockWidget_scope->setFloating(false);
+}
+
+void MainWindow::stopScope(){
+    dockWidget_scope->hide();
 }
 
 

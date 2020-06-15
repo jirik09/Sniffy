@@ -4,6 +4,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+QT += charts
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -18,6 +20,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     GUI/customdial.cpp \
     GUI/widgetbuttons.cpp \
+    GUI/widgetchart.cpp \
     GUI/widgetdial.cpp \
     GUI/widgetdialrange.cpp \
     GUI/widgetfeature.cpp \
@@ -26,6 +29,7 @@ SOURCES += \
     GUI/widgetselection.cpp \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
+    GUI/widgettab.cpp \
     GUI/widgettop.cpp \
     GUI/windowcounter.cpp \
     GUI/windowscope.cpp \
@@ -44,6 +48,7 @@ SOURCES += \
 HEADERS += \
     GUI/customdial.h \
     GUI/widgetbuttons.h \
+    GUI/widgetchart.h \
     GUI/widgetdial.h \
     GUI/widgetdialrange.h \
     GUI/widgetfeature.h \
@@ -52,6 +57,7 @@ HEADERS += \
     GUI/widgetselection.h \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
+    GUI/widgettab.h \
     GUI/widgettop.h \
     GUI/windowcounter.h \
     GUI/windowscope.h \
@@ -73,6 +79,7 @@ HEADERS += \
 
 FORMS += \
     GUI/widgetbuttons.ui \
+    GUI/widgetchart.ui \
     GUI/widgetdial.ui \
     GUI/widgetdialrange.ui \
     GUI/widgetfeature.ui \
@@ -81,6 +88,7 @@ FORMS += \
     GUI/widgetselection.ui \
     GUI/widgetseparator.ui \
     GUI/widgetswitch.ui \
+    GUI/widgettab.ui \
     GUI/widgettop.ui \
     GUI/windowcounter.ui \
     GUI/windowscope.ui \

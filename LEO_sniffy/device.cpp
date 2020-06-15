@@ -31,6 +31,9 @@ void Device::open(int deviceIndex){
     connect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
     connect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
     connect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
+
+    connect(scope,SIGNAL(send(QByteArray)),communication,SLOT(write(QByteArray)),Qt::QueuedConnection);
+
     while (communication->getIsOpen()==false) {
         QThread::msleep(500);
         qDebug() << "wait for comm to be opened";
@@ -67,7 +70,7 @@ void Device::loadHWSpecification(void){
 
 void Device::parseData(QByteArray data){
 
-    qDebug() << "deive Parse:" << data;
+    //qDebug() << "device Parse:" << data;
 
     QByteArray dataHeader = data.left(4);
     QByteArray dataToPass = data.right(data.length()-4);
@@ -82,7 +85,7 @@ void Device::parseData(QByteArray data){
 }
 
 void Device::parseSystemData(QByteArray data){
-    qDebug() << "data are in system parser device.cpp" << data;
+ //   qDebug() << "data are in system parser device.cpp" << data;
 
     QByteArray feature = data.left(4);
     data.remove(0,4);
@@ -109,6 +112,10 @@ bool Device::getIsSpecificationLoaded(){
 
 DeviceSpec* Device::getDeviceSpecification(){
     return deviceSpec;
+}
+
+Scope* Device::getScope(){
+    return scope;
 }
 
 

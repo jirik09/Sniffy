@@ -5,6 +5,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QToolButton>
+#include <QtCore/QtMath>
 #include "widgetfeature.h"
 #include "widgettop.h"
 #include "widgetseparator.h"
@@ -14,6 +15,10 @@
 #include "widgetbuttons.h"
 #include "widgetlabel.h"
 #include "widgetselection.h"
+#include "widgetchart.h"
+#include "widgettab.h"
+
+#include "../features/scope/scope.h"
 
 
 namespace Ui {
@@ -28,6 +33,24 @@ public:
     explicit WindowScope(QWidget *parent = nullptr);
     ~WindowScope();
 
+    void setScope(Scope * scp);
+    void setModuleWidget(WidgetFeature *scopeLeftWidget);
+    void windowOpen();
+
+signals:
+
+    void startScope();
+    void stopScope();
+
+
+private slots:
+    void generalSettingsClicked();
+    void generalMeasClicked();
+
+    void enableModuleWidget();
+    void visibilityChanged(bool vis);
+
+    void dataReceived(QVector<QVector<QPointF>> dataSeries);
 
 private:
     Ui::WindowScope *ui;
@@ -35,7 +58,7 @@ private:
     void fillTimeBase();
 
     WindowScope *scopeWindow;
-    WidgetFeature *scopeLeftWidget;
+    WidgetFeature *scopeModuleWidget;
 
     WidgetTop *WidgetTopSelection;
 
@@ -50,10 +73,10 @@ private:
     QScrollArea *scrollAreaMeas;
     QVBoxLayout *verticalLayoutMeas;
 
+    Scope *scope;
 
-private slots:
-    void generalSettingsClicked();
-    void generalMeasClicked();
+    widgetChart *chart;
+
 
 };
 

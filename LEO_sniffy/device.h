@@ -24,6 +24,8 @@ public:
     void startCommunication();
     void ScanDevices();
 
+    Scope* getScope();
+
 signals:
     void scopeNewData(QByteArray);
     void systemNewData(QByteArray);

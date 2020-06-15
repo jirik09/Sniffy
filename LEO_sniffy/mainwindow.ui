@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
+    <width>1156</width>
     <height>700</height>
    </rect>
   </property>
@@ -171,7 +171,7 @@ border: none</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1024</width>
+     <width>1156</width>
      <height>27</height>
     </rect>
    </property>
@@ -260,6 +260,10 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
           <height>16777215</height>
          </size>
         </property>
+        <property name="styleSheet">
+         <string notr="true">
+</string>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
           <number>5</number>
@@ -268,7 +272,7 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
           <number>5</number>
          </property>
          <property name="topMargin">
-          <number>5</number>
+          <number>0</number>
          </property>
          <property name="rightMargin">
           <number>5</number>

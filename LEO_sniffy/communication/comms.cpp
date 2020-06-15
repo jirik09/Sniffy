@@ -79,7 +79,7 @@ void Comms::writeUint16(int data){
 void Comms::parseMessage(QByteArray message){
     //CRC can be checked here but it is not implemented
     //just pass the data
-    qDebug() << "parse massage in coms.cpp";
+    //qDebug() << "parse massage in comms.cpp";
     emit newData(message);
 }
 

@@ -6,12 +6,14 @@
 #include <QLabel>
 #include <QSpacerItem>
 #include <QMessageBox>
+#include <QGraphicsDropShadowEffect>
 
 #include "GUI/widgetfeature.h"
 #include "GUI/widgetseparator.h"
 #include "GUI/widgetfooter.h"
 #include "GUI/windowscope.h"
 #include "GUI/windowcounter.h"
+#include "GUI/widgettab.h"
 #include "device.h"
 
 QT_BEGIN_NAMESPACE
@@ -69,6 +71,9 @@ private slots:
    void deviceConnection(int buttonIndex);
    void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
    void updateSpecGUI();
+   void unDockScope();
+   void dockScope();
+   void stopScope();
 
 };
 #endif // MAINWINDOW_H

@@ -16,13 +16,23 @@ WindowScope::WindowScope(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    widgetTab *tabs = new widgetTab(ui->widget_settings,5);
+    ui->verticalLayout_settings->addWidget(tabs);
+    tabs->setText("Set",0);
+    tabs->setText("Meas",1);
+    tabs->setText("Disp",2);
+    tabs->setText("Math",3);
+    tabs->setText("Adv*",4);
+
 
     //********************* insert top options *********************
-    WidgetTopSelection = new WidgetTop(ui->widget_settings,4);
+    WidgetTopSelection = new WidgetTop(ui->widget_settings,5);
     WidgetTopSelection->setText("Set",0);
     WidgetTopSelection->setText("Meas",1);
     WidgetTopSelection->setText("Disp",2);
-    WidgetTopSelection->setSelected(0);
+    WidgetTopSelection->setText("Math",3);
+    WidgetTopSelection->setText("Adv*",4);
+    WidgetTopSelection->setSelected(4);
 
     ui->verticalLayout_settings->addWidget(WidgetTopSelection);
 
@@ -52,11 +62,11 @@ WindowScope::WindowScope(QWidget *parent) :
     ui->verticalLayout_settings->addWidget(scrollAreaGeneral);
 
     //add items - only specified widgets like buttons, dials, labels, separators....
-    WidgetSeparator *separatorChannelEnable = new WidgetSeparator(WidgetGeneral,"Channel enable");
-    verticalLayoutGeneral->addWidget(separatorChannelEnable);
+    WidgetSeparator *separatorChannelEnable = new WidgetSeparator(tabs,"Channel enable");
+    tabs->getLayout(0)->addWidget(separatorChannelEnable);
 
-    WidgetButtons *buttonsChannelEnable = new WidgetButtons(WidgetGeneral,4,ButtonTypes::CHECKABLE);
-    verticalLayoutGeneral->addWidget(buttonsChannelEnable);
+    WidgetButtons *buttonsChannelEnable = new WidgetButtons(tabs,4,ButtonTypes::CHECKABLE);
+    tabs->getLayout(0)->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
     buttonsChannelEnable->setColor(BACKGROUND_COLOR_ORANGE,0);
     buttonsChannelEnable->setText("CH2",1);
@@ -68,50 +78,50 @@ WindowScope::WindowScope(QWidget *parent) :
 
 
 
-    WidgetSeparator *separatorTrig = new WidgetSeparator(WidgetGeneral,"Trigger");
-    verticalLayoutGeneral->addWidget(separatorTrig);
+    WidgetSeparator *separatorTrig = new WidgetSeparator(tabs,"Trigger");
+    tabs->getLayout(0)->addWidget(separatorTrig);
 
-    WidgetButtons *buttonsTriggerMode = new WidgetButtons(WidgetGeneral,3,ButtonTypes::RADIO,"",2);
-    verticalLayoutGeneral->addWidget(buttonsTriggerMode);
+    WidgetButtons *buttonsTriggerMode = new WidgetButtons(tabs,3,ButtonTypes::RADIO,"",2);
+    tabs->getLayout(0)->addWidget(buttonsTriggerMode);
     buttonsTriggerMode->setText("Stop",0);
     buttonsTriggerMode->setColor(BACKGROUND_COLOR_ORANGE,0);
     buttonsTriggerMode->setText("Normal",1);
     buttonsTriggerMode->setText("Auto",2);
 
-    WidgetButtons *buttonsTriggerChannel = new WidgetButtons(WidgetGeneral,4,ButtonTypes::RADIO,"Channel");
-    verticalLayoutGeneral->addWidget(buttonsTriggerChannel);
+    WidgetButtons *buttonsTriggerChannel = new WidgetButtons(tabs,4,ButtonTypes::RADIO,"Channel");
+    tabs->getLayout(0)->addWidget(buttonsTriggerChannel);
     buttonsTriggerChannel->setText("CH1",0);
     buttonsTriggerChannel->setText("CH2",1);
     buttonsTriggerChannel->setText("CH3",2);
     buttonsTriggerChannel->setText("CH4",3);
 
-    WidgetButtons *buttonsTriggerEdge = new WidgetButtons(WidgetGeneral,2,ButtonTypes::RADIO,"Edge");
-    verticalLayoutGeneral->addWidget(buttonsTriggerEdge);
+    WidgetButtons *buttonsTriggerEdge = new WidgetButtons(tabs,2,ButtonTypes::RADIO,"Edge");
+    tabs->getLayout(0)->addWidget(buttonsTriggerEdge);
     buttonsTriggerEdge->setText("Rise",0);
     buttonsTriggerEdge->setText("Fall",1);
 
-    WidgetDialRange *dialPretrigger = new WidgetDialRange(WidgetGeneral ,"Pretrigger");
+    WidgetDialRange *dialPretrigger = new WidgetDialRange(tabs ,"Pretrigger");
     dialPretrigger->setRange(0,100,"%",1,1,50);
     dialPretrigger->hideUnitSelection();
-    verticalLayoutGeneral->addWidget(dialPretrigger);
+    tabs->getLayout(0)->addWidget(dialPretrigger);
 
-    WidgetDialRange *dialTriggerValue = new WidgetDialRange(WidgetGeneral ,"Level");
+    WidgetDialRange *dialTriggerValue = new WidgetDialRange(tabs ,"Level");
     dialTriggerValue->setRange(0,3.3,"V",10,0.01,1.65);
     dialTriggerValue->hideUnitSelection();
-    verticalLayoutGeneral->addWidget(dialTriggerValue);
+    tabs->getLayout(0)->addWidget(dialTriggerValue);
 
 
 
-    WidgetSeparator *separatorHorizontal = new WidgetSeparator(WidgetGeneral,"Horizontal");
-    verticalLayoutGeneral->addWidget(separatorHorizontal);
+    WidgetSeparator *separatorHorizontal = new WidgetSeparator(tabs,"Horizontal");
+    tabs->getLayout(0)->addWidget(separatorHorizontal);
 
-    dialTimeBase = new WidgetDial(WidgetGeneral ,"Time base");
-    verticalLayoutGeneral->addWidget(dialTimeBase);
+    dialTimeBase = new WidgetDial(tabs ,"Time base");
+    tabs->getLayout(0)->addWidget(dialTimeBase);
     fillTimeBase();
     dialTimeBase->setSelected(6);
 
-    WidgetButtons *buttonsMemorySet = new WidgetButtons(WidgetGeneral,2,ButtonTypes::RADIO,"Memory");
-    verticalLayoutGeneral->addWidget(buttonsMemorySet);
+    WidgetButtons *buttonsMemorySet = new WidgetButtons(tabs,2,ButtonTypes::RADIO,"Memory");
+    tabs->getLayout(0)->addWidget(buttonsMemorySet);
     buttonsMemorySet->setText("Normal",0);
     buttonsMemorySet->setText(" Long ",1);
 
@@ -154,7 +164,7 @@ WindowScope::WindowScope(QWidget *parent) :
     scrollAreaGeneral->show();
 
 
-    //************************* creating widget general settings *******************
+    //************************* creating widget measurement *******************
     //create scroll area - each seting selection has its own scroll area
     scrollAreaMeas = new QScrollArea(ui->widget_settings);
     scrollAreaMeas->setWidgetResizable(true);
@@ -234,11 +244,65 @@ WindowScope::WindowScope(QWidget *parent) :
 
 
 
+    //******************** widget trace ***********************
+    chart = new widgetChart(ui->widget_trace,4);
+    ui->verticalLayout_trace->addWidget(chart);
+
+    QVector<QPointF> points;
+    points.reserve(100);
+    for (int i = 0; i<100;i++){
+        qreal x(0);
+        qreal y(0);
+
+        y = 2*qSin(i/10.0);
+        x = i/10.0;
+        points.append(QPointF(x,y));
+
+    }
+
+    chart->updateTrace(&points,0);
+
+
+
+
 }
 
 WindowScope::~WindowScope()
 {
     delete ui;
+}
+
+void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries){
+    for (int i = 0; i < dataSeries.length(); i++)
+        chart->updateTrace(&dataSeries[i], i);
+
+    scope->restartScope();
+}
+
+void WindowScope::setScope(Scope * scp){
+    scope = scp;
+    connect(scope,SIGNAL(scopeDataReceived(QVector<QVector<QPointF>>)),this,SLOT(dataReceived(QVector<QVector<QPointF>>)));
+    connect(scope,SIGNAL(scopeSpecified()),this,SLOT(enableModuleWidget()));
+}
+
+void WindowScope::setModuleWidget(WidgetFeature *scopeLeftWidget){
+    scopeModuleWidget = scopeLeftWidget;
+}
+
+
+void WindowScope::visibilityChanged(bool vis){
+    if(vis){
+        scopeModuleWidget->setStatus(FeatureStatus::PLAY);
+        scope->startScope();
+    }else{
+        scopeModuleWidget->setStatus(FeatureStatus::STOP);
+        scope->stopScope();
+    }
+
+}
+
+void WindowScope::enableModuleWidget(){
+   scopeModuleWidget->show();
 }
 
 
