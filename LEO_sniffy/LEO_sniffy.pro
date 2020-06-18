@@ -33,6 +33,8 @@ SOURCES += \
     GUI/widgettop.cpp \
     communication/comms.cpp \
     communication/serialline.cpp \
+    communication/serialportreader.cpp \
+    communication/serialportwriter.cpp \
     device.cpp \
     devicedescriptor.cpp \
     devicespec.cpp \
@@ -63,6 +65,8 @@ HEADERS += \
     communication/comms.h \
     communication/connectiontype.h \
     communication/serialline.h \
+    communication/serialportreader.h \
+    communication/serialportwriter.h \
     device.h \
     devicedescriptor.h \
     devicespec.h \

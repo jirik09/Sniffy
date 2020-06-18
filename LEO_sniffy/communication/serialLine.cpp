@@ -77,15 +77,27 @@ bool SerialLine::openLine(DeviceDescriptor desc){
   //  connect(serPort, &QSerialPort::readyRead, this, &SerialLine::receiveData);
     serPort->setPortName(desc.port);
     serPort->setBaudRate(desc.speed);
-    serPort->setDataBits(QSerialPort::DataBits::Data8);
+   /* serPort->setDataBits(QSerialPort::DataBits::Data8);
     serPort->setParity(QSerialPort::Parity::NoParity);
-    serPort->setStopBits(QSerialPort::StopBits::OneStop);
+    serPort->setStopBits(QSerialPort::StopBits::OneStop);*/
+
+   // connect(serPort, &QSerialPort::readyRead, this, &SerialLine::receiveData);
+   // connect(serPort, &QSerialPort::errorOccurred, this, &SerialLine::handleError);
+
+   // connect(serPort, &QSerialPort::bytesWritten,this, &SerialLine::handleBytesWritten);
+
+    buffer = new QByteArray();
+    message = new QByteArray();
 
     if(serPort->open(QIODevice::ReadWrite)){
         ret=true;
-        buffer = new QByteArray();
-        message = new QByteArray();
+
+        serialReader = new SerialPortReader(serPort,this);
+        serialWriter = new SerialPortWriter(serPort,this);
+
+        connect(serialReader,&SerialPortReader::newData, this, &SerialLine::receiveData);
         connect(serPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
+
     }else{
         qDebug () << "Serial port error opening";
     }
@@ -103,34 +115,30 @@ void SerialLine::handleError(QSerialPort::SerialPortError error){
 
 }
 
-void SerialLine::receiveData(){
 
-    serPort->waitForReadyRead(10);
+void SerialLine::receiveData(QByteArray data){
+    buffer->append(data);
 
-    if(serPort->bytesAvailable()>0) {
-        buffer->append(serPort->readAll());
+    //find delimiter
+    int i = buffer->indexOf(delimiter);
+    while(i>0){
+        message = new QByteArray(buffer->left(i));
+      //  qDebug() << "Received:" << *message;
+        emit newMessage(*message);
+        //remove message and delimiter from buffer
+        buffer->remove(0,i+4);
 
-        //find delimiter
-        int i = buffer->indexOf(delimiter);
-        while(i>0){
-            message = new QByteArray(buffer->left(i));
-          //  qDebug() << "Received:" << *message;
-            emit newMessage(*message);
-            //remove message and delimiter from buffer
-            buffer->remove(0,i+4);
-
-            //try to find new delimiter and message
-            i = buffer->indexOf(delimiter);
-        }
+        //try to find new delimiter and message
+        i = buffer->indexOf(delimiter);
     }
 }
+
 
 void SerialLine::write(const char *data){
     QDateTime date = QDateTime::currentDateTime();
    // qDebug() << "Sent" <<  date.time() <<":" << data;
     if(serPort->isOpen()){
-        serPort->write(data);
-        serPort->waitForBytesWritten();
+        serialWriter->write(data);
     }else{
         qDebug() << "ERROR cannot send data: port is closed";
     }

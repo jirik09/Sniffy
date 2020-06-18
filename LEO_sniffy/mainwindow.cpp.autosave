@@ -268,10 +268,8 @@ void MainWindow::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
 
 void MainWindow::connectDevice(int index){
     device->open(index);
-    device->loadHWSpecification();
     deviceConnectButton->setText("Disconnect",0);
     deviceConnectButton->setDisabledButton(true,1);//disable scan
- //   updateSpecGUI();
 }
 
 void MainWindow::disconnectDevice(){

@@ -12,6 +12,9 @@
 #include "connectiontype.h"
 #include "devicedescriptor.h"
 
+#include "serialportreader.h"
+#include "serialportwriter.h"
+
 #include <QDebug>
 
 
@@ -26,27 +29,26 @@ public:
     bool openLine(DeviceDescriptor desc);
     void closeLine();
     void write(const char *data);
-    void receiveData(void);
+
 
 signals:
         void newMessage(QByteArray message);
 
 private slots:
         void handleError(QSerialPort::SerialPortError error);
-
+        void receiveData(QByteArray data);
 
 private:
-
-    //QSerialPortInfo *portInfo;
     QSerialPort *serPort;
     QByteArray *buffer;
-    QDataStream *bufferReadStream;
 
     QByteArray *message;
 
     const char delimiterRaw[4] = { '\xCA', '\xFE', '\xFA', '\xDE'};
     const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
 
+    SerialPortReader *serialReader;
+    SerialPortWriter *serialWriter;
 };
 
 #endif // SERIALLINE_H

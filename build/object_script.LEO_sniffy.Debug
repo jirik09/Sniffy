@@ -13,6 +13,8 @@ debug/widgettab.o
 debug/widgettop.o
 debug/comms.o
 debug/serialline.o
+debug/serialportreader.o
+debug/serialportwriter.o
 debug/device.o
 debug/devicedescriptor.o
 debug/devicespec.o
@@ -39,6 +41,8 @@ debug/moc_widgettab.o
 debug/moc_widgettop.o
 debug/moc_comms.o
 debug/moc_serialline.o
+debug/moc_serialportreader.o
+debug/moc_serialportwriter.o
 debug/moc_device.o
 debug/moc_devicespec.o
 debug/moc_mainwindow.o

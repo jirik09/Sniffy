@@ -35,12 +35,14 @@ void Device::open(int deviceIndex){
 
     connect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
     connect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
-
+    
+    communication->write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
 }
 
 void Device::close(){
 
-    //All the signals conected above has to be disconnected here!!!
+    //All the signals conected above has to be disconnected here!!! 
+    //multiple connections cause multiple calls and multiple data receive
     disconnect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
 
     disconnect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
@@ -50,15 +52,7 @@ void Device::close(){
         communication->close();
         scope->close();
         isConnected = communication->getIsOpen();
-
     }
-}
-
-
-
-void Device::loadHWSpecification(void){
-
-    communication->write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
 }
 
 void Device::parseData(QByteArray data){

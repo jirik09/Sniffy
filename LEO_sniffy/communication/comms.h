@@ -6,18 +6,15 @@
 #include "connectiontype.h"
 #include "serialline.h"
 
-class Comms : public QThread
+class Comms : public QObject
 {
     Q_OBJECT
 public:
     explicit Comms(QObject *parent = nullptr);
-    void run();
     void close();
     void open(DeviceDescriptor device);
     bool getIsOpen() const;
     void scanForDevices();
-
-
 
 signals:
     void newData(QByteArray message);
@@ -32,12 +29,8 @@ public slots:
     void write(QByteArray data);
 
 private:
-
     SerialLine *serial;
     bool isOpen = false;
-    bool requestToScan = false;
-
-
 };
 
 #endif // COMMS_H

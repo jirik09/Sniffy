@@ -13,6 +13,8 @@ release/widgettab.o
 release/widgettop.o
 release/comms.o
 release/serialline.o
+release/serialportreader.o
+release/serialportwriter.o
 release/device.o
 release/devicedescriptor.o
 release/devicespec.o
@@ -39,6 +41,8 @@ release/moc_widgettab.o
 release/moc_widgettop.o
 release/moc_comms.o
 release/moc_serialline.o
+release/moc_serialportreader.o
+release/moc_serialportwriter.o
 release/moc_device.o
 release/moc_devicespec.o
 release/moc_mainwindow.o
