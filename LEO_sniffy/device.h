@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QThread>
 #include "communication/comms.h"
-#include "features/scope/scope.h"
+#include "modules/scope/scope.h"
 #include "communication/commands.h"
 #include "devicespec.h"
 

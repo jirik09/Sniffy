@@ -31,18 +31,18 @@ SOURCES += \
     GUI/widgetswitch.cpp \
     GUI/widgettab.cpp \
     GUI/widgettop.cpp \
-    GUI/windowcounter.cpp \
-    GUI/windowscope.cpp \
     communication/comms.cpp \
     communication/serialline.cpp \
     device.cpp \
     devicedescriptor.cpp \
     devicespec.cpp \
-    features/scope/scope.cpp \
-    features/scope/scopeconfig.cpp \
-    features/scope/scopespec.cpp \
     main.cpp \
     mainwindow.cpp \
+    modules/counter/windowcounter.cpp \
+    modules/scope/scope.cpp \
+    modules/scope/scopeconfig.cpp \
+    modules/scope/scopespec.cpp \
+    modules/scope/windowscope.cpp
 
 
 HEADERS += \
@@ -59,8 +59,6 @@ HEADERS += \
     GUI/widgetswitch.h \
     GUI/widgettab.h \
     GUI/widgettop.h \
-    GUI/windowcounter.h \
-    GUI/windowscope.h \
     communication/commands.h \
     communication/comms.h \
     communication/connectiontype.h \
@@ -68,12 +66,14 @@ HEADERS += \
     device.h \
     devicedescriptor.h \
     devicespec.h \
-    features/scope/scope.h \
-    features/scope/scopeconfig.h \
-    features/scope/scopedefs.h \
-    features/scope/scopespec.h \
     graphics/colors.h \
     mainwindow.h \
+    modules/counter/windowcounter.h \
+    modules/scope/ScopeDefs.h \
+    modules/scope/scope.h \
+    modules/scope/scopeconfig.h \
+    modules/scope/scopespec.h \
+    modules/scope/windowscope.h
 
 
 
@@ -90,9 +90,9 @@ FORMS += \
     GUI/widgetswitch.ui \
     GUI/widgettab.ui \
     GUI/widgettop.ui \
-    GUI/windowcounter.ui \
-    GUI/windowscope.ui \
     mainwindow.ui \
+    modules/counter/windowcounter.ui \
+    modules/scope/windowscope.ui
 
 
 TRANSLATIONS += \

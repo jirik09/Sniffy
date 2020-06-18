@@ -6,19 +6,20 @@
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QtCore/QtMath>
-#include "widgetfeature.h"
-#include "widgettop.h"
-#include "widgetseparator.h"
-#include "widgetdial.h"
-#include "widgetdialrange.h"
-#include "widgetswitch.h"
-#include "widgetbuttons.h"
-#include "widgetlabel.h"
-#include "widgetselection.h"
-#include "widgetchart.h"
-#include "widgettab.h"
 
-#include "../features/scope/scope.h"
+#include "../../GUI/widgetfeature.h"
+#include "../../GUI/widgettop.h"
+#include "../../GUI/widgetseparator.h"
+#include "../../GUI/widgetdial.h"
+#include "../../GUI/widgetdialrange.h"
+#include "../../GUI/widgetswitch.h"
+#include "../../GUI/widgetbuttons.h"
+#include "../../GUI/widgetlabel.h"
+#include "../../GUI/widgetselection.h"
+#include "../../GUI/widgetchart.h"
+#include "../../GUI/widgettab.h"
+
+#include "scope.h"
 
 
 namespace Ui {

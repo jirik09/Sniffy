@@ -11,8 +11,8 @@
 #include "GUI/widgetfeature.h"
 #include "GUI/widgetseparator.h"
 #include "GUI/widgetfooter.h"
-#include "GUI/windowscope.h"
-#include "GUI/windowcounter.h"
+#include "modules/scope/windowscope.h"
+#include "modules/counter/windowcounter.h"
 #include "GUI/widgettab.h"
 #include "device.h"
 

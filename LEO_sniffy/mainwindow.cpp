@@ -119,12 +119,15 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     QVBoxLayout *horizontalLayout;
-    horizontalLayout = new QVBoxLayout(dockWidget_scope);
+    horizontalLayout = new QVBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
 
     horizontalLayout->addWidget(scp);
     dockWidget_scope->setWidget(scp);
     dockWidget_scope->hide();
+
+ //   dockWidget_scope->setLayout(horizontalLayout);
+
 
     horizontalLayout->addWidget(cnt);
     dockWidget_counter->setWidget(cnt);
