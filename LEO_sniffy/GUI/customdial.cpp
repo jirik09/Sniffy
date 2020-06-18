@@ -21,7 +21,7 @@ CustomDial::CustomDial(QWidget* parent,
     QDial::setRange(0,100);
     QDial::setPageStep(5);
     QDial::setSingleStep(2);
-    int size = parent->size().height();
+ //   int size = parent->size().height();
    // QDial::setMinimumSize(size,size);
   //  QDial::setMaximumSize(size,size);
 }
@@ -52,7 +52,7 @@ void CustomDial::paintEvent(QPaintEvent*)
 
   //  static const double degree225 = 1.25 * M_PI;
 
-    static const int margin = 15;
+    static const int margin = 10;
 
     QPainter painter(this);
 

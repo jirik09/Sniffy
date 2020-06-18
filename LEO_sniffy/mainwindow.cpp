@@ -128,7 +128,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     horizontalLayout->addWidget(cnt);
     dockWidget_counter->setWidget(cnt);
-    dockWidget_counter->raise();
+    dockWidget_counter->hide();
 
 
     connect(WidgetFeature_scope->getPushButton(),SIGNAL(clicked()),this,SLOT(openScope()));
@@ -148,7 +148,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     scrollAreaSpecification->setContentsMargins(0,0,0,0);
     verticalLayoutSpecification->setSpacing(3);
-    verticalLayoutSpecification->setContentsMargins(10,0,10,0);
+    verticalLayoutSpecification->setContentsMargins(5,0,5,0);
 
     scrollAreaSpecification->setWidget(WidgetSpecification);
     ui->verticalLayout_specification->addWidget(scrollAreaSpecification);
@@ -353,6 +353,7 @@ void MainWindow::updateSpecGUI(){
     }
 }
 
+/*
 void MainWindow::unDockScope(){
     dockWidget_scope->setFloating(true);
 }
@@ -363,7 +364,7 @@ void MainWindow::dockScope(){
 
 void MainWindow::stopScope(){
     dockWidget_scope->hide();
-}
+}*/
 
 
 

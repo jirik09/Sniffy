@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QList>
 #include <QPushButton>
+#include <QtMath>
 
 namespace Ui {
 class WidgetButtons;
@@ -37,6 +38,7 @@ public:
     void setColor(QString text, int index);
     void clickedInternal (int index);
     bool isChecked (int index);
+    int getStatus();
     void setDisabledButton(bool state, int index);
     void disableAll();
     void setChecked (bool checked, int index);
@@ -63,6 +65,7 @@ private slots:
 
 signals:
     void clicked(int index);
+    void statusChanged(int status);
 };
 
 #endif // WIDGETBUTTONS_H

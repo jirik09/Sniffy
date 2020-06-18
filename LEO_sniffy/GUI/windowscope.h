@@ -44,34 +44,39 @@ signals:
 
 
 private slots:
-    void generalSettingsClicked();
-    void generalMeasClicked();
-
     void enableModuleWidget();
     void visibilityChanged(bool vis);
 
     void dataReceived(QVector<QVector<QPointF>> dataSeries);
+
+    void timeBaseCallback(float value);
+    void channelEnableCallback(int buttonStatus);
+    void triggerValueCallback(float value);
+    void triggerChannelCallback(int index);
+    void triggerModeCallback(int index);
 
 private:
     Ui::WindowScope *ui;
 
     void fillTimeBase();
 
-    WindowScope *scopeWindow;
     WidgetFeature *scopeModuleWidget;
 
-    WidgetTop *WidgetTopSelection;
 
 
-    QWidget *WidgetGeneral;
+
     WidgetDial *dialTimeBase;
-    QScrollArea *scrollAreaGeneral;
-    QVBoxLayout *verticalLayoutGeneral;
+    WidgetButtons *buttonsChannelEnable;
+    WidgetButtons *buttonsTriggerMode;
+    WidgetButtons *buttonsTriggerChannel;
+    WidgetButtons *buttonsTriggerEdge;
+
+    WidgetDialRange *dialPretrigger;
+    WidgetDialRange *dialTriggerValue;
 
 
-    QWidget *WidgetMeas;
-    QScrollArea *scrollAreaMeas;
-    QVBoxLayout *verticalLayoutMeas;
+
+
 
     Scope *scope;
 

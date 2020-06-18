@@ -55,6 +55,7 @@ void WidgetDial::setSelected(int index){
     ui->label_unit->setText(options->at(index).unit);
     ui->label_value->setText(options->at(index).shownValue);
     selectedIndex = index;
+    emit valueChanged(options->at(index).realValue);
 }
 
 void WidgetDial::plusClicked(){

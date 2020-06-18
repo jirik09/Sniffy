@@ -16,56 +16,23 @@ WindowScope::WindowScope(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    widgetTab *tabs = new widgetTab(ui->widget_settings,5);
+    //********************* insert top options *********************
+    widgetTab *tabs = new widgetTab(ui->widget_settings,4);
     ui->verticalLayout_settings->addWidget(tabs);
     tabs->setText("Set",0);
     tabs->setText("Meas",1);
     tabs->setText("Disp",2);
     tabs->setText("Math",3);
-    tabs->setText("Adv*",4);
 
-
-    //********************* insert top options *********************
-    WidgetTopSelection = new WidgetTop(ui->widget_settings,5);
-    WidgetTopSelection->setText("Set",0);
-    WidgetTopSelection->setText("Meas",1);
-    WidgetTopSelection->setText("Disp",2);
-    WidgetTopSelection->setText("Math",3);
-    WidgetTopSelection->setText("Adv*",4);
-    WidgetTopSelection->setSelected(4);
-
-    ui->verticalLayout_settings->addWidget(WidgetTopSelection);
-
-    //link options from topWidget
-    connect(WidgetTopSelection->getPushButton(0),SIGNAL(clicked()),this,SLOT(generalSettingsClicked()));
-    connect(WidgetTopSelection->getPushButton(1),SIGNAL(clicked()),this,SLOT(generalMeasClicked()));
-
-    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);  //horizontal , vertical
 
 
     //************************* creating widget general settings *******************
-
-    //create scroll area - each seting selection has its own scroll area and other stuff
-    scrollAreaGeneral = new QScrollArea(ui->widget_settings);
-    scrollAreaGeneral->setWidgetResizable(true);
-    scrollAreaGeneral->setSizePolicy(sizePolicy);
-
-    WidgetGeneral = new QWidget();
-    WidgetGeneral->setSizePolicy(sizePolicy);
-    verticalLayoutGeneral = new QVBoxLayout(WidgetGeneral);
-
-    scrollAreaGeneral->setContentsMargins(0,0,0,0);
-    verticalLayoutGeneral->setSpacing(3);
-    verticalLayoutGeneral->setContentsMargins(10,0,10,0);
-
-    scrollAreaGeneral->setWidget(WidgetGeneral);
-    ui->verticalLayout_settings->addWidget(scrollAreaGeneral);
 
     //add items - only specified widgets like buttons, dials, labels, separators....
     WidgetSeparator *separatorChannelEnable = new WidgetSeparator(tabs,"Channel enable");
     tabs->getLayout(0)->addWidget(separatorChannelEnable);
 
-    WidgetButtons *buttonsChannelEnable = new WidgetButtons(tabs,4,ButtonTypes::CHECKABLE);
+    buttonsChannelEnable = new WidgetButtons(tabs,4,ButtonTypes::CHECKABLE);
     tabs->getLayout(0)->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
     buttonsChannelEnable->setColor(BACKGROUND_COLOR_ORANGE,0);
@@ -81,31 +48,31 @@ WindowScope::WindowScope(QWidget *parent) :
     WidgetSeparator *separatorTrig = new WidgetSeparator(tabs,"Trigger");
     tabs->getLayout(0)->addWidget(separatorTrig);
 
-    WidgetButtons *buttonsTriggerMode = new WidgetButtons(tabs,3,ButtonTypes::RADIO,"",2);
+    buttonsTriggerMode = new WidgetButtons(tabs,3,ButtonTypes::RADIO,"",2);
     tabs->getLayout(0)->addWidget(buttonsTriggerMode);
     buttonsTriggerMode->setText("Stop",0);
     buttonsTriggerMode->setColor(BACKGROUND_COLOR_ORANGE,0);
     buttonsTriggerMode->setText("Normal",1);
     buttonsTriggerMode->setText("Auto",2);
 
-    WidgetButtons *buttonsTriggerChannel = new WidgetButtons(tabs,4,ButtonTypes::RADIO,"Channel");
+    buttonsTriggerChannel = new WidgetButtons(tabs,4,ButtonTypes::RADIO,"Channel");
     tabs->getLayout(0)->addWidget(buttonsTriggerChannel);
     buttonsTriggerChannel->setText("CH1",0);
     buttonsTriggerChannel->setText("CH2",1);
     buttonsTriggerChannel->setText("CH3",2);
     buttonsTriggerChannel->setText("CH4",3);
 
-    WidgetButtons *buttonsTriggerEdge = new WidgetButtons(tabs,2,ButtonTypes::RADIO,"Edge");
+    buttonsTriggerEdge = new WidgetButtons(tabs,2,ButtonTypes::RADIO,"Edge");
     tabs->getLayout(0)->addWidget(buttonsTriggerEdge);
     buttonsTriggerEdge->setText("Rise",0);
     buttonsTriggerEdge->setText("Fall",1);
 
-    WidgetDialRange *dialPretrigger = new WidgetDialRange(tabs ,"Pretrigger");
+    dialPretrigger = new WidgetDialRange(tabs ,"Pretrigger");
     dialPretrigger->setRange(0,100,"%",1,1,50);
     dialPretrigger->hideUnitSelection();
     tabs->getLayout(0)->addWidget(dialPretrigger);
 
-    WidgetDialRange *dialTriggerValue = new WidgetDialRange(tabs ,"Level");
+    dialTriggerValue = new WidgetDialRange(tabs ,"Level");
     dialTriggerValue->setRange(0,3.3,"V",10,0.01,1.65);
     dialTriggerValue->hideUnitSelection();
     tabs->getLayout(0)->addWidget(dialTriggerValue);
@@ -127,18 +94,18 @@ WindowScope::WindowScope(QWidget *parent) :
 
 
 
-    WidgetSeparator *separatorVertical = new WidgetSeparator(WidgetGeneral,"Vertical");
-    verticalLayoutGeneral->addWidget(separatorVertical);
+    WidgetSeparator *separatorVertical = new WidgetSeparator(tabs,"Vertical");
+    tabs->getLayout(0)->addWidget(separatorVertical);
 
-    WidgetButtons *buttonsChannelVerticalGain = new WidgetButtons(WidgetGeneral,4,ButtonTypes::RADIO);
-    verticalLayoutGeneral->addWidget(buttonsChannelVerticalGain);
+    WidgetButtons *buttonsChannelVerticalGain = new WidgetButtons(tabs,4,ButtonTypes::RADIO);
+    tabs->getLayout(0)->addWidget(buttonsChannelVerticalGain);
     buttonsChannelVerticalGain->setText("CH1",0);
     buttonsChannelVerticalGain->setText("CH2",1);
     buttonsChannelVerticalGain->setText("CH3",2);
     buttonsChannelVerticalGain->setText("CH4",3);
 
-    WidgetDial *dialVerticalGain = new WidgetDial(WidgetGeneral ,"Scale");
-    verticalLayoutGeneral->addWidget(dialVerticalGain);
+    WidgetDial *dialVerticalGain = new WidgetDial(tabs ,"Scale");
+    tabs->getLayout(0)->addWidget(dialVerticalGain);
     dialVerticalGain->addOption("10","mV/div",0.01);
     dialVerticalGain->addOption("20","mV/div",0.02);
     dialVerticalGain->addOption("50","mV/div",0.05);
@@ -149,50 +116,33 @@ WindowScope::WindowScope(QWidget *parent) :
     dialVerticalGain->addOption("2","V/div",2);
     dialVerticalGain->setSelected(6);
 
-    WidgetDialRange *dialVerticalShift = new WidgetDialRange(WidgetGeneral ,"Shift");
+    WidgetDialRange *dialVerticalShift = new WidgetDialRange(tabs ,"Shift");
     dialVerticalShift->setRange(-3.3,6.6,"V",10,0.01,0);
     //dialVerticalShift->hideUnitSelection();
-    verticalLayoutGeneral->addWidget(dialVerticalShift);
+    tabs->getLayout(0)->addWidget(dialVerticalShift);
 
 
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
     QSpacerItem *verticalSpacer;
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    verticalLayoutGeneral->addItem(verticalSpacer);
+    tabs->getLayout(0)->addItem(verticalSpacer);
 
-    scrollAreaGeneral->show();
 
 
     //************************* creating widget measurement *******************
-    //create scroll area - each seting selection has its own scroll area
-    scrollAreaMeas = new QScrollArea(ui->widget_settings);
-    scrollAreaMeas->setWidgetResizable(true);
-    scrollAreaMeas->setSizePolicy(sizePolicy);
-
-    WidgetMeas = new QWidget();
-    WidgetMeas->setSizePolicy(sizePolicy);
-    verticalLayoutMeas = new QVBoxLayout(WidgetMeas);
-
-    scrollAreaMeas->setContentsMargins(0,0,0,0);
-    verticalLayoutMeas->setSpacing(3);
-    verticalLayoutMeas->setContentsMargins(10,0,10,0);
-
-    scrollAreaMeas->setWidget(WidgetMeas);
-    ui->verticalLayout_settings->addWidget(scrollAreaMeas);
-
     //add items
 
-    WidgetSeparator *sepa = new WidgetSeparator(WidgetMeas,"Measurement");
-    verticalLayoutMeas->addWidget(sepa);
+    WidgetSeparator *sepa = new WidgetSeparator(tabs,"Measurement");
+    tabs->getLayout(1)->addWidget(sepa);
 
 
 
-    WidgetSeparator *separator = new WidgetSeparator(WidgetMeas,"Separator - just some stuff to test");
-    verticalLayoutMeas->addWidget(separator);
+    WidgetSeparator *separator = new WidgetSeparator(tabs,"Separator - just some stuff to test");
+    tabs->getLayout(1)->addWidget(separator);
 
-    WidgetButtons *butrad = new WidgetButtons(WidgetMeas,4,ButtonTypes::RADIO,"Selection");
-    verticalLayoutMeas->addWidget(butrad);
+    WidgetButtons *butrad = new WidgetButtons(tabs,4,ButtonTypes::RADIO,"Selection");
+    tabs->getLayout(1)->addWidget(butrad);
     butrad->setText("CH1",0);
     butrad->setColor(BACKGROUND_COLOR_ORANGE,0);
     butrad->setText("CH2",1);
@@ -204,40 +154,37 @@ WindowScope::WindowScope(QWidget *parent) :
 
 
 
-    WidgetDialRange *valb = new WidgetDialRange(WidgetMeas ,"Freq");
+    WidgetDialRange *valb = new WidgetDialRange(tabs ,"Freq");
     valb->setRange(1000,10000000,"Hz",1,1000,10000,true);
-    verticalLayoutMeas->addWidget(valb);
+    tabs->getLayout(1)->addWidget(valb);
 
 
 
-    WidgetDialRange *vala = new WidgetDialRange(WidgetMeas ,"Voltage");
+    WidgetDialRange *vala = new WidgetDialRange(tabs ,"Voltage");
     vala->setRange(-3.3,3.3,"V",10,0.01);
-    verticalLayoutMeas->addWidget(vala);
+    tabs->getLayout(1)->addWidget(vala);
 
 
-    WidgetSwitch *wsw = new WidgetSwitch(WidgetMeas,"prvni");
-    verticalLayoutMeas->addWidget(wsw);
+    WidgetSwitch *wsw = new WidgetSwitch(tabs,"prvni");
+    tabs->getLayout(1)->addWidget(wsw);
 
-    WidgetLabel *wlb = new WidgetLabel(WidgetMeas, "Channel y enable");
-    verticalLayoutMeas->addWidget(wlb);
+    WidgetLabel *wlb = new WidgetLabel(tabs, "Channel y enable");
+    tabs->getLayout(1)->addWidget(wlb);
 
 
 
-    WidgetSelection *wsel = new WidgetSelection(WidgetMeas,"Gain");
+    WidgetSelection *wsel = new WidgetSelection(tabs,"Gain");
     wsel->addOption("1x",1);
     wsel->addOption("2x",2);
     wsel->addOption("4x",4);
-    verticalLayoutMeas->addWidget(wsel);
+    tabs->getLayout(1)->addWidget(wsel);
 
-    WidgetButtons *but2 = new WidgetButtons(WidgetMeas,1,ButtonTypes::NORMAL,"Peak to peak");
-    verticalLayoutMeas->addWidget(but2);
+    WidgetButtons *but2 = new WidgetButtons(tabs,1,ButtonTypes::NORMAL,"Peak to peak");
+    tabs->getLayout(1)->addWidget(but2);
     but2->setText("  Add  ",0);
 
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    verticalLayoutMeas->addItem(verticalSpacer);
-
-    scrollAreaMeas->hide();
-
+    tabs->getLayout(1)->addItem(verticalSpacer);
 
 
     //*********************** end of widgets **************
@@ -248,22 +195,6 @@ WindowScope::WindowScope(QWidget *parent) :
     chart = new widgetChart(ui->widget_trace,4);
     ui->verticalLayout_trace->addWidget(chart);
 
-    QVector<QPointF> points;
-    points.reserve(100);
-    for (int i = 0; i<100;i++){
-        qreal x(0);
-        qreal y(0);
-
-        y = 2*qSin(i/10.0);
-        x = i/10.0;
-        points.append(QPointF(x,y));
-
-    }
-
-    chart->updateTrace(&points,0);
-
-
-
 
 }
 
@@ -273,16 +204,94 @@ WindowScope::~WindowScope()
 }
 
 void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries){
-    for (int i = 0; i < dataSeries.length(); i++)
-        chart->updateTrace(&dataSeries[i], i);
+    chart->clearAll();
+    chart->setXAxisMax(scope->getTimebase()*10);
 
-    scope->restartScope();
+    for (int i = 0; i < dataSeries.length(); i++){
+        if(buttonsChannelEnable->isChecked(i)){
+            chart->updateTrace(&dataSeries[i], i);
+        }
+    }
+
+    if(scope->getTriggerMode()==ScopeTriggerMode::TRIG_SINGLE){
+        buttonsTriggerMode->setText("Single",0);
+    }
 }
 
 void WindowScope::setScope(Scope * scp){
     scope = scp;
     connect(scope,SIGNAL(scopeDataReceived(QVector<QVector<QPointF>>)),this,SLOT(dataReceived(QVector<QVector<QPointF>>)));
     connect(scope,SIGNAL(scopeSpecified()),this,SLOT(enableModuleWidget()));
+    connect(buttonsChannelEnable,SIGNAL(statusChanged(int)),this,SLOT(channelEnableCallback(int)));
+    connect(buttonsTriggerMode,SIGNAL(clicked(int)),this, SLOT(triggerModeCallback(int)));
+    connect(buttonsTriggerEdge,SIGNAL(clicked(int)),scope, SLOT(triggerEdgeCallback(int)));
+    connect(buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
+
+    connect(dialPretrigger,SIGNAL(valueChanged(float)),scope,SLOT(setPretrigger(float)));
+ //   connect(dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
+
+    connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
+
+
+}
+
+void WindowScope::timeBaseCallback(float value){
+    scope->setTimebase(value);
+    chart->setXAxisMax(scope->getTimebase()*10);
+}
+
+void WindowScope::triggerValueCallback(float value){
+    scope->setTriggerLevel(3.3/value*100);
+}
+
+void WindowScope::triggerChannelCallback(int index){
+    scope->triggerChannelCallback(index);
+}
+
+void WindowScope::triggerModeCallback(int index){
+    if(index==0){
+        if(buttonsTriggerMode->getText(0)=="Stop"){
+            scope->stopScope();
+            scope->triggerModeCallback(index);
+            buttonsTriggerMode->setText("Single",0);
+        }
+        if(buttonsTriggerMode->getText(0)=="Single"){
+            scope->startScope();
+            scope->scopeNextData();
+            buttonsTriggerMode->setText("Stop",0);
+        }
+    }else{
+        scope->startScope();
+        buttonsTriggerMode->setText("Stop",0);
+        scope->triggerModeCallback(index);
+    }
+
+}
+
+
+void WindowScope::channelEnableCallback(int buttonStatus){
+    buttonsTriggerChannel->disableAll();
+
+    //if current trigger channel is disabled then select channel one for trigger
+    if(!(buttonsTriggerChannel->getStatus() & buttonStatus)){
+        buttonsTriggerChannel->setChecked(true,0);
+        triggerChannelCallback(0);
+    }
+
+    if(buttonStatus & 0x01){
+        buttonsTriggerChannel->setDisabledButton(false,0);
+    }
+    if(buttonStatus & 0x02){
+        buttonsTriggerChannel->setDisabledButton(false,1);
+    }
+    if(buttonStatus & 0x04){
+        buttonsTriggerChannel->setDisabledButton(false,2);
+    }
+    if(buttonStatus & 0x08){
+        buttonsTriggerChannel->setDisabledButton(false,3);
+    }
+    scope->channelEnableCallback(buttonStatus);
+
 }
 
 void WindowScope::setModuleWidget(WidgetFeature *scopeLeftWidget){
@@ -293,6 +302,7 @@ void WindowScope::setModuleWidget(WidgetFeature *scopeLeftWidget){
 void WindowScope::visibilityChanged(bool vis){
     if(vis){
         scopeModuleWidget->setStatus(FeatureStatus::PLAY);
+        scope->initDefault();
         scope->startScope();
     }else{
         scopeModuleWidget->setStatus(FeatureStatus::STOP);
@@ -302,23 +312,9 @@ void WindowScope::visibilityChanged(bool vis){
 }
 
 void WindowScope::enableModuleWidget(){
-   scopeModuleWidget->show();
+    scopeModuleWidget->show();
 }
 
-
-void WindowScope::generalSettingsClicked(){
-    WidgetTopSelection->setSelected(0);
-    scrollAreaGeneral->show();
-    scrollAreaMeas->hide();
-
-
-}
-void WindowScope::generalMeasClicked(){
-    WidgetTopSelection->setSelected(1);
-    scrollAreaGeneral->hide();
-    scrollAreaMeas->show();
-
-}
 
 void WindowScope::fillTimeBase(){
     dialTimeBase->addOption("1","us",1e-6);

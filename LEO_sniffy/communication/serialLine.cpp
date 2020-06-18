@@ -39,12 +39,23 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
             sPort->write("IDN?;");
             sPort->waitForBytesWritten();
 
-            QThread::msleep(100);
-            sPort->waitForReadyRead(50);
+            QThread::msleep(300);
+            sPort->waitForReadyRead(200);
 
             received = sPort->readAll();
    //         qDebug(" %d bytes received",received.length());
             if (received.length()>1){
+               /* sPort->write("RES;");
+                sPort->waitForBytesWritten();
+
+                thread()->msleep(200);
+                sPort->write("IDN?;");
+                sPort->waitForBytesWritten();
+
+                thread()->msleep(200);
+                sPort->waitForReadyRead(50);*/
+                received = sPort->readAll();
+
                 desc.port = sPort->portName();
                 desc.speed = sPort->baudRate();
                 desc.connType = Connection::SERIAL;
@@ -100,7 +111,7 @@ void SerialLine::receiveData(){
 
     //append data to buffer
     if(serPort->bytesAvailable()>0) {
-        qDebug() << "Incomming" << serPort->bytesAvailable();
+     //   qDebug() << "Incomming" << serPort->bytesAvailable();
         buffer->append(serPort->readAll());
 
 
@@ -112,7 +123,7 @@ void SerialLine::receiveData(){
 
             message = new QByteArray(buffer->left(i));
 
-            qDebug() << "Received:" << *message;
+          //  qDebug() << "Received:" << *message;
             emit newMessage(*message);
 
             //remove message and delimiter from buffer
@@ -130,8 +141,13 @@ void SerialLine::receiveData(){
 }
 
 void SerialLine::write(const char *data){
-    qDebug() << "Sent:" << data;
-    serPort->write(data);
-    serPort->waitForBytesWritten();
+    // qDebug() << "Sent:" << data;
+    if(serPort->isOpen()){
+        serPort->write(data);
+        serPort->waitForBytesWritten();
+    }else{
+
+        qDebug() << "ERROR cannot send data: port is closed";
+    }
 }
 

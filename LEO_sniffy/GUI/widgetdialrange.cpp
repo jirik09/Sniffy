@@ -46,6 +46,7 @@ void WidgetDialRange::addOption (QString unit,float mult){
 void WidgetDialRange::hideUnitSelection(void){
     ui->comboBox->close();
     ui->widget_4->close();
+    this->setMinimumSize(200,70);
 }
 
 void WidgetDialRange::setSelected(int index){
@@ -221,7 +222,6 @@ void WidgetDialRange::updateControls(int except){
             }
         }
 
-
         ui->label_unit->setText(unitString);
         ui->lineEdit->setText(QString::number(labelValue,'f',2));
     }
@@ -233,6 +233,7 @@ void WidgetDialRange::updateControls(int except){
         dial->setValue(getValueForDial(realValue));
         connect(dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
     }
+    emit valueChanged(realValue);
 }
 
 float WidgetDialRange::getRealValueFromDial(int in){

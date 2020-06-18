@@ -116,14 +116,34 @@ void WidgetButtons::clickedInternal (int index){
         setChecked(true, index);
     }
     emit clicked(index);
+
+    int status = 0;
+
+    for (int i=0;i<8;i++) {
+        if(isChecked(i)){
+            status += qPow(2,i);
+        }
+    }
+    emit statusChanged(status);
 }
 
 bool WidgetButtons::isChecked (int index){
     return pushButtonsList->at(index)->isChecked();
 }
 
-void WidgetButtons::setDisabledButton(bool state, int index){
-    pushButtonsList->at(index)->setDisabled(state);
+int WidgetButtons::getStatus(){
+    int status = 0;
+
+    for (int i=0;i<8;i++) {
+        if(isChecked(i)){
+            status += qPow(2,i);
+        }
+    }
+    return status;
+}
+
+void WidgetButtons::setDisabledButton(bool disabled, int index){
+    pushButtonsList->at(index)->setDisabled(disabled);
 }
 void WidgetButtons::disableAll(){
     for (int i=0;i<8;i++) {
@@ -168,5 +188,8 @@ void WidgetButtons::uncheckAll(){
 }
 
 void WidgetButtons::setChecked (bool checked, int index){
+    if(type==ButtonTypes::RADIO){
+        uncheckAll();
+    }
     pushButtonsList->at(index)->setChecked(checked);
 }

@@ -26,12 +26,20 @@ public:
     void clearAll();
     void updateTrace(QVector<QPointF> *points, int index);
     void repaint();
+    void setXAxisMax(float max);
 
 
 private:
     Ui::widgetChart *ui;
     QList<QXYSeries *> seriesList;
     int maxTraces;
+
+    QChart *chart;
+
+    QValueAxis *axisX;
+    QValueAxis *axisY;
+
+    QColor colors[4];
 };
 
 #endif // WIDGETCHART_H

@@ -68,6 +68,8 @@ private slots:
     void textEditChanged(const QString & text);
     void textEditFinished();
 
+signals:
+    void valueChanged(float val);
 };
 
 #endif // WIDGETDIALRANGE_H

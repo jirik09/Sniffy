@@ -71,9 +71,9 @@ private slots:
    void deviceConnection(int buttonIndex);
    void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
    void updateSpecGUI();
-   void unDockScope();
+  /* void unDockScope();
    void dockScope();
-   void stopScope();
+   void stopScope();*/
 
 };
 #endif // MAINWINDOW_H

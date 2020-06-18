@@ -47,7 +47,7 @@ private:
     Scope *scope;
     bool isConnected = false;
 
-    Commands commands;
+    Commands *commands;
     DeviceSpec *deviceSpec;
 
 };

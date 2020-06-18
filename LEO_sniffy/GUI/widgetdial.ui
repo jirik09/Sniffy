@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>222</width>
-    <height>91</height>
+    <width>219</width>
+    <height>90</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>200</width>
-    <height>80</height>
+    <height>90</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -45,7 +45,7 @@ background-color: rgb(48, 48, 48);
     <number>0</number>
    </property>
    <property name="topMargin">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="rightMargin">
     <number>0</number>
@@ -56,7 +56,7 @@ background-color: rgb(48, 48, 48);
    <item>
     <widget class="QWidget" name="widget" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -66,10 +66,10 @@ background-color: rgb(48, 48, 48);
        <number>4</number>
       </property>
       <property name="leftMargin">
-       <number>0</number>
+       <number>7</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>5</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
@@ -104,7 +104,7 @@ background-color: rgb(48, 48, 48);
          <item>
           <widget class="QWidget" name="widget_5" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -199,14 +199,14 @@ QPushButton{border: none;
          <item>
           <widget class="QWidget" name="widget_6" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="minimumSize">
             <size>
-             <width>0</width>
+             <width>95</width>
              <height>50</height>
             </size>
            </property>
@@ -226,7 +226,7 @@ QPushButton{border: none;
             <item>
              <widget class="QLabel" name="label_name">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -245,7 +245,7 @@ QPushButton{border: none;
             <item>
              <widget class="QWidget" name="widget_7" native="true">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -253,7 +253,7 @@ QPushButton{border: none;
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>20</height>
+                <height>30</height>
                </size>
               </property>
               <property name="styleSheet">
@@ -278,7 +278,7 @@ QPushButton{border: none;
                <item>
                 <widget class="QLabel" name="label_value">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -287,6 +287,12 @@ QPushButton{border: none;
                   <size>
                    <width>0</width>
                    <height>30</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>4000</width>
+                   <height>16777215</height>
                   </size>
                  </property>
                  <property name="font">
@@ -312,7 +318,7 @@ QPushButton{border: none;
                <item>
                 <widget class="QLabel" name="label_unit">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
@@ -376,7 +382,7 @@ QPushButton{border: none;
          <item>
           <widget class="QComboBox" name="comboBox">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -398,15 +404,15 @@ QPushButton{border: none;
    <item>
     <widget class="QWidget" name="widget_dial" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>95</width>
-       <height>95</height>
+       <width>70</width>
+       <height>70</height>
       </size>
      </property>
      <property name="maximumSize">

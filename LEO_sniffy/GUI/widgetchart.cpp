@@ -6,29 +6,36 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     ui(new Ui::widgetChart)
 {
     //QStringList colors;
-    QColor colors[4];
+
+
+
+    this->maxTraces = maxTraces;
+
+    ui->setupUi(this);
+    chart = new QChart();
+    chart->legend()->hide();
+
+    axisX = new QValueAxis;
+    axisY = new QValueAxis;
+
+    chart->addAxis(axisX, Qt::AlignBottom);
+    chart->addAxis(axisY, Qt::AlignLeft);
+
     colors[0] = QColor(255,170,0);
     colors[1] = QColor(24,154,224);
     colors[2] = QColor(54,154,24);
     colors[3] = QColor(204,24,224);
 
-    this->maxTraces = maxTraces;
-
-    ui->setupUi(this);
-    QChart *chart = new QChart();
-    chart->legend()->hide();
-
-    QValueAxis *axisX = new QValueAxis;
-    QValueAxis *axisY = new QValueAxis;
-
-    chart->addAxis(axisX, Qt::AlignBottom);
-    chart->addAxis(axisY, Qt::AlignLeft);
-
+    axisX->setRange(0, 0.1);
+    axisY->setRange(-0.1, 4.0);
 
     for (int i = 0; i < maxTraces; i++) {
-        QSplineSeries *series = 0;
-
+        QSplineSeries *series = 0; //spline
         series = new QSplineSeries;
+
+      /*  QXYSeries *series = 0; //normal
+        series = new QLineSeries;*/
+
         series->setPen(QPen(QBrush(QColor(colors[i%5])), 3.0));
 
         seriesList.append(series);
@@ -37,9 +44,6 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
         series->attachAxis(axisX);
         series->attachAxis(axisY);
     }
-
-    axisX->setRange(0, 0.1);
-    axisY->setRange(0, 4.0);
 
     QChartView *chartView = new QChartView(chart);
     chartView->setMinimumSize(500,250);
@@ -75,7 +79,9 @@ widgetChart::~widgetChart()
 }
 
 void widgetChart::clearAll(){
-    seriesList.clear();
+    for (int i = 0; i < maxTraces; i++) {
+        seriesList[i]->clear();
+    }
 }
 
 void widgetChart::updateTrace(QVector<QPointF> *points, int index){
@@ -85,4 +91,8 @@ void widgetChart::updateTrace(QVector<QPointF> *points, int index){
 
 void widgetChart::repaint(){
 
+}
+
+void widgetChart::setXAxisMax(float max){
+    axisX->setRange(0, max);
 }

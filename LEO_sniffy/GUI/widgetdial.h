@@ -41,6 +41,9 @@ private slots:
     void plusClicked();
     void minusClicked();
     void valChanged(int in);
+
+signals:
+    void valueChanged(float val);
 };
 
 #endif // WIDGETDIAL_H

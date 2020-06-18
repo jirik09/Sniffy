@@ -12,20 +12,6 @@ class ScopeConfig : public QObject
 public:
     explicit ScopeConfig(QObject *parent = nullptr);
 
-    int getSamplingRate() const;
-    void setSamplingRate(int value);
-
-    int getADCresolution() const;
-    void setADCresolution(int value);
-
-    int getDataLength() const;
-    void setDataLength(int value);
-
-
-    float getTimeBase() const;
-    void setTimeBase(float value);
-
-private:
 
     //parameters physicaly for Hardware
     int samplingRate;

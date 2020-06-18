@@ -3,7 +3,7 @@
 Device::Device(QObject *parent) : QObject(parent)
 {
     deviceSpec = new DeviceSpec();
-
+    commands = new Commands();
     scope = new Scope();
 }
 
@@ -36,9 +36,10 @@ void Device::open(int deviceIndex){
 
     while (communication->getIsOpen()==false) {
         QThread::msleep(500);
-        qDebug() << "wait for comm to be opened";
+        qDebug() << "ERROR wait for comm to be opened";
     }
     isConnected = communication->getIsOpen();
+
 }
 
 void Device::close(){
@@ -60,11 +61,8 @@ void Device::write(QByteArray data){
 
 void Device::loadHWSpecification(void){
 
-    //write((commands.RESET_DEVICE+";").toUtf8());
-    //QThread::msleep(100);
-
-    write((commands.SYSTEM+":"+commands.CONFIG_REQUEST+";").toUtf8());
-    write((commands.SCOPE+":"+commands.CONFIG_REQUEST+";").toUtf8());
+    write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
+    write(commands->SCOPE+":"+commands->CONFIG_REQUEST+";");
 
 }
 
@@ -94,9 +92,9 @@ void Device::parseSystemData(QByteArray data){
         deviceSpec->parseSpecification(data);
         emit updateSpecfication();
     }else if(feature=="ACK_"){
-        //do nothing
+      //  qDebug() << "ACK";
     }else{
-        qDebug() << "ERROR: unparsable data for system" << data;
+        qDebug() << "ERROR: unparsable data for system" << feature << " "<< data;
     }
 }
 

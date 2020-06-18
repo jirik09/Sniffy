@@ -33,7 +33,7 @@ QTabWidget::tab-bar {
 QTabBar::tab {
     background:rgb(38, 38, 38);
     border-bottom: 3px solid rgb(128, 128, 128); /* same as the pane color */
-    padding: 5px;
+    padding: 10px;
 }
 
 QTabBar::tab:selected, QTabBar::tab:hover {
@@ -70,7 +70,7 @@ QTabBar::tab:selected {
       <attribute name="title">
        <string>Tab 1</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_1">
+      <layout class="QVBoxLayout" name="verticalLayout_tab1">
        <property name="spacing">
         <number>5</number>
        </property>
@@ -97,10 +97,26 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>269</height>
+            <height>259</height>
            </rect>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_8"/>
+          <layout class="QVBoxLayout" name="verticalLayout_1">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+          </layout>
          </widget>
         </widget>
        </item>
@@ -110,7 +126,7 @@ QTabBar::tab:selected {
       <attribute name="title">
        <string>Tab 2</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <layout class="QVBoxLayout" name="verticalLayout_tab2">
        <property name="spacing">
         <number>5</number>
        </property>
@@ -137,9 +153,26 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>269</height>
+            <height>259</height>
            </rect>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+          </layout>
          </widget>
         </widget>
        </item>
@@ -149,7 +182,7 @@ QTabBar::tab:selected {
       <attribute name="title">
        <string>Page</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_tab3">
        <property name="spacing">
         <number>5</number>
        </property>
@@ -176,9 +209,26 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>269</height>
+            <height>259</height>
            </rect>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+          </layout>
          </widget>
         </widget>
        </item>
@@ -188,7 +238,7 @@ QTabBar::tab:selected {
       <attribute name="title">
        <string>Page</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
+      <layout class="QVBoxLayout" name="verticalLayout_tab4">
        <property name="spacing">
         <number>5</number>
        </property>
@@ -215,9 +265,26 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>269</height>
+            <height>259</height>
            </rect>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+          </layout>
          </widget>
         </widget>
        </item>
@@ -227,7 +294,7 @@ QTabBar::tab:selected {
       <attribute name="title">
        <string>Page</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QVBoxLayout" name="verticalLayout_tab5">
        <property name="spacing">
         <number>5</number>
        </property>
@@ -254,9 +321,26 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>269</height>
+            <height>259</height>
            </rect>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+          </layout>
          </widget>
         </widget>
        </item>
@@ -266,7 +350,7 @@ QTabBar::tab:selected {
       <attribute name="title">
        <string>Page</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <layout class="QVBoxLayout" name="verticalLayout_tab6">
        <property name="spacing">
         <number>5</number>
        </property>
@@ -293,9 +377,26 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>269</height>
+            <height>259</height>
            </rect>
           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>5</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+          </layout>
          </widget>
         </widget>
        </item>

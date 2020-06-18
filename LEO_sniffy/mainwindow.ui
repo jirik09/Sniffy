@@ -219,7 +219,16 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
      <string notr="true">background-color: rgb(58, 58, 58);</string>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
      <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
       <number>0</number>
      </property>
      <property name="bottomMargin">
@@ -261,27 +270,30 @@ QDockWidget::close-button:pressed, QDockWidget::float-button:pressed {
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">
-</string>
+         <string notr="true"/>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
           <number>5</number>
          </property>
          <property name="leftMargin">
-          <number>5</number>
+          <number>0</number>
          </property>
          <property name="topMargin">
           <number>0</number>
          </property>
          <property name="rightMargin">
-          <number>5</number>
+          <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>5</number>
+          <number>0</number>
          </property>
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_specification"/>
+          <layout class="QVBoxLayout" name="verticalLayout_specification">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+          </layout>
          </item>
         </layout>
        </widget>
