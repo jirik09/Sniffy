@@ -1820,6 +1820,7 @@ debug/moc_comms.cpp: ../LEO_sniffy/communication/comms.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qvarlengtharray.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qcontainerfwd.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qobject_impl.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMutex \
 		../LEO_sniffy/communication/connectiontype.h \
 		../LEO_sniffy/communication/serialline.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/QMessageBox \
@@ -1885,6 +1886,8 @@ debug/moc_comms.cpp: ../LEO_sniffy/communication/comms.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
 		../LEO_sniffy/devicedescriptor.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QStringList \
@@ -2010,6 +2013,8 @@ debug/moc_serialline.cpp: ../LEO_sniffy/communication/serialline.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
 		../LEO_sniffy/communication/connectiontype.h \
 		../LEO_sniffy/devicedescriptor.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
@@ -2076,6 +2081,7 @@ debug/moc_device.cpp: ../LEO_sniffy/device.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QThread \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
 		../LEO_sniffy/communication/comms.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMutex \
 		../LEO_sniffy/communication/connectiontype.h \
 		../LEO_sniffy/communication/serialline.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/QMessageBox \
@@ -2139,6 +2145,8 @@ debug/moc_device.cpp: ../LEO_sniffy/device.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialportinfo.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
 		../LEO_sniffy/devicedescriptor.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QStringList \
@@ -2502,6 +2510,7 @@ debug/moc_mainwindow.cpp: ../LEO_sniffy/mainwindow.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QThread \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
 		../LEO_sniffy/communication/comms.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMutex \
 		../LEO_sniffy/communication/connectiontype.h \
 		../LEO_sniffy/communication/serialline.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/QSerialPort \
@@ -2511,6 +2520,8 @@ debug/moc_mainwindow.cpp: ../LEO_sniffy/mainwindow.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialportinfo.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
 		../LEO_sniffy/devicedescriptor.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QStringList \
@@ -2852,6 +2863,27 @@ debug/moc_scope.cpp: ../LEO_sniffy/modules/scope/scope.h \
 		../LEO_sniffy/modules/scope/scopeconfig.h \
 		../LEO_sniffy/modules/scope/scopespec.h \
 		../LEO_sniffy/communication/Commands.h \
+		../LEO_sniffy/communication/comms.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMutex \
+		../LEO_sniffy/communication/connectiontype.h \
+		../LEO_sniffy/communication/serialline.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/QMessageBox \
+		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/qmessagebox.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/qdialog.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/QSerialPort \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialport.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialportglobal.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/QSerialPortInfo \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialportinfo.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QThread \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
+		../LEO_sniffy/devicedescriptor.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QStringList \
 		debug/moc_predefs.h \
 		C:/Qt/5.14.2/mingw73_32/bin/moc.exe
 	C:\Qt\5.14.2\mingw73_32\bin\moc.exe $(DEFINES) --include D:/GitHub/LEO_sniffy/Sniffy/build/debug/moc_predefs.h -IC:/Qt/5.14.2/mingw73_32/mkspecs/win32-g++ -ID:/GitHub/LEO_sniffy/Sniffy/LEO_sniffy -IC:/Qt/5.14.2/mingw73_32/include -IC:/Qt/5.14.2/mingw73_32/include/QtCharts -IC:/Qt/5.14.2/mingw73_32/include/QtWidgets -IC:/Qt/5.14.2/mingw73_32/include/QtGui -IC:/Qt/5.14.2/mingw73_32/include/QtANGLE -IC:/Qt/5.14.2/mingw73_32/include/QtSerialPort -IC:/Qt/5.14.2/mingw73_32/include/QtCore -I. -IC:/Qt/Tools/mingw730_32/lib/gcc/i686-w64-mingw32/7.3.0/include/c++ -IC:/Qt/Tools/mingw730_32/lib/gcc/i686-w64-mingw32/7.3.0/include/c++/i686-w64-mingw32 -IC:/Qt/Tools/mingw730_32/lib/gcc/i686-w64-mingw32/7.3.0/include/c++/backward -IC:/Qt/Tools/mingw730_32/lib/gcc/i686-w64-mingw32/7.3.0/include -IC:/Qt/Tools/mingw730_32/lib/gcc/i686-w64-mingw32/7.3.0/include-fixed -IC:/Qt/Tools/mingw730_32/i686-w64-mingw32/include ..\LEO_sniffy\modules\scope\scope.h -o debug\moc_scope.cpp
@@ -5024,6 +5056,7 @@ debug/comms.o: ../LEO_sniffy/communication/comms.cpp ../LEO_sniffy/communication
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qvarlengtharray.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qcontainerfwd.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qobject_impl.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMutex \
 		../LEO_sniffy/communication/connectiontype.h \
 		../LEO_sniffy/communication/serialline.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/QMessageBox \
@@ -5089,6 +5122,8 @@ debug/comms.o: ../LEO_sniffy/communication/comms.cpp ../LEO_sniffy/communication
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
 		../LEO_sniffy/devicedescriptor.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QStringList \
@@ -5212,6 +5247,8 @@ debug/serialline.o: ../LEO_sniffy/communication/serialline.cpp ../LEO_sniffy/com
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
 		../LEO_sniffy/communication/connectiontype.h \
 		../LEO_sniffy/devicedescriptor.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
@@ -5276,6 +5313,7 @@ debug/device.o: ../LEO_sniffy/device.cpp ../LEO_sniffy/device.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QThread \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
 		../LEO_sniffy/communication/comms.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMutex \
 		../LEO_sniffy/communication/connectiontype.h \
 		../LEO_sniffy/communication/serialline.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/QMessageBox \
@@ -5339,6 +5377,8 @@ debug/device.o: ../LEO_sniffy/device.cpp ../LEO_sniffy/device.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialportinfo.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
 		../LEO_sniffy/devicedescriptor.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QStringList \
@@ -5770,6 +5810,7 @@ debug/main.o: ../LEO_sniffy/main.cpp ../LEO_sniffy/mainwindow.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QThread \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
 		../LEO_sniffy/communication/comms.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMutex \
 		../LEO_sniffy/communication/connectiontype.h \
 		../LEO_sniffy/communication/serialline.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/QSerialPort \
@@ -5779,6 +5820,8 @@ debug/main.o: ../LEO_sniffy/main.cpp ../LEO_sniffy/mainwindow.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialportinfo.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
 		../LEO_sniffy/devicedescriptor.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QStringList \
@@ -5997,6 +6040,7 @@ debug/mainwindow.o: ../LEO_sniffy/mainwindow.cpp ../LEO_sniffy/mainwindow.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QThread \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
 		../LEO_sniffy/communication/comms.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMutex \
 		../LEO_sniffy/communication/connectiontype.h \
 		../LEO_sniffy/communication/serialline.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/QSerialPort \
@@ -6006,6 +6050,8 @@ debug/mainwindow.o: ../LEO_sniffy/mainwindow.cpp ../LEO_sniffy/mainwindow.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialportinfo.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
 		../LEO_sniffy/devicedescriptor.h \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
 		C:/Qt/5.14.2/mingw73_32/include/QtCore/QStringList \
@@ -6375,7 +6421,28 @@ debug/scope.o: ../LEO_sniffy/modules/scope/scope.cpp ../LEO_sniffy/modules/scope
 		../LEO_sniffy/modules/scope/scopedefs.h \
 		../LEO_sniffy/modules/scope/scopeconfig.h \
 		../LEO_sniffy/modules/scope/scopespec.h \
-		../LEO_sniffy/communication/Commands.h
+		../LEO_sniffy/communication/Commands.h \
+		../LEO_sniffy/communication/comms.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMutex \
+		../LEO_sniffy/communication/connectiontype.h \
+		../LEO_sniffy/communication/serialline.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/QMessageBox \
+		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/qmessagebox.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtWidgets/qdialog.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/QSerialPort \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialport.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialportglobal.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/QSerialPortInfo \
+		C:/Qt/5.14.2/mingw73_32/include/QtSerialPort/qserialportinfo.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QThread \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qthread.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QBuffer \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qbuffer.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QDateTime \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/qdatetime.h \
+		../LEO_sniffy/devicedescriptor.h \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QMetaType \
+		C:/Qt/5.14.2/mingw73_32/include/QtCore/QStringList
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o debug\scope.o ..\LEO_sniffy\modules\scope\scope.cpp
 
 debug/scopeconfig.o: ../LEO_sniffy/modules/scope/scopeconfig.cpp ../LEO_sniffy/modules/scope/scopeconfig.h \

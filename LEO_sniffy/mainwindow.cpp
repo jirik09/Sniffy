@@ -105,18 +105,6 @@ MainWindow::MainWindow(QWidget *parent)
    // connect(layoutScope.)
     dockWidget_scope->setTitleBarWidget(title_bar);
 
-//    QHBoxLayout* layoutCounter = new QHBoxLayout();
-//    title_bar->setLayout(layoutCounter);
-//    layoutCounter->addWidget(new QLabel("Counter window"));
-//    layoutCounter->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-//    layoutCounter->addWidget(new QPushButton("up"));
-//    layoutCounter->addWidget(new QPushButton("down"));
-//    layoutCounter->addWidget(new QPushButton("Exit"));
-//    dockWidget_counter->setTitleBarWidget(title_bar);
-
-
-
-
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
@@ -193,30 +181,21 @@ MainWindow::MainWindow(QWidget *parent)
     //*************************** end adding widgets to specification area *************************
 
 
-
-
-
-
-
-
-
     device = new Device(this);
     device->startCommunication();
     connect(device,SIGNAL(updateDeviceList(QList<DeviceDescriptor>)),this,SLOT(updateGUIDeviceList(QList<DeviceDescriptor>)));
     connect(device,SIGNAL(updateSpecfication()),this,SLOT(updateSpecGUI()));
 
+
+    //this code enables automatic scan at startup
   /*  device->ScanDevices();
     deviceConnectButton->disableAll();
     deviceSelection->addOption("Scanning...",0);
 */
 
-
     //pass scope pointer and pointer to module widget into scope window
     device->getScope()->setModuleWindow(scpWindow);
     device->getScope()->setModuleWidget(WidgetModule_scope);
-
-    connect(dockWidget_scope,SIGNAL(visibilityChanged(bool)),scpWindow,SLOT(visibilityChanged(bool)));
-
 }
 
 MainWindow::~MainWindow()
@@ -235,13 +214,11 @@ void MainWindow::setMenuSize(){
 }
 
 void MainWindow::openScope(){
-
     if(dockWidget_scope->isHidden()){
         dockWidget_scope->show();
     }else{
         dockWidget_scope->raise();
     }
-
 }
 
 void MainWindow::deviceConnection(int buttonIndex){
@@ -287,7 +264,6 @@ void MainWindow::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
         deviceConnectButton->setDisabledButton(false,0); //enable both
         deviceConnectButton->setDisabledButton(false,1);
     }
-
 }
 
 
@@ -301,6 +277,7 @@ void MainWindow::connectDevice(int index){
 
 void MainWindow::disconnectDevice(){
     device->close();
+    dockWidget_scope->hide();
     deviceConnectButton->setText("Connect",0);
     deviceConnectButton->setDisabledButton(false,1);//enable scan
     updateSpecGUI();
@@ -313,7 +290,7 @@ void MainWindow::updateSpecGUI(){
 
         int i = 0;
         while (!device->getIsSpecificationLoaded()) {
-            QThread::msleep(10);
+            QThread::msleep(100);
             if(i++==1000){
                 qDebug() << "ERROR : specification was not laoded";
                 return;

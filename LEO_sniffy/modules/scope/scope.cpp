@@ -266,8 +266,8 @@ void Scope::triggerChannelCallback(int index){
 }
 
 void Scope::scopeOpened(){
-    //initDefault();
-   // startScope();
+    initDefault();
+    startScope();
 }
 
 void Scope::scopeClosed(){
@@ -314,10 +314,13 @@ void Scope::setModuleWidget(WidgetModule *scpWidget){
     connect(scpModuleWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetClicked(ModuleStatus)));
 }
 
+void Scope::close(){
+    scpModuleWidget->hide();
+}
+
 void Scope::widgetClicked(ModuleStatus status){
     if(status == ModuleStatus::STOP){
-        initDefault();
-        startScope();
+        scopeOpened();
     }
 }
 

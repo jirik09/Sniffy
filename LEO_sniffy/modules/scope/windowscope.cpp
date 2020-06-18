@@ -290,18 +290,11 @@ void WindowScope::channelEnableCallback(int buttonStatus){
 
 }
 
-closeEvent(QCloseEvent * event){
-
-
-}
-
-
-
 void WindowScope::visibilityChanged(bool vis){
     if(!vis){
-        emit scopeWindowClosed();
-    }
-
+void WindowScope::closeEvent(QCloseEvent * event){
+    emit scopeWindowClosed();
+    event->accept();
 }
 
 

@@ -10,7 +10,6 @@ Device::Device(QObject *parent) : QObject(parent)
 void Device::startCommunication(){
     communication = new Comms(this);
     connect(communication,SIGNAL(devicesScaned(QList<DeviceDescriptor>)),this,SLOT(newDeviceList(QList<DeviceDescriptor>)),Qt::QueuedConnection);
-
     communication->start();
 }
 
@@ -43,9 +42,16 @@ void Device::open(int deviceIndex){
 }
 
 void Device::close(){
-    //TODO disconnect all the signals connected when opened
+
+    //All the signals conected above has to be disconnected here!!!
+    disconnect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
+
+    disconnect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
+    disconnect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
+
     if(isConnected){
         communication->close();
+        scope->close();
         isConnected = communication->getIsOpen();
 
     }

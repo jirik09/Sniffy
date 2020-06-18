@@ -21,8 +21,6 @@
 
 #include "scopedefs.h"
 
-//#include "scope.h"
-
 
 namespace Ui {
 class WindowScope;
@@ -36,15 +34,13 @@ public:
     explicit WindowScope(QWidget *parent = nullptr);
     ~WindowScope();
 
-   // void setScope(Scope * scp);
     void windowOpen();
 
     void dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase);
 
-
+    void closeEvent(QCloseEvent * event);
 
 signals:
-
     void startScope();
     void stopScope();
 
@@ -55,10 +51,6 @@ signals:
 
 
 private slots:
-    void visibilityChanged(bool vis);
-
-
-
     void timeBaseCallback(float value);
     void channelEnableCallback(int buttonStatus);
     void triggerValueCallback(float value);
@@ -79,11 +71,6 @@ private:
     WidgetDialRange *dialPretrigger;
     WidgetDialRange *dialTriggerValue;
 
-
-
-
-
-  //  Scope *scope;
 
     widgetChart *chart;
 

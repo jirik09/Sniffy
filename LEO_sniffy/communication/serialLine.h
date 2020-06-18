@@ -7,12 +7,12 @@
 #include <QtSerialPort/QSerialPortInfo>
 #include <QThread>
 #include <QBuffer>
+#include <QDateTime>
+
 #include "connectiontype.h"
 #include "devicedescriptor.h"
 
 #include <QDebug>
-
-
 
 
 class SerialLine : public QObject

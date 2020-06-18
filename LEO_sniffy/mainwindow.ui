@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1156</width>
-    <height>700</height>
+    <height>481</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -172,7 +172,7 @@ border: none</string>
      <x>0</x>
      <y>0</y>
      <width>1156</width>
-     <height>27</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -180,7 +180,7 @@ border: none</string>
   <widget class="QDockWidget" name="dockWidget_device">
    <property name="styleSheet">
     <string notr="true">QDockWidget {
-    border: 1px solid lightgray;
+    border: 3px solid lightgray;
 
 }
 

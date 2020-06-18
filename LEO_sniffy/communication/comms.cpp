@@ -12,11 +12,9 @@ void Comms::run(){
     forever{
         if(isOpen){
             serial->receiveData();
-
         }else{
             thread()->msleep(100);
         }
-
         if(requestToScan){
             QList<DeviceDescriptor> listDevices = *new QList<DeviceDescriptor>;
             serial = new SerialLine();
@@ -24,7 +22,6 @@ void Comms::run(){
             emit devicesScaned(listDevices);
             requestToScan = false;
         }
-
     }
     exec();
 }
@@ -46,6 +43,7 @@ void Comms::scanForDevices(){
 
 void Comms::close(){
     isOpen = false;
+    disconnect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
     serial->closeLine();
 }
 

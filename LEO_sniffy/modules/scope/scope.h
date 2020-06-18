@@ -23,6 +23,7 @@ public:
 
     void setModuleWindow(WindowScope *scpWin);
     void setModuleWidget(WidgetModule *scpWidget);
+    void close();
     void setComms(Comms *communication);
 
     void initDefault();
