@@ -36,29 +36,30 @@ void Device::open(int deviceIndex){
     connect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
     connect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
 
+    connect(communication,&Comms::communicationError,this,&Device::handleError);
+
+    communication->write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
 }
 
 void Device::close(){
+    if(isConnected){
+        communication->close();
+        scope->close();
+        isConnected = communication->getIsOpen();
+    }
 
     //All the signals conected above has to be disconnected here!!!
+    //multiple connections cause multiple calls and multiple data receive
     disconnect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
 
     disconnect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
     disconnect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
 
-    if(isConnected){
-        communication->close();
-        scope->close();
-        isConnected = communication->getIsOpen();
-
-    }
+    disconnect(communication,&Comms::communicationError,this,&Device::handleError);
 }
 
-
-
-void Device::loadHWSpecification(void){
-
-    communication->write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
+void Device::handleError(){
+    emit fatalError();
 }
 
 void Device::parseData(QByteArray data){
@@ -70,7 +71,9 @@ void Device::parseData(QByteArray data){
 
     if(dataHeader=="OSCP"){
        emit scopeNewData(dataToPass);
-        //What if data belongs to scope??????????? kurva device bud musi vedet co je open nebo module kdyz dostane data tak musi vedet ze neni aktivni.
+        //What if data belongs to voltmeter???????????
+        //Solution1: each module has to know if it is running or not and handle data correctly.
+        //Solution2: opeed modules will be handeled here
     }else if(dataHeader=="SYST"){
        emit systemNewData(dataToPass);
     }else{
@@ -80,7 +83,6 @@ void Device::parseData(QByteArray data){
 
 void Device::parseSystemData(QByteArray data){
  //   qDebug() << "data are in system parser device.cpp" << data;
-
     QByteArray feature = data.left(4);
     data.remove(0,4);
 

@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_features->addWidget(sepa);
+
     //footer widget
     WidgetFooter *footer = new WidgetFooter();
     ui->verticalLayout_features->addWidget(footer);
@@ -52,7 +53,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(footer->getPushButtonSize(),SIGNAL(clicked()),this,SLOT(setMenuSize()));
 
     ui->dockWidget_device->setWindowTitle("Device");
-
 
     dockWidget_scope=new QDockWidget(this);
     dockWidget_scope->setObjectName("dockWidget_scope");
@@ -74,7 +74,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     //******************************* customized title bar widget ***********************
     QWidget *title_bar = new QWidget();
- //   title_bar->setStyleSheet(QString::fromUtf8("margin:0px"));
 
     QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
     effect->setBlurRadius(50);
@@ -101,10 +100,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(up,SIGNAL(clicked()),this,SLOT(unDockScope()));
     connect(down,SIGNAL(clicked()),this,SLOT(dockScope()));
-    connect(exit,SIGNAL(clicked()),this,SLOT(stopScope()));
-   // connect(layoutScope.)
+    connect(exit,SIGNAL(clicked()),this,SLOT(closeScope()));
     dockWidget_scope->setTitleBarWidget(title_bar);
-
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
@@ -114,18 +111,12 @@ MainWindow::MainWindow(QWidget *parent)
     dockWidget_scope->setWidget(scpWindow);
     dockWidget_scope->hide();
 
- //   dockWidget_scope->setLayout(horizontalLayout);
-
-
     horizontalLayout->addWidget(cnt);
     dockWidget_counter->setWidget(cnt);
     dockWidget_counter->hide();
 
 
     connect(WidgetModule_scope,SIGNAL(clicked(ModuleStatus)),this,SLOT(openScope()));
-
-
-
 
     //********************* Insert buttons and labels into central widget **************************
     QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);  //horizontal , vertical
@@ -174,16 +165,14 @@ MainWindow::MainWindow(QWidget *parent)
     WidgetSeparator *scopeParameters = new WidgetSeparator(WidgetSpecification,"Scope Parameters");
     verticalLayoutSpecification->addWidget(scopeParameters);
 
-
-
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     verticalLayoutSpecification->addItem(verticalSpacer);
     //*************************** end adding widgets to specification area *************************
 
-
     device = new Device(this);
     connect(device,SIGNAL(updateDeviceList(QList<DeviceDescriptor>)),this,SLOT(updateGUIDeviceList(QList<DeviceDescriptor>)));
     connect(device,SIGNAL(updateSpecfication()),this,SLOT(updateSpecGUI()));
+    connect(device, &Device::fatalError,this,&MainWindow::errorHandler);
 
 
     //this code enables automatic scan at startup
@@ -265,13 +254,10 @@ void MainWindow::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
     }
 }
 
-
 void MainWindow::connectDevice(int index){
     device->open(index);
-    device->loadHWSpecification();
     deviceConnectButton->setText("Disconnect",0);
     deviceConnectButton->setDisabledButton(true,1);//disable scan
- //   updateSpecGUI();
 }
 
 void MainWindow::disconnectDevice(){
@@ -280,6 +266,11 @@ void MainWindow::disconnectDevice(){
     deviceConnectButton->setText("Connect",0);
     deviceConnectButton->setDisabledButton(false,1);//enable scan
     updateSpecGUI();
+}
+
+void MainWindow::errorHandler(){
+    disconnectDevice();
+    deviceConnectButton->setDisabledButton(true,0);//disable connect
 }
 
 void MainWindow::updateSpecGUI(){
@@ -307,16 +298,19 @@ void MainWindow::updateSpecGUI(){
     }
 }
 
-
 void MainWindow::unDockScope(){
-    dockWidget_scope->setFloating(true);
+    if(dockWidget_scope->isFloating()){
+        dockWidget_scope->showFullScreen();
+    }else{
+        dockWidget_scope->setFloating(true);
+    }
 }
 
 void MainWindow::dockScope(){
     dockWidget_scope->setFloating(false);
 }
 
-void MainWindow::stopScope(){
+void MainWindow::closeScope(){
     dockWidget_scope->hide();
 }
 

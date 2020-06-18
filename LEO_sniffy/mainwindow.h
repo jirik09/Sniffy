@@ -73,7 +73,9 @@ private slots:
    void updateSpecGUI();
    void unDockScope();
    void dockScope();
-   void stopScope();
+   void closeScope();
+
+   void errorHandler();
 
 };
 #endif // MAINWINDOW_H

@@ -1,6 +1,6 @@
 #include "comms.h"
 
-Comms::Comms(QObject *parent)
+Comms::Comms(QObject *parent) : QObject(parent)
 {
 
 }
@@ -10,6 +10,9 @@ void Comms::open(DeviceDescriptor device){
         case Connection::SERIAL:
             isOpen = serial->openLine(device);
             connect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
+            connect(serial,SIGNAL(serialLineError()),this,SLOT(errorReceived()));
+            break;
+        default:
             break;
     }
 }
@@ -24,6 +27,7 @@ void Comms::scanForDevices(){
 void Comms::close(){
     isOpen = false;
     disconnect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
+    disconnect(serial,SIGNAL(serialLineError()),this,SLOT(errorReceived()));
     serial->closeLine();
 }
 
@@ -44,7 +48,9 @@ void Comms::write(QByteArray data){
     serial->write(data);
 }
 
-
+void Comms::errorReceived(){
+    emit communicationError();
+}
 
 void Comms::parseMessage(QByteArray message){
     //CRC can be checked here but it is not implemented

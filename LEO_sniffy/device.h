@@ -15,7 +15,6 @@ public:
     explicit Device(QObject *parent = nullptr);
     void open(int deviceIndex);
     void close();
-    void loadHWSpecification(void);
     DeviceSpec* getDeviceSpecification();
 
     bool getIsConnected() const;
@@ -31,11 +30,13 @@ signals:
 
     void updateDeviceList(QList<DeviceDescriptor> deviceList);
     void updateSpecfication();
+    void fatalError();
 
 private slots:
     void parseData(QByteArray data);
     void parseSystemData(QByteArray data);
     void newDeviceList(QList<DeviceDescriptor> deviceList);
+    void handleError();
 
 
 private:

@@ -195,9 +195,7 @@ WindowScope::WindowScope(QWidget *parent) :
     chart = new widgetChart(ui->widget_trace,4);
     ui->verticalLayout_trace->addWidget(chart);
 
-
     connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
-
 
 }
 
@@ -216,21 +214,6 @@ void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries, float timeB
         }
     }
 }
-
-/*void WindowScope::setScope(Scope * scp){
-    scope = scp;
-    connect(scope,SIGNAL(scopeDataReceived(QVector<QVector<QPointF>>)),this,SLOT(dataReceived(QVector<QVector<QPointF>>)));
-    connect(scope,SIGNAL(scopeSpecified()),this,SLOT(enableModuleWidget()));
-    connect(buttonsChannelEnable,SIGNAL(statusChanged(int)),this,SLOT(channelEnableCallback(int)));
-    connect(buttonsTriggerMode,SIGNAL(clicked(int)),this, SLOT(triggerModeCallback(int)));
-    connect(buttonsTriggerEdge,SIGNAL(clicked(int)),scope, SLOT(triggerEdgeCallback(int)));
-    connect(buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
-
-    connect(dialPretrigger,SIGNAL(valueChanged(float)),scope,SLOT(setPretrigger(float)));
- //   connect(dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
-
-    connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
-}*/
 
 void WindowScope::timeBaseCallback(float value){
     emit timeBaseChanged(value);
@@ -290,9 +273,12 @@ void WindowScope::channelEnableCallback(int buttonStatus){
 
 }
 
-void WindowScope::closeEvent(QCloseEvent * event){
+void WindowScope::hideEvent(QHideEvent * event){
+    //to do this doesnt work. Try to make Windowscope directly the window.
+    qDebug() << event;
     emit scopeWindowClosed();
     event->accept();
+
 }
 
 
@@ -319,7 +305,6 @@ void WindowScope::fillTimeBase(){
     dialTimeBase->addOption("2","s",2);
     dialTimeBase->addOption("5","s",5);
     dialTimeBase->addOption("10","s",10);
-
 }
 
 

@@ -10,10 +10,8 @@ void Scope::parseData(QByteArray data){
  //   qDebug() << "data are in scope parser" << data;
 
     QByteArray dataHeader = data.left(4);
-   // QByteArray dataToPass = data.right(data.length()-4);
 
     if(dataHeader=="CFG_"){
-
         emit scopeSpecificationLoaded();
         scpModuleWidget->show();
         //todo pass specification into scopeSpec.cpp and parse it
@@ -31,12 +29,9 @@ void Scope::parseData(QByteArray data){
         int currentChannel=0;
         int numChannels=1;
 
-        //data = data.right(data.length()-4);
         QDataStream streamBuffLeng(data);
 
         while (numChannels>currentChannel){
-
-
             streamBuffLeng>>samplingFreq; //thow away first 4 bytes because it contains "OSC_"
 
             streamBuffLeng>>samplingFreq;
@@ -52,7 +47,6 @@ void Scope::parseData(QByteArray data){
 
             streamBuffLeng>>tmpByte;
             numChannels = tmpByte;
-
 
             QVector<QPointF> points;
             if(length<500000){
@@ -75,7 +69,6 @@ void Scope::parseData(QByteArray data){
                 }
             }else{
                 qDebug() << "TODO <8bit data parser";
-
             }
 
             while(numChannels<scopeData.length()){ //remove signals which will not be filled
@@ -89,11 +82,8 @@ void Scope::parseData(QByteArray data){
             }
         }
 
-
         if(currentChannel==numChannels){
-            //emit scopeDataReceived(scopeData);
             scpWindow->dataReceived(scopeData,config->timeBase);
-
             if(config->triggerMode!=ScopeTriggerMode::TRIG_SINGLE){
                 scopeNextData();
             }
@@ -101,8 +91,6 @@ void Scope::parseData(QByteArray data){
     }else{
         qDebug() << "ERROR such data cannot be parsed in Scope";
     }
-
-
 }
 
 void Scope::initDefault(){
@@ -115,7 +103,6 @@ void Scope::initDefault(){
     config->timeBase = 0.001;
     config->longMemory = 0;
 
-
     config->enabledChannels[0]=1;
     config->enabledChannels[1]=0;
     config->enabledChannels[2]=0;
@@ -124,7 +111,7 @@ void Scope::initDefault(){
     comm->write(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_1+";");
 
     //setTriggerLevel(50);
-   // setPretrigger(50);
+    //setPretrigger(50);
 
     config->triggerMode = ScopeTriggerMode::TRIG_AUTO;
     comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_AUTO+";");
@@ -137,7 +124,6 @@ void Scope::initDefault(){
 }
 
 void Scope::setTimebase(float div){
-
     config->timeBase = div;
 
     config->samplingRate = float(config->dataLength)/(10.0*div);
@@ -181,7 +167,6 @@ void Scope::setPretrigger(float percentage){
 void Scope::setTriggerLevel(float percentage){
     config->triggerLevelPercent=percentage;
     config->triggerLevel = 65536*percentage/100;
-
     comm->write(cmd->SCOPE, cmd->SCOPE_TRIG_LEVEL, config->triggerLevel);
 }
 
@@ -201,8 +186,6 @@ void Scope::setNumberOfChannels(int num){
         break;
     }
 }
-
-
 
 void Scope::channelEnableCallback(int buttonStatus){
     if(buttonStatus & 0x01){
@@ -268,14 +251,13 @@ void Scope::triggerChannelCallback(int index){
 void Scope::scopeOpened(){
     initDefault();
     startScope();
+    scpModuleWidget->setStatus(ModuleStatus::PLAY);
 }
 
 void Scope::scopeClosed(){
     stopScope();
     scpModuleWidget->setStatus(ModuleStatus::STOP);
-
 }
-
 
 void Scope::stopScope(){
     comm->write(cmd->SCOPE+":"+cmd->STOP+";");
@@ -283,8 +265,6 @@ void Scope::stopScope(){
 void Scope::startScope(){
     comm->write(cmd->SCOPE+":"+cmd->START+";");
 }
-
-
 void Scope::scopeNextData(){
     comm->write(cmd->SCOPE+":"+cmd->NEXT+";");
 }
@@ -323,8 +303,6 @@ void Scope::widgetClicked(ModuleStatus status){
         scopeOpened();
     }
 }
-
-
 
 void Scope::setComms(Comms *communication){
     comm = communication;

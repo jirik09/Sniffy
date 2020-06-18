@@ -33,6 +33,7 @@ public:
 
 signals:
         void newMessage(QByteArray message);
+        void serialLineError();
 
 private slots:
         void handleError(QSerialPort::SerialPortError error);

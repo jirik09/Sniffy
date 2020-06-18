@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QtCore/QtMath>
+#include <QDebug>
 
 #include "../../GUI/widgetmodule.h"
 #include "../../GUI/widgettop.h"
@@ -38,7 +39,7 @@ public:
 
     void dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase);
 
-    void closeEvent(QCloseEvent * event);
+    void hideEvent(QHideEvent * event);
 
 signals:
     void startScope();
@@ -48,7 +49,6 @@ signals:
     void triggerChanged(ScopeTriggerMode);
     void scopeWindowOpened();
     void scopeWindowClosed();
-
 
 private slots:
     void timeBaseCallback(float value);
@@ -71,10 +71,7 @@ private:
     WidgetDialRange *dialPretrigger;
     WidgetDialRange *dialTriggerValue;
 
-
     widgetChart *chart;
-
-
 };
 
 #endif // WINDOWSCOPE_H
