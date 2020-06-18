@@ -17,7 +17,6 @@ public:
     void close();
     void loadHWSpecification(void);
     DeviceSpec* getDeviceSpecification();
-    void write(QByteArray data);
 
     bool getIsConnected() const;
     bool getIsSpecificationLoaded();

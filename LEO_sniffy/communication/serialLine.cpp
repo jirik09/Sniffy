@@ -141,7 +141,7 @@ void SerialLine::receiveData(){
 }
 
 void SerialLine::write(const char *data){
-    // qDebug() << "Sent:" << data;
+    //qDebug() << "Sent:" << data;
     if(serPort->isOpen()){
         serPort->write(data);
         serPort->waitForBytesWritten();

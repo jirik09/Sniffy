@@ -2,6 +2,7 @@
 #define COMMS_H
 
 #include <QObject>
+#include <QMutex>
 #include "connectiontype.h"
 #include "serialline.h"
 
@@ -28,16 +29,17 @@ private slots:
     void parseMessage(QByteArray message);
 
 public slots:
+    void write(QByteArray module, QByteArray feature, QByteArray param);
+    void write(QByteArray module, QByteArray feature, int param);
     void write(QByteArray data);
-    void writeUint32(int data);
-    void writeUint16(int data);
-    void writeString(QString data);
 
 private:
 
     SerialLine *serial;
     bool isOpen = false;
     bool requestToScan = false;
+
+    QMutex *mutex;
 
 };
 

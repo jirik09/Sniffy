@@ -3,9 +3,9 @@ debug/widgetbuttons.o
 debug/widgetchart.o
 debug/widgetdial.o
 debug/widgetdialrange.o
-debug/widgetfeature.o
 debug/widgetfooter.o
 debug/widgetlabel.o
+debug/widgetmodule.o
 debug/widgetselection.o
 debug/widgetseparator.o
 debug/widgetswitch.o
@@ -29,9 +29,9 @@ debug/moc_widgetbuttons.o
 debug/moc_widgetchart.o
 debug/moc_widgetdial.o
 debug/moc_widgetdialrange.o
-debug/moc_widgetfeature.o
 debug/moc_widgetfooter.o
 debug/moc_widgetlabel.o
+debug/moc_widgetmodule.o
 debug/moc_widgetselection.o
 debug/moc_widgetseparator.o
 debug/moc_widgetswitch.o

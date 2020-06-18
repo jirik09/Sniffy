@@ -3,7 +3,8 @@
 
 enum class ScopeTriggerMode
 {
-    TRIG_NORMAL = 0,
+    TRIG_STOP = 0,
+    TRIG_NORMAL,
     TRIG_AUTO,
     TRIG_AUTO_FAST,
     TRIG_SINGLE

@@ -20,7 +20,7 @@ void Comms::run(){
         if(requestToScan){
             QList<DeviceDescriptor> listDevices = *new QList<DeviceDescriptor>;
             serial = new SerialLine();
-            serial->getAvailableDevices(&listDevices,0);   //scan fo available devices on serial port
+            serial->getAvailableDevices(&listDevices,0);   //scan for available devices on serial port
             emit devicesScaned(listDevices);
             requestToScan = false;
         }
@@ -44,36 +44,28 @@ void Comms::scanForDevices(){
     requestToScan = true;
 }
 
-
 void Comms::close(){
     isOpen = false;
     serial->closeLine();
+}
+
+void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
+    serial->write(module+":"+feature+":"+param+";");
+}
+
+void Comms::write(QByteArray module, QByteArray feature, int param){
+    QByteArray tmp (4,0);
+    tmp[3] = param>>24;
+    tmp[2] = param>>16;
+    tmp[1] = param>>8;
+    tmp[0] = param;
+    serial->write(module+":"+feature+" "+tmp+";");
 }
 
 void Comms::write(QByteArray data){
     serial->write(data);
 }
 
-void Comms::writeString(QString data){
-    QByteArray tmp = data.toUtf8();
-    serial->write(tmp);
-}
-
-void Comms::writeUint32(int data){
-    QByteArray tmp (4,0);
-    tmp[3] = data>>24;
-    tmp[2] = data>>16;
-    tmp[1] = data>>8;
-    tmp[0] = data;
-    serial->write(tmp);
-}
-
-void Comms::writeUint16(int data){
-    QByteArray tmp (2,0);
-    tmp[1] = data>>8;
-    tmp[0] = data;
-    serial->write(tmp);
-}
 
 
 void Comms::parseMessage(QByteArray message){

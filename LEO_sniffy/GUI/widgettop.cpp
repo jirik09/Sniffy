@@ -58,16 +58,28 @@ void WidgetTop::setText(QString text, int index){
 void WidgetTop::setImage(QString uri, int index){
     switch (index){
     case 0:
+        ui->pushButton_1->setIcon(QIcon(uri));
+        ui->pushButton_1->setText("");
         break;
     case 1:
+        ui->pushButton_2->setIcon(QIcon(uri));
+        ui->pushButton_2->setText("");
         break;
     case 2:
+        ui->pushButton_3->setIcon(QIcon(uri));
+        ui->pushButton_3->setText("");
         break;
     case 3:
+        ui->pushButton_4->setIcon(QIcon(uri));
+        ui->pushButton_4->setText("");
         break;
     case 4:
+        ui->pushButton_5->setIcon(QIcon(uri));
+        ui->pushButton_5->setText("");
         break;
     case 5:
+        ui->pushButton_6->setIcon(QIcon(uri));
+        ui->pushButton_6->setText("");
         break;
     }
 
@@ -77,34 +89,34 @@ void WidgetTop::setSelected (int index){
     clearSelected();
     switch (index){
     case 0:
-        ui->pushButton_1->setStyleSheet(QString::fromUtf8(SELECTED_STYLE));
+        ui->pushButton_1->setStyleSheet(SELECTED_STYLE);
         break;
     case 1:
-        ui->pushButton_2->setStyleSheet(QString::fromUtf8(SELECTED_STYLE));
+        ui->pushButton_2->setStyleSheet(SELECTED_STYLE);
         break;
     case 2:
-        ui->pushButton_3->setStyleSheet(QString::fromUtf8(SELECTED_STYLE));
+        ui->pushButton_3->setStyleSheet(SELECTED_STYLE);
         break;
     case 3:
-        ui->pushButton_4->setStyleSheet(QString::fromUtf8(SELECTED_STYLE));
+        ui->pushButton_4->setStyleSheet(SELECTED_STYLE);
         break;
     case 4:
-        ui->pushButton_5->setStyleSheet(QString::fromUtf8(SELECTED_STYLE));
+        ui->pushButton_5->setStyleSheet(SELECTED_STYLE);
         break;
     case 5:
-        ui->pushButton_6->setStyleSheet(QString::fromUtf8(SELECTED_STYLE));
+        ui->pushButton_6->setStyleSheet(SELECTED_STYLE);
         break;
     }
 }
 
 void WidgetTop::clearSelected (){
-    ui->pushButton_1->setStyleSheet(QString::fromUtf8(NOT_SELECTED_STYLE));
-    ui->pushButton_2->setStyleSheet(QString::fromUtf8(NOT_SELECTED_STYLE));
-    ui->pushButton_3->setStyleSheet(QString::fromUtf8(NOT_SELECTED_STYLE));
-    ui->pushButton_4->setStyleSheet(QString::fromUtf8(NOT_SELECTED_STYLE));
-    ui->pushButton_5->setStyleSheet(QString::fromUtf8(NOT_SELECTED_STYLE));
-    ui->pushButton_6->setStyleSheet(QString::fromUtf8(NOT_SELECTED_STYLE));
-}
+    ui->pushButton_1->setStyleSheet(NOT_SELECTED_STYLE);
+    ui->pushButton_2->setStyleSheet(NOT_SELECTED_STYLE);
+    ui->pushButton_3->setStyleSheet(NOT_SELECTED_STYLE);
+    ui->pushButton_4->setStyleSheet(NOT_SELECTED_STYLE);
+    ui->pushButton_5->setStyleSheet(NOT_SELECTED_STYLE);
+    ui->pushButton_6->setStyleSheet(NOT_SELECTED_STYLE);
+    }
 
 QPushButton * WidgetTop::getPushButton(int index){
     switch (index){
@@ -127,4 +139,5 @@ QPushButton * WidgetTop::getPushButton(int index){
         return ui->pushButton_6;
         break;
     }
+    return nullptr;
 }

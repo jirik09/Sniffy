@@ -196,6 +196,9 @@ WindowScope::WindowScope(QWidget *parent) :
     ui->verticalLayout_trace->addWidget(chart);
 
 
+    connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
+
+
 }
 
 WindowScope::~WindowScope()
@@ -203,22 +206,18 @@ WindowScope::~WindowScope()
     delete ui;
 }
 
-void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries){
+void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase){
     chart->clearAll();
-    chart->setXAxisMax(scope->getTimebase()*10);
+    chart->setXAxisMax(timeBase*10);
 
     for (int i = 0; i < dataSeries.length(); i++){
         if(buttonsChannelEnable->isChecked(i)){
             chart->updateTrace(&dataSeries[i], i);
         }
     }
-
-    if(scope->getTriggerMode()==ScopeTriggerMode::TRIG_SINGLE){
-        buttonsTriggerMode->setText("Single",0);
-    }
 }
 
-void WindowScope::setScope(Scope * scp){
+/*void WindowScope::setScope(Scope * scp){
     scope = scp;
     connect(scope,SIGNAL(scopeDataReceived(QVector<QVector<QPointF>>)),this,SLOT(dataReceived(QVector<QVector<QPointF>>)));
     connect(scope,SIGNAL(scopeSpecified()),this,SLOT(enableModuleWidget()));
@@ -231,41 +230,38 @@ void WindowScope::setScope(Scope * scp){
  //   connect(dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
 
     connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
-
-
-}
+}*/
 
 void WindowScope::timeBaseCallback(float value){
-    scope->setTimebase(value);
-    chart->setXAxisMax(scope->getTimebase()*10);
+    emit timeBaseChanged(value);
+    chart->setXAxisMax(value*10);
 }
 
 void WindowScope::triggerValueCallback(float value){
-    scope->setTriggerLevel(3.3/value*100);
+ //   scope->setTriggerLevel(3.3/value*100);
 }
 
 void WindowScope::triggerChannelCallback(int index){
-    scope->triggerChannelCallback(index);
+ //   scope->triggerChannelCallback(index);
 }
 
 void WindowScope::triggerModeCallback(int index){
     if(index==0){
         if(buttonsTriggerMode->getText(0)=="Stop"){
-            scope->stopScope();
-            scope->triggerModeCallback(index);
+            emit triggerChanged(ScopeTriggerMode::TRIG_STOP);
             buttonsTriggerMode->setText("Single",0);
         }
         if(buttonsTriggerMode->getText(0)=="Single"){
-            scope->startScope();
-            scope->scopeNextData();
+            emit triggerChanged(ScopeTriggerMode::TRIG_SINGLE);
             buttonsTriggerMode->setText("Stop",0);
         }
-    }else{
-        scope->startScope();
+    }else if(index==1){
+        emit triggerChanged(ScopeTriggerMode::TRIG_NORMAL);
         buttonsTriggerMode->setText("Stop",0);
-        scope->triggerModeCallback(index);
+    }else if (index==2){
+        emit triggerChanged(ScopeTriggerMode::TRIG_AUTO);
+        buttonsTriggerMode->setText("Stop",0);
     }
-
 }
 
 
@@ -290,23 +286,25 @@ void WindowScope::channelEnableCallback(int buttonStatus){
     if(buttonStatus & 0x08){
         buttonsTriggerChannel->setDisabledButton(false,3);
     }
-    scope->channelEnableCallback(buttonStatus);
+    //scope->channelEnableCallback(buttonStatus);
 
 }
 
-void WindowScope::setModuleWidget(WidgetFeature *scopeLeftWidget){
+void WindowScope::setModuleWidget(WidgetModule *scopeLeftWidget){
     scopeModuleWidget = scopeLeftWidget;
 }
 
 
 void WindowScope::visibilityChanged(bool vis){
     if(vis){
-        scopeModuleWidget->setStatus(FeatureStatus::PLAY);
-        scope->initDefault();
-        scope->startScope();
+        scopeModuleWidget->setStatus(ModuleStatus::PLAY);
+        emit scopeWindowOpened();
+     //   scope->initDefault();
+      //  scope->startScope();
     }else{
-        scopeModuleWidget->setStatus(FeatureStatus::STOP);
-        scope->stopScope();
+        scopeModuleWidget->setStatus(ModuleStatus::STOP);
+        emit scopeWindowClosed();
+      //  scope->stopScope();
     }
 
 }

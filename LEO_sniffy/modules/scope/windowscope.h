@@ -7,7 +7,7 @@
 #include <QToolButton>
 #include <QtCore/QtMath>
 
-#include "../../GUI/widgetfeature.h"
+#include "../../GUI/widgetmodule.h"
 #include "../../GUI/widgettop.h"
 #include "../../GUI/widgetseparator.h"
 #include "../../GUI/widgetdial.h"
@@ -19,7 +19,9 @@
 #include "../../GUI/widgetchart.h"
 #include "../../GUI/widgettab.h"
 
-#include "scope.h"
+#include "scopedefs.h"
+
+//#include "scope.h"
 
 
 namespace Ui {
@@ -34,21 +36,30 @@ public:
     explicit WindowScope(QWidget *parent = nullptr);
     ~WindowScope();
 
-    void setScope(Scope * scp);
-    void setModuleWidget(WidgetFeature *scopeLeftWidget);
+   // void setScope(Scope * scp);
+    void setModuleWidget(WidgetModule *scopeLeftWidget);
     void windowOpen();
+
+    void dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase);
+
+    WidgetDial *dialTimeBase;
 
 signals:
 
     void startScope();
     void stopScope();
 
+    void timeBaseChanged(float value);
+    void triggerChanged(ScopeTriggerMode);
+    void scopeWindowOpened();
+    void scopeWindowClosed();
+
 
 private slots:
     void enableModuleWidget();
     void visibilityChanged(bool vis);
 
-    void dataReceived(QVector<QVector<QPointF>> dataSeries);
+
 
     void timeBaseCallback(float value);
     void channelEnableCallback(int buttonStatus);
@@ -61,12 +72,11 @@ private:
 
     void fillTimeBase();
 
-    WidgetFeature *scopeModuleWidget;
+    WidgetModule *scopeModuleWidget;
 
 
 
 
-    WidgetDial *dialTimeBase;
     WidgetButtons *buttonsChannelEnable;
     WidgetButtons *buttonsTriggerMode;
     WidgetButtons *buttonsTriggerChannel;
@@ -79,7 +89,7 @@ private:
 
 
 
-    Scope *scope;
+  //  Scope *scope;
 
     widgetChart *chart;
 

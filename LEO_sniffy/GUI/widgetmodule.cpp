@@ -4,36 +4,41 @@ Widget to be shown on the left selection in centralWidget
 - Can have icon on the left and text desription
 - On the right side is shown stauts of the feature (Play, Stop, Idle, Error)
 */
-#include "widgetfeature.h"
+#include "widgetmodule.h"
 #include "ui_widgetfeature.h"
 
-WidgetFeature::WidgetFeature(QWidget *parent, FeatureIcon icon, QString name) :
+WidgetModule::WidgetModule(QWidget *parent, QString name) :
     QWidget(parent),
     ui(new Ui::WidgetFeature)
 {
     ui->setupUi(this);
-    if(icon == FeatureIcon::SCOPE)
-        ui->pushButton_name->setIcon(QIcon(":/graphics/graphics/icon_scope.png"));
+
         ui->pushButton_name->setText(name);
         ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_stop.png)"));
+        connect(ui->pushButton_name,SIGNAL(clicked()),this,SLOT(clickedInternal()));
 }
 
-WidgetFeature::~WidgetFeature()
+WidgetModule::~WidgetModule()
 {
     delete ui;
 }
 
-void WidgetFeature::setStatus(FeatureStatus status){
-    if(status==FeatureStatus::PLAY)
+void WidgetModule::setStatus(ModuleStatus status){
+    if(status==ModuleStatus::PLAY)
     ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_play.png)"));
 
-    if(status==FeatureStatus::STOP)
+    if(status==ModuleStatus::STOP)
     ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_stop.png)"));
 
-    if(status==FeatureStatus::PAUSE)
+    if(status==ModuleStatus::PAUSE)
     ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_pause.png)"));
 }
 
-QPushButton * WidgetFeature::getPushButton(){
-    return ui->pushButton_name;
+void WidgetModule::clickedInternal(){
+    emit clicked ();
 }
+
+void WidgetModule::setIcon (QString ImageURI){
+    ui->pushButton_name->setIcon(QIcon(ImageURI));
+}
+

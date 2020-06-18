@@ -7,8 +7,8 @@ namespace Ui {
 class WidgetSwitch;
 }
 
-#define SELECTED_STYLE "background-color: rgb(24,154,224);border: none;"
-#define NOT_SELECTED_STYLE "background-color: rgb(38,38,38);border: none;"
+
+
 
 class WidgetSwitch : public QWidget
 {
@@ -20,6 +20,9 @@ public:
 
 private:
     Ui::WidgetSwitch *ui;
+
+    const QString SELECTED_STYLE = "background-color: rgb(24,154,224);border: none;";
+    const QString NOT_SELECTED_STYLE = "background-color: rgb(38,38,38);border: none;";
 
 private slots:
     void setOn();

@@ -23,9 +23,9 @@ SOURCES += \
     GUI/widgetchart.cpp \
     GUI/widgetdial.cpp \
     GUI/widgetdialrange.cpp \
-    GUI/widgetfeature.cpp \
     GUI/widgetfooter.cpp \
     GUI/widgetlabel.cpp \
+    GUI/widgetmodule.cpp \
     GUI/widgetselection.cpp \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
@@ -51,9 +51,9 @@ HEADERS += \
     GUI/widgetchart.h \
     GUI/widgetdial.h \
     GUI/widgetdialrange.h \
-    GUI/widgetfeature.h \
     GUI/widgetfooter.h \
     GUI/widgetlabel.h \
+    GUI/widgetmodule.h \
     GUI/widgetselection.h \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
@@ -69,9 +69,9 @@ HEADERS += \
     graphics/colors.h \
     mainwindow.h \
     modules/counter/windowcounter.h \
-    modules/scope/ScopeDefs.h \
     modules/scope/scope.h \
     modules/scope/scopeconfig.h \
+    modules/scope/scopedefs.h \
     modules/scope/scopespec.h \
     modules/scope/windowscope.h
 
@@ -82,9 +82,9 @@ FORMS += \
     GUI/widgetchart.ui \
     GUI/widgetdial.ui \
     GUI/widgetdialrange.ui \
-    GUI/widgetfeature.ui \
     GUI/widgetfooter.ui \
     GUI/widgetlabel.ui \
+    GUI/widgetmodule.ui \
     GUI/widgetselection.ui \
     GUI/widgetseparator.ui \
     GUI/widgetswitch.ui \

@@ -26,18 +26,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* BUDE HROMADA DUPLICIT - REFACTOR */
 
-    WidgetFeature_scope = new WidgetFeature(ui->centralwidget,FeatureIcon::SCOPE,"Oscilloscope");
-    ui->verticalLayout_features->addWidget(WidgetFeature_scope);
-    WidgetFeature_scope->setStatus(FeatureStatus::STOP);
-    WidgetFeature_scope->hide();
+    WidgetModule_scope = new WidgetModule(ui->centralwidget,"Oscilloscope");
+    ui->verticalLayout_features->addWidget(WidgetModule_scope);
+    WidgetModule_scope->setStatus(ModuleStatus::STOP);
+    WidgetModule_scope->hide();
 
-    WidgetFeature_gen = new WidgetFeature(ui->centralwidget,FeatureIcon::SCOPE,"Signal generator");
+    WidgetFeature_gen = new WidgetModule(ui->centralwidget,"Signal generator");
     ui->verticalLayout_features->addWidget(WidgetFeature_gen);
-    WidgetFeature_gen->setStatus(FeatureStatus::STOP);
+    WidgetFeature_gen->setStatus(ModuleStatus::STOP);
 
-    WidgetFeature_counter = new WidgetFeature(ui->centralwidget,FeatureIcon::SCOPE,"Counter");
+    WidgetFeature_counter = new WidgetModule(ui->centralwidget,"Counter");
     ui->verticalLayout_features->addWidget(WidgetFeature_counter);
-    WidgetFeature_counter->setStatus(FeatureStatus::STOP);
+    WidgetFeature_counter->setStatus(ModuleStatus::STOP);
 
     QSpacerItem *verticalSpacer;
     verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -61,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     dockWidget_scope->setFloating(false);
     dockWidget_scope->setAllowedAreas(Qt::RightDockWidgetArea);
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_scope);
-    scp = new WindowScope(dockWidget_scope);
+    scpWindow = new WindowScope(dockWidget_scope);
 
     dockWidget_counter=new QDockWidget(this);
     dockWidget_counter->setObjectName("dockWidget_counter");
@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_counter);
     cnt = new WindowCounter(dockWidget_counter);
 
-/*    //customized title bar widget
+    //******************************* customized title bar widget ***********************
     QWidget *title_bar = new QWidget();
  //   title_bar->setStyleSheet(QString::fromUtf8("margin:0px"));
 
@@ -113,7 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    layoutCounter->addWidget(new QPushButton("down"));
 //    layoutCounter->addWidget(new QPushButton("Exit"));
 //    dockWidget_counter->setTitleBarWidget(title_bar);
-*/
+
 
 
 
@@ -122,8 +122,8 @@ MainWindow::MainWindow(QWidget *parent)
     horizontalLayout = new QVBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
 
-    horizontalLayout->addWidget(scp);
-    dockWidget_scope->setWidget(scp);
+    horizontalLayout->addWidget(scpWindow);
+    dockWidget_scope->setWidget(scpWindow);
     dockWidget_scope->hide();
 
  //   dockWidget_scope->setLayout(horizontalLayout);
@@ -131,10 +131,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     horizontalLayout->addWidget(cnt);
     dockWidget_counter->setWidget(cnt);
-    dockWidget_counter->hide();
+    dockWidget_counter->raise();
 
 
-    connect(WidgetFeature_scope->getPushButton(),SIGNAL(clicked()),this,SLOT(openScope()));
+    connect(WidgetModule_scope,SIGNAL(clicked()),this,SLOT(openScope()));
 
 
 
@@ -193,20 +193,6 @@ MainWindow::MainWindow(QWidget *parent)
     //*************************** end adding widgets to specification area *************************
 
 
- /*  WidgetButtons *buttonsTriggerEdge = new WidgetButtons(ui->scrollArea,2,ButtonTypes::RADIO,"Edge");
-    ui->verticalLayout_4->addWidget(buttonsTriggerEdge);
-    buttonsTriggerEdge->setText("Rise",0);
-    buttonsTriggerEdge->setText("Fall",1);
-
-    WidgetDialRange *dialPretrigger = new WidgetDialRange(ui->scrollArea ,"Pretrigger");
-    dialPretrigger->setRange(0,100,"%",1,1,50);
-    dialPretrigger->hideUnitSelection();
-    ui->verticalLayout_4->addWidget(dialPretrigger);
-
-    QSpacerItem *verticalSpacera;
-    verticalSpacera = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    ui->verticalLayout_4->addItem(verticalSpacera);*/
-
 
 
 
@@ -226,9 +212,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //pass scope pointer and pointer to module widget into scope window
-    scp->setScope(device->getScope());
-    scp->setModuleWidget(WidgetFeature_scope);
-    connect(dockWidget_scope,SIGNAL(visibilityChanged(bool)),scp,SLOT(visibilityChanged(bool)));
+
+    device->getScope()->setModuleWindow(scpWindow);
+    scpWindow->setModuleWidget(WidgetModule_scope);
+    connect(dockWidget_scope,SIGNAL(visibilityChanged(bool)),scpWindow,SLOT(visibilityChanged(bool)));
 
   //  deviceConnectButton->setDisabledButton(true,0); //disable connect button
 
@@ -356,7 +343,7 @@ void MainWindow::updateSpecGUI(){
     }
 }
 
-/*
+
 void MainWindow::unDockScope(){
     dockWidget_scope->setFloating(true);
 }
@@ -367,7 +354,7 @@ void MainWindow::dockScope(){
 
 void MainWindow::stopScope(){
     dockWidget_scope->hide();
-}*/
+}
 
 
 

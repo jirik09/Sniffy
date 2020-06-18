@@ -27,6 +27,10 @@ const QByteArray SCOPE_INCOME = "OSC_";
 const QByteArray COMMS = "COMS";
 const QByteArray SYSTEM = "SYST";
 
+const QByteArray STOP = "STOP";
+const QByteArray START = "STRT";
+const QByteArray NEXT = "NEXT";
+
 const QByteArray GET_REAL_SMP_FREQ = "FRQ?";
 const QByteArray GET_SCOPE_INPUTS = "INP?";
 

@@ -14,7 +14,9 @@ void Scope::parseData(QByteArray data){
 
     if(dataHeader=="CFG_"){
 
-        emit scopeSpecified();
+        emit scopeSpecificationLoaded();
+        //todo pass specification into scopeSpec.cpp and parse it
+
     }else if(dataHeader=="SMPL"){
 
     }else if(dataHeader=="TRIG"){
@@ -88,7 +90,8 @@ void Scope::parseData(QByteArray data){
 
 
         if(currentChannel==numChannels){
-            emit scopeDataReceived(scopeData);
+            //emit scopeDataReceived(scopeData);
+            scpWindow->dataReceived(scopeData,config->timeBase);
 
             if(config->triggerMode!=ScopeTriggerMode::TRIG_SINGLE){
                 scopeNextData();
@@ -103,12 +106,12 @@ void Scope::parseData(QByteArray data){
 
 void Scope::initDefault(){
     config->samplingRate = 10000;
-    sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_100K+";");
+    comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_100K+";");
 
     config->dataLength = 1000;
-    sendCommand(cmd->SCOPE+":"+cmd->DATA_LENGTH+":"+cmd->SAMPLES_1K+";");
+    comm->write(cmd->SCOPE+":"+cmd->DATA_LENGTH+":"+cmd->SAMPLES_1K+";");
 
-    config->timeBase = 0.01;
+    config->timeBase = 0.001;
     config->longMemory = 0;
 
 
@@ -117,19 +120,19 @@ void Scope::initDefault(){
     config->enabledChannels[2]=0;
     config->enabledChannels[3]=0;
     config->numberOfChannels=1;
-    sendCommand(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_1+";");
+    comm->write(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_1+";");
 
-    setTriggerLevel(50);
-    setPretrigger(50);
+    //setTriggerLevel(50);
+   // setPretrigger(50);
 
     config->triggerMode = ScopeTriggerMode::TRIG_AUTO;
-    sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_AUTO+";");
+    comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_AUTO+";");
 
     config->triggerChannel = 1;
-    sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");
+    comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");
 
     config->triggerEdge = ScopeTriggerEdge::EDGE_RISING;
-    sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_EDGE+":"+cmd->EDGE_RISING+";");
+    comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_EDGE+":"+cmd->EDGE_RISING+";");
 }
 
 void Scope::setTimebase(float div){
@@ -139,27 +142,27 @@ void Scope::setTimebase(float div){
     config->samplingRate = float(config->dataLength)/(10.0*div);
 
     if(config->samplingRate<=1000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_1K+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_1K+";");
     }else if(config->samplingRate<=2000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_2K+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_2K+";");
     }else if(config->samplingRate<=5000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_5K+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_5K+";");
     }else if(config->samplingRate<=10000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_10K+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_10K+";");
     }else if(config->samplingRate<=20000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_20K+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_20K+";");
     }else if(config->samplingRate<=50000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_50K+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_50K+";");
     }else if(config->samplingRate<=100000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_100K+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_100K+";");
     }else if(config->samplingRate<=200000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_200K+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_200K+";");
     }else if(config->samplingRate<=500000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_500K+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_500K+";");
     }else if(config->samplingRate<=1000000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_1M+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_1M+";");
     }else if(config->samplingRate<=2000000){
-        sendCommand(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_2M+";");
+        comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_2M+";");
     }
 }
 
@@ -171,42 +174,34 @@ void Scope::setPretrigger(float percentage){
     QByteArray toSend;
     QDataStream out(&toSend, QIODevice::WriteOnly);
     out << cmd->SCOPE + ":" + cmd->SCOPE_PRETRIGGER + " " << tmpTrig << ";";
-    sendCommand(toSend);
+    comm->write(toSend);
 }
 
 void Scope::setTriggerLevel(float percentage){
     config->triggerLevelPercent=percentage;
     config->triggerLevel = 65536*percentage/100;
-    sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_LEVEL+" ");
-   // sendCommand("xxxx");
-    sendCommandInt32(config->triggerLevel);
-    sendCommand(";");
+
+    comm->write(cmd->SCOPE, cmd->SCOPE_TRIG_LEVEL, config->triggerLevel);
 }
 
 void Scope::setNumberOfChannels(int num){
     switch (num){
     case 1:
-        sendCommand(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_1+";");
+        comm->write(cmd->SCOPE, cmd->CHANNELS, cmd->CHANNELS_1);
         break;
     case 2:
-        sendCommand(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_2+";");
+        comm->write(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_2+";");
         break;
     case 3:
-        sendCommand(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_3+";");
+        comm->write(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_3+";");
         break;
     case 4:
-        sendCommand(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_4+";");
+        comm->write(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_4+";");
         break;
     }
 }
 
-void Scope::sendCommandInt32(int number){
-    quint32 tmpTrig = number;
-    QByteArray byteTrig;
-    QDataStream out(&byteTrig, QIODevice::WriteOnly | QIODevice::Append);
-    out << tmpTrig;
-    sendCommand(byteTrig);
-}
+
 
 void Scope::channelEnableCallback(int buttonStatus){
     if(buttonStatus & 0x01){
@@ -231,56 +226,66 @@ void Scope::channelEnableCallback(int buttonStatus){
 void Scope::triggerModeCallback(int buttonIndex){
     if(buttonIndex==0){
         config->triggerMode=ScopeTriggerMode::TRIG_SINGLE;
-        sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_SINGLE+";");
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_SINGLE+";");
     }
     if(buttonIndex==1){
         config->triggerMode=ScopeTriggerMode::TRIG_NORMAL;
-        sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_NORMAL+";");
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_NORMAL+";");
     }
     if(buttonIndex==2){
         config->triggerMode=ScopeTriggerMode::TRIG_AUTO;
-        sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_AUTO+";");
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_AUTO+";");
     }
 }
 
 void Scope::triggerEdgeCallback(int buttonIndex){
     if(buttonIndex==0){
         config->triggerEdge=ScopeTriggerEdge::EDGE_RISING;
-        sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_EDGE+":"+cmd->EDGE_RISING+";");
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_EDGE+":"+cmd->EDGE_RISING+";");
     }
     if(buttonIndex==1){
         config->triggerEdge=ScopeTriggerEdge::EDGE_FALLING;
-        sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_EDGE+":"+cmd->EDGE_FALLING+";");
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_EDGE+":"+cmd->EDGE_FALLING+";");
     }
 }
 
 void Scope::triggerChannelCallback(int index){
     if(index==0){
-        sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");
     }
     if(index==1){
-        sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_2+";");
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_2+";");
     }
     if(index==2){
-        sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_3+";");
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_3+";");
     }
     if(index==3){
-        sendCommand(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_4+";");
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_4+";");
     }
+}
+
+void Scope::scopeOpened(){
+    initDefault();
+    startScope();
+}
+
+void Scope::scopeClosed(){
+    stopScope();
+
 }
 
 
 
 void Scope::stopScope(){
-    sendCommand("OSCP:STOP;");
+    comm->write(cmd->SCOPE+":"+cmd->STOP+";");
 }
 void Scope::startScope(){
-    sendCommand("OSCP:STRT;");
+    comm->write(cmd->SCOPE+":"+cmd->START+";");
 }
 
 
 void Scope::scopeNextData(){
-    sendCommand("OSCP:NEXT;");
+    comm->write(cmd->SCOPE+":"+cmd->NEXT+";");
 }
 
 float Scope::getTimebase(){
@@ -291,7 +296,35 @@ ScopeTriggerMode Scope::getTriggerMode(){
     return config->triggerMode;
 }
 
+void Scope::setModuleWindow(WindowScope *scpWin){
+    scpWindow = scpWin;
 
-void Scope::sendCommand(QByteArray data){
-    emit send(data);
+    //connect signals from scope to GUI --> can be actually done by function call
+    connect(this,SIGNAL(scopeSpecificationLoaded()),scpWin,SLOT(enableModuleWidget()));
+
+    //connect signals from GUI into scope
+    connect(scpWin,SIGNAL(scopeWindowOpened()),this,SLOT(scopeOpened()));
+    connect(scpWin,SIGNAL(scopeWindowClosed()),this,SLOT(scopeClosed()));
+    connect(scpWin,SIGNAL(timeBaseChanged(float)),this,SLOT(setTimebase(float)));
+
+
+ /*
+    connect(scope,SIGNAL(scopeDataReceived(QVector<QVector<QPointF>>)),this,SLOT(dataReceived(QVector<QVector<QPointF>>)));
+    connect(scope,SIGNAL(scopeSpecified()),this,SLOT(enableModuleWidget()));
+    connect(buttonsChannelEnable,SIGNAL(statusChanged(int)),this,SLOT(channelEnableCallback(int)));
+    connect(buttonsTriggerMode,SIGNAL(clicked(int)),this, SLOT(triggerModeCallback(int)));
+    connect(buttonsTriggerEdge,SIGNAL(clicked(int)),scope, SLOT(triggerEdgeCallback(int)));
+    connect(buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
+
+    connect(dialPretrigger,SIGNAL(valueChanged(float)),scope,SLOT(setPretrigger(float)));
+ //   connect(dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
+
+    connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));*/
+
+
+}
+
+void Scope::setComms(Comms *communication){
+    comm = communication;
+
 }

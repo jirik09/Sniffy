@@ -8,8 +8,6 @@ namespace Ui {
 class WidgetTop;
 }
 
-#define SELECTED_STYLE "background-color: rgb(58,58,58);border: none;border-bottom: 3px solid rgb(255, 170, 0);"
-#define NOT_SELECTED_STYLE "background-color: rgb(38,38,38);border: none;border-bottom: 3px solid rgb(124, 124, 124);"
 
 class WidgetTop : public QWidget
 {
@@ -26,6 +24,9 @@ public:
 
 private:
     Ui::WidgetTop *ui;
+
+    const QString SELECTED_STYLE = "background-color: rgb(58,58,58);border: none;border-bottom: 3px solid rgb(255, 170, 0);";
+    const QString NOT_SELECTED_STYLE = "background-color: rgb(38,38,38);border: none;border-bottom: 3px solid rgb(124, 124, 124);";
 };
 
 #endif // WIDGETTOP_H

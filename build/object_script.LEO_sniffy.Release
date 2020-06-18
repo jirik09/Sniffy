@@ -3,9 +3,9 @@ release/widgetbuttons.o
 release/widgetchart.o
 release/widgetdial.o
 release/widgetdialrange.o
-release/widgetfeature.o
 release/widgetfooter.o
 release/widgetlabel.o
+release/widgetmodule.o
 release/widgetselection.o
 release/widgetseparator.o
 release/widgetswitch.o
@@ -29,9 +29,9 @@ release/moc_widgetbuttons.o
 release/moc_widgetchart.o
 release/moc_widgetdial.o
 release/moc_widgetdialrange.o
-release/moc_widgetfeature.o
 release/moc_widgetfooter.o
 release/moc_widgetlabel.o
+release/moc_widgetmodule.o
 release/moc_widgetselection.o
 release/moc_widgetseparator.o
 release/moc_widgetswitch.o

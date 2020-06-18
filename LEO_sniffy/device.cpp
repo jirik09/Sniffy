@@ -27,18 +27,18 @@ void Device::newDeviceList(QList<DeviceDescriptor> deviceList){
 
 void Device::open(int deviceIndex){
     communication->open(deviceList.at(deviceIndex));
+
     connect(this,SIGNAL(writeData(QByteArray)),communication,SLOT(write(QByteArray)),Qt::QueuedConnection);
     connect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
     connect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
     connect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
-
-    connect(scope,SIGNAL(send(QByteArray)),communication,SLOT(write(QByteArray)),Qt::QueuedConnection);
 
     while (communication->getIsOpen()==false) {
         QThread::msleep(500);
         qDebug() << "ERROR wait for comm to be opened";
     }
     isConnected = communication->getIsOpen();
+    scope->setComms(communication);
 
 }
 
@@ -54,15 +54,11 @@ void Device::close(){
 }
 
 
-void Device::write(QByteArray data){
-   emit writeData (data);
-//   communication->write(data);
-}
 
 void Device::loadHWSpecification(void){
 
-    write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
-    write(commands->SCOPE+":"+commands->CONFIG_REQUEST+";");
+    communication->write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
+    communication->write(commands->SCOPE+":"+commands->CONFIG_REQUEST+";");
 
 }
 
@@ -75,6 +71,7 @@ void Device::parseData(QByteArray data){
 
     if(dataHeader=="OSCP"){
        emit scopeNewData(dataToPass);
+        //What if data belongs to scope??????????? kurva device bud musi vedet co je open nebo module kdyz dostane data tak musi vedet ze neni aktivni.
     }else if(dataHeader=="SYST"){
        emit systemNewData(dataToPass);
     }else{
@@ -115,6 +112,7 @@ DeviceSpec* Device::getDeviceSpecification(){
 Scope* Device::getScope(){
     return scope;
 }
+
 
 
 

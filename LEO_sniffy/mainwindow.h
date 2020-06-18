@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <QGraphicsDropShadowEffect>
 
-#include "GUI/widgetfeature.h"
+#include "GUI/widgetmodule.h"
 #include "GUI/widgetseparator.h"
 #include "GUI/widgetfooter.h"
 #include "modules/scope/windowscope.h"
@@ -42,15 +42,15 @@ private:
     Ui::MainWindow *ui;
 
     Device *dev;
-    WidgetFeature *WidgetFeature_scope = NULL;
+    WidgetModule *WidgetModule_scope = NULL;
     QDockWidget *dockWidget_scope = NULL;
-    WindowScope *scp;
+    WindowScope *scpWindow;
 
-    WidgetFeature *WidgetFeature_counter = NULL;
+    WidgetModule *WidgetFeature_counter = NULL;
     QDockWidget *dockWidget_counter = NULL;
     WindowCounter *cnt;
 
-    WidgetFeature *WidgetFeature_gen = NULL;
+    WidgetModule *WidgetFeature_gen = NULL;
 
     QScrollArea *scrollAreaSpecification;
     QWidget *WidgetSpecification;
@@ -71,9 +71,9 @@ private slots:
    void deviceConnection(int buttonIndex);
    void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
    void updateSpecGUI();
-  /* void unDockScope();
+   void unDockScope();
    void dockScope();
-   void stopScope();*/
+   void stopScope();
 
 };
 #endif // MAINWINDOW_H

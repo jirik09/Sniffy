@@ -6,9 +6,11 @@
 #include <QDataStream>
 #include <QPointF>
 
+#include "windowscope.h"
 #include "scopeconfig.h"
 #include "scopespec.h"
 #include "communication/Commands.h"
+#include "communication/comms.h"
 
 class Scope : public QObject
 {
@@ -17,8 +19,9 @@ public:
     explicit Scope(QObject *parent = nullptr);
     void initDefault();
     void setNumberOfChannels(int num);
-    void sendCommandInt32(int number);
-    void sendCommand(QByteArray);
+
+    void setModuleWindow(WindowScope *scpWin);
+    void setComms(Comms *communication);
 
     void stopScope();
     void startScope();
@@ -31,8 +34,7 @@ public:
     void triggerModeCallback(int buttonIndex);
 
 signals:
-    void scopeSpecified();
-    void send(QByteArray);
+    void scopeSpecificationLoaded();
     void scopeDataReceived(QVector<QVector<QPointF>>);
 
 public slots:
@@ -46,11 +48,18 @@ public slots:
     void setTriggerLevel(float percentage);
     void setPretrigger(float percentage);
 
+    void scopeOpened();
+    void scopeClosed();
+
 private:
     QVector<QVector<QPointF>> scopeData;
 
     Commands *cmd;
+    Comms *comm;
+
     ScopeConfig *config;
+
+    WindowScope *scpWindow;
 };
 
 #endif // SCOPE_H

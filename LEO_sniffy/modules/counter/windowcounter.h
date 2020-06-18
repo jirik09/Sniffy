@@ -5,7 +5,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QToolButton>
-#include "../../GUI/widgetfeature.h"
+#include "../../GUI/widgetmodule.h"
 #include "../../GUI/widgettop.h"
 #include "../../GUI/widgetseparator.h"
 #include "../../GUI/widgetdial.h"
@@ -32,7 +32,7 @@ private:
     Ui::WindowCounter *ui;
 
     WindowCounter *counterWindow;
-    WidgetFeature *counterLeftWidget;
+    WidgetModule *counterLeftWidget;
 
     WidgetTop *WidgetTopSelection;
 
