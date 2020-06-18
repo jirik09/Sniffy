@@ -20,8 +20,6 @@ public:
 
 
 signals:
-
-
     void newData(QByteArray message);
     void devicesScaned(QList<DeviceDescriptor> deviceList);
 
@@ -39,7 +37,6 @@ private:
     bool isOpen = false;
     bool requestToScan = false;
 
-    QMutex *mutex;
 
 };
 

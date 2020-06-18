@@ -24,11 +24,12 @@ public:
     explicit WidgetModule(QWidget *parent = nullptr,  QString name="N/A");
     ~WidgetModule();
 
-    void setStatus(ModuleStatus status);
+    void setStatus(ModuleStatus stat);
+    ModuleStatus getStatus(void);
     void setIcon (QString ImageURI);
 
 signals:
-    void clicked();
+    void clicked(ModuleStatus);
 
 private slots:
 
@@ -36,6 +37,7 @@ private slots:
 
 private:
     Ui::WidgetFeature *ui;
+    ModuleStatus status;
 };
 
 

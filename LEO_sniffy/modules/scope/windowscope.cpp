@@ -290,27 +290,18 @@ void WindowScope::channelEnableCallback(int buttonStatus){
 
 }
 
-void WindowScope::setModuleWidget(WidgetModule *scopeLeftWidget){
-    scopeModuleWidget = scopeLeftWidget;
+closeEvent(QCloseEvent * event){
+
+
 }
+
 
 
 void WindowScope::visibilityChanged(bool vis){
-    if(vis){
-        scopeModuleWidget->setStatus(ModuleStatus::PLAY);
-        emit scopeWindowOpened();
-     //   scope->initDefault();
-      //  scope->startScope();
-    }else{
-        scopeModuleWidget->setStatus(ModuleStatus::STOP);
+    if(!vis){
         emit scopeWindowClosed();
-      //  scope->stopScope();
     }
 
-}
-
-void WindowScope::enableModuleWidget(){
-    scopeModuleWidget->show();
 }
 
 

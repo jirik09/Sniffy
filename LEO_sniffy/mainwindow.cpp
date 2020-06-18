@@ -131,10 +131,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     horizontalLayout->addWidget(cnt);
     dockWidget_counter->setWidget(cnt);
-    dockWidget_counter->raise();
+    dockWidget_counter->hide();
 
 
-    connect(WidgetModule_scope,SIGNAL(clicked()),this,SLOT(openScope()));
+    connect(WidgetModule_scope,SIGNAL(clicked(ModuleStatus)),this,SLOT(openScope()));
 
 
 
@@ -212,12 +212,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //pass scope pointer and pointer to module widget into scope window
-
     device->getScope()->setModuleWindow(scpWindow);
-    scpWindow->setModuleWidget(WidgetModule_scope);
-    connect(dockWidget_scope,SIGNAL(visibilityChanged(bool)),scpWindow,SLOT(visibilityChanged(bool)));
+    device->getScope()->setModuleWidget(WidgetModule_scope);
 
-  //  deviceConnectButton->setDisabledButton(true,0); //disable connect button
+    connect(dockWidget_scope,SIGNAL(visibilityChanged(bool)),scpWindow,SLOT(visibilityChanged(bool)));
 
 }
 

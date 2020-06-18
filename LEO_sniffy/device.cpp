@@ -28,24 +28,22 @@ void Device::newDeviceList(QList<DeviceDescriptor> deviceList){
 void Device::open(int deviceIndex){
     communication->open(deviceList.at(deviceIndex));
 
-    connect(this,SIGNAL(writeData(QByteArray)),communication,SLOT(write(QByteArray)),Qt::QueuedConnection);
-    connect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
-    connect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
-    connect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
-
     while (communication->getIsOpen()==false) {
         QThread::msleep(500);
         qDebug() << "ERROR wait for comm to be opened";
     }
     isConnected = communication->getIsOpen();
+
     scope->setComms(communication);
+    connect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
+
+    connect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
+    connect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
 
 }
 
 void Device::close(){
-    disconnect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
-    disconnect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
-    disconnect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
+    //TODO disconnect all the signals connected when opened
     if(isConnected){
         communication->close();
         isConnected = communication->getIsOpen();
@@ -58,8 +56,6 @@ void Device::close(){
 void Device::loadHWSpecification(void){
 
     communication->write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
-    communication->write(commands->SCOPE+":"+commands->CONFIG_REQUEST+";");
-
 }
 
 void Device::parseData(QByteArray data){
@@ -102,7 +98,6 @@ bool Device::getIsConnected() const
 
 bool Device::getIsSpecificationLoaded(){
     return deviceSpec->isSpecLoaded;
-
 }
 
 DeviceSpec* Device::getDeviceSpecification(){

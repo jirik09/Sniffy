@@ -37,12 +37,11 @@ public:
     ~WindowScope();
 
    // void setScope(Scope * scp);
-    void setModuleWidget(WidgetModule *scopeLeftWidget);
     void windowOpen();
 
     void dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase);
 
-    WidgetDial *dialTimeBase;
+
 
 signals:
 
@@ -56,7 +55,6 @@ signals:
 
 
 private slots:
-    void enableModuleWidget();
     void visibilityChanged(bool vis);
 
 
@@ -72,11 +70,7 @@ private:
 
     void fillTimeBase();
 
-    WidgetModule *scopeModuleWidget;
-
-
-
-
+    WidgetDial *dialTimeBase;
     WidgetButtons *buttonsChannelEnable;
     WidgetButtons *buttonsTriggerMode;
     WidgetButtons *buttonsTriggerChannel;

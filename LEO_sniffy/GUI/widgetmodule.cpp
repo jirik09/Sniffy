@@ -16,6 +16,8 @@ WidgetModule::WidgetModule(QWidget *parent, QString name) :
         ui->pushButton_name->setText(name);
         ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_stop.png)"));
         connect(ui->pushButton_name,SIGNAL(clicked()),this,SLOT(clickedInternal()));
+
+        status = ModuleStatus::STOP;
 }
 
 WidgetModule::~WidgetModule()
@@ -23,19 +25,25 @@ WidgetModule::~WidgetModule()
     delete ui;
 }
 
-void WidgetModule::setStatus(ModuleStatus status){
-    if(status==ModuleStatus::PLAY)
-    ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_play.png)"));
+void WidgetModule::setStatus(ModuleStatus stat){
+    if(stat==ModuleStatus::PLAY)
+        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_play.png)"));
 
-    if(status==ModuleStatus::STOP)
-    ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_stop.png)"));
+    if(stat==ModuleStatus::STOP)
+        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_stop.png)"));
 
-    if(status==ModuleStatus::PAUSE)
-    ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_pause.png)"));
+    if(stat==ModuleStatus::PAUSE)
+        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_pause.png)"));
+
+    status = stat;
+}
+
+ModuleStatus WidgetModule::getStatus(void){
+    return status;
 }
 
 void WidgetModule::clickedInternal(){
-    emit clicked ();
+    emit clicked (status);
 }
 
 void WidgetModule::setIcon (QString ImageURI){

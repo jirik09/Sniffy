@@ -15,6 +15,7 @@ void Scope::parseData(QByteArray data){
     if(dataHeader=="CFG_"){
 
         emit scopeSpecificationLoaded();
+        scpModuleWidget->show();
         //todo pass specification into scopeSpec.cpp and parse it
 
     }else if(dataHeader=="SMPL"){
@@ -265,15 +266,15 @@ void Scope::triggerChannelCallback(int index){
 }
 
 void Scope::scopeOpened(){
-    initDefault();
-    startScope();
+    //initDefault();
+   // startScope();
 }
 
 void Scope::scopeClosed(){
     stopScope();
+    scpModuleWidget->setStatus(ModuleStatus::STOP);
 
 }
-
 
 
 void Scope::stopScope(){
@@ -300,31 +301,29 @@ void Scope::setModuleWindow(WindowScope *scpWin){
     scpWindow = scpWin;
 
     //connect signals from scope to GUI --> can be actually done by function call
-    connect(this,SIGNAL(scopeSpecificationLoaded()),scpWin,SLOT(enableModuleWidget()));
+
 
     //connect signals from GUI into scope
     connect(scpWin,SIGNAL(scopeWindowOpened()),this,SLOT(scopeOpened()));
     connect(scpWin,SIGNAL(scopeWindowClosed()),this,SLOT(scopeClosed()));
     connect(scpWin,SIGNAL(timeBaseChanged(float)),this,SLOT(setTimebase(float)));
-
-
- /*
-    connect(scope,SIGNAL(scopeDataReceived(QVector<QVector<QPointF>>)),this,SLOT(dataReceived(QVector<QVector<QPointF>>)));
-    connect(scope,SIGNAL(scopeSpecified()),this,SLOT(enableModuleWidget()));
-    connect(buttonsChannelEnable,SIGNAL(statusChanged(int)),this,SLOT(channelEnableCallback(int)));
-    connect(buttonsTriggerMode,SIGNAL(clicked(int)),this, SLOT(triggerModeCallback(int)));
-    connect(buttonsTriggerEdge,SIGNAL(clicked(int)),scope, SLOT(triggerEdgeCallback(int)));
-    connect(buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
-
-    connect(dialPretrigger,SIGNAL(valueChanged(float)),scope,SLOT(setPretrigger(float)));
- //   connect(dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
-
-    connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));*/
-
-
 }
+
+void Scope::setModuleWidget(WidgetModule *scpWidget){
+    scpModuleWidget = scpWidget;
+    connect(scpModuleWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetClicked(ModuleStatus)));
+}
+
+void Scope::widgetClicked(ModuleStatus status){
+    if(status == ModuleStatus::STOP){
+        initDefault();
+        startScope();
+    }
+}
+
+
 
 void Scope::setComms(Comms *communication){
     comm = communication;
-
+    comm->write(cmd->SCOPE+":"+cmd->CONFIG_REQUEST+";");
 }
