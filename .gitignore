@@ -9,3 +9,6 @@ ui_*.*
 
 #executables
 *.exe
+
+#buit folder
+build

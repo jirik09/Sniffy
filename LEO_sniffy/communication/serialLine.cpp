@@ -43,7 +43,7 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
             sPort->waitForReadyRead(50);
 
             received = sPort->readAll();
-   //         qDebug(" %d bytes received",received.length());
+
             if (received.length()>16 && received.left(4)=="SYST"){
                 sPort->write("RES!;");
                 sPort->waitForBytesWritten();
@@ -74,7 +74,6 @@ bool SerialLine::openLine(DeviceDescriptor desc){
 
     bool ret = false;
     serPort = new QSerialPort();
-  //  connect(serPort, &QSerialPort::readyRead, this, &SerialLine::receiveData);
     serPort->setPortName(desc.port);
     serPort->setBaudRate(desc.speed);
    /* serPort->setDataBits(QSerialPort::DataBits::Data8);
@@ -125,7 +124,6 @@ void SerialLine::receiveData(QByteArray data){
         //remove message and delimiter from buffer
         buffer->remove(0,i+4);
 
-        //try to find new delimiter and message
         i = buffer->indexOf(delimiter);
     }
 }
