@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QGraphicsDropShadowEffect>
 
+#include "GUI/moduledockwidget.h"
 #include "GUI/widgetmodule.h"
 #include "GUI/widgetseparator.h"
 #include "GUI/widgetfooter.h"
@@ -43,7 +44,7 @@ private:
 
     Device *dev;
     WidgetModule *WidgetModule_scope = NULL;
-    QDockWidget *dockWidget_scope = NULL;
+    ModuleDockWidget *dockWidget_scope = NULL;
     WindowScope *scpWindow;
 
     WidgetModule *WidgetFeature_counter = NULL;
@@ -67,15 +68,11 @@ private:
 
 private slots:
    void setMenuSize();
-   void openScope();
    void deviceConnection(int buttonIndex);
    void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
    void updateSpecGUI();
-   void unDockScope();
-   void dockScope();
-   void closeScope();
 
-   void errorHandler();
+   void errorHandler(QByteArray error);
 
 };
 #endif // MAINWINDOW_H

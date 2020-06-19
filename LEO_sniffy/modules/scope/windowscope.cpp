@@ -196,6 +196,7 @@ WindowScope::WindowScope(QWidget *parent) :
     ui->verticalLayout_trace->addWidget(chart);
 
     connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
+    connect(dialPretrigger,SIGNAL(valueChanged(float)),this,SLOT(pretriggerCallback(float)));
 
 }
 
@@ -218,6 +219,11 @@ void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries, float timeB
 void WindowScope::timeBaseCallback(float value){
     emit timeBaseChanged(value);
     chart->setXAxisMax(value*10);
+}
+
+void WindowScope::pretriggerCallback(float value){
+    emit pretriggerChanged(value);
+ //   scope->setTriggerLevel(3.3/value*100);
 }
 
 void WindowScope::triggerValueCallback(float value){
@@ -270,14 +276,6 @@ void WindowScope::channelEnableCallback(int buttonStatus){
         buttonsTriggerChannel->setDisabledButton(false,3);
     }
     //scope->channelEnableCallback(buttonStatus);
-
-}
-
-void WindowScope::hideEvent(QHideEvent * event){
-    //to do this doesnt work. Try to make Windowscope directly the window.
-    qDebug() << event;
-    emit scopeWindowClosed();
-    event->accept();
 
 }
 

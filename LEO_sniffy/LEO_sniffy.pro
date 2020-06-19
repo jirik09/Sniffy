@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     GUI/customdial.cpp \
+    GUI/moduledockwidget.cpp \
     GUI/widgetbuttons.cpp \
     GUI/widgetchart.cpp \
     GUI/widgetdial.cpp \
@@ -49,6 +50,7 @@ SOURCES += \
 
 HEADERS += \
     GUI/customdial.h \
+    GUI/moduledockwidget.h \
     GUI/widgetbuttons.h \
     GUI/widgetchart.h \
     GUI/widgetdial.h \

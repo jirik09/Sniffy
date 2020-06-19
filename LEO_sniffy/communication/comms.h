@@ -23,11 +23,11 @@ public:
 signals:
     void newData(QByteArray message);
     void devicesScaned(QList<DeviceDescriptor> deviceList);
-    void communicationError();
+    void communicationError(QByteArray);
 
 private slots:
     void parseMessage(QByteArray message);
-    void errorReceived();
+    void errorReceived(QByteArray error);
 
 private:
     SerialLine *serial;

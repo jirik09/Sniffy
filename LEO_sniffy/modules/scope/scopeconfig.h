@@ -14,26 +14,26 @@ public:
 
 
     //parameters physicaly for Hardware
-    int samplingRate;
-    int ADCresolution;
-    int dataLength;
-    int triggerLevel; //16bit number
-    int pretrigger; //16bit number
-    int numberOfChannels;
+    int samplingRate = 10000;
+    int ADCresolution = 12;
+    int dataLength = 1000;
+    int triggerLevel = 32767; //16bit number
+    int pretrigger = 32767; //16bit number
+    int numberOfChannels = 1;
 
 
     //parameters for GUI
-    int enabledChannels[MAX_SCOPE_CHANNELS];
-    float triggerLevelPercent; //0-100% number
-    float pretriggerPercent; //0-100% number
+    int enabledChannels[MAX_SCOPE_CHANNELS] = {1,0 ,0, 0};
+    float triggerLevelPercent = 50; //0-100% number
+    float pretriggerPercent = 50; //0-100% number
 
 
     //params common for both
-    ScopeTriggerMode triggerMode;
-    int triggerChannel;
-    ScopeTriggerEdge triggerEdge;
-    float timeBase;
-    int longMemory;
+    ScopeTriggerMode triggerMode = ScopeTriggerMode::TRIG_AUTO;
+    int triggerChannel = 1;
+    ScopeTriggerEdge triggerEdge = ScopeTriggerEdge::EDGE_RISING;
+    float timeBase = 0.001;
+    int longMemory = 0;
     float verticalScale[MAX_SCOPE_CHANNELS];
     float verticalShift[MAX_SCOPE_CHANNELS];
 

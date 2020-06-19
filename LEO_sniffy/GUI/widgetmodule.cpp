@@ -32,7 +32,11 @@ void WidgetModule::setStatus(ModuleStatus stat){
     if(stat==ModuleStatus::STOP)
         ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_stop.png)"));
 
-    if(stat==ModuleStatus::PAUSE)
+    if(stat==ModuleStatus::HIDDEN_PLAY)
+        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_play_hidden.png)"));
+
+
+    if(stat==ModuleStatus::PAUSE || stat==ModuleStatus::HIDDEN_PAUSE)
         ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_pause.png)"));
 
     status = stat;

@@ -1,4 +1,5 @@
 debug/customdial.o
+debug/moduledockwidget.o
 debug/widgetbuttons.o
 debug/widgetchart.o
 debug/widgetdial.o
@@ -27,6 +28,7 @@ debug/scopespec.o
 debug/windowscope.o
 debug/qrc_graphics.o
 debug/moc_customdial.o
+debug/moc_moduledockwidget.o
 debug/moc_widgetbuttons.o
 debug/moc_widgetchart.o
 debug/moc_widgetdial.o

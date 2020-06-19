@@ -14,6 +14,7 @@
 #include "communication/comms.h"
 
 #include "../../GUI/widgetmodule.h"
+#include "../../GUI/moduledockwidget.h"
 
 class Scope : public QObject
 {
@@ -22,11 +23,12 @@ public:
     explicit Scope(QObject *parent = nullptr);
 
     void setModuleWindow(WindowScope *scpWin);
-    void setModuleWidget(WidgetModule *scpWidget);
-    void close();
+    void setDockWidgetWindow(ModuleDockWidget *dockWidget);
+    void setModuleControlWidget(WidgetModule *scpWidget);
+
     void setComms(Comms *communication);
 
-    void initDefault();
+    void writeConfiguration();
 
     void stopScope();
     void startScope();
@@ -42,6 +44,9 @@ signals:
     void scopeSpecificationLoaded();
     void scopeDataReceived(QVector<QVector<QPointF>>);
 
+public slots:
+    void closeModule();
+
 private slots:
     void parseData(QByteArray);
 
@@ -54,9 +59,6 @@ private slots:
     void setTriggerLevel(float percentage);
     void setPretrigger(float percentage);
 
-    void scopeOpened();
-    void scopeClosed();
-
 private:
     QVector<QVector<QPointF>> scopeData;
 
@@ -66,7 +68,8 @@ private:
     ScopeConfig *config;
 
     WindowScope *scpWindow;
-    WidgetModule *scpModuleWidget;
+    ModuleDockWidget *scpDockWidgetWindow;
+    WidgetModule *scpModuleControlWidget;
 };
 
 #endif // SCOPE_H

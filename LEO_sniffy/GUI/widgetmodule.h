@@ -12,7 +12,10 @@ enum class ModuleStatus
   {
     STOP,
     PAUSE,
-    PLAY
+    PLAY,
+    HIDDEN_PAUSE,
+    HIDDEN_PLAY
+
   };
 
 class WidgetModule : public QWidget

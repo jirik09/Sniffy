@@ -12,5 +12,7 @@
         <file>graphics/dock.png</file>
         <file>graphics/exit.png</file>
         <file>graphics/unDock.png</file>
+        <file>graphics/status_play_hidden.png</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>

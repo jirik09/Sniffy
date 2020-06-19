@@ -39,7 +39,6 @@ public:
 
     void dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase);
 
-    void hideEvent(QHideEvent * event);
 
 signals:
     void startScope();
@@ -47,12 +46,12 @@ signals:
 
     void timeBaseChanged(float value);
     void triggerChanged(ScopeTriggerMode);
-    void scopeWindowOpened();
-    void scopeWindowClosed();
+    void pretriggerChanged(float value);
 
 private slots:
     void timeBaseCallback(float value);
     void channelEnableCallback(int buttonStatus);
+    void pretriggerCallback(float value);
     void triggerValueCallback(float value);
     void triggerChannelCallback(int index);
     void triggerModeCallback(int index);

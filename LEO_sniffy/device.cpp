@@ -44,7 +44,7 @@ void Device::open(int deviceIndex){
 void Device::close(){
     if(isConnected){
         communication->close();
-        scope->close();
+        scope->closeModule();
         isConnected = communication->getIsOpen();
     }
 
@@ -58,8 +58,8 @@ void Device::close(){
     disconnect(communication,&Comms::communicationError,this,&Device::handleError);
 }
 
-void Device::handleError(){
-    emit fatalError();
+void Device::handleError(QByteArray error){
+    emit fatalError(error);
 }
 
 void Device::parseData(QByteArray data){

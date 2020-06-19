@@ -54,14 +54,29 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->dockWidget_device->setWindowTitle("Device");
 
-    dockWidget_scope=new QDockWidget(this);
-    dockWidget_scope->setObjectName("dockWidget_scope");
-    dockWidget_scope->setWindowTitle("Oscilloscope");
-    dockWidget_scope->setMinimumSize(QSize(250, 250));
-    dockWidget_scope->setFloating(false);
-    dockWidget_scope->setAllowedAreas(Qt::RightDockWidgetArea);
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_scope);
     scpWindow = new WindowScope(dockWidget_scope);
+    dockWidget_scope = new ModuleDockWidget(this,"Oscilloscope");
+    dockWidget_scope->setWidget(scpWindow);
+    addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_scope);
+
+  /*  ModuleDockWidget *myDock = new ModuleDockWidget("Hokus",this,);
+    myDock->setWindowTitle("Hokus");
+    myDock->setFloating(false);
+    myDock->setMinimumSize(QSize(250, 250));
+    myDock->setAllowedAreas(Qt::RightDockWidgetArea);
+    addDockWidget(static_cast<Qt::DockWidgetArea>(2), myDock);
+*/
+  /*  dockWidget_scopeA=new QDockWidget(this);
+    dockWidget_scopeA->setObjectName("dockWidget_scope");
+    dockWidget_scopeA->setWindowTitle("Oscilloscope");
+    dockWidget_scopeA->setMinimumSize(QSize(250, 250));
+    dockWidget_scopeA->setFloating(false);
+    dockWidget_scopeA->setAllowedAreas(Qt::RightDockWidgetArea);
+    addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_scopeA);
+
+    dockWidget_scopeA->setWidget(scpWindow);
+    dockWidget_scopeA->hide();*/
+
 
     dockWidget_counter=new QDockWidget(this);
     dockWidget_counter->setObjectName("dockWidget_counter");
@@ -72,51 +87,18 @@ MainWindow::MainWindow(QWidget *parent)
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_counter);
     cnt = new WindowCounter(dockWidget_counter);
 
-    //******************************* customized title bar widget ***********************
-    QWidget *title_bar = new QWidget();
-
-    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect();
-    effect->setBlurRadius(50);
-    dockWidget_scope->setGraphicsEffect(effect);
-
-    QHBoxLayout* layoutScope = new QHBoxLayout();
-    layoutScope->setContentsMargins(5, 5, 5, 5);
-    title_bar->setLayout(layoutScope);
-    layoutScope->addWidget(new QLabel("Scope window"));
-    layoutScope->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-    QPushButton *up = new QPushButton();
-    up->resize(10,10);
-    up->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/unDock.png);}QPushButton:hover{background-color: rgb(71, 76, 94);}"));
-    layoutScope->addWidget(up);
-    QPushButton *down = new QPushButton();
-    down->resize(10,10);
-    down->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/dock.png);}QPushButton:hover{background-color: rgb(71, 76, 94);}"));
-    layoutScope->addWidget(down);
-    QPushButton *exit = new QPushButton();
-    exit->resize(10,10);
-    exit->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/exit.png);}QPushButton:hover{background-color: rgb(120, 50, 50);}"));
-    layoutScope->addWidget(exit);
-
-    connect(up,SIGNAL(clicked()),this,SLOT(unDockScope()));
-    connect(down,SIGNAL(clicked()),this,SLOT(dockScope()));
-    connect(exit,SIGNAL(clicked()),this,SLOT(closeScope()));
-    dockWidget_scope->setTitleBarWidget(title_bar);
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
 
-    horizontalLayout->addWidget(scpWindow);
-    dockWidget_scope->setWidget(scpWindow);
-    dockWidget_scope->hide();
+   // horizontalLayout->addWidget(scpWindow);
+
 
     horizontalLayout->addWidget(cnt);
     dockWidget_counter->setWidget(cnt);
     dockWidget_counter->hide();
 
-
-    connect(WidgetModule_scope,SIGNAL(clicked(ModuleStatus)),this,SLOT(openScope()));
 
     //********************* Insert buttons and labels into central widget **************************
     QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);  //horizontal , vertical
@@ -181,9 +163,10 @@ MainWindow::MainWindow(QWidget *parent)
     deviceSelection->addOption("Scanning...",0);
 */
 
-    //pass scope pointer and pointer to module widget into scope window
+    //pass scope pointer and pointer to module widget into scope window - this connects mediator to GUI
     device->getScope()->setModuleWindow(scpWindow);
-    device->getScope()->setModuleWidget(WidgetModule_scope);
+    device->getScope()->setDockWidgetWindow(dockWidget_scope);
+    device->getScope()->setModuleControlWidget(WidgetModule_scope);
 }
 
 MainWindow::~MainWindow()
@@ -198,14 +181,6 @@ void MainWindow::setMenuSize(){
     }else{
        ui->centralwidget->setMinimumSize(250,200);
        ui->centralwidget->setMaximumSize(250,20000);
-    }
-}
-
-void MainWindow::openScope(){
-    if(dockWidget_scope->isHidden()){
-        dockWidget_scope->show();
-    }else{
-        dockWidget_scope->raise();
     }
 }
 
@@ -268,7 +243,10 @@ void MainWindow::disconnectDevice(){
     updateSpecGUI();
 }
 
-void MainWindow::errorHandler(){
+void MainWindow::errorHandler(QByteArray error){
+    QMessageBox messageBox;
+    messageBox.critical(0,"Error","An error has occured:\n" + error + "\nPlease reconnect the device");
+    messageBox.setFixedSize(500,200);
     disconnectDevice();
     deviceConnectButton->setDisabledButton(true,0);//disable connect
 }
@@ -296,22 +274,6 @@ void MainWindow::updateSpecGUI(){
         labelRTOSVer->hide();
         labelCoreFreq->hide();
     }
-}
-
-void MainWindow::unDockScope(){
-    if(dockWidget_scope->isFloating()){
-        dockWidget_scope->showFullScreen();
-    }else{
-        dockWidget_scope->setFloating(true);
-    }
-}
-
-void MainWindow::dockScope(){
-    dockWidget_scope->setFloating(false);
-}
-
-void MainWindow::closeScope(){
-    dockWidget_scope->hide();
 }
 
 

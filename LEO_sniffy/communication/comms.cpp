@@ -10,7 +10,7 @@ void Comms::open(DeviceDescriptor device){
         case Connection::SERIAL:
             isOpen = serial->openLine(device);
             connect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
-            connect(serial,SIGNAL(serialLineError()),this,SLOT(errorReceived()));
+            connect(serial,SIGNAL(serialLineError(QByteArray)),this,SLOT(errorReceived(QByteArray)));
             break;
         default:
             break;
@@ -27,7 +27,7 @@ void Comms::scanForDevices(){
 void Comms::close(){
     isOpen = false;
     disconnect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
-    disconnect(serial,SIGNAL(serialLineError()),this,SLOT(errorReceived()));
+    disconnect(serial,SIGNAL(serialLineError(QByteArray)),this,SLOT(errorReceived(QByteArray)));
     serial->closeLine();
 }
 
@@ -36,20 +36,22 @@ void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
 }
 
 void Comms::write(QByteArray module, QByteArray feature, int param){
-    QByteArray tmp (4,0);
-    tmp[3] = param>>24;
-    tmp[2] = param>>16;
-    tmp[1] = param>>8;
-    tmp[0] = param;
-    serial->write(module+":"+feature+" "+tmp+";");
+    char tmp[4] = {0};
+    tmp[3] = (param>>24);
+    tmp[2] = (param>>16);
+    tmp[1] = (param>>8);
+    tmp[0] = (param);
+    serial->write(module+":"+feature+" ");
+    serial->write(tmp,4);
+    serial->write(";");
 }
 
 void Comms::write(QByteArray data){
     serial->write(data);
 }
 
-void Comms::errorReceived(){
-    emit communicationError();
+void Comms::errorReceived(QByteArray error){
+    emit communicationError(error);
 }
 
 void Comms::parseMessage(QByteArray message){

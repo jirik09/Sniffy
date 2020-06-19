@@ -13,7 +13,7 @@ void Scope::parseData(QByteArray data){
 
     if(dataHeader=="CFG_"){
         emit scopeSpecificationLoaded();
-        scpModuleWidget->show();
+        scpModuleControlWidget->show();
         //todo pass specification into scopeSpec.cpp and parse it
 
     }else if(dataHeader=="SMPL"){
@@ -93,14 +93,12 @@ void Scope::parseData(QByteArray data){
     }
 }
 
-void Scope::initDefault(){
-    config->samplingRate = 10000;
-    comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_100K+";");
+void Scope::writeConfiguration(){
+    setTimebase(config->timeBase);
 
     config->dataLength = 1000;
     comm->write(cmd->SCOPE+":"+cmd->DATA_LENGTH+":"+cmd->SAMPLES_1K+";");
 
-    config->timeBase = 0.001;
     config->longMemory = 0;
 
     config->enabledChannels[0]=1;
@@ -155,18 +153,13 @@ void Scope::setTimebase(float div){
 
 void Scope::setPretrigger(float percentage){
     config->pretriggerPercent=percentage;
-    config->pretrigger = 65536*percentage/100;
-
-    quint32 tmpTrig = config->pretrigger;
-    QByteArray toSend;
-    QDataStream out(&toSend, QIODevice::WriteOnly);
-    out << cmd->SCOPE + ":" + cmd->SCOPE_PRETRIGGER + " " << tmpTrig << ";";
-    comm->write(toSend);
+    config->pretrigger = 65535*percentage/100;
+    comm->write(cmd->SCOPE, cmd->SCOPE_PRETRIGGER, config->pretrigger);
 }
 
 void Scope::setTriggerLevel(float percentage){
     config->triggerLevelPercent=percentage;
-    config->triggerLevel = 65536*percentage/100;
+    config->triggerLevel = 65535*percentage/100;
     comm->write(cmd->SCOPE, cmd->SCOPE_TRIG_LEVEL, config->triggerLevel);
 }
 
@@ -248,17 +241,6 @@ void Scope::triggerChannelCallback(int index){
     }
 }
 
-void Scope::scopeOpened(){
-    initDefault();
-    startScope();
-    scpModuleWidget->setStatus(ModuleStatus::PLAY);
-}
-
-void Scope::scopeClosed(){
-    stopScope();
-    scpModuleWidget->setStatus(ModuleStatus::STOP);
-}
-
 void Scope::stopScope(){
     comm->write(cmd->SCOPE+":"+cmd->STOP+";");
 }
@@ -284,23 +266,52 @@ void Scope::setModuleWindow(WindowScope *scpWin){
 
 
     //connect signals from GUI into scope
-    connect(scpWin,SIGNAL(scopeWindowOpened()),this,SLOT(scopeOpened()));
-    connect(scpWin,SIGNAL(scopeWindowClosed()),this,SLOT(scopeClosed()));
     connect(scpWin,SIGNAL(timeBaseChanged(float)),this,SLOT(setTimebase(float)));
+    connect(scpWin,SIGNAL(pretriggerChanged(float)),this,SLOT(setPretrigger(float)));
 }
 
-void Scope::setModuleWidget(WidgetModule *scpWidget){
-    scpModuleWidget = scpWidget;
-    connect(scpModuleWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetClicked(ModuleStatus)));
+void Scope::setDockWidgetWindow(ModuleDockWidget *dockWidget){
+    scpDockWidgetWindow = dockWidget;
+
+    connect(scpDockWidgetWindow, &ModuleDockWidget::moduleWindowClosing,this, &Scope::closeModule);
+
 }
 
-void Scope::close(){
-    scpModuleWidget->hide();
+void Scope::setModuleControlWidget(WidgetModule *scpWidget){
+    scpModuleControlWidget = scpWidget;
+    connect(scpModuleControlWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetClicked(ModuleStatus)));
+}
+
+void Scope::closeModule(){
+    scpDockWidgetWindow->hide();
+    stopScope();
+    scpModuleControlWidget->setStatus(ModuleStatus::STOP);
 }
 
 void Scope::widgetClicked(ModuleStatus status){
-    if(status == ModuleStatus::STOP){
-        scopeOpened();
+    switch (status) {
+    case ModuleStatus::STOP:
+        scpDockWidgetWindow->show();
+        writeConfiguration();
+        startScope();
+        scpModuleControlWidget->setStatus(ModuleStatus::PLAY);
+        break;
+    case ModuleStatus::PLAY:
+        scpDockWidgetWindow->hide();
+        scpModuleControlWidget->setStatus(ModuleStatus::HIDDEN_PLAY);
+        break;
+    case ModuleStatus::PAUSE:
+        scpDockWidgetWindow->hide();
+        scpModuleControlWidget->setStatus(ModuleStatus::HIDDEN_PAUSE);
+        break;
+    case ModuleStatus::HIDDEN_PLAY:
+        scpDockWidgetWindow->show();
+        scpModuleControlWidget->setStatus(ModuleStatus::PLAY);
+        break;
+    case ModuleStatus::HIDDEN_PAUSE:
+        scpDockWidgetWindow->show();
+        scpModuleControlWidget->setStatus(ModuleStatus::PAUSE);
+        break;
     }
 }
 

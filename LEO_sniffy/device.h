@@ -30,13 +30,13 @@ signals:
 
     void updateDeviceList(QList<DeviceDescriptor> deviceList);
     void updateSpecfication();
-    void fatalError();
+    void fatalError(QByteArray);
 
 private slots:
     void parseData(QByteArray data);
     void parseSystemData(QByteArray data);
     void newDeviceList(QList<DeviceDescriptor> deviceList);
-    void handleError();
+    void handleError(QByteArray error);
 
 
 private:

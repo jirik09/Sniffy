@@ -1,4 +1,5 @@
 release/customdial.o
+release/moduledockwidget.o
 release/widgetbuttons.o
 release/widgetchart.o
 release/widgetdial.o
@@ -27,6 +28,7 @@ release/scopespec.o
 release/windowscope.o
 release/qrc_graphics.o
 release/moc_customdial.o
+release/moc_moduledockwidget.o
 release/moc_widgetbuttons.o
 release/moc_widgetchart.o
 release/moc_widgetdial.o

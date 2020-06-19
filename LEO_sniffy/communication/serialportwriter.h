@@ -19,6 +19,7 @@ class SerialPortWriter : public QObject
 public:
     explicit SerialPortWriter(QSerialPort *serialPort, QObject *parent = nullptr);
     void write(const QByteArray &writeData);
+    void write(const char *writeData, qint32 len);
 
 private slots:
     void handleBytesWritten(qint64 bytes);

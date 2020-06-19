@@ -28,12 +28,13 @@ public:
 
     bool openLine(DeviceDescriptor desc);
     void closeLine();
-    void write(const char *data);
+    void write(const char *data, qint32 len);
+    void write(const QByteArray &writeData);
 
 
 signals:
         void newMessage(QByteArray message);
-        void serialLineError();
+        void serialLineError(QByteArray error);
 
 private slots:
         void handleError(QSerialPort::SerialPortError error);

@@ -44,7 +44,7 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
 
             received = sPort->readAll();
    //         qDebug(" %d bytes received",received.length());
-            if (received.length()>16){
+            if (received.length()>16 && received.left(4)=="SYST"){
                 sPort->write("RES!;");
                 sPort->waitForBytesWritten();
 
@@ -105,7 +105,11 @@ void SerialLine::closeLine(){
 
 void SerialLine::handleError(QSerialPort::SerialPortError error){
     qDebug()<<"FATAL ERROR occured on serial line" << error;
-    emit serialLineError();
+
+    QByteArray errorString;
+    QDataStream out(&errorString, QIODevice::WriteOnly);
+
+    emit serialLineError("SerialLine Error");
 }
 
 
@@ -126,14 +130,24 @@ void SerialLine::receiveData(QByteArray data){
     }
 }
 
-
-void SerialLine::write(const char *data){
+void SerialLine::write(const QByteArray &writeData){
     QDateTime date = QDateTime::currentDateTime();
-    qDebug() << "Sent" <<  date.time() <<":" << data;
+    qDebug() << "Sent" <<  date.time() <<":" << writeData;
     if(serPort->isOpen()){
-        serialWriter->write(data);
+        serialWriter->write(writeData);
     }else{
         qDebug() << "ERROR cannot send data: port is closed";
     }
 }
+
+void SerialLine::write(const char *data, qint32 len){
+    QDateTime date = QDateTime::currentDateTime();
+    qDebug() << "Sent" <<  date.time() <<":" << data;
+    if(serPort->isOpen()){
+        serialWriter->write(data,len);
+    }else{
+        qDebug() << "ERROR cannot send data: port is closed";
+    }
+}
+
 
