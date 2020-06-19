@@ -44,6 +44,9 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     modules/abstractmodule.cpp \
+    modules/counter/counter.cpp \
+    modules/counter/counterconfig.cpp \
+    modules/counter/counterspec.cpp \
     modules/counter/windowcounter.cpp \
     modules/scope/scope.cpp \
     modules/scope/scopeconfig.cpp \
@@ -79,6 +82,10 @@ HEADERS += \
     devicespec.h \
     graphics/colors.h \
     mainwindow.h \
+    modules/counter/counter.h \
+    modules/counter/counterconfig.h \
+    modules/counter/counterdefs.h \
+    modules/counter/counterspec.h \
     modules/abstractmodule.h \
     modules/counter/windowcounter.h \
     modules/scope/scope.h \

@@ -14,6 +14,7 @@
 #include "../../GUI/widgetbuttons.h"
 #include "../../GUI/widgetlabel.h"
 #include "../../GUI/widgetselection.h"
+#include "../../GUI/widgettab.h"
 
 namespace Ui {
 class WindowCounter;
@@ -30,26 +31,6 @@ public:
 
 private:
     Ui::WindowCounter *ui;
-
-    WindowCounter *counterWindow;
-    WidgetControlModule *counterLeftWidget;
-
-    WidgetTop *WidgetTopSelection;
-
-    QWidget *WidgetHighFrequency;
-    QScrollArea *scrollAreaHighFrequency;
-    QVBoxLayout *verticalLayoutHighFrequency;
-
-    QWidget *WidgetLowFrequency;
-    QScrollArea *scrollAreaLowFrequency;
-    QVBoxLayout *verticalLayoutLowFrequency;
-
-
-private slots:
-    void highFrequencyClicked();
-    void lowFrequencyClicked();
-    void frequencyRatioClicked();
-    void timeIntervalClicked();
 
 };
 
