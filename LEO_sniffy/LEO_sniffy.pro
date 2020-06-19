@@ -23,6 +23,7 @@ SOURCES += \
     GUI/widgetchart.cpp \
     GUI/widgetdial.cpp \
     GUI/widgetdialrange.cpp \
+    GUI/widgetdisplay.cpp \
     GUI/widgetfooter.cpp \
     GUI/widgetlabel.cpp \
     GUI/widgetmodule.cpp \
@@ -53,6 +54,7 @@ HEADERS += \
     GUI/widgetchart.h \
     GUI/widgetdial.h \
     GUI/widgetdialrange.h \
+    GUI/widgetdisplay.h \
     GUI/widgetfooter.h \
     GUI/widgetlabel.h \
     GUI/widgetmodule.h \
@@ -86,6 +88,7 @@ FORMS += \
     GUI/widgetchart.ui \
     GUI/widgetdial.ui \
     GUI/widgetdialrange.ui \
+    GUI/widgetdisplay.ui \
     GUI/widgetfooter.ui \
     GUI/widgetlabel.ui \
     GUI/widgetmodule.ui \
