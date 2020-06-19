@@ -13,7 +13,7 @@
 #include "communication/Commands.h"
 #include "communication/comms.h"
 
-#include "../../GUI/widgetmodule.h"
+#include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
 
 class Counter : public QObject
@@ -24,7 +24,7 @@ public:
 
     void setModuleWindow(WindowCounter *cntWin);
     void setDockWidgetWindow(ModuleDockWidget *dockWidget);
-    void setModuleControlWidget(WidgetModule *cntWidget);
+    void setModuleControlWidget(WidgetControlModule *cntWidget);
 
     void setComms(Comms *communication);
 
@@ -38,7 +38,7 @@ private:
 
     WindowCounter *cntWindow;
     ModuleDockWidget *cntDockWidgetWindow;
-    WidgetModule *cntModuleControlWidget;
+    WidgetControlModule *cntModuleControlWidget;
 
 };
 
