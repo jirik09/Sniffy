@@ -30,15 +30,14 @@ void Device::open(int deviceIndex){
     }
     isConnected = communication->getIsOpen();
 
-    scope->setComms(communication);
     connect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
-
-    connect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
     connect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
-
+    connect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
     connect(communication,&Comms::communicationError,this,&Device::handleError);
 
     communication->write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
+
+    scope->setComms(communication,commands->SCOPE);
 }
 
 void Device::close(){
@@ -107,6 +106,12 @@ bool Device::getIsSpecificationLoaded(){
 
 DeviceSpec* Device::getDeviceSpecification(){
     return deviceSpec;
+}
+
+void Device::createModule(WindowScope *moduleWidget,ModuleDockWidget *dockWidget ,WidgetControlModule *controlModule){
+    scope->setModuleWindow(moduleWidget);
+    scope->setDockWidgetWindow(dockWidget);
+    scope->setModuleControlWidget(controlModule);
 }
 
 Scope* Device::getScope(){

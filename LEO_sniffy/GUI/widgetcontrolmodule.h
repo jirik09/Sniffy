@@ -18,14 +18,14 @@ enum class ModuleStatus
 
   };
 
-class WidgetModule : public QWidget
+class WidgetControlModule : public QWidget
 {
     Q_OBJECT
 
 public:
 
-    explicit WidgetModule(QWidget *parent = nullptr,  QString name="N/A");
-    ~WidgetModule();
+    explicit WidgetControlModule(QWidget *parent = nullptr,  QString name="N/A");
+    ~WidgetControlModule();
 
     void setStatus(ModuleStatus stat);
     ModuleStatus getStatus(void);

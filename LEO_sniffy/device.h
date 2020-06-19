@@ -22,6 +22,7 @@ public:
     void ScanDevices();
 
     Scope* getScope();
+    void createModule(WindowScope *moduleWidget,ModuleDockWidget *dockWidget ,WidgetControlModule *controlModule);
 
 signals:
     void scopeNewData(QByteArray);

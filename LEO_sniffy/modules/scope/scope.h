@@ -13,25 +13,27 @@
 #include "communication/Commands.h"
 #include "communication/comms.h"
 
-#include "../../GUI/widgetmodule.h"
+#include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
 
-class Scope : public QObject
+#include "../abstractmodule.h"
+
+class Scope : public AbstractModule
 {
     Q_OBJECT
 public:
     explicit Scope(QObject *parent = nullptr);
 
     void setModuleWindow(WindowScope *scpWin);
-    void setDockWidgetWindow(ModuleDockWidget *dockWidget);
-    void setModuleControlWidget(WidgetModule *scpWidget);
+  //  void setDockWidgetWindow(ModuleDockWidget *dockWidget);
+ //   void setModuleControlWidget(WidgetControlModule *scpWidget);
 
-    void setComms(Comms *communication);
+ //   void setComms(Comms *communication);
 
     void writeConfiguration();
 
-    void stopScope();
-    void startScope();
+    void stopModule();
+    void startModule();
     void scopeNextData();
 
     float getTimebase();
@@ -45,12 +47,10 @@ signals:
     void scopeDataReceived(QVector<QVector<QPointF>>);
 
 public slots:
-    void closeModule();
+  //  void closeModule();
 
 private slots:
     void parseData(QByteArray);
-
-    void widgetClicked(ModuleStatus status);
 
     void triggerEdgeCallback(int buttonIndex);
     void triggerChannelCallback(int index);
@@ -62,14 +62,9 @@ private slots:
 private:
     QVector<QVector<QPointF>> scopeData;
 
-    Commands *cmd;
-    Comms *comm;
-
     ScopeConfig *config;
 
     WindowScope *scpWindow;
-    ModuleDockWidget *scpDockWidgetWindow;
-    WidgetModule *scpModuleControlWidget;
 };
 
 #endif // SCOPE_H
