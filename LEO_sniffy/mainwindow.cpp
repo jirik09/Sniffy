@@ -26,16 +26,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     /* BUDE HROMADA DUPLICIT - REFACTOR */
 
-    WidgetModule_scope = new WidgetModule(ui->centralwidget,"Oscilloscope");
+    WidgetModule_scope = new WidgetControlModule(ui->centralwidget,"Oscilloscope");
     ui->verticalLayout_features->addWidget(WidgetModule_scope);
     WidgetModule_scope->setStatus(ModuleStatus::STOP);
     WidgetModule_scope->hide();
 
-    WidgetFeature_gen = new WidgetModule(ui->centralwidget,"Signal generator");
+    WidgetFeature_gen = new WidgetControlModule(ui->centralwidget,"Signal generator");
     ui->verticalLayout_features->addWidget(WidgetFeature_gen);
     WidgetFeature_gen->setStatus(ModuleStatus::STOP);
 
-    WidgetFeature_counter = new WidgetModule(ui->centralwidget,"Counter");
+    WidgetFeature_counter = new WidgetControlModule(ui->centralwidget,"Counter");
     ui->verticalLayout_features->addWidget(WidgetFeature_counter);
     WidgetFeature_counter->setStatus(ModuleStatus::STOP);
 
@@ -156,6 +156,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(device,SIGNAL(updateSpecfication()),this,SLOT(updateSpecGUI()));
     connect(device, &Device::fatalError,this,&MainWindow::errorHandler);
 
+    device->createModule(scpWindow,dockWidget_scope,WidgetModule_scope);
+
 
     //this code enables automatic scan at startup
   /*  device->ScanDevices();
@@ -164,9 +166,6 @@ MainWindow::MainWindow(QWidget *parent)
 */
 
     //pass scope pointer and pointer to module widget into scope window - this connects mediator to GUI
-    device->getScope()->setModuleWindow(scpWindow);
-    device->getScope()->setDockWidgetWindow(dockWidget_scope);
-    device->getScope()->setModuleControlWidget(WidgetModule_scope);
 }
 
 MainWindow::~MainWindow()

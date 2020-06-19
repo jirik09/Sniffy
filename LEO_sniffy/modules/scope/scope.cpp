@@ -1,7 +1,8 @@
 #include "scope.h"
 
-Scope::Scope(QObject *parent) : QObject(parent)
+Scope::Scope(QObject *parent)
 {
+    Q_UNUSED(parent);
     config = new ScopeConfig();
     cmd = new Commands();
 }
@@ -13,7 +14,7 @@ void Scope::parseData(QByteArray data){
 
     if(dataHeader=="CFG_"){
         emit scopeSpecificationLoaded();
-        scpModuleControlWidget->show();
+        moduleControlWidget->show();
         //todo pass specification into scopeSpec.cpp and parse it
 
     }else if(dataHeader=="SMPL"){
@@ -241,10 +242,10 @@ void Scope::triggerChannelCallback(int index){
     }
 }
 
-void Scope::stopScope(){
+void Scope::stopModule(){
     comm->write(cmd->SCOPE+":"+cmd->STOP+";");
 }
-void Scope::startScope(){
+void Scope::startModule(){
     comm->write(cmd->SCOPE+":"+cmd->START+";");
 }
 void Scope::scopeNextData(){
@@ -270,52 +271,8 @@ void Scope::setModuleWindow(WindowScope *scpWin){
     connect(scpWin,SIGNAL(pretriggerChanged(float)),this,SLOT(setPretrigger(float)));
 }
 
-void Scope::setDockWidgetWindow(ModuleDockWidget *dockWidget){
-    scpDockWidgetWindow = dockWidget;
 
-    connect(scpDockWidgetWindow, &ModuleDockWidget::moduleWindowClosing,this, &Scope::closeModule);
 
-}
 
-void Scope::setModuleControlWidget(WidgetModule *scpWidget){
-    scpModuleControlWidget = scpWidget;
-    connect(scpModuleControlWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetClicked(ModuleStatus)));
-}
 
-void Scope::closeModule(){
-    scpDockWidgetWindow->hide();
-    stopScope();
-    scpModuleControlWidget->setStatus(ModuleStatus::STOP);
-}
 
-void Scope::widgetClicked(ModuleStatus status){
-    switch (status) {
-    case ModuleStatus::STOP:
-        scpDockWidgetWindow->show();
-        writeConfiguration();
-        startScope();
-        scpModuleControlWidget->setStatus(ModuleStatus::PLAY);
-        break;
-    case ModuleStatus::PLAY:
-        scpDockWidgetWindow->hide();
-        scpModuleControlWidget->setStatus(ModuleStatus::HIDDEN_PLAY);
-        break;
-    case ModuleStatus::PAUSE:
-        scpDockWidgetWindow->hide();
-        scpModuleControlWidget->setStatus(ModuleStatus::HIDDEN_PAUSE);
-        break;
-    case ModuleStatus::HIDDEN_PLAY:
-        scpDockWidgetWindow->show();
-        scpModuleControlWidget->setStatus(ModuleStatus::PLAY);
-        break;
-    case ModuleStatus::HIDDEN_PAUSE:
-        scpDockWidgetWindow->show();
-        scpModuleControlWidget->setStatus(ModuleStatus::PAUSE);
-        break;
-    }
-}
-
-void Scope::setComms(Comms *communication){
-    comm = communication;
-    comm->write(cmd->SCOPE+":"+cmd->CONFIG_REQUEST+";");
-}

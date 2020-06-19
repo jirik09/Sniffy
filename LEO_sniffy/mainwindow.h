@@ -9,7 +9,7 @@
 #include <QGraphicsDropShadowEffect>
 
 #include "GUI/moduledockwidget.h"
-#include "GUI/widgetmodule.h"
+#include "GUI/widgetcontrolmodule.h"
 #include "GUI/widgetseparator.h"
 #include "GUI/widgetfooter.h"
 #include "modules/scope/windowscope.h"
@@ -43,15 +43,15 @@ private:
     Ui::MainWindow *ui;
 
     Device *dev;
-    WidgetModule *WidgetModule_scope = NULL;
+    WidgetControlModule *WidgetModule_scope = NULL;
     ModuleDockWidget *dockWidget_scope = NULL;
     WindowScope *scpWindow;
 
-    WidgetModule *WidgetFeature_counter = NULL;
+    WidgetControlModule *WidgetFeature_counter = NULL;
     QDockWidget *dockWidget_counter = NULL;
     WindowCounter *cnt;
 
-    WidgetModule *WidgetFeature_gen = NULL;
+    WidgetControlModule *WidgetFeature_gen = NULL;
 
     QScrollArea *scrollAreaSpecification;
     QWidget *WidgetSpecification;

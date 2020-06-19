@@ -39,8 +39,8 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
             sPort->write("IDN?;");
             sPort->waitForBytesWritten();
 
-            QThread::msleep(50);
-            sPort->waitForReadyRead(50);
+            QThread::msleep(100);
+            sPort->waitForReadyRead(100);
 
             received = sPort->readAll();
 
@@ -48,11 +48,11 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
                 sPort->write("RES!;");
                 sPort->waitForBytesWritten();
 
-                thread()->msleep(50);
+                thread()->msleep(150);
                 sPort->write("IDN?;");
                 sPort->waitForBytesWritten();
 
-                thread()->msleep(50);
+                thread()->msleep(100);
                 sPort->waitForReadyRead(50);
 
                 received = sPort->readAll();

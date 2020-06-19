@@ -55,7 +55,7 @@ background-color: rgb(58, 58, 58);
      <property name="handleWidth">
       <number>3</number>
      </property>
-     <widget class="QWidget" name="widget_left" native="true">
+     <widget class="QWidget" name="widget_display" native="true">
       <property name="styleSheet">
        <string notr="true"/>
       </property>
@@ -76,7 +76,7 @@ background-color: rgb(58, 58, 58);
         <number>0</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_left"/>
+        <layout class="QVBoxLayout" name="verticalLayout_display"/>
        </item>
       </layout>
      </widget>

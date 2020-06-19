@@ -8,7 +8,7 @@
 #include <QtCore/QtMath>
 #include <QDebug>
 
-#include "../../GUI/widgetmodule.h"
+#include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgettop.h"
 #include "../../GUI/widgetseparator.h"
 #include "../../GUI/widgetdial.h"
@@ -35,15 +35,10 @@ public:
     explicit WindowScope(QWidget *parent = nullptr);
     ~WindowScope();
 
-    void windowOpen();
-
     void dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase);
 
 
 signals:
-    void startScope();
-    void stopScope();
-
     void timeBaseChanged(float value);
     void triggerChanged(ScopeTriggerMode);
     void pretriggerChanged(float value);

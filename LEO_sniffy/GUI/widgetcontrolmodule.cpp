@@ -4,10 +4,10 @@ Widget to be shown on the left selection in centralWidget
 - Can have icon on the left and text desription
 - On the right side is shown stauts of the feature (Play, Stop, Idle, Error)
 */
-#include "widgetmodule.h"
-#include "ui_widgetfeature.h"
+#include "widgetcontrolmodule.h"
+#include "ui_widgetmodule.h"
 
-WidgetModule::WidgetModule(QWidget *parent, QString name) :
+WidgetControlModule::WidgetControlModule(QWidget *parent, QString name) :
     QWidget(parent),
     ui(new Ui::WidgetFeature)
 {
@@ -20,12 +20,12 @@ WidgetModule::WidgetModule(QWidget *parent, QString name) :
         status = ModuleStatus::STOP;
 }
 
-WidgetModule::~WidgetModule()
+WidgetControlModule::~WidgetControlModule()
 {
     delete ui;
 }
 
-void WidgetModule::setStatus(ModuleStatus stat){
+void WidgetControlModule::setStatus(ModuleStatus stat){
     if(stat==ModuleStatus::PLAY)
         ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_play.png)"));
 
@@ -42,15 +42,15 @@ void WidgetModule::setStatus(ModuleStatus stat){
     status = stat;
 }
 
-ModuleStatus WidgetModule::getStatus(void){
+ModuleStatus WidgetControlModule::getStatus(void){
     return status;
 }
 
-void WidgetModule::clickedInternal(){
+void WidgetControlModule::clickedInternal(){
     emit clicked (status);
 }
 
-void WidgetModule::setIcon (QString ImageURI){
+void WidgetControlModule::setIcon (QString ImageURI){
     ui->pushButton_name->setIcon(QIcon(ImageURI));
 }
 
