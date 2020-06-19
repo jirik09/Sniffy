@@ -162,6 +162,8 @@ void Scope::setTriggerLevel(float percentage){
     config->triggerLevelPercent=percentage;
     config->triggerLevel = 65535*percentage/100;
     comm->write(cmd->SCOPE, cmd->SCOPE_TRIG_LEVEL, config->triggerLevel);
+
+    qDebug () << "trigger value was set to" <<config->triggerLevel;
 }
 
 void Scope::setNumberOfChannels(int num){
@@ -269,6 +271,9 @@ void Scope::setModuleWindow(WindowScope *scpWin){
     //connect signals from GUI into scope
     connect(scpWin,SIGNAL(timeBaseChanged(float)),this,SLOT(setTimebase(float)));
     connect(scpWin,SIGNAL(pretriggerChanged(float)),this,SLOT(setPretrigger(float)));
+    connect(scpWin, &WindowScope::triggerValueChanged,this,&Scope::setTriggerLevel);
+    connect(scpWin, &WindowScope::channelEnableChanged,this,&Scope::channelEnableCallback);
+
 }
 
 

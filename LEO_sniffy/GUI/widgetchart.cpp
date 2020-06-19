@@ -15,6 +15,10 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart = new QChart();
     chart->legend()->hide();
 
+    QMargins *chrtMargin = new QMargins(0,0,0,0);
+
+    chart->setMargins(*chrtMargin);
+
     axisX = new QValueAxis;
     axisY = new QValueAxis;
 
@@ -27,7 +31,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     colors[3] = QColor(204,24,224);
 
     axisX->setRange(0, 0.1);
-    axisY->setRange(-0.1, 4.0);
+    axisY->setRange(-0.1, 3.9);
 
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = 0; //spline
@@ -46,7 +50,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     }
 
     QChartView *chartView = new QChartView(chart);
-    chartView->setMinimumSize(500,250);
+    chartView->setMinimumSize(200,100);
         //chartView->setStyleSheet(QString::fromUtf8("background-color: rgb(155, 155, 155);color: rgb(255, 255, 255);"));
 
 
@@ -54,18 +58,30 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 
         chart->setBackgroundBrush(QColor(38,38,38));
 
-      /*  QPen axisPen(QRgb(0xf0f0f0));
+        /*QPen axisPen(QRgb(0xf0f0f0));
         axisPen.setWidth(2);
         axisX->setLinePen(axisPen);
         axisY->setLinePen(axisPen);*/
+
+        axisX->setLabelsBrush(QBrush(QColor(128,128,128)));
+        axisX->setLabelFormat("%.0e");
+        axisY->setLabelsBrush(QBrush(QColor(128,128,128)));
+        axisY->setLabelFormat("%.2g");
+
+        QFont font = axisX->labelsFont();
+        font.setPointSize(8);
+        axisX->setLabelsFont(font);
+        axisY->setLabelsFont(font);
 
        // axisX->setMinorGridLineVisible(true);
         axisX->setTickCount(11);
         axisY->setTickCount(9);
 
 
-        axisX->setLabelsVisible(false);
-        axisY->setLabelsVisible(false);
+      //  axisX->setLabelsVisible(false);
+     //   axisY->setLabelsVisible(false);
+
+       // axisX->setShadesVisible(false);
 
         //axisX->setLabelsBrush(axisBrush);
         //axisY->setLabelsBrush(axisBrush);

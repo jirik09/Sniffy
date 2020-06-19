@@ -19,6 +19,7 @@
 #include "../../GUI/widgetselection.h"
 #include "../../GUI/widgetchart.h"
 #include "../../GUI/widgettab.h"
+#include "../../GUI/widgetlabelarea.h"
 
 #include "scopedefs.h"
 
@@ -42,6 +43,9 @@ signals:
     void timeBaseChanged(float value);
     void triggerChanged(ScopeTriggerMode);
     void pretriggerChanged(float value);
+    void triggerValueChanged(float value);
+    void channelEnableChanged(int buttonStatus);
+
 
 private slots:
     void timeBaseCallback(float value);
@@ -66,6 +70,7 @@ private:
     WidgetDialRange *dialTriggerValue;
 
     widgetChart *chart;
+    widgetLabelArea *infoPanel;
 };
 
 #endif // WINDOWSCOPE_H

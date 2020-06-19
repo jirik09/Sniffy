@@ -195,8 +195,16 @@ WindowScope::WindowScope(QWidget *parent) :
     chart = new widgetChart(ui->widget_trace,4);
     ui->verticalLayout_trace->addWidget(chart);
 
+    infoPanel = new widgetLabelArea(ui->widget_info);
+    ui->verticalLayout_info->addWidget(infoPanel);
+
+
+
+
     connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
     connect(dialPretrigger,SIGNAL(valueChanged(float)),this,SLOT(pretriggerCallback(float)));
+    connect(buttonsChannelEnable,SIGNAL(statusChanged(int)),this,SLOT(channelEnableCallback(int)));
+    connect(dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
 
 }
 
@@ -227,7 +235,7 @@ void WindowScope::pretriggerCallback(float value){
 }
 
 void WindowScope::triggerValueCallback(float value){
- //   scope->setTriggerLevel(3.3/value*100);
+    emit triggerValueChanged(value/3.3*100);
 }
 
 void WindowScope::triggerChannelCallback(int index){
@@ -275,7 +283,7 @@ void WindowScope::channelEnableCallback(int buttonStatus){
     if(buttonStatus & 0x08){
         buttonsTriggerChannel->setDisabledButton(false,3);
     }
-    //scope->channelEnableCallback(buttonStatus);
+    emit channelEnableChanged(buttonStatus);
 
 }
 
