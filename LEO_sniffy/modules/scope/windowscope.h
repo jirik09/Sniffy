@@ -38,12 +38,19 @@ public:
 
     void dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase);
 
+    void singleSamplingDone();
+    void samplingOngoing();
+    void triggerCaptured();
+    void setRealSamplingRate(int smpl);
+
 
 signals:
     void timeBaseChanged(float value);
-    void triggerChanged(ScopeTriggerMode);
+    void triggerModeChanged(ScopeTriggerMode);
+    void triggerEdgeChanged(ScopeTriggerEdge);
     void pretriggerChanged(float value);
     void triggerValueChanged(float value);
+    void triggerChannelChanged(int index);
     void channelEnableChanged(int buttonStatus);
 
 
@@ -53,12 +60,13 @@ private slots:
     void pretriggerCallback(float value);
     void triggerValueCallback(float value);
     void triggerChannelCallback(int index);
+    void triggerEdgeCallback(int index);
     void triggerModeCallback(int index);
 
 private:
     Ui::WindowScope *ui;
 
-    void fillTimeBase();
+
 
     WidgetDial *dialTimeBase;
     WidgetButtons *buttonsChannelEnable;
@@ -71,6 +79,9 @@ private:
 
     widgetChart *chart;
     widgetLabelArea *infoPanel;
+
+    void updateChartScale(float timeBase);
+    void fillTimeBase();
 };
 
 #endif // WINDOWSCOPE_H

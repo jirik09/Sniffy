@@ -57,6 +57,9 @@ background-color: rgb(58, 58, 58);
        <string notr="true"/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
         <number>5</number>
        </property>
@@ -67,7 +70,7 @@ background-color: rgb(58, 58, 58);
         <number>5</number>
        </property>
        <property name="bottomMargin">
-        <number>0</number>
+        <number>5</number>
        </property>
        <item>
         <widget class="QWidget" name="widget_top" native="true">
@@ -100,7 +103,9 @@ background-color: rgb(58, 58, 58);
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true"/>
+          <string notr="true">QWidget{
+background-color: rgb(38, 38, 38);
+}</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_trace">
           <property name="spacing">
@@ -132,7 +137,7 @@ background-color: rgb(58, 58, 58);
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>50</height>
+           <height>10</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -141,9 +146,14 @@ background-color: rgb(58, 58, 58);
            <height>150</height>
           </size>
          </property>
+         <property name="styleSheet">
+          <string notr="true">QWidget{
+background-color: rgb(38, 38, 38);
+}</string>
+         </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <property name="spacing">
-           <number>5</number>
+           <number>0</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -155,10 +165,14 @@ background-color: rgb(58, 58, 58);
            <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>5</number>
           </property>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_info"/>
+           <layout class="QVBoxLayout" name="verticalLayout_info">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+           </layout>
           </item>
          </layout>
         </widget>

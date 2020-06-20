@@ -15,7 +15,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart = new QChart();
     chart->legend()->hide();
 
-    QMargins *chrtMargin = new QMargins(0,0,0,0);
+    QMargins *chrtMargin = new QMargins(0,5,0,0);
 
     chart->setMargins(*chrtMargin);
 

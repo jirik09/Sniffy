@@ -6,6 +6,8 @@
 #include <QPushButton>
 #include <QtMath>
 
+#include "../graphics/colors.h"
+
 namespace Ui {
 class WidgetButtons;
 }
@@ -17,10 +19,7 @@ enum class ButtonTypes
     RADIO
   };
 
-#define BACKGROUND_COLOR_BLUE   "background-color: rgb(24,154,224);"
-#define BACKGROUND_COLOR_ORANGE "background-color: rgb(255,170,0);"
-#define BACKGROUND_COLOR_GREEN  "background-color: rgb(54,154,24);"
-#define BACKGROUND_COLOR_PURPLE "background-color: rgb(204,24,224);"
+
 
 //#define SELECTED_STYLE "border: none;"
 
@@ -39,13 +38,13 @@ public:
     void clickedInternal (int index);
     bool isChecked (int index);
     int getStatus();
-    void setDisabledButton(bool state, int index);
+    void setDisabledButton(bool disabled, int index);
     void disableAll();
     void setChecked (bool checked, int index);
 
 private:
     Ui::WidgetButtons *ui;
-    QString buttonColors[8] = {BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE,BACKGROUND_COLOR_BLUE};
+    QString buttonColors[8] = {BUTTON_COLOR_BLUE};
     ButtonTypes type = ButtonTypes::NORMAL;
 
     QList<QPushButton*> *pushButtonsList;

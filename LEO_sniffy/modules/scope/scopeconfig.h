@@ -12,6 +12,7 @@ class ScopeConfig : public QObject
 public:
     explicit ScopeConfig(QObject *parent = nullptr);
 
+    //all parameters must be initialized to default values and also aligned with GUI (I know it is not good)
 
     //parameters physicaly for Hardware
     int samplingRate = 10000;
@@ -30,15 +31,13 @@ public:
 
     //params common for both
     ScopeTriggerMode triggerMode = ScopeTriggerMode::TRIG_AUTO;
-    int triggerChannel = 1;
+    int triggerChannelIndex = 0;
     ScopeTriggerEdge triggerEdge = ScopeTriggerEdge::EDGE_RISING;
     float timeBase = 0.001;
     int longMemory = 0;
     float verticalScale[MAX_SCOPE_CHANNELS];
     float verticalShift[MAX_SCOPE_CHANNELS];
 
-
-signals:
 
 };
 

@@ -15,6 +15,11 @@ public:
     explicit widgetLabelArea(QWidget *parent = nullptr);
     ~widgetLabelArea();
 
+    void setTriggerLabelText(QString text);
+    void setSamplingRateLabelText(QString text);
+    void setScaleLabelText(QString text);
+
+
 private:
     Ui::widgetLabelArea *ui;
 };

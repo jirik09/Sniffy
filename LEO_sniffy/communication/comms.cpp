@@ -35,6 +35,10 @@ void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
     serial->write(module+":"+feature+":"+param+";");
 }
 
+void Comms::write(QByteArray module, QByteArray command){
+    serial->write(module+":"+command+";");
+}
+
 void Comms::write(QByteArray module, QByteArray feature, int param){
     char tmp[4] = {0};
     tmp[3] = (param>>24);

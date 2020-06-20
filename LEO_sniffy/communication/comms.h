@@ -18,6 +18,7 @@ public:
 
     void write(QByteArray module, QByteArray feature, QByteArray param);
     void write(QByteArray module, QByteArray feature, int param);
+    void write(QByteArray module, QByteArray command);
     void write(QByteArray data);
 
 signals:

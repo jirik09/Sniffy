@@ -16,6 +16,14 @@ WindowScope::WindowScope(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    chart = new widgetChart(ui->widget_trace,4);
+    ui->verticalLayout_trace->addWidget(chart);
+
+    infoPanel = new widgetLabelArea(ui->widget_info);
+    ui->verticalLayout_info->addWidget(infoPanel);
+
+
+
     //********************* insert top options *********************
     widgetTab *tabs = new widgetTab(ui->widget_settings,4);
     ui->verticalLayout_settings->addWidget(tabs);
@@ -35,13 +43,13 @@ WindowScope::WindowScope(QWidget *parent) :
     buttonsChannelEnable = new WidgetButtons(tabs,4,ButtonTypes::CHECKABLE);
     tabs->getLayout(0)->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
-    buttonsChannelEnable->setColor(BACKGROUND_COLOR_ORANGE,0);
+    buttonsChannelEnable->setColor(BUTTON_COLOR_ORANGE,0);
     buttonsChannelEnable->setText("CH2",1);
-    buttonsChannelEnable->setColor(BACKGROUND_COLOR_BLUE,1);
+    buttonsChannelEnable->setColor(BUTTON_COLOR_BLUE,1);
     buttonsChannelEnable->setText("CH3",2);
-    buttonsChannelEnable->setColor(BACKGROUND_COLOR_GREEN,2);
+    buttonsChannelEnable->setColor(BUTTON_COLOR_GREEN,2);
     buttonsChannelEnable->setText("CH4",3);
-    buttonsChannelEnable->setColor(BACKGROUND_COLOR_PURPLE,3);
+    buttonsChannelEnable->setColor(BUTTON_COLOR_PURPLE,3);
 
 
 
@@ -51,7 +59,7 @@ WindowScope::WindowScope(QWidget *parent) :
     buttonsTriggerMode = new WidgetButtons(tabs,3,ButtonTypes::RADIO,"",2);
     tabs->getLayout(0)->addWidget(buttonsTriggerMode);
     buttonsTriggerMode->setText("Stop",0);
-    buttonsTriggerMode->setColor(BACKGROUND_COLOR_ORANGE,0);
+    buttonsTriggerMode->setColor(BUTTON_COLOR_ORANGE,0);
     buttonsTriggerMode->setText("Normal",1);
     buttonsTriggerMode->setText("Auto",2);
 
@@ -61,6 +69,8 @@ WindowScope::WindowScope(QWidget *parent) :
     buttonsTriggerChannel->setText("CH2",1);
     buttonsTriggerChannel->setText("CH3",2);
     buttonsTriggerChannel->setText("CH4",3);
+    buttonsTriggerChannel->disableAll();
+    buttonsTriggerChannel->setDisabledButton(false,0);
 
     buttonsTriggerEdge = new WidgetButtons(tabs,2,ButtonTypes::RADIO,"Edge");
     tabs->getLayout(0)->addWidget(buttonsTriggerEdge);
@@ -85,7 +95,7 @@ WindowScope::WindowScope(QWidget *parent) :
     dialTimeBase = new WidgetDial(tabs ,"Time base");
     tabs->getLayout(0)->addWidget(dialTimeBase);
     fillTimeBase();
-    dialTimeBase->setSelected(6);
+    dialTimeBase->setSelected(9);
 
     WidgetButtons *buttonsMemorySet = new WidgetButtons(tabs,2,ButtonTypes::RADIO,"Memory");
     tabs->getLayout(0)->addWidget(buttonsMemorySet);
@@ -131,7 +141,6 @@ WindowScope::WindowScope(QWidget *parent) :
 
 
     //************************* creating widget measurement *******************
-    //add items
 
     WidgetSeparator *sepa = new WidgetSeparator(tabs,"Measurement");
     tabs->getLayout(1)->addWidget(sepa);
@@ -144,11 +153,11 @@ WindowScope::WindowScope(QWidget *parent) :
     WidgetButtons *butrad = new WidgetButtons(tabs,4,ButtonTypes::RADIO,"Selection");
     tabs->getLayout(1)->addWidget(butrad);
     butrad->setText("CH1",0);
-    butrad->setColor(BACKGROUND_COLOR_ORANGE,0);
+    butrad->setColor(BUTTON_COLOR_ORANGE,0);
     butrad->setText("CH2",1);
-    butrad->setColor(BACKGROUND_COLOR_BLUE,1);
+    butrad->setColor(BUTTON_COLOR_BLUE,1);
     butrad->setText("CH3",2);
-    butrad->setColor(BACKGROUND_COLOR_GREEN,2);
+    butrad->setColor(BUTTON_COLOR_GREEN,2);
     butrad->setText("CH4",3);
 
 
@@ -191,20 +200,15 @@ WindowScope::WindowScope(QWidget *parent) :
 
 
 
-    //******************** widget trace ***********************
-    chart = new widgetChart(ui->widget_trace,4);
-    ui->verticalLayout_trace->addWidget(chart);
-
-    infoPanel = new widgetLabelArea(ui->widget_info);
-    ui->verticalLayout_info->addWidget(infoPanel);
-
-
-
 
     connect(dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
     connect(dialPretrigger,SIGNAL(valueChanged(float)),this,SLOT(pretriggerCallback(float)));
     connect(buttonsChannelEnable,SIGNAL(statusChanged(int)),this,SLOT(channelEnableCallback(int)));
+    connect(buttonsTriggerMode,SIGNAL(clicked(int)),this,SLOT(triggerModeCallback(int)));
+    connect(buttonsTriggerEdge,SIGNAL(clicked(int)),this,SLOT(triggerEdgeCallback(int)));
+    connect(buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
     connect(dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
+
 
 }
 
@@ -215,7 +219,8 @@ WindowScope::~WindowScope()
 
 void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase){
     chart->clearAll();
-    chart->setXAxisMax(timeBase*10);
+    updateChartScale(timeBase);
+    infoPanel->setTriggerLabelText("");
 
     for (int i = 0; i < dataSeries.length(); i++){
         if(buttonsChannelEnable->isChecked(i)){
@@ -226,12 +231,11 @@ void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries, float timeB
 
 void WindowScope::timeBaseCallback(float value){
     emit timeBaseChanged(value);
-    chart->setXAxisMax(value*10);
+    updateChartScale(value);
 }
 
 void WindowScope::pretriggerCallback(float value){
     emit pretriggerChanged(value);
- //   scope->setTriggerLevel(3.3/value*100);
 }
 
 void WindowScope::triggerValueCallback(float value){
@@ -239,24 +243,35 @@ void WindowScope::triggerValueCallback(float value){
 }
 
 void WindowScope::triggerChannelCallback(int index){
- //   scope->triggerChannelCallback(index);
+    emit triggerChannelChanged(index);
+}
+
+void WindowScope::triggerEdgeCallback(int index){
+    if(index==0){
+        emit triggerEdgeChanged(ScopeTriggerEdge::EDGE_RISING);
+    }else if(index==1){
+        emit triggerEdgeChanged(ScopeTriggerEdge::EDGE_FALLING);
+    }
 }
 
 void WindowScope::triggerModeCallback(int index){
     if(index==0){
         if(buttonsTriggerMode->getText(0)=="Stop"){
-            emit triggerChanged(ScopeTriggerMode::TRIG_STOP);
+            buttonsTriggerMode->setColor(BUTTON_COLOR_ORANGE,0);
+            emit triggerModeChanged(ScopeTriggerMode::TRIG_STOP);
             buttonsTriggerMode->setText("Single",0);
-        }
-        if(buttonsTriggerMode->getText(0)=="Single"){
-            emit triggerChanged(ScopeTriggerMode::TRIG_SINGLE);
+            infoPanel->setTriggerLabelText("");
+
+        }else if(buttonsTriggerMode->getText(0)=="Single"){
+            emit triggerModeChanged(ScopeTriggerMode::TRIG_SINGLE);
+            buttonsTriggerMode->setColor(BUTTON_COLOR_GREEN,0);
             buttonsTriggerMode->setText("Stop",0);
         }
     }else if(index==1){
-        emit triggerChanged(ScopeTriggerMode::TRIG_NORMAL);
+        emit triggerModeChanged(ScopeTriggerMode::TRIG_NORMAL);
         buttonsTriggerMode->setText("Stop",0);
     }else if (index==2){
-        emit triggerChanged(ScopeTriggerMode::TRIG_AUTO);
+        emit triggerModeChanged(ScopeTriggerMode::TRIG_AUTO);
         buttonsTriggerMode->setText("Stop",0);
     }
 }
@@ -284,9 +299,54 @@ void WindowScope::channelEnableCallback(int buttonStatus){
         buttonsTriggerChannel->setDisabledButton(false,3);
     }
     emit channelEnableChanged(buttonStatus);
-
 }
 
+void WindowScope::singleSamplingDone(){
+    buttonsTriggerMode->setText("Single",0);
+    buttonsTriggerMode->setColor(BUTTON_COLOR_ORANGE,0);
+    infoPanel->setTriggerLabelText("");
+}
+
+void WindowScope::samplingOngoing(){
+    infoPanel->setTriggerLabelText("Smpl");
+}
+
+void WindowScope::triggerCaptured(){
+    infoPanel->setTriggerLabelText("Trig");
+}
+
+void WindowScope::setRealSamplingRate(int smpl){
+
+    if (smpl>=100000000){
+        infoPanel->setSamplingRateLabelText(QString::number(smpl/1000000,'f',0) + " MSPS");
+    }else if (smpl>=10000000){
+        infoPanel->setSamplingRateLabelText(QString::number(smpl/1000000,'f',1) + " MSPS");
+    }else if (smpl>=1000000){
+        infoPanel->setSamplingRateLabelText(QString::number(smpl/1000000,'f',2) + " MSPS");
+    }else if (smpl>=100000){
+        infoPanel->setSamplingRateLabelText(QString::number(smpl/1000,'f',0) + " kSPS");
+    }else if (smpl>=10000){
+        infoPanel->setSamplingRateLabelText(QString::number(smpl/1000,'f',1) + " kSPS");
+    }else if (smpl>=1000){
+        infoPanel->setSamplingRateLabelText(QString::number(smpl/1000,'f',2) + " kSPS");
+    }else{
+        infoPanel->setSamplingRateLabelText(QString::number(smpl,'f',0) + " SPS");
+    }
+}
+
+void WindowScope::updateChartScale(float timeBase){
+    chart->setXAxisMax(timeBase*10);
+    //099 to mitigate precision impact
+    if(timeBase<=0.00000099){
+        infoPanel->setScaleLabelText(QString::number(round(timeBase*100000000000)/100,'f',2) + " ns/Div");
+    }else if(timeBase<=0.00099){
+        infoPanel->setScaleLabelText(QString::number(round(timeBase*100000000)/100,'f',2) + " us/Div");
+    }else if(timeBase<=0.99){
+        infoPanel->setScaleLabelText(QString::number(round(timeBase*100000)/100,'f',2) + " ms/Div");
+    }else{
+        infoPanel->setScaleLabelText(QString::number(round(timeBase*100)/100,'f',2) + " s/Div");
+    }
+}
 
 void WindowScope::fillTimeBase(){
     dialTimeBase->addOption("1","us",1e-6);

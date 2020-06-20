@@ -25,46 +25,42 @@ public:
     explicit Scope(QObject *parent = nullptr);
 
     void setModuleWindow(WindowScope *scpWin);
-  //  void setDockWidgetWindow(ModuleDockWidget *dockWidget);
- //   void setModuleControlWidget(WidgetControlModule *scpWidget);
-
- //   void setComms(Comms *communication);
-
-    void writeConfiguration();
-
-    void stopModule();
-    void startModule();
-    void scopeNextData();
-
-    float getTimebase();
-    ScopeTriggerMode getTriggerMode();
-    void setNumberOfChannels(int num);
-    void channelEnableCallback(int buttonStatus);
-    void triggerModeCallback(int buttonIndex);
 
 signals:
-    void scopeSpecificationLoaded();
-    void scopeDataReceived(QVector<QVector<QPointF>>);
-
-public slots:
-  //  void closeModule();
+    //module will probably emit signal to close other resources (must be handled in device.cpp)
 
 private slots:
     void parseData(QByteArray);
+    void writeConfiguration();
 
-    void triggerEdgeCallback(int buttonIndex);
-    void triggerChannelCallback(int index);
+    void startModule();
+    void stopModule();
 
-    void setTimebase(float div);
-    void setTriggerLevel(float percentage);
-    void setPretrigger(float percentage);
+    void updateTriggerEdge(ScopeTriggerEdge edge);
+    void updateTriggerChannel(int index);
+    void updateChannelsEnable(int buttonStatus);
+    void updateTriggerMode(ScopeTriggerMode mode);
+
+    void updateTimebase(float div);
+    void updateTriggerLevel(float percentage);
+    void updatePretrigger(float percentage);
 
 private:
+    WindowScope *scpWindow;
+    ScopeConfig *config;
     QVector<QVector<QPointF>> scopeData;
 
-    ScopeConfig *config;
 
-    WindowScope *scpWindow;
+    //private functions - writing into device only - no logic
+    void stopSampling();
+    void startSampling();
+    void restartSampling();
+    void setNumberOfChannels(int num);
+    void setTriggerChannel(int chan);
+    void setTriggerMode(ScopeTriggerMode mode);
+    void setTriggerEdge(ScopeTriggerEdge edge);
+    void setSamplingFrequency(int samplingFreq);
+
 };
 
 #endif // SCOPE_H
