@@ -24,10 +24,11 @@ class Scope : public AbstractModule
 public:
     explicit Scope(QObject *parent = nullptr);
 
-    void setModuleWindow(WindowScope *scpWin);
+    QWidget* getWidget();
 
 signals:
-    //module will probably emit signal to close other resources (must be handled in device.cpp)
+    //module will probably emit signal to close other resources
+    //(must be done in abstract module and handled in device.cpp)
 
 private slots:
     void parseData(QByteArray);
@@ -35,6 +36,7 @@ private slots:
 
     void startModule();
     void stopModule();
+
 
     void updateTriggerEdge(ScopeTriggerEdge edge);
     void updateTriggerChannel(int index);

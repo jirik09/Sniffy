@@ -5,23 +5,17 @@ Scope::Scope(QObject *parent)
     Q_UNUSED(parent);
     config = new ScopeConfig();
     cmd = new Commands();
-}
-
-void Scope::setModuleWindow(WindowScope *scpWin){
-    scpWindow = scpWin;
-
-    //connect signals from scope to GUI --> can be actually done by function call
+    scpWindow = new WindowScope();
 
     //connect signals from GUI into scope
-    connect(scpWin,SIGNAL(timeBaseChanged(float)),this,SLOT(updateTimebase(float)));
-    connect(scpWin,SIGNAL(pretriggerChanged(float)),this,SLOT(updatePretrigger(float)));
-    connect(scpWin, &WindowScope::triggerValueChanged,this,&Scope::updateTriggerLevel);
-    connect(scpWin, &WindowScope::channelEnableChanged,this,&Scope::updateChannelsEnable);
-    connect(scpWin, &WindowScope::triggerModeChanged,this,&Scope::updateTriggerMode);
-    connect(scpWin, &WindowScope::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
-    connect(scpWin, &WindowScope::triggerChannelChanged,this,&Scope::updateTriggerChannel);
+    connect(scpWindow, &WindowScope::timeBaseChanged,this,&Scope::updateTimebase);
+    connect(scpWindow, &WindowScope::pretriggerChanged,this,&Scope::updatePretrigger);
+    connect(scpWindow, &WindowScope::triggerValueChanged,this,&Scope::updateTriggerLevel);
+    connect(scpWindow, &WindowScope::channelEnableChanged,this,&Scope::updateChannelsEnable);
+    connect(scpWindow, &WindowScope::triggerModeChanged,this,&Scope::updateTriggerMode);
+    connect(scpWindow, &WindowScope::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
+    connect(scpWindow, &WindowScope::triggerChannelChanged,this,&Scope::updateTriggerChannel);
 }
-
 
 void Scope::parseData(QByteArray data){
  //   qDebug() << "data are in scope parser" << data;
@@ -139,6 +133,10 @@ void Scope::stopModule(){
 }
 void Scope::startModule(){
     startSampling();
+}
+
+QWidget* Scope::getWidget(){
+    return scpWindow;
 }
 
 void Scope::updateTimebase(float div){

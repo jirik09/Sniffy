@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    device = new Device(this);
 
     //setup left menu with features separators etc
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
@@ -54,9 +55,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->dockWidget_device->setWindowTitle("Device");
 
-    scpWindow = new WindowScope(dockWidget_scope);
+
+
+    //scpWindow = new WindowScope(dockWidget_scope);
     dockWidget_scope = new ModuleDockWidget(this,"Oscilloscope");
-    dockWidget_scope->setWidget(scpWindow);
+    Commands *cmd = new Commands();
+    QWidget *mod = device->createModule(dockWidget_scope,WidgetModule_scope, cmd->SCOPE);
+    dockWidget_scope->setWidget(mod);
     addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget_scope);
 
   /*  ModuleDockWidget *myDock = new ModuleDockWidget("Hokus",this,);
@@ -151,12 +156,12 @@ MainWindow::MainWindow(QWidget *parent)
     verticalLayoutSpecification->addItem(verticalSpacer);
     //*************************** end adding widgets to specification area *************************
 
-    device = new Device(this);
+
     connect(device,SIGNAL(updateDeviceList(QList<DeviceDescriptor>)),this,SLOT(updateGUIDeviceList(QList<DeviceDescriptor>)));
     connect(device,SIGNAL(updateSpecfication()),this,SLOT(updateSpecGUI()));
     connect(device, &Device::fatalError,this,&MainWindow::errorHandler);
 
-    device->createModule(scpWindow,dockWidget_scope,WidgetModule_scope);
+
 
 
     //this code enables automatic scan at startup

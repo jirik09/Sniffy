@@ -64,7 +64,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
         axisY->setLinePen(axisPen);*/
 
         axisX->setLabelsBrush(QBrush(QColor(128,128,128)));
-        axisX->setLabelFormat("%.0e");
+        axisX->setLabelFormat("%.1e");
         axisY->setLabelsBrush(QBrush(QColor(128,128,128)));
         axisY->setLabelFormat("%.2g");
 

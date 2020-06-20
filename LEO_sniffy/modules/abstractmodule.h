@@ -15,18 +15,18 @@ public:
     //virtual setModuleWindow()  // Module window probably cannot be abstract
 
     virtual void parseData(QByteArray data) = 0;
-
-    virtual void writeConfiguration() = 0;
-
     virtual void startModule() = 0;
     virtual void stopModule() = 0;
-
+    virtual void writeConfiguration() = 0;
+    virtual QWidget* getWidget() = 0;
 
 public slots:
+
     void widgetControlClicked(ModuleStatus status);
     void setDockWidgetWindow(ModuleDockWidget *dockWidget);
     void setModuleControlWidget(WidgetControlModule *scpWidget);
-    void setComms(Comms *communication,QByteArray cmdPrefix);
+    void setCommandPrefix(QByteArray prefix);
+    void setComms(Comms *communication);
 
     void closeModule();
 

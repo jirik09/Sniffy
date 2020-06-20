@@ -45,7 +45,7 @@ private:
     Device *dev;
     WidgetControlModule *WidgetModule_scope = NULL;
     ModuleDockWidget *dockWidget_scope = NULL;
-    WindowScope *scpWindow;
+  //  WindowScope *scpWindow;
 
     WidgetControlModule *WidgetFeature_counter = NULL;
     QDockWidget *dockWidget_counter = NULL;

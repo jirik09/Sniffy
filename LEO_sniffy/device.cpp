@@ -4,8 +4,10 @@ Device::Device(QObject *parent) : QObject(parent)
 {
     deviceSpec = new DeviceSpec();
     commands = new Commands();
-    scope = new Scope();
     communication = new Comms();
+
+    modules = *new QList<QSharedPointer<AbstractModule>>();
+
     connect(communication,SIGNAL(devicesScaned(QList<DeviceDescriptor>)),this,SLOT(newDeviceList(QList<DeviceDescriptor>)),Qt::QueuedConnection);
 }
 
@@ -30,30 +32,25 @@ void Device::open(int deviceIndex){
     }
     isConnected = communication->getIsOpen();
 
-    connect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
-    connect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
-    connect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
+    connect(communication,&Comms::newData,this,&Device::parseData);
     connect(communication,&Comms::communicationError,this,&Device::handleError);
 
     communication->write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
-
-    scope->setComms(communication,commands->SCOPE);
+    foreach(QSharedPointer<AbstractModule> mod, modules){
+       mod->setComms(communication);
+    }
 }
 
 void Device::close(){
     if(isConnected){
         communication->close();
-        scope->closeModule();
+        foreach(QSharedPointer<AbstractModule> mod, modules){
+           mod->closeModule();
+        }
         isConnected = communication->getIsOpen();
     }
 
-    //All the signals conected above has to be disconnected here!!!
-    //multiple connections cause multiple calls and multiple data receive
-    disconnect(this,SIGNAL(scopeNewData(QByteArray)),scope,SLOT(parseData(QByteArray)));
-
-    disconnect(communication,SIGNAL(newData(QByteArray)),this,SLOT(parseData(QByteArray)));
-    disconnect(this,SIGNAL(systemNewData(QByteArray)),this, SLOT(parseSystemData(QByteArray)));
-
+    disconnect(communication,&Comms::newData,this,&Device::parseData);
     disconnect(communication,&Comms::communicationError,this,&Device::handleError);
 }
 
@@ -62,21 +59,28 @@ void Device::handleError(QByteArray error){
 }
 
 void Device::parseData(QByteArray data){
-
-    //qDebug() << "device Parse:" << data;
+    bool isDataPassed = false;
 
     QByteArray dataHeader = data.left(4);
     QByteArray dataToPass = data.right(data.length()-4);
 
-    if(dataHeader=="OSCP"){
-       emit scopeNewData(dataToPass);
+    foreach(QSharedPointer<AbstractModule> mod, modules){
+        if(dataHeader == mod->moduleCommandPrefix){
+            mod->parseData(dataToPass);
+            isDataPassed=true;
+        }
+    }
         //What if data belongs to voltmeter???????????
         //Solution1: each module has to know if it is running or not and handle data correctly.
         //Solution2: opeed modules will be handeled here
-    }else if(dataHeader=="SYST"){
-       emit systemNewData(dataToPass);
-    }else{
-       qDebug() << "ERROR: this data could not be passed into module" << data;
+
+    if(dataHeader=="SYST"){
+       parseSystemData(dataToPass);
+        isDataPassed=true;
+    }
+
+    if(!isDataPassed){
+       qDebug() << "ERROR: this data was not passed to any module" << data;
     }
 }
 
@@ -108,15 +112,17 @@ DeviceSpec* Device::getDeviceSpecification(){
     return deviceSpec;
 }
 
-void Device::createModule(WindowScope *moduleWidget,ModuleDockWidget *dockWidget ,WidgetControlModule *controlModule){
-    scope->setModuleWindow(moduleWidget);
-    scope->setDockWidgetWindow(dockWidget);
-    scope->setModuleControlWidget(controlModule);
+QWidget* Device::createModule(ModuleDockWidget *dockWidget ,WidgetControlModule *controlModule, QByteArray cmdPrefix){
+    QSharedPointer<AbstractModule>  module (new Scope());
+
+    modules.append(module);
+
+    module->setDockWidgetWindow(dockWidget);
+    module->setModuleControlWidget(controlModule);
+    module->setCommandPrefix(cmdPrefix);
+    return module->getWidget();
 }
 
-Scope* Device::getScope(){
-    return scope;
-}
 
 
 

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <QSharedPointer>
 #include "communication/comms.h"
 #include "modules/scope/scope.h"
 #include "communication/commands.h"
@@ -21,11 +22,10 @@ public:
     bool getIsSpecificationLoaded();
     void ScanDevices();
 
-    Scope* getScope();
-    void createModule(WindowScope *moduleWidget,ModuleDockWidget *dockWidget ,WidgetControlModule *controlModule);
+    QWidget* createModule(ModuleDockWidget *dockWidget ,WidgetControlModule *controlModule, QByteArray cmdPrefix);
 
 signals:
-    void scopeNewData(QByteArray);
+  //  void scopeNewData(QByteArray);
     void systemNewData(QByteArray);
     void writeData (QByteArray data);
 
@@ -44,7 +44,8 @@ private:
     QList<DeviceDescriptor> deviceList;
 
     Comms *communication;
-    Scope *scope;
+    QList<QSharedPointer<AbstractModule>> modules;
+
     bool isConnected = false;
 
     Commands *commands;

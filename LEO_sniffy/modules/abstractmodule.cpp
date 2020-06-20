@@ -36,7 +36,6 @@ void AbstractModule::setDockWidgetWindow(ModuleDockWidget *dockWidget){
     dockWidgetWindow = dockWidget;
 
     connect(dockWidgetWindow, &ModuleDockWidget::moduleWindowClosing,this, &AbstractModule::closeModule);
-
 }
 
 void AbstractModule::setModuleControlWidget(WidgetControlModule *scpWidget){
@@ -44,10 +43,14 @@ void AbstractModule::setModuleControlWidget(WidgetControlModule *scpWidget){
     connect(moduleControlWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetControlClicked(ModuleStatus)));
 }
 
-void AbstractModule::setComms(Comms *communication, QByteArray cmdPrefix ){
+void AbstractModule::setCommandPrefix(QByteArray prefix){
+    moduleCommandPrefix = prefix;
+}
+
+void AbstractModule::setComms(Comms *communication){
     comm = communication;
     cmd = new Commands();
-    comm->write(cmdPrefix+":"+cmd->CONFIG_REQUEST+";");
+    comm->write(moduleCommandPrefix+":"+cmd->CONFIG_REQUEST+";");
 }
 
 void AbstractModule::closeModule(){
