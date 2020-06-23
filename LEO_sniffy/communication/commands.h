@@ -3,119 +3,123 @@
 
 #include <QObject>
 
-class Commands
+
+
+class Commands : public QObject
 {
+    Q_OBJECT
 public:
-const QByteArray IDN = "IDN_";
+    explicit Commands(QObject *parent = nullptr);
 
-/* COMMUNICATION */
-// General
-const QByteArray IDN_REQUEST = "IDN?";
-const QByteArray VERSION_REQUEST = "VER?";
-const QByteArray CONFIG_REQUEST = "CFG?";
-const QByteArray IS_SHIELD_CONNECTED = "SH_?";
-const QByteArray RESET_DEVICE = "RES!";
+    static const QByteArray IDN;
 
-
-const QByteArray GENERATOR = "GEN_";
-const QByteArray PWM_GENERATOR = "GENP";
-const QByteArray SYNC_PWM_GEN = "SYNP";
-const QByteArray LOG_ANLYS = "LOGA";
-const QByteArray COUNTER = "CNT_";
-const QByteArray SCOPE = "OSCP";
-const QByteArray SCOPE_INCOME = "OSC_";
-const QByteArray COMMS = "COMS";
-const QByteArray SYSTEM = "SYST";
-
-const QByteArray STOP = "STOP";
-const QByteArray START = "STRT";
-const QByteArray NEXT = "NEXT";
-
-const QByteArray GET_REAL_SMP_FREQ = "FRQ?";
-const QByteArray GET_SCOPE_INPUTS = "INP?";
+    /* COMMUNICATION */
+    // General
+    static const QByteArray IDN_REQUEST;
+    static const QByteArray VERSION_REQUEST;
+    static const QByteArray CONFIG_REQUEST;
+    static const QByteArray IS_SHIELD_CONNECTED;
+    static const QByteArray RESET_DEVICE;
 
 
-/************************ SCOPE ***********************/
-//Scope
- const QByteArray CHANNELS = "CHAN";
- const QByteArray DATA_LENGTH = "LENG";  //number of samples
+    static const QByteArray GENERATOR;
+    static const QByteArray PWM_GENERATOR;
+    static const QByteArray SYNC_PWM_GEN;
+    static const QByteArray LOG_ANLYS;
+    static const QByteArray COUNTER;
+    static const QByteArray SCOPE;
+    static const QByteArray SCOPE_INCOME;
+    static const QByteArray COMMS;
+    static const QByteArray SYSTEM;
 
- const QByteArray DATA_LENGTH_CH1 = "LCH1";
- const QByteArray DATA_LENGTH_CH2 = "LCH2";
+    static const QByteArray STOP;
+    static const QByteArray START;
+    static const QByteArray NEXT;
 
- const QByteArray SAMPLING_FREQ = "FREQ";
+    static const QByteArray GET_REAL_SMP_FREQ;
+    static const QByteArray GET_SCOPE_INPUTS;
 
- const QByteArray TRIGGERED = "TRIG";
- const QByteArray SAMPLING = "SMPL";
- const QByteArray SCOPE_OK = "S_OK";
-//Scope specific commands flags
- const QByteArray SCOPE_TRIG_MODE = "TRIG";
- const QByteArray SCOPE_TRIG_EDGE = "EDGE";
- const QByteArray SCOPE_TRIG_LEVEL = "LEVL";
- const QByteArray SCOPE_TRIG_CHANNEL = "TRCH";
- const QByteArray SCOPE_DATA_DEPTH = "DATA";
- const QByteArray SCOPE_PRETRIGGER = "PRET";
- const QByteArray SCOPE_NEXT = "NEXT";
- const QByteArray SCOPE_FREQ = "OSCF";
- const QByteArray SCOPE_ADC_CHANNEL = "A_CH";
- const QByteArray SCOPE_ADC_CHANNEL_DEAFULT = "ADEF";
- const QByteArray SCOPE_ADC_CHANNEL_VREF = "AREF";
 
-//scope modes
- const QByteArray MODE_NORMAL = "NORM";
- const QByteArray MODE_AUTO = "AUTO";
- const QByteArray MODE_SINGLE = "SING";
- const QByteArray MODE_AUTO_FAST = "F_A_";
+    /************************ SCOPE ***********************/
+    //Scope
+     static const QByteArray CHANNELS;
+     static const QByteArray DATA_LENGTH;  //number of samples
 
-//Scope trigger edges
+     static const QByteArray DATA_LENGTH_CH1;
+     static const QByteArray DATA_LENGTH_CH2;
 
- const QByteArray EDGE_RISING = "RISE";
- const QByteArray EDGE_FALLING = "FALL";
+     static const QByteArray SAMPLING_FREQ;
 
-//Scope sampling frequencies
+     static const QByteArray TRIGGERED;
+     static const QByteArray SAMPLING;
+     static const QByteArray SCOPE_OK;
+    //Scope specific commands flags
+     static const QByteArray SCOPE_TRIG_MODE;
+     static const QByteArray SCOPE_TRIG_EDGE;
+     static const QByteArray SCOPE_TRIG_LEVEL;
+     static const QByteArray SCOPE_TRIG_CHANNEL;
+     static const QByteArray SCOPE_DATA_DEPTH;
+     static const QByteArray SCOPE_PRETRIGGER;
+     static const QByteArray SCOPE_NEXT;
+     static const QByteArray SCOPE_FREQ;
+     static const QByteArray SCOPE_ADC_CHANNEL;
+     static const QByteArray SCOPE_ADC_CHANNEL_DEAFULT;
+     static const QByteArray SCOPE_ADC_CHANNEL_VREF;
 
- const QByteArray FREQ_1K = "1K__";
- const QByteArray FREQ_2K = "2K__";
- const QByteArray FREQ_5K = "5K__";
- const QByteArray FREQ_10K = "10K_";
- const QByteArray FREQ_20K = "20K_";
- const QByteArray FREQ_50K = "50K_";
- const QByteArray FREQ_100K = "100K";
- const QByteArray FREQ_200K = "200K";
- const QByteArray FREQ_500K = "500K";
- const QByteArray FREQ_1M = "1M__";
- const QByteArray FREQ_2M = "2M__";
- const QByteArray FREQ_5M = "5M__";
- const QByteArray FREQ_10M = "10M_";
- const QByteArray FREQ_MAX = "MAX_";
+    //scope modes
+     static const QByteArray MODE_NORMAL;
+     static const QByteArray MODE_AUTO;
+     static const QByteArray MODE_SINGLE;
+     static const QByteArray MODE_AUTO_FAST;
 
-//Scope data lengths
+    //Scope trigger edges
 
- const QByteArray SAMPLES_100 = "100_";
- const QByteArray SAMPLES_200 = "200_";
- const QByteArray SAMPLES_500 = "500_";
- const QByteArray SAMPLES_1K = "1K__";
- const QByteArray SAMPLES_2K = "2K__";
- const QByteArray SAMPLES_5K = "5K__";
- const QByteArray SAMPLES_10K = "10K_";
- const QByteArray SAMPLES_20K = "20K_";
- const QByteArray SAMPLES_50K = "50K_";
- const QByteArray SAMPLES_100K = "100K";
+     static const QByteArray EDGE_RISING;
+     static const QByteArray EDGE_FALLING;
 
-//Scope Data depths
+    //Scope sampling frequencies
 
- const QByteArray DATA_DEPTH_12B = "12B_";
- const QByteArray DATA_DEPTH_10B = "10B_";
- const QByteArray DATA_DEPTH_8B = "8B__";
- const QByteArray DATA_DEPTH_6B = "6B__";
+     static const QByteArray FREQ_1K;
+     static const QByteArray FREQ_2K;
+     static const QByteArray FREQ_5K;
+     static const QByteArray FREQ_10K;
+     static const QByteArray FREQ_20K;
+     static const QByteArray FREQ_50K;
+     static const QByteArray FREQ_100K;
+     static const QByteArray FREQ_200K;
+     static const QByteArray FREQ_500K;
+     static const QByteArray FREQ_1M;
+     static const QByteArray FREQ_2M;
+     static const QByteArray FREQ_5M;
+     static const QByteArray FREQ_10M;
+     static const QByteArray FREQ_MAX;
 
-//Number of channels
+    //Scope data lengths
 
- const QByteArray CHANNELS_1 = "1CH_";
- const QByteArray CHANNELS_2 = "2CH_";
- const QByteArray CHANNELS_3 = "3CH_";
- const QByteArray CHANNELS_4 = "4CH_";
+     static const QByteArray SAMPLES_100;
+     static const QByteArray SAMPLES_200;
+     static const QByteArray SAMPLES_500;
+     static const QByteArray SAMPLES_1K;
+     static const QByteArray SAMPLES_2K;
+     static const QByteArray SAMPLES_5K;
+     static const QByteArray SAMPLES_10K;
+     static const QByteArray SAMPLES_20K;
+     static const QByteArray SAMPLES_50K;
+     static const QByteArray SAMPLES_100K;
 
+    //Scope Data depths
+
+     static const QByteArray DATA_DEPTH_12B;
+     static const QByteArray DATA_DEPTH_10B;
+     static const QByteArray DATA_DEPTH_8B;
+     static const QByteArray DATA_DEPTH_6B;
+
+    //Number of channels
+
+     static const QByteArray CHANNELS_1;
+     static const QByteArray CHANNELS_2;
+     static const QByteArray CHANNELS_3;
+     static const QByteArray CHANNELS_4;
 };
 
 #endif // COMMANDS_H

@@ -34,6 +34,7 @@ SOURCES += \
     GUI/widgetswitch.cpp \
     GUI/widgettab.cpp \
     GUI/widgettop.cpp \
+    communication/commands.cpp \
     communication/comms.cpp \
     communication/serialline.cpp \
     communication/serialportreader.cpp \
@@ -48,6 +49,8 @@ SOURCES += \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
     modules/counter/windowcounter.cpp \
+    modules/scope/panelmeasurement.cpp \
+    modules/scope/panelsettings.cpp \
     modules/scope/scope.cpp \
     modules/scope/scopeconfig.cpp \
     modules/scope/scopespec.cpp \
@@ -88,6 +91,8 @@ HEADERS += \
     modules/counter/counterspec.h \
     modules/abstractmodule.h \
     modules/counter/windowcounter.h \
+    modules/scope/panelmeasurement.h \
+    modules/scope/panelsettings.h \
     modules/scope/scope.h \
     modules/scope/scopeconfig.h \
     modules/scope/scopedefs.h \

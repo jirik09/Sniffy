@@ -50,7 +50,7 @@ void WidgetDialRange::hideUnitSelection(void){
 }
 
 void WidgetDialRange::setSelected(int index){
-
+    ui->comboBox->setCurrentIndex(index);
 }
 
 void WidgetDialRange::plusClicked(){
