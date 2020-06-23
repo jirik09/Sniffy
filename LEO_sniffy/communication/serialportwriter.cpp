@@ -9,6 +9,7 @@ SerialPortWriter::SerialPortWriter(QSerialPort *serialPort, QObject *parent) :
 
 void SerialPortWriter::handleBytesWritten(qint64 bytes)
 {
+    Q_UNUSED(bytes);
   //  qDebug() << "Bytes Written" << bytes;
 }
 
