@@ -4,8 +4,13 @@ Scope::Scope(QObject *parent)
 {
     Q_UNUSED(parent);
     config = new ScopeConfig();
+    measCalc = new MeasCalculations();
     cmd = new Commands();
+    setCommandPrefix(cmd->SCOPE);
     scpWindow = new WindowScope();
+
+    scopeData = new QVector<QVector<QPointF>>;
+    //scopeMeas = new QList<Measurement>;
 
     //connect signals from GUI into scope
     connect(scpWindow, &WindowScope::timeBaseChanged,this,&Scope::updateTimebase);
@@ -15,6 +20,9 @@ Scope::Scope(QObject *parent)
     connect(scpWindow, &WindowScope::triggerModeChanged,this,&Scope::updateTriggerMode);
     connect(scpWindow, &WindowScope::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
     connect(scpWindow, &WindowScope::triggerChannelChanged,this,&Scope::updateTriggerChannel);
+
+    connect(scpWindow, &WindowScope::measurementChanged,this, &Scope::addMeasurement);
+    connect(measCalc, &MeasCalculations::measCalculated, this, &Scope::updateMeasurement);
 }
 
 void Scope::parseData(QByteArray data){
@@ -83,19 +91,20 @@ void Scope::parseData(QByteArray data){
                 qDebug() << "TODO <8bit data parser";
             }
 
-            while(numChannels<scopeData.length()){ //remove signals which will not be filled
-                scopeData.removeAt(scopeData.length()-1);
+            while(numChannels<scopeData->length()){ //remove signals which will not be filled
+                scopeData->removeAt(scopeData->length()-1);
             }
 
-            if(scopeData.length()>=currentChannel){
-                scopeData.replace(currentChannel-1,points);
+            if(scopeData->length()>=currentChannel){
+                scopeData->replace(currentChannel-1,points);
             }else{
-                scopeData.append(points);
+                scopeData->append(points);
             }
         }
 
         if(currentChannel==numChannels){
-            scpWindow->dataReceived(scopeData,config->timeBase);
+            measCalc->calculate(*scopeData,scopeMeas,samplingFreq);
+            scpWindow->dataReceived(*scopeData,config->timeBase);
             scpWindow->setRealSamplingRate(samplingFreq);
 
             //handel single trigger
@@ -130,6 +139,7 @@ void Scope::writeConfiguration(){
 
 void Scope::stopModule(){
     stopSampling();
+    measCalc->exit();
 }
 void Scope::startModule(){
     startSampling();
@@ -157,6 +167,27 @@ void Scope::updateTriggerLevel(float percentage){
     comm->write(cmd->SCOPE, cmd->SCOPE_TRIG_LEVEL, config->triggerLevel);
 }
 
+void Scope::updateTriggerMode(ScopeTriggerMode mode){
+    config->triggerMode=mode;
+    setTriggerMode(mode);
+
+    if(mode==ScopeTriggerMode::TRIG_STOP){
+        stopSampling();
+    }else{
+        startSampling();
+    }
+}
+
+void Scope::updateTriggerEdge(ScopeTriggerEdge edge){
+    setTriggerEdge(edge);
+    config->triggerEdge=edge;
+}
+
+void Scope::updateTriggerChannel(int index){
+    config->triggerChannelIndex=index;
+    setTriggerChannel(index);
+}
+
 void Scope::updateChannelsEnable(int buttonStatus){
     if(buttonStatus & 0x01){
         config->enabledChannels[0]=1;
@@ -177,25 +208,16 @@ void Scope::updateChannelsEnable(int buttonStatus){
     setNumberOfChannels(config->numberOfChannels);
 }
 
-void Scope::updateTriggerMode(ScopeTriggerMode mode){
-    config->triggerMode=mode;
-    setTriggerMode(mode);
-
-    if(mode==ScopeTriggerMode::TRIG_STOP){
-        stopSampling();
-    }else{
-        startSampling();
-    }
+void Scope::addMeasurement(Measurement *m){
+    scopeMeas.append(m);
 }
 
-void Scope::updateTriggerEdge(ScopeTriggerEdge edge){
-    setTriggerEdge(edge);
-    config->triggerEdge=edge;
+void Scope::updateMeasurement(QList<Measurement*> m){
+    scpWindow->updateMeasurement(m);
 }
 
-void Scope::updateTriggerChannel(int index){
-    config->triggerChannelIndex=index;
-    setTriggerChannel(index);
+void Scope::processData(){
+
 }
 
 

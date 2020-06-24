@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QDataStream>
 #include <QPointF>
+#include <QList>
 
 #include "windowscope.h"
 
@@ -12,6 +13,8 @@
 #include "scopespec.h"
 #include "communication/Commands.h"
 #include "communication/comms.h"
+#include "measurement.h"
+#include "meascalculations.h"
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
@@ -37,21 +40,26 @@ private slots:
     void startModule();
     void stopModule();
 
-
+    void updateTimebase(float div);
+    void updatePretrigger(float percentage);
+    void updateTriggerLevel(float percentage);
+    void updateTriggerMode(ScopeTriggerMode mode);
     void updateTriggerEdge(ScopeTriggerEdge edge);
     void updateTriggerChannel(int index);
     void updateChannelsEnable(int buttonStatus);
-    void updateTriggerMode(ScopeTriggerMode mode);
+    void addMeasurement(Measurement *m);
+    void updateMeasurement(QList<Measurement*> m);
 
-    void updateTimebase(float div);
-    void updateTriggerLevel(float percentage);
-    void updatePretrigger(float percentage);
 
 private:
     WindowScope *scpWindow;
     ScopeConfig *config;
-    QVector<QVector<QPointF>> scopeData;
+    MeasCalculations *measCalc;
+    QVector<QVector<QPointF>> *scopeData;
+    QList<Measurement *> scopeMeas;
 
+
+    void processData();
 
     //private functions - writing into device only - no logic
     void stopSampling();
@@ -62,6 +70,8 @@ private:
     void setTriggerMode(ScopeTriggerMode mode);
     void setTriggerEdge(ScopeTriggerEdge edge);
     void setSamplingFrequency(int samplingFreq);
+
+
 
 };
 

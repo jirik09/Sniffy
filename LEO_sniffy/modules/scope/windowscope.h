@@ -45,6 +45,8 @@ public:
     void triggerCaptured();
     void setRealSamplingRate(int smpl);
 
+    void updateMeasurement(QList<Measurement*> m);
+
 
 signals:
     void timeBaseChanged(float value);
@@ -54,6 +56,7 @@ signals:
     void triggerValueChanged(float value);
     void triggerChannelChanged(int index);
     void channelEnableChanged(int buttonStatus);
+    void measurementChanged(Measurement *m);
 
 
 private slots:
@@ -64,6 +67,7 @@ private slots:
     void triggerChannelCallback(int index);
     void triggerEdgeCallback(int index);
     void triggerModeCallback(int index);
+    void measurementAddedCallback(Measurement *m);
 
 private:
     Ui::WindowScope *ui;

@@ -46,6 +46,8 @@ WindowScope::WindowScope(QWidget *parent) :
 
     //************************* creating widget measurement *******************
     panelMeas = new PanelMeasurement(tabs->getLayout(1),tabs);
+
+    connect(panelMeas, &PanelMeasurement::measurementAdded, this,&WindowScope::measurementAddedCallback);
 }
 
 WindowScope::~WindowScope()
@@ -135,6 +137,15 @@ void WindowScope::channelEnableCallback(int buttonStatus){
         panelSet->buttonsTriggerChannel->setDisabledButton(false,3);
     }
     emit channelEnableChanged(buttonStatus);
+}
+
+
+void WindowScope::measurementAddedCallback(Measurement *m){
+    emit measurementChanged (m);
+}
+
+void WindowScope::updateMeasurement(QList<Measurement*> m){
+    labelInfoPanel->setMeasurements(m);
 }
 
 void WindowScope::singleSamplingDone(){

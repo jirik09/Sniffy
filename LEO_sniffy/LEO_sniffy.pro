@@ -49,6 +49,8 @@ SOURCES += \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
     modules/counter/windowcounter.cpp \
+    modules/scope/meascalculations.cpp \
+    modules/scope/measurement.cpp \
     modules/scope/panelmeasurement.cpp \
     modules/scope/panelsettings.cpp \
     modules/scope/scope.cpp \
@@ -91,6 +93,8 @@ HEADERS += \
     modules/counter/counterspec.h \
     modules/abstractmodule.h \
     modules/counter/windowcounter.h \
+    modules/scope/meascalculations.h \
+    modules/scope/measurement.h \
     modules/scope/panelmeasurement.h \
     modules/scope/panelsettings.h \
     modules/scope/scope.h \

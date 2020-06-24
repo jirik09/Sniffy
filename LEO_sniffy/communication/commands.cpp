@@ -2,9 +2,7 @@
 
 Commands::Commands(QObject *parent) : QObject(parent)
 {
-
 }
-
 const QByteArray Commands::IDN = "IDN_";
 
 /* COMMUNICATION */
@@ -14,7 +12,6 @@ const QByteArray Commands::VERSION_REQUEST = "VER?";
 const QByteArray Commands::CONFIG_REQUEST = "CFG?";
 const QByteArray Commands::IS_SHIELD_CONNECTED = "SH_?";
 const QByteArray Commands::RESET_DEVICE = "RES!";
-
 
 const QByteArray Commands::GENERATOR = "GEN_";
 const QByteArray Commands::PWM_GENERATOR = "GENP";
@@ -33,7 +30,6 @@ const QByteArray Commands::NEXT = "NEXT";
 const QByteArray Commands::GET_REAL_SMP_FREQ = "FRQ?";
 const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";
 
-
 /************************ SCOPE ***********************/
 //Scope
  const QByteArray Commands::CHANNELS = "CHAN";
@@ -47,6 +43,7 @@ const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";
  const QByteArray Commands::TRIGGERED = "TRIG";
  const QByteArray Commands::SAMPLING = "SMPL";
  const QByteArray Commands::SCOPE_OK = "S_OK";
+
 //Scope specific commands flags
  const QByteArray Commands::SCOPE_TRIG_MODE = "TRIG";
  const QByteArray Commands::SCOPE_TRIG_EDGE = "EDGE";
@@ -67,12 +64,10 @@ const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";
  const QByteArray Commands::MODE_AUTO_FAST = "F_A_";
 
 //Scope trigger edges
-
  const QByteArray Commands::EDGE_RISING = "RISE";
  const QByteArray Commands::EDGE_FALLING = "FALL";
 
 //Scope sampling frequencies
-
  const QByteArray Commands::FREQ_1K = "1K__";
  const QByteArray Commands::FREQ_2K = "2K__";
  const QByteArray Commands::FREQ_5K = "5K__";
@@ -89,7 +84,6 @@ const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";
  const QByteArray Commands::FREQ_MAX = "MAX_";
 
 //Scope data lengths
-
  const QByteArray Commands::SAMPLES_100 = "100_";
  const QByteArray Commands::SAMPLES_200 = "200_";
  const QByteArray Commands::SAMPLES_500 = "500_";
@@ -102,14 +96,12 @@ const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";
  const QByteArray Commands::SAMPLES_100K = "100K";
 
 //Scope Data depths
-
  const QByteArray Commands::DATA_DEPTH_12B = "12B_";
  const QByteArray Commands::DATA_DEPTH_10B = "10B_";
  const QByteArray Commands::DATA_DEPTH_8B = "8B__";
  const QByteArray Commands::DATA_DEPTH_6B = "6B__";
 
 //Number of channels
-
  const QByteArray Commands::CHANNELS_1 = "1CH_";
  const QByteArray Commands::CHANNELS_2 = "2CH_";
  const QByteArray Commands::CHANNELS_3 = "3CH_";
