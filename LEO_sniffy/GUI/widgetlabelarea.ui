@@ -145,7 +145,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>45</width>
+            <width>55</width>
             <height>0</height>
            </size>
           </property>
@@ -156,7 +156,7 @@
            </size>
           </property>
           <property name="text">
-           <string>trigger</string>
+           <string>Sampling</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

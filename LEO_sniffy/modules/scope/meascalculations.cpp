@@ -17,14 +17,16 @@ MeasCalculations::~MeasCalculations(){
 void MeasCalculations::calculate(QVector<QVector<QPointF>> scopeData, QList<Measurement*> scopeMeas, qint32 samplingFreq){
     QMutexLocker locker(&mutex);
 
-    data = scopeData;
-    meas = scopeMeas;
-    this->samplingFreq = samplingFreq;
-    if (!isRunning()) {
-        start(LowPriority);
-    } else {
-        restart = true;
-        condition.wakeOne();
+    if(scopeMeas.length()>0){
+        data = scopeData;
+        meas = scopeMeas;
+        this->samplingFreq = samplingFreq;
+        if (!isRunning()) {
+            start(LowPriority);
+        } else {
+            restart = true;
+            condition.wakeOne();
+        }
     }
 }
 
@@ -35,45 +37,83 @@ void MeasCalculations::run()
         QVector<QVector<QPointF>> data = this->data;
         QList<Measurement *> meas = this->meas;
         qint32 samplingFreq = this->samplingFreq;
+        qint32 channA = -1;
+        qint32 channB = -1;
         for (int i = 0;i<8;i++) {
             isVoltCalculated[i] = 0;
             isTimeCalculated[i] = 0;
         }
         mutex.unlock();
 
-
-
         foreach(Measurement* m, meas){
-            qint8 channelIndex = m->getChannel()-1;
+            qint8 channelIndex = m->getChannelIndex();
+
+            if(channelIndex>=data.length() && m->getType()!=MeasurementType::PHASE){
+                m->setLabel("N/A");
+                continue;
+            }
+
             switch (m->getType()) {
             case MeasurementType::LOW:
                 calculateTime(data[channelIndex],channelIndex,samplingFreq);
                 m->setLabel("Duty Low");
-                m->setValue(formatOutout(1-High[channelIndex],"%"));
+                m->setValue(LabelFormator::formatOutout(100-High[channelIndex]*100,"%"));
                 break;
             case MeasurementType::HIGH:
+                calculateTime(data[channelIndex],channelIndex,samplingFreq);
+                m->setLabel("Duty High");
+                m->setValue(LabelFormator::formatOutout(High[channelIndex]*100,"%"));
                 break;
             case MeasurementType::MIN:
+                calculateVolt(data[channelIndex],channelIndex);
+                m->setLabel("Min");
+                m->setValue(LabelFormator::formatOutout(Min[channelIndex],"V"));
                 break;
             case MeasurementType::MAX:
+                calculateVolt(data[channelIndex],channelIndex);
+                m->setLabel("Max");
+                m->setValue(LabelFormator::formatOutout(Max[channelIndex],"V"));
                 break;
             case MeasurementType::DUTY:
+                calculateTime(data[channelIndex],channelIndex,samplingFreq);
+                m->setLabel("Duty");
+                m->setValue(LabelFormator::formatOutout(High[channelIndex]*100,"%"));
                 break;
             case MeasurementType::RMS:
+                calculateVolt(data[channelIndex],channelIndex);
+                m->setLabel("RMS");
+                m->setValue(LabelFormator::formatOutout(RMS[channelIndex],"V"));
                 break;
             case MeasurementType::MEAN:
+                calculateVolt(data[channelIndex],channelIndex);
+                m->setLabel("Mean");
+                m->setValue(LabelFormator::formatOutout(Mean[channelIndex],"V"));
                 break;
             case MeasurementType::PKPK:
                 calculateVolt(data[channelIndex],channelIndex);
                 m->setLabel("Pk Pk");
-                m->setValue(formatOutout(Max[channelIndex] - Min[channelIndex] ,"V"));
-                qDebug () << "pkpk vaue calculated";
+                m->setValue(LabelFormator::formatOutout(Max[channelIndex] - Min[channelIndex] ,"V"));
                 break;
             case MeasurementType::PHASE:
+                channA = m->getChannelIndex()/10;
+                channB = m->getChannelIndex()%10;
+                if(channA >= data.length() || channB >= data.length()){
+                    m->setLabel("N/A");
+                    break;
+                }else{
+                    m->setLabel("Phase ("+QString::number(channA+1)+"->"+QString::number(channB+1)+")");
+                    m->setValue("TODO");
+                }
                 break;
             case MeasurementType::PERIOD:
+                calculateTime(data[channelIndex],channelIndex,samplingFreq);
+                m->setLabel("Period");
+                m->setValue(LabelFormator::formatOutout(1.0/Freq[channelIndex],"s"));
                 break;
             case MeasurementType::FREQUENCY:
+                calculateTime(data[channelIndex],channelIndex,samplingFreq);
+                m->setLabel("Freq.");
+                m->setValue(LabelFormator::formatOutout(Freq[channelIndex],"Hz"));
                 break;
             }
         }
@@ -121,8 +161,7 @@ void MeasCalculations::calculateTime(QVector<QPointF> data, qint32 ch, qint32 sa
 
 
     if(!isTimeCalculated[ch]){
-        double center = ((double)(Max[ch]) + Min[ch]) / 2;
-        //double center = Mean[ch] / scale;
+        double middleValue = ((double)(Max[ch]) + Min[ch]) / 2;
 
         int state = 0;
         int up = 0;
@@ -130,37 +169,37 @@ void MeasCalculations::calculateTime(QVector<QPointF> data, qint32 ch, qint32 sa
         bool below = false;
         int periods = 0;
         double frq = 0;
-        qreal LP = data[0].y();
+        qreal lowPass = data[0].y();
         int totalUp = 0;
         int totalDown = 0;
         int zerocrossindex = 0;
 
-        if (data[0].y() < center) {
+        if (data[0].y() < middleValue) {
             below = true;
         }
 
         for (int i = 3; i < data.length()-4; i++){
             //LP = (samples[ch, i] + samples[ch, i + 1] + samples[ch, i - 1] + samples[ch, i + 2] + samples[ch, i - 2] + samples[ch, i + 3] + samples[ch, i - 3] + samples[ch, i +4]) / 8;
-            LP = 0.9 * LP + 0.1 * data[0].y();
+            lowPass = 0.9 * lowPass + 0.1 * data[i].y();
             if (state == 0){
-                if ((below && LP >= center)){
+                if ((below && lowPass >= middleValue)){
                     state = 1; ;
                     if (zerocrossindex < MAX_ZERO_CROSS){
                         ZeroCrossingTimes[ch][zerocrossindex] = i;
                         zerocrossindex++;
                     }
-                }else if ((!below && LP < center)){
+                }else if ((!below && lowPass < middleValue)){
                     state = 2;
                 }
             }
             else if (state == 1){ //signal was below and now is above
-                if (LP < center){
+                if (lowPass < middleValue){
                     state = 3;
                 }
                 up++;
             }
             else if (state == 2){ //signal was above and now is below
-                if (LP > center){
+                if (lowPass > middleValue){
                     state = 4;
                     if (zerocrossindex<MAX_ZERO_CROSS){
                         ZeroCrossingTimes[ch][zerocrossindex] = i;
@@ -170,7 +209,7 @@ void MeasCalculations::calculateTime(QVector<QPointF> data, qint32 ch, qint32 sa
                 down++;
             }
             else if (state == 3){ //signal was above and now is below
-                if (LP > center){
+                if (lowPass > middleValue){
                     state = 5;
                     if (zerocrossindex<MAX_ZERO_CROSS){
                         ZeroCrossingTimes[ch][zerocrossindex] = i;
@@ -180,7 +219,7 @@ void MeasCalculations::calculateTime(QVector<QPointF> data, qint32 ch, qint32 sa
                 down++;
             }
             else if (state == 4){ //signal was below and now is above
-                if (LP < center){
+                if (lowPass < middleValue){
                     state = 6;
                 }
                 up++;
@@ -212,54 +251,5 @@ void MeasCalculations::calculateTime(QVector<QPointF> data, qint32 ch, qint32 sa
     }
 }
 
-// we can do this as a class because it will be use on many places
-QString MeasCalculations::formatOutout(qreal value, QString unit){
-    QString str;
-
-    if (value>=100000000000){
-        str=QString::number(value/1000000000,'f',0) + " G"+unit;
-    }else if (value>=10000000000){
-        str=QString::number(value/1000000000,'f',1) + " G"+unit;
-    }else if (value>=1000000000){
-        str=QString::number(value/1000000000,'f',2) + " G"+unit;
-    }else if (value>=100000000){
-        str=QString::number(value/1000000,'f',0) + " M"+unit;
-    }else if (value>=10000000){
-        str=QString::number(value/1000000,'f',1) + " M"+unit;
-    }else if (value>=1000000){
-        str=QString::number(value/1000000,'f',2) + " M"+unit;
-    }else if (value>=100000){
-        str=QString::number(value/1000,'f',0) + " k"+unit;
-    }else if (value>=10000){
-        str=QString::number(value/1000,'f',1) + " k"+unit;
-    }else if (value>=1000){
-        str=QString::number(value/1000,'f',2) + " k"+unit;
-    }else if (value>=100){
-        str=QString::number(value,'f',0) + " "+unit;
-    }else if (value>=10){
-        str=QString::number(value,'f',1) + " "+unit;
-    }else if (value>=1){
-        str=QString::number(value,'f',2) + " "+unit;
-    }else if (value>=0.1){
-        str=QString::number(value*1000,'f',0) + " m"+unit;
-    }else if (value>=0.01){
-        str=QString::number(value*1000,'f',1) + " m"+unit;
-    }else if (value>=0.001){
-        str=QString::number(value*1000,'f',2) + " m"+unit;
-    }else if (value>=0.0001){
-        str=QString::number(value*1000000,'f',0) + " u"+unit;
-    }else if (value>=0.00001){
-        str=QString::number(value*1000000,'f',1) + " u"+unit;
-    }else if (value>=0.000001){
-        str=QString::number(value*1000000,'f',2) + " u"+unit;
-    }else if (value>=0.0000001){
-        str=QString::number(value*1000000000,'f',0) + " n"+unit;
-    }else if (value>=0.00000001){
-        str=QString::number(value*1000000000,'f',1) + " n"+unit;
-    }else if (value>=0.000000001){
-        str=QString::number(value*1000000000,'f',2) + " n"+unit;
-    }
-    return str;
-}
 
 

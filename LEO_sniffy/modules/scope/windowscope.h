@@ -21,6 +21,8 @@
 #include "../../GUI/widgettab.h"
 #include "../../GUI/widgetlabelarea.h"
 
+#include "../labelformator.h"
+
 
 #include "scopedefs.h"
 #include "panelsettings.h"
@@ -38,7 +40,7 @@ public:
     explicit WindowScope(QWidget *parent = nullptr);
     ~WindowScope();
 
-    void dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase);
+    void showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase);
 
     void singleSamplingDone();
     void samplingOngoing();
@@ -57,6 +59,7 @@ signals:
     void triggerChannelChanged(int index);
     void channelEnableChanged(int buttonStatus);
     void measurementChanged(Measurement *m);
+    void measurementClearChanged();
 
 
 private slots:
@@ -68,13 +71,15 @@ private slots:
     void triggerEdgeCallback(int index);
     void triggerModeCallback(int index);
     void measurementAddedCallback(Measurement *m);
+    void measurementClearCallback();
+
 
 private:
     Ui::WindowScope *ui;
 
 
     widgetChart *chart;
-    widgetLabelArea *labelInfoPanel;
+    WidgetLabelArea *labelInfoPanel;
 
     PanelSettings *panelSet;
     PanelMeasurement *panelMeas;

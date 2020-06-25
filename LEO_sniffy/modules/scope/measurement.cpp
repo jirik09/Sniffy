@@ -1,8 +1,8 @@
 #include "measurement.h"
 
-Measurement::Measurement(MeasurementType type, qint32 channel, QObject *parent) : QObject(parent)
+Measurement::Measurement(MeasurementType type, qint32 channelIndex, QObject *parent) : QObject(parent)
 {
-    this->channel = channel;
+    this->channelIndex = channelIndex;
     this->type = type;
 }
 
@@ -10,7 +10,7 @@ Measurement::Measurement (const Measurement& m){
     this->label = m.getLabel();
     this->value = m.getValue();
     this->type = m.getType();
-    this->channel = m.getChannel();
+    this->channelIndex = m.getChannelIndex();
     return;
 }
 
@@ -42,8 +42,8 @@ MeasurementType Measurement::getType() const
     return type;
 }
 
-qint32 Measurement::getChannel() const
+qint32 Measurement::getChannelIndex() const
 {
-    return channel;
+    return channelIndex;
 }
 

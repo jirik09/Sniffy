@@ -40,7 +40,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
       /*  QXYSeries *series = 0; //normal
         series = new QLineSeries;*/
 
-        series->setPen(QPen(QBrush(QColor(colors[i%5])), 3.0));
+        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
 
         seriesList.append(series);
         series->setUseOpenGL(true);

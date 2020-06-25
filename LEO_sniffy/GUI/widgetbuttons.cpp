@@ -105,7 +105,6 @@ void WidgetButtons::setColor(QString text, int index){
         }else{
             tempStyleSheet += "QPushButton:disabled{background-color: rgb(48,48,48);color: rgb(128,128,128);} QPushButton:pressed{border: 2px solid rgb(48,48,48)} QPushButton{border: none;"+text +"}";
         }
-
         pushButtonsList.at(index)->setStyleSheet(tempStyleSheet);
     }
 }
@@ -133,8 +132,8 @@ bool WidgetButtons::isChecked (int index){
 
 int WidgetButtons::getSelectedIndex(){
     foreach(QPushButton *pb, pushButtonsList){
-        pb->isChecked();
-        return pushButtonsList.indexOf(pb);
+        if(pb->isChecked())
+            return pushButtonsList.indexOf(pb);
     }
     return -1;
 }

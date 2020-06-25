@@ -22,6 +22,7 @@ Scope::Scope(QObject *parent)
     connect(scpWindow, &WindowScope::triggerChannelChanged,this,&Scope::updateTriggerChannel);
 
     connect(scpWindow, &WindowScope::measurementChanged,this, &Scope::addMeasurement);
+    connect(scpWindow, &WindowScope::measurementClearChanged, this, &Scope::clearMeasurement);
     connect(measCalc, &MeasCalculations::measCalculated, this, &Scope::updateMeasurement);
 }
 
@@ -55,11 +56,14 @@ void Scope::parseData(QByteArray data){
             streamBuffLeng>>samplingFreq; //thow away first 4 bytes because it contains "OSC_"
 
             streamBuffLeng>>samplingFreq;
+            config->samplingRate = samplingFreq;
 
             streamBuffLeng>>tmpByte;
             resolution = tmpByte;
+            config->ADCresolution = resolution;
 
             streamBuffLeng>>length;
+            resolution>8?config->dataLength = length/2:config->dataLength = length;
 
             streamBuffLeng>>tmpByte;
             streamBuffLeng>>tmpByte;
@@ -67,6 +71,7 @@ void Scope::parseData(QByteArray data){
 
             streamBuffLeng>>tmpByte;
             numChannels = tmpByte;
+            config->numberOfChannels = numChannels;
 
             QVector<QPointF> points;
             if(length<500000){
@@ -103,8 +108,8 @@ void Scope::parseData(QByteArray data){
         }
 
         if(currentChannel==numChannels){
-            measCalc->calculate(*scopeData,scopeMeas,samplingFreq);
-            scpWindow->dataReceived(*scopeData,config->timeBase);
+            measCalc->calculate(*scopeData,scopeMeas,config->samplingRate);
+            scpWindow->showDataTraces(*scopeData,config->timeBase);
             scpWindow->setRealSamplingRate(samplingFreq);
 
             //handel single trigger
@@ -206,10 +211,20 @@ void Scope::updateChannelsEnable(int buttonStatus){
         config->numberOfChannels = 4;
     }
     setNumberOfChannels(config->numberOfChannels);
+    scpWindow->showDataTraces(*scopeData,config->timeBase);
 }
 
 void Scope::addMeasurement(Measurement *m){
     scopeMeas.append(m);
+    if(scopeMeas.length()>9){
+        scopeMeas.removeFirst();
+    }
+    measCalc->calculate(*scopeData,scopeMeas,config->samplingRate);
+}
+
+void Scope::clearMeasurement(){
+    scopeMeas.clear();
+    updateMeasurement(scopeMeas);
 }
 
 void Scope::updateMeasurement(QList<Measurement*> m){

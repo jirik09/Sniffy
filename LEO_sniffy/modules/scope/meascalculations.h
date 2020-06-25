@@ -9,6 +9,7 @@
 #include <QDebug>
 
 #include "measurement.h"
+#include "../labelformator.h"
 
 class MeasCalculations: public QThread
 {
@@ -43,20 +44,15 @@ private:
     qreal High[8] = {0};
 
     #define MAX_ZERO_CROSS 128
-
     int ZeroCrossingTimes[8][MAX_ZERO_CROSS] = {{0,0}};
-
 
     QMutex mutex;
     QWaitCondition condition;
     bool restart;
     bool abort;
 
-
     void calculateTime(QVector<QPointF> data, qint32 channel, qint32 sampling);
     void calculateVolt(QVector<QPointF> data, qint32 channel);
-
-    QString formatOutout(qreal value, QString unit);
 
 };
 

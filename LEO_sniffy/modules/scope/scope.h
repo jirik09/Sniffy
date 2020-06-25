@@ -49,6 +49,7 @@ private slots:
     void updateChannelsEnable(int buttonStatus);
     void addMeasurement(Measurement *m);
     void updateMeasurement(QList<Measurement*> m);
+    void clearMeasurement();
 
 
 private:

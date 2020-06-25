@@ -19,7 +19,7 @@ WindowScope::WindowScope(QWidget *parent) :
     chart = new widgetChart(ui->widget_trace,4);
     ui->verticalLayout_trace->addWidget(chart);
 
-    labelInfoPanel = new widgetLabelArea(ui->widget_info);
+    labelInfoPanel = new WidgetLabelArea(ui->widget_info);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
 
@@ -48,6 +48,7 @@ WindowScope::WindowScope(QWidget *parent) :
     panelMeas = new PanelMeasurement(tabs->getLayout(1),tabs);
 
     connect(panelMeas, &PanelMeasurement::measurementAdded, this,&WindowScope::measurementAddedCallback);
+    connect(panelMeas, &PanelMeasurement::measurementClearAll, this, &WindowScope::measurementClearCallback);
 }
 
 WindowScope::~WindowScope()
@@ -55,14 +56,16 @@ WindowScope::~WindowScope()
     delete ui;
 }
 
-void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase){
+void WindowScope::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase){
     chart->clearAll();
     updateChartScale(timeBase);
     labelInfoPanel->setTriggerLabelText("");
+    labelInfoPanel->hideChannelLabels();
 
     for (int i = 0; i < dataSeries.length(); i++){
         if(panelSet->buttonsChannelEnable->isChecked(i)){
             chart->updateTrace(&dataSeries[i], i);
+            labelInfoPanel->setChannelLabelVisible(i,true);
         }
     }
 }
@@ -143,6 +146,9 @@ void WindowScope::channelEnableCallback(int buttonStatus){
 void WindowScope::measurementAddedCallback(Measurement *m){
     emit measurementChanged (m);
 }
+void WindowScope::measurementClearCallback(){
+    emit measurementClearChanged ();
+}
 
 void WindowScope::updateMeasurement(QList<Measurement*> m){
     labelInfoPanel->setMeasurements(m);
@@ -155,7 +161,7 @@ void WindowScope::singleSamplingDone(){
 }
 
 void WindowScope::samplingOngoing(){
-    labelInfoPanel->setTriggerLabelText("Smpl");
+    labelInfoPanel->setTriggerLabelText("Sampling");
 }
 
 void WindowScope::triggerCaptured(){
@@ -163,36 +169,12 @@ void WindowScope::triggerCaptured(){
 }
 
 void WindowScope::setRealSamplingRate(int smpl){
-
-    if (smpl>=100000000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000000,'f',0) + " MSPS");
-    }else if (smpl>=10000000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000000,'f',1) + " MSPS");
-    }else if (smpl>=1000000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000000,'f',2) + " MSPS");
-    }else if (smpl>=100000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000,'f',0) + " kSPS");
-    }else if (smpl>=10000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000,'f',1) + " kSPS");
-    }else if (smpl>=1000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000,'f',2) + " kSPS");
-    }else{
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl,'f',0) + " SPS");
-    }
+    labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS"));
 }
 
 void WindowScope::updateChartScale(float timeBase){
     chart->setXAxisMax(timeBase*10);
-    //099 to mitigate precision impact
-    if(timeBase<=0.00000099){
-        labelInfoPanel->setScaleLabelText(QString::number(round(timeBase*100000000000)/100,'f',2) + " ns/Div");
-    }else if(timeBase<=0.00099){
-        labelInfoPanel->setScaleLabelText(QString::number(round(timeBase*100000000)/100,'f',2) + " us/Div");
-    }else if(timeBase<=0.99){
-        labelInfoPanel->setScaleLabelText(QString::number(round(timeBase*100000)/100,'f',2) + " ms/Div");
-    }else{
-        labelInfoPanel->setScaleLabelText(QString::number(round(timeBase*100)/100,'f',2) + " s/Div");
-    }
+    labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase,"s/div"));
 }
 
 

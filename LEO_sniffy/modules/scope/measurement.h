@@ -12,7 +12,7 @@ class Measurement : public QObject
 {
     Q_OBJECT
 public:
-    explicit Measurement(MeasurementType type, qint32 channel, QObject *parent = nullptr);
+    explicit Measurement(MeasurementType type, qint32 channelIndex, QObject *parent = nullptr);
     explicit Measurement (const Measurement& meas);
     ~Measurement();
 
@@ -25,13 +25,13 @@ public:
 
     MeasurementType getType() const;
 
-    qint32 getChannel() const;
+    qint32 getChannelIndex() const;
 
 private:
     MeasurementType type;
     QString label;
     QString value;
-    qint32 channel;
+    qint32 channelIndex;
 };
 
 #endif // MEASTYPE_H
