@@ -59,9 +59,6 @@ private:
     QVector<QVector<QPointF>> *scopeData;
     QList<Measurement *> scopeMeas;
 
-
-    void processData();
-
     //private functions - writing into device only - no logic
     void stopSampling();
     void startSampling();

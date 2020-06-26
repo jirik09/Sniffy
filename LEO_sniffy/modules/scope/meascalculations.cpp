@@ -158,8 +158,6 @@ void MeasCalculations::calculateTime(QVector<QPointF> data, qint32 ch, qint32 sa
     if(!isVoltCalculated[ch]){
         calculateVolt(data,ch);
     }
-
-
     if(!isTimeCalculated[ch]){
         double middleValue = ((double)(Max[ch]) + Min[ch]) / 2;
 

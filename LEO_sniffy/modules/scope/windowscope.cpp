@@ -22,8 +22,6 @@ WindowScope::WindowScope(QWidget *parent) :
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
-
-
     //********************* insert top options *********************
     widgetTab *tabs = new widgetTab(ui->widget_settings,4);
     ui->verticalLayout_settings->addWidget(tabs);
@@ -43,12 +41,14 @@ WindowScope::WindowScope(QWidget *parent) :
     connect(panelSet->buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
     connect(panelSet->dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
 
-
     //************************* creating widget measurement *******************
     panelMeas = new PanelMeasurement(tabs->getLayout(1),tabs);
 
     connect(panelMeas, &PanelMeasurement::measurementAdded, this,&WindowScope::measurementAddedCallback);
     connect(panelMeas, &PanelMeasurement::measurementClearAll, this, &WindowScope::measurementClearCallback);
+
+
+    connect(ui->sliderSignal, &QSlider::valueChanged, this, &WindowScope::sliderShiftCallback);
 }
 
 WindowScope::~WindowScope()
@@ -56,18 +56,38 @@ WindowScope::~WindowScope()
     delete ui;
 }
 
-void WindowScope::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase){
-    chart->clearAll();
+void WindowScope::paintEvent(QPaintEvent *event){
+    int handleW = ui->sliderSignal->size().width()/chart->getZoom();;
+    ui->sliderSignal->setStyleSheet(QString::fromUtf8(
+                                        "QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
+                                        "background-color: rgb(38, 38, 38);border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
+                                        "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
+                                        "margin-bottom: -3px;border-radius: 4px;width:")+QString::number(handleW)+QString::fromUtf8("px;}"));
+    event->accept();
+}
+
+void WindowScope::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex){
     updateChartScale(timeBase);
     labelInfoPanel->setTriggerLabelText("");
     labelInfoPanel->hideChannelLabels();
+    paintTraces(dataSeries);
 
+    chart->setZoom(1.5);
+    chart->setMarkerHorizontal(triggerChannelIndex,0);
+}
+
+void WindowScope::paintTraces(QVector<QVector<QPointF>> dataSeries){
+    chart->clearAll();
     for (int i = 0; i < dataSeries.length(); i++){
         if(panelSet->buttonsChannelEnable->isChecked(i)){
             chart->updateTrace(&dataSeries[i], i);
             labelInfoPanel->setChannelLabelVisible(i,true);
         }
     }
+}
+
+void WindowScope::setDataMinMaxTime(qreal minX, qreal maxX){
+     chart->setDataMinMax(minX,maxX);
 }
 
 void WindowScope::timeBaseCallback(float value){
@@ -150,6 +170,10 @@ void WindowScope::measurementClearCallback(){
     emit measurementClearChanged ();
 }
 
+void WindowScope::sliderShiftCallback(int value){
+    chart->setShift(value);
+}
+
 void WindowScope::updateMeasurement(QList<Measurement*> m){
     labelInfoPanel->setMeasurements(m);
 }
@@ -173,7 +197,7 @@ void WindowScope::setRealSamplingRate(int smpl){
 }
 
 void WindowScope::updateChartScale(float timeBase){
-    chart->setXAxisMax(timeBase*10);
+  //  chart->setXAxisMax(timeBase*10);
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase,"s/div"));
 }
 

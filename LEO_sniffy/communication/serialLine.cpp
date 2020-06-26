@@ -130,7 +130,7 @@ void SerialLine::receiveData(QByteArray data){
 
 void SerialLine::write(const QByteArray &writeData){
     QDateTime date = QDateTime::currentDateTime();
-    qDebug() << "Sent" <<  date.time() <<":" << writeData;
+    //qDebug() << "Sent" <<  date.time() <<":" << writeData;
     if(serPort->isOpen()){
         serialWriter->write(writeData);
     }else{
@@ -140,7 +140,7 @@ void SerialLine::write(const QByteArray &writeData){
 
 void SerialLine::write(const char *data, qint32 len){
     QDateTime date = QDateTime::currentDateTime();
-    qDebug() << "Sent" <<  date.time() <<":" << data;
+   // qDebug() << "Sent" <<  date.time() <<":" << data;
     if(serPort->isOpen()){
         serialWriter->write(data,len);
     }else{

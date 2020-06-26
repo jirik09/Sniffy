@@ -13,7 +13,6 @@ class Measurement : public QObject
     Q_OBJECT
 public:
     explicit Measurement(MeasurementType type, qint32 channelIndex, QObject *parent = nullptr);
-    explicit Measurement (const Measurement& meas);
     ~Measurement();
 
 

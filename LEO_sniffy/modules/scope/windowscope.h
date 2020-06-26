@@ -39,8 +39,11 @@ class WindowScope : public QWidget
 public:
     explicit WindowScope(QWidget *parent = nullptr);
     ~WindowScope();
+    void paintEvent(QPaintEvent *event);
 
-    void showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase);
+    void showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex);
+    void paintTraces(QVector<QVector<QPointF>> dataSeries);
+    void setDataMinMaxTime(qreal minX, qreal maxX);
 
     void singleSamplingDone();
     void samplingOngoing();
@@ -72,6 +75,7 @@ private slots:
     void triggerModeCallback(int index);
     void measurementAddedCallback(Measurement *m);
     void measurementClearCallback();
+    void sliderShiftCallback(int value);
 
 
 private:

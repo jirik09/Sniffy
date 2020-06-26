@@ -6,14 +6,6 @@ Measurement::Measurement(MeasurementType type, qint32 channelIndex, QObject *par
     this->type = type;
 }
 
-Measurement::Measurement (const Measurement& m){
-    this->label = m.getLabel();
-    this->value = m.getValue();
-    this->type = m.getType();
-    this->channelIndex = m.getChannelIndex();
-    return;
-}
-
 Measurement::~Measurement(){
 }
 
