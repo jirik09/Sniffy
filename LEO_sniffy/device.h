@@ -1,12 +1,13 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
-#include <QObject>
-#include <QThread>
-#include <QSharedPointer>
+//#include <QObject>
+//#include <QThread>
+//#include <QSharedPointer>
 #include "communication/comms.h"
-#include "modules/scope/scope.h"
 #include "communication/commands.h"
+#include "modules/scope/scope.h"
+#include "modules/scan/scan.h"
 #include "devicespec.h"
 
 class Device : public QObject
@@ -14,15 +15,24 @@ class Device : public QObject
     Q_OBJECT
 public:
     explicit Device(QObject *parent = nullptr);
-    void open(int deviceIndex);
-    void close();
-    DeviceSpec* getDeviceSpecification();
+    QList<QSharedPointer<AbstractModule>> createModulesList();
+    QList<QSharedPointer<AbstractModule>> getModulesList();   
+
+        void updateSpecGUI();
+    Scan *scan;
+
+private:
+    QList<DeviceDescriptor> deviceList;
+    QList<QSharedPointer<AbstractModule>> modules;
+
+    Comms *communication;
+    Commands *commands;
+    DeviceSpec *deviceSpec;
+    bool isConnected = false;
 
     bool getIsConnected() const;
     bool getIsSpecificationLoaded();
-    void ScanDevices();
-
-    QWidget* createModule(ModuleDockWidget *dockWidget ,WidgetControlModule *controlModule, QByteArray cmdPrefix);
+    DeviceSpec* getDeviceSpecification();
 
 signals:
   //  void scopeNewData(QByteArray);
@@ -31,26 +41,15 @@ signals:
 
     void updateDeviceList(QList<DeviceDescriptor> deviceList);
     void updateSpecfication();
-    void fatalError(QByteArray);
 
 private slots:
     void parseData(QByteArray data);
     void parseSystemData(QByteArray data);
     void newDeviceList(QList<DeviceDescriptor> deviceList);
     void handleError(QByteArray error);
-
-
-private:
-    QList<DeviceDescriptor> deviceList;
-
-    Comms *communication;
-    QList<QSharedPointer<AbstractModule>> modules;
-
-    bool isConnected = false;
-
-    Commands *commands;
-    DeviceSpec *deviceSpec;
-
+    void ScanDevices();
+    void open(int deviceIndex);
+    void close();
 };
 
 #endif // DEVICE_H
