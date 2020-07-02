@@ -37,6 +37,7 @@ public:
     void setColor(QString text, int index);
     void clickedInternal (int index);
     bool isChecked (int index);
+    int getSelectedIndex();
     int getStatus();
     void setDisabledButton(bool disabled, int index);
     void disableAll();
@@ -47,7 +48,7 @@ private:
     QString buttonColors[8] = {BUTTON_COLOR_BLUE};
     ButtonTypes type = ButtonTypes::NORMAL;
 
-    QList<QPushButton*> *pushButtonsList;
+    QList<QPushButton*> pushButtonsList;
 
     void uncheckAll();
 

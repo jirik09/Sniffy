@@ -33,6 +33,11 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsTriggerChannel->setText("CH2",1);
     buttonsTriggerChannel->setText("CH3",2);
     buttonsTriggerChannel->setText("CH4",3);
+    buttonsTriggerChannel->setColor(BUTTON_COLOR_ORANGE,0);
+    buttonsTriggerChannel->setColor(BUTTON_COLOR_BLUE,1);
+    buttonsTriggerChannel->setColor(BUTTON_COLOR_GREEN,2);
+    buttonsTriggerChannel->setColor(BUTTON_COLOR_PURPLE,3);
+
     buttonsTriggerChannel->disableAll();
     buttonsTriggerChannel->setDisabledButton(false,0);
 

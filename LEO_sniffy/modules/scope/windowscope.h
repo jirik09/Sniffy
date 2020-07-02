@@ -21,6 +21,8 @@
 #include "../../GUI/widgettab.h"
 #include "../../GUI/widgetlabelarea.h"
 
+#include "../labelformator.h"
+
 
 #include "scopedefs.h"
 #include "panelsettings.h"
@@ -37,13 +39,18 @@ class WindowScope : public QWidget
 public:
     explicit WindowScope(QWidget *parent = nullptr);
     ~WindowScope();
+    void paintEvent(QPaintEvent *event);
 
-    void dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase);
+    void showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex);
+    void paintTraces(QVector<QVector<QPointF>> dataSeries);
+    void setDataMinMaxTime(qreal minX, qreal maxX);
 
     void singleSamplingDone();
     void samplingOngoing();
     void triggerCaptured();
     void setRealSamplingRate(int smpl);
+
+    void updateMeasurement(QList<Measurement*> m);
 
 
 signals:
@@ -54,6 +61,8 @@ signals:
     void triggerValueChanged(float value);
     void triggerChannelChanged(int index);
     void channelEnableChanged(int buttonStatus);
+    void measurementChanged(Measurement *m);
+    void measurementClearChanged();
 
 
 private slots:
@@ -64,13 +73,17 @@ private slots:
     void triggerChannelCallback(int index);
     void triggerEdgeCallback(int index);
     void triggerModeCallback(int index);
+    void measurementAddedCallback(Measurement *m);
+    void measurementClearCallback();
+    void sliderShiftCallback(int value);
+
 
 private:
     Ui::WindowScope *ui;
 
 
     widgetChart *chart;
-    widgetLabelArea *labelInfoPanel;
+    WidgetLabelArea *labelInfoPanel;
 
     PanelSettings *panelSet;
     PanelMeasurement *panelMeas;

@@ -4,8 +4,13 @@ Scope::Scope(QObject *parent)
 {
     Q_UNUSED(parent);
     config = new ScopeConfig();
+    measCalc = new MeasCalculations();
     cmd = new Commands();
+    setCommandPrefix(cmd->SCOPE);
     scpWindow = new WindowScope();
+
+    scopeData = new QVector<QVector<QPointF>>;
+    //scopeMeas = new QList<Measurement>;
 
     //connect signals from GUI into scope
     connect(scpWindow, &WindowScope::timeBaseChanged,this,&Scope::updateTimebase);
@@ -15,6 +20,10 @@ Scope::Scope(QObject *parent)
     connect(scpWindow, &WindowScope::triggerModeChanged,this,&Scope::updateTriggerMode);
     connect(scpWindow, &WindowScope::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
     connect(scpWindow, &WindowScope::triggerChannelChanged,this,&Scope::updateTriggerChannel);
+
+    connect(scpWindow, &WindowScope::measurementChanged,this, &Scope::addMeasurement);
+    connect(scpWindow, &WindowScope::measurementClearChanged, this, &Scope::clearMeasurement);
+    connect(measCalc, &MeasCalculations::measCalculated, this, &Scope::updateMeasurement);
 }
 
 void Scope::parseData(QByteArray data){
@@ -35,6 +44,10 @@ void Scope::parseData(QByteArray data){
     }else if(dataHeader=="OSC_"){
         qint8 tmpByte;
         qint16 tmpShort;
+        qreal minX;
+        qreal maxX;
+        qreal x(0);
+        qreal y(0);
         int resolution;
         int length;
         int samplingFreq;
@@ -47,11 +60,14 @@ void Scope::parseData(QByteArray data){
             streamBuffLeng>>samplingFreq; //thow away first 4 bytes because it contains "OSC_"
 
             streamBuffLeng>>samplingFreq;
+            config->samplingRate = samplingFreq;
 
             streamBuffLeng>>tmpByte;
             resolution = tmpByte;
+            config->ADCresolution = resolution;
 
             streamBuffLeng>>length;
+            resolution>8?config->dataLength = length/2:config->dataLength = length;
 
             streamBuffLeng>>tmpByte;
             streamBuffLeng>>tmpByte;
@@ -59,6 +75,7 @@ void Scope::parseData(QByteArray data){
 
             streamBuffLeng>>tmpByte;
             numChannels = tmpByte;
+            config->numberOfChannels = numChannels;
 
             QVector<QPointF> points;
             if(length<500000){
@@ -68,34 +85,38 @@ void Scope::parseData(QByteArray data){
             }
 
             if(resolution>8){
+                minX = float(config->dataLength)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
                 for (int j(0); j < length/2; j++){
                     streamBuffLeng>>tmpByte;
                     tmpShort = tmpByte;
                     streamBuffLeng>>tmpByte;
                     tmpShort += tmpByte*256;
-                    qreal x(0);
-                    qreal y(0);
-                    x=j*1.0/samplingFreq;
+                    x = 0;
+                    y = 0;
+                    x=j*1.0/samplingFreq + minX;
                     y=tmpShort*3.3/4095.0;
                     points.append(QPointF(x,y));
                 }
+                maxX = x;
             }else{
                 qDebug() << "TODO <8bit data parser";
             }
 
-            while(numChannels<scopeData.length()){ //remove signals which will not be filled
-                scopeData.removeAt(scopeData.length()-1);
+            while(numChannels<scopeData->length()){ //remove signals which will not be filled
+                scopeData->removeAt(scopeData->length()-1);
             }
 
-            if(scopeData.length()>=currentChannel){
-                scopeData.replace(currentChannel-1,points);
+            if(scopeData->length()>=currentChannel){
+                scopeData->replace(currentChannel-1,points);
             }else{
-                scopeData.append(points);
+                scopeData->append(points);
             }
         }
 
         if(currentChannel==numChannels){
-            scpWindow->dataReceived(scopeData,config->timeBase);
+            measCalc->calculate(*scopeData,scopeMeas,config->samplingRate);
+            scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
+            scpWindow->setDataMinMaxTime(minX,maxX);
             scpWindow->setRealSamplingRate(samplingFreq);
 
             //handel single trigger
@@ -103,6 +124,7 @@ void Scope::parseData(QByteArray data){
                 restartSampling();
             }else{
                 scpWindow->singleSamplingDone();
+                moduleControlWidget->setStatus(ModuleStatus::PAUSE);
             }
         }
     }else{
@@ -130,6 +152,7 @@ void Scope::writeConfiguration(){
 
 void Scope::stopModule(){
     stopSampling();
+    measCalc->exit();
 }
 void Scope::startModule(){
     startSampling();
@@ -141,7 +164,7 @@ QWidget* Scope::getWidget(){
 
 void Scope::updateTimebase(float div){
     config->timeBase = div;
-    config->samplingRate = float(config->dataLength)/(10.0*div);
+    config->samplingRate = round(float(config->dataLength)/(20.0*div)+0.49);
     setSamplingFrequency(config->samplingRate);
 }
 
@@ -155,26 +178,6 @@ void Scope::updateTriggerLevel(float percentage){
     config->triggerLevelPercent=percentage;
     config->triggerLevel = 65535*percentage/100;
     comm->write(cmd->SCOPE, cmd->SCOPE_TRIG_LEVEL, config->triggerLevel);
-}
-
-void Scope::updateChannelsEnable(int buttonStatus){
-    if(buttonStatus & 0x01){
-        config->enabledChannels[0]=1;
-        config->numberOfChannels = 1;
-    }
-    if(buttonStatus & 0x02){
-        config->enabledChannels[1]=1;
-        config->numberOfChannels = 2;
-    }
-    if(buttonStatus & 0x04){
-        config->enabledChannels[2]=1;
-        config->numberOfChannels = 3;
-    }
-    if(buttonStatus & 0x08){
-        config->enabledChannels[3]=1;
-        config->numberOfChannels = 4;
-    }
-    setNumberOfChannels(config->numberOfChannels);
 }
 
 void Scope::updateTriggerMode(ScopeTriggerMode mode){
@@ -198,18 +201,55 @@ void Scope::updateTriggerChannel(int index){
     setTriggerChannel(index);
 }
 
+void Scope::updateChannelsEnable(int buttonStatus){
+    if(buttonStatus & 0x01){
+        config->enabledChannels[0]=1;
+        config->numberOfChannels = 1;
+    }
+    if(buttonStatus & 0x02){
+        config->enabledChannels[1]=1;
+        config->numberOfChannels = 2;
+    }
+    if(buttonStatus & 0x04){
+        config->enabledChannels[2]=1;
+        config->numberOfChannels = 3;
+    }
+    if(buttonStatus & 0x08){
+        config->enabledChannels[3]=1;
+        config->numberOfChannels = 4;
+    }
+    setNumberOfChannels(config->numberOfChannels);
+    scpWindow->paintTraces(*scopeData);
+}
 
+void Scope::addMeasurement(Measurement *m){
+    scopeMeas.append(m);
+    if(scopeMeas.length()>9){
+        scopeMeas.removeFirst();
+    }
+    measCalc->calculate(*scopeData,scopeMeas,config->samplingRate);
+}
 
+void Scope::clearMeasurement(){
+    scopeMeas.clear();
+    updateMeasurement(scopeMeas);
+}
 
-// ******************* Private functions - not important and no logic inside *******
+void Scope::updateMeasurement(QList<Measurement*> m){
+    scpWindow->updateMeasurement(m);
+}
+
 void Scope::stopSampling(){
     comm->write(cmd->SCOPE+":"+cmd->STOP+";");
+    moduleControlWidget->setStatus(ModuleStatus::PAUSE);
 }
 
 void Scope::startSampling(){
     comm->write(cmd->SCOPE+":"+cmd->START+";");
+    moduleControlWidget->setStatus(ModuleStatus::PLAY);
 }
 
+// ******************* Private functions - not important and no logic inside *******
 void Scope::restartSampling(){
     comm->write(cmd->SCOPE+":"+cmd->NEXT+";");
 }
@@ -275,7 +315,10 @@ void Scope::setTriggerEdge(ScopeTriggerEdge edge){
 }
 
 void Scope::setSamplingFrequency(int samplingRate){
-    if(samplingRate<=1000){
+    qDebug () << samplingRate;
+    comm->write(cmd->SCOPE,cmd->SAMPLING_FREQ,samplingRate);
+
+   /* if(samplingRate<=1000){
         comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_1K+";");
     }else if(samplingRate<=2000){
         comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_2K+";");
@@ -301,11 +344,5 @@ void Scope::setSamplingFrequency(int samplingRate){
         comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_5M+";");
     }else if(samplingRate<=10000000){
         comm->write(cmd->SCOPE+":"+cmd->SAMPLING_FREQ+":"+cmd->FREQ_10M+";");
-    }
+    }*/
 }
-
-
-
-
-
-

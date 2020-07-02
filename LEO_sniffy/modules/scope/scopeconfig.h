@@ -14,13 +14,15 @@ public:
 
     //all parameters must be initialized to default values and also aligned with GUI (I know it is not good)
 
-    //parameters physicaly for Hardware
+    //parameters really in HW (received each time with data)
     int samplingRate = 10000;
     int ADCresolution = 12;
     int dataLength = 1000;
+    int numberOfChannels = 1;
+
+
     int triggerLevel = 32767; //16bit number
     int pretrigger = 32767; //16bit number
-    int numberOfChannels = 1;
 
 
     //parameters for GUI

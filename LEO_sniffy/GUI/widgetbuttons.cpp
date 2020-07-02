@@ -22,16 +22,16 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
         ui->label->hide();
     }
 
-    pushButtonsList = new QList<QPushButton*>();
+    //pushButtonsList = new QList<QPushButton*>();
 
-    pushButtonsList->append(ui->pushButton_1);
-    pushButtonsList->append(ui->pushButton_2);
-    pushButtonsList->append(ui->pushButton_3);
-    pushButtonsList->append(ui->pushButton_4);
-    pushButtonsList->append(ui->pushButton_5);
-    pushButtonsList->append(ui->pushButton_6);
-    pushButtonsList->append(ui->pushButton_7);
-    pushButtonsList->append(ui->pushButton_8);
+    pushButtonsList.append(ui->pushButton_1);
+    pushButtonsList.append(ui->pushButton_2);
+    pushButtonsList.append(ui->pushButton_3);
+    pushButtonsList.append(ui->pushButton_4);
+    pushButtonsList.append(ui->pushButton_5);
+    pushButtonsList.append(ui->pushButton_6);
+    pushButtonsList.append(ui->pushButton_7);
+    pushButtonsList.append(ui->pushButton_8);
 
 
     if(num<=1)
@@ -89,11 +89,11 @@ WidgetButtons::~WidgetButtons()
 }
 
 void WidgetButtons::setText(QString text, int index){
-    pushButtonsList->at(index)->setText(text);
+    pushButtonsList.at(index)->setText(text);
 }
 
 QString WidgetButtons::getText(int index){
-    return pushButtonsList->at(index)->text();
+    return pushButtonsList.at(index)->text();
 
 }
 
@@ -105,8 +105,7 @@ void WidgetButtons::setColor(QString text, int index){
         }else{
             tempStyleSheet += "QPushButton:disabled{background-color: rgb(48,48,48);color: rgb(128,128,128);} QPushButton:pressed{border: 2px solid rgb(48,48,48)} QPushButton{border: none;"+text +"}";
         }
-
-        pushButtonsList->at(index)->setStyleSheet(tempStyleSheet);
+        pushButtonsList.at(index)->setStyleSheet(tempStyleSheet);
     }
 }
 
@@ -128,7 +127,15 @@ void WidgetButtons::clickedInternal (int index){
 }
 
 bool WidgetButtons::isChecked (int index){
-    return pushButtonsList->at(index)->isChecked();
+    return pushButtonsList.at(index)->isChecked();
+}
+
+int WidgetButtons::getSelectedIndex(){
+    foreach(QPushButton *pb, pushButtonsList){
+        if(pb->isChecked())
+            return pushButtonsList.indexOf(pb);
+    }
+    return -1;
 }
 
 int WidgetButtons::getStatus(){
@@ -143,7 +150,7 @@ int WidgetButtons::getStatus(){
 }
 
 void WidgetButtons::setDisabledButton(bool disabled, int index){
-    pushButtonsList->at(index)->setDisabled(disabled);
+    pushButtonsList.at(index)->setDisabled(disabled);
 }
 void WidgetButtons::disableAll(){
     for (int i=0;i<8;i++) {
@@ -191,5 +198,5 @@ void WidgetButtons::setChecked (bool checked, int index){
     if(type==ButtonTypes::RADIO){
         uncheckAll();
     }
-    pushButtonsList->at(index)->setChecked(checked);
+    pushButtonsList.at(index)->setChecked(checked);
 }

@@ -19,10 +19,8 @@ WindowScope::WindowScope(QWidget *parent) :
     chart = new widgetChart(ui->widget_trace,4);
     ui->verticalLayout_trace->addWidget(chart);
 
-    labelInfoPanel = new widgetLabelArea(ui->widget_info);
+    labelInfoPanel = new WidgetLabelArea(ui->widget_info);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
-
-
 
     //********************* insert top options *********************
     widgetTab *tabs = new widgetTab(ui->widget_settings,4);
@@ -43,9 +41,14 @@ WindowScope::WindowScope(QWidget *parent) :
     connect(panelSet->buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
     connect(panelSet->dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
 
-
     //************************* creating widget measurement *******************
     panelMeas = new PanelMeasurement(tabs->getLayout(1),tabs);
+
+    connect(panelMeas, &PanelMeasurement::measurementAdded, this,&WindowScope::measurementAddedCallback);
+    connect(panelMeas, &PanelMeasurement::measurementClearAll, this, &WindowScope::measurementClearCallback);
+
+
+    connect(ui->sliderSignal, &QSlider::valueChanged, this, &WindowScope::sliderShiftCallback);
 }
 
 WindowScope::~WindowScope()
@@ -53,16 +56,38 @@ WindowScope::~WindowScope()
     delete ui;
 }
 
-void WindowScope::dataReceived(QVector<QVector<QPointF>> dataSeries, float timeBase){
-    chart->clearAll();
+void WindowScope::paintEvent(QPaintEvent *event){
+    int handleW = ui->sliderSignal->size().width()/chart->getZoom();;
+    ui->sliderSignal->setStyleSheet(QString::fromUtf8(
+                                        "QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
+                                        "background-color: rgb(38, 38, 38);border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
+                                        "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
+                                        "margin-bottom: -3px;border-radius: 4px;width:")+QString::number(handleW)+QString::fromUtf8("px;}"));
+    event->accept();
+}
+
+void WindowScope::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex){
     updateChartScale(timeBase);
     labelInfoPanel->setTriggerLabelText("");
+    labelInfoPanel->hideChannelLabels();
+    paintTraces(dataSeries);
 
+    chart->setZoom(1.5);
+    chart->setMarkerHorizontal(triggerChannelIndex,0);
+}
+
+void WindowScope::paintTraces(QVector<QVector<QPointF>> dataSeries){
+    chart->clearAll();
     for (int i = 0; i < dataSeries.length(); i++){
         if(panelSet->buttonsChannelEnable->isChecked(i)){
             chart->updateTrace(&dataSeries[i], i);
+            labelInfoPanel->setChannelLabelVisible(i,true);
         }
     }
+}
+
+void WindowScope::setDataMinMaxTime(qreal minX, qreal maxX){
+     chart->setDataMinMax(minX,maxX);
 }
 
 void WindowScope::timeBaseCallback(float value){
@@ -137,6 +162,22 @@ void WindowScope::channelEnableCallback(int buttonStatus){
     emit channelEnableChanged(buttonStatus);
 }
 
+
+void WindowScope::measurementAddedCallback(Measurement *m){
+    emit measurementChanged (m);
+}
+void WindowScope::measurementClearCallback(){
+    emit measurementClearChanged ();
+}
+
+void WindowScope::sliderShiftCallback(int value){
+    chart->setShift(value);
+}
+
+void WindowScope::updateMeasurement(QList<Measurement*> m){
+    labelInfoPanel->setMeasurements(m);
+}
+
 void WindowScope::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
     panelSet->buttonsTriggerMode->setColor(BUTTON_COLOR_ORANGE,0);
@@ -144,7 +185,7 @@ void WindowScope::singleSamplingDone(){
 }
 
 void WindowScope::samplingOngoing(){
-    labelInfoPanel->setTriggerLabelText("Smpl");
+    labelInfoPanel->setTriggerLabelText("Sampling");
 }
 
 void WindowScope::triggerCaptured(){
@@ -152,36 +193,12 @@ void WindowScope::triggerCaptured(){
 }
 
 void WindowScope::setRealSamplingRate(int smpl){
-
-    if (smpl>=100000000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000000,'f',0) + " MSPS");
-    }else if (smpl>=10000000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000000,'f',1) + " MSPS");
-    }else if (smpl>=1000000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000000,'f',2) + " MSPS");
-    }else if (smpl>=100000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000,'f',0) + " kSPS");
-    }else if (smpl>=10000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000,'f',1) + " kSPS");
-    }else if (smpl>=1000){
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl/1000,'f',2) + " kSPS");
-    }else{
-        labelInfoPanel->setSamplingRateLabelText(QString::number(smpl,'f',0) + " SPS");
-    }
+    labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS"));
 }
 
 void WindowScope::updateChartScale(float timeBase){
-    chart->setXAxisMax(timeBase*10);
-    //099 to mitigate precision impact
-    if(timeBase<=0.00000099){
-        labelInfoPanel->setScaleLabelText(QString::number(round(timeBase*100000000000)/100,'f',2) + " ns/Div");
-    }else if(timeBase<=0.00099){
-        labelInfoPanel->setScaleLabelText(QString::number(round(timeBase*100000000)/100,'f',2) + " us/Div");
-    }else if(timeBase<=0.99){
-        labelInfoPanel->setScaleLabelText(QString::number(round(timeBase*100000)/100,'f',2) + " ms/Div");
-    }else{
-        labelInfoPanel->setScaleLabelText(QString::number(round(timeBase*100)/100,'f',2) + " s/Div");
-    }
+  //  chart->setXAxisMax(timeBase*10);
+    labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase,"s/div"));
 }
 
 
