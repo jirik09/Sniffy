@@ -49,6 +49,12 @@ background-color: rgb(58, 58, 58);
      <property name="enabled">
       <bool>true</bool>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QWidget{
+background-color: rgb(58, 58, 58);
+}
+</string>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

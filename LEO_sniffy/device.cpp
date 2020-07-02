@@ -4,13 +4,30 @@ Device::Device(QObject *parent) : QObject(parent)
 {
     deviceSpec = new DeviceSpec();
     commands = new Commands();
-    communication = new Comms();
-
-    modules = *new QList<QSharedPointer<AbstractModule>>();
+    communication = new Comms();    
 
     connect(communication,SIGNAL(devicesScaned(QList<DeviceDescriptor>)),this,SLOT(newDeviceList(QList<DeviceDescriptor>)),Qt::QueuedConnection);
+
+    /* Create modules */
+    modules = createModulesList();
+
+    connect(scan,&Scan::ScanDevicesGUI,this,&Device::ScanDevices);
+    connect(scan,&Scan::updateSpecGUIGUI,this,&Device::updateSpecGUI);
+    connect(scan,&Scan::openGUI,this,&Device::open);
+    connect(scan,&Scan::closeGUI,this,&Device::close);
 }
 
+/* Here's the created list of instantiated modules */
+QList<QSharedPointer<AbstractModule>> Device::createModulesList(){
+    QList<QSharedPointer<AbstractModule>> modules;
+    modules.append(QSharedPointer<AbstractModule> (scan = new Scan()));
+    modules.append(QSharedPointer<AbstractModule> (new Scope()));
+    return modules;
+}
+
+QList<QSharedPointer<AbstractModule>> Device::getModulesList(){
+    return modules;
+}
 
 void Device::ScanDevices(){
   communication->scanForDevices();
@@ -19,7 +36,7 @@ void Device::ScanDevices(){
 void Device::newDeviceList(QList<DeviceDescriptor> deviceList){
     this->deviceList = deviceList;
     qDebug() << "scanned device lis received in device.cpp";
-    emit updateDeviceList(deviceList);
+    scan->updateGUIDeviceList(deviceList);
 }
 
 
@@ -55,7 +72,7 @@ void Device::close(){
 }
 
 void Device::handleError(QByteArray error){
-    emit fatalError(error);
+    scan->errorHandler(error);
 }
 
 void Device::parseData(QByteArray data){
@@ -91,7 +108,7 @@ void Device::parseSystemData(QByteArray data){
 
     if(feature=="CFG_"){
         deviceSpec->parseSpecification(data);
-        emit updateSpecfication();
+        updateSpecGUI();
     }else if(feature=="ACK_"){
       //  qDebug() << "ACK";
     }else{
@@ -112,18 +129,30 @@ DeviceSpec* Device::getDeviceSpecification(){
     return deviceSpec;
 }
 
-QWidget* Device::createModule(ModuleDockWidget *dockWidget ,WidgetControlModule *controlModule, QByteArray cmdPrefix){
-    QSharedPointer<AbstractModule>  module (new Scope());
+void Device::updateSpecGUI(){
+     qDebug() << "update specification got to GUI";
 
-    modules.append(module);
-
-    module->setDockWidgetWindow(dockWidget);
-    module->setModuleControlWidget(controlModule);
-    module->setCommandPrefix(cmdPrefix);
-    return module->getWidget();
+     if (getIsConnected() && getIsSpecificationLoaded()){
+        scan->scanWindow->deviceParameters->show();
+        scan->scanWindow->labelMCU->show();
+        scan->scanWindow->labelMCU->setValue(getDeviceSpecification()->MCU);
+        scan->scanWindow->labelFWVer->show();
+        scan->scanWindow->labelFWVer->setValue(getDeviceSpecification()->FW_Version);
+        scan->scanWindow->labelHALVer->show();
+        scan->scanWindow->labelHALVer->setValue(getDeviceSpecification()->HAL_Version);
+        scan->scanWindow->labelRTOSVer->show();
+        scan->scanWindow->labelRTOSVer->setValue(getDeviceSpecification()->FREE_RTOS_Version);
+        scan->scanWindow->labelCoreFreq->show();
+        scan->scanWindow->labelCoreFreq->setValue(QString::number(getDeviceSpecification()->CoreClock/1000000) + "MHz");
+    }else{
+        scan->scanWindow->deviceParameters->hide();
+        scan->scanWindow->labelMCU->hide();
+        scan->scanWindow->labelFWVer->hide();
+        scan->scanWindow->labelHALVer->hide();
+        scan->scanWindow->labelRTOSVer->hide();
+        scan->scanWindow->labelCoreFreq->hide();
+    }
 }
-
-
 
 
 
