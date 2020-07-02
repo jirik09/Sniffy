@@ -29,16 +29,16 @@
 #include "panelmeasurement.h"
 
 namespace Ui {
-class WindowScope;
+class ScopeWindow;
 }
 
-class WindowScope : public QWidget
+class ScopeWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit WindowScope(QWidget *parent = nullptr);
-    ~WindowScope();
+    explicit ScopeWindow(QWidget *parent = nullptr);
+    ~ScopeWindow();
     void paintEvent(QPaintEvent *event);
 
     void showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex);
@@ -79,7 +79,7 @@ private slots:
 
 
 private:
-    Ui::WindowScope *ui;
+    Ui::ScopeWindow *ui;
 
 
     widgetChart *chart;

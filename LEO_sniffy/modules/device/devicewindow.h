@@ -12,7 +12,7 @@
 #include "devicespec.h"
 
 namespace Ui {
-class WindowScan;
+class DeviceWindow;
 }
 
 class DeviceWindow : public QWidget
@@ -44,7 +44,7 @@ private:
     WidgetLabel *labelHALVer;
 
 
-    Ui::WindowScan *ui;
+    Ui::DeviceWindow *ui;
 
 signals:
 

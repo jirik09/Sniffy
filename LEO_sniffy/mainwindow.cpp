@@ -15,13 +15,6 @@ Right - area for dock widgets
 #include "ui_mainwindow.h"
 #include "GUI/widgetfooter.h"
 
-//#include "GUI/moduledockwidget.h"
-//#include "GUI/widgetcontrolmodule.h"
-//#include "GUI/widgetseparator.h"
-//#include "modules/scope/windowscope.h"
-//#include "modules/counter/windowcounter.h"
-//#include "GUI/widgettab.h"
-
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -32,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent):
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sep);
 
-    /* Build MainWindow-related parts of Moduls */   
+    /* Build MainWindow-related parts of Modules */
     QList<QSharedPointer<AbstractModule>> modulesList = deviceMediator->getModulesList();
     QSharedPointer<AbstractModule> module;
     QString moduleName;
@@ -63,9 +56,6 @@ MainWindow::MainWindow(QWidget *parent):
 
     deviceMediator->ShowDeviceModule();
 
-
-    /* Left pane Menu of Control Play/Pause buttons */
-
     verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ui->verticalLayout_modules->addItem(verticalSpacer);
     WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget);
@@ -78,11 +68,7 @@ MainWindow::MainWindow(QWidget *parent):
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-
-   // addDockWidget(static_cast<Qt::DockWidgetArea>(2), ScnaWindowtamšopnout);
-
-    //pass scope pointer and pointer to module widget into scope window - this connects mediator to GUI
-}
+ }
 
 MainWindow::~MainWindow()
 {
@@ -99,4 +85,3 @@ void MainWindow::setMenuSize(){
     }
 }
 
-/* End of File my Friend */

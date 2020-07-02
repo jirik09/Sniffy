@@ -7,7 +7,7 @@
 #include <QPointF>
 #include <QList>
 
-#include "windowscope.h"
+#include "scopewindow.h"
 #include "scopeconfig.h"
 #include "scopespec.h"
 
@@ -53,7 +53,7 @@ public slots:
 
 
 private:
-    WindowScope *scpWindow;
+    ScopeWindow *scpWindow;
     ScopeConfig *config;
     ScopeSpec *specification;
     MeasCalculations *measCalc;

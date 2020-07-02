@@ -1,13 +1,13 @@
 #include "devicewindow.h"
-#include "ui_windowscan.h"
+#include "ui_devicewindow.h"
 
 DeviceWindow::DeviceWindow(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::WindowScan)
+    ui(new Ui::DeviceWindow)
 {
     ui->setupUi(this);
 
-   //********************* Insert buttons and labels into Scan Window  **************************
+   // ********************* Insert buttons and labels into Scan Window  **************************
    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);//horizontal , vertical
    scrollAreaSpecification = new QScrollArea();
    scrollAreaSpecification->setWidgetResizable(true);
@@ -30,9 +30,11 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
 
    deviceSelection  = new WidgetSelection(WidgetSpecification);
    verticalLayoutSpecification->addWidget(deviceSelection);
+   deviceSelection->addOption("Scan for available devices",-1);
 
    deviceConnectButton = new WidgetButtons(WidgetSpecification,2);
    deviceConnectButton->setText("Connect",0);
+   deviceConnectButton->setDisabledButton(true,0);
    deviceConnectButton->setText("Scan",1);
 
    verticalLayoutSpecification->addWidget(deviceConnectButton);
@@ -50,15 +52,16 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
    labelHALVer = new WidgetLabel(WidgetSpecification,"ST HAL");
    verticalLayoutSpecification->addWidget(labelHALVer);
 
-   WidgetSeparator *scopeParameters = new WidgetSeparator(WidgetSpecification,"Scope Parameters");
-   verticalLayoutSpecification->addWidget(scopeParameters);
+  // WidgetSeparator *scopeParameters = new WidgetSeparator(WidgetSpecification,"Scope Parameters");
+  // verticalLayoutSpecification->addWidget(scopeParameters);
 
    verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
    verticalLayoutSpecification->addItem(verticalSpacer);
 
    //ui->dockWidget_device->setWindowTitle("Device");
 
-   //*************************** end adding widgets to specification area *************************
+   // *************************** end adding widgets to specification area *************************
+    hideSpecification();
 }
 
 DeviceWindow::~DeviceWindow()
@@ -68,6 +71,9 @@ DeviceWindow::~DeviceWindow()
 
 void DeviceWindow::showSpecification(DeviceSpec *spec){
     qDebug() << "update specification got to GUI";
+
+    ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/NUCLEO_F303RE.png);");
+
 
     deviceParameters->show();
     labelMCU->show();
@@ -83,6 +89,8 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
 }
 
 void DeviceWindow::hideSpecification(){
+
+    ui->widget_device->setStyleSheet("image: none;");
     deviceParameters->hide();
     labelMCU->hide();
     labelFWVer->hide();

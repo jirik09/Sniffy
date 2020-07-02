@@ -7,12 +7,12 @@ Comment: This will be similar for all features but making this window abstract m
 crazy so I keept it like this and we will have to specify it for all features like gen, counter etc.
 But it can be easily coppied so we can keep some template file.
 */
-#include "windowscope.h"
-#include "ui_windowscope.h"
+#include "scopewindow.h"
+#include "ui_scopewindow.h"
 
-WindowScope::WindowScope(QWidget *parent) :
+ScopeWindow::ScopeWindow(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::WindowScope)
+    ui(new Ui::ScopeWindow)
 {
     ui->setupUi(this);
 
@@ -22,7 +22,7 @@ WindowScope::WindowScope(QWidget *parent) :
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
-    //********************* insert top options *********************
+    // ********************* insert top options *********************
     widgetTab *tabs = new widgetTab(ui->widget_settings,4);
     ui->verticalLayout_settings->addWidget(tabs);
     tabs->setText("Set",0);
@@ -30,7 +30,7 @@ WindowScope::WindowScope(QWidget *parent) :
     tabs->setText("Disp",2);
     tabs->setText("Math",3);
 
-    //************************* creating widget general settings *******************
+    // ************************* creating widget general settings *******************
     panelSet = new PanelSettings(tabs->getLayout(0),tabs);
 
     connect(panelSet->dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
@@ -41,22 +41,22 @@ WindowScope::WindowScope(QWidget *parent) :
     connect(panelSet->buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
     connect(panelSet->dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
 
-    //************************* creating widget measurement *******************
+    // ************************* creating widget measurement *******************
     panelMeas = new PanelMeasurement(tabs->getLayout(1),tabs);
 
-    connect(panelMeas, &PanelMeasurement::measurementAdded, this,&WindowScope::measurementAddedCallback);
-    connect(panelMeas, &PanelMeasurement::measurementClearAll, this, &WindowScope::measurementClearCallback);
+    connect(panelMeas, &PanelMeasurement::measurementAdded, this,&ScopeWindow::measurementAddedCallback);
+    connect(panelMeas, &PanelMeasurement::measurementClearAll, this, &ScopeWindow::measurementClearCallback);
 
 
-    connect(ui->sliderSignal, &QSlider::valueChanged, this, &WindowScope::sliderShiftCallback);
+    connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
 }
 
-WindowScope::~WindowScope()
+ScopeWindow::~ScopeWindow()
 {
     delete ui;
 }
 
-void WindowScope::paintEvent(QPaintEvent *event){
+void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom();;
     ui->sliderSignal->setStyleSheet(QString::fromUtf8(
                                         "QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
@@ -66,7 +66,7 @@ void WindowScope::paintEvent(QPaintEvent *event){
     event->accept();
 }
 
-void WindowScope::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex){
+void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex){
     updateChartScale(timeBase);
     labelInfoPanel->setTriggerLabelText("");
     labelInfoPanel->hideChannelLabels();
@@ -76,7 +76,7 @@ void WindowScope::showDataTraces(QVector<QVector<QPointF>> dataSeries, float tim
     chart->setMarkerHorizontal(triggerChannelIndex,0);
 }
 
-void WindowScope::paintTraces(QVector<QVector<QPointF>> dataSeries){
+void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries){
     chart->clearAll();
     for (int i = 0; i < dataSeries.length(); i++){
         if(panelSet->buttonsChannelEnable->isChecked(i)){
@@ -86,28 +86,28 @@ void WindowScope::paintTraces(QVector<QVector<QPointF>> dataSeries){
     }
 }
 
-void WindowScope::setDataMinMaxTime(qreal minX, qreal maxX){
+void ScopeWindow::setDataMinMaxTime(qreal minX, qreal maxX){
      chart->setDataMinMax(minX,maxX);
 }
 
-void WindowScope::timeBaseCallback(float value){
+void ScopeWindow::timeBaseCallback(float value){
     emit timeBaseChanged(value);
     updateChartScale(value);
 }
 
-void WindowScope::pretriggerCallback(float value){
+void ScopeWindow::pretriggerCallback(float value){
     emit pretriggerChanged(value);
 }
 
-void WindowScope::triggerValueCallback(float value){
+void ScopeWindow::triggerValueCallback(float value){
     emit triggerValueChanged(value/3.3*100);
 }
 
-void WindowScope::triggerChannelCallback(int index){
+void ScopeWindow::triggerChannelCallback(int index){
     emit triggerChannelChanged(index);
 }
 
-void WindowScope::triggerEdgeCallback(int index){
+void ScopeWindow::triggerEdgeCallback(int index){
     if(index==0){
         emit triggerEdgeChanged(ScopeTriggerEdge::EDGE_RISING);
     }else if(index==1){
@@ -115,7 +115,7 @@ void WindowScope::triggerEdgeCallback(int index){
     }
 }
 
-void WindowScope::triggerModeCallback(int index){
+void ScopeWindow::triggerModeCallback(int index){
     if(index==0){
         if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
             panelSet->buttonsTriggerMode->setColor(BUTTON_COLOR_ORANGE,0);
@@ -138,7 +138,7 @@ void WindowScope::triggerModeCallback(int index){
 }
 
 
-void WindowScope::channelEnableCallback(int buttonStatus){
+void ScopeWindow::channelEnableCallback(int buttonStatus){
     panelSet->buttonsTriggerChannel->disableAll();
 
     //if current trigger channel is disabled then select channel one for trigger
@@ -163,40 +163,40 @@ void WindowScope::channelEnableCallback(int buttonStatus){
 }
 
 
-void WindowScope::measurementAddedCallback(Measurement *m){
+void ScopeWindow::measurementAddedCallback(Measurement *m){
     emit measurementChanged (m);
 }
-void WindowScope::measurementClearCallback(){
+void ScopeWindow::measurementClearCallback(){
     emit measurementClearChanged ();
 }
 
-void WindowScope::sliderShiftCallback(int value){
+void ScopeWindow::sliderShiftCallback(int value){
     chart->setShift(value);
 }
 
-void WindowScope::updateMeasurement(QList<Measurement*> m){
+void ScopeWindow::updateMeasurement(QList<Measurement*> m){
     labelInfoPanel->setMeasurements(m);
 }
 
-void WindowScope::singleSamplingDone(){
+void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
     panelSet->buttonsTriggerMode->setColor(BUTTON_COLOR_ORANGE,0);
     labelInfoPanel->setTriggerLabelText("");
 }
 
-void WindowScope::samplingOngoing(){
+void ScopeWindow::samplingOngoing(){
     labelInfoPanel->setTriggerLabelText("Sampling");
 }
 
-void WindowScope::triggerCaptured(){
+void ScopeWindow::triggerCaptured(){
     labelInfoPanel->setTriggerLabelText("Trig");
 }
 
-void WindowScope::setRealSamplingRate(int smpl){
+void ScopeWindow::setRealSamplingRate(int smpl){
     labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS"));
 }
 
-void WindowScope::updateChartScale(float timeBase){
+void ScopeWindow::updateChartScale(float timeBase){
   //  chart->setXAxisMax(timeBase*10);
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase,"s/div"));
 }

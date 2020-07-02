@@ -5,7 +5,7 @@ Scope::Scope(QObject *parent)
     Q_UNUSED(parent);
     config = new ScopeConfig();
     measCalc = new MeasCalculations();
-    scpWindow = new WindowScope();
+    scpWindow = new ScopeWindow();
     setCommandPrefix(cmd->SCOPE);
     moduleName = "Oscilloscope";
 
@@ -14,16 +14,16 @@ Scope::Scope(QObject *parent)
     //scopeMeas = new QList<Measurement>;
 
     //connect signals from GUI into scope
-    connect(scpWindow, &WindowScope::timeBaseChanged,this,&Scope::updateTimebase);
-    connect(scpWindow, &WindowScope::pretriggerChanged,this,&Scope::updatePretrigger);
-    connect(scpWindow, &WindowScope::triggerValueChanged,this,&Scope::updateTriggerLevel);
-    connect(scpWindow, &WindowScope::channelEnableChanged,this,&Scope::updateChannelsEnable);
-    connect(scpWindow, &WindowScope::triggerModeChanged,this,&Scope::updateTriggerMode);
-    connect(scpWindow, &WindowScope::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
-    connect(scpWindow, &WindowScope::triggerChannelChanged,this,&Scope::updateTriggerChannel);
+    connect(scpWindow, &ScopeWindow::timeBaseChanged,this,&Scope::updateTimebase);
+    connect(scpWindow, &ScopeWindow::pretriggerChanged,this,&Scope::updatePretrigger);
+    connect(scpWindow, &ScopeWindow::triggerValueChanged,this,&Scope::updateTriggerLevel);
+    connect(scpWindow, &ScopeWindow::channelEnableChanged,this,&Scope::updateChannelsEnable);
+    connect(scpWindow, &ScopeWindow::triggerModeChanged,this,&Scope::updateTriggerMode);
+    connect(scpWindow, &ScopeWindow::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
+    connect(scpWindow, &ScopeWindow::triggerChannelChanged,this,&Scope::updateTriggerChannel);
 
-    connect(scpWindow, &WindowScope::measurementChanged,this, &Scope::addMeasurement);
-    connect(scpWindow, &WindowScope::measurementClearChanged, this, &Scope::clearMeasurement);
+    connect(scpWindow, &ScopeWindow::measurementChanged,this, &Scope::addMeasurement);
+    connect(scpWindow, &ScopeWindow::measurementClearChanged, this, &Scope::clearMeasurement);
     connect(measCalc, &MeasCalculations::measCalculated, this, &Scope::updateMeasurement);
 }
 

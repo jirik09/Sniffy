@@ -59,7 +59,7 @@ SOURCES += \
     modules/scope/scope.cpp \
     modules/scope/scopeconfig.cpp \
     modules/scope/scopespec.cpp \
-    modules/scope/windowscope.cpp
+    modules/scope/scopewindow.cpp
 
 
 HEADERS += \
@@ -107,7 +107,7 @@ HEADERS += \
     modules/scope/scopeconfig.h \
     modules/scope/scopedefs.h \
     modules/scope/scopespec.h \
-    modules/scope/windowscope.h
+    modules/scope/scopewindow.h
 
 
 
@@ -129,7 +129,7 @@ FORMS += \
     mainwindow.ui \
     modules/counter/windowcounter.ui \
     modules/device/devicewindow.ui \
-    modules/scope/windowscope.ui
+    modules/scope/scopewindow.ui
 
 
 TRANSLATIONS += \

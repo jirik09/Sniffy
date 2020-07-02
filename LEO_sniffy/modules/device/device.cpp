@@ -10,12 +10,6 @@ Device::Device(QObject *parent)
     moduleName = "Device";
 
     connect(deviceWindow->deviceConnectButton,SIGNAL(clicked(int)),this,SLOT(deviceConnection(int)));
-
-    //this code enables automatic scan at startup
-    /*  device->ScanDevices();
-       deviceConnectButton->disableAll();
-       deviceSelection->addOption("Scanning...",0);
-   */
 }
 
 void Device::deviceConnection(int buttonIndex){
@@ -34,6 +28,7 @@ void Device::deviceConnection(int buttonIndex){
 
         }else if (btnText.compare("Disconnect")==0){
             disconnectDevice();
+            deviceWindow->hideSpecification();
             qDebug() << "disconnect clicked";
         }
     }
