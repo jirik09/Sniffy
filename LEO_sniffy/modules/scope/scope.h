@@ -33,7 +33,7 @@ signals:
     //module will probably emit signal to close other resources
     //(must be done in abstract module and handled in device.cpp)
 
-private slots:
+public slots:
     void parseData(QByteArray);
     void writeConfiguration();
 

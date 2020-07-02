@@ -2,19 +2,14 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QDebug>
-#include <QLabel>
-#include <QSpacerItem>
-#include <QMessageBox>
-#include <QGraphicsDropShadowEffect>
 
-#include "GUI/moduledockwidget.h"
-#include "GUI/widgetcontrolmodule.h"
-#include "GUI/widgetseparator.h"
-#include "GUI/widgetfooter.h"
-#include "modules/scope/windowscope.h"
-#include "modules/counter/windowcounter.h"
-#include "GUI/widgettab.h"
+//#include <QDebug>
+//#include <QLabel>
+#include <QSpacerItem>
+#include <QVBoxLayout>
+//#include <QMessageBox>
+//#include <QGraphicsDropShadowEffect>
+
 #include "device.h"
 
 QT_BEGIN_NAMESPACE
@@ -27,52 +22,19 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    ~MainWindow();    
 
 private:
-    void connectDevice(int index);
-    void disconnectDevice();
-
-
-  //  Comms *communication;
-    Device *device;
-
-    WidgetSelection *deviceSelection;
-    WidgetButtons *deviceConnectButton;
-
+  //  Comms *communication;    
     Ui::MainWindow *ui;
 
-    Device *dev;
-    WidgetControlModule *WidgetModule_scope = NULL;
-    ModuleDockWidget *dockWidget_scope = NULL;
-  //  WindowScope *scpWindow;
+    Device *device;
+    QSpacerItem *verticalSpacer;
 
-    WidgetControlModule *WidgetFeature_counter = NULL;
-    QDockWidget *dockWidget_counter = NULL;
-    WindowCounter *cnt;
-
-    WidgetControlModule *WidgetFeature_gen = NULL;
-
-    QScrollArea *scrollAreaSpecification;
-    QWidget *WidgetSpecification;
-    QVBoxLayout *verticalLayoutSpecification;
-
-
-    WidgetSeparator *deviceParameters;
-    WidgetLabel *labelMCU;
-    WidgetLabel *labelCoreFreq;
-    WidgetLabel *labelFWVer;
-    WidgetLabel *labelRTOSVer;
-    WidgetLabel *labelHALVer;
-
+signals:
+    void setVerticalLayoutSpec(QVBoxLayout *boxLayout);
 
 private slots:
    void setMenuSize();
-   void deviceConnection(int buttonIndex);
-   void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
-   void updateSpecGUI();
-
-   void errorHandler(QByteArray error);
-
 };
 #endif // MAINWINDOW_H

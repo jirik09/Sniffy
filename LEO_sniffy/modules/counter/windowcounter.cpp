@@ -12,12 +12,12 @@ WindowCounter::WindowCounter(QWidget *parent) :
     ui->setupUi(this);
 
     //********************* insert top options *********************
-    widgetTab *tabs = new widgetTab(ui->widget_display,4);
-    ui->verticalLayout_settings->addWidget(tabs);
-    tabs->setText("High Frequency",0);
-    tabs->setText("Low Frequency",1);
-    tabs->setText("Frequency Ratio",2);
-    tabs->setText("Time Interval",3);
+    //widgetTab *tabs = new widgetTab(ui->widget_display,4);
+//    ui->verticalLayout_settings->addWidget(tabs);
+//    tabs->setText("High Frequency",0);
+//    tabs->setText("Low Frequency",1);
+//    tabs->setText("Frequency Ratio",2);
+//    tabs->setText("Time Interval",3);
 }
 
 
