@@ -7,6 +7,7 @@ Scope::Scope(QObject *parent)
     measCalc = new MeasCalculations();
     cmd = new Commands();
     setCommandPrefix(cmd->SCOPE);
+    setModuleName("Oscilloscope");
     scpWindow = new WindowScope();
 
     scopeData = new QVector<QVector<QPointF>>;

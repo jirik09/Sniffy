@@ -3,21 +3,21 @@
 
 #include <QObject>
 
-#include "windowscan.h"
+#include "devicewindow.h"
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
 #include "../abstractmodule.h"
 
-class Scan : public AbstractModule
+class Device : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit Scan(QObject *parent = nullptr);
+    explicit Device(QObject *parent = nullptr);
 
     QWidget* getWidget();
 
-    WindowScan *scanWindow;
+    DeviceWindow *scanWindow;
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
     void errorHandler(QByteArray error);

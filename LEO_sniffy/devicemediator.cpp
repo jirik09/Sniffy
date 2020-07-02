@@ -1,6 +1,6 @@
-#include "device.h"
+#include "devicemediator.h"
 
-Device::Device(QObject *parent) : QObject(parent)
+DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 {
     deviceSpec = new DeviceSpec();
     commands = new Commands();
@@ -11,36 +11,36 @@ Device::Device(QObject *parent) : QObject(parent)
     /* Create modules */
     modules = createModulesList();
 
-    connect(scan,&Scan::ScanDevicesGUI,this,&Device::ScanDevices);
-    connect(scan,&Scan::updateSpecGUIGUI,this,&Device::updateSpecGUI);
-    connect(scan,&Scan::openGUI,this,&Device::open);
-    connect(scan,&Scan::closeGUI,this,&Device::close);
+    connect(scan,&Device::ScanDevicesGUI,this,&DeviceMediator::ScanDevices);
+    connect(scan,&Device::updateSpecGUIGUI,this,&DeviceMediator::updateSpecGUI);
+    connect(scan,&Device::openGUI,this,&DeviceMediator::open);
+    connect(scan,&Device::closeGUI,this,&DeviceMediator::close);
 }
 
 /* Here's the created list of instantiated modules */
-QList<QSharedPointer<AbstractModule>> Device::createModulesList(){
+QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     QList<QSharedPointer<AbstractModule>> modules;
-    modules.append(QSharedPointer<AbstractModule> (scan = new Scan()));
+    modules.append(QSharedPointer<AbstractModule> (scan = new Device()));
     modules.append(QSharedPointer<AbstractModule> (new Scope()));
     return modules;
 }
 
-QList<QSharedPointer<AbstractModule>> Device::getModulesList(){
+QList<QSharedPointer<AbstractModule>> DeviceMediator::getModulesList(){
     return modules;
 }
 
-void Device::ScanDevices(){
+void DeviceMediator::ScanDevices(){
   communication->scanForDevices();
 }
 
-void Device::newDeviceList(QList<DeviceDescriptor> deviceList){
+void DeviceMediator::newDeviceList(QList<DeviceDescriptor> deviceList){
     this->deviceList = deviceList;
     qDebug() << "scanned device lis received in device.cpp";
     scan->updateGUIDeviceList(deviceList);
 }
 
 
-void Device::open(int deviceIndex){
+void DeviceMediator::open(int deviceIndex){
     communication->open(deviceList.at(deviceIndex));
 
     while (communication->getIsOpen()==false) {
@@ -49,8 +49,8 @@ void Device::open(int deviceIndex){
     }
     isConnected = communication->getIsOpen();
 
-    connect(communication,&Comms::newData,this,&Device::parseData);
-    connect(communication,&Comms::communicationError,this,&Device::handleError);
+    connect(communication,&Comms::newData,this,&DeviceMediator::parseData);
+    connect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
 
     communication->write(commands->SYSTEM+":"+commands->CONFIG_REQUEST+";");
     foreach(QSharedPointer<AbstractModule> mod, modules){
@@ -58,7 +58,7 @@ void Device::open(int deviceIndex){
     }
 }
 
-void Device::close(){
+void DeviceMediator::close(){
     if(isConnected){
         communication->close();
         foreach(QSharedPointer<AbstractModule> mod, modules){
@@ -67,15 +67,15 @@ void Device::close(){
         isConnected = communication->getIsOpen();
     }
 
-    disconnect(communication,&Comms::newData,this,&Device::parseData);
-    disconnect(communication,&Comms::communicationError,this,&Device::handleError);
+    disconnect(communication,&Comms::newData,this,&DeviceMediator::parseData);
+    disconnect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
 }
 
-void Device::handleError(QByteArray error){
+void DeviceMediator::handleError(QByteArray error){
     scan->errorHandler(error);
 }
 
-void Device::parseData(QByteArray data){
+void DeviceMediator::parseData(QByteArray data){
     bool isDataPassed = false;
 
     QByteArray dataHeader = data.left(4);
@@ -101,7 +101,7 @@ void Device::parseData(QByteArray data){
     }
 }
 
-void Device::parseSystemData(QByteArray data){
+void DeviceMediator::parseSystemData(QByteArray data){
  //   qDebug() << "data are in system parser device.cpp" << data;
     QByteArray feature = data.left(4);
     data.remove(0,4);
@@ -116,20 +116,20 @@ void Device::parseSystemData(QByteArray data){
     }
 }
 
-bool Device::getIsConnected() const
+bool DeviceMediator::getIsConnected() const
 {
     return isConnected;
 }
 
-bool Device::getIsSpecificationLoaded(){
+bool DeviceMediator::getIsSpecificationLoaded(){
     return deviceSpec->isSpecLoaded;
 }
 
-DeviceSpec* Device::getDeviceSpecification(){
+DeviceSpec* DeviceMediator::getDeviceSpecification(){
     return deviceSpec;
 }
 
-void Device::updateSpecGUI(){
+void DeviceMediator::updateSpecGUI(){
      qDebug() << "update specification got to GUI";
 
      if (getIsConnected() && getIsSpecificationLoaded()){

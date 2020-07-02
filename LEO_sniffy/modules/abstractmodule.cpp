@@ -47,6 +47,13 @@ void AbstractModule::setCommandPrefix(QByteArray prefix){
     moduleCommandPrefix = prefix;
 }
 
+void AbstractModule::setModuleName(QString name){
+    moduleName = name;
+}
+QString AbstractModule::getModuleName(){
+    return moduleName;
+}
+
 void AbstractModule::setComms(Comms *communication){
     comm = communication;
     cmd = new Commands();

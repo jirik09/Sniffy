@@ -7,19 +7,19 @@
 #include "communication/comms.h"
 #include "communication/commands.h"
 #include "modules/scope/scope.h"
-#include "modules/scan/scan.h"
+#include "modules/scan/device.h"
 #include "devicespec.h"
 
-class Device : public QObject
+class DeviceMediator : public QObject
 {
     Q_OBJECT
 public:
-    explicit Device(QObject *parent = nullptr);
+    explicit DeviceMediator(QObject *parent = nullptr);
     QList<QSharedPointer<AbstractModule>> createModulesList();
     QList<QSharedPointer<AbstractModule>> getModulesList();   
 
         void updateSpecGUI();
-    Scan *scan;
+    Device *scan;
 
 private:
     QList<DeviceDescriptor> deviceList;

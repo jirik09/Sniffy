@@ -1,7 +1,7 @@
-#include "windowscan.h"
+#include "devicewindow.h"
 #include "ui_windowscan.h"
 
-WindowScan::WindowScan(QWidget *parent) :
+DeviceWindow::DeviceWindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WindowScan)
 {
@@ -61,7 +61,7 @@ WindowScan::WindowScan(QWidget *parent) :
    //*************************** end adding widgets to specification area *************************
 }
 
-WindowScan::~WindowScan()
+DeviceWindow::~DeviceWindow()
 {
     delete ui;
 }

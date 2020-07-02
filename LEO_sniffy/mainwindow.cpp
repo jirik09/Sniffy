@@ -27,7 +27,10 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    device = new Device(this);
+    device = new DeviceMediator(this);
+
+    WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
+    ui->verticalLayout_modules->addWidget(sep);
 
     /* Build MainWindow-related parts of Moduls */   
     QList<QSharedPointer<AbstractModule>> modulesList = device->getModulesList();
@@ -37,15 +40,14 @@ MainWindow::MainWindow(QWidget *parent):
     int listSize = modulesList.size();
     WidgetControlModule *WidgetModule[listSize];
     ModuleDockWidget *dockWidget[listSize];
-    Commands *cmd = new Commands();
 
     int index;
     foreach(module, modulesList){
         index = modulesList.indexOf(module);
-        moduleName = module->objectName();
+        moduleName = module->getModuleName();
 
         WidgetModule[index] = new WidgetControlModule(ui->centralwidget, moduleName);
-        ui->verticalLayout_features->addWidget(WidgetModule[index]);
+        ui->verticalLayout_modules->addWidget(WidgetModule[index]);
         WidgetModule[index]->setStatus(ModuleStatus::STOP);
         WidgetModule[index]->hide();
 
@@ -53,7 +55,6 @@ MainWindow::MainWindow(QWidget *parent):
 
         module->setDockWidgetWindow(dockWidget[index]);
         module->setModuleControlWidget(WidgetModule[index]);
-        module->setCommandPrefix(cmd->SCOPE/*(moduleName.toUpper())*/);
 
         dockWidget[index]->setWidget(module->getWidget());
 
@@ -64,14 +65,13 @@ MainWindow::MainWindow(QWidget *parent):
     dockWidget[0]->show();
 
     /* Left pane Menu of Control Play/Pause buttons */
-    WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
-    ui->verticalLayout_features->addWidget(sep);
+
     verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    ui->verticalLayout_features->addItem(verticalSpacer);
+    ui->verticalLayout_modules->addItem(verticalSpacer);
     WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget);
-    ui->verticalLayout_features->addWidget(sepa);
+    ui->verticalLayout_modules->addWidget(sepa);
     WidgetFooter *footer = new WidgetFooter();
-    ui->verticalLayout_features->addWidget(footer);
+    ui->verticalLayout_modules->addWidget(footer);
 
     connect(footer->getPushButtonSize(),SIGNAL(clicked()),this,SLOT(setMenuSize()));
 

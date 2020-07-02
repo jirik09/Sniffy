@@ -26,6 +26,8 @@ public slots:
     void setDockWidgetWindow(ModuleDockWidget *dockWidget);
     void setModuleControlWidget(WidgetControlModule *scpWidget);
     void setCommandPrefix(QByteArray prefix);
+    void setModuleName(QString name);
+    QString getModuleName();
     void setComms(Comms *communication);
 
     void closeModule();
@@ -34,6 +36,7 @@ public:
     ModuleDockWidget *dockWidgetWindow;
     WidgetControlModule *moduleControlWidget;
     QByteArray moduleCommandPrefix;
+    QString moduleName;
     Comms *comm;
     Commands *cmd;
 

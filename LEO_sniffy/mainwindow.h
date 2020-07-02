@@ -10,7 +10,7 @@
 //#include <QMessageBox>
 //#include <QGraphicsDropShadowEffect>
 
-#include "device.h"
+#include "devicemediator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -28,7 +28,7 @@ private:
   //  Comms *communication;    
     Ui::MainWindow *ui;
 
-    Device *device;
+    DeviceMediator *device;
     QSpacerItem *verticalSpacer;
 
 signals:

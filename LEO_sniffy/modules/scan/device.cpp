@@ -1,9 +1,9 @@
-#include "scan.h"
+#include "device.h"
 
-Scan::Scan(QObject *parent)
+Device::Device(QObject *parent)
 {
     Q_UNUSED(parent);
-    scanWindow = new WindowScan();
+    scanWindow = new DeviceWindow();
 
     connect(scanWindow->deviceConnectButton,SIGNAL(clicked(int)),this,SLOT(deviceConnection(int)));
 
@@ -14,7 +14,7 @@ Scan::Scan(QObject *parent)
    */
 }
 
-void Scan::deviceConnection(int buttonIndex){
+void Device::deviceConnection(int buttonIndex){
     if(buttonIndex==1){
         qDebug() << "scan clicked";
         emit ScanDevicesGUI();
@@ -35,7 +35,7 @@ void Scan::deviceConnection(int buttonIndex){
     }
 }
 
-void Scan::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
+void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
     QList<DeviceDescriptor> list = deviceList;
     DeviceDescriptor devStr;
     int i = 0;
@@ -59,13 +59,13 @@ void Scan::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
     }
 }
 
-void Scan::connectDevice(int index){
+void Device::connectDevice(int index){
     emit openGUI(index);
     scanWindow->deviceConnectButton->setText("Disconnect",0);
     scanWindow->deviceConnectButton->setDisabledButton(true,1);//disable scan
 }
 
-void Scan::disconnectDevice(){
+void Device::disconnectDevice(){
     emit closeGUI();
     //dockWidget_scope->hide();
     scanWindow->deviceConnectButton->setText("Connect",0);
@@ -73,7 +73,7 @@ void Scan::disconnectDevice(){
     emit updateSpecGUIGUI();
 }
 
-void Scan::errorHandler(QByteArray error){
+void Device::errorHandler(QByteArray error){
     QMessageBox messageBox;
     messageBox.critical(0,"Error","An error has occured:\n" + error + "\nPlease reconnect the device");
     messageBox.setFixedSize(500,200);
@@ -81,10 +81,10 @@ void Scan::errorHandler(QByteArray error){
     scanWindow->deviceConnectButton->setDisabledButton(true,0);//disable connect
 }
 
-void Scan::parseData(QByteArray){}
-void Scan::writeConfiguration(){}
-void Scan::startModule(){}
-void Scan::stopModule(){}
-QWidget* Scan::getWidget(){
+void Device::parseData(QByteArray){}
+void Device::writeConfiguration(){}
+void Device::startModule(){}
+void Device::stopModule(){}
+QWidget* Device::getWidget(){
     return scanWindow;
 }

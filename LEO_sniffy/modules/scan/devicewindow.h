@@ -13,12 +13,12 @@ namespace Ui {
 class WindowScan;
 }
 
-class WindowScan : public QWidget
+class DeviceWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit WindowScan(QWidget *parent = nullptr);
-    ~WindowScan();
+    explicit DeviceWindow(QWidget *parent = nullptr);
+    ~DeviceWindow();
 
     ModuleDockWidget *dockWidgetWindow;
 
