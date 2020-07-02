@@ -39,7 +39,7 @@
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
-        <widget class="QWidget" name="horizontalWidget" native="true">
+        <widget class="QWidget" name="horizontalWidget_1" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
            <number>3</number>
@@ -161,7 +161,7 @@
         </widget>
        </item>
       </layout>
-      <zorder>horizontalWidget</zorder>
+      <zorder>horizontalWidget_1</zorder>
       <zorder>progressBar</zorder>
       <zorder>horizontalWidget_2</zorder>
      </widget>

@@ -21,8 +21,10 @@
 #include "../../GUI/widgettab.h"
 #include "../../GUI/widgetlabelarea.h"
 
-#include "scopedefs.h"
 
+#include "scopedefs.h"
+#include "panelsettings.h"
+#include "panelmeasurement.h"
 
 namespace Ui {
 class WindowScope;
@@ -67,18 +69,11 @@ private:
     Ui::WindowScope *ui;
 
 
-
-    WidgetDial *dialTimeBase;
-    WidgetButtons *buttonsChannelEnable;
-    WidgetButtons *buttonsTriggerMode;
-    WidgetButtons *buttonsTriggerChannel;
-    WidgetButtons *buttonsTriggerEdge;
-
-    WidgetDialRange *dialPretrigger;
-    WidgetDialRange *dialTriggerValue;
-
     widgetChart *chart;
-    widgetLabelArea *infoPanel;
+    widgetLabelArea *labelInfoPanel;
+
+    PanelSettings *panelSet;
+    PanelMeasurement *panelMeas;
 
     void updateChartScale(float timeBase);
     void fillTimeBase();
