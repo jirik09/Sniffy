@@ -5,10 +5,10 @@ Scope::Scope(QObject *parent)
     Q_UNUSED(parent);
     config = new ScopeConfig();
     measCalc = new MeasCalculations();
-    cmd = new Commands();
-    setCommandPrefix(cmd->SCOPE);
-    setModuleName("Oscilloscope");
     scpWindow = new WindowScope();
+    setCommandPrefix(cmd->SCOPE);
+    moduleName = "Oscilloscope";
+
 
     scopeData = new QVector<QVector<QPointF>>;
     //scopeMeas = new QList<Measurement>;

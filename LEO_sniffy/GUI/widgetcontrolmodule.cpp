@@ -46,6 +46,10 @@ ModuleStatus WidgetControlModule::getStatus(void){
     return status;
 }
 
+void WidgetControlModule::hideStatus(){
+    ui->widget_status->hide();
+}
+
 void WidgetControlModule::clickedInternal(){
     emit clicked (status);
 }

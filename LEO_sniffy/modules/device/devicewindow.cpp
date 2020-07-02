@@ -66,3 +66,29 @@ DeviceWindow::~DeviceWindow()
     delete ui;
 }
 
+void DeviceWindow::showSpecification(DeviceSpec *spec){
+    qDebug() << "update specification got to GUI";
+
+    deviceParameters->show();
+    labelMCU->show();
+    labelMCU->setValue(spec->MCU);
+    labelFWVer->show();
+    labelFWVer->setValue(spec->FW_Version);
+    labelHALVer->show();
+    labelHALVer->setValue(spec->HAL_Version);
+    labelRTOSVer->show();
+    labelRTOSVer->setValue(spec->FREE_RTOS_Version);
+    labelCoreFreq->show();
+    labelCoreFreq->setValue(QString::number(spec->CoreClock/1000000) + "MHz");
+}
+
+void DeviceWindow::hideSpecification(){
+    deviceParameters->hide();
+    labelMCU->hide();
+    labelFWVer->hide();
+    labelHALVer->hide();
+    labelRTOSVer->hide();
+    labelCoreFreq->hide();
+
+}
+

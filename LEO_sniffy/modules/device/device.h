@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "devicewindow.h"
+#include "devicespec.h"
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
@@ -17,7 +18,7 @@ public:
 
     QWidget* getWidget();
 
-    DeviceWindow *scanWindow;
+
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
     void errorHandler(QByteArray error);
@@ -25,6 +26,9 @@ public:
 private:
     void connectDevice(int index);
     void disconnectDevice();
+
+    DeviceSpec *deviceSpec;
+    DeviceWindow *deviceWindow;
 
 signals:
     void ScanDevicesGUI();

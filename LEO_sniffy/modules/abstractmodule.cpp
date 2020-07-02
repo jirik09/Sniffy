@@ -38,8 +38,8 @@ void AbstractModule::setDockWidgetWindow(ModuleDockWidget *dockWidget){
     connect(dockWidgetWindow, &ModuleDockWidget::moduleWindowClosing,this, &AbstractModule::closeModule);
 }
 
-void AbstractModule::setModuleControlWidget(WidgetControlModule *scpWidget){
-    moduleControlWidget = scpWidget;
+void AbstractModule::setModuleControlWidget(WidgetControlModule *controlWidget){
+    moduleControlWidget = controlWidget;
     connect(moduleControlWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetControlClicked(ModuleStatus)));
 }
 
@@ -47,17 +47,23 @@ void AbstractModule::setCommandPrefix(QByteArray prefix){
     moduleCommandPrefix = prefix;
 }
 
-void AbstractModule::setModuleName(QString name){
+/*void AbstractModule::setModuleName(QString name){
     moduleName = name;
 }
+
 QString AbstractModule::getModuleName(){
     return moduleName;
 }
 
+QByteArray AbstractModule::getModuleCommandPrefix()
+{
+    return moduleCommandPrefix;
+}*/
+
 void AbstractModule::setComms(Comms *communication){
     comm = communication;
     cmd = new Commands();
-    comm->write(moduleCommandPrefix+":"+cmd->CONFIG_REQUEST+";");
+    comm->write(moduleCommandPrefix+":"+Commands::CONFIG_REQUEST+";");
 }
 
 void AbstractModule::closeModule(){

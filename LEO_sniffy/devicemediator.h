@@ -6,9 +6,9 @@
 //#include <QSharedPointer>
 #include "communication/comms.h"
 #include "communication/commands.h"
+#include "modules/device/device.h"
 #include "modules/scope/scope.h"
-#include "modules/scan/device.h"
-#include "devicespec.h"
+
 
 class DeviceMediator : public QObject
 {
@@ -19,20 +19,18 @@ public:
     QList<QSharedPointer<AbstractModule>> getModulesList();   
 
         void updateSpecGUI();
-    Device *scan;
+
 
 private:
     QList<DeviceDescriptor> deviceList;
     QList<QSharedPointer<AbstractModule>> modules;
+    Device *device;
 
     Comms *communication;
-    Commands *commands;
-    DeviceSpec *deviceSpec;
+
     bool isConnected = false;
 
     bool getIsConnected() const;
-    bool getIsSpecificationLoaded();
-    DeviceSpec* getDeviceSpecification();
 
 signals:
   //  void scopeNewData(QByteArray);
@@ -44,7 +42,6 @@ signals:
 
 private slots:
     void parseData(QByteArray data);
-    void parseSystemData(QByteArray data);
     void newDeviceList(QList<DeviceDescriptor> deviceList);
     void handleError(QByteArray error);
     void ScanDevices();

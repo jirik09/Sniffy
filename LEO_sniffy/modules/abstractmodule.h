@@ -20,27 +20,24 @@ public:
     virtual void writeConfiguration() = 0;
     virtual QWidget* getWidget() = 0;
 
+
+    ModuleDockWidget *dockWidgetWindow;
+    WidgetControlModule *moduleControlWidget;
+    QByteArray moduleCommandPrefix;
+    QString moduleName;
+    Commands *cmd;
+    Comms *comm;
+
 public slots:
 
     void widgetControlClicked(ModuleStatus status);
     void setDockWidgetWindow(ModuleDockWidget *dockWidget);
     void setModuleControlWidget(WidgetControlModule *scpWidget);
     void setCommandPrefix(QByteArray prefix);
-    void setModuleName(QString name);
-    QString getModuleName();
+
     void setComms(Comms *communication);
 
     void closeModule();
-
-public:
-    ModuleDockWidget *dockWidgetWindow;
-    WidgetControlModule *moduleControlWidget;
-    QByteArray moduleCommandPrefix;
-    QString moduleName;
-    Comms *comm;
-    Commands *cmd;
-
-signals:
 
 };
 

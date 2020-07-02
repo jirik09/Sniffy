@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent):
     int index;
     foreach(module, modulesList){
         index = modulesList.indexOf(module);
-        moduleName = module->getModuleName();
+        moduleName = module->moduleName;
 
         WidgetModule[index] = new WidgetControlModule(ui->centralwidget, moduleName);
         ui->verticalLayout_modules->addWidget(WidgetModule[index]);
@@ -63,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent):
 
     /* Show DeviceWindow straight away */
     dockWidget[0]->show();
+    WidgetModule[0]->show();
+    WidgetModule[0]->hideStatus();
 
     /* Left pane Menu of Control Play/Pause buttons */
 

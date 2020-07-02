@@ -2,12 +2,14 @@
 #define WINDOWSCAN_H
 
 #include <QScrollArea>
+#include <QVBoxLayout>
 
-#include "modules/scope/scope.h"
 #include "../../GUI/widgetselection.h"
 #include "../../GUI/widgetbuttons.h"
 #include "../../GUI/widgetlabel.h"
 #include "../../GUI/widgetseparator.h"
+
+#include "devicespec.h"
 
 namespace Ui {
 class WindowScan;
@@ -20,17 +22,20 @@ public:
     explicit DeviceWindow(QWidget *parent = nullptr);
     ~DeviceWindow();
 
-    ModuleDockWidget *dockWidgetWindow;
+    void showSpecification(DeviceSpec *spec);
+    void hideSpecification();
 
-    QSpacerItem *verticalSpacer;
-    QScrollArea *scrollAreaSpecification;
+
 
     WidgetSelection *deviceSelection;
     WidgetButtons *deviceConnectButton;
 
     QWidget *WidgetSpecification;
     QVBoxLayout *verticalLayoutSpecification;
+private:
 
+    QSpacerItem *verticalSpacer;
+    QScrollArea *scrollAreaSpecification;
     WidgetSeparator *deviceParameters;
     WidgetLabel *labelMCU;
     WidgetLabel *labelCoreFreq;
@@ -38,7 +43,7 @@ public:
     WidgetLabel *labelRTOSVer;
     WidgetLabel *labelHALVer;
 
-private:
+
     Ui::WindowScan *ui;
 
 signals:
