@@ -12,8 +12,8 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 
     connect(device,&Device::ScanDevicesGUI,this,&DeviceMediator::ScanDevices);
 
-    connect(device,&Device::openGUI,this,&DeviceMediator::open);
-    connect(device,&Device::closeGUI,this,&DeviceMediator::close);
+    connect(device,&Device::opened,this,&DeviceMediator::open);
+    connect(device,&Device::closed,this,&DeviceMediator::close);
 }
 
 /* Here's the created list of instantiated modules */
@@ -61,10 +61,11 @@ void DeviceMediator::close(){
     if(isConnected){
         communication->close();
         foreach(QSharedPointer<AbstractModule> mod, modules){
-           mod->closeModule();
+           mod->disableModule();
         }
         isConnected = communication->getIsOpen();
     }
+    ShowDeviceModule();
 
     disconnect(communication,&Comms::newData,this,&DeviceMediator::parseData);
     disconnect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
@@ -92,6 +93,12 @@ void DeviceMediator::parseData(QByteArray data){
          if(!isDataPassed){
        qDebug() << "ERROR: this data was not passed to any module" << data;
     }
+}
+
+void DeviceMediator::ShowDeviceModule(){
+    device->dockWidgetWindow->show();
+    device->moduleControlWidget->show();
+    device->moduleControlWidget->hideStatus();
 }
 
 

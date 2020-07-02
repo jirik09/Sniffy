@@ -17,6 +17,7 @@ public:
     explicit DeviceMediator(QObject *parent = nullptr);
     QList<QSharedPointer<AbstractModule>> createModulesList();
     QList<QSharedPointer<AbstractModule>> getModulesList();   
+    void ShowDeviceModule();
 
         void updateSpecGUI();
 

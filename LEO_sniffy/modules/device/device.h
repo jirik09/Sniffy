@@ -32,10 +32,8 @@ private:
 
 signals:
     void ScanDevicesGUI();
-    void openGUI(int deviceIndex);
-    void closeGUI();
-    bool getIsConnectedGUI() const;
-    void updateSpecGUIGUI();
+    void opened(int deviceIndex);
+    void closed();
     //bool getIsSpecificationLoadedGUI();
     //void getDeviceSpecificationGUI(void *devSpec);
 

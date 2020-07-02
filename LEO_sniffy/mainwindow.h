@@ -28,7 +28,7 @@ private:
   //  Comms *communication;    
     Ui::MainWindow *ui;
 
-    DeviceMediator *device;
+    DeviceMediator *deviceMediator;
     QSpacerItem *verticalSpacer;
 
 signals:

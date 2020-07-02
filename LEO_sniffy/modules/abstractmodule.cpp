@@ -71,3 +71,8 @@ void AbstractModule::closeModule(){
     stopModule();
     moduleControlWidget->setStatus(ModuleStatus::STOP);
 }
+
+void AbstractModule::disableModule(){
+    moduleControlWidget->hide();
+    closeModule();
+}

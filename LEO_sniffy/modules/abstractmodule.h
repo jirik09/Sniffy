@@ -38,6 +38,7 @@ public slots:
     void setComms(Comms *communication);
 
     void closeModule();
+    void disableModule();
 
 };
 

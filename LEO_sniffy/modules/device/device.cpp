@@ -64,17 +64,16 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
 }
 
 void Device::connectDevice(int index){
-    emit openGUI(index);
+    emit opened(index);
     deviceWindow->deviceConnectButton->setText("Disconnect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(true,1);//disable scan
 }
 
 void Device::disconnectDevice(){
-    emit closeGUI();
+    emit closed();
     //dockWidget_scope->hide();
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
-    emit updateSpecGUIGUI();
 }
 
 void Device::errorHandler(QByteArray error){

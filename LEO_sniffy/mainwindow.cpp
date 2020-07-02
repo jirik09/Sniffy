@@ -27,13 +27,13 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    device = new DeviceMediator(this);
+    deviceMediator = new DeviceMediator(this);
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sep);
 
     /* Build MainWindow-related parts of Moduls */   
-    QList<QSharedPointer<AbstractModule>> modulesList = device->getModulesList();
+    QList<QSharedPointer<AbstractModule>> modulesList = deviceMediator->getModulesList();
     QSharedPointer<AbstractModule> module;
     QString moduleName;
 
@@ -61,10 +61,8 @@ MainWindow::MainWindow(QWidget *parent):
         addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget[index]);
     }
 
-    /* Show DeviceWindow straight away */
-    dockWidget[0]->show();
-    WidgetModule[0]->show();
-    WidgetModule[0]->hideStatus();
+    deviceMediator->ShowDeviceModule();
+
 
     /* Left pane Menu of Control Play/Pause buttons */
 
