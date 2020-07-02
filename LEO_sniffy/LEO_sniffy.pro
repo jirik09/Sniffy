@@ -41,7 +41,6 @@ SOURCES += \
     communication/serialportwriter.cpp \
     devicedescriptor.cpp \
     devicemediator.cpp \
-    devicespec.cpp \
     main.cpp \
     mainwindow.cpp \
     modules/abstractmodule.cpp \
@@ -50,8 +49,9 @@ SOURCES += \
     modules/counter/counterspec.cpp \
     modules/counter/windowcounter.cpp \
     modules/labelformator.cpp \
-    modules/scan/device.cpp \
-    modules/scan/devicewindow.cpp \
+    modules/device/device.cpp \
+    modules/device/devicewindow.cpp \
+    modules/device/devicespec.cpp \
     modules/scope/meascalculations.cpp \
     modules/scope/measurement.cpp \
     modules/scope/panelmeasurement.cpp \
@@ -87,7 +87,6 @@ HEADERS += \
     communication/serialportwriter.h \
     devicedescriptor.h \
     devicemediator.h \
-    devicespec.h \
     graphics/colors.h \
     mainwindow.h \
     modules/counter/counter.h \
@@ -97,8 +96,9 @@ HEADERS += \
     modules/abstractmodule.h \
     modules/counter/windowcounter.h \
     modules/labelformator.h \
-    modules/scan/device.h \
-    modules/scan/devicewindow.h \
+    modules/device/device.h \
+    modules/device/devicewindow.h \
+    modules/device/devicespec.h \
     modules/scope/meascalculations.h \
     modules/scope/measurement.h \
     modules/scope/panelmeasurement.h \
@@ -128,7 +128,7 @@ FORMS += \
     GUI/widgettop.ui \
     mainwindow.ui \
     modules/counter/windowcounter.ui \
-    modules/scan/devicewindow.ui \
+    modules/device/devicewindow.ui \
     modules/scope/windowscope.ui
 
 
