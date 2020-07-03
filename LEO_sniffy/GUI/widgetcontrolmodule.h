@@ -29,6 +29,7 @@ public:
 
     void setStatus(ModuleStatus stat);
     ModuleStatus getStatus(void);
+    void hideStatus();
     void setIcon (QString ImageURI);
 
 signals:

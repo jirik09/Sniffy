@@ -2,48 +2,44 @@
 #define WINDOWSCAN_H
 
 #include <QScrollArea>
+#include <QVBoxLayout>
 
-#include "modules/scope/scope.h"
 #include "../../GUI/widgetselection.h"
 #include "../../GUI/widgetbuttons.h"
 #include "../../GUI/widgetlabel.h"
 #include "../../GUI/widgetseparator.h"
 
+#include "devicespec.h"
+
 namespace Ui {
-class WindowScan;
+class DeviceWindow;
 }
 
-class WindowScan : public QWidget
+class DeviceWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit WindowScan(QWidget *parent = nullptr);
-    ~WindowScan();
+    explicit DeviceWindow(QWidget *parent = nullptr);
+    ~DeviceWindow();
 
-    ModuleDockWidget *dockWidgetWindow;
-
-    QSpacerItem *verticalSpacer;
-    QScrollArea *scrollAreaSpecification;
+    void showSpecification(DeviceSpec *spec);
+    void hideSpecification();
 
     WidgetSelection *deviceSelection;
     WidgetButtons *deviceConnectButton;
 
+private:
     QWidget *WidgetSpecification;
     QVBoxLayout *verticalLayoutSpecification;
-
+    QSpacerItem *verticalSpacer;
+    QScrollArea *scrollAreaSpecification;
     WidgetSeparator *deviceParameters;
     WidgetLabel *labelMCU;
     WidgetLabel *labelCoreFreq;
     WidgetLabel *labelFWVer;
     WidgetLabel *labelRTOSVer;
     WidgetLabel *labelHALVer;
-
-private:
-    Ui::WindowScan *ui;
-
-signals:
-
-
+    Ui::DeviceWindow *ui;
 };
 
 #endif // WINDOWSCAN_H

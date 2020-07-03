@@ -108,7 +108,7 @@ height: 0px;
      <number>15</number>
     </property>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_features">
+     <layout class="QVBoxLayout" name="verticalLayout_modules">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -172,7 +172,7 @@ border: none</string>
      <x>0</x>
      <y>0</y>
      <width>1156</width>
-     <height>22</height>
+     <height>27</height>
     </rect>
    </property>
   </widget>

@@ -2,7 +2,6 @@
 
 LabelFormator::LabelFormator(QObject *parent) : QObject(parent)
 {
-
 }
 
 QString LabelFormator::formatOutout(qreal value, QString unit){

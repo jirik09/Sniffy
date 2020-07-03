@@ -3,21 +3,20 @@
 
 #include <QObject>
 
-#include "windowscan.h"
+#include "devicewindow.h"
+#include "devicespec.h"
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
 #include "../abstractmodule.h"
 
-class Scan : public AbstractModule
+class Device : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit Scan(QObject *parent = nullptr);
+    explicit Device(QObject *parent = nullptr);
 
     QWidget* getWidget();
-
-    WindowScan *scanWindow;
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
     void errorHandler(QByteArray error);
@@ -26,14 +25,13 @@ private:
     void connectDevice(int index);
     void disconnectDevice();
 
+    DeviceSpec *deviceSpec;
+    DeviceWindow *deviceWindow;
+
 signals:
-    void ScanDevicesGUI();
-    void openGUI(int deviceIndex);
-    void closeGUI();
-    bool getIsConnectedGUI() const;
-    void updateSpecGUIGUI();
-    //bool getIsSpecificationLoadedGUI();
-    //void getDeviceSpecificationGUI(void *devSpec);
+    void ScanDevices();
+    void opened(int deviceIndex);
+    void closed();
 
 public slots:
     void parseData(QByteArray);
@@ -42,7 +40,6 @@ public slots:
     void stopModule();
 
 private slots:
-    //void writeVerticalLayoutSpec(QVBoxLayout *boxLayout);
     void deviceConnection(int buttonIndex);
 };
 

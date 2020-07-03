@@ -38,8 +38,8 @@ void AbstractModule::setDockWidgetWindow(ModuleDockWidget *dockWidget){
     connect(dockWidgetWindow, &ModuleDockWidget::moduleWindowClosing,this, &AbstractModule::closeModule);
 }
 
-void AbstractModule::setModuleControlWidget(WidgetControlModule *scpWidget){
-    moduleControlWidget = scpWidget;
+void AbstractModule::setModuleControlWidget(WidgetControlModule *controlWidget){
+    moduleControlWidget = controlWidget;
     connect(moduleControlWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetControlClicked(ModuleStatus)));
 }
 
@@ -47,14 +47,45 @@ void AbstractModule::setCommandPrefix(QByteArray prefix){
     moduleCommandPrefix = prefix;
 }
 
+QByteArray AbstractModule::getCommandPrefix()
+{
+    return moduleCommandPrefix;
+}
+
 void AbstractModule::setComms(Comms *communication){
     comm = communication;
     cmd = new Commands();
-    comm->write(moduleCommandPrefix+":"+cmd->CONFIG_REQUEST+";");
+    comm->write(moduleCommandPrefix+":"+Commands::CONFIG_REQUEST+";");
+}
+
+void AbstractModule::hideModuleStatus(){
+    moduleControlWidget->hideStatus();
+}
+
+void AbstractModule::setModuleStatus(ModuleStatus stat){
+    moduleControlWidget->setStatus(stat);
+}
+
+void AbstractModule::showModuleControl(){
+    moduleControlWidget->show();
+}
+
+void AbstractModule::showModuleWindow(){
+    dockWidgetWindow->show();
 }
 
 void AbstractModule::closeModule(){
     dockWidgetWindow->hide();
     stopModule();
     moduleControlWidget->setStatus(ModuleStatus::STOP);
+}
+
+void AbstractModule::disableModule(){
+    moduleControlWidget->hide();
+    closeModule();
+}
+
+QString AbstractModule::getModuleName()
+{
+    return moduleName;
 }

@@ -5,24 +5,25 @@ Scope::Scope(QObject *parent)
     Q_UNUSED(parent);
     config = new ScopeConfig();
     measCalc = new MeasCalculations();
-    cmd = new Commands();
+    scpWindow = new ScopeWindow();
     setCommandPrefix(cmd->SCOPE);
-    scpWindow = new WindowScope();
+    moduleName = "Oscilloscope";
+
 
     scopeData = new QVector<QVector<QPointF>>;
     //scopeMeas = new QList<Measurement>;
 
     //connect signals from GUI into scope
-    connect(scpWindow, &WindowScope::timeBaseChanged,this,&Scope::updateTimebase);
-    connect(scpWindow, &WindowScope::pretriggerChanged,this,&Scope::updatePretrigger);
-    connect(scpWindow, &WindowScope::triggerValueChanged,this,&Scope::updateTriggerLevel);
-    connect(scpWindow, &WindowScope::channelEnableChanged,this,&Scope::updateChannelsEnable);
-    connect(scpWindow, &WindowScope::triggerModeChanged,this,&Scope::updateTriggerMode);
-    connect(scpWindow, &WindowScope::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
-    connect(scpWindow, &WindowScope::triggerChannelChanged,this,&Scope::updateTriggerChannel);
+    connect(scpWindow, &ScopeWindow::timeBaseChanged,this,&Scope::updateTimebase);
+    connect(scpWindow, &ScopeWindow::pretriggerChanged,this,&Scope::updatePretrigger);
+    connect(scpWindow, &ScopeWindow::triggerValueChanged,this,&Scope::updateTriggerLevel);
+    connect(scpWindow, &ScopeWindow::channelEnableChanged,this,&Scope::updateChannelsEnable);
+    connect(scpWindow, &ScopeWindow::triggerModeChanged,this,&Scope::updateTriggerMode);
+    connect(scpWindow, &ScopeWindow::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
+    connect(scpWindow, &ScopeWindow::triggerChannelChanged,this,&Scope::updateTriggerChannel);
 
-    connect(scpWindow, &WindowScope::measurementChanged,this, &Scope::addMeasurement);
-    connect(scpWindow, &WindowScope::measurementClearChanged, this, &Scope::clearMeasurement);
+    connect(scpWindow, &ScopeWindow::measurementChanged,this, &Scope::addMeasurement);
+    connect(scpWindow, &ScopeWindow::measurementClearChanged, this, &Scope::clearMeasurement);
     connect(measCalc, &MeasCalculations::measCalculated, this, &Scope::updateMeasurement);
 }
 
@@ -32,7 +33,7 @@ void Scope::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
 
     if(dataHeader=="CFG_"){
-        moduleControlWidget->show();
+        showModuleControl();
         //todo pass specification into scopeSpec.cpp and parse it
 
     }else if(dataHeader=="SMPL"){
@@ -124,7 +125,7 @@ void Scope::parseData(QByteArray data){
                 restartSampling();
             }else{
                 scpWindow->singleSamplingDone();
-                moduleControlWidget->setStatus(ModuleStatus::PAUSE);
+                setModuleStatus(ModuleStatus::PAUSE);
             }
         }
     }else{
@@ -241,12 +242,12 @@ void Scope::updateMeasurement(QList<Measurement*> m){
 
 void Scope::stopSampling(){
     comm->write(cmd->SCOPE+":"+cmd->STOP+";");
-    moduleControlWidget->setStatus(ModuleStatus::PAUSE);
+    setModuleStatus(ModuleStatus::PAUSE);
 }
 
 void Scope::startSampling(){
     comm->write(cmd->SCOPE+":"+cmd->START+";");
-    moduleControlWidget->setStatus(ModuleStatus::PLAY);
+    setModuleStatus(ModuleStatus::PLAY);
 }
 
 // ******************* Private functions - not important and no logic inside *******

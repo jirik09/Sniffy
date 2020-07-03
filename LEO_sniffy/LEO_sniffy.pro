@@ -39,9 +39,8 @@ SOURCES += \
     communication/serialline.cpp \
     communication/serialportreader.cpp \
     communication/serialportwriter.cpp \
-    device.cpp \
     devicedescriptor.cpp \
-    devicespec.cpp \
+    devicemediator.cpp \
     main.cpp \
     mainwindow.cpp \
     modules/abstractmodule.cpp \
@@ -50,16 +49,17 @@ SOURCES += \
     modules/counter/counterspec.cpp \
     modules/counter/windowcounter.cpp \
     modules/labelformator.cpp \
+    modules/device/device.cpp \
+    modules/device/devicewindow.cpp \
+    modules/device/devicespec.cpp \
     modules/scope/meascalculations.cpp \
     modules/scope/measurement.cpp \
-    modules/scan/scan.cpp \
-    modules/scan/windowscan.cpp \
     modules/scope/panelmeasurement.cpp \
     modules/scope/panelsettings.cpp \
     modules/scope/scope.cpp \
     modules/scope/scopeconfig.cpp \
     modules/scope/scopespec.cpp \
-    modules/scope/windowscope.cpp
+    modules/scope/scopewindow.cpp
 
 
 HEADERS += \
@@ -85,9 +85,8 @@ HEADERS += \
     communication/serialline.h \
     communication/serialportreader.h \
     communication/serialportwriter.h \
-    device.h \
     devicedescriptor.h \
-    devicespec.h \
+    devicemediator.h \
     graphics/colors.h \
     mainwindow.h \
     modules/counter/counter.h \
@@ -97,17 +96,18 @@ HEADERS += \
     modules/abstractmodule.h \
     modules/counter/windowcounter.h \
     modules/labelformator.h \
+    modules/device/device.h \
+    modules/device/devicewindow.h \
+    modules/device/devicespec.h \
     modules/scope/meascalculations.h \
     modules/scope/measurement.h \
-    modules/scan/scan.h \
-    modules/scan/windowscan.h \
     modules/scope/panelmeasurement.h \
     modules/scope/panelsettings.h \
     modules/scope/scope.h \
     modules/scope/scopeconfig.h \
     modules/scope/scopedefs.h \
     modules/scope/scopespec.h \
-    modules/scope/windowscope.h
+    modules/scope/scopewindow.h
 
 
 
@@ -128,8 +128,8 @@ FORMS += \
     GUI/widgettop.ui \
     mainwindow.ui \
     modules/counter/windowcounter.ui \
-    modules/scan/windowscan.ui \
-    modules/scope/windowscope.ui
+    modules/device/devicewindow.ui \
+    modules/scope/scopewindow.ui
 
 
 TRANSLATIONS += \
