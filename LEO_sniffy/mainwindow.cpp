@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent):
     int index;
     foreach(module, modulesList){
         index = modulesList.indexOf(module);
-        moduleName = module->moduleName;
+        moduleName = module->getModuleName();
 
         WidgetModule[index] = new WidgetControlModule(ui->centralwidget, moduleName);
         ui->verticalLayout_modules->addWidget(WidgetModule[index]);
@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     deviceMediator->ShowDeviceModule();
 
-    verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QSpacerItem * verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ui->verticalLayout_modules->addItem(verticalSpacer);
     WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sepa);

@@ -47,10 +47,31 @@ void AbstractModule::setCommandPrefix(QByteArray prefix){
     moduleCommandPrefix = prefix;
 }
 
+QByteArray AbstractModule::getCommandPrefix()
+{
+    return moduleCommandPrefix;
+}
+
 void AbstractModule::setComms(Comms *communication){
     comm = communication;
     cmd = new Commands();
     comm->write(moduleCommandPrefix+":"+Commands::CONFIG_REQUEST+";");
+}
+
+void AbstractModule::hideModuleStatus(){
+    moduleControlWidget->hideStatus();
+}
+
+void AbstractModule::setModuleStatus(ModuleStatus stat){
+    moduleControlWidget->setStatus(stat);
+}
+
+void AbstractModule::showModuleControl(){
+    moduleControlWidget->show();
+}
+
+void AbstractModule::showModuleWindow(){
+    dockWidgetWindow->show();
 }
 
 void AbstractModule::closeModule(){
@@ -62,4 +83,9 @@ void AbstractModule::closeModule(){
 void AbstractModule::disableModule(){
     moduleControlWidget->hide();
     closeModule();
+}
+
+QString AbstractModule::getModuleName()
+{
+    return moduleName;
 }

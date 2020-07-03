@@ -12,10 +12,12 @@ Device::Device(QObject *parent)
     connect(deviceWindow->deviceConnectButton,SIGNAL(clicked(int)),this,SLOT(deviceConnection(int)));
 }
 
+//this is GUI so it should be in deviceWindow.cpp
+//(keep it here bacause it is simpler and no need to use signals)
 void Device::deviceConnection(int buttonIndex){
     if(buttonIndex==1){
         qDebug() << "scan clicked";
-        emit ScanDevicesGUI();
+        emit ScanDevices();
         deviceWindow->deviceConnectButton->disableAll();
         deviceWindow->deviceSelection->addOption("Scanning...",0);
 
@@ -24,12 +26,9 @@ void Device::deviceConnection(int buttonIndex){
 
         if(btnText.compare("Connect")==0){
             connectDevice(deviceWindow->deviceSelection->getSelected());
-            qDebug() << "connect clicked";
-
         }else if (btnText.compare("Disconnect")==0){
             disconnectDevice();
             deviceWindow->hideSpecification();
-            qDebug() << "disconnect clicked";
         }
     }
 }
@@ -44,7 +43,6 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
         deviceWindow->deviceSelection->addOption(devStr.deviceName + " (" + devStr.port + ")",i);
         i++;
     }
-
     if(deviceWindow->deviceSelection->count()==0){
         deviceWindow->deviceSelection->addOption("No devices were found",0);
         deviceWindow->deviceConnectButton->setDisabledButton(false,1); //enable scan button
@@ -66,7 +64,6 @@ void Device::connectDevice(int index){
 
 void Device::disconnectDevice(){
     emit closed();
-    //dockWidget_scope->hide();
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
 }

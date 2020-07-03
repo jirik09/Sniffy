@@ -33,7 +33,7 @@ void Scope::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
 
     if(dataHeader=="CFG_"){
-        moduleControlWidget->show();
+        showModuleControl();
         //todo pass specification into scopeSpec.cpp and parse it
 
     }else if(dataHeader=="SMPL"){
@@ -125,7 +125,7 @@ void Scope::parseData(QByteArray data){
                 restartSampling();
             }else{
                 scpWindow->singleSamplingDone();
-                moduleControlWidget->setStatus(ModuleStatus::PAUSE);
+                setModuleStatus(ModuleStatus::PAUSE);
             }
         }
     }else{
@@ -242,12 +242,12 @@ void Scope::updateMeasurement(QList<Measurement*> m){
 
 void Scope::stopSampling(){
     comm->write(cmd->SCOPE+":"+cmd->STOP+";");
-    moduleControlWidget->setStatus(ModuleStatus::PAUSE);
+    setModuleStatus(ModuleStatus::PAUSE);
 }
 
 void Scope::startSampling(){
     comm->write(cmd->SCOPE+":"+cmd->START+";");
-    moduleControlWidget->setStatus(ModuleStatus::PLAY);
+    setModuleStatus(ModuleStatus::PLAY);
 }
 
 // ******************* Private functions - not important and no logic inside *******

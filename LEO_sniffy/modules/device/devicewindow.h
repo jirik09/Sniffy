@@ -25,15 +25,12 @@ public:
     void showSpecification(DeviceSpec *spec);
     void hideSpecification();
 
-
-
     WidgetSelection *deviceSelection;
     WidgetButtons *deviceConnectButton;
 
+private:
     QWidget *WidgetSpecification;
     QVBoxLayout *verticalLayoutSpecification;
-private:
-
     QSpacerItem *verticalSpacer;
     QScrollArea *scrollAreaSpecification;
     WidgetSeparator *deviceParameters;
@@ -42,13 +39,7 @@ private:
     WidgetLabel *labelFWVer;
     WidgetLabel *labelRTOSVer;
     WidgetLabel *labelHALVer;
-
-
     Ui::DeviceWindow *ui;
-
-signals:
-
-
 };
 
 #endif // WINDOWSCAN_H

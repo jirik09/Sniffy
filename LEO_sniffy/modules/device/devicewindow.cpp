@@ -58,8 +58,6 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
    verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
    verticalLayoutSpecification->addItem(verticalSpacer);
 
-   //ui->dockWidget_device->setWindowTitle("Device");
-
    // *************************** end adding widgets to specification area *************************
     hideSpecification();
 }
@@ -70,11 +68,8 @@ DeviceWindow::~DeviceWindow()
 }
 
 void DeviceWindow::showSpecification(DeviceSpec *spec){
-    qDebug() << "update specification got to GUI";
-
+  //  qDebug() << "update specification got to GUI"
     ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/NUCLEO_F303RE.png);");
-
-
     deviceParameters->show();
     labelMCU->show();
     labelMCU->setValue(spec->MCU);
@@ -89,7 +84,6 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
 }
 
 void DeviceWindow::hideSpecification(){
-
     ui->widget_device->setStyleSheet("image: none;");
     deviceParameters->hide();
     labelMCU->hide();
@@ -97,6 +91,5 @@ void DeviceWindow::hideSpecification(){
     labelHALVer->hide();
     labelRTOSVer->hide();
     labelCoreFreq->hide();
-
 }
 

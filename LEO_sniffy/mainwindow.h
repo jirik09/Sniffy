@@ -2,13 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
-//#include <QDebug>
-//#include <QLabel>
 #include <QSpacerItem>
 #include <QVBoxLayout>
-//#include <QMessageBox>
-//#include <QGraphicsDropShadowEffect>
 
 #include "devicemediator.h"
 
@@ -25,14 +20,8 @@ public:
     ~MainWindow();    
 
 private:
-  //  Comms *communication;    
     Ui::MainWindow *ui;
-
     DeviceMediator *deviceMediator;
-    QSpacerItem *verticalSpacer;
-
-signals:
-    void setVerticalLayoutSpec(QVBoxLayout *boxLayout);
 
 private slots:
    void setMenuSize();

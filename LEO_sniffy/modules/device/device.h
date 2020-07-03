@@ -18,8 +18,6 @@ public:
 
     QWidget* getWidget();
 
-
-
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
     void errorHandler(QByteArray error);
 
@@ -31,11 +29,9 @@ private:
     DeviceWindow *deviceWindow;
 
 signals:
-    void ScanDevicesGUI();
+    void ScanDevices();
     void opened(int deviceIndex);
     void closed();
-    //bool getIsSpecificationLoadedGUI();
-    //void getDeviceSpecificationGUI(void *devSpec);
 
 public slots:
     void parseData(QByteArray);
@@ -44,7 +40,6 @@ public slots:
     void stopModule();
 
 private slots:
-    //void writeVerticalLayoutSpec(QVBoxLayout *boxLayout);
     void deviceConnection(int buttonIndex);
 };
 
