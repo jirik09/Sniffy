@@ -84,7 +84,7 @@ void Device::parseData(QByteArray data){
         deviceSpec->parseSpecification(data);
         deviceWindow->showSpecification(deviceSpec);
     }else if(feature=="ACK_"){
-      //  qDebug() << "ACK";
+        //  qDebug() << "ACK";
     }else{
         qDebug() << "ERROR: unparsable data for system" << feature << " "<< data;
     }

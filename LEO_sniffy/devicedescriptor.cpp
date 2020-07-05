@@ -3,7 +3,7 @@
 #include <QDebug>
 
 DeviceDescriptor::DeviceDescriptor(const QString &deviceName, const QString &port, const int &speed, const Connection &connType, const int &index)
-:deviceName(deviceName),port(port),speed(speed),connType(connType),index(index)
+    :deviceName(deviceName),port(port),speed(speed),connType(connType),index(index)
 {
 }
 

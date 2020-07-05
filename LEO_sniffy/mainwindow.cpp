@@ -20,12 +20,14 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    createModulesWidgets();
+    setupMainWindowComponents();
+}
+
+void MainWindow::createModulesWidgets(){
     deviceMediator = new DeviceMediator(this);
 
-    WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
-    ui->verticalLayout_modules->addWidget(sep);
-
-    /* Build MainWindow-related parts of Modules */
     QList<QSharedPointer<AbstractModule>> modulesList = deviceMediator->getModulesList();
     QSharedPointer<AbstractModule> module;
     QString moduleName;
@@ -55,33 +57,36 @@ MainWindow::MainWindow(QWidget *parent):
     }
 
     deviceMediator->ShowDeviceModule();
+}
 
+void MainWindow::setupMainWindowComponents(){
+    WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
+    ui->verticalLayout_modules->addWidget(sep);
     QSpacerItem * verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ui->verticalLayout_modules->addItem(verticalSpacer);
     WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sepa);
     WidgetFooter *footer = new WidgetFooter();
     ui->verticalLayout_modules->addWidget(footer);
-
     connect(footer->getPushButtonSize(),SIGNAL(clicked()),this,SLOT(setMenuSize()));
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
- }
-
-MainWindow::~MainWindow()
-{
-    delete ui;
 }
 
 void MainWindow::setMenuSize(){
     if(ui->centralwidget->geometry().width()>150){
-       ui->centralwidget->setMinimumSize(100,200);
-       ui->centralwidget->setMaximumSize(100,20000);
+        ui->centralwidget->setMinimumSize(100,200);
+        ui->centralwidget->setMaximumSize(100,20000);
     }else{
-       ui->centralwidget->setMinimumSize(250,200);
-       ui->centralwidget->setMaximumSize(250,20000);
+        ui->centralwidget->setMinimumSize(250,200);
+        ui->centralwidget->setMaximumSize(250,20000);
     }
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 
