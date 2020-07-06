@@ -6,40 +6,40 @@
 #include <QDataStream>
 #include <QPointF>
 
-#include "windowcounter.h"
+#include "counterwindow.h"
 
 #include "counterconfig.h"
 #include "counterspec.h"
-#include "communication/Commands.h"
+#include "communication/commands.h"
 #include "communication/comms.h"
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
 
-class Counter : public QObject
+#include "../abstractmodule.h"
+
+class Counter : public AbstractModule
 {
     Q_OBJECT
 public:
     explicit Counter(QObject *parent = nullptr);
+    ~Counter();
 
-    void setModuleWindow(WindowCounter *cntWin);
-    void setDockWidgetWindow(ModuleDockWidget *dockWidget);
-    void setModuleControlWidget(WidgetControlModule *cntWidget);
-
-    void setComms(Comms *communication);
+    QWidget* getWidget();
 
 signals:
 
+private slots:
+    void parseData(QByteArray);
+    void writeConfiguration();
+
+    void startModule();
+    void stopModule();
+
 private:
-    Commands *cmd;
-    Comms *comm;
-
+    CounterWindow *cntWindow;
     CounterConfig *config;
-
-    WindowCounter *cntWindow;
-    ModuleDockWidget *cntDockWidgetWindow;
-    WidgetControlModule *cntModuleControlWidget;
-
+    CounterSpec *specification;
 };
 
 #endif // COUNTER_H

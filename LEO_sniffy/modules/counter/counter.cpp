@@ -1,20 +1,41 @@
 #include "counter.h"
 
-Counter::Counter(QObject *parent) : QObject(parent)
+Counter::Counter(QObject *parent)
 {
-    config = new CounterConfig();
-    cmd = new Commands();
+    Q_UNUSED(parent);
+    config = new CounterConfig(this);
+    cntWindow = new CounterWindow();
+    setCommandPrefix(cmd->COUNTER);
+    moduleName = "Counter";
 }
 
-void Counter::setModuleWindow(WindowCounter *cntWin)
-{
-    cntWindow = cntWin;
+void Counter::startModule(){
+
 }
 
-void Counter::setDockWidgetWindow(ModuleDockWidget *dockWidget)
-{
-    cntDockWidgetWindow = dockWidget;
+void Counter::stopModule(){
 
-  //  connect(cntDockWidgetWindow, &ModuleDockWidget::moduleWindowClosing,this, &Counter::closeModule);
+}
+
+void Counter::parseData(QByteArray data){
+    QByteArray dataHeader = data.left(4);
+
+    if(dataHeader=="CFG_"){
+        showModuleControl();
+
+    }else if(dataHeader=="GATE"){
+
+    }
+}
+
+void Counter::writeConfiguration(){
+
+}
+
+QWidget* Counter::getWidget(){
+    return cntWindow;
+}
+
+Counter::~Counter(){
 
 }

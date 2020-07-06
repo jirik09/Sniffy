@@ -15,8 +15,9 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     QList<QSharedPointer<AbstractModule>> modules;
-    modules.append(QSharedPointer<AbstractModule> (device = new Device()));
-    modules.append(QSharedPointer<AbstractModule> (new Scope()));
+    modules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
+    modules.append(QSharedPointer<AbstractModule> (new Scope(this)));
+    modules.append(QSharedPointer<AbstractModule> (new Counter(this)));
     return modules;
 }
 
@@ -78,10 +79,10 @@ void DeviceMediator::parseData(QByteArray data){
     //What if data belongs to voltmeter and scope???????????
     //Solution1: each module has to know if it is running or not and handle data correctly.
     foreach(QSharedPointer<AbstractModule> module, modules){
-        if(dataHeader == module->getCommandPrefix()){
+        //if(dataHeader == module->getCommandPrefix()){
             module->parseData(dataToPass);
             isDataPassed=true;
-        }
+        //}
     }
     if(!isDataPassed){
         qDebug() << "ERROR: this data was not passed to any module" << data;

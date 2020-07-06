@@ -6,52 +6,118 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>651</width>
-    <height>151</height>
+    <width>619</width>
+    <height>139</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>255</horstretch>
+    <verstretch>255</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget{
+background-color: rgb(58, 58, 58);
+}
+</string>
+  </property>
   <widget class="QWidget" name="horizontalWidget" native="true">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>180</x>
      <y>0</y>
-     <width>481</width>
-     <height>151</height>
+     <width>431</width>
+     <height>131</height>
     </rect>
    </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="spacing">
+     <number>4</number>
+    </property>
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>5</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QWidget" name="verticalWidget" native="true">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>2</number>
+       </property>
        <property name="sizeConstraint">
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
+       <property name="leftMargin">
+        <number>3</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>5</number>
+       </property>
        <item>
-        <widget class="QWidget" name="horizontalWidget_1" native="true">
+        <widget class="QWidget" name="horizontalWidget_labelArea" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
            <number>3</number>
           </property>
+          <property name="leftMargin">
+           <number>3</number>
+          </property>
           <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
            <number>3</number>
           </property>
           <property name="bottomMargin">
            <number>1</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_3">
+           <widget class="QLabel" name="label_1">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="font">
              <font>
               <pointsize>11</pointsize>
@@ -64,6 +130,12 @@
           </item>
           <item>
            <widget class="QLabel" name="label_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="font">
              <font>
               <pointsize>11</pointsize>
@@ -78,7 +150,13 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="label_3">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -102,7 +180,13 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="horizontalWidget_2" native="true">
+        <widget class="QWidget" name="horizontalWidget_valueAndUnit" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
            <widget class="QLCDNumber" name="lcdNumber">
@@ -122,11 +206,20 @@
           </item>
           <item>
            <widget class="QLabel" name="label_unit">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>40</width>
+              <height>40</height>
+             </size>
             </property>
             <property name="font">
              <font>
@@ -143,10 +236,13 @@
              <number>1</number>
             </property>
             <property name="text">
-             <string>Herců</string>
+             <string>Units</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+            </property>
+            <property name="wordWrap">
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -155,15 +251,29 @@
        </item>
        <item>
         <widget class="QProgressBar" name="progressBar">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <italic>false</italic>
+          </font>
+         </property>
          <property name="value">
           <number>24</number>
          </property>
         </widget>
        </item>
       </layout>
-      <zorder>horizontalWidget_1</zorder>
-      <zorder>progressBar</zorder>
-      <zorder>horizontalWidget_2</zorder>
      </widget>
     </item>
    </layout>
@@ -174,8 +284,14 @@
      <x>0</x>
      <y>0</y>
      <width>171</width>
-     <height>151</height>
+     <height>131</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
   </widget>
  </widget>
