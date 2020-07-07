@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>954</width>
-    <height>364</height>
+    <width>861</width>
+    <height>265</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,9 +21,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>400</width>
-    <height>350</height>
+    <width>200</width>
+    <height>100</height>
    </size>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>8</pointsize>
+   </font>
   </property>
   <property name="contextMenuPolicy">
    <enum>Qt::DefaultContextMenu</enum>
@@ -60,6 +65,12 @@ background-color: rgb(58, 58, 58);
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>100</height>
+      </size>
      </property>
      <property name="styleSheet">
       <string notr="true">QWidget{

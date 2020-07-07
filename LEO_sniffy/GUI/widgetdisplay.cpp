@@ -14,18 +14,16 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString units, bool showPrg
     labelList.append(ui->label_4);
 
     foreach(QLabel* label, labelList){
-        label->setStyleSheet("QLabel { color : white; }");
         label->hide();
     }
 
     ui->label_0->setText(firstLabelText);
     ui->label_0->show();
-
     ui->label_unit->setText(units);
     showPrgrssBar ? ui->progressBar->show() : ui->progressBar->hide();
-
-    ui->lcdNumber->setStyleSheet("QLabel { color : white; }");
     ui->lcdNumber->display(0);
+
+    //ui->horizontalWidget_labelArea->setStyleSheet("background-color: rgb(48, 48, 48);}");
 }
 
 void WidgetDisplay::setUnits(QString units){

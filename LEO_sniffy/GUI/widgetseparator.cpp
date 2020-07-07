@@ -12,6 +12,10 @@ WidgetSeparator::WidgetSeparator(QWidget *parent, QString name) :
     ui->label_name->setText(name);
 }
 
+void WidgetSeparator::hideLine(){
+    ui->widget->hide();
+}
+
 WidgetSeparator::~WidgetSeparator()
 {
     delete ui;

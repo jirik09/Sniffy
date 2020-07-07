@@ -15,23 +15,27 @@ CounterWindow::CounterWindow(QWidget *parent) :
     tabs->setText("Frequency Ratio",2);
     tabs->setText("Time Interval",3);
 
-    WidgetSeparator *sepa_0 = new WidgetSeparator();
-    ui->verticalLayout_display->addWidget(sepa_0);
+//    WidgetSeparator *sepa_0 = new WidgetSeparator();
+//    ui->verticalLayout_display->addWidget(sepa_0);
+//    sepa_0->layout()->setMargin(0);
+//    sepa_0->hideLine();
+//    sepa_0->resize(160, 5);
 
     WidgetDisplay *frequencyDisplay = new WidgetDisplay("Frequency", "Hz", false);
     ui->verticalLayout_display->addWidget(frequencyDisplay);
-    WidgetSeparator *sepa_1 = new WidgetSeparator();
-    ui->verticalLayout_display->addWidget(sepa_1);
+    frequencyDisplay->setContentsMargins(0, 6, 0, 0);
 
-    WidgetDisplay *avgFrequencyDisplay = new WidgetDisplay("Average frequency", "Hz", true);
+    WidgetDisplay *avgFrequencyDisplay = new WidgetDisplay("Average Frequency", "Hz", false);
     ui->verticalLayout_display->addWidget(avgFrequencyDisplay);   
-    WidgetSeparator *sepa_2 = new WidgetSeparator();
-    ui->verticalLayout_display->addWidget(sepa_2);
+    avgFrequencyDisplay->setContentsMargins(0, 3, 0, 3);
 
-    WidgetDisplay *avgPeriodDisplay = new WidgetDisplay("Average period", "s", true);
+    WidgetDisplay *avgPeriodDisplay = new WidgetDisplay("Average Period", "s", false);
     ui->verticalLayout_display->addWidget(avgPeriodDisplay);
-    WidgetSeparator *sepa_3 = new WidgetSeparator();
-    ui->verticalLayout_display->addWidget(sepa_3);
+    avgPeriodDisplay->setContentsMargins(0, 0, 0, 6);
+//    WidgetSeparator *sepa_3 = new WidgetSeparator();
+//    ui->verticalLayout_display->addWidget(sepa_3);
+//    sepa_3->layout()->setMargin(0);
+//    sepa_3->hideLine();
 }
 
 
