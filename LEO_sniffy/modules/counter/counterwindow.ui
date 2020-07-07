@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>861</width>
-    <height>265</height>
+    <width>742</width>
+    <height>289</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -21,8 +21,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>200</width>
-    <height>100</height>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
    </size>
   </property>
   <property name="font">
@@ -68,8 +74,8 @@ background-color: rgb(58, 58, 58);
      </property>
      <property name="minimumSize">
       <size>
-       <width>200</width>
-       <height>100</height>
+       <width>0</width>
+       <height>0</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -90,6 +96,12 @@ background-color: rgb(58, 58, 58);
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
       </property>
       <property name="styleSheet">
        <string notr="true"/>
@@ -124,7 +136,7 @@ background-color: rgb(58, 58, 58);
       </property>
       <property name="minimumSize">
        <size>
-        <width>360</width>
+        <width>0</width>
         <height>0</height>
        </size>
       </property>

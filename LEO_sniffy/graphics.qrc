@@ -14,6 +14,7 @@
         <file>graphics/unDock.png</file>
         <file>graphics/status_play_hidden.png</file>
         <file>graphics/signalBackground.png</file>
+        <file>graphics/hz_unit.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

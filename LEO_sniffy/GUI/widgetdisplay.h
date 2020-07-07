@@ -18,12 +18,9 @@ public:
     explicit WidgetDisplay(QString firstLabelText, QString units, bool showPrgrssBar, QWidget *parent = nullptr);
     ~WidgetDisplay();
 
-private:
-    QList<QLabel*> labelList;
-
-protected:           
     void setUnits(QString units);
     void displayNumber(double number);
+    void displayNumber(const QString &string);
     QString getLabelText(int labelNumber);
     void setLabelText(int labelNumber, const QString text);
 
@@ -34,6 +31,7 @@ protected:
 
 private:
     Ui::WidgetDisplay *ui;
+    QList<QLabel*> labelList;
 };
 
 #endif // WIDGETDISPLAY_H

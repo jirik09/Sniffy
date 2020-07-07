@@ -19,19 +19,22 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString units, bool showPrg
 
     ui->label_0->setText(firstLabelText);
     ui->label_0->show();
-    ui->label_unit->setText(units);
+    //ui->label_unit->setText(units);
+
     showPrgrssBar ? ui->progressBar->show() : ui->progressBar->hide();
     ui->lcdNumber->display(0);
-
-    //ui->horizontalWidget_labelArea->setStyleSheet("background-color: rgb(48, 48, 48);}");
 }
 
 void WidgetDisplay::setUnits(QString units){
-    ui->label_unit->setText(units);
+    //ui->label_unit->setText(units);
 }
 
 void WidgetDisplay::displayNumber(double number){
     ui->lcdNumber->display(number);
+}
+
+void WidgetDisplay::displayNumber(const QString &string){
+    ui->lcdNumber->display(string);
 }
 
 void WidgetDisplay::hideProgressBar(){
