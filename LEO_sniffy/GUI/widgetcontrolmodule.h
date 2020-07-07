@@ -31,6 +31,7 @@ public:
     ModuleStatus getStatus(void);
     void hideStatus();
     void setIcon (QString ImageURI);
+    void setName (QString name);
 
 signals:
     void clicked(ModuleStatus);

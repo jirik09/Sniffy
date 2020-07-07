@@ -67,8 +67,9 @@ border-radius: 5px;
       <string>PushButton</string>
      </property>
      <property name="icon">
-      <iconset resource="../graphics.qrc">
-       <normaloff>:/graphics/graphics/icon_scope.png</normaloff>:/graphics/graphics/icon_scope.png</iconset>
+      <iconset>
+       <normalon>:/graphics/graphics/icon_not_connected.png</normalon>
+      </iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -105,8 +106,6 @@ border-radius: 5px;
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../graphics.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

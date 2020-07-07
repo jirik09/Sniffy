@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent):
     WidgetFooter *footer = new WidgetFooter();
     ui->verticalLayout_modules->addWidget(footer);
 
-    connect(footer->getPushButtonSize(),SIGNAL(clicked()),this,SLOT(setMenuSize()));
+    connect(footer,&WidgetFooter::sizeClicked,this,&MainWindow::setMenuSize);
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
@@ -75,13 +75,23 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::setMenuSize(){
-    if(ui->centralwidget->geometry().width()>150){
-       ui->centralwidget->setMinimumSize(100,200);
-       ui->centralwidget->setMaximumSize(100,20000);
+void MainWindow::setMenuSize(bool isWide){
+    if(isWide){
+        setMenuWide();
     }else{
-       ui->centralwidget->setMinimumSize(250,200);
-       ui->centralwidget->setMaximumSize(250,20000);
+        setMenuNarrow();
     }
 }
+
+void MainWindow::setMenuNarrow(){
+    ui->centralwidget->setMinimumSize(90,200);
+    ui->centralwidget->setMaximumSize(90,20000);
+}
+
+void MainWindow::setMenuWide(){
+    ui->centralwidget->setMinimumSize(250,200);
+    ui->centralwidget->setMaximumSize(250,20000);
+}
+
+
 

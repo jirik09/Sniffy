@@ -6,8 +6,10 @@ Device::Device(QObject *parent)
     deviceWindow = new DeviceWindow();
     deviceSpec = new DeviceSpec();
 
-    setCommandPrefix(cmd->SYSTEM);
+    //module is not fully initialized - control widget and dock wodget cannot be modified
+    moduleCommandPrefix = cmd->SYSTEM;
     moduleName = "Device";
+    moduleIconURI = ":/graphics/graphics/icon_not_connected.png";
 
     connect(deviceWindow->deviceConnectButton,SIGNAL(clicked(int)),this,SLOT(deviceConnection(int)));
 }
@@ -66,6 +68,8 @@ void Device::disconnectDevice(){
     emit closed();
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
+    setIcon(":/graphics/graphics/icon_not_connected.png");
+    setModuleName("Device");
 }
 
 void Device::errorHandler(QByteArray error){
@@ -83,6 +87,8 @@ void Device::parseData(QByteArray data){
     if(feature=="CFG_"){
         deviceSpec->parseSpecification(data);
         deviceWindow->showSpecification(deviceSpec);
+        setIcon(":/graphics/graphics/icon_connected.png");
+        setModuleName(deviceSpec->device);
     }else if(feature=="ACK_"){
       //  qDebug() << "ACK";
     }else{

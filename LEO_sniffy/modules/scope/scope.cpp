@@ -6,12 +6,14 @@ Scope::Scope(QObject *parent)
     config = new ScopeConfig();
     measCalc = new MeasCalculations();
     scpWindow = new ScopeWindow();
-    setCommandPrefix(cmd->SCOPE);
+
+    //module is not fully initialized - control widget and dock wodget cannot be modified
+    moduleCommandPrefix = cmd->SCOPE;
     moduleName = "Oscilloscope";
+    moduleIconURI = ":/graphics/graphics/icon_scope.png";
 
 
     scopeData = new QVector<QVector<QPointF>>;
-    //scopeMeas = new QList<Measurement>;
 
     //connect signals from GUI into scope
     connect(scpWindow, &ScopeWindow::timeBaseChanged,this,&Scope::updateTimebase);

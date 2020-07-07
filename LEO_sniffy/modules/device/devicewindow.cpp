@@ -69,7 +69,14 @@ DeviceWindow::~DeviceWindow()
 
 void DeviceWindow::showSpecification(DeviceSpec *spec){
   //  qDebug() << "update specification got to GUI"
-    ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/NUCLEO_F303RE.png);");
+    QString devicePreviewImage =":/graphics/graphics/"+spec->device+".png";
+
+    if(QFileInfo::exists(devicePreviewImage)){
+        ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/"+spec->device+".png);");
+    }else{
+        ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/unknown_device.png);");
+    }
+
     deviceParameters->show();
     labelMCU->show();
     labelMCU->setValue(spec->MCU);
@@ -85,6 +92,7 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
 
 void DeviceWindow::hideSpecification(){
     ui->widget_device->setStyleSheet("image: none;");
+    ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/no_device.png);");
     deviceParameters->hide();
     labelMCU->hide();
     labelFWVer->hide();

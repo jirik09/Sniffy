@@ -6,14 +6,20 @@
         <file>graphics/status_play.png</file>
         <file>graphics/status_stop.png</file>
         <file>graphics/separator.png</file>
-        <file>graphics/panel_settings.png</file>
-        <file>graphics/panel_size.png</file>
-        <file>graphics/NUCLEO_F303RE.png</file>
         <file>graphics/dock.png</file>
         <file>graphics/exit.png</file>
         <file>graphics/unDock.png</file>
         <file>graphics/status_play_hidden.png</file>
         <file>graphics/signalBackground.png</file>
+        <file>graphics/icon_not_connected.png</file>
+        <file>graphics/icon_connected.png</file>
+        <file>graphics/settings_gear.png</file>
+        <file>graphics/settings_horizontal.png</file>
+        <file>graphics/settings_vertical.png</file>
+        <file>graphics/no_device.png</file>
+        <file>graphics/Nucleo-F303RE.png</file>
+        <file>graphics/Nucleo-G474RE.png</file>
+        <file>graphics/unknown_device.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
