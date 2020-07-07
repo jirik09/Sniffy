@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent):
     ui->setupUi(this);
     deviceMediator = new DeviceMediator(this);
 
+    setWindowTitle("LEO sniffy");
+
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sep);
 
