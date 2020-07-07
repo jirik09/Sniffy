@@ -2,6 +2,7 @@
 #define WIDGETDISPLAY_H
 
 #include <QWidget>
+#include <QLabel>
 
 #include "widgetlabel.h"
 
@@ -14,19 +15,22 @@ class WidgetDisplay : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetDisplay(bool showPrgrssBar, QString units, QString label_1, QString label_2, QString label_3, QWidget *parent = nullptr);
+    explicit WidgetDisplay(QString firstLabelText, QString units, bool showPrgrssBar, QWidget *parent = nullptr);
     ~WidgetDisplay();
 
-protected:
+private:
+    QList<QLabel*> labelList;
+
+protected:           
     void setUnits(QString units);
     void displayNumber(double number);
-    QString getLabelText(int labelNumer);
-    void setLabelText(int labelNumer, const QString text);
+    QString getLabelText(int labelNumber);
+    void setLabelText(int labelNumber, const QString text);
 
     void hideProgressBar();
     void showProgressBar();
-    void hideLabel(int labelNumer);
-    void showLabel(int labelNumer);
+    void hideLabel(int labelNumber);
+    void showLabel(int labelNumber);
 
 private:
     Ui::WidgetDisplay *ui;
