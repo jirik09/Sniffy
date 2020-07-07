@@ -19,11 +19,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();    
 
-private:
+private:    
     Ui::MainWindow *ui;
     DeviceMediator *deviceMediator;
     void setMenuNarrow();
     void setMenuWide();
+
+    void setupMainWindowComponents();
+    void createModulesWidgets();
 
 private slots:
    void setMenuSize(bool isWide);

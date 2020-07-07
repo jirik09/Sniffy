@@ -25,7 +25,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::getModulesList(){
 }
 
 void DeviceMediator::ScanDevices(){
-  communication->scanForDevices();
+    communication->scanForDevices();
 }
 
 void DeviceMediator::newDeviceList(QList<DeviceDescriptor> deviceList){
@@ -48,7 +48,7 @@ void DeviceMediator::open(int deviceIndex){
 
     communication->write(Commands::SYSTEM+":"+Commands::CONFIG_REQUEST+";");
     foreach(QSharedPointer<AbstractModule> mod, modules){
-       mod->setComms(communication);
+        mod->setComms(communication);
     }
 }
 
@@ -56,7 +56,7 @@ void DeviceMediator::close(){
     if(isConnected){
         communication->close();
         foreach(QSharedPointer<AbstractModule> mod, modules){
-           mod->disableModule();
+            mod->disableModule();
         }
         isConnected = communication->getIsOpen();
     }
@@ -83,8 +83,8 @@ void DeviceMediator::parseData(QByteArray data){
             isDataPassed=true;
         }
     }
-         if(!isDataPassed){
-       qDebug() << "ERROR: this data was not passed to any module" << data;
+    if(!isDataPassed){
+        qDebug() << "ERROR: this data was not passed to any module" << data;
     }
 }
 

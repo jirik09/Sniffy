@@ -20,14 +20,19 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    deviceMediator = new DeviceMediator(this);
 
     setWindowTitle("LEO sniffy");
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sep);
 
-    /* Build MainWindow-related parts of Modules */
+    createModulesWidgets();
+    setupMainWindowComponents();
+}
+
+void MainWindow::createModulesWidgets(){
+    deviceMediator = new DeviceMediator(this);
+
     QList<QSharedPointer<AbstractModule>> modulesList = deviceMediator->getModulesList();
     QSharedPointer<AbstractModule> module;
     QString moduleName;
@@ -57,7 +62,11 @@ MainWindow::MainWindow(QWidget *parent):
     }
 
     deviceMediator->ShowDeviceModule();
+}
 
+void MainWindow::setupMainWindowComponents(){
+    WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
+    ui->verticalLayout_modules->addWidget(sep);
     QSpacerItem * verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ui->verticalLayout_modules->addItem(verticalSpacer);
     WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget);
@@ -70,11 +79,6 @@ MainWindow::MainWindow(QWidget *parent):
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
- }
-
-MainWindow::~MainWindow()
-{
-    delete ui;
 }
 
 void MainWindow::setMenuSize(bool isWide){
@@ -95,5 +99,8 @@ void MainWindow::setMenuWide(){
     ui->centralwidget->setMaximumSize(250,20000);
 }
 
-
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
 

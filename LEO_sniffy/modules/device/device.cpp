@@ -90,7 +90,7 @@ void Device::parseData(QByteArray data){
         setIcon(":/graphics/graphics/icon_connected.png");
         setModuleName(deviceSpec->device);
     }else if(feature=="ACK_"){
-      //  qDebug() << "ACK";
+        //  qDebug() << "ACK";
     }else{
         qDebug() << "ERROR: unparsable data for system" << feature << " "<< data;
     }
