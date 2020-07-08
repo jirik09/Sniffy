@@ -30,7 +30,7 @@ void CounterWindow::createLowFrequencyTab(void){
     addDisplayWidgetToTab(1);
 }
 
-void CounterWindow::addDisplayWidgetToTab(int tabNumber){
+WidgetDisplay* CounterWindow::addDisplayWidgetToTab(int tabNumber){
     QString unitsStyleSheet, avgStyleSheet, errStyleSheet;
 
     unitsStyleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
@@ -41,9 +41,11 @@ void CounterWindow::addDisplayWidgetToTab(int tabNumber){
     errStyleSheet = "image: url(:/graphics/graphics/units_err.png); border: none;";
     frequencyDisplay->setErrStyle(errStyleSheet);
     frequencyDisplay->setContentsMargins(0, 6, 0, 0);
-    frequencyDisplay->displayNumber("255 256.0531");
+    frequencyDisplay->displayNumber("0.00");
 
     tabs->getLayout(tabNumber)->addWidget(frequencyDisplay);
+
+    return frequencyDisplay;
 }
 
 CounterWindow::~CounterWindow()

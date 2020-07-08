@@ -35,7 +35,7 @@ private:
     void createHighFrequencyTab(void);
     void createDisplayTabs(void);
     void createLowFrequencyTab(void);
-    void addDisplayWidgetToTab(int tabNumber);
+    WidgetDisplay* addDisplayWidgetToTab(int tabNumber);
 };
 
 #endif // COUNTERWINDOW_H
