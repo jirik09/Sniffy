@@ -7,14 +7,30 @@ CounterWindow::CounterWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    //********************* insert top options *********************
-    widgetTab *tabs = new widgetTab(ui->widget_display,4);
+    createDisplayTabs();
+    createHighFrequencyTab();
+    createLowFrequencyTab();
+}
+
+void CounterWindow::createDisplayTabs(void){
+    tabs = new widgetTab(ui->widget_display,4);
     ui->verticalLayout_display->addWidget(tabs);
     tabs->setText("High Frequency",0);
     tabs->setText("Low Frequency",1);
     tabs->setText("Frequency Ratio",2);
     tabs->setText("Time Interval",3);
+}
 
+void CounterWindow::createHighFrequencyTab(void){
+    addDisplayWidgetToTab(0);
+}
+
+void CounterWindow::createLowFrequencyTab(void){
+    addDisplayWidgetToTab(1);
+    addDisplayWidgetToTab(1);
+}
+
+void CounterWindow::addDisplayWidgetToTab(int tabNumber){
     QString unitsStyleSheet, avgStyleSheet, errStyleSheet;
 
     unitsStyleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
@@ -27,7 +43,7 @@ CounterWindow::CounterWindow(QWidget *parent) :
     frequencyDisplay->setContentsMargins(0, 6, 0, 0);
     frequencyDisplay->displayNumber("255 256.0531");
 
-    tabs->getLayout(0)->addWidget(frequencyDisplay);
+    tabs->getLayout(tabNumber)->addWidget(frequencyDisplay);
 }
 
 CounterWindow::~CounterWindow()

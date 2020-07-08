@@ -30,7 +30,12 @@ public:
 
 private:
     Ui::CounterWindow *ui;
+    widgetTab *tabs;
 
+    void createHighFrequencyTab(void);
+    void createDisplayTabs(void);
+    void createLowFrequencyTab(void);
+    void addDisplayWidgetToTab(int tabNumber);
 };
 
 #endif // COUNTERWINDOW_H
