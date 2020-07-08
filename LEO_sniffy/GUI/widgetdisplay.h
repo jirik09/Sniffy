@@ -15,10 +15,12 @@ class WidgetDisplay : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetDisplay(QString firstLabelText, QString units, bool showPrgrssBar, QWidget *parent = nullptr);
+    explicit WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar, QWidget *parent = nullptr);
     ~WidgetDisplay();
 
-    void setUnits(QString units);
+    void setUnitsStyle(QString &unitsStyleSheet);
+    void setAvgStyle(QString &avgStyleSheet);
+    void setErrStyle(QString &errStyleSheet);
     void displayNumber(double number);
     void displayNumber(const QString &string);
     QString getLabelText(int labelNumber);

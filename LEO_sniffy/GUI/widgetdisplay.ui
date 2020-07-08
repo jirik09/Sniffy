@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>776</width>
-    <height>150</height>
+    <width>957</width>
+    <height>318</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,7 +29,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QObject{
-background-color: rgb(48, 48, 48);
+background-color: rgb(38, 38, 38);
 color: rgb(228, 228, 228);
 font-size: 12px;
 }</string>
@@ -39,13 +39,13 @@ font-size: 12px;
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
@@ -62,7 +62,9 @@ font-size: 12px;
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true"/>
+      <string notr="true">QObject{
+background-color: rgb(38, 38, 38);
+}</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
@@ -92,6 +94,21 @@ font-size: 12px;
          </sizepolicy>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <property name="leftMargin">
+          <number>2</number>
+         </property>
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="rightMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
          <item>
           <widget class="QWidget" name="horizontalWidget_labelArea" native="true">
            <property name="sizePolicy">
@@ -104,7 +121,14 @@ font-size: 12px;
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true"/>
+            <string notr="true">QObject{
+background-color: rgb(48, 48, 48);
+}
+
+QLabel{
+font-size: 12px;
+color: rgb(228, 228, 228);
+}</string>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <property name="spacing">
@@ -120,7 +144,7 @@ font-size: 12px;
              <number>6</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>6</number>
             </property>
             <item>
              <widget class="QLabel" name="label_0">
@@ -138,13 +162,10 @@ font-size: 12px;
                </font>
               </property>
               <property name="styleSheet">
-               <string notr="true">QLabel{
-font-size: 12px;
-color: rgb(228, 228, 228);
-}</string>
+               <string notr="true"/>
               </property>
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;TextLabel&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TextLabel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </widget>
             </item>
@@ -213,7 +234,7 @@ color: rgb(228, 228, 228);
                <string>TextLabel</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -248,9 +269,94 @@ color: rgb(228, 228, 228);
           </widget>
          </item>
          <item>
+          <widget class="QWidget" name="horizontalWidget_avg" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QObject{
+background-color: rgb(48, 48, 48);
+}</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_avg">
+            <property name="spacing">
+             <number>30</number>
+            </property>
+            <property name="leftMargin">
+             <number>6</number>
+            </property>
+            <property name="topMargin">
+             <number>3</number>
+            </property>
+            <property name="rightMargin">
+             <number>6</number>
+            </property>
+            <property name="bottomMargin">
+             <number>3</number>
+            </property>
+            <item>
+             <widget class="QLCDNumber" name="lcdNumber_avg">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="digitCount">
+               <number>14</number>
+              </property>
+              <property name="segmentStyle">
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="avg" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>15</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>35</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <widget class="QWidget" name="horizontalWidget_valueAndUnit" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -258,8 +364,13 @@ color: rgb(228, 228, 228);
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>43</height>
+             <height>25</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QObject{
+background-color: rgb(48, 48, 48);
+}</string>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <property name="spacing">
@@ -269,13 +380,13 @@ color: rgb(228, 228, 228);
              <number>6</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>4</number>
             </property>
             <property name="rightMargin">
-             <number>10</number>
+             <number>6</number>
             </property>
             <property name="bottomMargin">
-             <number>0</number>
+             <number>4</number>
             </property>
             <item>
              <widget class="QLCDNumber" name="lcdNumber">
@@ -329,28 +440,112 @@ color: rgb(228, 228, 228);
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="widget" native="true">
+             <widget class="QWidget" name="units" native="true">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
               <property name="minimumSize">
                <size>
-                <width>20</width>
+                <width>15</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>150</width>
-                <height>16777215</height>
+                <width>120</width>
+                <height>80</height>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">image: url(:/graphics/graphics/hz_unit.png);
-border: none</string>
+               <string notr="true"/>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="horizontalWidget_err" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>50</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QObject{
+background-color: rgb(48, 48, 48);
+}</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_avg_2">
+            <property name="spacing">
+             <number>30</number>
+            </property>
+            <property name="leftMargin">
+             <number>6</number>
+            </property>
+            <property name="topMargin">
+             <number>3</number>
+            </property>
+            <property name="rightMargin">
+             <number>6</number>
+            </property>
+            <property name="bottomMargin">
+             <number>3</number>
+            </property>
+            <item>
+             <widget class="QLCDNumber" name="lcdNumber_err">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="digitCount">
+               <number>14</number>
+              </property>
+              <property name="segmentStyle">
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="err" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>15</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>35</height>
+               </size>
               </property>
              </widget>
             </item>
@@ -371,50 +566,24 @@ border: none</string>
              <height>0</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QObject{
+background-color: rgb(48, 48, 48);
+}</string>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <property name="spacing">
              <number>6</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>5</number>
             </property>
             <property name="rightMargin">
              <number>9</number>
             </property>
             <property name="bottomMargin">
-             <number>2</number>
+             <number>5</number>
             </property>
-            <item>
-             <widget class="QLCDNumber" name="lcdNumber_2">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>10</width>
-                <height>10</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>120</height>
-               </size>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="digitCount">
-               <number>14</number>
-              </property>
-              <property name="segmentStyle">
-               <enum>QLCDNumber::Flat</enum>
-              </property>
-             </widget>
-            </item>
             <item>
              <widget class="QProgressBar" name="progressBar">
               <property name="sizePolicy">
@@ -432,7 +601,7 @@ border: none</string>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
-                <height>20</height>
+                <height>15</height>
                </size>
               </property>
               <property name="font">

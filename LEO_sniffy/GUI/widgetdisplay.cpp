@@ -1,7 +1,7 @@
 #include "widgetdisplay.h"
 #include "ui_widgetdisplay.h"
 
-WidgetDisplay::WidgetDisplay(QString firstLabelText, QString units, bool showPrgrssBar, QWidget *parent) :
+WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WidgetDisplay)
 {
@@ -19,14 +19,23 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString units, bool showPrg
 
     ui->label_0->setText(firstLabelText);
     ui->label_0->show();
-    //ui->label_unit->setText(units);
+
+    setUnitsStyle(unitsStyleSheet);
 
     showPrgrssBar ? ui->progressBar->show() : ui->progressBar->hide();
     ui->lcdNumber->display(0);
 }
 
-void WidgetDisplay::setUnits(QString units){
-    //ui->label_unit->setText(units);
+void WidgetDisplay::setUnitsStyle(QString &unitsStyleSheet){
+    ui->units->setStyleSheet(unitsStyleSheet.arg(ui->units->property("units").toString()));
+}
+
+void WidgetDisplay::setAvgStyle(QString &avgStyleSheet){
+    ui->avg->setStyleSheet(avgStyleSheet.arg(ui->avg->property("avg").toString()));
+}
+
+void WidgetDisplay::setErrStyle(QString &errStyleSheet){
+    ui->err->setStyleSheet(errStyleSheet.arg(ui->err->property("err").toString()));
 }
 
 void WidgetDisplay::displayNumber(double number){
