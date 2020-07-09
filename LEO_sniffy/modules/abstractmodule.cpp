@@ -41,6 +41,8 @@ void AbstractModule::setDockWidgetWindow(ModuleDockWidget *dockWidget){
 void AbstractModule::setModuleControlWidget(WidgetControlModule *controlWidget){
     moduleControlWidget = controlWidget;
     connect(moduleControlWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetControlClicked(ModuleStatus)));
+
+    moduleControlWidget->setIcon(moduleIconURI);
 }
 
 void AbstractModule::setCommandPrefix(QByteArray prefix){
@@ -85,7 +87,17 @@ void AbstractModule::disableModule(){
     closeModule();
 }
 
+void AbstractModule::setIcon (QString ImageURI){
+    moduleControlWidget->setIcon(ImageURI);
+}
+
 QString AbstractModule::getModuleName()
 {
     return moduleName;
+}
+
+void AbstractModule::setModuleName(QString value)
+{
+    moduleName = value;
+    moduleControlWidget->setName(moduleName);
 }

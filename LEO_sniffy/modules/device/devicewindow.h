@@ -3,6 +3,7 @@
 
 #include <QScrollArea>
 #include <QVBoxLayout>
+#include <QFileInfo>
 
 #include "../../GUI/widgetselection.h"
 #include "../../GUI/widgetbuttons.h"

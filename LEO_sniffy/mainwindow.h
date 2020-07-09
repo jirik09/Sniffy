@@ -22,11 +22,13 @@ public:
 private:    
     Ui::MainWindow *ui;
     DeviceMediator *deviceMediator;
+    void setMenuNarrow();
+    void setMenuWide();
 
     void setupMainWindowComponents();
     void createModulesWidgets();
 
 private slots:
-   void setMenuSize();
+   void setMenuSize(bool isWide);
 };
 #endif // MAINWINDOW_H

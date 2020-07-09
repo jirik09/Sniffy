@@ -17,9 +17,20 @@ public:
     ~WidgetFooter();
     QPushButton * getPushButtonSize();
 
+signals:
+    void settingsClicked();
+    void sizeClicked(bool isWide);
+
 
 private:
     Ui::WidgetFooter *ui;
+    bool isWide = true;
+
+    void setAppearance(bool isWide);
+
+private slots:
+    void settingsCallback();
+    void sizeCallback();
 
 };
 

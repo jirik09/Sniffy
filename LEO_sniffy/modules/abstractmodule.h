@@ -34,15 +34,19 @@ public:
     void closeModule();
     void disableModule();
 
+    void setIcon (QString ImageURI);
+
     QString getModuleName();
+    void setModuleName(QString value);
 
 protected:
     QString moduleName;
+    QString moduleIconURI;
     Commands *cmd;
     Comms *comm;
+    QByteArray moduleCommandPrefix;
 
 private:
-    QByteArray moduleCommandPrefix;
     ModuleDockWidget *dockWidgetWindow;
     WidgetControlModule *moduleControlWidget;
 
