@@ -15,6 +15,8 @@ public:
     explicit WidgetSeparator(QWidget *parent = nullptr, QString name = "");
     ~WidgetSeparator();
 
+    void hideLine();
+
 private:
     Ui::WidgetSeparator *ui;
 };

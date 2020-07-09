@@ -5,6 +5,7 @@
 #include "communication/commands.h"
 #include "modules/device/device.h"
 #include "modules/scope/scope.h"
+#include "modules/counter/counter.h"
 
 class DeviceMediator : public QObject
 {

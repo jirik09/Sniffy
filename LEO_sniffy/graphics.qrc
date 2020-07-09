@@ -11,6 +11,10 @@
         <file>graphics/unDock.png</file>
         <file>graphics/status_play_hidden.png</file>
         <file>graphics/signalBackground.png</file>
+        <file>graphics/units_hz.png</file>
+        <file>graphics/units_sec.png</file>
+        <file>graphics/units_avg.png</file>
+        <file>graphics/units_err.png</file>
         <file>graphics/icon_not_connected.png</file>
         <file>graphics/icon_connected.png</file>
         <file>graphics/settings_gear.png</file>
@@ -20,6 +24,9 @@
         <file>graphics/Nucleo-F303RE.png</file>
         <file>graphics/Nucleo-G474RE.png</file>
         <file>graphics/unknown_device.png</file>
+        <file>graphics/icon_counter.png</file>
+        <file>graphics/icon_signal_generator.png</file>
+        <file>graphics/icon_voltmeter.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

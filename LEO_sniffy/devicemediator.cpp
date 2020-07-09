@@ -15,8 +15,9 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     QList<QSharedPointer<AbstractModule>> modules;
-    modules.append(QSharedPointer<AbstractModule> (device = new Device()));
-    modules.append(QSharedPointer<AbstractModule> (new Scope()));
+    modules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
+    modules.append(QSharedPointer<AbstractModule> (new Scope(this)));
+    modules.append(QSharedPointer<AbstractModule> (new Counter(this)));
     return modules;
 }
 
