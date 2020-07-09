@@ -79,10 +79,10 @@ void DeviceMediator::parseData(QByteArray data){
     //What if data belongs to voltmeter and scope???????????
     //Solution1: each module has to know if it is running or not and handle data correctly.
     foreach(QSharedPointer<AbstractModule> module, modules){
-        //if(dataHeader == module->getCommandPrefix()){
+        if(dataHeader == module->getCommandPrefix()){
             module->parseData(dataToPass);
             isDataPassed=true;
-        //}
+        }
     }
     if(!isDataPassed){
         qDebug() << "ERROR: this data was not passed to any module" << data;

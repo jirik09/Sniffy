@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WindowCounter</class>
- <widget class="QWidget" name="WindowCounter">
+ <class>CounterWindow</class>
+ <widget class="QWidget" name="CounterWindow">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>

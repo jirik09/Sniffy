@@ -24,6 +24,9 @@
         <file>graphics/Nucleo-F303RE.png</file>
         <file>graphics/Nucleo-G474RE.png</file>
         <file>graphics/unknown_device.png</file>
+        <file>graphics/icon_counter.png</file>
+        <file>graphics/icon_signal_generator.png</file>
+        <file>graphics/icon_voltmeter.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

@@ -25,7 +25,6 @@ public:
     void setComms(Comms *communication);
 
     QByteArray getCommandPrefix();
-    void setCommandPrefix(QByteArray prefix);
     void hideModuleStatus();
     void setModuleStatus(ModuleStatus stat);
 

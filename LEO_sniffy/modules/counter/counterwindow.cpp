@@ -1,5 +1,5 @@
 #include "counterwindow.h"
-#include "ui_windowcounter.h"
+#include "ui_counterwindow.h"
 
 CounterWindow::CounterWindow(QWidget *parent) :
     QWidget(parent),

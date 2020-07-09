@@ -27,15 +27,15 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
 }
 
 void WidgetDisplay::setUnitsStyle(QString &unitsStyleSheet){
-    ui->units->setStyleSheet(unitsStyleSheet.arg(ui->units->property("units").toString()));
+    ui->units->setStyleSheet(unitsStyleSheet);
 }
 
 void WidgetDisplay::setAvgStyle(QString &avgStyleSheet){
-    ui->avg->setStyleSheet(avgStyleSheet.arg(ui->avg->property("avg").toString()));
+    ui->avg->setStyleSheet(avgStyleSheet);
 }
 
 void WidgetDisplay::setErrStyle(QString &errStyleSheet){
-    ui->err->setStyleSheet(errStyleSheet.arg(ui->err->property("err").toString()));
+    ui->err->setStyleSheet(errStyleSheet);
 }
 
 void WidgetDisplay::displayNumber(double number){

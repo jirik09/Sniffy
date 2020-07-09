@@ -45,9 +45,6 @@ void AbstractModule::setModuleControlWidget(WidgetControlModule *controlWidget){
     moduleControlWidget->setIcon(moduleIconURI);
 }
 
-void AbstractModule::setCommandPrefix(QByteArray prefix){
-    moduleCommandPrefix = prefix;
-}
 
 QByteArray AbstractModule::getCommandPrefix()
 {
