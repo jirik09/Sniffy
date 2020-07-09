@@ -59,7 +59,7 @@ QTabBar::tab:selected {
     <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>5</number>
    </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -97,7 +97,7 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>262</height>
+            <height>254</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_1">
@@ -153,7 +153,7 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>262</height>
+            <height>254</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -209,7 +209,7 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>262</height>
+            <height>254</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -265,7 +265,7 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>262</height>
+            <height>254</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -321,7 +321,7 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>262</height>
+            <height>254</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -377,7 +377,7 @@ QTabBar::tab:selected {
             <x>0</x>
             <y>0</y>
             <width>740</width>
-            <height>262</height>
+            <height>254</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">

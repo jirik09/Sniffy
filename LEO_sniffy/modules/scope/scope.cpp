@@ -45,7 +45,7 @@ void Scope::parseData(QByteArray data){
         scpWindow->triggerCaptured();
 
     }else if(dataHeader=="OSC_"){
-        qint8 tmpByte;
+        quint8 tmpByte;
         qint16 tmpShort;
         qreal minX;
         qreal maxX;
