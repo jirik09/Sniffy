@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QSpacerItem>
 #include <QVBoxLayout>
+#include <QPropertyAnimation>
 
 #include "devicemediator.h"
 
@@ -17,11 +18,13 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();    
+    ~MainWindow();
 
 private:    
     Ui::MainWindow *ui;
     DeviceMediator *deviceMediator;
+    QPropertyAnimation *animation;
+
     void setMenuNarrow();
     void setMenuWide();
 
@@ -29,6 +32,6 @@ private:
     void createModulesWidgets();
 
 private slots:
-   void setMenuSize(bool isWide);
+    void setMenuSize(bool isWide);
 };
 #endif // MAINWINDOW_H

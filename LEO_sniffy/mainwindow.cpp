@@ -79,6 +79,11 @@ void MainWindow::setupMainWindowComponents(){
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+
+//    animation = new QPropertyAnimation(ui->centralwidget, "size", this);
+//    animation->setDuration(355);
+//    animation->setStartValue(QSize(250, ui->centralwidget->height()));
+//    animation->setEndValue(QSize(90, ui->centralwidget->height()));
 }
 
 void MainWindow::setMenuSize(bool isWide){
@@ -89,15 +94,25 @@ void MainWindow::setMenuSize(bool isWide){
     }
 }
 
-void MainWindow::setMenuNarrow(){
-    ui->centralwidget->setMinimumSize(90,200);
-    ui->centralwidget->setMaximumSize(90,20000);
-}
-
 void MainWindow::setMenuWide(){
     ui->centralwidget->setMinimumSize(250,200);
     ui->centralwidget->setMaximumSize(250,20000);
+
+//    animation->setStartValue(QSize(90, ui->centralwidget->height()));
+//    animation->setEndValue(QSize(250, ui->centralwidget->height()));
+//    animation->start();
 }
+
+void MainWindow::setMenuNarrow(){
+    ui->centralwidget->setMinimumSize(90,200);
+    ui->centralwidget->setMaximumSize(90,20000);
+
+//    animation->setStartValue(QSize(250, ui->centralwidget->height()));
+//    animation->setEndValue(QSize(90, ui->centralwidget->height()));
+//    animation->start();
+}
+
+
 
 MainWindow::~MainWindow()
 {
