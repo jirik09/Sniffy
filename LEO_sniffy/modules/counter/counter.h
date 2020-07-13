@@ -7,6 +7,8 @@
 #include <QPointF>
 
 #include "counterwindow.h"
+#include "counterconfig.h"
+#include "counterspec.h"
 
 #include "counterconfig.h"
 #include "counterspec.h"
@@ -34,12 +36,16 @@ private slots:
     void writeConfiguration();
 
     void startModule();
-    void stopModule();
+    void stopModule();    
 
 private:
     CounterWindow *cntWindow;
     CounterConfig *config;
     CounterSpec *specification;
+    QVector<QVector<QPointF>> *cntData;
+
+    void startCounting();
+    void stopCounting();
 };
 
 #endif // COUNTER_H

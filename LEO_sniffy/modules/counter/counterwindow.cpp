@@ -7,12 +7,17 @@ CounterWindow::CounterWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    createDisplayTabs();
-    createHighFrequencyTab();
-    createLowFrequencyTab();
+    createCounterTabs();
+    createHighFrequencyDisplay();
+    createLowFrequencyDisplay();
 }
 
-void CounterWindow::createDisplayTabs(void){
+CounterWindow::~CounterWindow()
+{
+    delete ui;
+}
+
+void CounterWindow::createCounterTabs(void){
     tabs = new widgetTab(ui->widget_display,4);
     ui->verticalLayout_display->addWidget(tabs);
     tabs->setText("High Frequency",0);
@@ -21,25 +26,25 @@ void CounterWindow::createDisplayTabs(void){
     tabs->setText("Time Interval",3);
 }
 
-void CounterWindow::createHighFrequencyTab(void){
-    addDisplayWidgetToTab(0);
+void CounterWindow::createHighFrequencyDisplay(void){
+    HFDisplay = addDisplayWidgetToTab(0);
 }
 
-void CounterWindow::createLowFrequencyTab(void){
-    addDisplayWidgetToTab(1);
-    addDisplayWidgetToTab(1);
+void CounterWindow::createLowFrequencyDisplay(void){
+    LFDisplay1 = addDisplayWidgetToTab(1);
+    LFDisplay2 = addDisplayWidgetToTab(1);
 }
 
-WidgetDisplay* CounterWindow::addDisplayWidgetToTab(int tabNumber){
+WidgetDisplay *CounterWindow::addDisplayWidgetToTab(int tabNumber){
     QString unitsStyleSheet, avgStyleSheet, errStyleSheet;
 
     unitsStyleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
     WidgetDisplay *frequencyDisplay = new WidgetDisplay("Frequency", unitsStyleSheet, true, tabs);
-
     avgStyleSheet = "image: url(:/graphics/graphics/units_avg.png); border: none;";
     frequencyDisplay->setAvgStyle(avgStyleSheet);
     errStyleSheet = "image: url(:/graphics/graphics/units_err.png); border: none;";
     frequencyDisplay->setErrStyle(errStyleSheet);
+
     frequencyDisplay->setContentsMargins(0, 6, 0, 0);
     frequencyDisplay->displayNumber("0.00");
 
@@ -48,7 +53,14 @@ WidgetDisplay* CounterWindow::addDisplayWidgetToTab(int tabNumber){
     return frequencyDisplay;
 }
 
-CounterWindow::~CounterWindow()
-{
-    delete ui;
+WidgetDisplay *CounterWindow::hfDisplay(){
+    return HFDisplay;
+}
+
+WidgetDisplay *CounterWindow::lfDisplay1(){
+    return LFDisplay1;
+}
+
+WidgetDisplay *CounterWindow::lfDisplay2(){
+    return LFDisplay2;
 }

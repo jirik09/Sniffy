@@ -23,6 +23,10 @@ public:
     void setErrStyle(QString &errStyleSheet);
     void displayNumber(double number);
     void displayNumber(const QString &string);
+    void displayAvgNumber(double number);
+    void displayAvgNumber(const QString &string);
+    void displayErrNumber(double number);
+    void displayErrNumber(const QString &string);
     QString getLabelText(int labelNumber);
     void setLabelText(int labelNumber, const QString text);
 

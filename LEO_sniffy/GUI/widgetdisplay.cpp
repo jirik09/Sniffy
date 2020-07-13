@@ -46,6 +46,22 @@ void WidgetDisplay::displayNumber(const QString &string){
     ui->lcdNumber->display(string);
 }
 
+void WidgetDisplay::displayAvgNumber(double number){
+    ui->lcdNumber_avg->display(number);
+}
+
+void WidgetDisplay::displayAvgNumber(const QString &string){
+    ui->lcdNumber_avg->display(string);
+}
+
+void WidgetDisplay::displayErrNumber(double number){
+    ui->lcdNumber_err->display(number);
+}
+
+void WidgetDisplay::displayErrNumber(const QString &string){
+    ui->lcdNumber_err->display(string);
+}
+
 void WidgetDisplay::hideProgressBar(){
     ui->progressBar->hide();
 }
