@@ -32,6 +32,7 @@ public:
 
     WidgetDisplay* getDisplayChannel1(void);
     WidgetDisplay* getDisplayChannel2(void);
+    widgetTab* getTabs(void);
 
 private:
     Ui::CounterWindow *ui;

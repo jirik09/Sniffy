@@ -10,6 +10,8 @@ Counter::Counter(QObject *parent)
     moduleName = "Counter";
     moduleIconURI = ":/graphics/graphics/icon_counter.png";
 
+    connect(cntWindow->getTabs(), &widgetTab::tabBarClicked, this, &Counter::tabBarClickedCallback);
+
 }
 
 void Counter::startModule(){
@@ -39,7 +41,7 @@ void Counter::parseData(QByteArray data){
     if(dataHeader=="CFG_"){
         showModuleControl();
         //todo pass specification into counterSpec.cpp and parse it
-    }else if(dataHeader=="ETRD"){        
+    }else if(dataHeader=="ETRD"){
         cntWindow->getDisplayChannel1()->displayNumber(displayValue);
     }else if(dataHeader=="IC1D"){
         cntWindow->getDisplayChannel1()->displayNumber(displayValue);
@@ -53,15 +55,15 @@ void Counter::writeConfiguration(){
 }
 
 /*Test function*/
-//void Counter::tabBarClicked(int index){
-//    if(index == 0){
-//        cntWindow->getDisplayChannel1()->displayNumber(11);
-//    }else if(index == 1){
-//        cntWindow->getDisplayChannel1()->displayNumber(22);
-//    }else{
-//        cntWindow->getDisplayChannel1()->displayNumber(33);
-//    }
-//}
+void Counter::tabBarClickedCallback(int index){
+    if(index == 0){
+        /* works well */
+    }else if(index == 1){
+        /* works well */
+    }else{
+
+    }
+}
 
 QWidget *Counter::getWidget(){
     return cntWindow;
