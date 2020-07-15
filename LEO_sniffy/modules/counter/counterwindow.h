@@ -16,6 +16,8 @@
 #include "../../GUI/widgetswitch.h"
 #include "../../GUI/widgetbuttons.h"
 
+#include "countertabhighfreq.h"
+
 namespace Ui {
 class CounterWindow;
 }
@@ -28,21 +30,21 @@ public:
     explicit CounterWindow(QWidget *parent = nullptr);
     ~CounterWindow();
 
-    WidgetDisplay* hfDisplay(void);
-    WidgetDisplay* lfDisplay1(void);
-    WidgetDisplay* lfDisplay2(void);
+    WidgetDisplay* getDisplay1(void);
+    WidgetDisplay* getDisplay2(void);
 
 private:
     Ui::CounterWindow *ui;
+
+    CounterTabHighFreq *tabHighFreq;
+
     widgetTab *tabs;
-    WidgetDisplay *HFDisplay;
-    WidgetDisplay *LFDisplay1;
-    WidgetDisplay *LFDisplay2;
+    WidgetDisplay *display1;
+    WidgetDisplay *display2;
 
     void createCounterTabs(void);
-    void createHighFrequencyDisplay(void);
-    void createLowFrequencyDisplay(void);
-    WidgetDisplay* addDisplayWidgetToTab(int tabNumber);
+    void createTwoDisplays(void);
+    WidgetDisplay* addDisplayWidgetToMeasArea(void);
 };
 
 #endif // COUNTERWINDOW_H

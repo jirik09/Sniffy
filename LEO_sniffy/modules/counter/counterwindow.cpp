@@ -8,8 +8,11 @@ CounterWindow::CounterWindow(QWidget *parent) :
     ui->setupUi(this);
 
     createCounterTabs();
-    createHighFrequencyDisplay();
-    createLowFrequencyDisplay();
+    createTwoDisplays();
+
+    getDisplay2()->hide();
+
+    tabHighFreq = new CounterTabHighFreq(tabs->getLayout(0), tabs);
 }
 
 CounterWindow::~CounterWindow()
@@ -18,49 +21,42 @@ CounterWindow::~CounterWindow()
 }
 
 void CounterWindow::createCounterTabs(void){
-    tabs = new widgetTab(ui->widget_display,4);
-    ui->verticalLayout_display->addWidget(tabs);
-    tabs->setText("High Frequency",0);
-    tabs->setText("Low Frequency",1);
-    tabs->setText("Frequency Ratio",2);
-    tabs->setText("Time Interval",3);
+    tabs = new widgetTab(ui->widget_settings,4);
+    ui->verticalLayout_settings->addWidget(tabs);
+    tabs->setText("High Freq",0);
+    tabs->setText("Low Freq",1);
+    tabs->setText("Freq Ratio",2);
+    tabs->setText("Intervals",3);
 }
 
-void CounterWindow::createHighFrequencyDisplay(void){
-    HFDisplay = addDisplayWidgetToTab(0);
+void CounterWindow::createTwoDisplays(void){
+    display1 = addDisplayWidgetToMeasArea();
+    display1->setContentsMargins(5, 5, 5, 5);
+    display2 = addDisplayWidgetToMeasArea();
+    display2->setContentsMargins(5, 0, 5, 5);
 }
 
-void CounterWindow::createLowFrequencyDisplay(void){
-    LFDisplay1 = addDisplayWidgetToTab(1);
-    LFDisplay2 = addDisplayWidgetToTab(1);
-}
-
-WidgetDisplay *CounterWindow::addDisplayWidgetToTab(int tabNumber){
+WidgetDisplay *CounterWindow::addDisplayWidgetToMeasArea(void){
     QString unitsStyleSheet, avgStyleSheet, errStyleSheet;
 
     unitsStyleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
-    WidgetDisplay *frequencyDisplay = new WidgetDisplay("Frequency", unitsStyleSheet, true, tabs);
+    WidgetDisplay *display = new WidgetDisplay("Frequency", unitsStyleSheet, true, this);
     avgStyleSheet = "image: url(:/graphics/graphics/units_avg.png); border: none;";
-    frequencyDisplay->setAvgStyle(avgStyleSheet);
+    display->setAvgStyle(avgStyleSheet);
     errStyleSheet = "image: url(:/graphics/graphics/units_err.png); border: none;";
-    frequencyDisplay->setErrStyle(errStyleSheet);
+    display->setErrStyle(errStyleSheet);
 
-    frequencyDisplay->setContentsMargins(0, 6, 0, 0);
-    frequencyDisplay->displayNumber("0.00");
+    display->displayNumber("0.00");
+    ui->verticalLayout_display->addWidget(display);
 
-    tabs->getLayout(tabNumber)->addWidget(frequencyDisplay);
-
-    return frequencyDisplay;
+    return display;
 }
 
-WidgetDisplay *CounterWindow::hfDisplay(){
-    return HFDisplay;
+WidgetDisplay *CounterWindow::getDisplay1(){
+    return display1;
 }
 
-WidgetDisplay *CounterWindow::lfDisplay1(){
-    return LFDisplay1;
+WidgetDisplay *CounterWindow::getDisplay2(){
+    return display2;
 }
 
-WidgetDisplay *CounterWindow::lfDisplay2(){
-    return LFDisplay2;
-}

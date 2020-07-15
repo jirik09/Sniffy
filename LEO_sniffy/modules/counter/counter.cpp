@@ -40,11 +40,11 @@ void Counter::parseData(QByteArray data){
         showModuleControl();
         //todo pass specification into counterSpec.cpp and parse it
     }else if(dataHeader=="ETRD"){        
-        cntWindow->hfDisplay()->displayNumber(displayValue);
+        cntWindow->getDisplay1()->displayNumber(displayValue);
     }else if(dataHeader=="IC1D"){
-        cntWindow->lfDisplay1()->displayNumber(displayValue);
+        cntWindow->getDisplay1()->displayNumber(displayValue);
     }else if(dataHeader=="IC2D"){
-        cntWindow->lfDisplay2()->displayNumber(displayValue);
+        cntWindow->getDisplay2()->displayNumber(displayValue);
     }
 }
 

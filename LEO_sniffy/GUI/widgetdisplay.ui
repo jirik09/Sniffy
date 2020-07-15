@@ -34,7 +34,7 @@ color: rgb(228, 228, 228);
 font-size: 12px;
 }</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_3">
+  <layout class="QHBoxLayout" name="WidgetDisplay_2">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -589,9 +589,9 @@ background-color: rgb(48, 48, 48);
 background-color: rgb(48, 48, 48);
 }</string>
            </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QHBoxLayout" name="horizontalLayout_bar">
             <property name="spacing">
-             <number>6</number>
+             <number>0</number>
             </property>
             <property name="leftMargin">
              <number>10</number>
@@ -603,7 +603,7 @@ background-color: rgb(48, 48, 48);
              <number>10</number>
             </property>
             <property name="bottomMargin">
-             <number>3</number>
+             <number>5</number>
             </property>
             <item>
              <widget class="QProgressBar" name="progressBar">
@@ -660,7 +660,7 @@ QProgressBar::chunk {
                <number>24</number>
               </property>
               <property name="alignment">
-               <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+               <set>Qt::AlignCenter</set>
               </property>
               <property name="textVisible">
                <bool>false</bool>
