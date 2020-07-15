@@ -40,17 +40,28 @@ void Counter::parseData(QByteArray data){
         showModuleControl();
         //todo pass specification into counterSpec.cpp and parse it
     }else if(dataHeader=="ETRD"){        
-        cntWindow->getDisplay1()->displayNumber(displayValue);
+        cntWindow->getDisplayChannel1()->displayNumber(displayValue);
     }else if(dataHeader=="IC1D"){
-        cntWindow->getDisplay1()->displayNumber(displayValue);
+        cntWindow->getDisplayChannel1()->displayNumber(displayValue);
     }else if(dataHeader=="IC2D"){
-        cntWindow->getDisplay2()->displayNumber(displayValue);
+        cntWindow->getDisplayChannel2()->displayNumber(displayValue);
     }
 }
 
 void Counter::writeConfiguration(){
 
 }
+
+/*Test function*/
+//void Counter::tabBarClicked(int index){
+//    if(index == 0){
+//        cntWindow->getDisplayChannel1()->displayNumber(11);
+//    }else if(index == 1){
+//        cntWindow->getDisplayChannel1()->displayNumber(22);
+//    }else{
+//        cntWindow->getDisplayChannel1()->displayNumber(33);
+//    }
+//}
 
 QWidget *Counter::getWidget(){
     return cntWindow;

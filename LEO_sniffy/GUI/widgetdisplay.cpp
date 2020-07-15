@@ -23,7 +23,7 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
     setUnitsStyle(unitsStyleSheet);
 
     showPrgrssBar ? ui->progressBar->show() : ui->progressBar->hide();
-    ui->lcdNumber->display(0);
+    ui->lcdNumber->display(0.00);
 }
 
 void WidgetDisplay::setUnitsStyle(QString &unitsStyleSheet){
@@ -71,21 +71,21 @@ void WidgetDisplay::showProgressBar(){
 }
 
 QString WidgetDisplay::getLabelText(int labelNumber){
-    QString text = labelList[labelNumber]->text();
+    QString text = labelList.at(labelNumber)->text();
     return text;
 }
 
 void WidgetDisplay::setLabelText(int labelNumber, const QString text){
-    labelList[labelNumber]->setText(text);
-    labelList[labelNumber]->show();
+    labelList.at(labelNumber)->setText(text);
+    labelList.at(labelNumber)->show();
 }
 
 void WidgetDisplay::hideLabel(int labelNumber){
-    labelList[labelNumber]->hide();
+    labelList.at(labelNumber)->hide();
 }
 
 void WidgetDisplay::showLabel(int labelNumber){
-    labelList[labelNumber]->show();
+    labelList.at(labelNumber)->show();
 }
 
 WidgetDisplay::~WidgetDisplay()

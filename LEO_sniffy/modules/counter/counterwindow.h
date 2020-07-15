@@ -30,8 +30,8 @@ public:
     explicit CounterWindow(QWidget *parent = nullptr);
     ~CounterWindow();
 
-    WidgetDisplay* getDisplay1(void);
-    WidgetDisplay* getDisplay2(void);
+    WidgetDisplay* getDisplayChannel1(void);
+    WidgetDisplay* getDisplayChannel2(void);
 
 private:
     Ui::CounterWindow *ui;
@@ -39,12 +39,12 @@ private:
     CounterTabHighFreq *tabHighFreq;
 
     widgetTab *tabs;
-    WidgetDisplay *display1;
-    WidgetDisplay *display2;
+    WidgetDisplay *displayChannel1;
+    WidgetDisplay *displayChannel2;
 
     void createCounterTabs(void);
     void createTwoDisplays(void);
-    WidgetDisplay* addDisplayWidgetToMeasArea(void);
+    WidgetDisplay* createDisplay(void);
 };
 
 #endif // COUNTERWINDOW_H

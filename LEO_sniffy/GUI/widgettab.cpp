@@ -38,9 +38,12 @@ QVBoxLayout * widgetTab::getLayout (int index){
     return nullptr;
 }
 
-
-
 widgetTab::~widgetTab()
 {
     delete ui;
+}
+
+void widgetTab::on_tabWidget_tabBarClicked(int index)
+{
+    emit tabBarClicked(index);
 }
