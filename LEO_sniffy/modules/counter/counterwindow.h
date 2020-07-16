@@ -31,14 +31,13 @@ public:
     ~CounterWindow();
 
     widgetTab *tabs;
+    CounterTabHighFreq *tabHighFreq;
 
     WidgetDisplay* getDisplayChannel1(void);
     WidgetDisplay* getDisplayChannel2(void);    
 
 private:
-    Ui::CounterWindow *ui;
-
-    CounterTabHighFreq *tabHighFreq;
+    Ui::CounterWindow *ui;    
 
     WidgetDisplay *displayChannel1;
     WidgetDisplay *displayChannel2;

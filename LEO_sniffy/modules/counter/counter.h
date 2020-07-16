@@ -39,6 +39,7 @@ private slots:
     void stopModule();
 
     void switchCounterModeCallback(int index);
+    void switchGateTimeCallback(int index);
 
 private:
     CounterWindow *cntWindow;
