@@ -120,6 +120,25 @@ public:
      static const QByteArray CHANNELS_2;
      static const QByteArray CHANNELS_3;
      static const QByteArray CHANNELS_4;
+
+     /************************ COUNTER ***********************/
+     // Counter modes
+     static const QByteArray COUNTER_MODE;
+     static const QByteArray MODE_HIGH_FREQ;
+     static const QByteArray MODE_LOW_FREQ;
+     static const QByteArray MODE_REFERENCE;
+     static const QByteArray MODE_INTERVAL;
+
+     // Counter complete deinit
+     static const QByteArray COUNTER_DEINIT;
+
+     // Counter ETR GATE times
+     static const QByteArray COUNTER_GATE;
+     static const QByteArray GATE_TIME_100M;
+     static const QByteArray GATE_TIME_500M;
+     static const QByteArray GATE_TIME_1S;
+     static const QByteArray GATE_TIME_5S;
+     static const QByteArray GATE_TIME_10S;
 };
 
 #endif // COMMANDS_H

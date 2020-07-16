@@ -38,7 +38,7 @@ private slots:
     void startModule();
     void stopModule();
 
-    void tabBarClickedCallback(int index);
+    void switchCounterCallback(int index);
 
 private:
     CounterWindow *cntWindow;

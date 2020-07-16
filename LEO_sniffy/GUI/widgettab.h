@@ -19,11 +19,11 @@ public:
     void setText(QString text, int index);
     QVBoxLayout * getLayout (int index);
 
-private slots:
-    void on_tabWidget_tabBarClicked(int index);
-
 private:
     Ui::widgetTab *ui;
+
+private slots:
+    void on_tabWidget_tabBarClicked(int index);
 
 signals:
     void tabBarClicked(int index);

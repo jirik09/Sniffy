@@ -10,8 +10,7 @@ Counter::Counter(QObject *parent)
     moduleName = "Counter";
     moduleIconURI = ":/graphics/graphics/icon_counter.png";
 
-    connect(cntWindow->getTabs(), &widgetTab::tabBarClicked, this, &Counter::tabBarClickedCallback);
-
+    connect(cntWindow->tabs, &widgetTab::tabBarClicked, this, &Counter::switchCounterCallback);
 }
 
 void Counter::startModule(){
@@ -41,27 +40,28 @@ void Counter::parseData(QByteArray data){
     if(dataHeader=="CFG_"){
         showModuleControl();
         //todo pass specification into counterSpec.cpp and parse it
-    }else if(dataHeader=="ETRD"){
-        cntWindow->getDisplayChannel1()->displayNumber(displayValue);
-    }else if(dataHeader=="IC1D"){
+
+    }else if(dataHeader=="ETRD"||"IC1D"||"REFD"||"TIDA"){
         cntWindow->getDisplayChannel1()->displayNumber(displayValue);
     }else if(dataHeader=="IC2D"){
         cntWindow->getDisplayChannel2()->displayNumber(displayValue);
     }
+
 }
 
 void Counter::writeConfiguration(){
 
 }
 
-/*Test function*/
-void Counter::tabBarClickedCallback(int index){
+void Counter::switchCounterCallback(int index){
     if(index == 0){
-        /* works well */
+        comm->write(cmd->COUNTER, cmd->MODE_HIGH_FREQ);
     }else if(index == 1){
-        /* works well */
-    }else{
-
+        comm->write(cmd->COUNTER, cmd->MODE_LOW_FREQ);
+    }else if(index == 2){
+        comm->write(cmd->COUNTER, cmd->MODE_REFERENCE);
+    }else if(index == 3){
+        comm->write(cmd->COUNTER, cmd->MODE_INTERVAL);
     }
 }
 

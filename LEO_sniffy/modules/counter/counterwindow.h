@@ -30,16 +30,15 @@ public:
     explicit CounterWindow(QWidget *parent = nullptr);
     ~CounterWindow();
 
+    widgetTab *tabs;
+
     WidgetDisplay* getDisplayChannel1(void);
-    WidgetDisplay* getDisplayChannel2(void);
-    widgetTab* getTabs(void);
+    WidgetDisplay* getDisplayChannel2(void);    
 
 private:
     Ui::CounterWindow *ui;
 
-    CounterTabHighFreq *tabHighFreq;
-
-    widgetTab *tabs;
+    CounterTabHighFreq *tabHighFreq;    
     WidgetDisplay *displayChannel1;
     WidgetDisplay *displayChannel2;
 

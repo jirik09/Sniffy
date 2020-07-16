@@ -106,3 +106,22 @@ const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";
  const QByteArray Commands::CHANNELS_2 = "2CH_";
  const QByteArray Commands::CHANNELS_3 = "3CH_";
  const QByteArray Commands::CHANNELS_4 = "4CH_";
+
+ /************************ COUNTER ***********************/
+ // Counter modes
+ const QByteArray Commands::COUNTER_MODE = "MODE";
+ const QByteArray Commands::MODE_HIGH_FREQ = "ETR_";
+ const QByteArray Commands::MODE_LOW_FREQ = "IC__";
+ const QByteArray Commands::MODE_REFERENCE = "REF_";
+ const QByteArray Commands::MODE_INTERVAL = "TI__";
+
+ // Counter complete deinit
+ const QByteArray Commands::COUNTER_DEINIT = "DEIN";
+
+ // Counter ETR GATE times
+ const QByteArray Commands::COUNTER_GATE = "GATE";
+ const QByteArray Commands::GATE_TIME_100M = "100m";
+ const QByteArray Commands::GATE_TIME_500M = "500m";
+ const QByteArray Commands::GATE_TIME_1S = "1s__";
+ const QByteArray Commands::GATE_TIME_5S = "5s__";
+ const QByteArray Commands::GATE_TIME_10S = "10s_";

@@ -58,10 +58,3 @@ WidgetDisplay *CounterWindow::getDisplayChannel1(){
 WidgetDisplay *CounterWindow::getDisplayChannel2(){
     return displayChannel2;
 }
-
-widgetTab *CounterWindow::getTabs(void){
-    return tabs;
-}
-
-
-
