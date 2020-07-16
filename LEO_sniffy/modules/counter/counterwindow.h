@@ -38,13 +38,23 @@ public:
 private:
     Ui::CounterWindow *ui;
 
-    CounterTabHighFreq *tabHighFreq;    
+    CounterTabHighFreq *tabHighFreq;
+
     WidgetDisplay *displayChannel1;
     WidgetDisplay *displayChannel2;
 
     void createCounterTabs(void);
+    void configureCounterTabs(void);
     void createTwoDisplays(void);
     WidgetDisplay* createDisplay(void);
+    void configureDisplays(void);
+
+signals:
+
+private slots:
+    void switchCounterModeCallback(int index);
+    void switchFrequencyPeriodCallback(int index);
+    void switchErrorAvgCallback(int index);
 };
 
 #endif // COUNTERWINDOW_H

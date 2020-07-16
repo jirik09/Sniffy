@@ -29,6 +29,7 @@
         <file>graphics/icon_voltmeter.png</file>
         <file>graphics/menu_burger_button.gif</file>
         <file>graphics/menu_burger_button_backw.gif</file>
+        <file>graphics/units_erravg.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

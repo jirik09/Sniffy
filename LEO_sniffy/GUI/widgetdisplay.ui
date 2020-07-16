@@ -16,10 +16,14 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>100</height>
+   </size>
+  </property>
   <property name="font">
-   <font>
-    <pointsize>-1</pointsize>
-   </font>
+   <font/>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -30,8 +34,7 @@
   <property name="styleSheet">
    <string notr="true">QObject{
 background-color: rgb(38, 38, 38);
-color: rgb(228, 228, 228);
-font-size: 12px;
+color: rgb(214, 214, 214)
 }</string>
   </property>
   <layout class="QHBoxLayout" name="WidgetDisplay_2">
@@ -123,11 +126,6 @@ background-color: rgb(38, 38, 38);
            <property name="styleSheet">
             <string notr="true">QObject{
 background-color: rgb(48, 48, 48);
-}
-
-QLabel{
-font-size: 12px;
-color: rgb(228, 228, 228);
 }</string>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_labelArea">
@@ -156,7 +154,6 @@ color: rgb(228, 228, 228);
               </property>
               <property name="font">
                <font>
-                <pointsize>-1</pointsize>
                 <weight>50</weight>
                 <bold>false</bold>
                </font>
@@ -178,9 +175,7 @@ color: rgb(228, 228, 228);
                </sizepolicy>
               </property>
               <property name="font">
-               <font>
-                <pointsize>-1</pointsize>
-               </font>
+               <font/>
               </property>
               <property name="text">
                <string>TextLabel</string>
@@ -205,9 +200,7 @@ color: rgb(228, 228, 228);
                </size>
               </property>
               <property name="font">
-               <font>
-                <pointsize>-1</pointsize>
-               </font>
+               <font/>
               </property>
               <property name="text">
                <string>TextLabel</string>
@@ -226,9 +219,7 @@ color: rgb(228, 228, 228);
                </sizepolicy>
               </property>
               <property name="font">
-               <font>
-                <pointsize>-1</pointsize>
-               </font>
+               <font/>
               </property>
               <property name="text">
                <string>TextLabel</string>
@@ -253,9 +244,7 @@ color: rgb(228, 228, 228);
                </size>
               </property>
               <property name="font">
-               <font>
-                <pointsize>-1</pointsize>
-               </font>
+               <font/>
               </property>
               <property name="text">
                <string>TextLabel</string>
@@ -404,7 +393,7 @@ background-color: rgb(48, 48, 48);
               </property>
               <property name="styleSheet">
                <string notr="true">QLCDNumber{
-color: rgb(228, 228, 228);
+color: rgb(214, 214, 214);
 }</string>
               </property>
               <property name="frameShape">
@@ -639,7 +628,6 @@ background-color: rgb(48, 48, 48);
               </property>
               <property name="font">
                <font>
-                <pointsize>-1</pointsize>
                 <italic>false</italic>
                 <kerning>true</kerning>
                </font>

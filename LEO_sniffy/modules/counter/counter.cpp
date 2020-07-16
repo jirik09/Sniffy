@@ -10,7 +10,7 @@ Counter::Counter(QObject *parent)
     moduleName = "Counter";
     moduleIconURI = ":/graphics/graphics/icon_counter.png";
 
-    connect(cntWindow->tabs, &widgetTab::tabBarClicked, this, &Counter::switchCounterCallback);
+    connect(cntWindow->tabs, &widgetTab::tabBarClicked, this, &Counter::switchCounterModeCallback);
 }
 
 void Counter::startModule(){
@@ -41,27 +41,26 @@ void Counter::parseData(QByteArray data){
         showModuleControl();
         //todo pass specification into counterSpec.cpp and parse it
 
-    }else if(dataHeader=="ETRD"||"IC1D"||"REFD"||"TIDA"){
+    }else if(dataHeader=="ETRD"||dataHeader=="IC1D"||dataHeader=="REFD"||dataHeader=="TIDA"){
         cntWindow->getDisplayChannel1()->displayNumber(displayValue);
     }else if(dataHeader=="IC2D"){
         cntWindow->getDisplayChannel2()->displayNumber(displayValue);
     }
-
 }
 
 void Counter::writeConfiguration(){
 
 }
 
-void Counter::switchCounterCallback(int index){
-    if(index == 0){
-        comm->write(cmd->COUNTER, cmd->MODE_HIGH_FREQ);
-    }else if(index == 1){
-        comm->write(cmd->COUNTER, cmd->MODE_LOW_FREQ);
-    }else if(index == 2){
-        comm->write(cmd->COUNTER, cmd->MODE_REFERENCE);
-    }else if(index == 3){
-        comm->write(cmd->COUNTER, cmd->MODE_INTERVAL);
+void Counter::switchCounterModeCallback(int index){
+    if(index == 0){        
+        comm->write(cmd->COUNTER, cmd->COUNTER_MODE, cmd->MODE_HIGH_FREQ);
+    }else if(index == 1){        
+        comm->write(cmd->COUNTER, cmd->COUNTER_MODE, cmd->MODE_LOW_FREQ);
+    }else if(index == 2){        
+        comm->write(cmd->COUNTER, cmd->COUNTER_MODE, cmd->MODE_REFERENCE);
+    }else if(index == 3){        
+        comm->write(cmd->COUNTER, cmd->COUNTER_MODE, cmd->MODE_INTERVAL);
     }
 }
 

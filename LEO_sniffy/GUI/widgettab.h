@@ -23,7 +23,7 @@ private:
     Ui::widgetTab *ui;
 
 private slots:
-    void on_tabWidget_tabBarClicked(int index);
+    void on_tabWidget_currentChanged(int index);
 
 signals:
     void tabBarClicked(int index);

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <QString>
 
 #include "widgetlabel.h"
 
@@ -27,8 +28,9 @@ public:
     void displayAvgNumber(const QString &string);
     void displayErrNumber(double number);
     void displayErrNumber(const QString &string);
+    void configLabel(int labelNumber, const QString text, QString color, bool visible);
     QString getLabelText(int labelNumber);
-    void setLabelText(int labelNumber, const QString text);
+    void setLabelText(int labelNumber, const QString text);    
 
     void hideProgressBar();
     void showProgressBar();

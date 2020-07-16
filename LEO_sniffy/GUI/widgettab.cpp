@@ -43,7 +43,7 @@ widgetTab::~widgetTab()
     delete ui;
 }
 
-void widgetTab::on_tabWidget_tabBarClicked(int index)
+void widgetTab::on_tabWidget_currentChanged(int index)
 {
     emit tabBarClicked(index);
 }

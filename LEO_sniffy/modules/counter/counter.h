@@ -38,7 +38,7 @@ private slots:
     void startModule();
     void stopModule();
 
-    void switchCounterCallback(int index);
+    void switchCounterModeCallback(int index);
 
 private:
     CounterWindow *cntWindow;

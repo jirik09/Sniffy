@@ -18,14 +18,16 @@ class CounterTabHighFreq : public QObject
 public:
     explicit CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent = nullptr);
 
-signals:
-
-private:
     WidgetDialRange *dialAveraging;
     WidgetButtons *buttonsQuantitySwitch;
     WidgetButtons *buttonsErrorSwitch;
     WidgetButtons *buttonsGateTime;
     QLabel *labelAutoInputPrescaler;
+
+signals:
+
+private:
+
 };
 
 #endif // COUNTERTABHIGHFREQ_H

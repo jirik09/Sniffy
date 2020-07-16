@@ -70,6 +70,26 @@ void WidgetDisplay::showProgressBar(){
     ui->progressBar->show();
 }
 
+void WidgetDisplay::configLabel(int labelNumber, QString text, const QString color, bool visible){
+    labelList.at(labelNumber)->setText(text);
+    QString styleSheet;
+    if (color == "blue"){
+        styleSheet = "QLabel { color: rgb(24, 154, 224); }";
+    }else if (color == "orange") {
+        styleSheet = "QLabel { color: rgb(224, 154, 24); }";
+    }else if (color == "green") {
+        styleSheet = "QLabel { color: rgb(54, 154, 24); }";
+    }else if (color == "violet") {
+        styleSheet = "QLabel { color: rgb(204, 24, 224); }";
+    }else if (color == "white") {
+        styleSheet = "QLabel { color: rgb(214, 214, 214); }";
+    }else if (color == "grey") {
+        styleSheet = "QLabel { color: rgb(124, 124, 124); }";
+    }
+    labelList.at(labelNumber)->setStyleSheet(styleSheet);
+    (visible == true) ? labelList.at(labelNumber)->show() : labelList.at(labelNumber)->hide();
+}
+
 QString WidgetDisplay::getLabelText(int labelNumber){
     QString text = labelList.at(labelNumber)->text();
     return text;
