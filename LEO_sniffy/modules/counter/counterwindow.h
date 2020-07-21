@@ -52,7 +52,7 @@ signals:
 
 private slots:
     void switchCounterModeCallback(int index);
-    void switchFrequencyPeriodCallback(int index);
+    void switchQuantityCallback(int index);
     void switchErrorAvgCallback(int index);
 };
 

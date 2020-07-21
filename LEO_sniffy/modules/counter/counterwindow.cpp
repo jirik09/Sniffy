@@ -16,7 +16,7 @@ CounterWindow::CounterWindow(QWidget *parent) :
     configureCounterTabs();
 
     connect(tabs, &widgetTab::tabBarClicked, this, &CounterWindow::switchCounterModeCallback);
-    connect(tabHighFreq->buttonsQuantitySwitch, &WidgetButtons::clicked, this, &CounterWindow::switchFrequencyPeriodCallback);
+    connect(tabHighFreq->buttonsQuantitySwitch, &WidgetButtons::clicked, this, &CounterWindow::switchQuantityCallback);
     connect(tabHighFreq->buttonsErrorSwitch, &WidgetButtons::clicked, this, &CounterWindow::switchErrorAvgCallback);
 }
 
@@ -84,7 +84,7 @@ void CounterWindow::switchCounterModeCallback(int index){
     }
 }
 
-void CounterWindow::switchFrequencyPeriodCallback(int index){
+void CounterWindow::switchQuantityCallback(int index){
     QString unitsStyleSheet;
     if(index == 0){
         displayChannel1->setLabelText(0, "Frequency");

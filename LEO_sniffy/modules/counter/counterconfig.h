@@ -2,12 +2,15 @@
 #define COUNTERCONFIG_H
 
 #include <QObject>
+#include "counterdefs.h"
 
 class CounterConfig : public QObject
 {
     Q_OBJECT
 public:
     explicit CounterConfig(QObject *parent = nullptr);
+
+    CounterQuantity quantity = CounterQuantity::FREQUENCY;
 
     /* Direct Frequency measurement (High Frequency) */
     int gateTime = 100; // ms

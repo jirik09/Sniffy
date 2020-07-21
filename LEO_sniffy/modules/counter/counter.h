@@ -23,11 +23,20 @@
 class Counter : public AbstractModule
 {
     Q_OBJECT
+
 public:
     explicit Counter(QObject *parent = nullptr);
     ~Counter();
 
     QWidget* getWidget();
+
+private:
+    CounterWindow *cntWindow;
+    CounterConfig *config;
+    CounterSpec *specification;
+
+    void startCounting();
+    void stopCounting();
 
 signals:
 
@@ -40,15 +49,7 @@ private slots:
 
     void switchCounterModeCallback(int index);
     void switchGateTimeCallback(int index);
-
-private:
-    CounterWindow *cntWindow;
-    CounterConfig *config;
-    CounterSpec *specification;
-    QVector<QVector<QPointF>> *cntData;
-
-    void startCounting();
-    void stopCounting();
+    void switchQuantityCallback(int index);
 };
 
 #endif // COUNTER_H

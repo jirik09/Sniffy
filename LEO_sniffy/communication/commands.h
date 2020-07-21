@@ -122,6 +122,9 @@ public:
     static const QByteArray CHANNELS_4;
 
     /************************ COUNTER ***********************/
+    // Counter complete deinit
+    static const QByteArray COUNTER_DEINIT;
+
     // Counter modes
     static const QByteArray COUNTER_MODE;
     static const QByteArray MODE_HIGH_FREQ;
@@ -129,8 +132,10 @@ public:
     static const QByteArray MODE_REFERENCE;
     static const QByteArray MODE_INTERVAL;
 
-    // Counter complete deinit
-    static const QByteArray COUNTER_DEINIT;
+    // Counter quantity
+    static const QByteArray COUNTER_QUANTITY;
+    static const QByteArray QUANT_FREQUENCY;
+    static const QByteArray QUANT_PERIOD;
 
     // Counter ETR GATE times
     static const QByteArray COUNTER_GATE;
