@@ -9,9 +9,6 @@
 #include "counterwindow.h"
 #include "counterconfig.h"
 #include "counterspec.h"
-
-#include "counterconfig.h"
-#include "counterspec.h"
 #include "communication/commands.h"
 #include "communication/comms.h"
 

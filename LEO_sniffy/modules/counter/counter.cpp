@@ -3,10 +3,11 @@
 Counter::Counter(QObject *parent)
 {
     Q_UNUSED(parent);
+
     QLocale::setDefault(QLocale::English);
 
-    config = new CounterConfig(this);
     cntWindow = new CounterWindow();
+    config = new CounterConfig(this);
 
     moduleCommandPrefix = cmd->COUNTER;
     moduleName = "Counter";
@@ -38,8 +39,11 @@ void Counter::stopCounting(){
 void Counter::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
     QDataStream streamBuffLeng(data.remove(0, 4));
-    double displayData;
+
+    double displayData, displayQerror, displayTerror;   // Display Quantization and Timebase errors
     streamBuffLeng >> displayData;
+    streamBuffLeng >> displayQerror;
+    streamBuffLeng >> displayTerror;
 
     QLocale locale;
     QString displayValue;
@@ -48,7 +52,7 @@ void Counter::parseData(QByteArray data){
         showModuleControl();
         //todo pass specification into counterSpec.cpp and parse it
 
-    }else if(dataHeader=="ETRD"||dataHeader=="REFD"||dataHeader=="TIDA"){
+    }else if(dataHeader=="ETRD"){
         if(config->quantity == CounterQuantity::FREQUENCY){
             displayValue = locale.toString(displayData, ' ', 4);
             cntWindow->getDisplayChannel1()->displayNumber(displayValue);
@@ -56,7 +60,10 @@ void Counter::parseData(QByteArray data){
             displayValue = locale.toString(displayData, 'e');
             cntWindow->getDisplayChannel1()->displayNumber(displayValue);
         }
-
+        displayValue = locale.toString(displayQerror, 'e', 4);
+        cntWindow->getDisplayChannel1()->displayQuantErrNumber(displayValue);
+        displayValue = locale.toString(displayTerror, 'e', 4);
+        cntWindow->getDisplayChannel1()->displayTimebaseErrNumber(displayValue);
 
     }else if(dataHeader=="IC1D"||dataHeader=="IC2D"){
         if(dataHeader=="IC1D"){
@@ -67,15 +74,11 @@ void Counter::parseData(QByteArray data){
             cntWindow->getDisplayChannel2()->displayNumber(displayValue);
         }
 
-    }else if(dataHeader=="QERR"){
+    }else if(dataHeader=="REFD"){
 
-    }else if(dataHeader=="TERR"){
+    }else if(dataHeader=="TIDA"){
 
     }
-}
-
-void Counter::writeConfiguration(){
-
 }
 
 void Counter::switchCounterModeCallback(int index){
@@ -112,6 +115,10 @@ void Counter::switchGateTimeCallback(int index){
     }else if(index == 4){
         comm->write(cmd->COUNTER, cmd->COUNTER_GATE, cmd->GATE_TIME_10S);
     }
+}
+
+void Counter::writeConfiguration(){
+
 }
 
 QWidget *Counter::getWidget(){

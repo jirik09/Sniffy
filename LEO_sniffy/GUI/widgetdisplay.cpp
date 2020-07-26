@@ -27,15 +27,23 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
 }
 
 void WidgetDisplay::setUnitsStyle(QString &unitsStyleSheet){
-    ui->units->setStyleSheet(unitsStyleSheet);
+    ui->styleUnits->setStyleSheet(unitsStyleSheet);
 }
 
 void WidgetDisplay::setAvgStyle(QString &avgStyleSheet){
-    ui->avg->setStyleSheet(avgStyleSheet);
+    ui->styleAvg->setStyleSheet(avgStyleSheet);
 }
 
 void WidgetDisplay::setErrStyle(QString &errStyleSheet){
-    ui->err->setStyleSheet(errStyleSheet);
+    ui->styleErr->setStyleSheet(errStyleSheet);
+}
+
+void WidgetDisplay::setQuantErrStyle(QString &qerrStyleSheet){
+    ui->styleQerr->setStyleSheet(qerrStyleSheet);
+}
+
+void WidgetDisplay::setTimebaseErrStyle(QString &terrStyleSheet){
+    ui->styleTerr->setStyleSheet(terrStyleSheet);
 }
 
 void WidgetDisplay::displayNumber(double number){
@@ -54,12 +62,20 @@ void WidgetDisplay::displayAvgNumber(const QString &string){
     ui->lcdNumber_avg->display(string);
 }
 
-void WidgetDisplay::displayErrNumber(double number){
-    ui->lcdNumber_err->display(number);
+void WidgetDisplay::displayQuantErrNumber(double number){
+    ui->lcdNumber_qerr->display(number);
 }
 
-void WidgetDisplay::displayErrNumber(const QString &string){
-    ui->lcdNumber_err->display(string);
+void WidgetDisplay::displayQuantErrNumber(const QString &string){
+    ui->lcdNumber_qerr->display(string);
+}
+
+void WidgetDisplay::displayTimebaseErrNumber(double number){
+    ui->lcdNumber_terr->display(number);
+}
+
+void WidgetDisplay::displayTimebaseErrNumber(const QString &string){
+    ui->lcdNumber_terr->display(string);
 }
 
 void WidgetDisplay::hideProgressBar(){

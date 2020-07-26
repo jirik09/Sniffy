@@ -318,7 +318,7 @@ background-color: rgb(48, 48, 48);
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="avg" native="true">
+             <widget class="QWidget" name="styleAvg" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
@@ -429,7 +429,7 @@ color: rgb(214, 214, 214);
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="units" native="true">
+             <widget class="QWidget" name="styleUnits" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
@@ -492,7 +492,23 @@ background-color: rgb(48, 48, 48);
              <number>3</number>
             </property>
             <item>
-             <widget class="QLCDNumber" name="lcdNumber_err">
+             <widget class="QWidget" name="styleQerr" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>35</width>
+                <height>35</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLCDNumber" name="lcdNumber_qerr">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
@@ -509,7 +525,7 @@ background-color: rgb(48, 48, 48);
                <enum>QFrame::NoFrame</enum>
               </property>
               <property name="digitCount">
-               <number>14</number>
+               <number>10</number>
               </property>
               <property name="segmentStyle">
                <enum>QLCDNumber::Flat</enum>
@@ -517,7 +533,45 @@ background-color: rgb(48, 48, 48);
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="err" native="true">
+             <widget class="QWidget" name="styleTerr" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>35</width>
+                <height>35</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLCDNumber" name="lcdNumber_terr">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Plain</enum>
+              </property>
+              <property name="digitCount">
+               <number>10</number>
+              </property>
+              <property name="segmentStyle">
+               <enum>QLCDNumber::Flat</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="styleErr" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
