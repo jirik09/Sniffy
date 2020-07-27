@@ -26,7 +26,7 @@ uint MovingAverage::prepend(double newValue){
  * @retval Returns average. If buffer not full -100 is returned.
  */
 double MovingAverage::getAverage(){
-    if(isBufferFull() == true){
+    if(isBufferFull()){
         QListIterator<double> i(buffer);
         double sum = 0;
         while (i.hasNext()){
