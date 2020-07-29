@@ -13,9 +13,13 @@ Counter::Counter(QObject *parent)
     moduleName = "Counter";
     moduleIconURI = ":/graphics/graphics/icon_counter.png";
 
+    movAvg = new MovingAverage(2);
+
     connect(cntWindow->tabs, &widgetTab::tabBarClicked, this, &Counter::switchCounterModeCallback);
     connect(cntWindow->tabHighFreq->buttonsQuantitySwitch, &WidgetButtons::clicked, this, &Counter::switchQuantityCallback);
     connect(cntWindow->tabHighFreq->buttonsGateTime, &WidgetButtons::clicked, this, &Counter::switchGateTimeCallback);
+    connect(cntWindow->tabHighFreq->buttonsErrorSwitch, &WidgetButtons::clicked, this, &Counter::switchErrorAvgCallback);
+    connect(cntWindow->tabHighFreq->dialAveraging, &WidgetDialRange::valueChanged, this, &Counter::dialAvgChangedCallback);
 }
 
 void Counter::startModule(){
@@ -40,38 +44,82 @@ void Counter::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
     QDataStream streamBuffLeng(data.remove(0, 4));
 
-    double displayData, displayQerror, displayTerror;   // Display Quantization and Timebase errors
-    streamBuffLeng >> displayData;
-    streamBuffLeng >> displayQerror;
-    streamBuffLeng >> displayTerror;
+    double val, qerr, terr;   // Display the Value, Quantization and Timebase errors
+    streamBuffLeng >> val;
+    streamBuffLeng >> qerr;
+    streamBuffLeng >> terr;
 
-    QLocale locale;
-    QString displayValue;
+    QString strVal, strQerr, strTerr;
+    QLocale loc;
 
     if(dataHeader=="CFG_"){
         showModuleControl();
         //todo pass specification into counterSpec.cpp and parse it
 
     }else if(dataHeader=="ETRD"){
-        if(config->quantity == CounterQuantity::FREQUENCY){
-            displayValue = locale.toString(displayData, ' ', 4);
-            cntWindow->getDisplayChannel1()->displayNumber(displayValue);
-        }else {
-            displayValue = locale.toString(displayData, 'e');
-            cntWindow->getDisplayChannel1()->displayNumber(displayValue);
+
+        double avg;
+        strTerr = loc.toString(terr, 'e', 4);
+        strQerr = loc.toString(qerr, 'e', 4);
+
+        if(isFrequency()){
+            uint countToGo = movAvg->prepend(val);
+
+            if(movAvg->isBufferFull()){
+                avg = movAvg->getAverage();
+                QString strAvg = loc.toString(avg, 'e', 4);
+                cntWindow->getDispChan1()->displayAvgString(strAvg);
+                if (config->error == ErrorType::AVERAGE){
+                    qerr = qerr / movAvg->getBufferSize();
+                    strQerr = loc.toString(qerr, 'e', 4);
+                }
+            }else {
+                double time = countToGo * config->gateTime;
+                time = (config->gateTime >= 5000) ? time / 1000 : time / 1000 + 1;
+                QString strTime = loc.toString(time, ' ', 0);
+                cntWindow->getDispChan1()->displayAvgString("HOLd " + strTime + " Sec");
+                if(config->error == ErrorType::AVERAGE){
+                    strQerr = " ";
+                    strTerr = " ";
+                }
+            }
+
+        }else if(!isFrequency()){
+            uint countToGo = movAvg->prepend(1/val);
+
+            if(movAvg->isBufferFull()){
+                avg = 1 / movAvg->getAverage();
+                QString strAvg = loc.toString(avg, 'e');
+                cntWindow->getDispChan1()->displayAvgString(strAvg);
+                if (config->error == ErrorType::AVERAGE){
+                    qerr = 1 / (avg - movAvg->getBufferSize()) - 1 / avg;
+                    strQerr = loc.toString(qerr, 'e', 4);
+                }
+            }else {
+                double time = countToGo * config->gateTime;
+                time = (config->gateTime >= 5000) ? time / 1000 : time / 1000 + 1;
+                QString strTime = loc.toString(time, ' ', 0);
+                cntWindow->getDispChan1()->displayAvgString("HOLd " + strTime + " Sec");
+                if(config->error == ErrorType::AVERAGE){
+                    strQerr = " ";
+                    strTerr = " ";
+                }
+            }
         }
-        displayValue = locale.toString(displayQerror, 'e', 4);
-        cntWindow->getDisplayChannel1()->displayQuantErrNumber(displayValue);
-        displayValue = locale.toString(displayTerror, 'e', 4);
-        cntWindow->getDisplayChannel1()->displayTimebaseErrNumber(displayValue);
+
+        strVal = loc.toString(val, ' ', 4);
+        cntWindow->getDispChan1()->displayString(strVal);
+        cntWindow->getDispChan1()->displayQerrString(strQerr);
+        cntWindow->getDispChan1()->displayTerrString(strTerr);
 
     }else if(dataHeader=="IC1D"||dataHeader=="IC2D"){
+
         if(dataHeader=="IC1D"){
-            displayValue = locale.toString(displayData, ' ', 6);
-            cntWindow->getDisplayChannel1()->displayNumber(displayValue);
+            strVal = loc.toString(val, ' ', 6);
+            cntWindow->getDispChan1()->displayString(strVal);
         }else {
-            displayValue = locale.toString(displayData, ' ', 6);
-            cntWindow->getDisplayChannel2()->displayNumber(displayValue);
+            strVal = loc.toString(val, ' ', 6);
+            cntWindow->getDispChan2()->displayString(strVal);
         }
 
     }else if(dataHeader=="REFD"){
@@ -106,15 +154,37 @@ void Counter::switchQuantityCallback(int index){
 void Counter::switchGateTimeCallback(int index){
     if(index == 0){
         comm->write(cmd->COUNTER, cmd->COUNTER_GATE, cmd->GATE_TIME_100M);
+        config->gateTime = 100;
     }else if(index == 1){
         comm->write(cmd->COUNTER, cmd->COUNTER_GATE, cmd->GATE_TIME_500M);
+        config->gateTime = 500;
     }else if(index == 2){
         comm->write(cmd->COUNTER, cmd->COUNTER_GATE, cmd->GATE_TIME_1S);
+        config->gateTime = 1000;
     }else if(index == 3){
         comm->write(cmd->COUNTER, cmd->COUNTER_GATE, cmd->GATE_TIME_5S);
+        config->gateTime = 5000;
     }else if(index == 4){
         comm->write(cmd->COUNTER, cmd->COUNTER_GATE, cmd->GATE_TIME_10S);
+        config->gateTime = 10000;
     }
+}
+
+void Counter::switchErrorAvgCallback(int index){
+    if(index == 0){
+        config->error = ErrorType::SIMPLE;
+    }else if(index == 1){
+        config->error = ErrorType::AVERAGE;
+    }
+}
+
+void Counter::dialAvgChangedCallback(float val){
+    movAvg->setBufferSize(qCeil(val));
+}
+
+bool Counter::isFrequency(){
+    bool isFrequency = (config->quantity == CounterQuantity::FREQUENCY) ? true : false;
+    return isFrequency;
 }
 
 void Counter::writeConfiguration(){

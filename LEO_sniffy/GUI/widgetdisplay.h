@@ -22,17 +22,17 @@ public:
     void setUnitsStyle(QString &unitsStyleSheet);
     void setAvgStyle(QString &avgStyleSheet);
     void setErrStyle(QString &errStyleSheet);
-    void setQuantErrStyle(QString &qerrStyleSheet);
-    void setTimebaseErrStyle(QString &terrStyleSheet);
+    void setQerrStyle(QString &qerrStyleSheet);
+    void setTerrStyle(QString &terrStyleSheet);
 
     void displayNumber(double number);
-    void displayNumber(const QString &string);
+    void displayString(const QString &string);
     void displayAvgNumber(double number);
-    void displayAvgNumber(const QString &string);
-    void displayQuantErrNumber(double number);
-    void displayQuantErrNumber(const QString &string);
-    void displayTimebaseErrNumber(double number);
-    void displayTimebaseErrNumber(const QString &string);
+    void displayAvgString(const QString &string);
+    void displayQerrNumber(double number);
+    void displayQerrString(const QString &string);
+    void displayTerrNumber(double number);
+    void displayTerrString(const QString &string);
 
     void configLabel(int labelNumber, const QString text, QString color, bool visible);
     QString getLabelText(int labelNumber);

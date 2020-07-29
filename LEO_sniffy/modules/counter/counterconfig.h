@@ -11,11 +11,11 @@ public:
     explicit CounterConfig(QObject *parent = nullptr);
 
     CounterQuantity quantity = CounterQuantity::FREQUENCY;
+    ErrorType error = ErrorType::SIMPLE;
 
     /* Direct Frequency measurement (High Frequency) */
-    int gateTime = 100; // ms
-    int averaging = 2;
-    int autoInputPsc = 1;
+    uint gateTime = 100; // ms
+    //int autoInputPsc = 1;
 
     /* Reciprocal Frequency measurement (Low Frequency) */
 

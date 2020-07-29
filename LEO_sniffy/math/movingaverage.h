@@ -15,6 +15,7 @@ public:
     uint setBufferSize(uint buffSize);
     uint getBufferSize();
     bool isBufferFull();
+    void clearBuffer();
 
 private:
     QList<double> buffer;

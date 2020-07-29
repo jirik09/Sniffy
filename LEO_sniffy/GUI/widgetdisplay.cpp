@@ -38,11 +38,11 @@ void WidgetDisplay::setErrStyle(QString &errStyleSheet){
     ui->styleErr->setStyleSheet(errStyleSheet);
 }
 
-void WidgetDisplay::setQuantErrStyle(QString &qerrStyleSheet){
+void WidgetDisplay::setQerrStyle(QString &qerrStyleSheet){
     ui->styleQerr->setStyleSheet(qerrStyleSheet);
 }
 
-void WidgetDisplay::setTimebaseErrStyle(QString &terrStyleSheet){
+void WidgetDisplay::setTerrStyle(QString &terrStyleSheet){
     ui->styleTerr->setStyleSheet(terrStyleSheet);
 }
 
@@ -50,7 +50,7 @@ void WidgetDisplay::displayNumber(double number){
     ui->lcdNumber->display(number);
 }
 
-void WidgetDisplay::displayNumber(const QString &string){
+void WidgetDisplay::displayString(const QString &string){
     ui->lcdNumber->display(string);
 }
 
@@ -58,23 +58,23 @@ void WidgetDisplay::displayAvgNumber(double number){
     ui->lcdNumber_avg->display(number);
 }
 
-void WidgetDisplay::displayAvgNumber(const QString &string){
+void WidgetDisplay::displayAvgString(const QString &string){
     ui->lcdNumber_avg->display(string);
 }
 
-void WidgetDisplay::displayQuantErrNumber(double number){
+void WidgetDisplay::displayQerrNumber(double number){
     ui->lcdNumber_qerr->display(number);
 }
 
-void WidgetDisplay::displayQuantErrNumber(const QString &string){
+void WidgetDisplay::displayQerrString(const QString &string){
     ui->lcdNumber_qerr->display(string);
 }
 
-void WidgetDisplay::displayTimebaseErrNumber(double number){
+void WidgetDisplay::displayTerrNumber(double number){
     ui->lcdNumber_terr->display(number);
 }
 
-void WidgetDisplay::displayTimebaseErrNumber(const QString &string){
+void WidgetDisplay::displayTerrString(const QString &string){
     ui->lcdNumber_terr->display(string);
 }
 

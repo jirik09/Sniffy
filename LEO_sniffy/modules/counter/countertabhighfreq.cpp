@@ -1,4 +1,5 @@
 #include "countertabhighfreq.h"
+#include "counterdefs.h"
 
 CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent) : QObject(parent)
 {
@@ -19,7 +20,7 @@ CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent
     destination->addWidget(buttonsErrorSwitch);
 
     dialAveraging = new WidgetDialRange(parent ,"Averaging");
-    dialAveraging->setRange(2, 200, "Samples", 1, 1, 2);
+    dialAveraging->setRange(2, AVERAGE_RANGE, "Samples", 1, 100, 2, false);
     dialAveraging->hideUnitSelection();
     destination->addWidget(dialAveraging);
 
@@ -34,11 +35,11 @@ CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent
     buttonsGateTime->setText("10.0", 4);
     destination->addWidget(buttonsGateTime);
 
-    WidgetSeparator *separatorAutoPrescaler = new WidgetSeparator(parent,"Automatic input prescaler");
-    destination->addWidget(separatorAutoPrescaler);
+//    WidgetSeparator *separatorAutoPrescaler = new WidgetSeparator(parent,"Automatic input prescaler");
+//    destination->addWidget(separatorAutoPrescaler);
 
-    labelAutoInputPrescaler = new QLabel(parent);
-    labelAutoInputPrescaler->setNum(1);
-    labelAutoInputPrescaler->setAlignment(Qt::AlignCenter);
-    destination->addWidget(labelAutoInputPrescaler);
+//    labelAutoInputPrescaler = new QLabel(parent);
+//    labelAutoInputPrescaler->setNum(1);
+//    labelAutoInputPrescaler->setAlignment(Qt::AlignCenter);
+//    destination->addWidget(labelAutoInputPrescaler);
 }

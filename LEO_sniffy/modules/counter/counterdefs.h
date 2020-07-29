@@ -7,4 +7,12 @@ enum class CounterQuantity
   PERIOD,
 };
 
+enum class ErrorType
+{
+  SIMPLE = 0,
+  AVERAGE,
+};
+
+static const int AVERAGE_RANGE = 200;
+
 #endif // COUNTERDEFS_H

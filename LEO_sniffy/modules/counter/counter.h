@@ -5,12 +5,14 @@
 #include <QDebug>
 #include <QDataStream>
 #include <QPointF>
+#include <QtMath>
 
 #include "counterwindow.h"
 #include "counterconfig.h"
 #include "counterspec.h"
 #include "communication/commands.h"
 #include "communication/comms.h"
+#include "math/movingaverage.h"
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
@@ -32,8 +34,13 @@ private:
     CounterConfig *config;
     CounterSpec *specification;
 
+    MovingAverage *movAvg;
+
     void startCounting();
     void stopCounting();
+
+    /* High Frequency Counter */
+    bool isFrequency();
 
 signals:
 
@@ -47,6 +54,8 @@ private slots:
     void switchCounterModeCallback(int index);
     void switchGateTimeCallback(int index);
     void switchQuantityCallback(int index);
+    void switchErrorAvgCallback(int index);
+    void dialAvgChangedCallback(float val);
 };
 
 #endif // COUNTER_H

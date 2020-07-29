@@ -496,13 +496,19 @@ background-color: rgb(48, 48, 48);
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
+                <verstretch>10</verstretch>
                </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>10</width>
+                <height>0</height>
+               </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>35</width>
-                <height>35</height>
+                <width>25</width>
+                <height>25</height>
                </size>
               </property>
              </widget>
@@ -537,13 +543,19 @@ background-color: rgb(48, 48, 48);
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
+                <verstretch>10</verstretch>
                </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>10</width>
+                <height>0</height>
+               </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>35</width>
-                <height>35</height>
+                <width>25</width>
+                <height>25</height>
                </size>
               </property>
              </widget>

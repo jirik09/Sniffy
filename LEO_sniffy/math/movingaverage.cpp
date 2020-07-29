@@ -27,10 +27,9 @@ uint MovingAverage::prepend(double newValue){
  */
 double MovingAverage::getAverage(){
     if(isBufferFull()){
-        QListIterator<double> i(buffer);
         double sum = 0;
-        while (i.hasNext()){
-            sum += buffer.at(i.next());
+        for (uint i = 0; i < buffSize; i++) {
+            sum += buffer.at(i);
         }
         double average = sum / buffSize;
         return average;
@@ -84,3 +83,13 @@ void MovingAverage::removeItems(uint sampleCount){
     }
 }
 
+/*
+ * @brief Delete all elements from the buffer
+ */
+void MovingAverage::clearBuffer(){
+    removeItems((uint)buffer.count());
+}
+
+MovingAverage::~MovingAverage(){
+
+}

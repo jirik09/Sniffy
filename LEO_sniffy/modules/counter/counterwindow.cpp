@@ -49,13 +49,18 @@ void CounterWindow::createTwoDisplays(void){
 }
 
 WidgetDisplay *CounterWindow::createDisplay(void){
-    QString unitsStyleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
-    WidgetDisplay *display = new WidgetDisplay("Frequency", unitsStyleSheet, true, this);
-    QString avgStyleSheet = "image: url(:/graphics/graphics/units_avg.png); border: none;";
-    display->setAvgStyle(avgStyleSheet);
-    QString errStyleSheet = "image: url(:/graphics/graphics/units_err.png); border: none;";
-    display->setErrStyle(errStyleSheet);
-    display->displayNumber("0.00");
+    QString styleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
+    WidgetDisplay *display = new WidgetDisplay("Frequency", styleSheet, true, this);
+
+    styleSheet = "image: url(:/graphics/graphics/units_avg.png); border: none;";
+    display->setAvgStyle(styleSheet);
+    styleSheet = "image: url(:/graphics/graphics/units_err.png); border: none;";
+    display->setErrStyle(styleSheet);
+    styleSheet = "image: url(:/graphics/graphics/sign_pm.png); border: none;";
+    display->setQerrStyle(styleSheet);
+    display->setTerrStyle(styleSheet);
+
+    display->displayString("0.00");
 
     return display;
 }
@@ -66,11 +71,11 @@ void CounterWindow::configureDisplays(void){
     displayChannel2->hide();
 }
 
-WidgetDisplay *CounterWindow::getDisplayChannel1(){
+WidgetDisplay *CounterWindow::getDispChan1(){
     return displayChannel1;
 }
 
-WidgetDisplay *CounterWindow::getDisplayChannel2(){
+WidgetDisplay *CounterWindow::getDispChan2(){
     return displayChannel2;
 }
 
