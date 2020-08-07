@@ -6,6 +6,7 @@
 #include <QString>
 
 #include "widgetlabel.h"
+#include "../graphics/colors.h"
 
 namespace Ui {
 class WidgetDisplay;
@@ -34,18 +35,25 @@ public:
     void displayTerrNumber(double number);
     void displayTerrString(const QString &string);
 
-    void configLabel(int labelNumber, const QString text, QString color, bool visible);
+    void changeAvgColor(QColor color);
+
+    void configLabel(int labelNumber, const QString text, QString colorStyle, bool visible);
     QString getLabelText(int labelNumber);
-    void setLabelText(int labelNumber, const QString text);    
+    void setLabelText(int labelNumber, const QString text);
+    void hideLabel(int labelNumber);
+    void showLabel(int labelNumber);
+    void drawFlagLabel(int labelNumber);
 
     void hideProgressBar();
     void showProgressBar();
-    void hideLabel(int labelNumber);
-    void showLabel(int labelNumber);
+    void setRangeProgressBar(int min, int max);
+    void updateProgressBar(int value);
 
 private:
     Ui::WidgetDisplay *ui;
     QList<QLabel*> labelList;
+    QPalette palette;
+    int drawFlag = 0;
 };
 
 #endif // WIDGETDISPLAY_H

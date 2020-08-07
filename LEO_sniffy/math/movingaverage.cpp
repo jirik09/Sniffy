@@ -26,16 +26,11 @@ uint MovingAverage::prepend(double newValue){
  * @retval Returns average. If buffer not full -100 is returned.
  */
 double MovingAverage::getAverage(){
-    if(isBufferFull()){
-        double sum = 0;
-        for (uint i = 0; i < buffSize; i++) {
-            sum += buffer.at(i);
-        }
-        double average = sum / buffSize;
-        return average;
-    }else {
-        return -100;
+    double sum = 0;
+    for (uint i = 0; i < buffSize; i++) {
+        sum += buffer.at(i);
     }
+    return (sum / buffSize);
 }
 
 /*
@@ -64,11 +59,14 @@ uint MovingAverage::getBufferSize(){
  * @retval TRUE / FALSE
  */
 bool MovingAverage::isBufferFull(){
-    if((uint)buffer.count() == buffSize){
-        return true;
-    }else {
-        return false;
-    }
+     return ((uint)buffer.count() == buffSize) ? true : false;
+}
+
+/*
+ * @retval Remaining sample count to fill the buffer
+ */
+uint MovingAverage::getSampleCountToFillBuff(){
+    return buffSize - buffer.count();
 }
 
 /*

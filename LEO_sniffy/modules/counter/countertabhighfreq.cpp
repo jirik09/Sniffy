@@ -1,5 +1,4 @@
 #include "countertabhighfreq.h"
-#include "counterdefs.h"
 
 CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent) : QObject(parent)
 {

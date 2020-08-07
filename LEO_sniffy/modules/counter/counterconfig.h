@@ -10,12 +10,16 @@ class CounterConfig : public QObject
 public:
     explicit CounterConfig(QObject *parent = nullptr);
 
-    CounterQuantity quantity = CounterQuantity::FREQUENCY;
-    ErrorType error = ErrorType::SIMPLE;
+    CounterMode mode = CounterMode::HIGH_FREQUENCY;
 
     /* Direct Frequency measurement (High Frequency) */
+    CounterQuantity quantity = CounterQuantity::FREQUENCY;
+    QuantitySwitched quantState = QuantitySwitched::NO;
+    GateTime gateTimeSel = GateTime::GATE_TIME_100M;
+    ErrorType error = ErrorType::SIMPLE;
+    HoldOnState hold = HoldOnState::OFF;
+
     uint gateTime = 100; // ms
-    //int autoInputPsc = 1;
 
     /* Reciprocal Frequency measurement (Low Frequency) */
 

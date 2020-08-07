@@ -12,6 +12,8 @@
 #include "../../GUI/widgetbuttons.h"
 #include "../../GUI/widgetlabel.h"
 
+#include "counterdefs.h"
+
 class CounterTabHighFreq : public QObject
 {
     Q_OBJECT

@@ -124,9 +124,7 @@ background-color: rgb(38, 38, 38);
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">QObject{
-background-color: rgb(48, 48, 48);
-}</string>
+            <string notr="true"/>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_labelArea">
             <property name="spacing">
@@ -181,7 +179,7 @@ background-color: rgb(48, 48, 48);
                <string>TextLabel</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -225,7 +223,7 @@ background-color: rgb(48, 48, 48);
                <string>TextLabel</string>
               </property>
               <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
@@ -272,9 +270,7 @@ background-color: rgb(48, 48, 48);
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">QObject{
-background-color: rgb(48, 48, 48);
-}</string>
+            <string notr="true"/>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_avg">
             <property name="spacing">
@@ -310,7 +306,7 @@ background-color: rgb(48, 48, 48);
                <enum>QFrame::NoFrame</enum>
               </property>
               <property name="digitCount">
-               <number>14</number>
+               <number>16</number>
               </property>
               <property name="segmentStyle">
                <enum>QLCDNumber::Flat</enum>
@@ -334,7 +330,7 @@ background-color: rgb(48, 48, 48);
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>35</height>
+                <height>30</height>
                </size>
               </property>
              </widget>
@@ -357,9 +353,7 @@ background-color: rgb(48, 48, 48);
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">QObject{
-background-color: rgb(48, 48, 48);
-}</string>
+            <string notr="true"/>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_valueAndUnit">
             <property name="spacing">
@@ -444,8 +438,8 @@ color: rgb(214, 214, 214);
               </property>
               <property name="maximumSize">
                <size>
-                <width>120</width>
-                <height>80</height>
+                <width>70</width>
+                <height>50</height>
                </size>
               </property>
               <property name="styleSheet">
@@ -471,9 +465,7 @@ color: rgb(214, 214, 214);
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">QObject{
-background-color: rgb(48, 48, 48);
-}</string>
+            <string notr="true"/>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_err">
             <property name="spacing">
@@ -507,8 +499,8 @@ background-color: rgb(48, 48, 48);
               </property>
               <property name="maximumSize">
                <size>
-                <width>25</width>
-                <height>25</height>
+                <width>20</width>
+                <height>22</height>
                </size>
               </property>
              </widget>
@@ -554,8 +546,8 @@ background-color: rgb(48, 48, 48);
               </property>
               <property name="maximumSize">
                <size>
-                <width>25</width>
-                <height>25</height>
+                <width>20</width>
+                <height>22</height>
                </size>
               </property>
              </widget>
@@ -592,14 +584,14 @@ background-color: rgb(48, 48, 48);
               </property>
               <property name="minimumSize">
                <size>
-                <width>15</width>
+                <width>30</width>
                 <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>120</width>
-                <height>35</height>
+                <height>30</height>
                </size>
               </property>
              </widget>
@@ -610,7 +602,7 @@ background-color: rgb(48, 48, 48);
          <item>
           <widget class="QWidget" name="horizontalWidget_bar" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -640,9 +632,7 @@ background-color: rgb(48, 48, 48);
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">QObject{
-background-color: rgb(48, 48, 48);
-}</string>
+            <string notr="true"/>
            </property>
            <layout class="QHBoxLayout" name="horizontalLayout_bar">
             <property name="spacing">

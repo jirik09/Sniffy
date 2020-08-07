@@ -7,13 +7,13 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
     channelButtons = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Channel selection");
     destination->addWidget(channelButtons);
     channelButtons->setText("CH1",0);
-    channelButtons->setColor(BUTTON_COLOR_ORANGE,0);
+    channelButtons->setColor(BCKGRND_COLOR_ORANGE,0);
     channelButtons->setText("CH2",1);
-    channelButtons->setColor(BUTTON_COLOR_BLUE,1);
+    channelButtons->setColor(BCKGRND_COLOR_BLUE,1);
     channelButtons->setText("CH3",2);
-    channelButtons->setColor(BUTTON_COLOR_GREEN,2);
+    channelButtons->setColor(BCKGRND_COLOR_GREEN,2);
     channelButtons->setText("CH4",3);
-    channelButtons->setColor(BUTTON_COLOR_PURPLE,3);
+    channelButtons->setColor(BCKGRND_COLOR_PURPLE,3);
 
     destination->addWidget(new WidgetSeparator(parent,"Voltage measurement"));
 
@@ -75,24 +75,24 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
     channelButtonPhaseA = new WidgetButtons(parent,4,ButtonTypes::RADIO,"1st channel");
     destination->addWidget(channelButtonPhaseA);
     channelButtonPhaseA->setText("CH1",0);
-    channelButtonPhaseA->setColor(BUTTON_COLOR_ORANGE,0);
+    channelButtonPhaseA->setColor(BCKGRND_COLOR_ORANGE,0);
     channelButtonPhaseA->setText("CH2",1);
-    channelButtonPhaseA->setColor(BUTTON_COLOR_BLUE,1);
+    channelButtonPhaseA->setColor(BCKGRND_COLOR_BLUE,1);
     channelButtonPhaseA->setText("CH3",2);
-    channelButtonPhaseA->setColor(BUTTON_COLOR_GREEN,2);
+    channelButtonPhaseA->setColor(BCKGRND_COLOR_GREEN,2);
     channelButtonPhaseA->setText("CH4",3);
-    channelButtonPhaseA->setColor(BUTTON_COLOR_PURPLE,3);
+    channelButtonPhaseA->setColor(BCKGRND_COLOR_PURPLE,3);
 
     channelButtonPhaseB = new WidgetButtons(parent,4,ButtonTypes::RADIO,"2nd channel");
     destination->addWidget(channelButtonPhaseB);
     channelButtonPhaseB->setText("CH1",0);
-    channelButtonPhaseB->setColor(BUTTON_COLOR_ORANGE,0);
+    channelButtonPhaseB->setColor(BCKGRND_COLOR_ORANGE,0);
     channelButtonPhaseB->setText("CH2",1);
-    channelButtonPhaseB->setColor(BUTTON_COLOR_BLUE,1);
+    channelButtonPhaseB->setColor(BCKGRND_COLOR_BLUE,1);
     channelButtonPhaseB->setText("CH3",2);
-    channelButtonPhaseB->setColor(BUTTON_COLOR_GREEN,2);
+    channelButtonPhaseB->setColor(BCKGRND_COLOR_GREEN,2);
     channelButtonPhaseB->setText("CH4",3);
-    channelButtonPhaseB->setColor(BUTTON_COLOR_PURPLE,3);
+    channelButtonPhaseB->setColor(BCKGRND_COLOR_PURPLE,3);
     channelButtonPhaseB->setChecked(true,1);
 
 
@@ -191,13 +191,13 @@ void PanelMeasurement::clearClicked(){
 void PanelMeasurement::setMeasButtonsColor(int index){
     foreach(WidgetButtons* but, measButtons){
         if(index==0)
-            but->setColor(QString::fromUtf8(BUTTON_COLOR_ORANGE),0);
+            but->setColor(QString::fromUtf8(BCKGRND_COLOR_ORANGE),0);
         if(index==1)
-            but->setColor(QString::fromUtf8(BUTTON_COLOR_BLUE),0);
+            but->setColor(QString::fromUtf8(BCKGRND_COLOR_BLUE),0);
         if(index==2)
-            but->setColor(QString::fromUtf8(BUTTON_COLOR_GREEN),0);
+            but->setColor(QString::fromUtf8(BCKGRND_COLOR_GREEN),0);
         if(index==3)
-            but->setColor(QString::fromUtf8(BUTTON_COLOR_PURPLE),0);
+            but->setColor(QString::fromUtf8(BCKGRND_COLOR_PURPLE),0);
     }
 
 }

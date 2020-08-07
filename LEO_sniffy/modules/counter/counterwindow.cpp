@@ -26,12 +26,12 @@ CounterWindow::~CounterWindow()
 }
 
 void CounterWindow::createCounterTabs(void){
-    tabs = new widgetTab(ui->widget_settings,4);
+    tabs = new widgetTab(ui->widget_settings, 4);
     ui->verticalLayout_settings->addWidget(tabs);
-    tabs->setText("High Freq",0);
-    tabs->setText("Low Freq",1);
-    tabs->setText("Freq Ratio",2);
-    tabs->setText("Intervals",3);
+    tabs->setText("High Freq", 0);
+    tabs->setText("Low Freq", 1);
+    tabs->setText("Freq Ratio", 2);
+    tabs->setText("Intervals", 3);
 }
 
 void CounterWindow::configureCounterTabs(void){
@@ -40,17 +40,17 @@ void CounterWindow::configureCounterTabs(void){
 }
 
 void CounterWindow::createTwoDisplays(void){
-    displayChannel1 = createDisplay();
-    displayChannel1->setContentsMargins(5, 5, 5, 5);
-    ui->verticalLayout_display->addWidget(displayChannel1);
-    displayChannel2 = createDisplay();
-    displayChannel2->setContentsMargins(5, 0, 5, 5);
-    ui->verticalLayout_display->addWidget(displayChannel2);
+    displayCh1 = createDisplay();
+    displayCh1->setContentsMargins(5, 5, 5, 5);
+    ui->verticalLayout_display->addWidget(displayCh1);
+    displayCh2 = createDisplay();
+    displayCh2->setContentsMargins(5, 0, 5, 5);
+    ui->verticalLayout_display->addWidget(displayCh2);
 }
 
 WidgetDisplay *CounterWindow::createDisplay(void){
     QString styleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
-    WidgetDisplay *display = new WidgetDisplay("Frequency", styleSheet, true, this);
+    WidgetDisplay *display = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, this);
 
     styleSheet = "image: url(:/graphics/graphics/units_avg.png); border: none;";
     display->setAvgStyle(styleSheet);
@@ -65,52 +65,62 @@ WidgetDisplay *CounterWindow::createDisplay(void){
     return display;
 }
 
-void CounterWindow::configureDisplays(void){
-    displayChannel1->configLabel(4, "CH1", "green", false);
-    displayChannel2->configLabel(4, "CH2", "violet", true);
-    displayChannel2->hide();
-}
+void CounterWindow::configureDisplays(void){    
+    displayCh1->configLabel(LABELNUM_QUAN, LITERAL_FREQUENCY, TEXT_COLOR_GREY, true);
+    displayCh1->configLabel(LABELNUM_CHAN, "CH1", TEXT_COLOR_GREY, true);
+    displayCh1->configLabel(LABELNUM_FLAG, "    ", TEXT_COLOR_BLUE, true);
 
-WidgetDisplay *CounterWindow::getDispChan1(){
-    return displayChannel1;
-}
-
-WidgetDisplay *CounterWindow::getDispChan2(){
-    return displayChannel2;
+    displayCh1->configLabel(LABELNUM_QUAN, LITERAL_FREQUENCY, TEXT_COLOR_GREY, true);
+    displayCh2->configLabel(LABELNUM_CHAN, "CH2", TEXT_COLOR_GREY, true);
+    displayCh2->configLabel(LABELNUM_FLAG, "    ", TEXT_COLOR_BLUE, true);
+    displayCh2->hide();
 }
 
 void CounterWindow::switchCounterModeCallback(int index){
     if(index == 1){
-        displayChannel2->show();
-        displayChannel1->showLabel(4);
+        displayCh2->show();
     }else {
-        displayChannel2->hide();
-        displayChannel1->hideLabel(4);
+        displayCh2->hide();
     }
 }
 
 void CounterWindow::switchQuantityCallback(int index){
     QString unitsStyleSheet;
     if(index == 0){
-        displayChannel1->setLabelText(0, "Frequency");
+        displayCh1->setLabelText(LABELNUM_QUAN, LITERAL_FREQUENCY);
         unitsStyleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
-        displayChannel1->setUnitsStyle(unitsStyleSheet);
     }else {
-        displayChannel1->setLabelText(0, "Period");
+        displayCh1->setLabelText(LABELNUM_QUAN, LITERAL_PERIOD);
         unitsStyleSheet = "image: url(:/graphics/graphics/units_sec.png); border: none;";
-        displayChannel1->setUnitsStyle(unitsStyleSheet);
     }
+    displayCh1->setUnitsStyle(unitsStyleSheet);
 }
 
 void CounterWindow::switchErrorAvgCallback(int index){
     QString unitsStyleSheet;
     if(index == 0){
         unitsStyleSheet = "image: url(:/graphics/graphics/units_err.png); border: none;";
-        displayChannel1->setErrStyle(unitsStyleSheet);
     }else {
         unitsStyleSheet = "image: url(:/graphics/graphics/units_erravg.png); border: none;";
-        displayChannel1->setErrStyle(unitsStyleSheet);
+    }
+    displayCh1->setErrStyle(unitsStyleSheet);
+}
+
+void CounterWindow::setColorHoldOn(QColor color){
+    displayCh1->changeAvgColor(color);
+}
+
+void CounterWindow::displayHoldOnFlag(bool visible){
+    if(visible){
+        displayCh1->setLabelText(LABELNUM_HOLD, "Hold on");
+    }else {
+        displayCh1->setLabelText(LABELNUM_HOLD, "");
     }
 }
 
-
+void CounterWindow::specReceived(CounterSpec *spec){
+    displayCh1->configLabel(LABELNUM_PINS, spec->pins.hf_pin, TEXT_COLOR_GREY, true);
+    displayCh1->configLabel(LABELNUM_HOLD, "", TEXT_COLOR_ORANGE, true);
+    displayCh1->setRangeProgressBar(spec->hf_lowLmt_Tg100ms, spec->hf_uppLmt);
+    displayCh2->setRangeProgressBar(spec->lf_lowLmt, spec->lf_uppLmt);
+}

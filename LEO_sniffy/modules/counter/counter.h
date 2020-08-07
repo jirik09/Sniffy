@@ -1,15 +1,12 @@
 #ifndef COUNTER_H
 #define COUNTER_H
 
-#include <QObject>
 #include <QDebug>
-#include <QDataStream>
 #include <QPointF>
 #include <QtMath>
 
 #include "counterwindow.h"
 #include "counterconfig.h"
-#include "counterspec.h"
 #include "communication/commands.h"
 #include "communication/comms.h"
 #include "math/movingaverage.h"
@@ -32,17 +29,26 @@ public:
 private:
     CounterWindow *cntWindow;
     CounterConfig *config;
-    CounterSpec *specification;
+    CounterSpec *spec;
 
-    MovingAverage *movAvg;
+    QLocale loc;
 
     void startCounting();
     void stopCounting();
 
+    QString formatNumber(double valToFormat, double error);
+
     /* High Frequency Counter */
-    bool isFrequency();
+    MovingAverage *movAvg;
+    QString strQerr, strTerr, avgQerr;
+
+    QString formatHoldOn(uint countToGo, uint additionTime);
+    void displayErrors(WidgetDisplay *display);
+    void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);
+    void clearDisplay(WidgetDisplay *display);
 
 signals:
+    void specReceived();
 
 private slots:
     void parseData(QByteArray);

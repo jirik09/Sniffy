@@ -7,6 +7,8 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
 {
     ui->setupUi(this);
 
+    palette = ui->lcdNumber_avg->palette();
+
     labelList.append(ui->label_0);
     labelList.append(ui->label_1);
     labelList.append(ui->label_2);
@@ -78,6 +80,11 @@ void WidgetDisplay::displayTerrString(const QString &string){
     ui->lcdNumber_terr->display(string);
 }
 
+void WidgetDisplay::changeAvgColor(QColor color){
+    palette.setColor(QPalette::WindowText, color);
+    ui->lcdNumber_avg->setPalette(palette);
+}
+
 void WidgetDisplay::hideProgressBar(){
     ui->progressBar->hide();
 }
@@ -86,24 +93,18 @@ void WidgetDisplay::showProgressBar(){
     ui->progressBar->show();
 }
 
-void WidgetDisplay::configLabel(int labelNumber, QString text, const QString color, bool visible){
+void WidgetDisplay::setRangeProgressBar(int min, int max){
+    ui->progressBar->setRange(min, max);
+}
+
+void WidgetDisplay::updateProgressBar(int value){
+    ui->progressBar->setValue(value);
+}
+
+void WidgetDisplay::configLabel(int labelNumber, QString text, QString colorStyle, bool isVisible){
     labelList.at(labelNumber)->setText(text);
-    QString styleSheet;
-    if (color == "blue"){
-        styleSheet = "QLabel { color: rgb(24, 154, 224); }";
-    }else if (color == "orange") {
-        styleSheet = "QLabel { color: rgb(224, 154, 24); }";
-    }else if (color == "green") {
-        styleSheet = "QLabel { color: rgb(54, 154, 24); }";
-    }else if (color == "violet") {
-        styleSheet = "QLabel { color: rgb(204, 24, 224); }";
-    }else if (color == "white") {
-        styleSheet = "QLabel { color: rgb(214, 214, 214); }";
-    }else if (color == "grey") {
-        styleSheet = "QLabel { color: rgb(124, 124, 124); }";
-    }
-    labelList.at(labelNumber)->setStyleSheet(styleSheet);
-    (visible == true) ? labelList.at(labelNumber)->show() : labelList.at(labelNumber)->hide();
+    labelList.at(labelNumber)->setStyleSheet(colorStyle);
+    isVisible ? labelList.at(labelNumber)->show() : labelList.at(labelNumber)->hide();
 }
 
 QString WidgetDisplay::getLabelText(int labelNumber){
@@ -122,6 +123,75 @@ void WidgetDisplay::hideLabel(int labelNumber){
 
 void WidgetDisplay::showLabel(int labelNumber){
     labelList.at(labelNumber)->show();
+}
+
+void WidgetDisplay::drawFlagLabel(int labelNumber)
+{
+    if(drawFlag == 0){
+        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+        drawFlag++;
+    }else if (drawFlag == 1) {
+        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+        drawFlag++;
+    }else if (drawFlag == 2) {
+        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+        drawFlag++;
+    }else if (drawFlag == 3) {
+        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+        drawFlag++;
+    }else if (drawFlag == 4) {
+        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--)**");
+        drawFlag++;
+    }else if (drawFlag == 5) {
+        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--)**");
+        drawFlag++;
+    }else if (drawFlag == 6) {
+        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--)**");
+        drawFlag++;
+    }else if (drawFlag == 7) {
+        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+        drawFlag = 0;
+    }
+
+    //    if(drawFlag == 0){
+    //        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+    //        drawFlag++;
+    //    }else if (drawFlag == 1) {
+    //        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(54,154,24);color:rgb(54,154,24);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+    //        drawFlag++;
+    //    }else if (drawFlag == 2) {
+    //        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(204,24,224);color:rgb(204,24,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+    //        drawFlag++;
+    //    }else if (drawFlag == 3) {
+    //        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(255,170,0);color:rgb(255,170,0);">--)**");
+    //        drawFlag = 0;
+    //    }
+
+
+    //        if(drawFlag == 0){
+    //            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+    //            drawFlag++;
+    //        }else if (drawFlag == 1) {
+    //            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+    //            drawFlag++;
+    //        }else if (drawFlag == 2) {
+    //            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+    //            drawFlag++;
+    //        }else if (drawFlag == 3) {
+    //            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--)**");
+    //            drawFlag++;
+    //        }else if (drawFlag == 4) {
+    //            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--)**");
+    //            drawFlag++;
+    //        }else if (drawFlag == 5) {
+    //            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--)**");
+    //            drawFlag = 0;
+    //        }
+
+    /* Blue - rgb(24,154,224)
+     * Darker blue - rgb(29,115,162)
+     * Dark blue - rgb(33,77,100)
+     * */
 }
 
 WidgetDisplay::~WidgetDisplay()

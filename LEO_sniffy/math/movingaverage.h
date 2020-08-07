@@ -15,6 +15,7 @@ public:
     uint setBufferSize(uint buffSize);
     uint getBufferSize();
     bool isBufferFull();
+    uint getSampleCountToFillBuff();
     void clearBuffer();
 
 private:
