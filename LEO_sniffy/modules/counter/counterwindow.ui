@@ -9,26 +9,26 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>742</width>
-    <height>289</height>
+    <width>782</width>
+    <height>180</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
   <property name="minimumSize">
    <size>
-    <width>0</width>
-    <height>0</height>
+    <width>400</width>
+    <height>160</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>16777215</width>
-    <height>16777215</height>
+    <height>400</height>
    </size>
   </property>
   <property name="font">
@@ -43,12 +43,12 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget{
-background-color: rgb(58, 58, 58);
-}
-</string>
+   <string notr="true"/>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -90,16 +90,22 @@ background-color: rgb(58, 58, 58);
 }
 </string>
      </property>
+     <property name="lineWidth">
+      <number>1</number>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="opaqueResize">
+      <bool>true</bool>
      </property>
      <property name="handleWidth">
       <number>3</number>
      </property>
      <widget class="QWidget" name="widget_display" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+        <horstretch>150</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
@@ -114,7 +120,7 @@ background-color: rgb(58, 58, 58);
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
-        <number>2</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -129,26 +135,30 @@ background-color: rgb(58, 58, 58);
         <number>0</number>
        </property>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_display"/>
+        <layout class="QVBoxLayout" name="verticalLayout_display">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+        </layout>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="widget_settings" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>255</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="minimumSize">
        <size>
-        <width>400</width>
+        <width>150</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>16777215</width>
+        <width>330</width>
         <height>16777215</height>
        </size>
       </property>
@@ -157,7 +167,7 @@ background-color: rgb(58, 58, 58);
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="spacing">
-        <number>2</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -174,7 +184,7 @@ background-color: rgb(58, 58, 58);
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_settings">
          <property name="spacing">
-          <number>3</number>
+          <number>0</number>
          </property>
         </layout>
        </item>

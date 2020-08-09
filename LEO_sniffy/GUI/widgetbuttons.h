@@ -45,7 +45,7 @@ public:
 
 private:
     Ui::WidgetButtons *ui;
-    QString buttonColors[8] = {BUTTON_COLOR_BLUE};
+    QString buttonColors[8] = {BCKGRND_COLOR_BLUE};
     ButtonTypes type = ButtonTypes::NORMAL;
 
     QList<QPushButton*> pushButtonsList;

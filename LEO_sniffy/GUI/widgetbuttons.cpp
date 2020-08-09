@@ -62,14 +62,14 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
     }
 
 
-    setColor(BUTTON_COLOR_BLUE,0);
-    setColor(BUTTON_COLOR_BLUE,1);
-    setColor(BUTTON_COLOR_BLUE,2);
-    setColor(BUTTON_COLOR_BLUE,3);
-    setColor(BUTTON_COLOR_BLUE,4);
-    setColor(BUTTON_COLOR_BLUE,5);
-    setColor(BUTTON_COLOR_BLUE,6);
-    setColor(BUTTON_COLOR_BLUE,7);
+    setColor(BCKGRND_COLOR_BLUE,0);
+    setColor(BCKGRND_COLOR_BLUE,1);
+    setColor(BCKGRND_COLOR_BLUE,2);
+    setColor(BCKGRND_COLOR_BLUE,3);
+    setColor(BCKGRND_COLOR_BLUE,4);
+    setColor(BCKGRND_COLOR_BLUE,5);
+    setColor(BCKGRND_COLOR_BLUE,6);
+    setColor(BCKGRND_COLOR_BLUE,7);
 
 
 

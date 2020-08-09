@@ -2,6 +2,7 @@
 #define COUNTERCONFIG_H
 
 #include <QObject>
+#include "counterdefs.h"
 
 class CounterConfig : public QObject
 {
@@ -9,10 +10,16 @@ class CounterConfig : public QObject
 public:
     explicit CounterConfig(QObject *parent = nullptr);
 
+    CounterMode mode = CounterMode::HIGH_FREQUENCY;
+
     /* Direct Frequency measurement (High Frequency) */
-    int gateTime = 100; // ms
-    int averaging = 2;
-    int autoInputPsc = 1;
+    CounterQuantity quantity = CounterQuantity::FREQUENCY;
+    QuantitySwitched quantState = QuantitySwitched::NO;
+    GateTime gateTimeSel = GateTime::GATE_TIME_100M;
+    ErrorType error = ErrorType::SIMPLE;
+    HoldOnState hold = HoldOnState::OFF;
+
+    uint gateTime = 100; // ms
 
     /* Reciprocal Frequency measurement (Low Frequency) */
 

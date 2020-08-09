@@ -118,14 +118,14 @@ void ScopeWindow::triggerEdgeCallback(int index){
 void ScopeWindow::triggerModeCallback(int index){
     if(index==0){
         if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-            panelSet->buttonsTriggerMode->setColor(BUTTON_COLOR_ORANGE,0);
+            panelSet->buttonsTriggerMode->setColor(BCKGRND_COLOR_ORANGE,0);
             emit triggerModeChanged(ScopeTriggerMode::TRIG_STOP);
             panelSet->buttonsTriggerMode->setText("Single",0);
             labelInfoPanel->setTriggerLabelText("");
 
         }else if(panelSet->buttonsTriggerMode->getText(0)=="Single"){
             emit triggerModeChanged(ScopeTriggerMode::TRIG_SINGLE);
-            panelSet->buttonsTriggerMode->setColor(BUTTON_COLOR_GREEN,0);
+            panelSet->buttonsTriggerMode->setColor(BCKGRND_COLOR_GREEN,0);
             panelSet->buttonsTriggerMode->setText("Stop",0);
         }
     }else if(index==1){
@@ -180,7 +180,7 @@ void ScopeWindow::updateMeasurement(QList<Measurement*> m){
 
 void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
-    panelSet->buttonsTriggerMode->setColor(BUTTON_COLOR_ORANGE,0);
+    panelSet->buttonsTriggerMode->setColor(BCKGRND_COLOR_ORANGE,0);
     labelInfoPanel->setTriggerLabelText("");
 }
 

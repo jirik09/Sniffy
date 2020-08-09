@@ -9,13 +9,13 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsChannelEnable = new WidgetButtons(parent,4,ButtonTypes::CHECKABLE);
     destination->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
-    buttonsChannelEnable->setColor(BUTTON_COLOR_ORANGE,0);
+    buttonsChannelEnable->setColor(BCKGRND_COLOR_ORANGE,0);
     buttonsChannelEnable->setText("CH2",1);
-    buttonsChannelEnable->setColor(BUTTON_COLOR_BLUE,1);
+    buttonsChannelEnable->setColor(BCKGRND_COLOR_BLUE,1);
     buttonsChannelEnable->setText("CH3",2);
-    buttonsChannelEnable->setColor(BUTTON_COLOR_GREEN,2);
+    buttonsChannelEnable->setColor(BCKGRND_COLOR_GREEN,2);
     buttonsChannelEnable->setText("CH4",3);
-    buttonsChannelEnable->setColor(BUTTON_COLOR_PURPLE,3);
+    buttonsChannelEnable->setColor(BCKGRND_COLOR_PURPLE,3);
 
     WidgetSeparator *separatorTrig = new WidgetSeparator(parent,"Trigger");
     destination->addWidget(separatorTrig);
@@ -23,7 +23,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsTriggerMode = new WidgetButtons(parent,3,ButtonTypes::RADIO,"",2);
     destination->addWidget(buttonsTriggerMode);
     buttonsTriggerMode->setText("Stop",0);
-    buttonsTriggerMode->setColor(BUTTON_COLOR_ORANGE,0);
+    buttonsTriggerMode->setColor(BCKGRND_COLOR_ORANGE,0);
     buttonsTriggerMode->setText("Normal",1);
     buttonsTriggerMode->setText("Auto",2);
 
@@ -33,10 +33,10 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsTriggerChannel->setText("CH2",1);
     buttonsTriggerChannel->setText("CH3",2);
     buttonsTriggerChannel->setText("CH4",3);
-    buttonsTriggerChannel->setColor(BUTTON_COLOR_ORANGE,0);
-    buttonsTriggerChannel->setColor(BUTTON_COLOR_BLUE,1);
-    buttonsTriggerChannel->setColor(BUTTON_COLOR_GREEN,2);
-    buttonsTriggerChannel->setColor(BUTTON_COLOR_PURPLE,3);
+    buttonsTriggerChannel->setColor(BCKGRND_COLOR_ORANGE,0);
+    buttonsTriggerChannel->setColor(BCKGRND_COLOR_BLUE,1);
+    buttonsTriggerChannel->setColor(BCKGRND_COLOR_GREEN,2);
+    buttonsTriggerChannel->setColor(BCKGRND_COLOR_PURPLE,3);
 
     buttonsTriggerChannel->disableAll();
     buttonsTriggerChannel->setDisabledButton(false,0);
