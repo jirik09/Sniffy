@@ -329,7 +329,7 @@ background-color: rgb(38, 38, 38);
               </property>
               <property name="maximumSize">
                <size>
-                <width>120</width>
+                <width>80</width>
                 <height>30</height>
                </size>
               </property>
@@ -590,8 +590,8 @@ color: rgb(214, 214, 214);
               </property>
               <property name="maximumSize">
                <size>
-                <width>120</width>
-                <height>30</height>
+                <width>80</width>
+                <height>40</height>
                </size>
               </property>
              </widget>

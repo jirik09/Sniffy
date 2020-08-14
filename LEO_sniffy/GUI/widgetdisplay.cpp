@@ -48,6 +48,34 @@ void WidgetDisplay::setTerrStyle(QString &terrStyleSheet){
     ui->styleTerr->setStyleSheet(terrStyleSheet);
 }
 
+void WidgetDisplay::showQerrStyle(bool visible){
+    (visible) ? ui->styleQerr->show() : ui->styleQerr->hide();
+}
+
+void WidgetDisplay::showTerrStyle(bool visible){
+    (visible) ? ui->styleTerr->show() : ui->styleQerr->hide();
+}
+
+void WidgetDisplay::showQerrTerrStyle(bool visible){
+    if(visible){
+        ui->styleQerr->show();
+        ui->styleTerr->show();
+    }else {
+        ui->styleQerr->hide();
+        ui->styleTerr->hide();
+    }
+}
+
+void WidgetDisplay::hideAvgDisplay()
+{
+    ui->horizontalWidget_avg->hide();
+}
+
+void WidgetDisplay::showAvgDisplay()
+{
+    ui->horizontalWidget_avg->show();
+}
+
 void WidgetDisplay::displayNumber(double number){
     ui->lcdNumber->display(number);
 }
@@ -125,7 +153,7 @@ void WidgetDisplay::showLabel(int labelNumber){
     labelList.at(labelNumber)->show();
 }
 
-void WidgetDisplay::drawFlagLabel(int labelNumber)
+void WidgetDisplay::drawIndicationFlag(int labelNumber)
 {
     if(drawFlag == 0){
         labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");

@@ -12,16 +12,15 @@ public:
 
     CounterMode mode = CounterMode::HIGH_FREQUENCY;
 
-    /* Direct Frequency measurement (High Frequency) */
-    CounterQuantity quantity = CounterQuantity::FREQUENCY;
-    QuantitySwitched quantState = QuantitySwitched::NO;
-    GateTime gateTimeSel = GateTime::GATE_TIME_100M;
-    ErrorType error = ErrorType::SIMPLE;
-    HoldOnState hold = HoldOnState::OFF;
+    /* High Frequency counter */
+    StatesHF statesHF;
+    StatesHF::Quantity quantity = StatesHF::Quantity::FREQUENCY;
+    StatesHF::QuantitySwitched quantState = StatesHF::QuantitySwitched::NO;
+    StatesHF::GateTime gateTime = StatesHF::GateTime::GATE_TIME_100M;
+    StatesHF::ErrorType error = StatesHF::ErrorType::SIMPLE;
+    StatesHF::HoldOnState hold = StatesHF::HoldOnState::OFF;
 
-    uint gateTime = 100; // ms
-
-    /* Reciprocal Frequency measurement (Low Frequency) */
+    /* Low Frequency counter */
 
 
 signals:

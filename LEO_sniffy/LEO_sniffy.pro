@@ -50,6 +50,7 @@ SOURCES += \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
     modules/counter/countertabhighfreq.cpp \
+    modules/counter/countertablowfreq.cpp \
     modules/counter/counterwindow.cpp \
     modules/labelformator.cpp \
     modules/device/device.cpp \
@@ -100,6 +101,7 @@ HEADERS += \
     modules/counter/counterspec.h \
     modules/abstractmodule.h \
     modules/counter/countertabhighfreq.h \
+    modules/counter/countertablowfreq.h \
     modules/counter/counterwindow.h \
     modules/labelformator.h \
     modules/device/device.h \

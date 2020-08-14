@@ -17,6 +17,7 @@ uint MovingAverage::prepend(double newValue){
         buffer.removeLast();
     }
     buffer.prepend(newValue);
+    count+= 1;
     return (buffSize - count);
 }
 
@@ -37,12 +38,13 @@ double MovingAverage::getAverage(){
  * @param buffSize A new buffer size to be set
  * @retval Remaining sample count to fill the buffer
  */
-uint MovingAverage::setBufferSize(uint newBuffSize){
-    if(newBuffSize < buffSize){
-        removeItems(buffSize - newBuffSize);
+uint MovingAverage::setBufferSize(int newBuffSize){
+    int count = buffer.count();
+    if(newBuffSize < count){
+        removeItems(count - newBuffSize);
     }
     buffSize = newBuffSize;
-    return (newBuffSize - buffer.count());
+    return (newBuffSize - count);
 }
 
 /*

@@ -17,7 +17,10 @@
 #include "../../GUI/widgetbuttons.h"
 
 #include "counterspec.h"
+#include "counterconfig.h"
+#include "counterdefs.h"
 #include "countertabhighfreq.h"
+#include "countertablowfreq.h"
 
 namespace Ui {
 class CounterWindow;
@@ -36,10 +39,13 @@ public:
 
     widgetTab *tabs;
     CounterTabHighFreq *tabHighFreq;
+    CounterTabLowFreq *tabLowFreq;
 
-    void setColorHoldOn(QColor color);
+    void hfSetColorRemainSec(QColor color);
     void specReceived(CounterSpec *spec);
-    void displayHoldOnFlag(bool visible);
+    void displayHoldOnFlag(WidgetDisplay *display, bool visible);
+    void showPMErrorSigns(WidgetDisplay *display, bool visible);
+    void reconfigDisplayLabelArea(CounterConfig* config, CounterSpec *spec);
 
 private:
     Ui::CounterWindow *ui;    
@@ -53,9 +59,15 @@ private:
 signals:
 
 private slots:
+    /* Common */
     void switchCounterModeCallback(int index);
-    void switchQuantityCallback(int index);
-    void switchErrorAvgCallback(int index);
+
+    /* High Frequency mode */
+    void hfSwitchQuantityCallback(int index);
+    void hfSwitchErrorAvgCallback(int index);
+
+    /* Low Frequency mode */
+    void lfSwitchChannelCallback(int index);
 };
 
 #endif // COUNTERWINDOW_H

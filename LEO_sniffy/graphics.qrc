@@ -14,7 +14,6 @@
         <file>graphics/units_hz.png</file>
         <file>graphics/units_sec.png</file>
         <file>graphics/units_avg.png</file>
-        <file>graphics/units_err.png</file>
         <file>graphics/icon_not_connected.png</file>
         <file>graphics/icon_connected.png</file>
         <file>graphics/settings_gear.png</file>
@@ -29,8 +28,9 @@
         <file>graphics/icon_voltmeter.png</file>
         <file>graphics/menu_burger_button.gif</file>
         <file>graphics/menu_burger_button_backw.gif</file>
-        <file>graphics/units_erravg.png</file>
         <file>graphics/sign_pm.png</file>
+        <file>graphics/units_err.png</file>
+        <file>graphics/units_erravg.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

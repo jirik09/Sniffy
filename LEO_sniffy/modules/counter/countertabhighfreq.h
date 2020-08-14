@@ -10,7 +10,6 @@
 #include "../../GUI/widgetdialrange.h"
 #include "../../GUI/widgetswitch.h"
 #include "../../GUI/widgetbuttons.h"
-#include "../../GUI/widgetlabel.h"
 
 #include "counterdefs.h"
 

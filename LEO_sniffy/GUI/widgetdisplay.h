@@ -26,6 +26,9 @@ public:
     void setQerrStyle(QString &qerrStyleSheet);
     void setTerrStyle(QString &terrStyleSheet);
 
+    void showAvgDisplay();
+    void hideAvgDisplay();
+
     void displayNumber(double number);
     void displayString(const QString &string);
     void displayAvgNumber(double number);
@@ -34,6 +37,9 @@ public:
     void displayQerrString(const QString &string);
     void displayTerrNumber(double number);
     void displayTerrString(const QString &string);
+    void showQerrStyle(bool visible);
+    void showTerrStyle(bool visible);
+    void showQerrTerrStyle(bool visible);
 
     void changeAvgColor(QColor color);
 
@@ -42,7 +48,7 @@ public:
     void setLabelText(int labelNumber, const QString text);
     void hideLabel(int labelNumber);
     void showLabel(int labelNumber);
-    void drawFlagLabel(int labelNumber);
+    void drawIndicationFlag(int labelNumber);
 
     void hideProgressBar();
     void showProgressBar();

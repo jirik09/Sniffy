@@ -12,7 +12,7 @@ public:
 
     uint prepend(double newValue);
     double getAverage();
-    uint setBufferSize(uint buffSize);
+    uint setBufferSize(int buffSize);
     uint getBufferSize();
     bool isBufferFull();
     uint getSampleCountToFillBuff();

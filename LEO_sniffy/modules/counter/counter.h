@@ -6,7 +6,6 @@
 #include <QtMath>
 
 #include "counterwindow.h"
-#include "counterconfig.h"
 #include "communication/commands.h"
 #include "communication/comms.h"
 #include "math/movingaverage.h"
@@ -30,7 +29,6 @@ private:
     CounterWindow *cntWindow;
     CounterConfig *config;
     CounterSpec *spec;
-
     QLocale loc;
 
     void startCounting();
@@ -42,12 +40,11 @@ private:
     MovingAverage *movAvg;
     QString strQerr, strTerr, avgQerr;
 
-    QString formatHoldOn(uint countToGo, uint additionTime);
-    void displayErrors(WidgetDisplay *display);
+    void parseHighFrequencyCounter(QByteArray metaData, QByteArray data);
+    QString hfFormatRemainSec(uint countToGo, uint additionTime);
+    void hfDisplayErrors();
     void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);
     void clearDisplay(WidgetDisplay *display);
-
-signals:
     void specReceived();
 
 private slots:
@@ -58,10 +55,10 @@ private slots:
     void stopModule();
 
     void switchCounterModeCallback(int index);
-    void switchGateTimeCallback(int index);
-    void switchQuantityCallback(int index);
-    void switchErrorAvgCallback(int index);
-    void dialAvgChangedCallback(float val);
+    void hfSwitchGateTimeCallback(int index);
+    void hfSwitchQuantityCallback(int index);
+    void hfSwitchErrorAvgCallback(int index);
+    void hfDialAvgChangedCallback(float val);
 };
 
 #endif // COUNTER_H
