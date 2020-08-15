@@ -125,6 +125,10 @@ public:
     // Counter complete deinit
     static const QByteArray COUNTER_DEINIT;
 
+    // Counter common
+    static const QByteArray QUANT_FREQUENCY;
+    static const QByteArray QUANT_PERIOD;
+
     // Counter modes
     static const QByteArray COUNTER_MODE;
     static const QByteArray MODE_HIGH_FREQ;
@@ -132,18 +136,34 @@ public:
     static const QByteArray MODE_REFERENCE;
     static const QByteArray MODE_INTERVAL;
 
-    // Counter quantity
-    static const QByteArray COUNTER_QUANTITY;
-    static const QByteArray QUANT_FREQUENCY;
-    static const QByteArray QUANT_PERIOD;
+    // Counter HF quantity
+    static const QByteArray HF_QUANTITY;
 
-    // Counter ETR GATE times
-    static const QByteArray COUNTER_GATE;
-    static const QByteArray GATE_TIME_100M;
-    static const QByteArray GATE_TIME_500M;
-    static const QByteArray GATE_TIME_1S;
-    static const QByteArray GATE_TIME_5S;
-    static const QByteArray GATE_TIME_10S;
+    // Counter HF GATE times
+    static const QByteArray HF_GATE_TIME;
+    static const QByteArray HF_TIME_100M;
+    static const QByteArray HF_TIME_500M;
+    static const QByteArray HF_TIME_1S;
+    static const QByteArray HF_TIME_5S;
+    static const QByteArray HF_TIME_10S;
+
+    // Counter LF quantity
+    static const QByteArray LF_CH1_QUANTITY;
+    static const QByteArray LF_CH2_QUANTITY;
+
+    // Counter LF channel multiplier
+    static const QByteArray LF_CH1_MULTIPLIER;
+    static const QByteArray LF_CH2_MULTIPLIER;
+
+    // Counter LF multiplier
+    static const QByteArray LF_MULTIPLIER_1X;
+    static const QByteArray LF_MULTIPLIER_2X;
+    static const QByteArray LF_MULTIPLIER_4X;
+    static const QByteArray LF_MULTIPLIER_8X;
+
+    // Counter LF Sample Count buffer
+    static const QByteArray LF_CH1_SAMPLE_COUNT;
+    static const QByteArray LF_CH2_SAMPLE_COUNT;
 };
 
 #endif // COMMANDS_H

@@ -1,14 +1,14 @@
 #include "countertablowfreq.h"
 
 CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) : QObject(parent)
-{    
+{        
     WidgetSeparator *separatorChannelSwitch = new WidgetSeparator(parent, "Channel configuration");
     destination->addWidget(separatorChannelSwitch);
 
     buttonsChannelSwitch = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
     buttonsChannelSwitch->setText("CH1", 0);
     buttonsChannelSwitch->setText("CH2", 1);
-    buttonsChannelSwitch->setColor(BCKGRND_COLOR_GREEN, 1);
+    buttonsChannelSwitch->setColor(lfCh2BckgndColor, 1);
     destination->addWidget(buttonsChannelSwitch);
 
     WidgetSeparator *separatorQuantitySwitch = new WidgetSeparator(parent,"Quantity switch");
@@ -19,27 +19,37 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     buttonsQuantitySwitch->setText("Period", 1);
     destination->addWidget(buttonsQuantitySwitch);
 
-    dialSampleCount = new WidgetDialRange(parent ,"Sample Count");
-    dialSampleCount->setRange(1, SAMPLE_COUNT, "Samples", 1, 100, 2, false);
-    dialSampleCount->hideUnitSelection();
-    destination->addWidget(dialSampleCount);
+    dialSampleCountCh1 = new WidgetDialRange(parent ,"Sample Count");
+    dialSampleCountCh1->setRange(1, SAMPLE_COUNT, "Samples", 1, 100, 2, false);
+    dialSampleCountCh1->hideUnitSelection();
+    destination->addWidget(dialSampleCountCh1);
 
-    WidgetSeparator *separatorMultiplierSwitch = new WidgetSeparator(parent,"Quantity multiplier");
+    dialSampleCountCh2 = new WidgetDialRange(parent ,"Sample Count");
+    dialSampleCountCh2->setRange(1, SAMPLE_COUNT, "Samples", 1, 100, 2, false);
+    dialSampleCountCh2->hideUnitSelection();
+    destination->addWidget(dialSampleCountCh2);
+    QString colorStyleSheet = lfCh2BckgndColor;
+    dialSampleCountCh2->setDialButtonsColor(colorStyleSheet);
+    colorStyleSheet = lfCh2TextColor;
+    dialSampleCountCh2->setDialColor(colorStyleSheet);
+    dialSampleCountCh2->hide();
+
+    WidgetSeparator *separatorMultiplierSwitch = new WidgetSeparator(parent,"Sample Count multiplier");
     destination->addWidget(separatorMultiplierSwitch);
 
-    buttonsSampleCountMultiplierSwitch = new WidgetButtons(parent, 4, ButtonTypes::RADIO, "", 0);
-    buttonsSampleCountMultiplierSwitch->setText("1x", 0);
-    buttonsSampleCountMultiplierSwitch->setText("2x", 1);
-    buttonsSampleCountMultiplierSwitch->setText("4x", 2);
-    buttonsSampleCountMultiplierSwitch->setText("8x", 3);
-    destination->addWidget(buttonsSampleCountMultiplierSwitch);
+    buttonsMultiplierSwitch = new WidgetButtons(parent, 4, ButtonTypes::RADIO, "", 0);
+    buttonsMultiplierSwitch->setText("1x", 0);
+    buttonsMultiplierSwitch->setText("2x", 1);
+    buttonsMultiplierSwitch->setText("4x", 2);
+    buttonsMultiplierSwitch->setText("8x", 3);
+    destination->addWidget(buttonsMultiplierSwitch);
 
     WidgetSeparator *separatorDutyCycleSwitch = new WidgetSeparator(parent,"Switch to Duty cycle");
     destination->addWidget(separatorDutyCycleSwitch);
 
     buttonsDutyCycleSwitch = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
-    buttonsDutyCycleSwitch->setText("Show", 0);
-    buttonsDutyCycleSwitch->setText("Hide", 1);
+    buttonsDutyCycleSwitch->setText("Disable", 0);
+    buttonsDutyCycleSwitch->setText("Enable", 1);
     destination->addWidget(buttonsDutyCycleSwitch);
 }
 

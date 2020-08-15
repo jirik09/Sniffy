@@ -31,7 +31,7 @@ class CounterWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit CounterWindow(QWidget *parent = nullptr);
+    explicit CounterWindow(CounterConfig *config, QWidget *parent = nullptr);
     ~CounterWindow();
 
     WidgetDisplay *displayCh1;
@@ -43,18 +43,21 @@ public:
 
     void hfSetColorRemainSec(QColor color);
     void specReceived(CounterSpec *spec);
-    void displayHoldOnFlag(WidgetDisplay *display, bool visible);
+    void displayFlagHoldOn(WidgetDisplay *display, bool visible);
+    void displayFlagSwitchMode(WidgetDisplay *display, bool visible);
     void showPMErrorSigns(WidgetDisplay *display, bool visible);
-    void reconfigDisplayLabelArea(CounterConfig* config, CounterSpec *spec);
+    void reconfigDisplayLabelArea(CounterSpec *spec);
 
 private:
-    Ui::CounterWindow *ui;    
+    Ui::CounterWindow *ui;
+    CounterConfig *config;
 
     void createCounterTabs(void);
     void configureCounterTabs(void);
     void createTwoDisplays(void);
     WidgetDisplay* createDisplay(void);
     void configureDisplays(void);
+    void switchQuantity(int index, WidgetDisplay *display);
 
 signals:
 
@@ -68,6 +71,7 @@ private slots:
 
     /* Low Frequency mode */
     void lfSwitchChannelCallback(int index);
+    void lfSwitchQuantityCallback(int index);
 };
 
 #endif // COUNTERWINDOW_H

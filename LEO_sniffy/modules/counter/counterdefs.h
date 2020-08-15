@@ -11,23 +11,33 @@ enum class CounterMode
     INTERVAL = 3,
 };
 
-struct StatesHF
+struct HFStates
 {
     enum class Quantity { FREQUENCY = 0, PERIOD = 1 };
     enum class QuantitySwitched { NO = 0, YES = 1 };
     enum class ErrorType { SIMPLE = 0, AVERAGE = 1 };
     enum class HoldOnState { OFF = 0, ON = 1 };
     enum class GateTime { GATE_TIME_100M = 100, GATE_TIME_500M = 500,
-                          GATE_TIME_1S   = 1000, GATE_TIME_5S   = 5000,
+                          GATE_TIME_1S   = 1000, GATE_TIME_5S  = 5000,
                           GATE_TIME_10S  = 10000 };
 
-    int gateTimeBackupIndex;
-    int avgBackupSampleCount;
+    int gateTimeIndexBackup;
+    //int avgSampleCountBackup;
 };
 
-struct StatesLF
-{
+enum class LFActiveChan{
+    CHAN1 = 0,
+    CHAN2 = 1
+};
 
+struct LFStates
+{    
+    enum class Quantity { FREQUENCY = 0, PERIOD = 1 } lfQuantity;
+    enum class DutyCycle { DISABLED = 0, ENABLED = 1 } dutyCycle;
+    enum class Multiplier { MULT_1X = 0, MULT_2X = 1,
+                            MULT_4X = 2, MULT_8X = 3 } multiplier;
+
+    int sampleCountBackup;
 };
 
 struct StatesRef

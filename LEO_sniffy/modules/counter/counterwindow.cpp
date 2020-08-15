@@ -1,9 +1,10 @@
 #include "counterwindow.h"
 #include "ui_counterwindow.h"
 
-CounterWindow::CounterWindow(QWidget *parent) :
+CounterWindow::CounterWindow(CounterConfig *config, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::CounterWindow)
+    ui(new Ui::CounterWindow),
+    config(config)
 {
     ui->setupUi(this);
 
@@ -24,6 +25,7 @@ CounterWindow::CounterWindow(QWidget *parent) :
 
     /* Low Frequency Counter Signals/Slots */
     connect(tabLowFreq->buttonsChannelSwitch, &WidgetButtons::clicked, this, &CounterWindow::lfSwitchChannelCallback);
+    connect(tabLowFreq->buttonsQuantitySwitch, &WidgetButtons::clicked, this, &CounterWindow::lfSwitchQuantityCallback);
 }
 
 CounterWindow::~CounterWindow()
@@ -76,7 +78,7 @@ void CounterWindow::configureDisplays(void){
     displayCh1->configLabel(LABELNUM_CHAN, "CH1", TEXT_COLOR_BLUE, true);
     displayCh1->configLabel(LABELNUM_FLAG, "    ", TEXT_COLOR_BLUE, true);
     displayCh2->configLabel(LABELNUM_QUAN, LITERAL_FREQUENCY, TEXT_COLOR_GREY, true);
-    displayCh2->configLabel(LABELNUM_CHAN, "CH2", TEXT_COLOR_GREEN, true);
+    displayCh2->configLabel(LABELNUM_CHAN, "CH2", TEXT_COLOR_GREY, true);
     displayCh2->configLabel(LABELNUM_FLAG, "    ", TEXT_COLOR_BLUE, true);
     displayCh2->hide();
 }
@@ -94,23 +96,36 @@ void CounterWindow::switchCounterModeCallback(int index){
     if(index == 0){
         displayCh2->hide();
         displayCh1->showAvgDisplay();
+        //displayCh1->displayString("");
+        hfSwitchQuantityCallback((int)config->hfQuantity);
+        hfSwitchErrorAvgCallback((int)config->error);
     }else if(index == 1) {
         displayCh2->show();
+        //displayCh1->displayString("");
         displayCh1->hideAvgDisplay();
         displayCh2->hideAvgDisplay();
+        switchQuantity((int)config->lfCh1States.lfQuantity, displayCh1);
+        hfSwitchErrorAvgCallback(0);
     }else if(index == 2) {
+        displayCh2->hide();
         displayCh1->hideAvgDisplay();
     }else if(index == 3) {
+        displayCh2->hide();
         displayCh1->hideAvgDisplay();
     }
 }
 
-void CounterWindow::displayHoldOnFlag(WidgetDisplay *display, bool visible){
+void CounterWindow::displayFlagHoldOn(WidgetDisplay *display, bool visible){
     QString string = (visible) ? "Hold on" : "";
     display->setLabelText(LABELNUM_HOLD, string);
 }
 
-void CounterWindow::reconfigDisplayLabelArea(CounterConfig* config, CounterSpec *spec){
+void CounterWindow::displayFlagSwitchMode(WidgetDisplay *display, bool visible){
+    QString string = (visible) ? "Switch Mode" : "";
+    display->setLabelText(LABELNUM_HOLD, string);
+}
+
+void CounterWindow::reconfigDisplayLabelArea(CounterSpec *spec){
     if(config->mode == CounterMode::HIGH_FREQUENCY){
         displayCh1->configLabel(LABELNUM_PINS, spec->pins.lf_pin_ch1, TEXT_COLOR_GREY, true);
         displayCh1->configLabel(LABELNUM_HOLD, "", TEXT_COLOR_ORANGE, true);
@@ -128,18 +143,22 @@ void CounterWindow::showPMErrorSigns(WidgetDisplay *display, bool visible){
     display->showQerrTerrStyle(visible);
 }
 
+void CounterWindow::switchQuantity(int index, WidgetDisplay *display){
+    QString unitsStyleSheet;
+    if(index == 0){
+        display->setLabelText(LABELNUM_QUAN, LITERAL_FREQUENCY);
+        unitsStyleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
+    }else if (index == 1) {
+        display->setLabelText(LABELNUM_QUAN, LITERAL_PERIOD);
+        unitsStyleSheet = "image: url(:/graphics/graphics/units_sec.png); border: none;";
+    }
+    display->setUnitsStyle(unitsStyleSheet);
+}
+
 /************************************** HIGH FREQ FUNCTIONS ****************************************/
 
 void CounterWindow::hfSwitchQuantityCallback(int index){
-    QString unitsStyleSheet;
-    if(index == 0){
-        displayCh1->setLabelText(LABELNUM_QUAN, LITERAL_FREQUENCY);
-        unitsStyleSheet = "image: url(:/graphics/graphics/units_hz.png); border: none;";
-    }else {
-        displayCh1->setLabelText(LABELNUM_QUAN, LITERAL_PERIOD);
-        unitsStyleSheet = "image: url(:/graphics/graphics/units_sec.png); border: none;";
-    }
-    displayCh1->setUnitsStyle(unitsStyleSheet);
+    switchQuantity(index, displayCh1);
 }
 
 void CounterWindow::hfSwitchErrorAvgCallback(int index){
@@ -159,13 +178,30 @@ void CounterWindow::hfSetColorRemainSec(QColor color){
 /************************************** LOW FREQ FUNCTIONS ****************************************/
 
 void CounterWindow::lfSwitchChannelCallback(int index){
-    QString bckgndColor = (index == 0) ? BCKGRND_COLOR_BLUE : BCKGRND_COLOR_GREEN;
+    QString bckgndColor;
+
+    if(index == 0){
+        bckgndColor = BCKGRND_COLOR_BLUE;
+        tabLowFreq->dialSampleCountCh2->hide();
+        tabLowFreq->dialSampleCountCh1->show();
+    }else if (index == 1) {
+        bckgndColor = tabLowFreq->lfCh2BckgndColor;
+        tabLowFreq->dialSampleCountCh1->hide();
+        tabLowFreq->dialSampleCountCh2->show();
+    }
+
     tabLowFreq->buttonsQuantitySwitch->setColor(bckgndColor, 0);
     tabLowFreq->buttonsQuantitySwitch->setColor(bckgndColor, 1);
-    tabLowFreq->buttonsSampleCountMultiplierSwitch->setColor(bckgndColor, 0);
-    tabLowFreq->buttonsSampleCountMultiplierSwitch->setColor(bckgndColor, 1);
-    tabLowFreq->buttonsSampleCountMultiplierSwitch->setColor(bckgndColor, 2);
-    tabLowFreq->buttonsSampleCountMultiplierSwitch->setColor(bckgndColor, 3);
+    tabLowFreq->buttonsMultiplierSwitch->setColor(bckgndColor, 0);
+    tabLowFreq->buttonsMultiplierSwitch->setColor(bckgndColor, 1);
+    tabLowFreq->buttonsMultiplierSwitch->setColor(bckgndColor, 2);
+    tabLowFreq->buttonsMultiplierSwitch->setColor(bckgndColor, 3);
     tabLowFreq->buttonsDutyCycleSwitch->setColor(bckgndColor, 0);
     tabLowFreq->buttonsDutyCycleSwitch->setColor(bckgndColor, 1);
 }
+
+void CounterWindow::lfSwitchQuantityCallback(int index){    
+    WidgetDisplay *display = (config->activeChan == LFActiveChan::CHAN1) ? displayCh1 : displayCh2;
+    switchQuantity(index, display);
+}
+

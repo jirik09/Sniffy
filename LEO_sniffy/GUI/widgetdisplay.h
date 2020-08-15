@@ -20,15 +20,14 @@ public:
     explicit WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar, QWidget *parent = nullptr);
     ~WidgetDisplay();
 
+    /* Unit styles */
     void setUnitsStyle(QString &unitsStyleSheet);
     void setAvgStyle(QString &avgStyleSheet);
     void setErrStyle(QString &errStyleSheet);
     void setQerrStyle(QString &qerrStyleSheet);
     void setTerrStyle(QString &terrStyleSheet);
 
-    void showAvgDisplay();
-    void hideAvgDisplay();
-
+    /* Displays */
     void displayNumber(double number);
     void displayString(const QString &string);
     void displayAvgNumber(double number);
@@ -39,17 +38,21 @@ public:
     void displayTerrString(const QString &string);
     void showQerrStyle(bool visible);
     void showTerrStyle(bool visible);
-    void showQerrTerrStyle(bool visible);
-
+    void showQerrTerrStyle(bool visible);    
+    void showAvgDisplay();
+    void hideAvgDisplay();
     void changeAvgColor(QColor color);
 
-    void configLabel(int labelNumber, const QString text, QString colorStyle, bool visible);
-    QString getLabelText(int labelNumber);
+    /* Label area */
+    void configLabel(int labelNumber, const QString text, QString colorStyle, bool visible);    
     void setLabelText(int labelNumber, const QString text);
+    void setLabelColor(int labelNumber, const QString &textStyleSheet);
+    QString getLabelText(int labelNumber);
     void hideLabel(int labelNumber);
     void showLabel(int labelNumber);
     void drawIndicationFlag(int labelNumber);
 
+    /* Progress bar */
     void hideProgressBar();
     void showProgressBar();
     void setRangeProgressBar(int min, int max);

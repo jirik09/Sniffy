@@ -145,6 +145,10 @@ void WidgetDisplay::setLabelText(int labelNumber, const QString text){
     labelList.at(labelNumber)->show();
 }
 
+void WidgetDisplay::setLabelColor(int labelNumber, const QString &textStyleSheet){
+    labelList.at(labelNumber)->setStyleSheet(textStyleSheet);
+}
+
 void WidgetDisplay::hideLabel(int labelNumber){
     labelList.at(labelNumber)->hide();
 }

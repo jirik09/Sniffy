@@ -18,11 +18,15 @@ class CounterTabLowFreq : public QObject
 public:
     explicit CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent = nullptr);
 
-    WidgetDialRange *dialSampleCount;
+    WidgetDialRange *dialSampleCountCh1;
+    WidgetDialRange *dialSampleCountCh2;
     WidgetButtons *buttonsChannelSwitch;
     WidgetButtons *buttonsQuantitySwitch;
-    WidgetButtons *buttonsSampleCountMultiplierSwitch;
+    WidgetButtons *buttonsMultiplierSwitch;
     WidgetButtons *buttonsDutyCycleSwitch;
+
+    const QString lfCh2BckgndColor = BCKGRND_COLOR_GREY;
+    const QString lfCh2TextColor = TEXT_COLOR_GREY;
 
 signals:
 

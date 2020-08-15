@@ -111,6 +111,10 @@ const QByteArray Commands::CHANNELS_4 = "4CH_";
 // Counter complete deinit
 const QByteArray Commands::COUNTER_DEINIT = "DEIN";
 
+// Coutner common
+const QByteArray Commands::QUANT_FREQUENCY = "QFRE";
+const QByteArray Commands::QUANT_PERIOD = "QPER";
+
 // Counter modes
 const QByteArray Commands::COUNTER_MODE = "MODE";
 const QByteArray Commands::MODE_HIGH_FREQ = "ETR_";
@@ -118,15 +122,32 @@ const QByteArray Commands::MODE_LOW_FREQ = "IC__";
 const QByteArray Commands::MODE_REFERENCE = "REF_";
 const QByteArray Commands::MODE_INTERVAL = "TI__";
 
-// Counter quantity
-const QByteArray Commands::COUNTER_QUANTITY = "QUAN";
-const QByteArray Commands::QUANT_FREQUENCY = "QFRE";
-const QByteArray Commands::QUANT_PERIOD = "QPER";
+// Counter HF quantity
+const QByteArray Commands::HF_QUANTITY = "QUAN";
 
-// Counter ETR GATE times
-const QByteArray Commands::COUNTER_GATE = "GATE";
-const QByteArray Commands::GATE_TIME_100M = "100m";
-const QByteArray Commands::GATE_TIME_500M = "500m";
-const QByteArray Commands::GATE_TIME_1S = "1s__";
-const QByteArray Commands::GATE_TIME_5S = "5s__";
-const QByteArray Commands::GATE_TIME_10S = "10s_";
+// Counter HF GATE times
+const QByteArray Commands::HF_GATE_TIME = "GATE";
+const QByteArray Commands::HF_TIME_100M = "100m";
+const QByteArray Commands::HF_TIME_500M = "500m";
+const QByteArray Commands::HF_TIME_1S = "1s__";
+const QByteArray Commands::HF_TIME_5S = "5s__";
+const QByteArray Commands::HF_TIME_10S = "10s_";
+
+// Counter LF quantity
+const QByteArray Commands::LF_CH1_QUANTITY = "QIC1";
+const QByteArray Commands::LF_CH2_QUANTITY = "QIC2";
+
+// Counter LF channel multiplier
+const QByteArray Commands::LF_CH1_MULTIPLIER = "PRE1";
+const QByteArray Commands::LF_CH2_MULTIPLIER = "PRE2";
+
+// Counter LF multiplier
+const QByteArray Commands::LF_MULTIPLIER_1X = "1x__";
+const QByteArray Commands::LF_MULTIPLIER_2X = "2x__";
+const QByteArray Commands::LF_MULTIPLIER_4X = "4x__";
+const QByteArray Commands::LF_MULTIPLIER_8X = "8x__";
+
+// Counter LF Sample Count buffer
+const QByteArray Commands::LF_CH1_SAMPLE_COUNT = "BUF1";
+const QByteArray Commands::LF_CH2_SAMPLE_COUNT = "BUF2";
+

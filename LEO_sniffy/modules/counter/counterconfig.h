@@ -13,15 +13,17 @@ public:
     CounterMode mode = CounterMode::HIGH_FREQUENCY;
 
     /* High Frequency counter */
-    StatesHF statesHF;
-    StatesHF::Quantity quantity = StatesHF::Quantity::FREQUENCY;
-    StatesHF::QuantitySwitched quantState = StatesHF::QuantitySwitched::NO;
-    StatesHF::GateTime gateTime = StatesHF::GateTime::GATE_TIME_100M;
-    StatesHF::ErrorType error = StatesHF::ErrorType::SIMPLE;
-    StatesHF::HoldOnState hold = StatesHF::HoldOnState::OFF;
+    HFStates hfStates;
+    HFStates::Quantity hfQuantity = HFStates::Quantity::FREQUENCY;
+    HFStates::QuantitySwitched quantState = HFStates::QuantitySwitched::NO;
+    HFStates::GateTime gateTime = HFStates::GateTime::GATE_TIME_100M;
+    HFStates::ErrorType error = HFStates::ErrorType::SIMPLE;
+    HFStates::HoldOnState hold = HFStates::HoldOnState::OFF;
 
     /* Low Frequency counter */
-
+    LFActiveChan activeChan = LFActiveChan::CHAN1;
+    LFStates lfCh1States;
+    LFStates lfCh2States;
 
 signals:
 

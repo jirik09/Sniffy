@@ -33,6 +33,15 @@ WidgetDialRange::~WidgetDialRange()
     delete ui;
 }
 
+void WidgetDialRange::setDialColor(QString &textStyleSheet){
+    ui->widget_dial->setStyleSheet(textStyleSheet);
+}
+
+void WidgetDialRange::setDialButtonsColor(QString &bckgndStyleSheet){
+    ui->pushButton_plus->setStyleSheet(bckgndStyleSheet);
+    ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
+}
+
 void WidgetDialRange::addOption (QString unit,float mult){
     params_unit *tmpUnit = new params_unit();
     tmpUnit->mult = mult;
