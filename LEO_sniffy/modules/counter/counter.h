@@ -6,6 +6,7 @@
 #include <QtMath>
 #include <QEventLoop>
 #include <QTimer>
+#include <QVector>
 
 #include "counterwindow.h"
 #include "communication/commands.h"
@@ -37,14 +38,20 @@ private:
     void startCounting();
     void stopCounting();
 
-    QString formatNumber(double valToFormat, double error);
-
     /* Common functions */
+    //typedef void (Counter::*funPointer)();
+    /*funPointer*/ void (Counter::*reloadModeState[4])() = { &Counter::hfReloadState,
+                                          &Counter::lfReloadState,
+                                          &Counter::refReloadState,
+                                          &Counter::intReloadState };
+
+    //QList<QVector<void*()>> reloadModeState;
+
+    QString formatNumber(double valToFormat, double error);
     void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);
     void clearDisplay(WidgetDisplay *display);
     void specReceived();
     void write(QByteArray feature, QByteArray param);
-//    void write2(QByteArray feature, QByteArray param);
     void write(QByteArray feature, int param);
     //void msleep(int msec);
 
@@ -53,14 +60,22 @@ private:
     QString strQerr, strTerr, avgQerr;
 
     void parseHighFrequencyCounter(QByteArray data);
-    QString hfFormatRemainSec(uint countToGo, uint additionTime);
     void hfDisplayErrors();
+    void hfReloadState();
+    QString hfFormatRemainSec(uint countToGo, uint additionTime);
 
     /* Low Frequency Counter */
     void parseLowFrequencyCounter(QByteArray data);
+    bool isRangeExceeded(double frequency);
     void lfSwitchQuantity(int index, QByteArray channelQuantitiy);
     void lfSwitchMultiplier(int index, QByteArray channelMultiplier);
-    bool isRangeExceeded(double frequency);
+    void lfReloadState();
+
+    /* Reference Counter */
+    void refReloadState();
+
+    /* Intervals Counter */
+    void intReloadState();
 
 private slots:
 
@@ -83,9 +98,11 @@ private slots:
     void lfSwitchChannelCallback(int index);
     void lfSwitchQuantityCallback(int index);
     void lfSwitchMultiplierCallback(int index);
-    void lfSwitchDutyCycleCallback(int index);    
+    void lfSwitchDutyCycleCallback(int index);
     void lfDialSampleCountCh1ChangedCallback(float val);
     void lfDialSampleCountCh2ChangedCallback(float val);
 };
+
+//#define CALL_MEMBER_FUNCTION(object, ptrToMember)  ((object)->*(ptrToMember))
 
 #endif // COUNTER_H

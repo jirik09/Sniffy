@@ -40,7 +40,9 @@ public:
     int getSelectedIndex();
     int getStatus();
     void setDisabledButton(bool disabled, int index);
+    void setEnabledButton(bool enabled, int index);
     void disableAll();
+    void enableAll();
     void setChecked (bool checked, int index);
 
 private:

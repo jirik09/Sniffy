@@ -40,7 +40,11 @@ public:
     void showTerrStyle(bool visible);
     void showQerrTerrStyle(bool visible);    
     void showAvgDisplay();
-    void hideAvgDisplay();
+    void showErrDisplay();
+    void showBarDisplay();
+    void hideAvgDisplay();    
+    void hideErrDisplay();
+    void hideBarDisplay();
     void changeAvgColor(QColor color);
 
     /* Label area */

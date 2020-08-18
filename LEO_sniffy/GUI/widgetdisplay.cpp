@@ -66,14 +66,34 @@ void WidgetDisplay::showQerrTerrStyle(bool visible){
     }
 }
 
+void WidgetDisplay::showAvgDisplay()
+{
+    ui->horizontalWidget_avg->show();
+}
+
 void WidgetDisplay::hideAvgDisplay()
 {
     ui->horizontalWidget_avg->hide();
 }
 
-void WidgetDisplay::showAvgDisplay()
+void WidgetDisplay::showErrDisplay()
 {
-    ui->horizontalWidget_avg->show();
+    ui->horizontalWidget_err->show();
+}
+
+void WidgetDisplay::hideErrDisplay()
+{
+    ui->horizontalWidget_err->hide();
+}
+
+void WidgetDisplay::showBarDisplay()
+{
+    ui->horizontalWidget_err->show();
+}
+
+void WidgetDisplay::hideBarDisplay()
+{
+    ui->horizontalWidget_err->hide();
 }
 
 void WidgetDisplay::displayNumber(double number){

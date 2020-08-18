@@ -2,13 +2,11 @@
 
 Commands::Commands(QObject *parent) : QObject(parent)
 {
-
-    // Counter LF multiplier
-//    Commands::LF_MULTIPLIER_1X = (QByteArray *)"1x__";
-//    Commands::LF_MULTIPLIER_2X = (QByteArray *)"2x__";
-//    Commands::LF_MULTIPLIER_4X = (QByteArray *)"4x__";
-//    Commands::LF_MULTIPLIER_8X = (QByteArray *)"8x__";
+    /* Counter lists for index-based access */
+    Commands::pCOUNTER_MODE = {MODE_HIGH_FREQ, MODE_LOW_FREQ, MODE_REFERENCE, MODE_INTERVAL};
+    Commands::pHF_GATE_TIME = {HF_TIME_100M, HF_TIME_500M, HF_TIME_1S, HF_TIME_5S, HF_TIME_10S};
     Commands::pLF_MULTIPLIER = {LF_MULTIPLIER_1X, LF_MULTIPLIER_2X, LF_MULTIPLIER_4X, LF_MULTIPLIER_8X};
+    Commands::pQUANTITIY = {QUANT_FREQUENCY, QUANT_PERIOD};
 }
 
 const QByteArray Commands::IDN = "IDN_";

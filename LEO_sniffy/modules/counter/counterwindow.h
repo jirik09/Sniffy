@@ -41,16 +41,18 @@ public:
     CounterTabHighFreq *tabHighFreq;
     CounterTabLowFreq *tabLowFreq;
 
-    void hfSetColorRemainSec(QColor color);
     void specReceived(CounterSpec *spec);
     void displayFlagHoldOn(WidgetDisplay *display, bool visible);
     void displayFlagSwitchMode(WidgetDisplay *display, bool visible);
     void showPMErrorSigns(WidgetDisplay *display, bool visible);
     void reconfigDisplayLabelArea(CounterSpec *spec);
 
+    void hfSetColorRemainSec(QColor color);
+
 private:
     Ui::CounterWindow *ui;
-    CounterConfig *config;
+    CounterConfig *conf;
+    CounterSpec *spec;
 
     void createCounterTabs(void);
     void configureCounterTabs(void);
@@ -58,6 +60,9 @@ private:
     WidgetDisplay* createDisplay(void);
     void configureDisplays(void);
     void switchQuantity(int index, WidgetDisplay *display);
+
+    void lfDisableButtons();
+    void lfEnableButtons();
 
 signals:
 
@@ -72,6 +77,7 @@ private slots:
     /* Low Frequency mode */
     void lfSwitchChannelCallback(int index);
     void lfSwitchQuantityCallback(int index);
+    void lfSwitchDutyCycleCallback(int index);
 };
 
 #endif // COUNTERWINDOW_H

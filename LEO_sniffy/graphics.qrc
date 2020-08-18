@@ -31,6 +31,7 @@
         <file>graphics/sign_pm.png</file>
         <file>graphics/units_err.png</file>
         <file>graphics/units_erravg.png</file>
+        <file>graphics/units_perc.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

@@ -1,10 +1,10 @@
 #include "counterwindow.h"
 #include "ui_counterwindow.h"
 
-CounterWindow::CounterWindow(CounterConfig *config, QWidget *parent) :
+CounterWindow::CounterWindow(CounterConfig *conf, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::CounterWindow),
-    config(config)
+    conf(conf)
 {
     ui->setupUi(this);
 
@@ -26,6 +26,7 @@ CounterWindow::CounterWindow(CounterConfig *config, QWidget *parent) :
     /* Low Frequency Counter Signals/Slots */
     connect(tabLowFreq->buttonsChannelSwitch, &WidgetButtons::clicked, this, &CounterWindow::lfSwitchChannelCallback);
     connect(tabLowFreq->buttonsQuantitySwitch, &WidgetButtons::clicked, this, &CounterWindow::lfSwitchQuantityCallback);
+    connect(tabLowFreq->buttonsDutyCycleSwitch, &WidgetButtons::clicked, this, &CounterWindow::lfSwitchDutyCycleCallback);
 }
 
 CounterWindow::~CounterWindow()
@@ -95,14 +96,14 @@ void CounterWindow::specReceived(CounterSpec *spec){
 void CounterWindow::switchCounterModeCallback(int index){
     if(index == 0){
         displayCh2->hide();
-        displayCh1->showAvgDisplay();        
-        hfSwitchQuantityCallback((int)config->hfState.quantity);
-        hfSwitchErrorAvgCallback((int)config->hfState.error);
+        displayCh1->showAvgDisplay();
+        hfSwitchQuantityCallback((int)conf->hfState.quantity);
+        hfSwitchErrorAvgCallback((int)conf->hfState.error);
     }else if(index == 1) {
-        displayCh2->show();        
+        displayCh2->show();
         displayCh1->hideAvgDisplay();
         displayCh2->hideAvgDisplay();
-        switchQuantity((int)config->lfState.chan1.quantity, displayCh1);
+        switchQuantity((int)conf->lfState.chan1.quantity, displayCh1);
         hfSwitchErrorAvgCallback(0);
     }else if(index == 2) {
         displayCh2->hide();
@@ -124,15 +125,16 @@ void CounterWindow::displayFlagSwitchMode(WidgetDisplay *display, bool visible){
 }
 
 void CounterWindow::reconfigDisplayLabelArea(CounterSpec *spec){
-    if(config->mode == CounterMode::HIGH_FREQUENCY){
+    this->spec = spec;
+    if(conf->mode == CounterMode::HIGH_FREQUENCY){
         displayCh1->configLabel(LABELNUM_PINS, spec->pins.lf_pin_ch1, TEXT_COLOR_GREY, true);
         displayCh1->configLabel(LABELNUM_HOLD, "", TEXT_COLOR_ORANGE, true);
-    }else if (config->mode == CounterMode::LOW_FREQUENCY) {
+    }else if (conf->mode == CounterMode::LOW_FREQUENCY) {
         displayCh2->configLabel(LABELNUM_PINS, spec->pins.lf_pin_ch2, TEXT_COLOR_GREY, true);
         displayCh2->configLabel(LABELNUM_HOLD, "", TEXT_COLOR_ORANGE, true);
-    }else if (config->mode == CounterMode::REFERENCE) {
+    }else if (conf->mode == CounterMode::REFERENCE) {
 
-    }else if (config->mode == CounterMode::INTERVAL) {
+    }else if (conf->mode == CounterMode::INTERVAL) {
 
     }
 }
@@ -199,7 +201,70 @@ void CounterWindow::lfSwitchChannelCallback(int index){
 }
 
 void CounterWindow::lfSwitchQuantityCallback(int index){    
-    WidgetDisplay *display = (config->lfState.activeChan == LFState::ActiveChan::CHAN1) ? displayCh1 : displayCh2;
+    WidgetDisplay *display = (conf->lfState.activeChan == LFState::ActiveChan::CHAN1) ? displayCh1 : displayCh2;
     switchQuantity(index, display);
 }
 
+void CounterWindow::lfSwitchDutyCycleCallback(int index){
+    WidgetDisplay *display, *norDisplay; QString pin; QString unitsStyleSheet;
+    if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){
+        display = displayCh1;
+        norDisplay = displayCh2;
+        pin = spec->pins.lf_pin_ch1;
+    }else {
+        display = displayCh2;
+        norDisplay = displayCh1;
+        pin = spec->pins.lf_pin_ch2;
+    }
+
+    if(index == 0){
+        lfEnableButtons();
+        norDisplay->show();
+        displayFlagHoldOn(display, true);
+        displayFlagHoldOn(norDisplay, true);
+        switchQuantity((int)conf->lfState.chan1.quantity, display);
+        switchQuantity((int)conf->lfState.chan2.quantity, norDisplay);
+        showPMErrorSigns(display, true);
+        display->hideAvgDisplay();
+        display->showErrDisplay();
+        display->showBarDisplay();
+    }else {
+        lfDisableButtons();
+        norDisplay->hide();
+        displayFlagHoldOn(display, true);
+        display->setLabelText(LABELNUM_QUAN, "DUTY CYCLE & PULSE WIDTH");
+        display->configLabel(LABELNUM_PINS, pin, TEXT_COLOR_GREY, true);
+        unitsStyleSheet = "image: url(:/graphics/graphics/units_sec.png); border: none;";
+        display->setAvgStyle(unitsStyleSheet);
+        unitsStyleSheet = "image: url(:/graphics/graphics/units_perc.png); border: none;";
+        display->setUnitsStyle(unitsStyleSheet);
+        display->showAvgDisplay();
+        showPMErrorSigns(display, false);
+        display->hideErrDisplay();
+        display->hideBarDisplay();
+    }
+}
+
+void CounterWindow::lfDisableButtons(){
+    tabLowFreq->buttonsChannelSwitch->disableAll();
+    tabLowFreq->buttonsQuantitySwitch->disableAll();
+    tabLowFreq->buttonsMultiplierSwitch->disableAll();
+    if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){
+        tabLowFreq->dialSampleCountCh1->setEnabled(false);
+    } else {
+        tabLowFreq->dialSampleCountCh2->setEnabled(false);
+    }
+}
+
+void CounterWindow::lfEnableButtons(){
+    tabLowFreq->buttonsChannelSwitch->enableAll();
+    tabLowFreq->buttonsQuantitySwitch->enableAll();
+    tabLowFreq->buttonsMultiplierSwitch->enableAll();
+    if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){
+        tabLowFreq->dialSampleCountCh1->setEnabled(true);
+    }    else {
+        tabLowFreq->dialSampleCountCh2->setEnabled(true);
+    }
+}
+
+/************************************** REFERENCE MEAS. FUNCTIONS ****************************************/
