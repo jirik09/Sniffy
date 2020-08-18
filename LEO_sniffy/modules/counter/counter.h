@@ -5,8 +5,6 @@
 #include <QPointF>
 #include <QtMath>
 #include <QEventLoop>
-#include <QTimer>
-#include <QVector>
 
 #include "counterwindow.h"
 #include "communication/commands.h"
@@ -53,7 +51,6 @@ private:
     void specReceived();
     void write(QByteArray feature, QByteArray param);
     void write(QByteArray feature, int param);
-    //void msleep(int msec);
 
     /* High Frequency Counter */
     MovingAverage *movAvg;

@@ -114,7 +114,7 @@ void Counter::clearDisplay(WidgetDisplay *display){
     cntWindow->showPMErrorSigns(display, false);
 }
 
-void Counter::switchCounterModeCallback(int index){    
+void Counter::switchCounterModeCallback(int index){
     conf->mode = (CounterMode)index;
     cntWindow->reconfigDisplayLabelArea(spec);
     write(cmd->COUNTER_MODE, cmd->pCOUNTER_MODE.at(index));
@@ -137,12 +137,6 @@ void Counter::write(QByteArray feature, QByteArray param){
 void Counter::write(QByteArray feature, int param){
     comm->write(moduleCommandPrefix, feature, param);
 }
-
-//void Counter::msleep(int msec){
-//    QEventLoop loop;
-//    QTimer::singleShot(msec, &loop, &QEventLoop::quit);
-//    loop.exec();
-//}
 
 /************************************** HIGH FREQ FUNCTIONS ****************************************/
 void Counter::parseHighFrequencyCounter(QByteArray data){
@@ -291,7 +285,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         display->displayString(strVal);
         display->displayAvgString(strVal2);
         QString color = (channel == "IC1D") ? "blue" : "grey";
-        display->drawIndicationFlag(LABELNUM_FLAG, "blue");
+        display->drawIndicationFlag(LABELNUM_FLAG, color);
     }
 }
 
@@ -307,7 +301,9 @@ void Counter::lfReloadState(){
     lfSwitchMultiplier((int)conf->lfState.chan2.multiplier, cmd->LF_CH2_MULTIPLIER);
     lfDialSampleCountCh1ChangedCallback(conf->lfState.chan1.sampleCountBackup);
     lfDialSampleCountCh2ChangedCallback(conf->lfState.chan2.sampleCountBackup);
-
+    LFState::Channel chan = (conf->lfState.activeChan == LFState::ActiveChan::CHAN1) ? conf->lfState.chan1 : conf->lfState.chan2;
+    if (chan.dutyCycle == LFState::Channel::DutyCycle::ENABLED)
+        lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
 }
 
 bool Counter::isRangeExceeded(double frequency){
@@ -367,13 +363,15 @@ void Counter::lfSwitchDutyCycleCallback(int index){
         conf->lfState.chan2.dutyCycle = (LFState::Channel::DutyCycle)index;
         chanDutyCycle = cmd->LF_CH2_DUTY_CYCLE_ENABLE;
     }
+
     if(index == 0){
         write(cmd->LF_DUTY_CYCLE, cmd->LF_DUTY_CYCLE_DISABLE);
+        clearDisplay(cntWindow->displayCh1);
+        clearDisplay(cntWindow->displayCh2);
+        lfReloadState();
     }else if (index == 1) {
         write(cmd->LF_DUTY_CYCLE, chanDutyCycle);
     }
-    clearDisplay(cntWindow->displayCh1);
-    clearDisplay(cntWindow->displayCh2);
 }
 
 void Counter::lfDialSampleCountCh1ChangedCallback(float val){

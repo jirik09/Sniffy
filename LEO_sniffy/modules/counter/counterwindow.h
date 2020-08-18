@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QDebug>
+#include <QTimer>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgettab.h"
@@ -46,6 +47,7 @@ public:
     void displayFlagSwitchMode(WidgetDisplay *display, bool visible);
     void showPMErrorSigns(WidgetDisplay *display, bool visible);
     void reconfigDisplayLabelArea(CounterSpec *spec);
+    void msleep(int msec);
 
     void hfSetColorRemainSec(QColor color);
 
@@ -53,6 +55,7 @@ private:
     Ui::CounterWindow *ui;
     CounterConfig *conf;
     CounterSpec *spec;
+    int previousIndex;
 
     void createCounterTabs(void);
     void configureCounterTabs(void);

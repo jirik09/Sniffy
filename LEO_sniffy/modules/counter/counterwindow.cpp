@@ -94,6 +94,9 @@ void CounterWindow::specReceived(CounterSpec *spec){
 }
 
 void CounterWindow::switchCounterModeCallback(int index){
+    if(previousIndex == (int)CounterMode::LOW_FREQUENCY)
+        lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::DISABLED);
+
     if(index == 0){
         displayCh2->hide();
         displayCh1->showAvgDisplay();
@@ -105,6 +108,9 @@ void CounterWindow::switchCounterModeCallback(int index){
         displayCh2->hideAvgDisplay();
         switchQuantity((int)conf->lfState.chan1.quantity, displayCh1);
         hfSwitchErrorAvgCallback(0);
+        LFState::Channel chan = (conf->lfState.activeChan == LFState::ActiveChan::CHAN1) ? conf->lfState.chan1 : conf->lfState.chan2;
+        if (chan.dutyCycle == LFState::Channel::DutyCycle::ENABLED)
+            lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
     }else if(index == 2) {
         displayCh2->hide();
         displayCh1->hideAvgDisplay();
@@ -112,6 +118,8 @@ void CounterWindow::switchCounterModeCallback(int index){
         displayCh2->hide();
         displayCh1->hideAvgDisplay();
     }
+
+    previousIndex = index;
 }
 
 void CounterWindow::displayFlagHoldOn(WidgetDisplay *display, bool visible){
@@ -153,6 +161,12 @@ void CounterWindow::switchQuantity(int index, WidgetDisplay *display){
         unitsStyleSheet = "image: url(:/graphics/graphics/units_sec.png); border: none;";
     }
     display->setUnitsStyle(unitsStyleSheet);
+}
+
+void CounterWindow::msleep(int msec){
+    QEventLoop loop;
+    QTimer::singleShot(msec, &loop, &QEventLoop::quit);
+    loop.exec();
 }
 
 /************************************** HIGH FREQ FUNCTIONS ****************************************/
@@ -234,6 +248,7 @@ void CounterWindow::lfSwitchDutyCycleCallback(int index){
         displayFlagHoldOn(display, true);
         display->setLabelText(LABELNUM_QUAN, "DUTY CYCLE & PULSE WIDTH");
         display->configLabel(LABELNUM_PINS, pin, TEXT_COLOR_GREY, true);
+        display->changeAvgColor(QCOLOR_WHITE);
         unitsStyleSheet = "image: url(:/graphics/graphics/units_sec.png); border: none;";
         display->setAvgStyle(unitsStyleSheet);
         unitsStyleSheet = "image: url(:/graphics/graphics/units_perc.png); border: none;";
