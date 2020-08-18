@@ -523,7 +523,7 @@ color: rgb(214, 214, 214);
                <enum>QFrame::NoFrame</enum>
               </property>
               <property name="digitCount">
-               <number>12</number>
+               <number>11</number>
               </property>
               <property name="segmentStyle">
                <enum>QLCDNumber::Flat</enum>
@@ -560,6 +560,9 @@ color: rgb(214, 214, 214);
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
               <property name="frameShape">
                <enum>QFrame::NoFrame</enum>
               </property>
@@ -567,7 +570,7 @@ color: rgb(214, 214, 214);
                <enum>QFrame::Plain</enum>
               </property>
               <property name="digitCount">
-               <number>12</number>
+               <number>11</number>
               </property>
               <property name="segmentStyle">
                <enum>QLCDNumber::Flat</enum>

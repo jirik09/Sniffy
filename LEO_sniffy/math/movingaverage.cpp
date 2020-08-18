@@ -4,7 +4,7 @@ MovingAverage::MovingAverage(uint defaultBuffSize, QObject *parent) :
     QObject(parent), buffSize(defaultBuffSize)
 {
     /* Default buffer size is set to 2 if not specified higher */
-    if(defaultBuffSize < 2){ buffSize = 2; }
+    if(defaultBuffSize < 2) buffSize = 2;
 }
 
 /*
@@ -13,9 +13,8 @@ MovingAverage::MovingAverage(uint defaultBuffSize, QObject *parent) :
  */
 uint MovingAverage::prepend(double newValue){
     uint count = buffer.count();
-    if (count == buffSize){
+    if (count == buffSize)
         buffer.removeLast();
-    }
     buffer.prepend(newValue);
     count+= 1;
     return (buffSize - count);
@@ -28,9 +27,8 @@ uint MovingAverage::prepend(double newValue){
  */
 double MovingAverage::getAverage(){
     double sum = 0;
-    for (uint i = 0; i < buffSize; i++) {
+    for (uint i = 0; i < buffSize; i++)
         sum += buffer.at(i);
-    }
     return (sum / buffSize);
 }
 
@@ -40,9 +38,8 @@ double MovingAverage::getAverage(){
  */
 uint MovingAverage::setBufferSize(int newBuffSize){
     int count = buffer.count();
-    if(newBuffSize < count){
+    if(newBuffSize < count)
         removeItems(count - newBuffSize);
-    }
     buffSize = newBuffSize;
     return (newBuffSize - count);
 }
@@ -61,7 +58,7 @@ uint MovingAverage::getBufferSize(){
  * @retval TRUE / FALSE
  */
 bool MovingAverage::isBufferFull(){
-     return ((uint)buffer.count() == buffSize) ? true : false;
+    return ((uint)buffer.count() == buffSize) ? true : false;
 }
 
 /*
@@ -69,6 +66,14 @@ bool MovingAverage::isBufferFull(){
  */
 uint MovingAverage::getSampleCountToFillBuff(){
     return buffSize - buffer.count();
+}
+
+/*
+ * @rbrief Clear the entire buffer
+ */
+void MovingAverage::clear(){
+    if(!buffer.isEmpty())
+        buffer.clear();
 }
 
 /*

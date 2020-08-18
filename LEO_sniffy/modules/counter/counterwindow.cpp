@@ -95,16 +95,14 @@ void CounterWindow::specReceived(CounterSpec *spec){
 void CounterWindow::switchCounterModeCallback(int index){
     if(index == 0){
         displayCh2->hide();
-        displayCh1->showAvgDisplay();
-        //displayCh1->displayString("");
-        hfSwitchQuantityCallback((int)config->hfQuantity);
-        hfSwitchErrorAvgCallback((int)config->error);
+        displayCh1->showAvgDisplay();        
+        hfSwitchQuantityCallback((int)config->hfState.quantity);
+        hfSwitchErrorAvgCallback((int)config->hfState.error);
     }else if(index == 1) {
-        displayCh2->show();
-        //displayCh1->displayString("");
+        displayCh2->show();        
         displayCh1->hideAvgDisplay();
         displayCh2->hideAvgDisplay();
-        switchQuantity((int)config->lfCh1States.lfQuantity, displayCh1);
+        switchQuantity((int)config->lfState.chan1.quantity, displayCh1);
         hfSwitchErrorAvgCallback(0);
     }else if(index == 2) {
         displayCh2->hide();
@@ -201,7 +199,7 @@ void CounterWindow::lfSwitchChannelCallback(int index){
 }
 
 void CounterWindow::lfSwitchQuantityCallback(int index){    
-    WidgetDisplay *display = (config->activeChan == LFActiveChan::CHAN1) ? displayCh1 : displayCh2;
+    WidgetDisplay *display = (config->lfState.activeChan == LFState::ActiveChan::CHAN1) ? displayCh1 : displayCh2;
     switchQuantity(index, display);
 }
 

@@ -2,7 +2,15 @@
 
 Commands::Commands(QObject *parent) : QObject(parent)
 {
+
+    // Counter LF multiplier
+//    Commands::LF_MULTIPLIER_1X = (QByteArray *)"1x__";
+//    Commands::LF_MULTIPLIER_2X = (QByteArray *)"2x__";
+//    Commands::LF_MULTIPLIER_4X = (QByteArray *)"4x__";
+//    Commands::LF_MULTIPLIER_8X = (QByteArray *)"8x__";
+    Commands::pLF_MULTIPLIER = {LF_MULTIPLIER_1X, LF_MULTIPLIER_2X, LF_MULTIPLIER_4X, LF_MULTIPLIER_8X};
 }
+
 const QByteArray Commands::IDN = "IDN_";
 
 /* COMMUNICATION */
@@ -150,4 +158,10 @@ const QByteArray Commands::LF_MULTIPLIER_8X = "8x__";
 // Counter LF Sample Count buffer
 const QByteArray Commands::LF_CH1_SAMPLE_COUNT = "BUF1";
 const QByteArray Commands::LF_CH2_SAMPLE_COUNT = "BUF2";
+
+// Counter LF Duty Cycle
+const QByteArray Commands::LF_DUTY_CYCLE = "DUCY";
+const QByteArray Commands::LF_CH1_DUTY_CYCLE_ENABLE = "DCE1";
+const QByteArray Commands::LF_CH2_DUTY_CYCLE_ENABLE = "DCE2";
+const QByteArray Commands::LF_DUTY_CYCLE_DISABLE = "DCX_";
 

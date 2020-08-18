@@ -50,7 +50,7 @@ public:
     QString getLabelText(int labelNumber);
     void hideLabel(int labelNumber);
     void showLabel(int labelNumber);
-    void drawIndicationFlag(int labelNumber);
+    void drawIndicationFlag(int labelNumber, QString color);
 
     /* Progress bar */
     void hideProgressBar();

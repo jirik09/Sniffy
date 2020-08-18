@@ -45,5 +45,10 @@ widgetTab::~widgetTab()
 
 void widgetTab::on_tabWidget_currentChanged(int index)
 {
+    emit currentChanged(index);
+}
+
+void widgetTab::on_tabWidget_tabBarClicked(int index)
+{
     emit tabBarClicked(index);
 }

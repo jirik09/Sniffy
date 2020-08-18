@@ -16,13 +16,14 @@ public:
     uint getBufferSize();
     bool isBufferFull();
     uint getSampleCountToFillBuff();
-    void clearBuffer();
+    void clear();
 
 private:
     QList<double> buffer;
     uint buffSize;
 
     void removeItems(uint sampleCount);
+    void clearBuffer();
 
 signals:
 

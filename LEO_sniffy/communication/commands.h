@@ -2,8 +2,7 @@
 #define COMMANDS_H
 
 #include <QObject>
-
-
+#include <QList>
 
 class Commands : public QObject
 {
@@ -125,16 +124,16 @@ public:
     // Counter complete deinit
     static const QByteArray COUNTER_DEINIT;
 
-    // Counter common
-    static const QByteArray QUANT_FREQUENCY;
-    static const QByteArray QUANT_PERIOD;
-
     // Counter modes
     static const QByteArray COUNTER_MODE;
     static const QByteArray MODE_HIGH_FREQ;
     static const QByteArray MODE_LOW_FREQ;
     static const QByteArray MODE_REFERENCE;
     static const QByteArray MODE_INTERVAL;
+
+    // Counter common
+    static const QByteArray QUANT_FREQUENCY;
+    static const QByteArray QUANT_PERIOD;
 
     // Counter HF quantity
     static const QByteArray HF_QUANTITY;
@@ -155,15 +154,22 @@ public:
     static const QByteArray LF_CH1_MULTIPLIER;
     static const QByteArray LF_CH2_MULTIPLIER;
 
-    // Counter LF multiplier
+    // Counter LF multiplier    
     static const QByteArray LF_MULTIPLIER_1X;
     static const QByteArray LF_MULTIPLIER_2X;
     static const QByteArray LF_MULTIPLIER_4X;
     static const QByteArray LF_MULTIPLIER_8X;
+    QList<QByteArray> pLF_MULTIPLIER;
 
     // Counter LF Sample Count buffer
     static const QByteArray LF_CH1_SAMPLE_COUNT;
     static const QByteArray LF_CH2_SAMPLE_COUNT;
+
+    // Counter LF Duty Cycle
+    static const QByteArray LF_DUTY_CYCLE;
+    static const QByteArray LF_CH1_DUTY_CYCLE_ENABLE;
+    static const QByteArray LF_CH2_DUTY_CYCLE_ENABLE;
+    static const QByteArray LF_DUTY_CYCLE_DISABLE;
 };
 
 #endif // COMMANDS_H

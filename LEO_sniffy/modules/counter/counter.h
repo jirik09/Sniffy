@@ -30,7 +30,7 @@ public:
 private:
 
     CounterWindow *cntWindow;
-    CounterConfig *config;
+    CounterConfig *conf;
     CounterSpec *spec;
     QLocale loc;
 
@@ -43,7 +43,10 @@ private:
     void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);
     void clearDisplay(WidgetDisplay *display);
     void specReceived();
-    void msleep(int msec);
+    void write(QByteArray feature, QByteArray param);
+//    void write2(QByteArray feature, QByteArray param);
+    void write(QByteArray feature, int param);
+    //void msleep(int msec);
 
     /* High Frequency Counter */
     MovingAverage *movAvg;
@@ -80,7 +83,7 @@ private slots:
     void lfSwitchChannelCallback(int index);
     void lfSwitchQuantityCallback(int index);
     void lfSwitchMultiplierCallback(int index);
-    void lfSwitchDutyCycleCallback(int index);
+    void lfSwitchDutyCycleCallback(int index);    
     void lfDialSampleCountCh1ChangedCallback(float val);
     void lfDialSampleCountCh2ChangedCallback(float val);
 };
