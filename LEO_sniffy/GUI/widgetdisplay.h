@@ -7,6 +7,7 @@
 
 #include "widgetlabel.h"
 #include "../graphics/colors.h"
+#include "../graphics/styles.h"
 
 namespace Ui {
 class WidgetDisplay;
@@ -39,12 +40,10 @@ public:
     void showQerrStyle(bool visible);
     void showTerrStyle(bool visible);
     void showQerrTerrStyle(bool visible);    
-    void showAvgDisplay();
-    void showErrDisplay();
-    void showBarDisplay();
-    void hideAvgDisplay();    
-    void hideErrDisplay();
-    void hideBarDisplay();
+    void showAvgDisplay(bool visible);
+    void showErrDisplay(bool visible);
+    void showBarDisplay(bool visible);
+
     void changeAvgColor(QColor color);
 
     /* Label area */
@@ -56,9 +55,8 @@ public:
     void showLabel(int labelNumber);
     void drawIndicationFlag(int labelNumber, QString color);
 
-    /* Progress bar */
-    void hideProgressBar();
-    void showProgressBar();
+    /* Progress bar */    
+    void showProgressBar(bool visible);
     void setRangeProgressBar(int min, int max);
     void updateProgressBar(int value);
 

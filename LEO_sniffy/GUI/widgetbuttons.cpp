@@ -158,12 +158,12 @@ void WidgetButtons::disableAll(){
     }
 }
 
-void WidgetButtons::setEnabledButton(bool enabled, int index){
-    pushButtonsList.at(index)->setEnabled(enabled);
+void WidgetButtons::setEnabledButton(bool enable, int index){
+    pushButtonsList.at(index)->setEnabled(enable);
 }
-void WidgetButtons::enableAll(){
+void WidgetButtons::enableAll(bool enable){
     for (int i=0;i<8;i++) {
-        setEnabledButton(true, i);
+        setEnabledButton(enable, i);
     }
 }
 

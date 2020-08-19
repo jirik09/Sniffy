@@ -58,7 +58,7 @@ void Counter::parseData(QByteArray data){
     if(dataHeader == "CFG_"){
         showModuleControl();
         spec = new CounterSpec(dataToPass, this);
-        cntWindow->specReceived(spec); // something like signal :D
+        cntWindow->setSpecification(spec);
     }else {
 
         if(dataHeader == "HF_D"){
@@ -74,8 +74,7 @@ void Counter::parseData(QByteArray data){
 }
 
 /************************************** COMMON FUNCTIONS ****************************************/
-QString Counter::formatNumber(double valToFormat, double error)
-{
+QString Counter::formatNumber(double valToFormat, double error){
     QString str;
     const int places = 5;
     int abs = qFabs(error);
@@ -95,28 +94,17 @@ QString Counter::formatNumber(double valToFormat, double error)
 }
 
 void Counter::displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr){
-    if(conf->mode == CounterMode::HIGH_FREQUENCY)
-        display->displayAvgString(avg);
+    display->displayAvgString(avg);
     display->displayString(val);
     display->displayQerrString(qerr);
     display->displayTerrString(terr);
-    QString color = (display == cntWindow->displayCh1) ? "blue" : "grey";
+    QString color = (display == cntWindow->displayLFCh2) ? "grey" : "blue";
     display->drawIndicationFlag(LABELNUM_FLAG, color);
-}
-
-void Counter::clearDisplay(WidgetDisplay *display){
-    if(conf->hfState.hold == HFState::HoldOnState::OFF)
-        display->displayAvgString("");
-    display->displayString("");
-    display->displayQerrString("");
-    display->displayTerrString("");
-    cntWindow->displayFlagHoldOn(display, true);
-    cntWindow->showPMErrorSigns(display, false);
+    cntWindow->displayFlagHoldOn(display, false);
 }
 
 void Counter::switchCounterModeCallback(int index){
     conf->mode = (CounterMode)index;
-    cntWindow->reconfigDisplayLabelArea(spec);
     write(cmd->COUNTER_MODE, cmd->pCOUNTER_MODE.at(index));
     //reloadModeState[index];
     if(index == 0){
@@ -151,7 +139,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     uint countToGo = (isFrequency) ? movAvg->prepend(val) : movAvg->prepend(1/val);
     this->strQerr = strQerr = loc.toString(qerr, 'g', 3).replace(loc.decimalPoint(), '.');
     this->strTerr = strTerr = loc.toString(terr, 'g', 3).replace(loc.decimalPoint(), '.');
-    cntWindow->showPMErrorSigns(cntWindow->displayCh1, true);
+    cntWindow->showPMErrorSigns(cntWindow->displayHF, true);
 
     if(movAvg->isBufferFull()){
         conf->hfState.hold = HFState::HoldOnState::OFF;
@@ -164,24 +152,20 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
         strAvg = formatNumber(avg, qerr+terr);
     }else {
         if(conf->hfState.error == HFState::ErrorType::AVERAGE){
-            cntWindow->showPMErrorSigns(cntWindow->displayCh1, false);
+            cntWindow->showPMErrorSigns(cntWindow->displayHF, false);
             strQerr = " ";
             strTerr = " ";
         }
         strAvg = hfFormatRemainSec(countToGo, 0);
     }
 
-    displayValues(cntWindow->displayCh1, formatNumber(val, qerr+terr), strAvg, strQerr, strTerr);
-    cntWindow->displayFlagHoldOn(cntWindow->displayCh1, false);
+    displayValues(cntWindow->displayHF, formatNumber(val, qerr+terr), strAvg, strQerr, strTerr);
     val = (isFrequency) ? val : 1 / val;
-    cntWindow->displayCh1->updateProgressBar(val);
+    cntWindow->displayHF->updateProgressBar(val);
     conf->hfState.quantState = HFState::QuantitySwitched::NO;
 }
 
 void Counter::hfReloadState(){
-    clearDisplay(cntWindow->displayCh1);
-    cntWindow->displayFlagHoldOn(cntWindow->displayCh1, true);
-
     hfSwitchQuantityCallback((int)conf->hfState.quantity);
     hfSwitchGateTimeCallback(conf->hfState.gateTimeIndexBackup);
 }
@@ -197,13 +181,13 @@ QString Counter::hfFormatRemainSec(uint countToGo, uint additionTime){
 void Counter::hfDisplayErrors(){
     if(conf->hfState.error == HFState::ErrorType::AVERAGE){
         if(conf->hfState.hold == HFState::HoldOnState::ON){
-            cntWindow->displayCh1->displayQerrString(" ");
-            cntWindow->displayCh1->displayTerrString(" ");
-            cntWindow->showPMErrorSigns(cntWindow->displayCh1, false);
+            cntWindow->displayHF->displayQerrString(" ");
+            cntWindow->displayHF->displayTerrString(" ");
+            cntWindow->showPMErrorSigns(cntWindow->displayHF, false);
         }else if (conf->hfState.hold == HFState::HoldOnState::OFF) {
-            cntWindow->displayCh1->displayQerrString(avgQerr);
-            cntWindow->displayCh1->displayTerrString(strTerr);
-            cntWindow->showPMErrorSigns(cntWindow->displayCh1, true);
+            cntWindow->displayHF->displayQerrString(avgQerr);
+            cntWindow->displayHF->displayTerrString(strTerr);
+            cntWindow->showPMErrorSigns(cntWindow->displayHF, true);
         }
     }
 }
@@ -212,7 +196,7 @@ void Counter::hfSwitchQuantityCallback(int index){
     conf->hfState.quantState = HFState::QuantitySwitched::YES;
     conf->hfState.quantity = (HFState::Quantity)index;
     write(cmd->HF_QUANTITY, cmd->pQUANTITIY.at(index));
-    clearDisplay(cntWindow->displayCh1);
+    cntWindow->clearDisplay(cntWindow->displayHF);
 }
 
 void Counter::hfSwitchGateTimeCallback(int index){
@@ -232,20 +216,20 @@ void Counter::hfSwitchGateTimeCallback(int index){
     }
     movAvg->clear();
     QString seconds = hfFormatRemainSec(movAvg->getSampleCountToFillBuff(), 0);
-    cntWindow->displayCh1->displayAvgString(seconds);
-    clearDisplay(cntWindow->displayCh1);
+    cntWindow->displayHF->displayAvgString(seconds);
+    cntWindow->clearDisplay(cntWindow->displayHF);
 }
 
 void Counter::hfSwitchErrorAvgCallback(int index){
     conf->hfState.error = (HFState::ErrorType)index;
-    cntWindow->displayFlagHoldOn(cntWindow->displayCh1, (bool)!index);
+    cntWindow->displayFlagHoldOn(cntWindow->displayHF, (bool)!index);
     hfDisplayErrors();
 }
 
 void Counter::hfDialAvgChangedCallback(float val){
     movAvg->setBufferSize(qFloor(val));
     QString seconds = hfFormatRemainSec(movAvg->getSampleCountToFillBuff(), 0);
-    cntWindow->displayCh1->displayAvgString(seconds);
+    cntWindow->displayHF->displayAvgString(seconds);
     hfDisplayErrors();
 }
 
@@ -261,56 +245,52 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val1 >> val2 >> qerr >> terr;
 
-    strQerr = loc.toString(qerr, 'g', 3).replace(loc.decimalPoint(), '.');
-    strTerr = loc.toString(terr, 'g', 3).replace(loc.decimalPoint(), '.');
-
     WidgetDisplay *display;
-    display = (channel == "IC1D") ? cntWindow->displayCh1 : cntWindow->displayCh2;
+    display = (channel == "IC1D") ? cntWindow->displayLFCh1 : cntWindow->displayLFCh2;
 
     if(mode == "FPME"){
+        strQerr = loc.toString(qerr, 'g', 3).replace(loc.decimalPoint(), '.');
+        strTerr = loc.toString(terr, 'g', 3).replace(loc.decimalPoint(), '.');
+
         bool isFrequency = (quantity == "QFRE") ? true : false;
         strVal = formatNumber(val1, qerr+terr);
+
         val1 = (isFrequency) ? val1 : 1 / val1;
         if(isRangeExceeded(val1)){
             cntWindow->displayFlagSwitchMode(display, true);
         }else {
             displayValues(display, strVal, "", strQerr, strTerr);
-            cntWindow->displayFlagSwitchMode(display, false);
         }
+
         display->updateProgressBar(val1);
         cntWindow->showPMErrorSigns(display, true);
+
     }else if (mode == "DUTY") {
         strVal = loc.toString(val1, 'f', 3).replace(loc.decimalPoint(), '.');
         strVal2 = loc.toString(val2, 'e', 5).replace(loc.decimalPoint(), '.');
-        display->displayString(strVal);
-        display->displayAvgString(strVal2);
-        QString color = (channel == "IC1D") ? "blue" : "grey";
-        display->drawIndicationFlag(LABELNUM_FLAG, color);
+        displayValues(display, strVal, strVal2, "", "");
     }
 }
 
 void Counter::lfReloadState(){
-    clearDisplay(cntWindow->displayCh1);
-    clearDisplay(cntWindow->displayCh2);
-    cntWindow->displayFlagHoldOn(cntWindow->displayCh1, true);
-    cntWindow->displayFlagHoldOn(cntWindow->displayCh2, true);
-
-    lfSwitchQuantity((int)conf->lfState.chan1.quantity, cmd->LF_CH1_QUANTITY);
-    lfSwitchQuantity((int)conf->lfState.chan2.quantity, cmd->LF_CH2_QUANTITY);
-    lfSwitchMultiplier((int)conf->lfState.chan1.multiplier, cmd->LF_CH1_MULTIPLIER);
-    lfSwitchMultiplier((int)conf->lfState.chan2.multiplier, cmd->LF_CH2_MULTIPLIER);
-    lfDialSampleCountCh1ChangedCallback(conf->lfState.chan1.sampleCountBackup);
-    lfDialSampleCountCh2ChangedCallback(conf->lfState.chan2.sampleCountBackup);
     LFState::Channel chan = (conf->lfState.activeChan == LFState::ActiveChan::CHAN1) ? conf->lfState.chan1 : conf->lfState.chan2;
-    if (chan.dutyCycle == LFState::Channel::DutyCycle::ENABLED)
+    if (chan.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
         lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
+    }else {
+        lfSwitchQuantity((int)conf->lfState.chan1.quantity, cmd->LF_CH1_QUANTITY);
+        lfSwitchQuantity((int)conf->lfState.chan2.quantity, cmd->LF_CH2_QUANTITY);
+        lfSwitchMultiplier((int)conf->lfState.chan1.multiplier, cmd->LF_CH1_MULTIPLIER);
+        lfSwitchMultiplier((int)conf->lfState.chan2.multiplier, cmd->LF_CH2_MULTIPLIER);
+        lfDialSampleCountCh1ChangedCallback(conf->lfState.chan1.sampleCountBackup);
+        lfDialSampleCountCh2ChangedCallback(conf->lfState.chan2.sampleCountBackup);
+    }
 }
 
 bool Counter::isRangeExceeded(double frequency){
     return (frequency > spec->lf_uppLmt) ? true : false;
 }
 
-void Counter::lfSwitchChannelCallback(int index){    
+void Counter::lfSwitchChannelCallback(int index){
     conf->lfState.activeChan = LFState::ActiveChan(index);
     LFState::Channel chanState = (index == 0) ? conf->lfState.chan1 : conf->lfState.chan2;
     cntWindow->tabLowFreq->buttonsQuantitySwitch->setChecked(true, (int)chanState.quantity);
@@ -318,20 +298,20 @@ void Counter::lfSwitchChannelCallback(int index){
     cntWindow->tabLowFreq->buttonsMultiplierSwitch->setChecked(true, (int)chanState.multiplier);
 }
 
-void Counter::lfSwitchQuantityCallback(int index){    
+void Counter::lfSwitchQuantityCallback(int index){
     QByteArray chanQuant;
-    WidgetDisplay *display = cntWindow->displayCh1;
+    WidgetDisplay *display = cntWindow->displayLFCh1;
     if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){
         conf->lfState.chan1.quantity = (LFState::Channel::Quantity)index;
-        display = cntWindow->displayCh1;
+        display = cntWindow->displayLFCh1;
         chanQuant = cmd->LF_CH1_QUANTITY;
     }else if (conf->lfState.activeChan == LFState::ActiveChan::CHAN2) {
         conf->lfState.chan2.quantity = (LFState::Channel::Quantity)index;
-        display = cntWindow->displayCh2;
+        display = cntWindow->displayLFCh2;
         chanQuant = cmd->LF_CH2_QUANTITY;
     }
     lfSwitchQuantity(index, chanQuant);
-    clearDisplay(display);
+    cntWindow->clearDisplay(display);
 }
 
 void Counter::lfSwitchQuantity(int index, QByteArray channelQuantitiy){
@@ -364,12 +344,10 @@ void Counter::lfSwitchDutyCycleCallback(int index){
         chanDutyCycle = cmd->LF_CH2_DUTY_CYCLE_ENABLE;
     }
 
-    if(index == 0){
+    if(index == (int)LFState::Channel::DutyCycle::DISABLED){
         write(cmd->LF_DUTY_CYCLE, cmd->LF_DUTY_CYCLE_DISABLE);
-        clearDisplay(cntWindow->displayCh1);
-        clearDisplay(cntWindow->displayCh2);
         lfReloadState();
-    }else if (index == 1) {
+    }else if (index == (int)LFState::Channel::DutyCycle::ENABLED) {
         write(cmd->LF_DUTY_CYCLE, chanDutyCycle);
     }
 }

@@ -35,18 +35,21 @@ public:
     explicit CounterWindow(CounterConfig *config, QWidget *parent = nullptr);
     ~CounterWindow();
 
-    WidgetDisplay *displayCh1;
-    WidgetDisplay *displayCh2;
+    WidgetDisplay *displayHF;
+    WidgetDisplay *displayLFCh1;
+    WidgetDisplay *displayLFCh2;
+    WidgetDisplay *displayRef;
+    WidgetDisplay *displayInt;
 
     widgetTab *tabs;
     CounterTabHighFreq *tabHighFreq;
     CounterTabLowFreq *tabLowFreq;
 
-    void specReceived(CounterSpec *spec);
+    void setSpecification(CounterSpec *spec);
     void displayFlagHoldOn(WidgetDisplay *display, bool visible);
     void displayFlagSwitchMode(WidgetDisplay *display, bool visible);
     void showPMErrorSigns(WidgetDisplay *display, bool visible);
-    void reconfigDisplayLabelArea(CounterSpec *spec);
+    void clearDisplay(WidgetDisplay *display);
     void msleep(int msec);
 
     void hfSetColorRemainSec(QColor color);
@@ -55,17 +58,24 @@ private:
     Ui::CounterWindow *ui;
     CounterConfig *conf;
     CounterSpec *spec;
-    int previousIndex;
+    int modePrevIndex;
 
     void createCounterTabs(void);
     void configureCounterTabs(void);
-    void createTwoDisplays(void);
-    WidgetDisplay* createDisplay(void);
-    void configureDisplays(void);
-    void switchQuantity(int index, WidgetDisplay *display);
+    void createAllDisplays(void);
+    WidgetDisplay* createLFDisplays(void);
+    void configureAllDisplays(void);
+    void configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString sideLabelsColor);
+    void configureDisplaysDynamicAttr();
+    void configureHFLFErrorStyles(WidgetDisplay *display);
+    void resetPreviousCounterMode();
+    void setNextCounterMode(int index);
+    void switchQuantity(int index, WidgetDisplay *display);    
 
-    void lfDisableButtons();
-    void lfEnableButtons();
+    void lfEnableTabsComponents(bool enable);
+    void lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *norDisplay, QString pin);
+    void lfResetDutyCycle(WidgetDisplay *display, WidgetDisplay *norDisplay);
+    void lfShowDutyCycleDisplays(WidgetDisplay *display, bool dutyEnable);
 
 signals:
 

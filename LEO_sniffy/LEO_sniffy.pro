@@ -93,6 +93,7 @@ HEADERS += \
     devicedescriptor.h \
     devicemediator.h \
     graphics/colors.h \
+    graphics/styles.h \
     mainwindow.h \
     math/movingaverage.h \
     modules/counter/counter.h \

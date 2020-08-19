@@ -42,7 +42,7 @@ public:
     void setDisabledButton(bool disabled, int index);
     void setEnabledButton(bool enabled, int index);
     void disableAll();
-    void enableAll();
+    void enableAll(bool enable);
     void setChecked (bool checked, int index);
 
 private:

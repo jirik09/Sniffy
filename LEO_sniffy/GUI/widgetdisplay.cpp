@@ -66,34 +66,19 @@ void WidgetDisplay::showQerrTerrStyle(bool visible){
     }
 }
 
-void WidgetDisplay::showAvgDisplay()
+void WidgetDisplay::showAvgDisplay(bool visible)
 {
-    ui->horizontalWidget_avg->show();
+    (visible) ? ui->horizontalWidget_avg->show() : ui->horizontalWidget_avg->hide();
 }
 
-void WidgetDisplay::hideAvgDisplay()
+void WidgetDisplay::showErrDisplay(bool visible)
 {
-    ui->horizontalWidget_avg->hide();
+    (visible) ? ui->horizontalWidget_err->show() : ui->horizontalWidget_err->hide();
 }
 
-void WidgetDisplay::showErrDisplay()
+void WidgetDisplay::showBarDisplay(bool visible)
 {
-    ui->horizontalWidget_err->show();
-}
-
-void WidgetDisplay::hideErrDisplay()
-{
-    ui->horizontalWidget_err->hide();
-}
-
-void WidgetDisplay::showBarDisplay()
-{
-    ui->horizontalWidget_err->show();
-}
-
-void WidgetDisplay::hideBarDisplay()
-{
-    ui->horizontalWidget_err->hide();
+    (visible) ? ui->horizontalWidget_err->show() : ui->horizontalWidget_err->hide();
 }
 
 void WidgetDisplay::displayNumber(double number){
@@ -133,12 +118,8 @@ void WidgetDisplay::changeAvgColor(QColor color){
     ui->lcdNumber_avg->setPalette(palette);
 }
 
-void WidgetDisplay::hideProgressBar(){
-    ui->progressBar->hide();
-}
-
-void WidgetDisplay::showProgressBar(){
-    ui->progressBar->show();
+void WidgetDisplay::showProgressBar(bool visible){
+    (visible) ? ui->progressBar->show() : ui->progressBar->hide();
 }
 
 void WidgetDisplay::setRangeProgressBar(int min, int max){

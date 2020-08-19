@@ -47,7 +47,7 @@ private:
 
     QString formatNumber(double valToFormat, double error);
     void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);
-    void clearDisplay(WidgetDisplay *display);
+    //void clearDisplay(WidgetDisplay *display);
     void specReceived();
     void write(QByteArray feature, QByteArray param);
     void write(QByteArray feature, int param);
