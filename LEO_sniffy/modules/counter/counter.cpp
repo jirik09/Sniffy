@@ -245,8 +245,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val1 >> val2 >> qerr >> terr;
 
-    WidgetDisplay *display;
-    display = (channel == "IC1D") ? cntWindow->displayLFCh1 : cntWindow->displayLFCh2;
+    WidgetDisplay *display = (channel == "IC1D") ? cntWindow->displayLFCh1 : cntWindow->displayLFCh2;
 
     if(mode == "FPME"){
         strQerr = loc.toString(qerr, 'g', 3).replace(loc.decimalPoint(), '.');
