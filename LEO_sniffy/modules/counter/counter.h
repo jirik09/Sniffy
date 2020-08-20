@@ -67,6 +67,7 @@ private:
     void lfSwitchQuantity(int index, QByteArray channelQuantitiy);
     void lfSwitchMultiplier(int index, QByteArray channelMultiplier);
     void lfReloadState();
+    void lfReloadStateQuantMeasurement();
 
     /* Reference Counter */
     void refReloadState();

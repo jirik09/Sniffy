@@ -49,7 +49,7 @@ public:
     void displayFlagHoldOn(WidgetDisplay *display, bool visible);
     void displayFlagSwitchMode(WidgetDisplay *display, bool visible);
     void showPMErrorSigns(WidgetDisplay *display, bool visible);
-    void clearDisplay(WidgetDisplay *display);
+    void clearDisplay(WidgetDisplay *display, bool uponSwitch);
     void msleep(int msec);
 
     void hfSetColorRemainSec(QColor color);
@@ -76,6 +76,7 @@ private:
     void lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *norDisplay, QString pin);
     void lfResetDutyCycle(WidgetDisplay *display, WidgetDisplay *norDisplay);
     void lfShowDutyCycleDisplays(WidgetDisplay *display, bool dutyEnable);
+    void lfShowErrorStyle(WidgetDisplay *display, bool show);
 
 signals:
 

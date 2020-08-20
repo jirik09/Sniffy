@@ -126,56 +126,46 @@ void CounterWindow::switchCounterModeCallback(int index){
 void CounterWindow::resetPreviousCounterMode(){
     if(modePrevIndex == (int)CounterMode::HIGH_FREQUENCY){
         displayHF->hide();
-        clearDisplay(displayHF);
+        clearDisplay(displayHF, true);
     }else if(modePrevIndex == (int)CounterMode::LOW_FREQUENCY){
         displayLFCh1->hide();
         displayLFCh2->hide();
-        clearDisplay(displayLFCh1);
-        clearDisplay(displayLFCh2);
+        clearDisplay(displayLFCh1, true);
+        clearDisplay(displayLFCh2, true);
     }else if(modePrevIndex == (int)CounterMode::REFERENCE) {
         displayRef->hide();
-        clearDisplay(displayRef);
+        clearDisplay(displayRef, true);
     }else if(modePrevIndex == (int)CounterMode::INTERVAL) {
         displayInt->hide();
-        clearDisplay(displayRef);
+        clearDisplay(displayRef, true);
     }
 }
 
 void CounterWindow::setNextCounterMode(int index){
     if(index == (int)CounterMode::HIGH_FREQUENCY){
-        displayFlagHoldOn(displayHF, true);
         displayHF->show();
     }else if(index == (int)CounterMode::LOW_FREQUENCY) {
-        if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
-            displayFlagHoldOn(displayLFCh1, true);
-            displayLFCh1->show();
-            displayLFCh2->hide();
-        }else if(conf->lfState.chan2.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
-            displayFlagHoldOn(displayLFCh2, true);
-            displayLFCh2->show();
-            displayLFCh1->hide();
-        }else {
-            displayFlagHoldOn(displayLFCh1, true);
-            displayFlagHoldOn(displayLFCh2, true);
-            displayLFCh1->show();
-            displayLFCh2->show();
-        }
+        if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED)
+            displayLFCh2->setLabelText(LABELNUM_HOLD, "Just no luck!");
+        if(conf->lfState.chan2.dutyCycle == LFState::Channel::DutyCycle::ENABLED)
+            displayLFCh1->setLabelText(LABELNUM_HOLD, "Just no luck!");
+        displayLFCh1->show();
+        displayLFCh2->show();
     }else if(index == (int)CounterMode::REFERENCE) {
-        displayFlagHoldOn(displayRef, true);
         displayRef->show();
     }else if(index == (int)CounterMode::INTERVAL) {
-        displayFlagHoldOn(displayInt, true);
         displayInt->show();
     }
 }
 
-void CounterWindow::clearDisplay(WidgetDisplay *display){
+void CounterWindow::clearDisplay(WidgetDisplay *display, bool uponSwitch){
     if(conf->mode != CounterMode::HIGH_FREQUENCY && conf->hfState.hold == HFState::HoldOnState::OFF)
         display->displayAvgString("");
     display->displayString("");
     display->displayQerrString("");
     display->displayTerrString("");
-    displayFlagHoldOn(display, true);
+    if(uponSwitch)
+        displayFlagHoldOn(display, true);
     showPMErrorSigns(display, false);
 }
 
@@ -251,72 +241,83 @@ void CounterWindow::lfSwitchChannelCallback(int index){
     tabLowFreq->buttonsDutyCycleSwitch->setColor(bckgndColor, 1);
 }
 
-void CounterWindow::lfSwitchQuantityCallback(int index){    
+void CounterWindow::lfSwitchQuantityCallback(int index){
     WidgetDisplay *display = (conf->lfState.activeChan == LFState::ActiveChan::CHAN1) ? displayLFCh1 : displayLFCh2;
     switchQuantity(index, display);
 }
 
 void CounterWindow::lfSwitchDutyCycleCallback(int index){
-    WidgetDisplay *display, *norDisplay;
+    WidgetDisplay *display, *unavailDisplay;
     QString unitsStyleSheet;
     QString pin;
 
     if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){
         display = displayLFCh1;
-        norDisplay = displayLFCh2;
+        unavailDisplay = displayLFCh2;
         pin = spec->pins.lf_pin_ch1;
-        clearDisplay(displayLFCh1);
     }else {
         display = displayLFCh2;
-        norDisplay = displayLFCh1;
+        unavailDisplay = displayLFCh1;
         pin = spec->pins.lf_pin_ch2;
-        clearDisplay(displayLFCh2);
     }
 
     if(index == (int)LFState::Channel::DutyCycle::DISABLED){
-        lfResetDutyCycle(display, norDisplay);
+        lfResetDutyCycle(display, unavailDisplay);
     }else {
-        lfSetDutyCycle(display, norDisplay, pin);
+        lfSetDutyCycle(display, unavailDisplay, pin);
     }
 }
 
-void CounterWindow::lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *norDisplay, QString pin){
+void CounterWindow::lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavailDisplay, QString pin){
     lfEnableTabsComponents(false);
-    norDisplay->hide();
+
+    unavailDisplay->showQerrTerrStyle(false);
+    unavailDisplay->setLabelText(LABELNUM_QUAN, "UNAVAILABLE");
 
     display->setLabelText(LABELNUM_QUAN, "PULSE WIDTH  |  DUTY CYCLE");
     display->setLabelText(LABELNUM_PINS, pin);
 
-    QString unitsStyleSheet;
-    unitsStyleSheet = IMAGE_UNITS_SEC;
+    QString unitsStyleSheet = IMAGE_UNITS_SEC;
     display->setAvgStyle(unitsStyleSheet);
     unitsStyleSheet = IMAGE_SIGN_PERCENT;
     display->setUnitsStyle(unitsStyleSheet);
+    unitsStyleSheet = "";
+    unavailDisplay->setUnitsStyle(unitsStyleSheet);
+    unavailDisplay->setErrStyle(unitsStyleSheet);
 
-    displayFlagHoldOn(display, true);
     showPMErrorSigns(display, false);
 
     lfShowDutyCycleDisplays(display, true);
+    unavailDisplay->setLabelText(LABELNUM_HOLD, "Just no luck!");
+
+    clearDisplay(unavailDisplay, false);
+    clearDisplay(display, true);
 }
 
-void CounterWindow::lfResetDutyCycle(WidgetDisplay *display, WidgetDisplay *norDisplay){
+void CounterWindow::lfResetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavailDisplay){
     lfEnableTabsComponents(true);
-    norDisplay->show();
 
-    switchQuantity((int)conf->lfState.chan1.quantity, display);
-    switchQuantity((int)conf->lfState.chan2.quantity, norDisplay);
+    unavailDisplay->showQerrTerrStyle(true);
 
-    displayFlagHoldOn(display, true);
-    displayFlagHoldOn(norDisplay, true);
-    showPMErrorSigns(display, true);
+    switchQuantity((int)conf->lfState.chan1.quantity, displayLFCh1);
+    switchQuantity((int)conf->lfState.chan2.quantity, displayLFCh2);
+    lfShowErrorStyle(unavailDisplay, true);
 
     lfShowDutyCycleDisplays(display, false);
+    clearDisplay(unavailDisplay, true);
+    clearDisplay(display, true);
 }
 
 void CounterWindow::lfShowDutyCycleDisplays(WidgetDisplay *display, bool dutyEnable){
     display->showAvgDisplay(dutyEnable);
     display->showErrDisplay(!dutyEnable);
     display->showBarDisplay(!dutyEnable);
+}
+
+void CounterWindow::lfShowErrorStyle(WidgetDisplay *display, bool show){
+    QString unitsStyleSheet;
+    unitsStyleSheet = (show) ? IMAGE_SIGN_ERR: "";
+    display->setErrStyle(unitsStyleSheet);
 }
 
 void CounterWindow::lfEnableTabsComponents(bool enable){
