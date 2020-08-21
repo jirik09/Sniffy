@@ -46,30 +46,53 @@ void CounterWindow::createCounterTabs(void){
 void CounterWindow::configureCounterTabs(void){
     tabHighFreq = new CounterTabHighFreq(tabs->getLayout(0), tabs);
     tabLowFreq = new CounterTabLowFreq(tabs->getLayout(1), tabs);
+    tabRatio = new CounterTabRatio(tabs->getLayout(2), tabs);
 }
 
 void CounterWindow::createAllDisplays(void){
-    QString styleSheet = IMAGE_UNITS_HZ;
-    displayHF = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, this);
+
+    displayHF = createHighFreqDisplay();
     displayHF->setContentsMargins(5, 5, 5, 5);
     ui->verticalLayout_display->addWidget(displayHF);
-    styleSheet = IMAGE_SIGN_AVG;
-    displayHF->setAvgStyle(styleSheet);
-    configureHFLFErrorStyles(displayHF);
 
-    displayLFCh1 = createLFDisplays();
+    displayLFCh1 = createLowFreqDisplays();
     displayLFCh1->setContentsMargins(5, 5, 5, 5);
     ui->verticalLayout_display->addWidget(displayLFCh1);
-    displayLFCh2 = createLFDisplays();
+    displayLFCh2 = createLowFreqDisplays();
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
     ui->verticalLayout_display->addWidget(displayLFCh2);
+
+    displayRat = createRatioDisplay();
+    displayRat->setContentsMargins(5, 5, 5, 5);
+    ui->verticalLayout_display->addWidget(displayRat);
 }
 
-WidgetDisplay *CounterWindow::createLFDisplays(void){
+WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
+    QString styleSheet = IMAGE_UNITS_HZ;
+    WidgetDisplay *display  = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, this);
+    styleSheet = IMAGE_SIGN_AVG;
+    display->setAvgStyle(styleSheet);
+    configureHFLFErrorStyles(display);
+    return display;
+}
+
+WidgetDisplay *CounterWindow::createLowFreqDisplays(void){
     QString styleSheet = IMAGE_UNITS_HZ;
     WidgetDisplay *display = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, this);
     display->showAvgDisplay(false);
     configureHFLFErrorStyles(display);
+    return display;
+}
+
+WidgetDisplay *CounterWindow::createRatioDisplay(void){
+    QString styleSheet = "";
+    WidgetDisplay *display  = new WidgetDisplay(LITERAL_RATIO, styleSheet, true, this);
+    styleSheet = IMAGE_SIGN_ERR;
+    display->setErrStyle(styleSheet);
+    styleSheet = IMAGE_SIGN_PLSMNS;
+    display->setTerrStyle(styleSheet);
+    display->showProgressBar(false);
+    display->showAvgDisplay(false);
     return display;
 }
 
@@ -80,20 +103,22 @@ void CounterWindow::configureHFLFErrorStyles(WidgetDisplay *display){
     styleSheet = IMAGE_SIGN_PLSMNS;
     display->setQerrStyle(styleSheet);
     display->setTerrStyle(styleSheet);
-    display->displayString("");
+    //clearDisplay(display, true);
 }
 
 void CounterWindow::configureAllDisplays(void){
-    configureDisplaysStaticAttr(displayHF, "CH1", TEXT_COLOR_BLUE);
-    configureDisplaysStaticAttr(displayLFCh1, "CH1", TEXT_COLOR_BLUE);
-    configureDisplaysStaticAttr(displayLFCh2, "CH2", TEXT_COLOR_GREY);
-
+    configureDisplaysStaticAttr(displayHF, "CH1", LITERAL_FREQUENCY, TEXT_COLOR_BLUE);
+    configureDisplaysStaticAttr(displayLFCh1, "CH1", LITERAL_FREQUENCY, TEXT_COLOR_BLUE);
+    configureDisplaysStaticAttr(displayLFCh2, "CH2", LITERAL_FREQUENCY, TEXT_COLOR_GREY);
+    configureDisplaysStaticAttr(displayRat, "CH3/CH1", LITERAL_RATIO, TEXT_COLOR_BLUE);
     displayLFCh1->hide();
     displayLFCh2->hide();
+    displayRat->hide();
+    //displayInt->hide();
 }
 
-void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString sideLabelsColor){
-    display->configLabel(LABELNUM_QUAN, LITERAL_FREQUENCY, TEXT_COLOR_GREY, true);
+void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor){
+    display->configLabel(LABELNUM_QUAN, quantity, TEXT_COLOR_GREY, true);
     display->configLabel(LABELNUM_CHAN, channel, sideLabelsColor, true);
     display->configLabel(LABELNUM_FLAG, "    ", sideLabelsColor, true);
 }
@@ -104,57 +129,65 @@ void CounterWindow::setSpecification(CounterSpec *spec){
 }
 
 void CounterWindow::configureDisplaysDynamicAttr(){
-    displayHF->configLabel(LABELNUM_PINS, spec->pins.hf_pin, TEXT_COLOR_GREY, true);
-    displayHF->configLabel(LABELNUM_HOLD, "", TEXT_COLOR_ORANGE, true);
-    displayHF->setRangeProgressBar(spec->hf_lowLmt_Tg100ms, spec->hf_uppLmt);
+    configureDisplaysDynamicLabels(displayHF, spec->pins.hf_ch1);
+    displayHF->setRangeProgressBar(spec->hf_min_Tg100ms, spec->hf_max);
 
-    displayLFCh1->configLabel(LABELNUM_PINS, spec->pins.lf_pin_ch1, TEXT_COLOR_GREY, true);
-    displayLFCh1->configLabel(LABELNUM_HOLD, "", TEXT_COLOR_ORANGE, true);
-    displayLFCh1->setRangeProgressBar(spec->lf_lowLmt, spec->hf_uppLmt);
+    configureDisplaysDynamicLabels(displayLFCh1, spec->pins.lf_ch1);
+    displayLFCh1->setRangeProgressBar(spec->lf_min, spec->hf_max);
 
-    displayLFCh2->configLabel(LABELNUM_PINS, spec->pins.lf_pin_ch2, TEXT_COLOR_GREY, true);
-    displayLFCh2->configLabel(LABELNUM_HOLD, "", TEXT_COLOR_ORANGE, true);
-    displayLFCh2->setRangeProgressBar(spec->lf_lowLmt, spec->lf_uppLmt);
+    configureDisplaysDynamicLabels(displayLFCh2, spec->pins.lf_ch2);
+    displayLFCh2->setRangeProgressBar(spec->lf_min, spec->hf_max);
+
+    QString pinsRatio = spec->pins.rat_ref + "/" + spec->pins.rat_ch3;
+    configureDisplaysDynamicLabels(displayRat, pinsRatio);
+}
+
+void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin)
+{
+    display->configLabel(LABELNUM_PINS, pin, TEXT_COLOR_GREY, true);
+    display->configLabel(LABELNUM_HOLD, "", TEXT_COLOR_ORANGE, true);
 }
 
 void CounterWindow::switchCounterModeCallback(int index){
     resetPreviousCounterMode();
     setNextCounterMode(index);
-    modePrevIndex = index;
+    conf->modePrevIndex = (CounterMode)index;
 }
 
 void CounterWindow::resetPreviousCounterMode(){
-    if(modePrevIndex == (int)CounterMode::HIGH_FREQUENCY){
+    if(conf->modePrevIndex == CounterMode::HIGH_FREQUENCY){
         displayHF->hide();
-        clearDisplay(displayHF, true);
-    }else if(modePrevIndex == (int)CounterMode::LOW_FREQUENCY){
+    }else if(conf->modePrevIndex == CounterMode::LOW_FREQUENCY){
         displayLFCh1->hide();
         displayLFCh2->hide();
-        clearDisplay(displayLFCh1, true);
-        clearDisplay(displayLFCh2, true);
-    }else if(modePrevIndex == (int)CounterMode::REFERENCE) {
-        displayRef->hide();
-        clearDisplay(displayRef, true);
-    }else if(modePrevIndex == (int)CounterMode::INTERVAL) {
+    }else if(conf->modePrevIndex == CounterMode::RATIO) {
+        displayRat->hide();
+    }else if(conf->modePrevIndex == CounterMode::INTERVAL) {
         displayInt->hide();
-        clearDisplay(displayRef, true);
     }
 }
 
 void CounterWindow::setNextCounterMode(int index){
     if(index == (int)CounterMode::HIGH_FREQUENCY){
         displayHF->show();
+        clearDisplay(displayHF, true);
     }else if(index == (int)CounterMode::LOW_FREQUENCY) {
-        if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED)
+        clearDisplay(displayLFCh1, true);
+        clearDisplay(displayLFCh2, true);
+        if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
             displayLFCh2->setLabelText(LABELNUM_HOLD, "Just no luck!");
-        if(conf->lfState.chan2.dutyCycle == LFState::Channel::DutyCycle::ENABLED)
+        }
+        if(conf->lfState.chan2.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
             displayLFCh1->setLabelText(LABELNUM_HOLD, "Just no luck!");
+        }
         displayLFCh1->show();
         displayLFCh2->show();
-    }else if(index == (int)CounterMode::REFERENCE) {
-        displayRef->show();
+    }else if(index == (int)CounterMode::RATIO) {
+        displayRat->show();
+        clearDisplay(displayRat, true);
     }else if(index == (int)CounterMode::INTERVAL) {
         displayInt->show();
+        clearDisplay(displayInt, true);
     }
 }
 
@@ -223,22 +256,14 @@ void CounterWindow::lfSwitchChannelCallback(int index){
 
     if(index == 0){
         bckgndColor = BCKGRND_COLOR_BLUE;
-        tabLowFreq->dialSampleCountCh2->hide();
-        tabLowFreq->dialSampleCountCh1->show();
+        tabLowFreq->showDialInChannel(CHANNEL_1, true);
+        tabLowFreq->showDialInChannel(CHANNEL_2, false);
     }else if (index == 1) {
         bckgndColor = tabLowFreq->lfCh2BckgndColor;
-        tabLowFreq->dialSampleCountCh1->hide();
-        tabLowFreq->dialSampleCountCh2->show();
+        tabLowFreq->showDialInChannel(CHANNEL_1, false);
+        tabLowFreq->showDialInChannel(CHANNEL_2, true);
     }
-
-    tabLowFreq->buttonsQuantitySwitch->setColor(bckgndColor, 0);
-    tabLowFreq->buttonsQuantitySwitch->setColor(bckgndColor, 1);
-    tabLowFreq->buttonsMultiplierSwitch->setColor(bckgndColor, 0);
-    tabLowFreq->buttonsMultiplierSwitch->setColor(bckgndColor, 1);
-    tabLowFreq->buttonsMultiplierSwitch->setColor(bckgndColor, 2);
-    tabLowFreq->buttonsMultiplierSwitch->setColor(bckgndColor, 3);
-    tabLowFreq->buttonsDutyCycleSwitch->setColor(bckgndColor, 0);
-    tabLowFreq->buttonsDutyCycleSwitch->setColor(bckgndColor, 1);
+    tabLowFreq->changeAllComponentsColor(bckgndColor);
 }
 
 void CounterWindow::lfSwitchQuantityCallback(int index){
@@ -254,11 +279,11 @@ void CounterWindow::lfSwitchDutyCycleCallback(int index){
     if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){
         display = displayLFCh1;
         unavailDisplay = displayLFCh2;
-        pin = spec->pins.lf_pin_ch1;
+        pin = spec->pins.lf_ch1;
     }else {
         display = displayLFCh2;
         unavailDisplay = displayLFCh1;
-        pin = spec->pins.lf_pin_ch2;
+        pin = spec->pins.lf_ch2;
     }
 
     if(index == (int)LFState::Channel::DutyCycle::DISABLED){
@@ -269,7 +294,7 @@ void CounterWindow::lfSwitchDutyCycleCallback(int index){
 }
 
 void CounterWindow::lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavailDisplay, QString pin){
-    lfEnableTabsComponents(false);
+    tabLowFreq->enableAllComponents(false);
 
     unavailDisplay->showQerrTerrStyle(false);
     unavailDisplay->setLabelText(LABELNUM_QUAN, "UNAVAILABLE");
@@ -295,7 +320,7 @@ void CounterWindow::lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavai
 }
 
 void CounterWindow::lfResetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavailDisplay){
-    lfEnableTabsComponents(true);
+    tabLowFreq->enableAllComponents(true);
 
     unavailDisplay->showQerrTerrStyle(true);
 
@@ -320,15 +345,9 @@ void CounterWindow::lfShowErrorStyle(WidgetDisplay *display, bool show){
     display->setErrStyle(unitsStyleSheet);
 }
 
-void CounterWindow::lfEnableTabsComponents(bool enable){
-    tabLowFreq->buttonsChannelSwitch->enableAll(enable);
-    tabLowFreq->buttonsQuantitySwitch->enableAll(enable);
-    tabLowFreq->buttonsMultiplierSwitch->enableAll(enable);
-    if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){
-        tabLowFreq->dialSampleCountCh1->setEnabled(enable);
-    }    else {
-        tabLowFreq->dialSampleCountCh2->setEnabled(enable);
-    }
+/************************************** RATIO MEAS. FUNCTIONS ****************************************/
+void CounterWindow::ratDisplayFlagWarning(WidgetDisplay *display, bool visible){
+    QString string = (visible) ? "SC too low!" : "";
+    display->setLabelText(LABELNUM_HOLD, string);
 }
 
-/************************************** REFERENCE MEAS. FUNCTIONS ****************************************/

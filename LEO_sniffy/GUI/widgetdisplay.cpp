@@ -24,7 +24,9 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
 
     setUnitsStyle(unitsStyleSheet);
 
-    showPrgrssBar ? ui->progressBar->show() : ui->progressBar->hide();
+    if(!showPrgrssBar)
+        showBarDisplay(false);
+
     ui->lcdNumber->display(0.00);
 }
 
@@ -66,19 +68,16 @@ void WidgetDisplay::showQerrTerrStyle(bool visible){
     }
 }
 
-void WidgetDisplay::showAvgDisplay(bool visible)
-{
+void WidgetDisplay::showAvgDisplay(bool visible){
     (visible) ? ui->horizontalWidget_avg->show() : ui->horizontalWidget_avg->hide();
 }
 
-void WidgetDisplay::showErrDisplay(bool visible)
-{
+void WidgetDisplay::showErrDisplay(bool visible){
     (visible) ? ui->horizontalWidget_err->show() : ui->horizontalWidget_err->hide();
 }
 
-void WidgetDisplay::showBarDisplay(bool visible)
-{
-    (visible) ? ui->horizontalWidget_err->show() : ui->horizontalWidget_err->hide();
+void WidgetDisplay::showBarDisplay(bool visible){
+    (visible) ? ui->horizontalWidget_bar->show() : ui->horizontalWidget_bar->hide();
 }
 
 void WidgetDisplay::displayNumber(double number){

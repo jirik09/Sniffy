@@ -3,6 +3,7 @@
 CounterConfig::CounterConfig(QObject *parent) : QObject(parent)
 {
     mode = CounterMode::HIGH_FREQUENCY;
+    modePrevIndex = CounterMode::HIGH_FREQUENCY;
 
     hfState.quantity = HFState::Quantity::FREQUENCY;
     hfState.quantState = HFState::QuantitySwitched::NO;
@@ -19,4 +20,6 @@ CounterConfig::CounterConfig(QObject *parent) : QObject(parent)
     lfState.chan2.multiplier = LFState::Channel::Multiplier::MULT_1X;
     lfState.chan2.dutyCycle = LFState::Channel::DutyCycle::DISABLED;
     lfState.chan2.sampleCountBackup = 1;
+
+    ratState.sampleCountBackup = REFERENCE_COUNT_DEFAULT;
 }

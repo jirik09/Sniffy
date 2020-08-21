@@ -53,3 +53,36 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     destination->addWidget(buttonsDutyCycleSwitch);
 }
 
+void CounterTabLowFreq::enableAllComponents(bool enable)
+{
+    buttonsChannelSwitch->enableAll(enable);
+    buttonsQuantitySwitch->enableAll(enable);
+    buttonsMultiplierSwitch->enableAll(enable);
+    if(buttonsChannelSwitch->isChecked(CHANNEL_1)){
+        dialSampleCountCh1->setEnabled(enable);
+    }else {
+        dialSampleCountCh2->setEnabled(enable);
+    }
+}
+
+void CounterTabLowFreq::changeAllComponentsColor(QString bckgndColor)
+{
+    buttonsQuantitySwitch->setColor(bckgndColor, 0);
+    buttonsQuantitySwitch->setColor(bckgndColor, 1);
+    buttonsMultiplierSwitch->setColor(bckgndColor, 0);
+    buttonsMultiplierSwitch->setColor(bckgndColor, 1);
+    buttonsMultiplierSwitch->setColor(bckgndColor, 2);
+    buttonsMultiplierSwitch->setColor(bckgndColor, 3);
+    buttonsDutyCycleSwitch->setColor(bckgndColor, 0);
+    buttonsDutyCycleSwitch->setColor(bckgndColor, 1);
+}
+
+void CounterTabLowFreq::showDialInChannel(int channel, bool visible)
+{
+    if(channel == 0){
+        (visible) ? dialSampleCountCh1->show() : dialSampleCountCh1->hide();
+    }else if (channel == 1) {
+        (visible) ? dialSampleCountCh2->show() : dialSampleCountCh2->hide();
+    }
+}
+

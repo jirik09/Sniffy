@@ -40,7 +40,7 @@ private:
     //typedef void (Counter::*funPointer)();
     /*funPointer*/ void (Counter::*reloadModeState[4])() = { &Counter::hfReloadState,
                                           &Counter::lfReloadState,
-                                          &Counter::refReloadState,
+                                          &Counter::ratReloadState,
                                           &Counter::intReloadState };
 
     //QList<QVector<void*()>> reloadModeState;
@@ -69,8 +69,9 @@ private:
     void lfReloadState();
     void lfReloadStateQuantMeasurement();
 
-    /* Reference Counter */
-    void refReloadState();
+    /* Ratio Counter */
+    void parseRatioCounter(QByteArray data);
+    void ratReloadState();
 
     /* Intervals Counter */
     void intReloadState();
@@ -99,6 +100,10 @@ private slots:
     void lfSwitchDutyCycleCallback(int index);
     void lfDialSampleCountCh1ChangedCallback(float val);
     void lfDialSampleCountCh2ChangedCallback(float val);
+
+    /* Ratio Counter */
+    void ratDialSampleCountChangedCallback(float val);
+    void ratRetriggerCallback(int index);
 };
 
 //#define CALL_MEMBER_FUNCTION(object, ptrToMember)  ((object)->*(ptrToMember))

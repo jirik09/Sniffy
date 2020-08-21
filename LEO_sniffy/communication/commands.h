@@ -128,7 +128,7 @@ public:
     static const QByteArray COUNTER_MODE;
     static const QByteArray MODE_HIGH_FREQ;
     static const QByteArray MODE_LOW_FREQ;
-    static const QByteArray MODE_REFERENCE;
+    static const QByteArray MODE_RATIO;
     static const QByteArray MODE_INTERVAL;
     QList<QByteArray> pCOUNTER_MODE;
 
@@ -173,6 +173,9 @@ public:
     static const QByteArray LF_CH1_DUTY_CYCLE_ENABLE;
     static const QByteArray LF_CH2_DUTY_CYCLE_ENABLE;
     static const QByteArray LF_DUTY_CYCLE_DISABLE;
+
+    // Counter Ratio
+    static const QByteArray RAT_CH3_SAMPLE_COUNT;
 };
 
 #endif // COMMANDS_H

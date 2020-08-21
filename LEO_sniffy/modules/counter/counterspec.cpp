@@ -3,8 +3,9 @@
 CounterSpec::CounterSpec(QByteArray data, QObject *parent) : QObject(parent)
 {
     QDataStream stream(data);
-    stream >> hf_uppLmt >> hf_lowLmt_Tg100ms >> hf_lowLmt_Tg500ms >> hf_lowLmt_Tg1s >> hf_lowLmt_Tg5s >> hf_lowLmt_Tg10s;
-    stream >> lf_uppLmt >> lf_lowLmt;
+    stream >> hf_max >> hf_min_Tg100ms >> hf_min_Tg500ms >> hf_min_Tg1s >> hf_min_Tg5s >> hf_min_Tg10s;
+    stream >> lf_max >> lf_min;
+    stream >> rat_max_ref >> rat_max_chan;
 
     char chars[4] = "";
     for(int i = 0; i < pinsList.size(); i++){
@@ -13,11 +14,11 @@ CounterSpec::CounterSpec(QByteArray data, QObject *parent) : QObject(parent)
         pinsList[i].remove('_');
     }
 
-    pins.hf_pin = pinsList.at(0);
-    pins.lf_pin_ch1 = pinsList.at(1);
-    pins.lf_pin_ch2 = pinsList.at(2);
-    pins.ref_pin_in1 = pinsList.at(3);
-    pins.ref_pin_in2 = pinsList.at(4);
-    pins.int_pin_ch1 = pinsList.at(5);
-    pins.int_pin_ch2 = pinsList.at(6);
+    pins.hf_ch1 = pinsList.at(0);
+    pins.lf_ch1 = pinsList.at(1);
+    pins.lf_ch2 = pinsList.at(2);
+    pins.rat_ref = pinsList.at(3);
+    pins.rat_ch3 = pinsList.at(4);
+    pins.int_ch1 = pinsList.at(5);
+    pins.int_ch2 = pinsList.at(6);
 }

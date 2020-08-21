@@ -22,6 +22,7 @@
 #include "counterdefs.h"
 #include "countertabhighfreq.h"
 #include "countertablowfreq.h"
+#include "countertabratio.h"
 
 namespace Ui {
 class CounterWindow;
@@ -38,16 +39,18 @@ public:
     WidgetDisplay *displayHF;
     WidgetDisplay *displayLFCh1;
     WidgetDisplay *displayLFCh2;
-    WidgetDisplay *displayRef;
+    WidgetDisplay *displayRat;
     WidgetDisplay *displayInt;
 
     widgetTab *tabs;
     CounterTabHighFreq *tabHighFreq;
     CounterTabLowFreq *tabLowFreq;
+    CounterTabRatio *tabRatio;
 
     void setSpecification(CounterSpec *spec);
     void displayFlagHoldOn(WidgetDisplay *display, bool visible);
     void displayFlagSwitchMode(WidgetDisplay *display, bool visible);
+    void ratDisplayFlagWarning(WidgetDisplay *display, bool visible);
     void showPMErrorSigns(WidgetDisplay *display, bool visible);
     void clearDisplay(WidgetDisplay *display, bool uponSwitch);
     void msleep(int msec);
@@ -58,21 +61,22 @@ private:
     Ui::CounterWindow *ui;
     CounterConfig *conf;
     CounterSpec *spec;
-    int modePrevIndex;
 
     void createCounterTabs(void);
     void configureCounterTabs(void);
     void createAllDisplays(void);
-    WidgetDisplay* createLFDisplays(void);
+    WidgetDisplay* createLowFreqDisplays(void);
+    WidgetDisplay* createRatioDisplay(void);
+    WidgetDisplay *createHighFreqDisplay(void);
     void configureAllDisplays(void);
-    void configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString sideLabelsColor);
+    void configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor);
     void configureDisplaysDynamicAttr();
+    void configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin);
     void configureHFLFErrorStyles(WidgetDisplay *display);
     void resetPreviousCounterMode();
     void setNextCounterMode(int index);
     void switchQuantity(int index, WidgetDisplay *display);    
 
-    void lfEnableTabsComponents(bool enable);
     void lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *norDisplay, QString pin);
     void lfResetDutyCycle(WidgetDisplay *display, WidgetDisplay *norDisplay);
     void lfShowDutyCycleDisplays(WidgetDisplay *display, bool dutyEnable);

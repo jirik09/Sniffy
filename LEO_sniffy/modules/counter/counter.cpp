@@ -31,6 +31,10 @@ Counter::Counter(QObject *parent)
     connect(cntWindow->tabLowFreq->buttonsDutyCycleSwitch, &WidgetButtons::clicked, this, &Counter::lfSwitchDutyCycleCallback);
     connect(cntWindow->tabLowFreq->dialSampleCountCh1, &WidgetDialRange::valueChanged, this, &Counter::lfDialSampleCountCh1ChangedCallback);
     connect(cntWindow->tabLowFreq->dialSampleCountCh2, &WidgetDialRange::valueChanged, this, &Counter::lfDialSampleCountCh2ChangedCallback);
+
+    /* Ratio Counter Signals/Slots */
+    connect(cntWindow->tabRatio->dialSampleCount, &WidgetDialRange::valueChanged, this, &Counter::ratDialSampleCountChangedCallback);
+    connect(cntWindow->tabRatio->buttonRetrigger, &WidgetButtons::clicked, this, &Counter::ratRetriggerCallback);
 }
 
 void Counter::startModule(){
@@ -66,7 +70,7 @@ void Counter::parseData(QByteArray data){
         }else if(dataHeader=="LF_D"){
             parseLowFrequencyCounter(dataToPass);
         }else if(dataHeader=="RF_D"){
-
+            parseRatioCounter(dataToPass);
         }else if(dataHeader=="TI_D"){
 
         }
@@ -112,7 +116,7 @@ void Counter::switchCounterModeCallback(int index){
     }else if (index == 1) {
         lfReloadState();
     }else if (index == 2) {
-
+        ratReloadState();
     }else if (index == 3) {
 
     }
@@ -183,15 +187,20 @@ QString Counter::hfFormatRemainSec(uint countToGo, uint additionTime){
 }
 
 void Counter::hfDisplayErrors(){
-    if(conf->hfState.error == HFState::ErrorType::AVERAGE){
-        if(conf->hfState.hold == HFState::HoldOnState::ON){
-            cntWindow->displayHF->displayQerrString(" ");
-            cntWindow->displayHF->displayTerrString(" ");
-            cntWindow->showPMErrorSigns(cntWindow->displayHF, false);
-        }else if (conf->hfState.hold == HFState::HoldOnState::OFF) {
+    if(conf->hfState.error == HFState::ErrorType::SIMPLE){
+        cntWindow->displayFlagHoldOn(cntWindow->displayHF, true);
+        cntWindow->displayHF->displayQerrString(" ");
+        cntWindow->displayHF->displayTerrString(" ");
+        cntWindow->showPMErrorSigns(cntWindow->displayHF, false);
+    }else if (conf->hfState.error == HFState::ErrorType::AVERAGE) {
+        if(conf->hfState.hold == HFState::HoldOnState::OFF){
             cntWindow->displayHF->displayQerrString(avgQerr);
             cntWindow->displayHF->displayTerrString(strTerr);
             cntWindow->showPMErrorSigns(cntWindow->displayHF, true);
+        }else{
+            cntWindow->displayHF->displayQerrString(" ");
+            cntWindow->displayHF->displayTerrString(" ");
+            cntWindow->showPMErrorSigns(cntWindow->displayHF, false);
         }
     }
 }
@@ -226,7 +235,6 @@ void Counter::hfSwitchGateTimeCallback(int index){
 
 void Counter::hfSwitchErrorAvgCallback(int index){
     conf->hfState.error = (HFState::ErrorType)index;
-    cntWindow->displayFlagHoldOn(cntWindow->displayHF, (bool)!index);
     hfDisplayErrors();
 }
 
@@ -295,7 +303,7 @@ void Counter::lfReloadStateQuantMeasurement(){
 }
 
 bool Counter::isRangeExceeded(double frequency){
-    return (frequency > spec->lf_uppLmt) ? true : false;
+    return (frequency > spec->lf_max) ? true : false;
 }
 
 void Counter::lfSwitchChannelCallback(int index){
@@ -361,21 +369,52 @@ void Counter::lfSwitchDutyCycleCallback(int index){
 }
 
 void Counter::lfDialSampleCountCh1ChangedCallback(float val){
-    int value;
-    value = conf->lfState.chan1.sampleCountBackup = qFloor(val);
-    write(cmd->LF_CH1_SAMPLE_COUNT, value);
+    val = conf->lfState.chan1.sampleCountBackup = qFloor(val);
+    write(cmd->LF_CH1_SAMPLE_COUNT, val);
 }
 
 void Counter::lfDialSampleCountCh2ChangedCallback(float val){
-    int value;
-    value = conf->lfState.chan2.sampleCountBackup = qFloor(val);
-    write(cmd->LF_CH2_SAMPLE_COUNT, value);
+    val = conf->lfState.chan2.sampleCountBackup = qFloor(val);
+    write(cmd->LF_CH2_SAMPLE_COUNT, val);
 }
 
-/************************************** REFERENCE FUNCTIONS ****************************************/
-void Counter::refReloadState()
-{
+/************************************** RATIO MEAS. FUNCTIONS ****************************************/
+void Counter::parseRatioCounter(QByteArray data){
+    QByteArray warn = data.left(4); data.remove(0, 4);
 
+    double val; QString strVal;
+    QDataStream streamBuffLeng(data);
+    streamBuffLeng >> val;
+
+    if(warn == "WARN"){
+        cntWindow->ratDisplayFlagWarning(cntWindow->displayRat, true);
+    }else {
+        cntWindow->displayFlagHoldOn(cntWindow->displayRat, false);
+        strVal = loc.toString(val, 'f', 5).replace(loc.decimalPoint(), '.');
+        cntWindow->displayRat->displayString(strVal);
+        /* Print-out the error */
+        double error = 1 / conf->ratState.sampleCountBackup;
+        strVal = loc.toString(error, 'f', 5).replace(loc.decimalPoint(), '.');
+        cntWindow->displayRat->displayTerrString(strVal);
+        cntWindow->showPMErrorSigns(cntWindow->displayRat, true);
+        cntWindow->displayRat->drawIndicationFlag(LABELNUM_FLAG, "blue");
+    }
+}
+
+void Counter::ratReloadState(){
+    ratDialSampleCountChangedCallback(conf->ratState.sampleCountBackup);
+}
+
+void Counter::ratDialSampleCountChangedCallback(float val){
+    cntWindow->clearDisplay(cntWindow->displayRat, true);
+    val = conf->ratState.sampleCountBackup = qFloor(val);
+    write(cmd->RAT_CH3_SAMPLE_COUNT, val);
+}
+
+void Counter::ratRetriggerCallback(int index){
+    Q_UNUSED(index);
+    cntWindow->clearDisplay(cntWindow->displayRat, true);
+    write(cmd->RAT_CH3_SAMPLE_COUNT, conf->ratState.sampleCountBackup);
 }
 
 /************************************** INTERVALS FUNCTIONS ****************************************/

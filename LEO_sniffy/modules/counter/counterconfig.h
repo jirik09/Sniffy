@@ -3,11 +3,13 @@
 
 #include <QObject>
 
+#include "counterdefs.h"
+
 enum class CounterMode
 {
     HIGH_FREQUENCY = 0,
     LOW_FREQUENCY = 1,
-    REFERENCE = 2,
+    RATIO = 2,
     INTERVAL = 3,
 };
 
@@ -41,10 +43,11 @@ struct LFState
     } chan1, chan2;
 };
 
-struct RefState
+struct RatState
 {
-
+    int sampleCountBackup;
 };
+
 
 class CounterConfig : public QObject
 {
@@ -53,8 +56,11 @@ public:
     explicit CounterConfig(QObject *parent = nullptr);
 
     CounterMode mode;
+    CounterMode modePrevIndex;
+
     HFState hfState;
     LFState lfState;
+    RatState ratState;
 
 signals:
 

@@ -3,7 +3,7 @@
 Commands::Commands(QObject *parent) : QObject(parent)
 {
     /* Counter lists for index-based access */
-    Commands::pCOUNTER_MODE = {MODE_HIGH_FREQ, MODE_LOW_FREQ, MODE_REFERENCE, MODE_INTERVAL};
+    Commands::pCOUNTER_MODE = {MODE_HIGH_FREQ, MODE_LOW_FREQ, MODE_RATIO, MODE_INTERVAL};
     Commands::pHF_GATE_TIME = {HF_TIME_100M, HF_TIME_500M, HF_TIME_1S, HF_TIME_5S, HF_TIME_10S};
     Commands::pLF_MULTIPLIER = {LF_MULTIPLIER_1X, LF_MULTIPLIER_2X, LF_MULTIPLIER_4X, LF_MULTIPLIER_8X};
     Commands::pQUANTITIY = {QUANT_FREQUENCY, QUANT_PERIOD};
@@ -125,7 +125,7 @@ const QByteArray Commands::QUANT_PERIOD = "QPER";
 const QByteArray Commands::COUNTER_MODE = "MODE";
 const QByteArray Commands::MODE_HIGH_FREQ = "ETR_";
 const QByteArray Commands::MODE_LOW_FREQ = "IC__";
-const QByteArray Commands::MODE_REFERENCE = "REF_";
+const QByteArray Commands::MODE_RATIO = "RAT_";
 const QByteArray Commands::MODE_INTERVAL = "TI__";
 
 // Counter HF quantity
@@ -162,4 +162,7 @@ const QByteArray Commands::LF_DUTY_CYCLE = "DUCY";
 const QByteArray Commands::LF_CH1_DUTY_CYCLE_ENABLE = "DCE1";
 const QByteArray Commands::LF_CH2_DUTY_CYCLE_ENABLE = "DCE2";
 const QByteArray Commands::LF_DUTY_CYCLE_DISABLE = "DCX_";
+
+// Counter Ratio
+const QByteArray Commands::RAT_CH3_SAMPLE_COUNT = "RSC_";
 

@@ -28,6 +28,11 @@ public:
     const QString lfCh2BckgndColor = BCKGRND_COLOR_GREY;
     const QString lfCh2TextColor = TEXT_COLOR_GREY;
 
+    void enableAllComponents(bool enable);
+    void changeAllComponentsColor(QString bckgndColor);
+
+    void showDialInChannel(int channel, bool visible);
+
 signals:
 
 };
