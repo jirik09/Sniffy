@@ -48,6 +48,13 @@ struct RatState
     int sampleCountBackup;
 };
 
+struct IntState
+{
+    enum class Sequence { AB = 0, BA = 1 } seqAB;
+    enum class Event { RISING = 0, FALLING = 1 } eventA, eventB;
+    int timeoutBackup;
+};
+
 
 class CounterConfig : public QObject
 {
@@ -61,6 +68,7 @@ public:
     HFState hfState;
     LFState lfState;
     RatState ratState;
+    IntState intState;
 
 signals:
 

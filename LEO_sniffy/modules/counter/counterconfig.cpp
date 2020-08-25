@@ -10,6 +10,7 @@ CounterConfig::CounterConfig(QObject *parent) : QObject(parent)
     hfState.gateTime = HFState::GateTime::GATE_TIME_100M;
     hfState.error = HFState::ErrorType::SIMPLE;
     hfState.hold = HFState::HoldOnState::OFF;
+    hfState.gateTimeIndexBackup = 0;
 
     lfState.activeChan = LFState::ActiveChan::CHAN1;
     lfState.chan1.quantity = LFState::Channel::Quantity::FREQUENCY;
@@ -22,4 +23,9 @@ CounterConfig::CounterConfig(QObject *parent) : QObject(parent)
     lfState.chan2.sampleCountBackup = 1;
 
     ratState.sampleCountBackup = REFERENCE_COUNT_DEFAULT;
+
+    intState.seqAB = IntState::Sequence::AB;
+    intState.eventA = IntState::Event::RISING;
+    intState.eventB = IntState::Event::RISING;
+    intState.timeoutBackup = INTERVAL_TIMEOUT_DEFAULT;
 }

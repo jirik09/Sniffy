@@ -27,7 +27,7 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
     if(!showPrgrssBar)
         showBarDisplay(false);
 
-    ui->lcdNumber->display(0.00);
+    displayString("");
 }
 
 void WidgetDisplay::setUnitsStyle(QString &unitsStyleSheet){

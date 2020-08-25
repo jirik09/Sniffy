@@ -3,6 +3,11 @@
 
 #include <QtGlobal>
 
+/* COMMON defines */
+#define LITERAL_FREQUENCY   "FREQUENCY"
+#define LITERAL_PERIOD      "PERIOD"
+#define LITERAL_NO_DATA     "Just bad luck!"
+
 /* HIGH FREQUENCY defines */
 #define AVERAGE_RANGE       200
 
@@ -18,13 +23,15 @@
 #define CHANNEL_2           1
 
 /* RATIO defines */
-#define REFERENCE_COUNT_DEFAULT 2000000
-#define REFERENCE_COUNT_MAX 4096000000
-
-/* COMMON defines */
-#define LITERAL_FREQUENCY   "FREQUENCY"
-#define LITERAL_PERIOD      "PERIOD"
 #define LITERAL_RATIO       "RATIO"
+
+#define REFERENCE_COUNT_DEFAULT 2000000
+#define REFERENCE_COUNT_MAX     4096000000
+
+/* INTERVALS defines */
+#define INTERVAL_TIMEOUT_MAX     3600
+#define INTERVAL_TIMEOUT_DEFAULT 5
+#define LITERAL_INTERVAL         "TIME INTERVAL"
 
 
 #endif // COUNTERDEFS_H

@@ -34,11 +34,7 @@ CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent
     buttonsGateTime->setText("10.0", 4);
     destination->addWidget(buttonsGateTime);
 
-//    WidgetSeparator *separatorAutoPrescaler = new WidgetSeparator(parent,"Automatic input prescaler");
-//    destination->addWidget(separatorAutoPrescaler);
-
-//    labelAutoInputPrescaler = new QLabel(parent);
-//    labelAutoInputPrescaler->setNum(1);
-//    labelAutoInputPrescaler->setAlignment(Qt::AlignCenter);
-//    destination->addWidget(labelAutoInputPrescaler);
+    QSpacerItem *verticalSpacer;
+    verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    destination->addItem(verticalSpacer);
 }
