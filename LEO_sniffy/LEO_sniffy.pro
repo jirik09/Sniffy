@@ -50,6 +50,7 @@ SOURCES += \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
     modules/counter/countertabhighfreq.cpp \
+    modules/counter/countertabintervals.cpp \
     modules/counter/countertablowfreq.cpp \
     modules/counter/countertabratio.cpp \
     modules/counter/counterwindow.cpp \
@@ -103,6 +104,7 @@ HEADERS += \
     modules/counter/counterspec.h \
     modules/abstractmodule.h \
     modules/counter/countertabhighfreq.h \
+    modules/counter/countertabintervals.h \
     modules/counter/countertablowfreq.h \
     modules/counter/countertabratio.h \
     modules/counter/counterwindow.h \

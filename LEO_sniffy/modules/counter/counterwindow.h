@@ -23,6 +23,7 @@
 #include "countertabhighfreq.h"
 #include "countertablowfreq.h"
 #include "countertabratio.h"
+#include "countertabintervals.h"
 
 namespace Ui {
 class CounterWindow;
@@ -46,11 +47,13 @@ public:
     CounterTabHighFreq *tabHighFreq;
     CounterTabLowFreq *tabLowFreq;
     CounterTabRatio *tabRatio;
+    CounterTabIntervals *tabInter;
 
     void setSpecification(CounterSpec *spec);
     void displayFlagHoldOn(WidgetDisplay *display, bool visible);
     void displayFlagSwitchMode(WidgetDisplay *display, bool visible);
     void ratDisplayFlagWarning(WidgetDisplay *display, bool visible);
+    void intDisplayFlagTimeout(WidgetDisplay *display, bool visible);
     void showPMErrorSigns(WidgetDisplay *display, bool visible);
     void clearDisplay(WidgetDisplay *display, bool uponSwitch);
     void msleep(int msec);
@@ -67,12 +70,13 @@ private:
     void createAllDisplays(void);
     WidgetDisplay* createLowFreqDisplays(void);
     WidgetDisplay* createRatioDisplay(void);
-    WidgetDisplay *createHighFreqDisplay(void);
+    WidgetDisplay* createHighFreqDisplay(void);
+    WidgetDisplay* createIntervalsDisplay(void);
     void configureAllDisplays(void);
     void configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor);
     void configureDisplaysDynamicAttr();
     void configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin);
-    void configureHFLFErrorStyles(WidgetDisplay *display);
+    void configureErrorStyles(WidgetDisplay *display);
     void resetPreviousCounterMode();
     void setNextCounterMode(int index);
     void switchQuantity(int index, WidgetDisplay *display);    

@@ -32,6 +32,14 @@
         <file>graphics/units_err.png</file>
         <file>graphics/units_erravg.png</file>
         <file>graphics/units_perc.png</file>
+        <file>graphics/cnt_ab_ff.png</file>
+        <file>graphics/cnt_ab_fr.png</file>
+        <file>graphics/cnt_ab_rf.png</file>
+        <file>graphics/cnt_ab_rr.png</file>
+        <file>graphics/cnt_ba_ff.png</file>
+        <file>graphics/cnt_ba_fr.png</file>
+        <file>graphics/cnt_ba_rf.png</file>
+        <file>graphics/cnt_ba_rr.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

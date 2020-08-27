@@ -51,6 +51,10 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     buttonsDutyCycleSwitch->setText("Disable", 0);
     buttonsDutyCycleSwitch->setText("Enable", 1);
     destination->addWidget(buttonsDutyCycleSwitch);
+
+    QSpacerItem *verticalSpacer;
+    verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    destination->addItem(verticalSpacer);
 }
 
 void CounterTabLowFreq::enableAllComponents(bool enable)

@@ -16,4 +16,8 @@ CounterTabRatio::CounterTabRatio(QVBoxLayout *destination, QWidget *parent) : QO
     buttonRetrigger = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, 0);
     buttonRetrigger->setText("Retrigger", 0);
     destination->addWidget(buttonRetrigger);
+
+    QSpacerItem *verticalSpacer;
+    verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    destination->addItem(verticalSpacer);
 }

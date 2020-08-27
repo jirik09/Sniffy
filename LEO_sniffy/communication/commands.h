@@ -176,6 +176,19 @@ public:
 
     // Counter Ratio
     static const QByteArray RAT_CH3_SAMPLE_COUNT;
+
+    // Counter Intervals
+    static const QByteArray INT_TIMEOUT_SEC;
+
+    static const QByteArray INT_EVENT;
+    static const QByteArray INT_EVENT_RISE_FALL_CH1;
+    static const QByteArray INT_EVENT_RISE_FALL_CH2;
+    static const QByteArray INT_EVENT_RISE_CH1;
+    static const QByteArray INT_EVENT_RISE_CH2;
+    static const QByteArray INT_EVENT_FALL_CH1;
+    static const QByteArray INT_EVENT_FALL_CH2;
+    static const QByteArray INT_EVENT_SEQUENCE_AB;
+    static const QByteArray INT_EVENT_SEQUENCE_BA;
 };
 
 #endif // COMMANDS_H

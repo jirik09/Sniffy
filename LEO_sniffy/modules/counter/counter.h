@@ -38,14 +38,15 @@ private:
 
     /* Common functions */
     //typedef void (Counter::*funPointer)();
-    /*funPointer*/ void (Counter::*reloadModeState[4])() = { &Counter::hfReloadState,
-                                          &Counter::lfReloadState,
-                                          &Counter::ratReloadState,
-                                          &Counter::intReloadState };
+//    /*funPointer*/ void (Counter::*reloadModeState[4])() = { &Counter::hfReloadState,
+//                                          &Counter::lfReloadState,
+//                                          &Counter::ratReloadState,
+//                                          &Counter::intReloadState };
 
     //QList<QVector<void*()>> reloadModeState;
 
     QString formatNumber(double valToFormat, double error);
+    QString formatErrNumber(double errToFormat);
     void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);
     //void clearDisplay(WidgetDisplay *display);
     void specReceived();
@@ -57,23 +58,26 @@ private:
     QString strQerr, strTerr, avgQerr;
 
     void parseHighFrequencyCounter(QByteArray data);
-    void hfDisplayErrors();
     void hfReloadState();
+    void hfDisplayErrors();    
     QString hfFormatRemainSec(uint countToGo, uint additionTime);
 
     /* Low Frequency Counter */
     void parseLowFrequencyCounter(QByteArray data);
+    void lfReloadState();
+    void lfReloadStateQuantMeasurement();
     bool isRangeExceeded(double frequency);
     void lfSwitchQuantity(int index, QByteArray channelQuantitiy);
     void lfSwitchMultiplier(int index, QByteArray channelMultiplier);
-    void lfReloadState();
-    void lfReloadStateQuantMeasurement();
 
     /* Ratio Counter */
     void parseRatioCounter(QByteArray data);
     void ratReloadState();
 
     /* Intervals Counter */
+//    bool seqAB = false, eventA = false, eventB = false;
+
+    void parseIntervalsCounter(QByteArray data);
     void intReloadState();
 
 private slots:
@@ -104,6 +108,13 @@ private slots:
     /* Ratio Counter */
     void ratDialSampleCountChangedCallback(float val);
     void ratRetriggerCallback(int index);
+
+    /* Intervals meas. Counter */
+    void intButtonsStartCallback();
+    void intSwitchEventSequenceChangedCallback(int index);
+    void intEventAChangedCallback(int index);
+    void intEventBChangedCallback(int index);
+    void intDialTimeoutChangedCallback(float val);
 };
 
 //#define CALL_MEMBER_FUNCTION(object, ptrToMember)  ((object)->*(ptrToMember))

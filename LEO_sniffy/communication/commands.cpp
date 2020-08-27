@@ -166,3 +166,15 @@ const QByteArray Commands::LF_DUTY_CYCLE_DISABLE = "DCX_";
 // Counter Ratio
 const QByteArray Commands::RAT_CH3_SAMPLE_COUNT = "RSC_";
 
+// Counter Intervals meas.
+const QByteArray Commands::INT_TIMEOUT_SEC = "TIMO";
+
+const QByteArray Commands::INT_EVENT = "EVNT";
+const QByteArray Commands::INT_EVENT_RISE_FALL_CH1 = "RF1_";
+const QByteArray Commands::INT_EVENT_RISE_FALL_CH2 = "RF2_";
+const QByteArray Commands::INT_EVENT_RISE_CH1 = "RO1_";
+const QByteArray Commands::INT_EVENT_RISE_CH2 = "RO2_";
+const QByteArray Commands::INT_EVENT_FALL_CH1 = "FO1_";
+const QByteArray Commands::INT_EVENT_FALL_CH2 = "FO2_";
+const QByteArray Commands::INT_EVENT_SEQUENCE_AB = "SQAB";
+const QByteArray Commands::INT_EVENT_SEQUENCE_BA = "SQBA";

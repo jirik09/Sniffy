@@ -47,10 +47,10 @@ void CounterWindow::configureCounterTabs(void){
     tabHighFreq = new CounterTabHighFreq(tabs->getLayout(0), tabs);
     tabLowFreq = new CounterTabLowFreq(tabs->getLayout(1), tabs);
     tabRatio = new CounterTabRatio(tabs->getLayout(2), tabs);
+    tabInter = new CounterTabIntervals(tabs->getLayout(3), tabs);
 }
 
 void CounterWindow::createAllDisplays(void){
-
     displayHF = createHighFreqDisplay();
     displayHF->setContentsMargins(5, 5, 5, 5);
     ui->verticalLayout_display->addWidget(displayHF);
@@ -65,6 +65,10 @@ void CounterWindow::createAllDisplays(void){
     displayRat = createRatioDisplay();
     displayRat->setContentsMargins(5, 5, 5, 5);
     ui->verticalLayout_display->addWidget(displayRat);
+
+    displayInt = createIntervalsDisplay();
+    displayInt->setContentsMargins(5, 5, 5, 5);
+    ui->verticalLayout_display->addWidget(displayInt);
 }
 
 WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
@@ -72,7 +76,7 @@ WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
     WidgetDisplay *display  = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, this);
     styleSheet = IMAGE_SIGN_AVG;
     display->setAvgStyle(styleSheet);
-    configureHFLFErrorStyles(display);
+    configureErrorStyles(display);
     return display;
 }
 
@@ -80,7 +84,7 @@ WidgetDisplay *CounterWindow::createLowFreqDisplays(void){
     QString styleSheet = IMAGE_UNITS_HZ;
     WidgetDisplay *display = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, this);
     display->showAvgDisplay(false);
-    configureHFLFErrorStyles(display);
+    configureErrorStyles(display);
     return display;
 }
 
@@ -96,14 +100,22 @@ WidgetDisplay *CounterWindow::createRatioDisplay(void){
     return display;
 }
 
-void CounterWindow::configureHFLFErrorStyles(WidgetDisplay *display){
+WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
+    QString styleSheet = IMAGE_UNITS_SEC;
+    WidgetDisplay *display  = new WidgetDisplay(LITERAL_INTERVAL, styleSheet, true, this);
+    configureErrorStyles(display);
+    display->showProgressBar(false);
+    display->showAvgDisplay(false);
+    return display;
+}
+
+void CounterWindow::configureErrorStyles(WidgetDisplay *display){
     QString styleSheet = IMAGE_SIGN_ERR;
     styleSheet = IMAGE_SIGN_ERR;
     display->setErrStyle(styleSheet);
     styleSheet = IMAGE_SIGN_PLSMNS;
     display->setQerrStyle(styleSheet);
-    display->setTerrStyle(styleSheet);
-    //clearDisplay(display, true);
+    display->setTerrStyle(styleSheet);    
 }
 
 void CounterWindow::configureAllDisplays(void){
@@ -111,10 +123,11 @@ void CounterWindow::configureAllDisplays(void){
     configureDisplaysStaticAttr(displayLFCh1, "CH1", LITERAL_FREQUENCY, TEXT_COLOR_BLUE);
     configureDisplaysStaticAttr(displayLFCh2, "CH2", LITERAL_FREQUENCY, TEXT_COLOR_GREY);
     configureDisplaysStaticAttr(displayRat, "CH3/CH1", LITERAL_RATIO, TEXT_COLOR_BLUE);
+    configureDisplaysStaticAttr(displayInt, "CH1 - CH2", LITERAL_INTERVAL, TEXT_COLOR_BLUE);
     displayLFCh1->hide();
     displayLFCh2->hide();
     displayRat->hide();
-    //displayInt->hide();
+    displayInt->hide();
 }
 
 void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor){
@@ -138,8 +151,8 @@ void CounterWindow::configureDisplaysDynamicAttr(){
     configureDisplaysDynamicLabels(displayLFCh2, spec->pins.lf_ch2);
     displayLFCh2->setRangeProgressBar(spec->lf_min, spec->hf_max);
 
-    QString pinsRatio = spec->pins.rat_ref + "/" + spec->pins.rat_ch3;
-    configureDisplaysDynamicLabels(displayRat, pinsRatio);
+    configureDisplaysDynamicLabels(displayRat, spec->pins.rat_ref + "/" + spec->pins.rat_ch3);
+    configureDisplaysDynamicLabels(displayInt, spec->pins.int_ch1 + " - " + spec->pins.int_ch2);
 }
 
 void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin)
@@ -172,27 +185,29 @@ void CounterWindow::setNextCounterMode(int index){
         displayHF->show();
         clearDisplay(displayHF, true);
     }else if(index == (int)CounterMode::LOW_FREQUENCY) {
-        clearDisplay(displayLFCh1, true);
-        clearDisplay(displayLFCh2, true);
-        if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
-            displayLFCh2->setLabelText(LABELNUM_HOLD, "Just no luck!");
+        if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED){            
+            displayLFCh2->setLabelText(LABELNUM_HOLD, LITERAL_NO_DATA);
+            displayLFCh1->displayAvgString("");
         }
         if(conf->lfState.chan2.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
-            displayLFCh1->setLabelText(LABELNUM_HOLD, "Just no luck!");
+            displayLFCh1->setLabelText(LABELNUM_HOLD, LITERAL_NO_DATA);
+            displayLFCh2->displayAvgString("");
         }
         displayLFCh1->show();
         displayLFCh2->show();
+        clearDisplay(displayLFCh1, true);
+        clearDisplay(displayLFCh2, true);
     }else if(index == (int)CounterMode::RATIO) {
         displayRat->show();
         clearDisplay(displayRat, true);
     }else if(index == (int)CounterMode::INTERVAL) {
         displayInt->show();
-        clearDisplay(displayInt, true);
+        clearDisplay(displayInt, false);
     }
 }
 
 void CounterWindow::clearDisplay(WidgetDisplay *display, bool uponSwitch){
-    if(conf->mode != CounterMode::HIGH_FREQUENCY && conf->hfState.hold == HFState::HoldOnState::OFF)
+    if(/*conf->mode != CounterMode::HIGH_FREQUENCY && */conf->hfState.hold == HFState::HoldOnState::OFF && uponSwitch)
         display->displayAvgString("");
     display->displayString("");
     display->displayQerrString("");
@@ -313,7 +328,7 @@ void CounterWindow::lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavai
     showPMErrorSigns(display, false);
 
     lfShowDutyCycleDisplays(display, true);
-    unavailDisplay->setLabelText(LABELNUM_HOLD, "Just no luck!");
+    unavailDisplay->setLabelText(LABELNUM_HOLD, LITERAL_NO_DATA);
 
     clearDisplay(unavailDisplay, false);
     clearDisplay(display, true);
@@ -351,3 +366,8 @@ void CounterWindow::ratDisplayFlagWarning(WidgetDisplay *display, bool visible){
     display->setLabelText(LABELNUM_HOLD, string);
 }
 
+/************************************ INTERVALS MEAS. FUNCTIONS ***************************************/
+void CounterWindow::intDisplayFlagTimeout(WidgetDisplay *display, bool visible){
+    QString string = (visible) ? "Timeout!" : "";
+    display->setLabelText(LABELNUM_HOLD, string);
+}

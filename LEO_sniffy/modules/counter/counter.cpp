@@ -35,6 +35,13 @@ Counter::Counter(QObject *parent)
     /* Ratio Counter Signals/Slots */
     connect(cntWindow->tabRatio->dialSampleCount, &WidgetDialRange::valueChanged, this, &Counter::ratDialSampleCountChangedCallback);
     connect(cntWindow->tabRatio->buttonRetrigger, &WidgetButtons::clicked, this, &Counter::ratRetriggerCallback);
+
+    /* Intervals Counter Signals/Slots */
+    connect(cntWindow->tabInter->buttonsStart, &WidgetButtons::clicked, this, &Counter::intButtonsStartCallback);
+    connect(cntWindow->tabInter->dialTimeout, &WidgetDialRange::valueChanged, this, &Counter::intDialTimeoutChangedCallback);
+    connect(cntWindow->tabInter->buttonsEventsSeq, &WidgetButtons::clicked, this, &Counter::intSwitchEventSequenceChangedCallback);
+    connect(cntWindow->tabInter->switchEdgeEventA, &WidgetSwitch::clicked, this, &Counter::intEventAChangedCallback);
+    connect(cntWindow->tabInter->switchEdgeEventB, &WidgetSwitch::clicked, this, &Counter::intEventBChangedCallback);
 }
 
 void Counter::startModule(){
@@ -72,29 +79,39 @@ void Counter::parseData(QByteArray data){
         }else if(dataHeader=="RF_D"){
             parseRatioCounter(dataToPass);
         }else if(dataHeader=="TI_D"){
-
+            parseIntervalsCounter(dataToPass);
         }
     }
 }
 
 /************************************** COMMON FUNCTIONS ****************************************/
 QString Counter::formatNumber(double valToFormat, double error){
-    QString str;
-    const int places = 5;
-    int abs = qFabs(error);
-    int leftDigitNum = (abs < 1) ? 0 : (int)(log10(abs) + 1);
+    QString str = "0.000";
+    if(valToFormat != 0){
+        const int places = 4;
+        int abs = qFabs(error);
+        int leftDigitNum = (abs < 1) ? 0 : (int)(log10(abs) + 1);
 
-    if(valToFormat < 1){
-        str = loc.toString(valToFormat, 'e');
-    }else if(leftDigitNum >= places){
-        str = loc.toString(valToFormat, 'f', 0);
-    }else if (leftDigitNum < places) {
-        int rightDigitNum = places - leftDigitNum;
-        str = loc.toString(valToFormat, 'f', rightDigitNum);
+        if(valToFormat < 1){
+            str = loc.toString(valToFormat, 'e');
+        }else if(leftDigitNum >= places){
+            str = loc.toString(valToFormat, 'f', 0);
+        }else if (leftDigitNum < places) {
+            int rightDigitNum = places - leftDigitNum;
+            str = loc.toString(valToFormat, 'f', rightDigitNum);
+        }
+        str.replace(loc.decimalPoint(), '.');
     }
-    str.replace(loc.decimalPoint(), '.');
 
     return str;
+}
+
+QString Counter::formatErrNumber(double errToFormat){
+    if(errToFormat != 0){
+        return loc.toString(errToFormat, 'g', 4).replace(loc.decimalPoint(), '.');
+    }else {
+        return "0.0000";
+    }
 }
 
 void Counter::displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr){
@@ -118,7 +135,7 @@ void Counter::switchCounterModeCallback(int index){
     }else if (index == 2) {
         ratReloadState();
     }else if (index == 3) {
-
+        intReloadState();
     }
 }
 
@@ -141,8 +158,8 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
 
     bool isFrequency = (freqPer == "QFRE") ? true : false;
     uint countToGo = (isFrequency) ? movAvg->prepend(val) : movAvg->prepend(1/val);
-    this->strQerr = strQerr = loc.toString(qerr, 'g', 3).replace(loc.decimalPoint(), '.');
-    this->strTerr = strTerr = loc.toString(terr, 'g', 3).replace(loc.decimalPoint(), '.');
+    this->strQerr = strQerr = formatErrNumber(qerr);
+    this->strTerr = strTerr = formatErrNumber(terr);
     cntWindow->showPMErrorSigns(cntWindow->displayHF, true);
 
     if(movAvg->isBufferFull()){
@@ -151,7 +168,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
         double avg = (isFrequency) ? movAvg->getAverage() : 1 / movAvg->getAverage();
         if (conf->hfState.error == HFState::ErrorType::AVERAGE){
             qerr = (isFrequency) ? qerr / movAvg->getBufferSize() : 1 / (1 / avg - movAvg->getBufferSize()) - avg;
-            avgQerr = strQerr = loc.toString(qerr, 'g', 3).replace(loc.decimalPoint(), '.');
+            avgQerr = strQerr = formatErrNumber(qerr);
         }
         strAvg = formatNumber(avg, qerr+terr);
     }else {
@@ -260,12 +277,11 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
     WidgetDisplay *display = (channel == "IC1D") ? cntWindow->displayLFCh1 : cntWindow->displayLFCh2;
 
     if(mode == "FPME"){
-        strQerr = loc.toString(qerr, 'g', 3).replace(loc.decimalPoint(), '.');
-        strTerr = loc.toString(terr, 'g', 3).replace(loc.decimalPoint(), '.');
+        strVal = formatNumber(val1, qerr+terr);
+        strQerr = formatErrNumber(qerr);
+        strTerr = formatErrNumber(terr);
 
         bool isFrequency = (quantity == "QFRE") ? true : false;
-        strVal = formatNumber(val1, qerr+terr);
-
         val1 = (isFrequency) ? val1 : 1 / val1;
         if(isRangeExceeded(val1)){
             cntWindow->displayFlagSwitchMode(display, true);
@@ -348,6 +364,11 @@ void Counter::lfSwitchMultiplierCallback(int index){
 
 void Counter::lfSwitchMultiplier(int index, QByteArray channelMultiplier){
     write(channelMultiplier, cmd->pLF_MULTIPLIER.at(index));
+    if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){
+        cntWindow->clearDisplay(cntWindow->displayLFCh1, true);
+    }else {
+        cntWindow->clearDisplay(cntWindow->displayLFCh2, true);
+    }
 }
 
 void Counter::lfSwitchDutyCycleCallback(int index){
@@ -380,22 +401,23 @@ void Counter::lfDialSampleCountCh2ChangedCallback(float val){
 
 /************************************** RATIO MEAS. FUNCTIONS ****************************************/
 void Counter::parseRatioCounter(QByteArray data){
-    QByteArray warn = data.left(4); data.remove(0, 4);
+    QByteArray inputString = data.left(4); data.remove(0, 4);
 
-    double val; QString strVal;
-    QDataStream streamBuffLeng(data);
-    streamBuffLeng >> val;
-
-    if(warn == "WARN"){
+    if(inputString == "WARN"){
         cntWindow->ratDisplayFlagWarning(cntWindow->displayRat, true);
+
     }else {
-        cntWindow->displayFlagHoldOn(cntWindow->displayRat, false);
+        double val; QString strVal;
+        QDataStream streamBuffLeng(data);
+        streamBuffLeng >> val;
+
         strVal = loc.toString(val, 'f', 5).replace(loc.decimalPoint(), '.');
         cntWindow->displayRat->displayString(strVal);
-        /* Print-out the error */
         double error = 1 / conf->ratState.sampleCountBackup;
         strVal = loc.toString(error, 'f', 5).replace(loc.decimalPoint(), '.');
         cntWindow->displayRat->displayTerrString(strVal);
+
+        cntWindow->displayFlagHoldOn(cntWindow->displayRat, false);
         cntWindow->showPMErrorSigns(cntWindow->displayRat, true);
         cntWindow->displayRat->drawIndicationFlag(LABELNUM_FLAG, "blue");
     }
@@ -418,9 +440,72 @@ void Counter::ratRetriggerCallback(int index){
 }
 
 /************************************** INTERVALS FUNCTIONS ****************************************/
-void Counter::intReloadState()
-{
+void Counter::parseIntervalsCounter(QByteArray data){
+    QByteArray inputString = data.left(4); data.remove(0, 4);
 
+    if(inputString == "TMOT"){
+        cntWindow->intDisplayFlagTimeout(cntWindow->displayInt, true);
+
+    }else {
+        double val, qerr, terr;
+        QString strVal, strQerr, strTerr;
+        QDataStream streamBuffLeng(data);
+        streamBuffLeng >> val >> qerr >> terr;
+
+        strVal = formatNumber(val, qerr+terr);
+        strQerr = formatErrNumber(qerr);
+        strTerr = formatErrNumber(terr);
+
+        displayValues(cntWindow->displayInt, strVal, "", strQerr, strTerr);
+
+        cntWindow->showPMErrorSigns(cntWindow->displayInt, true);
+        cntWindow->displayFlagHoldOn(cntWindow->displayInt, false);
+    }
+}
+
+void Counter::intReloadState(){
+    intSwitchEventSequenceChangedCallback((int)conf->intState.seqAB);
+    intDialTimeoutChangedCallback(conf->intState.timeoutBackup);
+    intEventAChangedCallback((int)conf->intState.eventA);
+    intEventBChangedCallback((int)conf->intState.eventB);
+}
+
+void Counter::intButtonsStartCallback(){
+    comm->write(moduleCommandPrefix+":"+cmd->START+";");
+    cntWindow->displayFlagHoldOn(cntWindow->displayInt, true);
+    cntWindow->clearDisplay(cntWindow->displayInt, true);
+}
+
+void Counter::intSwitchEventSequenceChangedCallback(int index){
+    if(index){
+        write(cmd->INT_EVENT, cmd->INT_EVENT_SEQUENCE_BA);
+    }else {
+        write(cmd->INT_EVENT, cmd->INT_EVENT_SEQUENCE_AB);
+    }
+    conf->intState.seqAB = (IntState::Sequence)index;
+}
+
+void Counter::intEventAChangedCallback(int index){
+    if(index){
+        write(cmd->INT_EVENT, cmd->INT_EVENT_FALL_CH1);
+    }else {
+        write(cmd->INT_EVENT, cmd->INT_EVENT_RISE_CH1);
+    }
+    conf->intState.eventA = (IntState::Event)index;
+}
+
+void Counter::intEventBChangedCallback(int index){
+    if(index){
+        write(cmd->INT_EVENT, cmd->INT_EVENT_FALL_CH2);
+    }else {
+        write(cmd->INT_EVENT, cmd->INT_EVENT_RISE_CH2);
+    }
+    conf->intState.eventB = (IntState::Event)index;
+}
+
+void Counter::intDialTimeoutChangedCallback(float val){
+    val = conf->intState.timeoutBackup = qFloor(val);
+    write(cmd->INT_TIMEOUT_SEC, val);
 }
 
 void Counter::writeConfiguration(){
@@ -434,3 +519,4 @@ QWidget *Counter::getWidget(){
 Counter::~Counter(){
 
 }
+

@@ -25,6 +25,9 @@ public:
     WidgetButtons *buttonsGateTime;
     QLabel *labelAutoInputPrescaler;
 
+private:
+
+
 signals:    
 
 private:
