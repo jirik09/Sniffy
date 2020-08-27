@@ -88,7 +88,7 @@ void Counter::parseData(QByteArray data){
 QString Counter::formatNumber(double valToFormat, double error){
     QString str = "0.000";
     if(valToFormat != 0){
-        const int places = 5;
+        const int places = 4;
         int abs = qFabs(error);
         int leftDigitNum = (abs < 1) ? 0 : (int)(log10(abs) + 1);
 
@@ -364,6 +364,11 @@ void Counter::lfSwitchMultiplierCallback(int index){
 
 void Counter::lfSwitchMultiplier(int index, QByteArray channelMultiplier){
     write(channelMultiplier, cmd->pLF_MULTIPLIER.at(index));
+    if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){
+        cntWindow->clearDisplay(cntWindow->displayLFCh1, true);
+    }else {
+        cntWindow->clearDisplay(cntWindow->displayLFCh2, true);
+    }
 }
 
 void Counter::lfSwitchDutyCycleCallback(int index){
@@ -460,14 +465,15 @@ void Counter::parseIntervalsCounter(QByteArray data){
 
 void Counter::intReloadState(){
     intSwitchEventSequenceChangedCallback((int)conf->intState.seqAB);
+    intDialTimeoutChangedCallback(conf->intState.timeoutBackup);
     intEventAChangedCallback((int)conf->intState.eventA);
     intEventBChangedCallback((int)conf->intState.eventB);
-    intDialTimeoutChangedCallback(conf->intState.timeoutBackup);
 }
 
 void Counter::intButtonsStartCallback(){
     comm->write(moduleCommandPrefix+":"+cmd->START+";");
     cntWindow->displayFlagHoldOn(cntWindow->displayInt, true);
+    cntWindow->clearDisplay(cntWindow->displayInt, true);
 }
 
 void Counter::intSwitchEventSequenceChangedCallback(int index){

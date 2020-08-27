@@ -167,7 +167,7 @@ const QByteArray Commands::LF_DUTY_CYCLE_DISABLE = "DCX_";
 const QByteArray Commands::RAT_CH3_SAMPLE_COUNT = "RSC_";
 
 // Counter Intervals meas.
-const QByteArray Commands::INT_TIMEOUT_SEC;
+const QByteArray Commands::INT_TIMEOUT_SEC = "TIMO";
 
 const QByteArray Commands::INT_EVENT = "EVNT";
 const QByteArray Commands::INT_EVENT_RISE_FALL_CH1 = "RF1_";

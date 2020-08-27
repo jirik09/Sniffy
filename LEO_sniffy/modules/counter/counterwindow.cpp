@@ -207,7 +207,7 @@ void CounterWindow::setNextCounterMode(int index){
 }
 
 void CounterWindow::clearDisplay(WidgetDisplay *display, bool uponSwitch){
-    if(conf->mode != CounterMode::HIGH_FREQUENCY && conf->hfState.hold == HFState::HoldOnState::OFF)
+    if(/*conf->mode != CounterMode::HIGH_FREQUENCY && */conf->hfState.hold == HFState::HoldOnState::OFF && uponSwitch)
         display->displayAvgString("");
     display->displayString("");
     display->displayQerrString("");
