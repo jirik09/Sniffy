@@ -50,6 +50,10 @@ void WidgetDisplay::setTerrStyle(QString &terrStyleSheet){
     ui->styleTerr->setStyleSheet(terrStyleSheet);
 }
 
+void WidgetDisplay::setBarStyle(QString &barStyleSheet){
+    ui->progressBar->setStyleSheet(barStyleSheet);
+}
+
 void WidgetDisplay::showQerrStyle(bool visible){
     (visible) ? ui->styleQerr->show() : ui->styleQerr->hide();
 }
@@ -121,12 +125,15 @@ void WidgetDisplay::showProgressBar(bool visible){
     (visible) ? ui->progressBar->show() : ui->progressBar->hide();
 }
 
-void WidgetDisplay::setRangeProgressBar(int min, int max){
+void WidgetDisplay::setProgressBarRange(int min, int max){
     ui->progressBar->setRange(min, max);
 }
 
 void WidgetDisplay::updateProgressBar(int value){
     ui->progressBar->setValue(value);
+    //  ui->progressBar->repaint();
+    //  if progress bar not left with its default style
+    //  the chunks are around 5% instead of at least 1%
 }
 
 void WidgetDisplay::configLabel(int labelNumber, QString text, QString colorStyle, bool isVisible){
@@ -136,8 +143,7 @@ void WidgetDisplay::configLabel(int labelNumber, QString text, QString colorStyl
 }
 
 QString WidgetDisplay::getLabelText(int labelNumber){
-    QString text = labelList.at(labelNumber)->text();
-    return text;
+    return labelList.at(labelNumber)->text();
 }
 
 void WidgetDisplay::setLabelText(int labelNumber, const QString text){

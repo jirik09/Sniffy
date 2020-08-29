@@ -21,7 +21,7 @@ WidgetFooter::WidgetFooter(QWidget *parent) :
     animationForward = new QMovie(":/graphics/graphics/menu_burger_button.gif");
     animationBackward = new QMovie(":/graphics/graphics/menu_burger_button_backw.gif");
 
-    QSize *size = new QSize(25, 25);
+    QSize *size = new QSize(30, 30);
     animationForward->setScaledSize(*size);
     animationBackward->setScaledSize(*size);
 

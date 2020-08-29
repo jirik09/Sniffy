@@ -81,6 +81,13 @@ void CounterTabLowFreq::changeAllComponentsColor(QString bckgndColor)
     buttonsDutyCycleSwitch->setColor(bckgndColor, 1);
 }
 
+void CounterTabLowFreq::changeAllComponentsCheck(int quantBtnIndex, int dcBtnIndex, int multipIndex)
+{
+    buttonsQuantitySwitch->setChecked(true, quantBtnIndex);
+    buttonsDutyCycleSwitch->setChecked(true, dcBtnIndex);
+    buttonsMultiplierSwitch->setChecked(true, multipIndex);
+}
+
 void CounterTabLowFreq::showDialInChannel(int channel, bool visible)
 {
     if(channel == 0){

@@ -30,6 +30,7 @@ public:
 
     void enableAllComponents(bool enable);
     void changeAllComponentsColor(QString bckgndColor);
+    void changeAllComponentsCheck(int quantBtnIndex, int dcBtnIndex, int multipIndex);
 
     void showDialInChannel(int channel, bool visible);
 

@@ -27,6 +27,7 @@ public:
     void setErrStyle(QString &errStyleSheet);
     void setQerrStyle(QString &qerrStyleSheet);
     void setTerrStyle(QString &terrStyleSheet);
+    void setBarStyle(QString &barStyleSheet);
 
     /* Displays */
     void displayNumber(double number);
@@ -37,6 +38,7 @@ public:
     void displayQerrString(const QString &string);
     void displayTerrNumber(double number);
     void displayTerrString(const QString &string);
+
     void showQerrStyle(bool visible);
     void showTerrStyle(bool visible);
     void showQerrTerrStyle(bool visible);    
@@ -57,7 +59,7 @@ public:
 
     /* Progress bar */    
     void showProgressBar(bool visible);
-    void setRangeProgressBar(int min, int max);
+    void setProgressBarRange(int min, int max);
     void updateProgressBar(int value);
 
 private:

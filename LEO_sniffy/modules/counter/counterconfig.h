@@ -39,20 +39,20 @@ struct LFState
         enum class Multiplier { MULT_1X = 0, MULT_2X = 1,
                                 MULT_4X = 2, MULT_8X = 3 } multiplier;
 
-        int sampleCountBackup;
+        int sampleCount;
     } chan1, chan2;
 };
 
 struct RatState
 {
-    int sampleCountBackup;
+    int sampleCount;
 };
 
 struct IntState
 {
     enum class Sequence { AB = 0, BA = 1 } seqAB;
     enum class Event { RISING = 0, FALLING = 1 } eventA, eventB;
-    int timeoutBackup;
+    int timeout;
 };
 
 

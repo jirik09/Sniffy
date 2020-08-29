@@ -16,16 +16,16 @@ CounterConfig::CounterConfig(QObject *parent) : QObject(parent)
     lfState.chan1.quantity = LFState::Channel::Quantity::FREQUENCY;
     lfState.chan1.multiplier = LFState::Channel::Multiplier::MULT_1X;
     lfState.chan1.dutyCycle = LFState::Channel::DutyCycle::DISABLED;
-    lfState.chan1.sampleCountBackup = 1;
+    lfState.chan1.sampleCount = 1;
     lfState.chan2.quantity = LFState::Channel::Quantity::FREQUENCY;
     lfState.chan2.multiplier = LFState::Channel::Multiplier::MULT_1X;
     lfState.chan2.dutyCycle = LFState::Channel::DutyCycle::DISABLED;
-    lfState.chan2.sampleCountBackup = 1;
+    lfState.chan2.sampleCount = 1;
 
-    ratState.sampleCountBackup = REFERENCE_COUNT_DEFAULT;
+    ratState.sampleCount = REFERENCE_COUNT_DEFAULT;
 
     intState.seqAB = IntState::Sequence::AB;
     intState.eventA = IntState::Event::RISING;
     intState.eventB = IntState::Event::RISING;
-    intState.timeoutBackup = INTERVAL_TIMEOUT_DEFAULT;
+    intState.timeout = INTERVAL_TIMEOUT_DEFAULT;
 }

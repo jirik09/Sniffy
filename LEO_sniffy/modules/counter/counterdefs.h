@@ -6,7 +6,7 @@
 /* COMMON defines */
 #define LITERAL_FREQUENCY   "FREQUENCY"
 #define LITERAL_PERIOD      "PERIOD"
-#define LITERAL_NO_DATA     "Just bad luck!"
+#define LITERAL_NO_DATA     " "
 
 /* HIGH FREQUENCY defines */
 #define AVERAGE_RANGE       200
@@ -14,8 +14,8 @@
 #define LABELNUM_CHAN       0
 #define LABELNUM_PINS       1
 #define LABELNUM_QUAN       2
-#define LABELNUM_HOLD       3
-#define LABELNUM_FLAG       4
+#define LABELNUM_FLAG       3
+#define LABELNUM_INDIC      4
 
 /* LOW FREQUENCY defines */
 #define SAMPLE_COUNT        100

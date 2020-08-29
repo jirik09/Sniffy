@@ -26,8 +26,6 @@
         <file>graphics/icon_counter.png</file>
         <file>graphics/icon_signal_generator.png</file>
         <file>graphics/icon_voltmeter.png</file>
-        <file>graphics/menu_burger_button.gif</file>
-        <file>graphics/menu_burger_button_backw.gif</file>
         <file>graphics/sign_pm.png</file>
         <file>graphics/units_err.png</file>
         <file>graphics/units_erravg.png</file>
@@ -40,6 +38,8 @@
         <file>graphics/cnt_ba_fr.png</file>
         <file>graphics/cnt_ba_rf.png</file>
         <file>graphics/cnt_ba_rr.png</file>
+        <file>graphics/menu_burger_button.gif</file>
+        <file>graphics/menu_burger_button_backw.gif</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

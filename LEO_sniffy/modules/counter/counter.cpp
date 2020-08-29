@@ -120,7 +120,7 @@ void Counter::displayValues(WidgetDisplay *display, QString val, QString avg, QS
     display->displayQerrString(qerr);
     display->displayTerrString(terr);
     QString color = (display == cntWindow->displayLFCh2) ? "grey" : "blue";
-    display->drawIndicationFlag(LABELNUM_FLAG, color);
+    display->drawIndicationFlag(LABELNUM_INDIC, color);
     cntWindow->displayFlagHoldOn(display, false);
 }
 
@@ -227,6 +227,7 @@ void Counter::hfSwitchQuantityCallback(int index){
     conf->hfState.quantity = (HFState::Quantity)index;
     write(cmd->HF_QUANTITY, cmd->pQUANTITIY.at(index));
     cntWindow->clearDisplay(cntWindow->displayHF, true);
+    cntWindow->displayHF->displayAvgString("");
 }
 
 void Counter::hfSwitchGateTimeCallback(int index){
@@ -281,21 +282,24 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         strQerr = formatErrNumber(qerr);
         strTerr = formatErrNumber(terr);
 
-        bool isFrequency = (quantity == "QFRE") ? true : false;
-        val1 = (isFrequency) ? val1 : 1 / val1;
+        if(quantity == "QPER")
+            val1 = 1 / val1;
+
         if(isRangeExceeded(val1)){
+            cntWindow->clearDisplay(display, false);
             cntWindow->displayFlagSwitchMode(display, true);
+            display->updateProgressBar(spec->lf_max);
         }else {
             displayValues(display, strVal, "", strQerr, strTerr);
+            cntWindow->showPMErrorSigns(display, true);
+            cntWindow->displayFlagHoldOn(display, false);
+            display->updateProgressBar(val1);
         }
-
-        display->updateProgressBar(val1);
-        cntWindow->showPMErrorSigns(display, true);
-
     }else if (mode == "DUTY") {
         strVal = loc.toString(val1, 'f', 3).replace(loc.decimalPoint(), '.');
         strVal2 = loc.toString(val2, 'e', 5).replace(loc.decimalPoint(), '.');
         cntWindow->showPMErrorSigns(display, true);
+        cntWindow->displayFlagHoldOn(display, false);
         displayValues(display, strVal, strVal2, "", "");
     }
 }
@@ -314,8 +318,8 @@ void Counter::lfReloadStateQuantMeasurement(){
     lfSwitchQuantity((int)conf->lfState.chan2.quantity, cmd->LF_CH2_QUANTITY);
     lfSwitchMultiplier((int)conf->lfState.chan1.multiplier, cmd->LF_CH1_MULTIPLIER);
     lfSwitchMultiplier((int)conf->lfState.chan2.multiplier, cmd->LF_CH2_MULTIPLIER);
-    lfDialSampleCountCh1ChangedCallback(conf->lfState.chan1.sampleCountBackup);
-    lfDialSampleCountCh2ChangedCallback(conf->lfState.chan2.sampleCountBackup);
+    lfDialSampleCountCh1ChangedCallback(conf->lfState.chan1.sampleCount);
+    lfDialSampleCountCh2ChangedCallback(conf->lfState.chan2.sampleCount);
 }
 
 bool Counter::isRangeExceeded(double frequency){
@@ -324,10 +328,6 @@ bool Counter::isRangeExceeded(double frequency){
 
 void Counter::lfSwitchChannelCallback(int index){
     conf->lfState.activeChan = LFState::ActiveChan(index);
-    LFState::Channel chanState = (index == 0) ? conf->lfState.chan1 : conf->lfState.chan2;
-    cntWindow->tabLowFreq->buttonsQuantitySwitch->setChecked(true, (int)chanState.quantity);
-    cntWindow->tabLowFreq->buttonsDutyCycleSwitch->setChecked(true, (int)chanState.dutyCycle);
-    cntWindow->tabLowFreq->buttonsMultiplierSwitch->setChecked(true, (int)chanState.multiplier);
 }
 
 void Counter::lfSwitchQuantityCallback(int index){
@@ -390,12 +390,12 @@ void Counter::lfSwitchDutyCycleCallback(int index){
 }
 
 void Counter::lfDialSampleCountCh1ChangedCallback(float val){
-    val = conf->lfState.chan1.sampleCountBackup = qFloor(val);
+    val = conf->lfState.chan1.sampleCount = qFloor(val);
     write(cmd->LF_CH1_SAMPLE_COUNT, val);
 }
 
 void Counter::lfDialSampleCountCh2ChangedCallback(float val){
-    val = conf->lfState.chan2.sampleCountBackup = qFloor(val);
+    val = conf->lfState.chan2.sampleCount = qFloor(val);
     write(cmd->LF_CH2_SAMPLE_COUNT, val);
 }
 
@@ -411,32 +411,32 @@ void Counter::parseRatioCounter(QByteArray data){
         QDataStream streamBuffLeng(data);
         streamBuffLeng >> val;
 
-        strVal = loc.toString(val, 'f', 5).replace(loc.decimalPoint(), '.');
+        strVal = loc.toString(val, 'g', 5).replace(loc.decimalPoint(), '.');
         cntWindow->displayRat->displayString(strVal);
-        double error = 1 / conf->ratState.sampleCountBackup;
-        strVal = loc.toString(error, 'f', 5).replace(loc.decimalPoint(), '.');
+        double error = 1 / (double)conf->ratState.sampleCount;
+        strVal = loc.toString(error, 'g', 6).replace(loc.decimalPoint(), '.');
         cntWindow->displayRat->displayTerrString(strVal);
 
         cntWindow->displayFlagHoldOn(cntWindow->displayRat, false);
         cntWindow->showPMErrorSigns(cntWindow->displayRat, true);
-        cntWindow->displayRat->drawIndicationFlag(LABELNUM_FLAG, "blue");
+        cntWindow->displayRat->drawIndicationFlag(LABELNUM_INDIC, "blue");
     }
 }
 
 void Counter::ratReloadState(){
-    ratDialSampleCountChangedCallback(conf->ratState.sampleCountBackup);
+    ratDialSampleCountChangedCallback(conf->ratState.sampleCount);
 }
 
 void Counter::ratDialSampleCountChangedCallback(float val){
     cntWindow->clearDisplay(cntWindow->displayRat, true);
-    val = conf->ratState.sampleCountBackup = qFloor(val);
+    conf->ratState.sampleCount = val = qFloor(val);
     write(cmd->RAT_CH3_SAMPLE_COUNT, val);
 }
 
 void Counter::ratRetriggerCallback(int index){
     Q_UNUSED(index);
     cntWindow->clearDisplay(cntWindow->displayRat, true);
-    write(cmd->RAT_CH3_SAMPLE_COUNT, conf->ratState.sampleCountBackup);
+    write(cmd->RAT_CH3_SAMPLE_COUNT, conf->ratState.sampleCount);
 }
 
 /************************************** INTERVALS FUNCTIONS ****************************************/
@@ -465,7 +465,7 @@ void Counter::parseIntervalsCounter(QByteArray data){
 
 void Counter::intReloadState(){
     intSwitchEventSequenceChangedCallback((int)conf->intState.seqAB);
-    intDialTimeoutChangedCallback(conf->intState.timeoutBackup);
+    intDialTimeoutChangedCallback(conf->intState.timeout);
     intEventAChangedCallback((int)conf->intState.eventA);
     intEventBChangedCallback((int)conf->intState.eventB);
 }
@@ -504,7 +504,7 @@ void Counter::intEventBChangedCallback(int index){
 }
 
 void Counter::intDialTimeoutChangedCallback(float val){
-    val = conf->intState.timeoutBackup = qFloor(val);
+    val = conf->intState.timeout = qFloor(val);
     write(cmd->INT_TIMEOUT_SEC, val);
 }
 
