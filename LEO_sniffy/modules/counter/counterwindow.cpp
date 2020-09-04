@@ -342,6 +342,7 @@ void CounterWindow::lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavai
     unavailDisplay->showBarDisplay(false);
     unavailDisplay->setLabelText(LABELNUM_FLAG, LITERAL_NO_DATA);
 
+    unavailDisplay->drawIndicationFlag(LABELNUM_INDIC, "clear");
     clearDisplay(unavailDisplay, false);
     clearDisplay(display, true);
 }
