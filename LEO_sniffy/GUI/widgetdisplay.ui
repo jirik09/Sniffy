@@ -89,7 +89,7 @@ background-color: rgb(38, 38, 38);
        <number>0</number>
       </property>
       <item>
-       <widget class="QWidget" name="verticalWidget" native="true">
+       <widget class="QWidget" name="verticalWidget_display" native="true">
         <property name="enabled">
          <bool>true</bool>
         </property>

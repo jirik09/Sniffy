@@ -6,7 +6,7 @@ CounterTabRatio::CounterTabRatio(QVBoxLayout *destination, QWidget *parent) : QO
     destination->addWidget(separatorSampleCounte);
 
     dialSampleCount = new WidgetDialRange(parent ,"Sample Count");
-    dialSampleCount->setRange(2, REFERENCE_COUNT_MAX, "Samples", 1, 1, REFERENCE_COUNT_DEFAULT, true);
+    dialSampleCount->setRange(2, REFERENCE_COUNT_MAX, "Smpls", 1, 1, REFERENCE_COUNT_DEFAULT, true);
     dialSampleCount->hideUnitSelection();
     destination->addWidget(dialSampleCount);
 

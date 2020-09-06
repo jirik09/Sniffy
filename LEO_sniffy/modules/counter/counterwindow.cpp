@@ -108,8 +108,7 @@ WidgetDisplay *CounterWindow::createRatioDisplay(void){
 WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
     QString styleSheet = IMAGE_UNITS_SEC;
     WidgetDisplay *display  = new WidgetDisplay(LITERAL_INTERVAL, styleSheet, true, this);
-    configureErrorStyles(display);
-    //display->showProgressBar(false);
+    configureErrorStyles(display);    
     display->showBarDisplay(false);
     display->showAvgDisplay(false);
     return display;

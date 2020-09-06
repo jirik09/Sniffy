@@ -22,7 +22,7 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     buttonsEventsSeq->setText("B -> A", 1);
     destination->addWidget(buttonsEventsSeq);
 
-    horizontalLayout_switchArea = new QHBoxLayout(parent);
+    horizontalLayout_switchArea = new QHBoxLayout();
     destination->addLayout(horizontalLayout_switchArea);
 
     switchEdgeEventA = new WidgetSwitch(parent, "Rising", "Falling", "");
@@ -44,9 +44,6 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     QString picPath = PATH_IMG_EVENT_AB_RR;
     pixmapEventsSeq->load(picPath);
     labelPicEventsSeq->setPixmap(pixmapEventsSeq->scaled(width, height, Qt::KeepAspectRatio));
-
-//    WidgetSeparator *separatorEnd = new WidgetSeparator(parent,"");
-//    destination->addWidget(separatorEnd);
 
     QSpacerItem *verticalSpacer;
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
