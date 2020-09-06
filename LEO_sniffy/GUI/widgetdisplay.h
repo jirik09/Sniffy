@@ -6,6 +6,9 @@
 #include <QString>
 
 #include "widgetlabel.h"
+
+#include "GUI/clickablelabel.h"
+
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
 
@@ -62,11 +65,17 @@ public:
     void setProgressBarRange(int min, int max);
     void updateProgressBar(int value);
 
+private slots:
+    void historyButtonClickedCallback();
+
 private:
     Ui::WidgetDisplay *ui;
     QList<QLabel*> labelList;
     QPalette palette;
     int drawFlag = 0;
+    enum {ENABLED, DISABLED} history = DISABLED;
+
+    void setDefaultSplitterRatio();
 };
 
 #endif // WIDGETDISPLAY_H

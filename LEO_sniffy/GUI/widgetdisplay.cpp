@@ -28,6 +28,15 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
 
     displayString("");
     displayAvgString("");
+
+    setDefaultSplitterRatio();
+
+    connect(ui->pushButton_history, SIGNAL(clicked()), this, SLOT(historyButtonClickedCallback()));
+}
+
+void WidgetDisplay::setDefaultSplitterRatio(){
+    QList<int> sizes = {0, ui->splitter->width()};
+    ui->splitter->setSizes(sizes);
 }
 
 void WidgetDisplay::setUnitsStyle(QString &unitsStyleSheet){
@@ -266,3 +275,26 @@ WidgetDisplay::~WidgetDisplay()
 {
     delete ui;
 }
+
+void WidgetDisplay::historyButtonClickedCallback()
+{
+    QString style;
+    QList<int> sizes = ui->splitter->sizes();
+
+    if(history == DISABLED){
+        sizes[0] = ui->splitter->width() / 3;
+        sizes[1] = ui->splitter->width() / 3 * 2;
+        style = "QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        history = ENABLED;
+    }else {
+        sizes = {0, ui->splitter->width()};
+        style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        history = DISABLED;
+    }
+    ui->splitter->setSizes(sizes);
+    ui->pushButton_history->setStyleSheet(style);
+}
+
+
