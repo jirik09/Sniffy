@@ -28,7 +28,15 @@ public:
 
 private:
 
+    void mouseMoveEvent(QMouseEvent *me) override;
+    void mousePressEvent(QMouseEvent *me) override;
+    void mouseReleaseEvent(QMouseEvent *me) override;
+
     virtual void paintEvent(QPaintEvent*) override;
+
+    int mousePressX;
+    int mousePressY;
+    int initialDialValue;
 
     double knobRadius_;
 

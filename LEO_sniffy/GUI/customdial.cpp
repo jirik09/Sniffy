@@ -7,6 +7,8 @@ Extends standard dial and just override the paint function
 
 #include <QPainter>
 #include <QColor>
+#include <QMouseEvent>
+#include <QDebug>
 
 #include <cmath>
 
@@ -46,12 +48,44 @@ double CustomDial::getKnobMargin() const
     return knobMargin_;
 }
 
+void CustomDial::mouseMoveEvent(QMouseEvent *me) {
+    double relativeX = me->x() - mousePressX+0.01;
+    double relativeY = me->y() - mousePressY+0.01;
+
+    double distance = sqrt(relativeX*relativeX + relativeY*relativeY);
+    double phi = atan(relativeX/relativeY)*180/3.14159;
+
+    double angle = 0;
+
+    if (relativeY>0){
+        angle = 90-phi;
+    }else {
+        angle = 270-phi;
+    }
+
+   // qDebug() << "dist"<<distance <<"angle" <<angle<<"(X" << relativeX << " Y" << relativeY << ")";
+    if (angle>225 || angle<45){
+        QDial::setValue(initialDialValue + distance/QDial::size().width()*QDial::maximum());
+    }else {
+        QDial::setValue(initialDialValue - distance/QDial::size().width()*QDial::maximum());
+    }
+}
+
+void CustomDial::mousePressEvent(QMouseEvent *me) {
+    mousePressX = me->x();
+    mousePressY = me->y();
+    initialDialValue = QDial::value();
+}
+
+void CustomDial::mouseReleaseEvent(QMouseEvent *me){
+    if(initialDialValue==QDial::value()){
+        QDial::mouseReleaseEvent(me);
+    }
+}
+
+
 void CustomDial::paintEvent(QPaintEvent*)
 {
-  //  static const double degree270 = 1.5 * M_PI;
-
-  //  static const double degree225 = 1.25 * M_PI;
-
     static const int margin = 10;
 
     QPainter painter(this);
@@ -80,22 +114,6 @@ void CustomDial::paintEvent(QPaintEvent*)
     // Get ratio between current value and maximum to calculate angle
     double ratio = static_cast<double>(QDial::value()) / QDial::maximum();
 
-    // The maximum amount of degrees is 270, offset by 225
-  //  double angle = ratio * degree270 - degree225;
-
-    // Radius of background circle
-  //  double r = QDial::height() / 2.0;
-
-    // Add r to have (0,0) in center of dial
- //   double y = sin(angle) * (r - knobRadius_ - knobMargin_) + r-5;
-
-  //  double x = cos(angle) * (r - knobRadius_ - knobMargin_) + r-5;
-
-    // Draw the ellipse
-   // painter.drawEllipse(QPointF(x,y),knobRadius_, knobRadius_);
-
-    //painter.setBrush(QBrush(QColor(10,200,150)));
-
     int marginHalf = margin/2;
     int size = (QDial::width()<QDial::height())?QDial::width():QDial::height();
     int diffH = (QDial::width()>QDial::height())?QDial::width()-QDial::height():0;
@@ -103,7 +121,6 @@ void CustomDial::paintEvent(QPaintEvent*)
 
 
     const QRectF rect(marginHalf+diffH/2,marginHalf+diffV/2,size-margin,size-margin);
-
 
     //draw background arc
     painter.setPen(QPen(QBrush(QColor(48,48,48)),5));
@@ -116,7 +133,4 @@ void CustomDial::paintEvent(QPaintEvent*)
     //draw marker
     painter.setPen(QPen(QBrush(QColor(214,214,214)),8));
     painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
-
-
-
 }
