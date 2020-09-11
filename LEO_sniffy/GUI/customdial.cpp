@@ -52,22 +52,23 @@ void CustomDial::mouseMoveEvent(QMouseEvent *me) {
     double relativeX = me->x() - mousePressX+0.01;
     double relativeY = me->y() - mousePressY+0.01;
 
-    double distance = sqrt(relativeX*relativeX + relativeY*relativeY);
+    //double distance = sqrt(relativeX*relativeX + relativeY*relativeY); //distance from initial point
+    double distance = abs(relativeX - relativeY) /sqrt(2); //distance from -xy axis
+
     double phi = atan(relativeX/relativeY)*180/3.14159;
 
     double angle = 0;
-
     if (relativeY>0){
         angle = 90-phi;
     }else {
         angle = 270-phi;
     }
 
-   // qDebug() << "dist"<<distance <<"angle" <<angle<<"(X" << relativeX << " Y" << relativeY << ")";
+    //qDebug() << "dist"<<distance <<"angle" <<angle<<"(X" << relativeX << " Y" << relativeY << ")";
     if (angle>225 || angle<45){
-        QDial::setValue(initialDialValue + distance/QDial::size().width()*QDial::maximum());
+        QDial::setValue(initialDialValue + distance/QDial::size().width()*QDial::maximum()*0.8);
     }else {
-        QDial::setValue(initialDialValue - distance/QDial::size().width()*QDial::maximum());
+        QDial::setValue(initialDialValue - distance/QDial::size().width()*QDial::maximum()*0.8);
     }
 }
 
@@ -81,6 +82,9 @@ void CustomDial::mouseReleaseEvent(QMouseEvent *me){
     if(initialDialValue==QDial::value()){
         QDial::mouseReleaseEvent(me);
     }
+    mousePressX = 0;
+    mousePressY = 0;
+    QDial::update();
 }
 
 
@@ -133,4 +137,10 @@ void CustomDial::paintEvent(QPaintEvent*)
     //draw marker
     painter.setPen(QPen(QBrush(QColor(214,214,214)),8));
     painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
+
+    //draw click pointer
+    if(mousePressX!=0){
+        painter.setPen(QPen(QBrush(QColor(128,128,128)),4));
+        painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
+    }
 }
