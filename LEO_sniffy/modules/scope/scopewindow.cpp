@@ -16,7 +16,9 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    chart = new widgetChart(ui->widget_trace,4);
+    chart = new widgetChart(ui->widget_trace, 4);
+    chart->setRange(-0.1, 0.1, -0.1, 3.9);
+    chart->createHorizontalMarkes();
     ui->verticalLayout_trace->addWidget(chart);
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
@@ -73,7 +75,7 @@ void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float tim
     paintTraces(dataSeries);
 
     chart->setZoom(1.5);
-    chart->setMarkerHorizontal(triggerChannelIndex,0);
+    chart->setHorizontalMarker(triggerChannelIndex,0);
 }
 
 void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries){

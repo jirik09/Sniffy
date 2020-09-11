@@ -77,7 +77,7 @@ void CounterWindow::createAllDisplays(void){
 
 WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
     QString styleSheet = IMAGE_UNITS_HZ;
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, this);
+    WidgetDisplay *display  = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 1, this);
     styleSheet = IMAGE_SIGN_AVG;
     display->setAvgStyle(styleSheet);
     configureErrorStyles(display);
@@ -86,31 +86,30 @@ WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
 
 WidgetDisplay *CounterWindow::createLowFreqDisplays(void){
     QString styleSheet = IMAGE_UNITS_HZ;
-    WidgetDisplay *display = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, this);
-    display->showAvgDisplay(false);
+    WidgetDisplay *display = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 1, this);
     configureErrorStyles(display);
+    display->showAvgDisplay(false);
     return display;
 }
 
 WidgetDisplay *CounterWindow::createRatioDisplay(void){
     QString styleSheet = "";
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_RATIO, styleSheet, true, this);
+    WidgetDisplay *display  = new WidgetDisplay(LITERAL_RATIO, styleSheet, false, 1, this);
     styleSheet = IMAGE_SIGN_ERR;
     display->setErrStyle(styleSheet);
     styleSheet = IMAGE_SIGN_PLSMNS;
     display->setTerrStyle(styleSheet);
-    //display->showProgressBar(false);
-    display->showBarDisplay(false);
     display->showAvgDisplay(false);
+    display->showTerrStyle(false);
     return display;
 }
 
 WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
     QString styleSheet = IMAGE_UNITS_SEC;
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_INTERVAL, styleSheet, true, this);
-    configureErrorStyles(display);    
-    display->showBarDisplay(false);
+    WidgetDisplay *display  = new WidgetDisplay(LITERAL_INTERVAL, styleSheet, false, 1, this);
+    configureErrorStyles(display);
     display->showAvgDisplay(false);
+    display->showQerrTerrStyle(false);
     return display;
 }
 
@@ -253,6 +252,19 @@ void CounterWindow::msleep(int msec){
     QEventLoop loop;
     QTimer::singleShot(msec, &loop, &QEventLoop::quit);
     loop.exec();
+}
+
+void CounterWindow::paintHistory(WidgetDisplay *display, QVector<QPointF> dataSeries){
+    //display->clearHistoryChart();
+    display->chart->appendToTrace(&dataSeries, 0);
+}
+
+void CounterWindow::setMinMaxTime(WidgetDisplay *display, qreal minX, qreal maxX){
+    display->chart->setRangeX(minX, maxX);
+}
+
+void CounterWindow::setMinMaxData(WidgetDisplay *display, qreal minY, qreal maxY){
+    display->chart->setRangeY(minY, maxY);
 }
 
 /************************************** HIGH FREQ FUNCTIONS ****************************************/

@@ -11,6 +11,9 @@
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QLogValueAxis>
 #include <QtMath>
+#include <QDateTimeAxis>
+
+#include "../graphics/colors.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -27,24 +30,34 @@ public:
     ~widgetChart();
     void clearAll();
     void updateTrace(QVector<QPointF> *points, int index);
+    void appendToTrace(QVector<QPointF> *points, int index);
     void updateAxis();
     void setMaxX(float max);
     void setDataMinMax(qreal minX, qreal maxX);
+    void setRangeX(qreal minX, qreal maxX);
+    void setRangeY(qreal minY, qreal maxY);
+    void setRange(qreal minX, qreal maxX, qreal minY, qreal maxY);
+    void setMargins(int left, int top, int right, int bottom);
 
-    void setZoom(float invZoom);
+    void setZoom(float invZoom);    
     qreal getZoom();
     void setShift (float shift);
 
-    void setMarkerHorizontal(int channelIndex, qreal value);
+    void setGridLinesVisible(bool gridVisibleX, bool gridVisibleY);
+    void setGridDensity(int tickX, int tickY);
 
-
-
-
+    void formatAxisLabelsForScope();
+    void formatLabels(QString axisXLabelForm, QString axisYLabelForm);
+    void setGraphColor(QColor qColor);
+    void setLabelsVisible(bool lableVisibleX, bool lableVisibleY);
+    void createHorizontalMarkes();
+    void setHorizontalMarker(int channelIndex, qreal value);
 
 private:
     Ui::widgetChart *ui;
     QList<QXYSeries *> seriesList;
     QScatterSeries *markersHorizontal;
+    enum markers {ENABLED, DISABLED} markers = DISABLED;
     int maxTraces;
 
     qreal minX = 0;
@@ -55,11 +68,12 @@ private:
 
     QChart *chart;
 
-    QValueAxis *axisX;
+    QValueAxis *axisX;   // QAbstractAxis
     QValueAxis *axisY;
     QValueAxis *axisMarkerHorizontal;
 
-    QColor colors[4];
+    QColor colors[4] = {QCOLOR_ORANGE, QCOLOR_BLUE,
+                        QCOLOR_GREEN, QCOLOR_PURPLE};
 };
 
 #endif // WIDGETCHART_H

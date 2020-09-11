@@ -14,6 +14,7 @@ Counter::Counter(QObject *parent)
     moduleIconURI = ":/graphics/graphics/icon_counter.png";
 
     movAvg = new MovingAverage(2, cntWindow->tabHighFreq);
+    historyData = new QVector<QPointF>;
 
     /* Common Counter Signals/Slots */
     connect(cntWindow->tabs, &widgetTab::tabBarClicked, this, &Counter::switchCounterModeCallback);
@@ -156,11 +157,12 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val >> qerr >> terr;
 
+    WidgetDisplay *display = cntWindow->displayHF;
     bool isFrequency = (freqPer == "QFRE") ? true : false;
     uint countToGo = (isFrequency) ? movAvg->prepend(val) : movAvg->prepend(1/val);
     this->strQerr = strQerr = formatErrNumber(qerr);
     this->strTerr = strTerr = formatErrNumber(terr);
-    cntWindow->showPMErrorSigns(cntWindow->displayHF, true);
+    cntWindow->showPMErrorSigns(display, true);
 
     if(movAvg->isBufferFull()){
         conf->hfState.hold = HFState::HoldOnState::OFF;
@@ -173,17 +175,40 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
         strAvg = formatNumber(avg, qerr+terr);
     }else {
         if(conf->hfState.error == HFState::ErrorType::AVERAGE){
-            cntWindow->showPMErrorSigns(cntWindow->displayHF, false);
+            cntWindow->showPMErrorSigns(display, false);
             strQerr = " ";
             strTerr = " ";
         }
         strAvg = hfFormatRemainSec(countToGo, 0);
     }
 
-    displayValues(cntWindow->displayHF, formatNumber(val, qerr+terr), strAvg, strQerr, strTerr);
-    val = (isFrequency) ? val : 1 / val;
-    cntWindow->displayHF->updateProgressBar(val);
+    displayValues(display, formatNumber(val, qerr+terr), strAvg, strQerr, strTerr);
+
+    if(!isFrequency)
+        val = 1 / val;
+    display->updateProgressBar(val);
     conf->hfState.quantState = HFState::QuantitySwitched::NO;
+
+
+    /* History section - create a new object or just a method.. */
+    float gateTime = (float)conf->hfState.gateTime/1000;
+
+    timeAxisMax += gateTime;
+    historyData->reserve(historyData->length());
+    historyData->append(QPointF(timeAxisMax, val));
+
+    if(val > rememberMax){
+        cntWindow->setMinMaxData(display, 0, val+(val/10));
+        rememberMax = val;
+    }
+
+    if(historyData->length() > histDataLength){
+        timeAxisMin += gateTime;
+        historyData->removeFirst();
+    }
+
+    cntWindow->setMinMaxTime(display, timeAxisMin, timeAxisMax);
+    cntWindow->paintHistory(display, *historyData);
 }
 
 void Counter::hfReloadState(){

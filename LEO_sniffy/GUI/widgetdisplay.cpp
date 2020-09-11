@@ -1,7 +1,7 @@
 #include "widgetdisplay.h"
 #include "ui_widgetdisplay.h"
 
-WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar, QWidget *parent) :
+WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar, int maxTraces, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WidgetDisplay)
 {
@@ -21,6 +21,9 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
     ui->label_0->setText(firstLabelText);
     ui->label_0->show();
 
+    /* One must hide the unnecessary displays
+       after the object construction */
+
     setUnitsStyle(unitsStyleSheet);
 
     if(!showPrgrssBar)
@@ -29,12 +32,18 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
     displayString("");
     displayAvgString("");
 
-    setDefaultSplitterRatio();
+    createHistoryChart(maxTraces);
+    hideHistoryChart();
 
     connect(ui->pushButton_history, SIGNAL(clicked()), this, SLOT(historyButtonClickedCallback()));
 }
 
-void WidgetDisplay::setDefaultSplitterRatio(){
+WidgetDisplay::~WidgetDisplay()
+{
+    delete ui;
+}
+
+void WidgetDisplay::hideHistoryChart(){
     QList<int> sizes = {0, ui->splitter->width()};
     ui->splitter->setSizes(sizes);
 }
@@ -68,17 +77,12 @@ void WidgetDisplay::showQerrStyle(bool visible){
 }
 
 void WidgetDisplay::showTerrStyle(bool visible){
-    (visible) ? ui->styleTerr->show() : ui->styleQerr->hide();
+    (visible) ? ui->styleTerr->show() : ui->styleTerr->hide();
 }
 
 void WidgetDisplay::showQerrTerrStyle(bool visible){
-    if(visible){
-        ui->styleQerr->show();
-        ui->styleTerr->show();
-    }else {
-        ui->styleQerr->hide();
-        ui->styleTerr->hide();
-    }
+    showQerrStyle(visible);
+    showTerrStyle(visible);
 }
 
 void WidgetDisplay::showAvgDisplay(bool visible){
@@ -170,6 +174,49 @@ void WidgetDisplay::hideLabel(int labelNumber){
 
 void WidgetDisplay::showLabel(int labelNumber){
     labelList.at(labelNumber)->show();
+}
+
+void WidgetDisplay::clearHistoryChart(){
+    chart->clearAll();
+}
+
+void WidgetDisplay::updateHistoryData(QVector<QPointF> *points, int index){    
+    chart->updateTrace(points, index);
+}
+
+void WidgetDisplay::historyButtonClickedCallback()
+{
+    QString style;
+    QList<int> sizes = ui->splitter->sizes();
+    int cmpltWidth = ui->splitter->width();
+
+    if(history == DISABLED){
+        sizes[0] = cmpltWidth / 3;
+        sizes[1] = cmpltWidth / 3 * 2;
+        style = "QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        history = ENABLED;
+    }else {
+        sizes = {0, cmpltWidth};
+        style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        history = DISABLED;
+    }
+    ui->splitter->setSizes(sizes);
+    ui->pushButton_history->setStyleSheet(style);
+}
+
+void WidgetDisplay::createHistoryChart(int maxTraces)
+{
+    chart = new widgetChart(ui->verticalWidget_history, maxTraces);
+    chart->setGridLinesVisible(true, true);
+    chart->setGridDensity(5, 5);
+    chart->setLabelsVisible(true, true);
+    chart->setGraphColor(QCOLOR_GREY);
+    chart->setMargins(-14, -5, -12, -11);
+    chart->setRangeY(0, 3.3);
+    chart->setDataMinMax(0, 10);
+    ui->horizontalWidget_graph_2->addWidget(chart);
 }
 
 void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){
@@ -269,32 +316,6 @@ void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){
      * Darker - rgb(95,95,95)
      * Dark   - rgb(67,67,67)
      * */
-}
-
-WidgetDisplay::~WidgetDisplay()
-{
-    delete ui;
-}
-
-void WidgetDisplay::historyButtonClickedCallback()
-{
-    QString style;
-    QList<int> sizes = ui->splitter->sizes();
-
-    if(history == DISABLED){
-        sizes[0] = ui->splitter->width() / 3;
-        sizes[1] = ui->splitter->width() / 3 * 2;
-        style = "QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
-        history = ENABLED;
-    }else {
-        sizes = {0, ui->splitter->width()};
-        style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
-        history = DISABLED;
-    }
-    ui->splitter->setSizes(sizes);
-    ui->pushButton_history->setStyleSheet(style);
 }
 
 

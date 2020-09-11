@@ -43,12 +43,9 @@ private:
 //                                          &Counter::ratReloadState,
 //                                          &Counter::intReloadState };
 
-    //QList<QVector<void*()>> reloadModeState;
-
     QString formatNumber(double valToFormat, double error);
     QString formatErrNumber(double errToFormat);
     void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);
-    //void clearDisplay(WidgetDisplay *display);
     void specReceived();
     void write(QByteArray feature, QByteArray param);
     void write(QByteArray feature, int param);
@@ -56,6 +53,11 @@ private:
     /* High Frequency Counter */
     MovingAverage *movAvg;
     QString strQerr, strTerr, avgQerr;
+
+    QVector<QPointF> *historyData;
+    int histDataLength = 1000;
+    float rememberMax = 0;
+    qreal timeAxisMax = 0, timeAxisMin = 0;
 
     void parseHighFrequencyCounter(QByteArray data);
     void hfReloadState();
@@ -67,8 +69,8 @@ private:
     void lfReloadState();
     void lfReloadStateQuantMeasurement();
     bool isRangeExceeded(double frequency);
-    void lfSwitchQuantity(int index, QByteArray channelQuantitiy);
-    void lfSwitchMultiplier(int index, QByteArray channelMultiplier);
+    void lfSwitchQuantity(int actualLength, QByteArray channelQuantitiy);
+    void lfSwitchMultiplier(int actualLength, QByteArray channelMultiplier);
 
     /* Ratio Counter */
     void parseRatioCounter(QByteArray data);
@@ -89,31 +91,31 @@ private slots:
     void stopModule();
 
     /* Common functions */
-    void switchCounterModeCallback(int index);
+    void switchCounterModeCallback(int actualLength);
 
     /* High Frequency Counter */
-    void hfSwitchGateTimeCallback(int index);
-    void hfSwitchQuantityCallback(int index);
-    void hfSwitchErrorAvgCallback(int index);
+    void hfSwitchGateTimeCallback(int actualLength);
+    void hfSwitchQuantityCallback(int actualLength);
+    void hfSwitchErrorAvgCallback(int actualLength);
     void hfDialAvgChangedCallback(float val);
 
     /* Low Frequency Counter */
-    void lfSwitchChannelCallback(int index);
-    void lfSwitchQuantityCallback(int index);
-    void lfSwitchMultiplierCallback(int index);
-    void lfSwitchDutyCycleCallback(int index);
+    void lfSwitchChannelCallback(int actualLength);
+    void lfSwitchQuantityCallback(int actualLength);
+    void lfSwitchMultiplierCallback(int actualLength);
+    void lfSwitchDutyCycleCallback(int actualLength);
     void lfDialSampleCountCh1ChangedCallback(float val);
     void lfDialSampleCountCh2ChangedCallback(float val);
 
     /* Ratio Counter */
     void ratDialSampleCountChangedCallback(float val);
-    void ratRetriggerCallback(int index);
+    void ratRetriggerCallback(int actualLength);
 
     /* Intervals meas. Counter */
     void intButtonsStartCallback();
-    void intSwitchEventSequenceChangedCallback(int index);
-    void intEventAChangedCallback(int index);
-    void intEventBChangedCallback(int index);
+    void intSwitchEventSequenceChangedCallback(int actualLength);
+    void intEventAChangedCallback(int actualLength);
+    void intEventBChangedCallback(int actualLength);
     void intDialTimeoutChangedCallback(float val);
 };
 

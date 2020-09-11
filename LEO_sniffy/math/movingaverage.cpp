@@ -1,11 +1,7 @@
 #include "movingaverage.h"
 
 MovingAverage::MovingAverage(uint defaultBuffSize, QObject *parent) :
-    QObject(parent), buffSize(defaultBuffSize)
-{
-    /* Default buffer size is set to 2 if not specified higher */
-    if(defaultBuffSize < 2) buffSize = 2;
-}
+    QObject(parent), buffSize(defaultBuffSize) {}
 
 /*
  * @param newValue A new element to be added at the beginning of the list
