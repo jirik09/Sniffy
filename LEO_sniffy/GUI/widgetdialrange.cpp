@@ -133,7 +133,8 @@ min - minimum value
 max - maximum value
 baseUnit - base unit to be used e.g. 's' for seconds (don't use ms or mV!)
 buttonStep - one click step. Linked with curent label value -> not dependent on unit (1 by default)
-smalestUnitMult - smallest unit to be shown in comboBox unit selection (1 by default)
+smalestUnitMult -   smallest unit to be shown in comboBox unit selection (1 by default)
+                    this value is also used a minimum for value rounding when set by dial (0.1 (Volts) means dial will set only values rounded to 100mV)
 defaultValue - selected by default (0 by default)
 log - bool type true=log scale, false=lin scale (false by default)
 */
