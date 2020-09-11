@@ -2,15 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
-//#include <QDebug>
-//#include <QLabel>
 #include <QSpacerItem>
 #include <QVBoxLayout>
-//#include <QMessageBox>
-//#include <QGraphicsDropShadowEffect>
+#include <QPropertyAnimation>
 
-#include "device.h"
+#include "devicemediator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,19 +18,20 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();    
+    ~MainWindow();
 
-private:
-  //  Comms *communication;    
+private:    
     Ui::MainWindow *ui;
+    DeviceMediator *deviceMediator;
+    QPropertyAnimation *animation;
 
-    Device *device;
-    QSpacerItem *verticalSpacer;
+    void setMenuNarrow();
+    void setMenuWide();
 
-signals:
-    void setVerticalLayoutSpec(QVBoxLayout *boxLayout);
+    void setupMainWindowComponents();
+    void createModulesWidgets();
 
 private slots:
-   void setMenuSize();
+    void setMenuSize(bool isWide);
 };
 #endif // MAINWINDOW_H

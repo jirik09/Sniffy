@@ -46,6 +46,10 @@ ModuleStatus WidgetControlModule::getStatus(void){
     return status;
 }
 
+void WidgetControlModule::hideStatus(){
+    ui->widget_status->hide();
+}
+
 void WidgetControlModule::clickedInternal(){
     emit clicked (status);
 }
@@ -53,4 +57,9 @@ void WidgetControlModule::clickedInternal(){
 void WidgetControlModule::setIcon (QString ImageURI){
     ui->pushButton_name->setIcon(QIcon(ImageURI));
 }
+
+void WidgetControlModule::setName (QString name){
+    ui->pushButton_name->setText(name);
+}
+
 

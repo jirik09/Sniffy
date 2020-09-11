@@ -63,7 +63,6 @@ void WidgetLabelArea::hideChannelLabels(){
     }
 }
 
-
 void WidgetLabelArea::setTriggerLabelText(QString text){
     ui->label_trigger->setText(text);
 }

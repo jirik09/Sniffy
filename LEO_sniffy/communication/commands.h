@@ -2,8 +2,7 @@
 #define COMMANDS_H
 
 #include <QObject>
-
-
+#include <QList>
 
 class Commands : public QObject
 {
@@ -42,84 +41,154 @@ public:
 
     /************************ SCOPE ***********************/
     //Scope
-     static const QByteArray CHANNELS;
-     static const QByteArray DATA_LENGTH;  //number of samples
+    static const QByteArray CHANNELS;
+    static const QByteArray DATA_LENGTH;  //number of samples
 
-     static const QByteArray DATA_LENGTH_CH1;
-     static const QByteArray DATA_LENGTH_CH2;
+    static const QByteArray DATA_LENGTH_CH1;
+    static const QByteArray DATA_LENGTH_CH2;
 
-     static const QByteArray SAMPLING_FREQ;
+    static const QByteArray SAMPLING_FREQ;
 
-     static const QByteArray TRIGGERED;
-     static const QByteArray SAMPLING;
-     static const QByteArray SCOPE_OK;
+    static const QByteArray TRIGGERED;
+    static const QByteArray SAMPLING;
+    static const QByteArray SCOPE_OK;
     //Scope specific commands flags
-     static const QByteArray SCOPE_TRIG_MODE;
-     static const QByteArray SCOPE_TRIG_EDGE;
-     static const QByteArray SCOPE_TRIG_LEVEL;
-     static const QByteArray SCOPE_TRIG_CHANNEL;
-     static const QByteArray SCOPE_DATA_DEPTH;
-     static const QByteArray SCOPE_PRETRIGGER;
-     static const QByteArray SCOPE_NEXT;
-     static const QByteArray SCOPE_FREQ;
-     static const QByteArray SCOPE_ADC_CHANNEL;
-     static const QByteArray SCOPE_ADC_CHANNEL_DEAFULT;
-     static const QByteArray SCOPE_ADC_CHANNEL_VREF;
+    static const QByteArray SCOPE_TRIG_MODE;
+    static const QByteArray SCOPE_TRIG_EDGE;
+    static const QByteArray SCOPE_TRIG_LEVEL;
+    static const QByteArray SCOPE_TRIG_CHANNEL;
+    static const QByteArray SCOPE_DATA_DEPTH;
+    static const QByteArray SCOPE_PRETRIGGER;
+    static const QByteArray SCOPE_NEXT;
+    static const QByteArray SCOPE_FREQ;
+    static const QByteArray SCOPE_ADC_CHANNEL;
+    static const QByteArray SCOPE_ADC_CHANNEL_DEAFULT;
+    static const QByteArray SCOPE_ADC_CHANNEL_VREF;
 
     //scope modes
-     static const QByteArray MODE_NORMAL;
-     static const QByteArray MODE_AUTO;
-     static const QByteArray MODE_SINGLE;
-     static const QByteArray MODE_AUTO_FAST;
+    static const QByteArray MODE_NORMAL;
+    static const QByteArray MODE_AUTO;
+    static const QByteArray MODE_SINGLE;
+    static const QByteArray MODE_AUTO_FAST;
 
     //Scope trigger edges
 
-     static const QByteArray EDGE_RISING;
-     static const QByteArray EDGE_FALLING;
+    static const QByteArray EDGE_RISING;
+    static const QByteArray EDGE_FALLING;
 
     //Scope sampling frequencies
 
-     static const QByteArray FREQ_1K;
-     static const QByteArray FREQ_2K;
-     static const QByteArray FREQ_5K;
-     static const QByteArray FREQ_10K;
-     static const QByteArray FREQ_20K;
-     static const QByteArray FREQ_50K;
-     static const QByteArray FREQ_100K;
-     static const QByteArray FREQ_200K;
-     static const QByteArray FREQ_500K;
-     static const QByteArray FREQ_1M;
-     static const QByteArray FREQ_2M;
-     static const QByteArray FREQ_5M;
-     static const QByteArray FREQ_10M;
-     static const QByteArray FREQ_MAX;
+    static const QByteArray FREQ_1K;
+    static const QByteArray FREQ_2K;
+    static const QByteArray FREQ_5K;
+    static const QByteArray FREQ_10K;
+    static const QByteArray FREQ_20K;
+    static const QByteArray FREQ_50K;
+    static const QByteArray FREQ_100K;
+    static const QByteArray FREQ_200K;
+    static const QByteArray FREQ_500K;
+    static const QByteArray FREQ_1M;
+    static const QByteArray FREQ_2M;
+    static const QByteArray FREQ_5M;
+    static const QByteArray FREQ_10M;
+    static const QByteArray FREQ_MAX;
 
     //Scope data lengths
 
-     static const QByteArray SAMPLES_100;
-     static const QByteArray SAMPLES_200;
-     static const QByteArray SAMPLES_500;
-     static const QByteArray SAMPLES_1K;
-     static const QByteArray SAMPLES_2K;
-     static const QByteArray SAMPLES_5K;
-     static const QByteArray SAMPLES_10K;
-     static const QByteArray SAMPLES_20K;
-     static const QByteArray SAMPLES_50K;
-     static const QByteArray SAMPLES_100K;
+    static const QByteArray SAMPLES_100;
+    static const QByteArray SAMPLES_200;
+    static const QByteArray SAMPLES_500;
+    static const QByteArray SAMPLES_1K;
+    static const QByteArray SAMPLES_2K;
+    static const QByteArray SAMPLES_5K;
+    static const QByteArray SAMPLES_10K;
+    static const QByteArray SAMPLES_20K;
+    static const QByteArray SAMPLES_50K;
+    static const QByteArray SAMPLES_100K;
 
     //Scope Data depths
 
-     static const QByteArray DATA_DEPTH_12B;
-     static const QByteArray DATA_DEPTH_10B;
-     static const QByteArray DATA_DEPTH_8B;
-     static const QByteArray DATA_DEPTH_6B;
+    static const QByteArray DATA_DEPTH_12B;
+    static const QByteArray DATA_DEPTH_10B;
+    static const QByteArray DATA_DEPTH_8B;
+    static const QByteArray DATA_DEPTH_6B;
 
     //Number of channels
 
-     static const QByteArray CHANNELS_1;
-     static const QByteArray CHANNELS_2;
-     static const QByteArray CHANNELS_3;
-     static const QByteArray CHANNELS_4;
+    static const QByteArray CHANNELS_1;
+    static const QByteArray CHANNELS_2;
+    static const QByteArray CHANNELS_3;
+    static const QByteArray CHANNELS_4;
+
+    /************************ COUNTER ***********************/
+    // Counter complete deinit
+    static const QByteArray COUNTER_DEINIT;
+
+    // Counter modes
+    static const QByteArray COUNTER_MODE;
+    static const QByteArray MODE_HIGH_FREQ;
+    static const QByteArray MODE_LOW_FREQ;
+    static const QByteArray MODE_RATIO;
+    static const QByteArray MODE_INTERVAL;
+    QList<QByteArray> pCOUNTER_MODE;
+
+    // Counter common
+    static const QByteArray QUANT_FREQUENCY;
+    static const QByteArray QUANT_PERIOD;
+    QList<QByteArray> pQUANTITIY;
+
+    // Counter HF quantity
+    static const QByteArray HF_QUANTITY;
+
+    // Counter HF GATE times
+    static const QByteArray HF_GATE_TIME;
+    static const QByteArray HF_TIME_100M;
+    static const QByteArray HF_TIME_500M;
+    static const QByteArray HF_TIME_1S;
+    static const QByteArray HF_TIME_5S;
+    static const QByteArray HF_TIME_10S;
+    QList<QByteArray> pHF_GATE_TIME;
+
+    // Counter LF quantity
+    static const QByteArray LF_CH1_QUANTITY;
+    static const QByteArray LF_CH2_QUANTITY;
+
+    // Counter LF channel multiplier
+    static const QByteArray LF_CH1_MULTIPLIER;
+    static const QByteArray LF_CH2_MULTIPLIER;
+
+    // Counter LF multiplier    
+    static const QByteArray LF_MULTIPLIER_1X;
+    static const QByteArray LF_MULTIPLIER_2X;
+    static const QByteArray LF_MULTIPLIER_4X;
+    static const QByteArray LF_MULTIPLIER_8X;
+    QList<QByteArray> pLF_MULTIPLIER;
+
+    // Counter LF Sample Count buffer
+    static const QByteArray LF_CH1_SAMPLE_COUNT;
+    static const QByteArray LF_CH2_SAMPLE_COUNT;
+
+    // Counter LF Duty Cycle
+    static const QByteArray LF_DUTY_CYCLE;
+    static const QByteArray LF_CH1_DUTY_CYCLE_ENABLE;
+    static const QByteArray LF_CH2_DUTY_CYCLE_ENABLE;
+    static const QByteArray LF_DUTY_CYCLE_DISABLE;
+
+    // Counter Ratio
+    static const QByteArray RAT_CH3_SAMPLE_COUNT;
+
+    // Counter Intervals
+    static const QByteArray INT_TIMEOUT_SEC;
+
+    static const QByteArray INT_EVENT;
+    static const QByteArray INT_EVENT_RISE_FALL_CH1;
+    static const QByteArray INT_EVENT_RISE_FALL_CH2;
+    static const QByteArray INT_EVENT_RISE_CH1;
+    static const QByteArray INT_EVENT_RISE_CH2;
+    static const QByteArray INT_EVENT_FALL_CH1;
+    static const QByteArray INT_EVENT_FALL_CH2;
+    static const QByteArray INT_EVENT_SEQUENCE_AB;
+    static const QByteArray INT_EVENT_SEQUENCE_BA;
 };
 
 #endif // COMMANDS_H

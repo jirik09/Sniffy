@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    GUI/clickablelabel.cpp \
     GUI/customdial.cpp \
     GUI/moduledockwidget.cpp \
     GUI/widgetbuttons.cpp \
@@ -39,30 +40,36 @@ SOURCES += \
     communication/serialline.cpp \
     communication/serialportreader.cpp \
     communication/serialportwriter.cpp \
-    device.cpp \
     devicedescriptor.cpp \
-    devicespec.cpp \
+    devicemediator.cpp \
     main.cpp \
     mainwindow.cpp \
+    math/movingaverage.cpp \
     modules/abstractmodule.cpp \
     modules/counter/counter.cpp \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
-    modules/counter/windowcounter.cpp \
+    modules/counter/countertabhighfreq.cpp \
+    modules/counter/countertabintervals.cpp \
+    modules/counter/countertablowfreq.cpp \
+    modules/counter/countertabratio.cpp \
+    modules/counter/counterwindow.cpp \
     modules/labelformator.cpp \
+    modules/device/device.cpp \
+    modules/device/devicewindow.cpp \
+    modules/device/devicespec.cpp \
     modules/scope/meascalculations.cpp \
     modules/scope/measurement.cpp \
-    modules/scan/scan.cpp \
-    modules/scan/windowscan.cpp \
     modules/scope/panelmeasurement.cpp \
     modules/scope/panelsettings.cpp \
     modules/scope/scope.cpp \
     modules/scope/scopeconfig.cpp \
     modules/scope/scopespec.cpp \
-    modules/scope/windowscope.cpp
+    modules/scope/scopewindow.cpp
 
 
 HEADERS += \
+    GUI/clickablelabel.h \
     GUI/customdial.h \
     GUI/moduledockwidget.h \
     GUI/widgetbuttons.h \
@@ -85,29 +92,35 @@ HEADERS += \
     communication/serialline.h \
     communication/serialportreader.h \
     communication/serialportwriter.h \
-    device.h \
     devicedescriptor.h \
-    devicespec.h \
+    devicemediator.h \
     graphics/colors.h \
+    graphics/styles.h \
     mainwindow.h \
+    math/movingaverage.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
     modules/counter/counterdefs.h \
     modules/counter/counterspec.h \
     modules/abstractmodule.h \
-    modules/counter/windowcounter.h \
+    modules/counter/countertabhighfreq.h \
+    modules/counter/countertabintervals.h \
+    modules/counter/countertablowfreq.h \
+    modules/counter/countertabratio.h \
+    modules/counter/counterwindow.h \
     modules/labelformator.h \
+    modules/device/device.h \
+    modules/device/devicewindow.h \
+    modules/device/devicespec.h \
     modules/scope/meascalculations.h \
     modules/scope/measurement.h \
-    modules/scan/scan.h \
-    modules/scan/windowscan.h \
     modules/scope/panelmeasurement.h \
     modules/scope/panelsettings.h \
     modules/scope/scope.h \
     modules/scope/scopeconfig.h \
     modules/scope/scopedefs.h \
     modules/scope/scopespec.h \
-    modules/scope/windowscope.h
+    modules/scope/scopewindow.h
 
 
 
@@ -127,9 +140,9 @@ FORMS += \
     GUI/widgettab.ui \
     GUI/widgettop.ui \
     mainwindow.ui \
-    modules/counter/windowcounter.ui \
-    modules/scan/windowscan.ui \
-    modules/scope/windowscope.ui
+    modules/counter/counterwindow.ui \
+    modules/device/devicewindow.ui \
+    modules/scope/scopewindow.ui
 
 
 TRANSLATIONS += \

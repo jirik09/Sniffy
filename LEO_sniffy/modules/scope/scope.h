@@ -7,11 +7,11 @@
 #include <QPointF>
 #include <QList>
 
-#include "windowscope.h"
-
+#include "scopewindow.h"
 #include "scopeconfig.h"
 #include "scopespec.h"
-#include "communication/Commands.h"
+
+#include "communication/commands.h"
 #include "communication/comms.h"
 #include "measurement.h"
 #include "meascalculations.h"
@@ -53,8 +53,9 @@ public slots:
 
 
 private:
-    WindowScope *scpWindow;
+    ScopeWindow *scpWindow;
     ScopeConfig *config;
+    ScopeSpec *specification;
     MeasCalculations *measCalc;
     QVector<QVector<QPointF>> *scopeData;
     QList<Measurement *> scopeMeas;

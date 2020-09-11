@@ -1,7 +1,6 @@
 #ifndef DEVICEDESCRIPTOR_H
 #define DEVICEDESCRIPTOR_H
 
-
 #include <QMetaType>
 #include <QStringList>
 

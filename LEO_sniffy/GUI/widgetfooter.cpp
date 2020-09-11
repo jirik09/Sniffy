@@ -9,6 +9,23 @@ WidgetFooter::WidgetFooter(QWidget *parent) :
     ui(new Ui::WidgetFooter)
 {
     ui->setupUi(this);
+
+    //connect(ui->pushButton_setSize,&QPushButton::clicked,this, &WidgetFooter::sizeCallback);
+    connect(ui->label_burgerAnim,&ClickableLabel::clicked,this, &WidgetFooter::sizeCallback);
+    connect(ui->pushButton_settingsA,&QPushButton::clicked,this, &WidgetFooter::settingsCallback);
+    connect(ui->pushButton_settingsB,&QPushButton::clicked,this, &WidgetFooter::settingsCallback);
+
+    ui->pushButton_settingsA->setIcon(QIcon(":/graphics/graphics/settings_gear.png"));
+    ui->pushButton_settingsB->setIcon(QIcon(":/graphics/graphics/settings_gear.png"));
+
+    animationForward = new QMovie(":/graphics/graphics/menu_burger_button.gif");
+    animationBackward = new QMovie(":/graphics/graphics/menu_burger_button_backw.gif");
+
+    QSize *size = new QSize(30, 30);
+    animationForward->setScaledSize(*size);
+    animationBackward->setScaledSize(*size);
+
+    setAppearance(isWide);
 }
 
 WidgetFooter::~WidgetFooter()
@@ -16,7 +33,37 @@ WidgetFooter::~WidgetFooter()
     delete ui;
 }
 
-QPushButton * WidgetFooter::getPushButtonSize(){
-    return ui->pushButton_setSize;
+void WidgetFooter::settingsCallback(){
+    emit settingsClicked();
 
 }
+void WidgetFooter::sizeCallback(){
+    if(isWide){
+        isWide=false;
+    }else{
+        isWide=true;
+    }
+    setAppearance(isWide);
+    emit sizeClicked(isWide);
+}
+
+void WidgetFooter::setAppearance(bool isWide){
+    if(!isWide){
+        ui->pushButton_settingsA->show();
+        ui->pushButton_settingsB->hide();
+        ui->label_settings->setText("");
+        //ui->pushButton_setSize->setIcon(QIcon(":/graphics/graphics/settings_horizontal.png"));
+
+        ui->label_burgerAnim->setMovie(animationBackward);
+        animationBackward->start();
+    }else{
+        ui->pushButton_settingsB->show();
+        ui->pushButton_settingsA->hide();
+        ui->label_settings->setText("Settings");
+        //ui->pushButton_setSize->setIcon(QIcon(":/graphics/graphics/settings_vertical.png"));
+
+        ui->label_burgerAnim->setMovie(animationForward);
+        animationForward->start();
+    }
+}
+

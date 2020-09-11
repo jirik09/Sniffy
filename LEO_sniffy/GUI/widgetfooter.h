@@ -3,6 +3,11 @@
 
 #include <QWidget>
 #include <QtWidgets/QPushButton>
+#include <QGraphicsScene>
+#include <QMovie>
+#include <QSize>
+
+#include "GUI/clickablelabel.h"
 
 namespace Ui {
 class WidgetFooter;
@@ -17,9 +22,22 @@ public:
     ~WidgetFooter();
     QPushButton * getPushButtonSize();
 
+signals:
+    void settingsClicked();
+    void sizeClicked(bool isWide);
+
 
 private:
     Ui::WidgetFooter *ui;
+    bool isWide = true;
+    QMovie *animationForward;
+    QMovie *animationBackward;
+
+    void setAppearance(bool isWide);
+
+private slots:
+    void settingsCallback();
+    void sizeCallback();
 
 };
 

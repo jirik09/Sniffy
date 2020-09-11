@@ -101,14 +101,23 @@ height: 0px;
 }</string>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <property name="spacing">
+     <number>5</number>
+    </property>
     <property name="leftMargin">
-     <number>15</number>
+     <number>10</number>
+    </property>
+    <property name="topMargin">
+     <number>5</number>
     </property>
     <property name="rightMargin">
-     <number>15</number>
+     <number>10</number>
+    </property>
+    <property name="bottomMargin">
+     <number>5</number>
     </property>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_features">
+     <layout class="QVBoxLayout" name="verticalLayout_modules">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -172,11 +181,10 @@ border: none</string>
      <x>0</x>
      <y>0</y>
      <width>1156</width>
-     <height>22</height>
+     <height>27</height>
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionneco">
    <property name="text">
     <string>neco</string>
