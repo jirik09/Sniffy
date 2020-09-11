@@ -90,7 +90,9 @@ private:
     QPalette palette;
 
     QChartView *chartView;
-    int drawFlag = 0;    
+    int drawFlag = 0;
+
+    const int SPLITTER_LINE = 5;
 
     void createHistoryChart(int maxTraces);
     void hideHistoryChart();

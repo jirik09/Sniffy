@@ -55,7 +55,7 @@ private:
     QString strQerr, strTerr, avgQerr;
 
     QVector<QPointF> *historyData;
-    int histDataLength = 1000;
+    int histDataLength = 600;
     float rememberMax = 0;
     qreal timeAxisMax = 0, timeAxisMin = 0;
 

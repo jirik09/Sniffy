@@ -36,7 +36,7 @@
   </property>
   <property name="styleSheet">
    <string notr="true">QObject{
-background-color: rgb(38, 38, 38);
+background-color: rgb(58, 58, 58);
 color: rgb(214, 214, 214)
 }</string>
   </property>
@@ -64,18 +64,23 @@ color: rgb(214, 214, 214)
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="styleSheet">
+      <string notr="true">QObject{
+background-color: rgb(38, 38, 38);
+}</string>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>4</number>
       </property>
       <property name="leftMargin">
-       <number>3</number>
+       <number>2</number>
       </property>
       <property name="topMargin">
        <number>3</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="bottomMargin">
        <number>3</number>
@@ -160,6 +165,9 @@ color: rgb(214, 214, 214)
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="lineWidth">
       <number>1</number>
      </property>
@@ -185,6 +193,9 @@ color: rgb(214, 214, 214)
         <height>0</height>
        </size>
       </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
       <layout class="QVBoxLayout" name="verticalWidget_history_2">
        <property name="spacing">
         <number>0</number>
@@ -208,6 +219,11 @@ color: rgb(214, 214, 214)
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QObject{
+background-color: rgb(38, 38, 38);
+}</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalWidget_graph_2">
           <property name="spacing">
@@ -239,6 +255,11 @@ color: rgb(214, 214, 214)
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QObject{
+background-color: rgb(38, 38, 38);
+}</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
