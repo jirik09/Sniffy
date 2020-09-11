@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     GUI/clickablelabel.cpp \
+    GUI/customcombobox.cpp \
     GUI/customdial.cpp \
     GUI/moduledockwidget.cpp \
     GUI/widgetbuttons.cpp \
@@ -70,6 +71,7 @@ SOURCES += \
 
 HEADERS += \
     GUI/clickablelabel.h \
+    GUI/customcombobox.h \
     GUI/customdial.h \
     GUI/moduledockwidget.h \
     GUI/widgetbuttons.h \
