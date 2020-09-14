@@ -249,7 +249,7 @@ void WidgetDisplay::historyButtonClickedCallback(){
 
 void WidgetDisplay::createHistoryChart(int historyTracesNum){
     historyData = new QVector<QPointF>;
-    //ui->verticalWidget_history->setContentsMargins(0, 0, 0, 0);
+    ui->verticalWidget_history->setContentsMargins(0, 0, 0, 0);
     chart = new widgetChart(ui->verticalWidget_history, historyTracesNum);
     chart->setGridLinesVisible(true, true);
     chart->setGridDensity(5, 5);
