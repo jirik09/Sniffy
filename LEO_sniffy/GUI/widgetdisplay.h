@@ -35,7 +35,7 @@ public:
     explicit WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar,
                            int historyTracesNum = 1, int historySize = 100,
                            QWidget *parent = nullptr);
-    ~WidgetDisplay();    
+    ~WidgetDisplay();
 
     QString formatNumber(double val, char f, int prec);
 
@@ -59,7 +59,7 @@ public:
 
     void showQerrStyle(bool visible);
     void showTerrStyle(bool visible);
-    void showQerrTerrStyle(bool visible);    
+    void showQerrTerrStyle(bool visible);
     void showAvgDisplay(bool visible);
     void showErrDisplay(bool visible);
     void showBarDisplay(bool visible);
@@ -67,7 +67,7 @@ public:
     void changeAvgColor(QColor color);
 
     /* Label area */
-    void configLabel(int labelNumber, const QString text, QString colorStyle, bool visible);    
+    void configLabel(int labelNumber, const QString text, QString colorStyle, bool visible);
     void setLabelText(int labelNumber, const QString text);
     void setLabelColor(int labelNumber, const QString &textStyleSheet);
     QString getLabelText(int labelNumber);
@@ -75,7 +75,7 @@ public:
     void showLabel(int labelNumber);
     void drawIndicationFlag(int labelNumber, QString color);
 
-    /* Progress bar */    
+    /* Progress bar */
     void showProgressBar(bool visible);
     void setProgressBarRange(int min, int max);
     void updateProgressBar(int value);
@@ -89,6 +89,8 @@ public:
 
 private slots:
     void historyButtonClickedCallback();
+    void clearHistoryButtonClickedCallback();
+    void listChartButtonClickedCallback();
 
 private:
     Ui::WidgetDisplay *ui;
@@ -106,9 +108,12 @@ private:
 
     const int SPLITTER_LINE = 5;
 
-    enum {ENABLED, DISABLED} history = DISABLED;
+    enum { ENABLED, DISABLED }
+         history = DISABLED,
+         list = DISABLED;
 
     void createHistoryChart(int historyTracesNum);
+    void createList();
     void hideHistoryChartArea();
     void clearHistoryChart();
     void clearExpiredPointsFromChart();

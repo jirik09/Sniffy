@@ -39,6 +39,8 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
     setHistorySize(historySize);
 
     connect(ui->pushButton_history, SIGNAL(clicked()), this, SLOT(historyButtonClickedCallback()));
+    connect(ui->pushButton_clear, SIGNAL(clicked()), this, SLOT(clearHistoryButtonClickedCallback()));
+    connect(ui->pushButton_list, SIGNAL(clicked()), this, SLOT(listChartButtonClickedCallback()));
 }
 
 WidgetDisplay::~WidgetDisplay()
@@ -247,9 +249,27 @@ void WidgetDisplay::historyButtonClickedCallback(){
     ui->pushButton_history->setStyleSheet(style);
 }
 
+void WidgetDisplay::clearHistoryButtonClickedCallback(){
+    historyData->clear();
+    chart->clearAll();
+}
+
+void WidgetDisplay::listChartButtonClickedCallback(){
+    QString style;
+    if(list == DISABLED){
+        style = "QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        list = ENABLED;
+    }else {
+        style = "QPushButton{image: url(:/graphics/graphics/icon_list.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        list = DISABLED;
+    }
+    ui->pushButton_list->setStyleSheet(style);
+}
+
 void WidgetDisplay::createHistoryChart(int historyTracesNum){
-    historyData = new QVector<QPointF>;
-    ui->verticalWidget_history->setContentsMargins(0, 0, 0, 0);
+    historyData = new QVector<QPointF>;    
     chart = new widgetChart(ui->verticalWidget_history, historyTracesNum);
     chart->setGridLinesVisible(true, true);
     chart->setGridDensity(5, 5);
@@ -259,6 +279,10 @@ void WidgetDisplay::createHistoryChart(int historyTracesNum){
     chart->setRangeY(0, 3.3);
     chart->setDataMinMax(0, 10);
     ui->horizontalWidget_graph_2->addWidget(chart);
+}
+
+void WidgetDisplay::createList(){
+
 }
 
 void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){

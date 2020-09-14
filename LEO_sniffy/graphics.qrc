@@ -40,8 +40,12 @@
         <file>graphics/cnt_ba_rr.png</file>
         <file>graphics/menu_burger_button.gif</file>
         <file>graphics/menu_burger_button_backw.gif</file>
+        <file>graphics/icon_clear_history.png</file>
         <file>graphics/icon_history_off.png</file>
         <file>graphics/icon_history_on.png</file>
+        <file>graphics/icon_save.png</file>
+        <file>graphics/icon_chart.png</file>
+        <file>graphics/icon_list.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
