@@ -1,11 +1,14 @@
 #include "widgetdisplay.h"
 #include "ui_widgetdisplay.h"
 
-WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar, int maxTraces, QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::WidgetDisplay)
+WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar,
+                             int historyTracesNum, int historySize,
+                             QWidget *parent) :
+    QWidget(parent), ui(new Ui::WidgetDisplay), historySize(historySize)
 {
     ui->setupUi(this);
+
+    loc = QLocale(QLocale::English);
 
     palette = ui->lcdNumber_avg->palette();
 
@@ -25,15 +28,15 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
        after the object construction */
 
     setUnitsStyle(unitsStyleSheet);
-
-    if(!showPrgrssBar)
-        showBarDisplay(false);
+    showBarDisplay(showPrgrssBar);
 
     displayString("");
     displayAvgString("");
 
-    createHistoryChart(maxTraces);    
-    hideHistoryChart();
+    hideHistoryChartArea();
+    createHistoryChart(historyTracesNum);
+
+    setHistorySize(historySize);
 
     connect(ui->pushButton_history, SIGNAL(clicked()), this, SLOT(historyButtonClickedCallback()));
 }
@@ -43,8 +46,12 @@ WidgetDisplay::~WidgetDisplay()
     delete ui;
 }
 
-void WidgetDisplay::hideHistoryChart(){
-    QList<int> sizes = {2, ui->splitter->width() - 2};
+QString WidgetDisplay::formatNumber(double val, char f, int prec){
+    return loc.toString(val, f, prec).replace(loc.decimalPoint(), '.');
+}
+
+void WidgetDisplay::hideHistoryChartArea(){
+    QList<int> sizes = {0, ui->splitter->width()};
     ui->splitter->setSizes(sizes);
 }
 
@@ -180,12 +187,47 @@ void WidgetDisplay::clearHistoryChart(){
     chart->clearAll();
 }
 
+void WidgetDisplay::clearExpiredPointsFromChart(){
+    chart->clearPoint(0, 0);
+}
+
+void WidgetDisplay::setHistorySize(int smplNumber){
+    historySize = smplNumber;
+}
+
+void WidgetDisplay::appendNewHistorySample(double sample, float timeStep){
+    timeAxisMax += timeStep;
+    historyData->reserve(historyData->length());
+    historyData->append(QPointF(timeAxisMax, sample));
+
+    if(sample > rememberMax){
+        setHistoryMinMaxData(0, sample+(sample/10));
+        rememberMax = sample;
+    }
+
+    if(historyData->length() > historySize){
+        timeAxisMin += timeStep;
+        historyData->removeFirst();
+        clearExpiredPointsFromChart();
+    }
+
+    setHistoryMinMaxTime(timeAxisMin, timeAxisMax);
+    chart->appendToTrace(historyData, 0);
+}
+
+void WidgetDisplay::setHistoryMinMaxTime(qreal minX, qreal maxX){
+    chart->setRangeX(minX, maxX);
+}
+
+void WidgetDisplay::setHistoryMinMaxData(qreal minY, qreal maxY){
+    chart->setRangeY(minY, maxY);
+}
+
 void WidgetDisplay::updateHistoryData(QVector<QPointF> *points, int index){    
     chart->updateTrace(points, index);
 }
 
-void WidgetDisplay::historyButtonClickedCallback()
-{
+void WidgetDisplay::historyButtonClickedCallback(){
     QString style;
     QList<int> sizes = ui->splitter->sizes();
     int cmpltWidth = ui->splitter->width();
@@ -196,7 +238,7 @@ void WidgetDisplay::historyButtonClickedCallback()
                 "QPushButton:hover{background-color: rgb(71, 76, 94);}";
         history = ENABLED;
     }else {
-        sizes = {SPLITTER_LINE, cmpltWidth - SPLITTER_LINE};
+        sizes = {0, cmpltWidth};
         style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
                 "QPushButton:hover{background-color: rgb(71, 76, 94);}";
         history = DISABLED;
@@ -205,10 +247,10 @@ void WidgetDisplay::historyButtonClickedCallback()
     ui->pushButton_history->setStyleSheet(style);
 }
 
-void WidgetDisplay::createHistoryChart(int maxTraces)
-{    
-    ui->verticalWidget_history->setContentsMargins(0, 0, SPLITTER_LINE, 0);
-    chart = new widgetChart(ui->verticalWidget_history, maxTraces);    
+void WidgetDisplay::createHistoryChart(int historyTracesNum){
+    historyData = new QVector<QPointF>;
+    //ui->verticalWidget_history->setContentsMargins(0, 0, 0, 0);
+    chart = new widgetChart(ui->verticalWidget_history, historyTracesNum);
     chart->setGridLinesVisible(true, true);
     chart->setGridDensity(5, 5);
     chart->setLabelsVisible(true, true);
@@ -216,7 +258,7 @@ void WidgetDisplay::createHistoryChart(int maxTraces)
     chart->setMargins(-14, -5, -12, -11);
     chart->setRangeY(0, 3.3);
     chart->setDataMinMax(0, 10);
-    ui->horizontalWidget_graph_2->addWidget(chart);    
+    ui->horizontalWidget_graph_2->addWidget(chart);
 }
 
 void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){

@@ -31,7 +31,6 @@ private:
     CounterWindow *cntWindow;
     CounterConfig *conf;
     CounterSpec *spec;
-    QLocale loc;
 
     void startCounting();
     void stopCounting();
@@ -43,8 +42,8 @@ private:
 //                                          &Counter::ratReloadState,
 //                                          &Counter::intReloadState };
 
-    QString formatNumber(double valToFormat, double error);
-    QString formatErrNumber(double errToFormat);
+    QString formatNumber(WidgetDisplay *display, double valToFormat, double error);
+    QString formatErrNumber(WidgetDisplay *display, double errToFormat);
     void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);
     void specReceived();
     void write(QByteArray feature, QByteArray param);
@@ -53,11 +52,6 @@ private:
     /* High Frequency Counter */
     MovingAverage *movAvg;
     QString strQerr, strTerr, avgQerr;
-
-    QVector<QPointF> *historyData;
-    int histDataLength = 600;
-    float rememberMax = 0;
-    qreal timeAxisMax = 0, timeAxisMin = 0;
 
     void parseHighFrequencyCounter(QByteArray data);
     void hfReloadState();

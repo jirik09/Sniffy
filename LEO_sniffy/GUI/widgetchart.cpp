@@ -52,14 +52,23 @@ void widgetChart::clearAll(){
         markersHorizontal->clear();
 }
 
+void widgetChart::clearPoints(int startIndex, int endIndex){
+    for (int i = startIndex; i <= endIndex; i++) {
+        seriesList[i]->clear();
+    }
+}
+
+void widgetChart::clearPoint(int traceIndex, int index){
+    seriesList[traceIndex]->remove(index);
+}
+
 void widgetChart::updateTrace(QVector<QPointF> *points, int index){
     const QVector<QPointF> &seriesData = *points;
     seriesList[index]->replace(seriesData);
 }
 
-void widgetChart::appendToTrace(QVector<QPointF> *points, int index){
-    //for(int i = 0; i < points->length(); i++)
-        seriesList[index]->append(points->at(points->length()-1));
+void widgetChart::appendToTrace(QVector<QPointF> *points, int index){    
+    seriesList[index]->append(points->at(points->length()-1));
 }
 
 void widgetChart::updateAxis(){

@@ -60,9 +60,7 @@ public:
 
     void hfSetColorRemainSec(QColor color);
 
-    void setMinMaxTime(WidgetDisplay *display, qreal minX, qreal maxX);
-    void setMinMaxData(WidgetDisplay *display, qreal minY, qreal maxY);
-    void paintHistory(WidgetDisplay *display, QVector<QPointF> dataSeries);
+    void appendNewHistorySample(WidgetDisplay *display, double sample, float timeStep);
 
 private:
     Ui::CounterWindow *ui;

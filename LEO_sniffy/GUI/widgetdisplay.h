@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QString>
+#include <QLocale>
 
 #include <QtCharts/QXYSeries>
 #include <QtCharts/QSplineSeries>
@@ -31,10 +32,12 @@ class WidgetDisplay : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar, int maxTraces, QWidget *parent = nullptr);
-    ~WidgetDisplay();
+    explicit WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar,
+                           int historyTracesNum = 1, int historySize = 100,
+                           QWidget *parent = nullptr);
+    ~WidgetDisplay();    
 
-    enum {ENABLED, DISABLED} history = DISABLED;
+    QString formatNumber(double val, char f, int prec);
 
     /* Unit styles */
     void setUnitsStyle(QString &unitsStyleSheet);
@@ -78,9 +81,12 @@ public:
     void updateProgressBar(int value);
 
     /* History area */
-    void clearHistoryChart();
+    void setHistorySize(int smplNumber);
+    void appendNewHistorySample(double sample, float timeStep);
     void updateHistoryData(QVector<QPointF> *points, int index);
+
     widgetChart *chart;
+
 private slots:
     void historyButtonClickedCallback();
 
@@ -88,14 +94,27 @@ private:
     Ui::WidgetDisplay *ui;
     QList<QLabel*> labelList;
     QPalette palette;
+    QLocale loc;
 
     QChartView *chartView;
+    QVector<QPointF> *historyData;
+    int historySize;
+    float rememberMax = 0;
+    qreal timeAxisMax = 0, timeAxisMin = 0;
+
     int drawFlag = 0;
 
     const int SPLITTER_LINE = 5;
 
-    void createHistoryChart(int maxTraces);
-    void hideHistoryChart();
+    enum {ENABLED, DISABLED} history = DISABLED;
+
+    void createHistoryChart(int historyTracesNum);
+    void hideHistoryChartArea();
+    void clearHistoryChart();
+    void clearExpiredPointsFromChart();
+
+    void setHistoryMinMaxTime(qreal minX, qreal maxX);
+    void setHistoryMinMaxData(qreal minY, qreal maxY);
 };
 
 #endif // WIDGETDISPLAY_H

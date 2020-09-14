@@ -29,6 +29,8 @@ public:
     explicit widgetChart(QWidget *parent = nullptr, int maxTraces = 1);
     ~widgetChart();
     void clearAll();
+    void clearPoints(int startIndex, int endIndex);
+    void clearPoint(int traceIndex, int index);
     void updateTrace(QVector<QPointF> *points, int index);
     void appendToTrace(QVector<QPointF> *points, int index);
     void updateAxis();
