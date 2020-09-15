@@ -400,7 +400,7 @@ QPushButton{border: none;
           <number>0</number>
          </property>
          <item>
-          <widget class="QComboBox" name="comboBox">
+          <widget class="CustomComboBox" name="comboBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
              <horstretch>0</horstretch>
@@ -468,6 +468,13 @@ width:5px;
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">GUI/customcombobox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
