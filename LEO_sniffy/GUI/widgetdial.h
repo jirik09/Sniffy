@@ -29,6 +29,9 @@ public:
     ~WidgetDial();
     void addOption (QString shownValue, QString unit,float realValue);
     void setSelected(int index);
+    void setDialColor(QString &textStyleSheet);
+    void setDialButtonsColor(QString &bckgndStyleSheet);
+    float getValue();
 
 private:
     Ui::WidgetDial *ui;

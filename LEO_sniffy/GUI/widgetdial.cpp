@@ -56,6 +56,19 @@ void WidgetDial::setSelected(int index){
     emit valueChanged(options->at(index).realValue);
 }
 
+void WidgetDial::setDialColor(QString &textStyleSheet){
+    ui->widget_dial->setStyleSheet(textStyleSheet);
+}
+
+void WidgetDial::setDialButtonsColor(QString &bckgndStyleSheet){
+    ui->pushButton_plus->setStyleSheet(bckgndStyleSheet);
+    ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
+}
+
+float WidgetDial::getValue(){
+    return options->at(selectedIndex).realValue;
+}
+
 void WidgetDial::plusClicked(){
     selectedIndex++;
     if(selectedIndex>=options->length()){

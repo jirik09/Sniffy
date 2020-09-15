@@ -67,6 +67,9 @@ signals:
 
 
 private slots:
+    void channelVerticalCallback(int index);
+    void channelVerticalScaleCallback(float value);
+    void channelVerticalShiftCallback(float value);
     void timeBaseCallback(float value);
     void channelEnableCallback(int buttonStatus);
     void longMemoryCallback(int index);
@@ -83,17 +86,24 @@ private slots:
 private:
     Ui::ScopeWindow *ui;
 
-
     widgetChart *chart;
+    QVector<QVector<QPointF>> ChartData;
+
     WidgetLabelArea *labelInfoPanel;
 
     PanelSettings *panelSet;
     PanelMeasurement *panelMeas;
 
-    void updateChartScale(float timeBase);
+    void updateChartTimeScale(float timeBase);
     void fillTimeBase();
 
     float previousTimeBase = 0;
+
+    int selectedChannelIndexVertical = 0;
+    QString channelBcgrColor[MAX_SCOPE_CHANNELS] = {BCKGRND_COLOR_ORANGE,BCKGRND_COLOR_BLUE,BCKGRND_COLOR_GREEN,BCKGRND_COLOR_PURPLE};
+    QString channelTextColor[MAX_SCOPE_CHANNELS] = {TEXT_COLOR_ORANGE,TEXT_COLOR_BLUE,TEXT_COLOR_GREEN,TEXT_COLOR_PURPLE};
+    float channelScale[MAX_SCOPE_CHANNELS]={1,1,1,1};
+    float channelOffset[MAX_SCOPE_CHANNELS]={0,0,0,0};
 };
 
 #endif // WINDOWSCOPE_H

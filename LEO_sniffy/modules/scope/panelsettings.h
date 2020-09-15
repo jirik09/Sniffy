@@ -30,8 +30,15 @@ public:
 
     WidgetButtons *buttonsMemorySet;
 
+    WidgetButtons *buttonsChannelVertical;
+    WidgetDial *dialVerticalGain;
+    WidgetDialRange *dialVerticalShift;
+
 private:
     void fillTimeBase();
+
+    const QString verticalControlColor = TEXT_COLOR_ORANGE;
+    const QString verticalControlBcgrColor = BCKGRND_COLOR_ORANGE;
 
 };
 

@@ -73,15 +73,24 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     WidgetSeparator *separatorVertical = new WidgetSeparator(parent,"Vertical");
     destination->addWidget(separatorVertical);
 
-    WidgetButtons *buttonsChannelVerticalGain = new WidgetButtons(parent,4,ButtonTypes::RADIO);
-    destination->addWidget(buttonsChannelVerticalGain);
-    buttonsChannelVerticalGain->setText("CH1",0);
-    buttonsChannelVerticalGain->setText("CH2",1);
-    buttonsChannelVerticalGain->setText("CH3",2);
-    buttonsChannelVerticalGain->setText("CH4",3);
+    buttonsChannelVertical = new WidgetButtons(parent,4,ButtonTypes::RADIO);
+    destination->addWidget(buttonsChannelVertical);
+    buttonsChannelVertical->setText("CH1",0);
+    buttonsChannelVertical->setText("CH2",1);
+    buttonsChannelVertical->setText("CH3",2);
+    buttonsChannelVertical->setText("CH4",3);
+    buttonsChannelVertical->setColor(BCKGRND_COLOR_ORANGE,0);
+    buttonsChannelVertical->setColor(BCKGRND_COLOR_BLUE,1);
+    buttonsChannelVertical->setColor(BCKGRND_COLOR_GREEN,2);
+    buttonsChannelVertical->setColor(BCKGRND_COLOR_PURPLE,3);
 
-    WidgetDial *dialVerticalGain = new WidgetDial(parent ,"Scale");
+
+    dialVerticalGain = new WidgetDial(parent ,"Scale");
     destination->addWidget(dialVerticalGain);
+    QString colorStyleSheet = verticalControlColor;
+    dialVerticalGain->setDialColor(colorStyleSheet);
+    colorStyleSheet = verticalControlBcgrColor;
+    dialVerticalGain->setDialButtonsColor(colorStyleSheet);
     dialVerticalGain->addOption("10","mV/div",0.01);
     dialVerticalGain->addOption("20","mV/div",0.02);
     dialVerticalGain->addOption("50","mV/div",0.05);
@@ -92,8 +101,12 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     dialVerticalGain->addOption("2","V/div",2);
     dialVerticalGain->setSelected(6);
 
-    WidgetDialRange *dialVerticalShift = new WidgetDialRange(parent ,"Shift");
-    dialVerticalShift->setRange(-3.3,6.6,"V",10,0.01,0);
+    dialVerticalShift = new WidgetDialRange(parent ,"Shift");
+    dialVerticalShift->setRange(-3.3,6.6,"V",10,0.001,0);
+    colorStyleSheet = verticalControlColor;
+    dialVerticalShift->setDialColor(colorStyleSheet);
+    colorStyleSheet = verticalControlBcgrColor;
+    dialVerticalShift->setDialButtonsColor(colorStyleSheet);
     destination->addWidget(dialVerticalShift);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
