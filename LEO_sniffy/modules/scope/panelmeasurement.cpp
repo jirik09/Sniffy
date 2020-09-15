@@ -107,6 +107,11 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
     destination->addWidget(butClear);
     butClear->setText("  Clear all measuremts  ",0);
 
+    // Separator at the end is very important otherwise controls would not be nicely shown when maximized
+    QSpacerItem *verticalSpacer;
+    verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    destination->addItem(verticalSpacer);
+
     setMeasButtonsColor(0);
 
     connect(channelButtons, &WidgetButtons::clicked, this, &PanelMeasurement::setMeasButtonsColor);

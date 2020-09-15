@@ -16,10 +16,10 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    chart = new widgetChart(ui->widget_trace, 4);
-    chart->setRange(-0.1, 0.1, -0.1, 3.9);
+    chart = new widgetChart(ui->widget_chart, 4);
+    chart->setRange(-0.1, 0.1, 0, 8);
     chart->createHorizontalMarkes();
-    ui->verticalLayout_trace->addWidget(chart);
+    ui->verticalLayout_chart->addWidget(chart);
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
@@ -42,6 +42,7 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
     connect(panelSet->buttonsTriggerEdge,SIGNAL(clicked(int)),this,SLOT(triggerEdgeCallback(int)));
     connect(panelSet->buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
     connect(panelSet->dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
+    connect(panelSet->buttonsMemorySet,&WidgetButtons::clicked,this,&ScopeWindow::longMemoryCallback);
 
     // ************************* creating widget measurement *******************
     panelMeas = new PanelMeasurement(tabs->getLayout(1),tabs);
@@ -72,9 +73,11 @@ void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float tim
     updateChartScale(timeBase);
     labelInfoPanel->setTriggerLabelText("");
     labelInfoPanel->hideChannelLabels();
+
+
+
     paintTraces(dataSeries);
 
-    chart->setZoom(1.2);
     chart->setHorizontalMarker(triggerChannelIndex,0);
 }
 
@@ -88,13 +91,19 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries){
     }
 }
 
-void ScopeWindow::setDataMinMaxTime(qreal minX, qreal maxX){
+void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
      chart->setDataMinMax(minX,maxX);
+     chart->setZoom(zoom*1.2);
 }
 
 void ScopeWindow::timeBaseCallback(float value){
     emit timeBaseChanged(value);
     updateChartScale(value);
+    previousTimeBase = value;
+}
+
+void ScopeWindow::longMemoryCallback(int index){
+    emit memoryLengthChanged(index);
 }
 
 void ScopeWindow::pretriggerCallback(float value){
@@ -173,7 +182,7 @@ void ScopeWindow::measurementClearCallback(){
 }
 
 void ScopeWindow::sliderShiftCallback(int value){
-    chart->setShift(value);
+    chart->setShift((float)value/10);
 }
 
 void ScopeWindow::updateMeasurement(QList<Measurement*> m){
@@ -199,7 +208,10 @@ void ScopeWindow::setRealSamplingRate(int smpl){
 }
 
 void ScopeWindow::updateChartScale(float timeBase){
-  //  chart->setXAxisMax(timeBase*10);
+    if(previousTimeBase !=0 && previousTimeBase != timeBase){
+        chart->setZoom(chart->getZoom()*previousTimeBase/timeBase);
+    }
+
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase,"s/div"));
 }
 

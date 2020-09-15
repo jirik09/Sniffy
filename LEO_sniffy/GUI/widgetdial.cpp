@@ -14,16 +14,12 @@ WidgetDial::WidgetDial(QWidget *parent, QString name) :
 {
     ui->setupUi(this);
     ui->label_name->setText(name);
-
-    dial = new CustomDial(ui->widget_dial);
-    dial->setPageStep(1);
-
-    ui->horizontalLayout_2->addWidget(dial);
+    ui->dial->setPageStep(1);
 
     connect(ui->pushButton_plus,SIGNAL(clicked()),this,SLOT(plusClicked()));
     connect(ui->pushButton_minus,SIGNAL(clicked()),this,SLOT(minusClicked()));
-    connect(dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
-    connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(valChanged(int)));
+    connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
+    connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
     options = new QList<params_dial>;
 }
 
@@ -42,7 +38,7 @@ void WidgetDial::addOption (QString shownValue, QString unit,float realValue){
 
     ui->comboBox->addItem(shownValue + " " +unit);
 
-    dial->setMaximum(options->length()-1);
+    ui->dial->setMaximum(options->length()-1);
 
     if(options->length()==1){
         setSelected(0);
@@ -50,8 +46,10 @@ void WidgetDial::addOption (QString shownValue, QString unit,float realValue){
 }
 
 void WidgetDial::setSelected(int index){
-    dial->setValue(index);
+
+    ui->dial->setValue(index);
     ui->comboBox->setCurrentIndex(index);
+
     ui->label_unit->setText(options->at(index).unit);
     ui->label_value->setText(options->at(index).shownValue);
     selectedIndex = index;

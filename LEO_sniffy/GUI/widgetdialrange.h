@@ -54,10 +54,6 @@ private:
     float logOffset = 0;
     float logGain = 0;
 
-
-
-    CustomDial *dial;
-
     void updateControls(int except);
     float getRealValueFromDial(int in);
     int getValueForDial(float real);

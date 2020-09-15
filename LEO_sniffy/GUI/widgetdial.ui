@@ -443,6 +443,9 @@ width:5px;
       <property name="bottomMargin">
        <number>0</number>
       </property>
+      <item>
+       <widget class="CustomDial" name="dial"/>
+      </item>
      </layout>
     </widget>
    </item>
@@ -453,6 +456,11 @@ width:5px;
    <class>CustomComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">GUI/customcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomDial</class>
+   <extends>QDial</extends>
+   <header location="global">GUI/customdial.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

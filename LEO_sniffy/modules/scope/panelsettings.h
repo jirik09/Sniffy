@@ -28,6 +28,8 @@ public:
     WidgetDialRange *dialPretrigger;
     WidgetDialRange *dialTriggerValue;
 
+    WidgetButtons *buttonsMemorySet;
+
 private:
     void fillTimeBase();
 

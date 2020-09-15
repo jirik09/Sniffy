@@ -15,12 +15,12 @@ public:
     //all parameters must be initialized to default values and also aligned with GUI (I know it is not good)
 
     //parameters really in HW (received each time with data)
-    int samplingRate = 10000;
+
+    int realSamplingRate = 1000;
     int ADCresolution = 12;
     int dataLength = 1200;
+
     int numberOfChannels = 1;
-
-
     int triggerLevel = 32767; //16bit number
     int pretrigger = 32767; //16bit number
 
@@ -29,14 +29,15 @@ public:
     int enabledChannels[MAX_SCOPE_CHANNELS] = {1,0 ,0, 0};
     float triggerLevelPercent = 50; //0-100% number
     float pretriggerPercent = 50; //0-100% number
-
+    bool longestDataLength = false;
+    bool signalMegazoom = false;
+    int requestedSamplingRate = 10000;
 
     //params common for both
     ScopeTriggerMode triggerMode = ScopeTriggerMode::TRIG_AUTO;
     int triggerChannelIndex = 0;
     ScopeTriggerEdge triggerEdge = ScopeTriggerEdge::EDGE_RISING;
     float timeBase = 0.001;
-    int longMemory = 0;
     float verticalScale[MAX_SCOPE_CHANNELS];
     float verticalShift[MAX_SCOPE_CHANNELS];
 

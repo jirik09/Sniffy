@@ -43,7 +43,7 @@ public:
 
     void showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex);
     void paintTraces(QVector<QVector<QPointF>> dataSeries);
-    void setDataMinMaxTime(qreal minX, qreal maxX);
+    void setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom);
 
     void singleSamplingDone();
     void samplingOngoing();
@@ -55,6 +55,7 @@ public:
 
 signals:
     void timeBaseChanged(float value);
+    void memoryLengthChanged(int length);
     void triggerModeChanged(ScopeTriggerMode);
     void triggerEdgeChanged(ScopeTriggerEdge);
     void pretriggerChanged(float value);
@@ -68,6 +69,7 @@ signals:
 private slots:
     void timeBaseCallback(float value);
     void channelEnableCallback(int buttonStatus);
+    void longMemoryCallback(int index);
     void pretriggerCallback(float value);
     void triggerValueCallback(float value);
     void triggerChannelCallback(int index);
@@ -90,6 +92,8 @@ private:
 
     void updateChartScale(float timeBase);
     void fillTimeBase();
+
+    float previousTimeBase = 0;
 };
 
 #endif // WINDOWSCOPE_H

@@ -77,6 +77,7 @@ void Device::errorHandler(QByteArray error){
     messageBox.critical(0,"Error","An error has occured:\n" + error + "\nPlease reconnect the device");
     messageBox.setFixedSize(500,200);
     disconnectDevice();
+    deviceWindow->hideSpecification();
     deviceWindow->deviceConnectButton->setDisabledButton(true,0);//disable connect
 }
 

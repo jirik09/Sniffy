@@ -62,12 +62,13 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     dialTimeBase = new WidgetDial(parent ,"Time base");
     destination->addWidget(dialTimeBase);
     fillTimeBase();
-    dialTimeBase->setSelected(9);
+    dialTimeBase->setSelected(10);
 
-    WidgetButtons *buttonsMemorySet = new WidgetButtons(parent,2,ButtonTypes::RADIO,"Memory");
+    buttonsMemorySet = new WidgetButtons(parent,3,ButtonTypes::RADIO,"Memory");
     destination->addWidget(buttonsMemorySet);
-    buttonsMemorySet->setText("Normal",0);
+    buttonsMemorySet->setText(" Normal ",0);
     buttonsMemorySet->setText(" Long ",1);
+    buttonsMemorySet->setText(" Zoom ",2);
 
     WidgetSeparator *separatorVertical = new WidgetSeparator(parent,"Vertical");
     destination->addWidget(separatorVertical);
@@ -104,6 +105,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
 
 
 void PanelSettings::fillTimeBase(){
+    dialTimeBase->addOption("500","ns",5e-7);
     dialTimeBase->addOption("1","us",1e-6);
     dialTimeBase->addOption("2","us",2e-6);
     dialTimeBase->addOption("5","us",5e-6);

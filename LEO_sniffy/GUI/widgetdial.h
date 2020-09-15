@@ -35,8 +35,6 @@ private:
     QList<params_dial> *options;
     int selectedIndex;
 
-    CustomDial *dial;
-
 private slots:
     void plusClicked();
     void minusClicked();
