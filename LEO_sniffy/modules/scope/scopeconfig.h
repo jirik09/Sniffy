@@ -17,7 +17,7 @@ public:
     //parameters really in HW (received each time with data)
     int samplingRate = 10000;
     int ADCresolution = 12;
-    int dataLength = 1000;
+    int dataLength = 1200;
     int numberOfChannels = 1;
 
 

@@ -74,7 +74,7 @@ void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float tim
     labelInfoPanel->hideChannelLabels();
     paintTraces(dataSeries);
 
-    chart->setZoom(1.5);
+    chart->setZoom(1.2);
     chart->setHorizontalMarker(triggerChannelIndex,0);
 }
 

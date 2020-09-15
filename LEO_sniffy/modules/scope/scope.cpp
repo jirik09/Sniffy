@@ -46,7 +46,7 @@ void Scope::parseData(QByteArray data){
 
     }else if(dataHeader=="OSC_"){
         quint8 tmpByte;
-        qint16 tmpShort;
+        quint16 tmpShort;
         qreal minX;
         qreal maxX;
         qreal x(0);
@@ -122,7 +122,7 @@ void Scope::parseData(QByteArray data){
             scpWindow->setDataMinMaxTime(minX,maxX);
             scpWindow->setRealSamplingRate(samplingFreq);
 
-            //handel single trigger
+            //handle single trigger
             if(config->triggerMode!=ScopeTriggerMode::TRIG_SINGLE){
                 restartSampling();
             }else{
@@ -139,8 +139,10 @@ void Scope::writeConfiguration(){
     updateTimebase(config->timeBase);
 
     //this one will be done like others
-    config->dataLength = 1000;
-    comm->write(cmd->SCOPE+":"+cmd->DATA_LENGTH+":"+cmd->SAMPLES_1K+";");
+    config->dataLength = 1200;
+   // comm->write(cmd->SCOPE+":"+cmd->DATA_LENGTH+":"+cmd->SAMPLES_1K+";");
+
+    comm->write(cmd->SCOPE,cmd->DATA_LENGTH,1200);
     config->longMemory = 0;
 
     updateTriggerLevel(config->triggerLevelPercent);
@@ -167,7 +169,7 @@ QWidget* Scope::getWidget(){
 
 void Scope::updateTimebase(float div){
     config->timeBase = div;
-    config->samplingRate = round(float(config->dataLength)/(20.0*div)+0.49);
+    config->samplingRate = round(float(config->dataLength)/(12.0*div)+0.49);
     setSamplingFrequency(config->samplingRate);
 }
 
