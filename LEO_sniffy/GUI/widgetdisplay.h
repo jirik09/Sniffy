@@ -92,7 +92,7 @@ public:
 private slots:
     void historyButtonClickedCallback();
     void clearHistoryButtonClickedCallback();
-    void listChartButtonClickedCallback();
+    void listChartSwitchClickedCallback();
     void showMenuOnRightClickCallback(const QPoint &mousePos);
 
 private:

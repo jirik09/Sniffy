@@ -20,6 +20,7 @@ public:
     void appendString(int listIndex, QString timeMark, QString str);
     void clearSample(int index);
     void clearLast();
+    void clearAll();
 
 private:
     Ui::WidgetList *ui;

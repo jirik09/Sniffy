@@ -46,7 +46,7 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
     connect(ui->pushButton_clear, SIGNAL(clicked()),
             this, SLOT(clearHistoryButtonClickedCallback()));
     connect(ui->pushButton_list, SIGNAL(clicked()),
-            this, SLOT(listChartButtonClickedCallback()));
+            this, SLOT(listChartSwitchClickedCallback()));
     connect(chart, &widgetChart::chartRightClicked,
             this, &WidgetDisplay::showMenuOnRightClickCallback);
 }
@@ -266,11 +266,12 @@ void WidgetDisplay::historyButtonClickedCallback(){
 void WidgetDisplay::clearHistoryButtonClickedCallback(){
     historyData->clear();
     chart->clearAll();
+    list->clearAll();
     timeAxisMax = 0;
     timeAxisMin = 0;
 }
 
-void WidgetDisplay::listChartButtonClickedCallback(){
+void WidgetDisplay::listChartSwitchClickedCallback(){
     QString style;
     if(listView == DISABLED){
         style = "QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"

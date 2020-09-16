@@ -45,3 +45,12 @@ void WidgetList::clearLast(){
         model->setStringList(lists[i]);
     }
 }
+
+void WidgetList::clearAll(){
+    //model->setStringList(QStringList{});
+    model->removeRows(0, model->rowCount());
+    for(int i = 0; i < lists.length(); i++){
+        lists[i].clear();
+        model->setStringList(lists[i]);
+    }
+}
