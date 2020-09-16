@@ -201,6 +201,10 @@ void WidgetDisplay::clearExpiredPointsFromChart(){
     chart->clearPoint(0, 0);
 }
 
+void WidgetDisplay::clearExpiredPointsFromList(){
+    list->clearLast();
+}
+
 void WidgetDisplay::setHistorySize(int smplNumber){
     historySize = smplNumber;
 }
@@ -219,10 +223,12 @@ void WidgetDisplay::appendNewHistorySample(double sample, float timeStep){
         timeAxisMin += timeStep;
         historyData->removeFirst();
         clearExpiredPointsFromChart();
+        clearExpiredPointsFromList();
     }
 
     setHistoryMinMaxTime(timeAxisMin, timeAxisMax);
     chart->appendToTrace(historyData, 0);
+    list->appendNumber(0, timeAxisMax, sample);
 }
 
 void WidgetDisplay::setHistoryMinMaxTime(qreal minX, qreal maxX){

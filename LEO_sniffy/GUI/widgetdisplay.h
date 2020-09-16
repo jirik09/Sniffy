@@ -122,6 +122,7 @@ private:
     void clearHistoryChart();
     void clearHistoryList();
     void clearExpiredPointsFromChart();
+    void clearExpiredPointsFromList();
 
     void setHistoryMinMaxTime(qreal minX, qreal maxX);
     void setHistoryMinMaxData(qreal minY, qreal maxY);
