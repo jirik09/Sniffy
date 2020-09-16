@@ -219,28 +219,6 @@ background-color: rgb(38, 38, 38);
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_undock">
-        <property name="maximumSize">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton{image: url(:/graphics/graphics/unDock.png);}QPushButton:hover{background-color: rgb(71, 76, 94);}</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>19</width>
-          <height>19</height>
-         </size>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>

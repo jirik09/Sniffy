@@ -34,13 +34,21 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
     displayAvgString("");
 
     hideHistoryChartArea();
+
+    historyData = new QVector<QPointF>;
     createHistoryChart(historyTracesNum);
+    createHistoryList(historyTracesNum);
 
     setHistorySize(historySize);
 
-    connect(ui->pushButton_history, SIGNAL(clicked()), this, SLOT(historyButtonClickedCallback()));
-    connect(ui->pushButton_clear, SIGNAL(clicked()), this, SLOT(clearHistoryButtonClickedCallback()));
-    connect(ui->pushButton_list, SIGNAL(clicked()), this, SLOT(listChartButtonClickedCallback()));
+    connect(ui->pushButton_history, SIGNAL(clicked()),
+            this, SLOT(historyButtonClickedCallback()));
+    connect(ui->pushButton_clear, SIGNAL(clicked()),
+            this, SLOT(clearHistoryButtonClickedCallback()));
+    connect(ui->pushButton_list, SIGNAL(clicked()),
+            this, SLOT(listChartButtonClickedCallback()));
+    connect(chart, &widgetChart::chartRightClicked,
+            this, &WidgetDisplay::showMenuOnRightClickCallback);
 }
 
 WidgetDisplay::~WidgetDisplay()
@@ -234,16 +242,16 @@ void WidgetDisplay::historyButtonClickedCallback(){
     QList<int> sizes = ui->splitter->sizes();
     int cmpltWidth = ui->splitter->width();
 
-    if(history == DISABLED){
+    if(historyView == DISABLED){
         sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
         style = "QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
                 "QPushButton:hover{background-color: rgb(71, 76, 94);}";
-        history = ENABLED;
+        historyView = ENABLED;
     }else {
         sizes = {0, cmpltWidth};
         style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
                 "QPushButton:hover{background-color: rgb(71, 76, 94);}";
-        history = DISABLED;
+        historyView = DISABLED;
     }
     ui->splitter->setSizes(sizes);
     ui->pushButton_history->setStyleSheet(style);
@@ -252,37 +260,54 @@ void WidgetDisplay::historyButtonClickedCallback(){
 void WidgetDisplay::clearHistoryButtonClickedCallback(){
     historyData->clear();
     chart->clearAll();
+    timeAxisMax = 0;
+    timeAxisMin = 0;
 }
 
 void WidgetDisplay::listChartButtonClickedCallback(){
     QString style;
-    if(list == DISABLED){
+    if(listView == DISABLED){
         style = "QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"
                 "QPushButton:hover{background-color: rgb(71, 76, 94);}";
-        list = ENABLED;
+        chart->hide();
+        list->show();
+        listView = ENABLED;
     }else {
         style = "QPushButton{image: url(:/graphics/graphics/icon_list.png);}"
                 "QPushButton:hover{background-color: rgb(71, 76, 94);}";
-        list = DISABLED;
+        chart->show();
+        list->hide();
+        listView = DISABLED;
     }
     ui->pushButton_list->setStyleSheet(style);
 }
 
-void WidgetDisplay::createHistoryChart(int historyTracesNum){
-    historyData = new QVector<QPointF>;    
+void WidgetDisplay::showMenuOnRightClickCallback(const QPoint &mousePos){
+    QMenu menu(tr("Context menu"), this);
+    QAction action1("Some Action", this);
+//    connect(&action1, SIGNAL(triggered()), this, SLOT(slotFunction()));
+    menu.addAction(&action1);
+
+    menu.exec(mapToGlobal(mousePos));
+}
+
+void WidgetDisplay::createHistoryChart(int historyTracesNum){    
     chart = new widgetChart(ui->verticalWidget_history, historyTracesNum);
+    chart->setLabelsSize(7);
     chart->setGridLinesVisible(true, true);
     chart->setGridDensity(5, 5);
     chart->setLabelsVisible(true, true);
     chart->setGraphColor(QCOLOR_GREY);
-    chart->setMargins(-14, -5, -12, -11);
+    chart->setMargins(-12, -5, -11, -10);
     chart->setRangeY(0, 3.3);
     chart->setDataMinMax(0, 10);
     ui->horizontalWidget_graph_2->addWidget(chart);
 }
 
-void WidgetDisplay::createList(){
-
+void WidgetDisplay::createHistoryList(int historyTracesNum){
+    list = new WidgetList(ui->verticalWidget_history, historyTracesNum);
+    list->hide();
+    ui->horizontalWidget_graph_2->addWidget(list);
 }
 
 void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){

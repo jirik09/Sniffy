@@ -19,6 +19,7 @@
 
 #include "GUI/clickablelabel.h"
 #include "GUI/widgetchart.h"
+#include "GUI/widgetlist.h"
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
@@ -86,11 +87,13 @@ public:
     void updateHistoryData(QVector<QPointF> *points, int index);
 
     widgetChart *chart;
+    WidgetList *list;
 
 private slots:
     void historyButtonClickedCallback();
     void clearHistoryButtonClickedCallback();
     void listChartButtonClickedCallback();
+    void showMenuOnRightClickCallback(const QPoint &mousePos);
 
 private:
     Ui::WidgetDisplay *ui;
@@ -102,20 +105,22 @@ private:
     QVector<QPointF> *historyData;
     int historySize;
     float rememberMax = 0;
-    qreal timeAxisMax = 0, timeAxisMin = 0;
+    qreal timeAxisMax = 0;
+    qreal timeAxisMin = 0;
 
     int drawFlag = 0;
 
     const int SPLITTER_LINE = 5;
 
     enum { ENABLED, DISABLED }
-         history = DISABLED,
-         list = DISABLED;
+         historyView = DISABLED,
+         listView = DISABLED;
 
-    void createHistoryChart(int historyTracesNum);
-    void createList();
     void hideHistoryChartArea();
+    void createHistoryChart(int historyTracesNum);
+    void createHistoryList(int historyTracesNum);
     void clearHistoryChart();
+    void clearHistoryList();
     void clearExpiredPointsFromChart();
 
     void setHistoryMinMaxTime(qreal minX, qreal maxX);

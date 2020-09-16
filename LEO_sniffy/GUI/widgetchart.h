@@ -10,6 +10,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QLogValueAxis>
+#include <QMenu>
 #include <QtMath>
 #include <QDateTimeAxis>
 
@@ -41,7 +42,7 @@ public:
     void setRange(qreal minX, qreal maxX, qreal minY, qreal maxY);
     void setMargins(int left, int top, int right, int bottom);
 
-    void setZoom(float invZoom);    
+    void setZoom(float invZoom);
     qreal getZoom();
     void setShift (float shift);
 
@@ -52,6 +53,7 @@ public:
     void formatLabels(QString axisXLabelForm, QString axisYLabelForm);
     void setGraphColor(QColor qColor);
     void setLabelsVisible(bool lableVisibleX, bool lableVisibleY);
+    void setLabelsSize(int pointSize);
     void createHorizontalMarkes();
     void setHorizontalMarker(int channelIndex, qreal value);
 
@@ -76,6 +78,13 @@ private:
 
     QColor colors[4] = {QCOLOR_ORANGE, QCOLOR_BLUE,
                         QCOLOR_GREEN, QCOLOR_PURPLE};
+
+signals:
+    void chartRightClicked(const QPoint &pos);
+
+private slots:
+    void chartRightClickCallback(const QPoint &mousePos);
+
 };
 
 #endif // WIDGETCHART_H
