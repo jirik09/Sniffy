@@ -1,8 +1,8 @@
 #include "devicespec.h"
 
-DeviceSpec::DeviceSpec(QObject *parent) : QObject(parent)
+DeviceSpec::DeviceSpec(QObject *parent)
 {
-
+    Q_UNUSED(parent);
 }
 
 void DeviceSpec::parseSpecification(QByteArray spec){
@@ -44,6 +44,6 @@ void DeviceSpec::parseSpecification(QByteArray spec){
             DP_pin = specParams[17];
             DM_pin = specParams[18];
         }
-        isSpecLoaded = true;
+        isSpecificationLoaded = true;
     }
 }

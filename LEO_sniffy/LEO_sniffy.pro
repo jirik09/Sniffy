@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     GUI/clickablelabel.cpp \
+    GUI/customcombobox.cpp \
     GUI/customdial.cpp \
     GUI/moduledockwidget.cpp \
     GUI/widgetbuttons.cpp \
@@ -46,6 +47,7 @@ SOURCES += \
     mainwindow.cpp \
     math/movingaverage.cpp \
     modules/abstractmodule.cpp \
+    modules/abstractspecification.cpp \
     modules/counter/counter.cpp \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
@@ -70,6 +72,7 @@ SOURCES += \
 
 HEADERS += \
     GUI/clickablelabel.h \
+    GUI/customcombobox.h \
     GUI/customdial.h \
     GUI/moduledockwidget.h \
     GUI/widgetbuttons.h \
@@ -98,6 +101,7 @@ HEADERS += \
     graphics/styles.h \
     mainwindow.h \
     math/movingaverage.h \
+    modules/abstractspecification.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
     modules/counter/counterdefs.h \

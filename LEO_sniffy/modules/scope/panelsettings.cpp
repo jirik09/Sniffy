@@ -62,37 +62,53 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     dialTimeBase = new WidgetDial(parent ,"Time base");
     destination->addWidget(dialTimeBase);
     fillTimeBase();
-    dialTimeBase->setSelected(9);
+    dialTimeBase->setDefaultIndex(10);
 
-    WidgetButtons *buttonsMemorySet = new WidgetButtons(parent,2,ButtonTypes::RADIO,"Memory");
+    buttonsMemorySet = new WidgetButtons(parent,3,ButtonTypes::RADIO,"Memory");
     destination->addWidget(buttonsMemorySet);
-    buttonsMemorySet->setText("Normal",0);
+    buttonsMemorySet->setText(" Normal ",0);
     buttonsMemorySet->setText(" Long ",1);
+    buttonsMemorySet->setText(" Zoom ",2);
 
     WidgetSeparator *separatorVertical = new WidgetSeparator(parent,"Vertical");
     destination->addWidget(separatorVertical);
 
-    WidgetButtons *buttonsChannelVerticalGain = new WidgetButtons(parent,4,ButtonTypes::RADIO);
-    destination->addWidget(buttonsChannelVerticalGain);
-    buttonsChannelVerticalGain->setText("CH1",0);
-    buttonsChannelVerticalGain->setText("CH2",1);
-    buttonsChannelVerticalGain->setText("CH3",2);
-    buttonsChannelVerticalGain->setText("CH4",3);
+    buttonsChannelVertical = new WidgetButtons(parent,4,ButtonTypes::RADIO);
+    destination->addWidget(buttonsChannelVertical);
+    buttonsChannelVertical->setText("CH1",0);
+    buttonsChannelVertical->setText("CH2",1);
+    buttonsChannelVertical->setText("CH3",2);
+    buttonsChannelVertical->setText("CH4",3);
+    buttonsChannelVertical->setColor(BCKGRND_COLOR_ORANGE,0);
+    buttonsChannelVertical->setColor(BCKGRND_COLOR_BLUE,1);
+    buttonsChannelVertical->setColor(BCKGRND_COLOR_GREEN,2);
+    buttonsChannelVertical->setColor(BCKGRND_COLOR_PURPLE,3);
 
-    WidgetDial *dialVerticalGain = new WidgetDial(parent ,"Scale");
-    destination->addWidget(dialVerticalGain);
-    dialVerticalGain->addOption("10","mV/div",0.01);
-    dialVerticalGain->addOption("20","mV/div",0.02);
-    dialVerticalGain->addOption("50","mV/div",0.05);
-    dialVerticalGain->addOption("100","mV/div",0.1);
-    dialVerticalGain->addOption("200","mV/div",0.2);
-    dialVerticalGain->addOption("500","mV/div",0.5);
-    dialVerticalGain->addOption("1","V/div",1);
-    dialVerticalGain->addOption("2","V/div",2);
-    dialVerticalGain->setSelected(6);
 
-    WidgetDialRange *dialVerticalShift = new WidgetDialRange(parent ,"Shift");
+    dialVerticalScale = new WidgetDial(parent ,"Scale");
+    destination->addWidget(dialVerticalScale);
+    QString colorStyleSheet = verticalControlColor;
+    dialVerticalScale->setDialColor(colorStyleSheet);
+    colorStyleSheet = verticalControlBcgrColor;
+    dialVerticalScale->setDialButtonsColor(colorStyleSheet);
+    dialVerticalScale->addOption("10","mV/div",0.01);
+    dialVerticalScale->addOption("20","mV/div",0.02);
+    dialVerticalScale->addOption("50","mV/div",0.05);
+    dialVerticalScale->addOption("100","mV/div",0.1);
+    dialVerticalScale->addOption("200","mV/div",0.2);
+    dialVerticalScale->addOption("500","mV/div",0.5);
+    dialVerticalScale->addOption("1","V/div",1);
+    dialVerticalScale->addOption("2","V/div",2);
+    dialVerticalScale->addOption("5","V/div",5);
+    dialVerticalScale->addOption("10","V/div",10);
+    dialVerticalScale->setDefaultIndex(6);
+
+    dialVerticalShift = new WidgetDialRange(parent ,"Shift");
     dialVerticalShift->setRange(-3.3,6.6,"V",10,0.01,0);
+    colorStyleSheet = verticalControlColor;
+    dialVerticalShift->setDialColor(colorStyleSheet);
+    colorStyleSheet = verticalControlBcgrColor;
+    dialVerticalShift->setDialButtonsColor(colorStyleSheet);
     destination->addWidget(dialVerticalShift);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
@@ -104,6 +120,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
 
 
 void PanelSettings::fillTimeBase(){
+    dialTimeBase->addOption("500","ns",5e-7);
     dialTimeBase->addOption("1","us",1e-6);
     dialTimeBase->addOption("2","us",2e-6);
     dialTimeBase->addOption("5","us",5e-6);

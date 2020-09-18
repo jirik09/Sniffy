@@ -6,9 +6,14 @@
 #include "connectiontype.h"
 #include "serialline.h"
 
+
+
 class Comms : public QObject
 {
     Q_OBJECT
+
+//#define DEBUG_COMMS
+
 public:
     explicit Comms(QObject *parent = nullptr);
     void close();

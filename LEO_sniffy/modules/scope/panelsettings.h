@@ -28,8 +28,17 @@ public:
     WidgetDialRange *dialPretrigger;
     WidgetDialRange *dialTriggerValue;
 
+    WidgetButtons *buttonsMemorySet;
+
+    WidgetButtons *buttonsChannelVertical;
+    WidgetDial *dialVerticalScale;
+    WidgetDialRange *dialVerticalShift;
+
 private:
     void fillTimeBase();
+
+    const QString verticalControlColor = TEXT_COLOR_ORANGE;
+    const QString verticalControlBcgrColor = BCKGRND_COLOR_ORANGE;
 
 };
 

@@ -18,7 +18,6 @@ Device::Device(QObject *parent)
 //(keep it here bacause it is simpler and no need to use signals)
 void Device::deviceConnection(int buttonIndex){
     if(buttonIndex==1){
-        qDebug() << "scan clicked";
         emit ScanDevices();
         deviceWindow->deviceConnectButton->disableAll();
         deviceWindow->deviceSelection->addOption("Scanning...",0);
@@ -77,6 +76,7 @@ void Device::errorHandler(QByteArray error){
     messageBox.critical(0,"Error","An error has occured:\n" + error + "\nPlease reconnect the device");
     messageBox.setFixedSize(500,200);
     disconnectDevice();
+    deviceWindow->hideSpecification();
     deviceWindow->deviceConnectButton->setDisabledButton(true,0);//disable connect
 }
 

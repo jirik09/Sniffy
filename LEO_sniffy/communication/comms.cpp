@@ -2,7 +2,6 @@
 
 Comms::Comms(QObject *parent) : QObject(parent)
 {
-
 }
 
 void Comms::open(DeviceDescriptor device){
@@ -33,10 +32,16 @@ void Comms::close(){
 
 void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
     serial->write(module+":"+feature+":"+param+";");
+#ifdef DEBUG_COMMS
+    qDebug() << module+":"+feature+":"+param+";";
+#endif
 }
 
 void Comms::write(QByteArray module, QByteArray command){
     serial->write(module+":"+command+";");
+#ifdef DEBUG_COMMS
+    qDebug() << module+":"+command;
+#endif
 }
 
 void Comms::write(QByteArray module, QByteArray feature, int param){
@@ -48,10 +53,17 @@ void Comms::write(QByteArray module, QByteArray feature, int param){
     serial->write(module+":"+feature+" ");
     serial->write(tmp,4);
     serial->write(";");
+#ifdef DEBUG_COMMS
+    qDebug() << module+":"+feature+":" << param <<";";
+#endif
 }
 
 void Comms::write(QByteArray data){
     serial->write(data);
+#ifdef DEBUG_COMMS
+    qDebug() << data;
+#endif
+
 }
 
 void Comms::errorReceived(QByteArray error){
@@ -61,7 +73,13 @@ void Comms::errorReceived(QByteArray error){
 void Comms::parseMessage(QByteArray message){
     //CRC can be checked here but it is not implemented
     //just pass the data
-    //qDebug() << "parse massage in comms.cpp";
+#ifdef DEBUG_COMMS
+    if(message.length()>96){
+        qDebug() << message.left(64)<<"..."<<message.right(16);
+    }else{
+        qDebug() << message;
+    }
+#endif
     emit newData(message);
 }
 

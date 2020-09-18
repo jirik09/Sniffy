@@ -4,8 +4,9 @@
 #include <QObject>
 #include <QDebug>
 #include <QDataStream>
+#include "../abstractspecification.h"
 
-class DeviceSpec : public QObject
+class DeviceSpec : public AbstractSpecification
 {
     Q_OBJECT
 public:
@@ -34,8 +35,6 @@ public:
     bool useUsb = false;
     QString DP_pin;
     QString DM_pin;
-
-    bool isSpecLoaded = false;
 };
 
 #endif // DEVICESPEC_H

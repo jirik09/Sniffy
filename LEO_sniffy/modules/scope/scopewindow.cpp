@@ -16,10 +16,13 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    chart = new widgetChart(ui->widget_trace, 4);
-    chart->setRange(-0.1, 0.1, -0.1, 3.9);
+    ui->verticalSlider->hide();
+    ui->verticalSlider_2->hide();
+
+    chart = new widgetChart(ui->widget_chart, 4);
+    chart->setRange(-0.1, 0.1, 0, 8);
     chart->createHorizontalMarkes();
-    ui->verticalLayout_trace->addWidget(chart);
+    ui->verticalLayout_chart->addWidget(chart);
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
@@ -42,6 +45,14 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
     connect(panelSet->buttonsTriggerEdge,SIGNAL(clicked(int)),this,SLOT(triggerEdgeCallback(int)));
     connect(panelSet->buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
     connect(panelSet->dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
+    connect(panelSet->buttonsMemorySet,&WidgetButtons::clicked,this,&ScopeWindow::longMemoryCallback);
+
+    connect(panelSet->buttonsChannelVertical,&WidgetButtons::clicked,this, &ScopeWindow::channelVerticalCallback);
+    connect(panelSet->dialVerticalScale,&WidgetDial::valueChanged,this,&ScopeWindow::channelVerticalScaleCallback);
+    connect(panelSet->dialVerticalShift,&WidgetDialRange::valueChanged,this,&ScopeWindow::channelVerticalShiftCallback);
+
+
+
 
     // ************************* creating widget measurement *******************
     panelMeas = new PanelMeasurement(tabs->getLayout(1),tabs);
@@ -69,12 +80,14 @@ void ScopeWindow::paintEvent(QPaintEvent *event){
 }
 
 void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex){
-    updateChartScale(timeBase);
+    updateChartTimeScale(timeBase);
     labelInfoPanel->setTriggerLabelText("");
     labelInfoPanel->hideChannelLabels();
-    paintTraces(dataSeries);
 
-    chart->setZoom(1.5);
+    ChartData = dataSeries;
+
+    paintTraces(ChartData);
+
     chart->setHorizontalMarker(triggerChannelIndex,0);
 }
 
@@ -82,19 +95,57 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries){
     chart->clearAll();
     for (int i = 0; i < dataSeries.length(); i++){
         if(panelSet->buttonsChannelEnable->isChecked(i)){
+
+            //put channel in scale
+            for (int j = 0; j < dataSeries[i].length(); j++){
+                dataSeries[i][j].setY((dataSeries[i][j].y()+channelOffset[i])/channelScale[i]);
+            }
+
             chart->updateTrace(&dataSeries[i], i);
             labelInfoPanel->setChannelLabelVisible(i,true);
+            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(channelScale[i],"V/div"));
         }
     }
 }
 
-void ScopeWindow::setDataMinMaxTime(qreal minX, qreal maxX){
+void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
      chart->setDataMinMax(minX,maxX);
+     chart->setZoom(zoom*1.2);
+}
+
+void ScopeWindow::channelVerticalCallback(int index){
+    selectedChannelIndexVertical = index;
+    panelSet->dialVerticalScale->setDialColor(channelTextColor[index]);
+    panelSet->dialVerticalScale->setDialButtonsColor(channelBcgrColor[index]);
+    if(channelScaleIndex[index]==-1){
+        channelScaleIndex[index] = panelSet->dialVerticalScale->getDefaultIndex();
+        channelOffsetIndex[index] = panelSet->dialVerticalShift->getDefaultRealValue();
+    }
+    panelSet->dialVerticalScale->setSelectedIndex(channelScaleIndex[index]);
+
+    panelSet->dialVerticalShift->setDialColor(channelTextColor[index]);
+    panelSet->dialVerticalShift->setDialButtonsColor(channelBcgrColor[index]);
+    panelSet->dialVerticalShift->setRealValue(channelOffset[index]);
+}
+
+void ScopeWindow::channelVerticalScaleCallback(float value){
+    channelScale[selectedChannelIndexVertical] = value;
+    channelScaleIndex[selectedChannelIndexVertical] = panelSet->dialVerticalScale->getSelectedIndex();
+    paintTraces(ChartData);
+}
+void ScopeWindow::channelVerticalShiftCallback(float value){
+    channelOffset[selectedChannelIndexVertical] = value;
+    paintTraces(ChartData);
 }
 
 void ScopeWindow::timeBaseCallback(float value){
     emit timeBaseChanged(value);
-    updateChartScale(value);
+    updateChartTimeScale(value);
+    previousTimeBase = value;
+}
+
+void ScopeWindow::longMemoryCallback(int index){
+    emit memoryLengthChanged(index);
 }
 
 void ScopeWindow::pretriggerCallback(float value){
@@ -173,7 +224,7 @@ void ScopeWindow::measurementClearCallback(){
 }
 
 void ScopeWindow::sliderShiftCallback(int value){
-    chart->setShift(value);
+    chart->setShift((float)value/10);
 }
 
 void ScopeWindow::updateMeasurement(QList<Measurement*> m){
@@ -198,8 +249,11 @@ void ScopeWindow::setRealSamplingRate(int smpl){
     labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS"));
 }
 
-void ScopeWindow::updateChartScale(float timeBase){
-  //  chart->setXAxisMax(timeBase*10);
+void ScopeWindow::updateChartTimeScale(float timeBase){
+    if(previousTimeBase !=0 && previousTimeBase != timeBase){
+        chart->setZoom(chart->getZoom()*previousTimeBase/timeBase);
+    }
+
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase,"s/div"));
 }
 
