@@ -31,7 +31,7 @@ public:
     WidgetButtons *buttonsMemorySet;
 
     WidgetButtons *buttonsChannelVertical;
-    WidgetDial *dialVerticalGain;
+    WidgetDial *dialVerticalScale;
     WidgetDialRange *dialVerticalShift;
 
 private:

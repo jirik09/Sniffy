@@ -36,6 +36,17 @@ void WidgetDialRange::setDialButtonsColor(QString &bckgndStyleSheet){
     ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
 }
 
+float WidgetDialRange::getDefaultRealValue() const
+{
+    return defaultRealValue;
+}
+
+void WidgetDialRange::setRealValue(float value)
+{
+    realValue = value;
+    updateControls(0);
+}
+
 void WidgetDialRange::addOption (QString unit,float mult){
     params_unit *tmpUnit = new params_unit();
     tmpUnit->mult = mult;
@@ -51,9 +62,6 @@ void WidgetDialRange::hideUnitSelection(void){
     this->setMinimumSize(200,70);
 }
 
-void WidgetDialRange::setSelected(int index){
-    ui->comboBox->setCurrentIndex(index);
-}
 
 void WidgetDialRange::plusClicked(){
     float tmpValue = labelValue + buttonStep;
@@ -145,6 +153,8 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     }else{
         realValue= defaultValue;
     }
+
+    defaultRealValue = realValue;
 
 
     if (smalestUnitMult<1e-3){

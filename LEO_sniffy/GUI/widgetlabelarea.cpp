@@ -65,7 +65,7 @@ void WidgetLabelArea::hideChannelLabels(){
 
 void WidgetLabelArea::setChannelScale(int index, QString Scale){
     int ch = index +1;
-    channLabelList[index]->setText("CH"+QString::number(ch)+" "+Scale);
+    channLabelList[index]->setText("CH"+QString::number(ch)+" "+Scale+" ");
 }
 
 void WidgetLabelArea::setTriggerLabelText(QString text){

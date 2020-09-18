@@ -40,8 +40,9 @@ void Scope::parseData(QByteArray data){
         specification->parseSpecification(data);
 
     }else if(dataHeader=="SMPL"){
-        scpWindow->samplingOngoing();
-
+        if(config->triggerMode!=ScopeTriggerMode::TRIG_STOP){
+            scpWindow->samplingOngoing();
+        }
     }else if(dataHeader=="TRIG"){
         scpWindow->triggerCaptured();
 

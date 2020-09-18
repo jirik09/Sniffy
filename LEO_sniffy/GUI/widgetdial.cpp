@@ -41,11 +41,16 @@ void WidgetDial::addOption (QString shownValue, QString unit,float realValue){
     ui->dial->setMaximum(options->length()-1);
 
     if(options->length()==1){
-        setSelected(0);
+        setSelectedIndex(0);
     }
 }
 
-void WidgetDial::setSelected(int index){
+int WidgetDial::getSelectedIndex() const
+{
+    return selectedIndex;
+}
+
+void WidgetDial::setSelectedIndex(int index){
 
     ui->dial->setValue(index);
     ui->comboBox->setCurrentIndex(index);
@@ -65,8 +70,15 @@ void WidgetDial::setDialButtonsColor(QString &bckgndStyleSheet){
     ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
 }
 
-float WidgetDial::getValue(){
-    return options->at(selectedIndex).realValue;
+int WidgetDial::getDefaultIndex() const
+{
+    return defaultIndex;
+}
+
+void WidgetDial::setDefaultIndex(int index)
+{
+    defaultIndex = index;
+    setSelectedIndex(index);
 }
 
 void WidgetDial::plusClicked(){
@@ -74,7 +86,7 @@ void WidgetDial::plusClicked(){
     if(selectedIndex>=options->length()){
         selectedIndex = options->length()-1;
     }
-    setSelected(selectedIndex);
+    setSelectedIndex(selectedIndex);
 }
 
 void WidgetDial::minusClicked(){
@@ -82,12 +94,12 @@ void WidgetDial::minusClicked(){
     if(selectedIndex<0){
         selectedIndex = 0;
     }
-    setSelected(selectedIndex);
+    setSelectedIndex(selectedIndex);
 }
 
 void WidgetDial::valChanged(int in){
     if(in>=0 && in<options->length()){
-        setSelected(in);
+        setSelectedIndex(in);
     }
 }
 

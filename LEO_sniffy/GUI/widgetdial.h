@@ -28,15 +28,19 @@ public:
     explicit WidgetDial(QWidget *parent = nullptr, QString name = "");
     ~WidgetDial();
     void addOption (QString shownValue, QString unit,float realValue);
-    void setSelected(int index);
+    int getSelectedIndex() const;
+    void setSelectedIndex(int index);
     void setDialColor(QString &textStyleSheet);
     void setDialButtonsColor(QString &bckgndStyleSheet);
-    float getValue();
+
+    int getDefaultIndex() const;
+    void setDefaultIndex(int value);
 
 private:
     Ui::WidgetDial *ui;
     QList<params_dial> *options;
     int selectedIndex;
+    int defaultIndex = 0;
 
 private slots:
     void plusClicked();

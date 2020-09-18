@@ -62,7 +62,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     dialTimeBase = new WidgetDial(parent ,"Time base");
     destination->addWidget(dialTimeBase);
     fillTimeBase();
-    dialTimeBase->setSelected(10);
+    dialTimeBase->setDefaultIndex(10);
 
     buttonsMemorySet = new WidgetButtons(parent,3,ButtonTypes::RADIO,"Memory");
     destination->addWidget(buttonsMemorySet);
@@ -85,24 +85,26 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsChannelVertical->setColor(BCKGRND_COLOR_PURPLE,3);
 
 
-    dialVerticalGain = new WidgetDial(parent ,"Scale");
-    destination->addWidget(dialVerticalGain);
+    dialVerticalScale = new WidgetDial(parent ,"Scale");
+    destination->addWidget(dialVerticalScale);
     QString colorStyleSheet = verticalControlColor;
-    dialVerticalGain->setDialColor(colorStyleSheet);
+    dialVerticalScale->setDialColor(colorStyleSheet);
     colorStyleSheet = verticalControlBcgrColor;
-    dialVerticalGain->setDialButtonsColor(colorStyleSheet);
-    dialVerticalGain->addOption("10","mV/div",0.01);
-    dialVerticalGain->addOption("20","mV/div",0.02);
-    dialVerticalGain->addOption("50","mV/div",0.05);
-    dialVerticalGain->addOption("100","mV/div",0.1);
-    dialVerticalGain->addOption("200","mV/div",0.2);
-    dialVerticalGain->addOption("500","mV/div",0.5);
-    dialVerticalGain->addOption("1","V/div",1);
-    dialVerticalGain->addOption("2","V/div",2);
-    dialVerticalGain->setSelected(6);
+    dialVerticalScale->setDialButtonsColor(colorStyleSheet);
+    dialVerticalScale->addOption("10","mV/div",0.01);
+    dialVerticalScale->addOption("20","mV/div",0.02);
+    dialVerticalScale->addOption("50","mV/div",0.05);
+    dialVerticalScale->addOption("100","mV/div",0.1);
+    dialVerticalScale->addOption("200","mV/div",0.2);
+    dialVerticalScale->addOption("500","mV/div",0.5);
+    dialVerticalScale->addOption("1","V/div",1);
+    dialVerticalScale->addOption("2","V/div",2);
+    dialVerticalScale->addOption("5","V/div",5);
+    dialVerticalScale->addOption("10","V/div",10);
+    dialVerticalScale->setDefaultIndex(6);
 
     dialVerticalShift = new WidgetDialRange(parent ,"Shift");
-    dialVerticalShift->setRange(-3.3,6.6,"V",10,0.001,0);
+    dialVerticalShift->setRange(-3.3,6.6,"V",10,0.01,0);
     colorStyleSheet = verticalControlColor;
     dialVerticalShift->setDialColor(colorStyleSheet);
     colorStyleSheet = verticalControlBcgrColor;

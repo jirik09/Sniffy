@@ -104,6 +104,8 @@ private:
     QString channelTextColor[MAX_SCOPE_CHANNELS] = {TEXT_COLOR_ORANGE,TEXT_COLOR_BLUE,TEXT_COLOR_GREEN,TEXT_COLOR_PURPLE};
     float channelScale[MAX_SCOPE_CHANNELS]={1,1,1,1};
     float channelOffset[MAX_SCOPE_CHANNELS]={0,0,0,0};
+    float channelScaleIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
+    float channelOffsetIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
 };
 
 #endif // WINDOWSCOPE_H
