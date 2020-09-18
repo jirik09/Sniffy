@@ -8,6 +8,8 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 {
     ui->setupUi(this);
 
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+
     chart = new QChart();
     chart->legend()->hide();
 
@@ -37,6 +39,9 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 
     QChartView *chartView = new QChartView(chart);
     ui->horizontalLayout_chart->addWidget(chartView);
+
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(chartRightClickCallback(const QPoint &)));
 }
 
 widgetChart::~widgetChart()
@@ -52,14 +57,23 @@ void widgetChart::clearAll(){
         markersHorizontal->clear();
 }
 
+void widgetChart::clearPoints(int startIndex, int endIndex){
+    for (int i = startIndex; i <= endIndex; i++) {
+        seriesList[i]->clear();
+    }
+}
+
+void widgetChart::clearPoint(int traceIndex, int index){
+    seriesList[traceIndex]->remove(index);
+}
+
 void widgetChart::updateTrace(QVector<QPointF> *points, int index){
     const QVector<QPointF> &seriesData = *points;
     seriesList[index]->replace(seriesData);
 }
 
-void widgetChart::appendToTrace(QVector<QPointF> *points, int index){
-    //for(int i = 0; i < points->length(); i++)
-        seriesList[index]->append(points->at(points->length()-1));
+void widgetChart::appendToTrace(QVector<QPointF> *points, int index){    
+    seriesList[index]->append(points->at(points->length()-1));
 }
 
 void widgetChart::updateAxis(){
@@ -155,6 +169,13 @@ void widgetChart::setLabelsVisible(bool lableVisibleX, bool lableVisibleY){
     axisY->setLabelsVisible(lableVisibleY);
 }
 
+void widgetChart::setLabelsSize(int pointSize){
+    QFont font = axisX->labelsFont();
+    font.setPointSize(pointSize);
+    axisX->setLabelsFont(font);
+    axisY->setLabelsFont(font);
+}
+
 void widgetChart::createHorizontalMarkes(){
     markers = ENABLED;
     //prepare markers on X axis
@@ -192,4 +213,8 @@ void widgetChart::setHorizontalMarker(int channelIndex, qreal value){
     markersHorizontal->setBrush(arrow);
     seriesData.append(QPointF(value,0.99));
     markersHorizontal->replace(seriesData);
+}
+
+void widgetChart::chartRightClickCallback(const QPoint &mousePos){
+    emit chartRightClicked(mousePos);
 }

@@ -31,6 +31,7 @@ SOURCES += \
     GUI/widgetfooter.cpp \
     GUI/widgetlabel.cpp \
     GUI/widgetlabelarea.cpp \
+    GUI/widgetlist.cpp \
     GUI/widgetselection.cpp \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
@@ -84,6 +85,7 @@ HEADERS += \
     GUI/widgetfooter.h \
     GUI/widgetlabel.h \
     GUI/widgetlabelarea.h \
+    GUI/widgetlist.h \
     GUI/widgetselection.h \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
@@ -137,6 +139,7 @@ FORMS += \
     GUI/widgetfooter.ui \
     GUI/widgetlabel.ui \
     GUI/widgetlabelarea.ui \
+    GUI/widgetlist.ui \
     GUI/widgetmodule.ui \
     GUI/widgetselection.ui \
     GUI/widgetseparator.ui \
