@@ -35,27 +35,26 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
         sPort->setStopBits(QSerialPort::StopBits::OneStop);
 
         if(sPort->open(QIODevice::ReadWrite)){
-
+            sPort->clear();
             sPort->write("IDN?;");
             sPort->waitForBytesWritten();
-
-            QThread::msleep(100);
-            sPort->waitForReadyRead(100);
+            sPort->waitForReadyRead(200);
 
             received = sPort->readAll();
 
+           // qDebug() <<sPort->portName()<<received.length()<<received;
             if (received.length()>16 && received.left(4)=="SYST"){
                 sPort->write("RES!;");
                 sPort->waitForBytesWritten();
 
-                thread()->msleep(150);
+              /*  thread()->msleep(150);
                 sPort->write("IDN?;");
                 sPort->waitForBytesWritten();
 
-                thread()->msleep(100);
-                sPort->waitForReadyRead(50);
+                //thread()->msleep(100);
+                sPort->waitForReadyRead(150);
 
-                received = sPort->readAll();
+                received = sPort->readAll();*/
                 desc.port = sPort->portName();
                 desc.speed = sPort->baudRate();
                 desc.connType = Connection::SERIAL;
@@ -76,9 +75,6 @@ bool SerialLine::openLine(DeviceDescriptor desc){
     serPort = new QSerialPort();
     serPort->setPortName(desc.port);
     serPort->setBaudRate(desc.speed);
-   /* serPort->setDataBits(QSerialPort::DataBits::Data8);
-    serPort->setParity(QSerialPort::Parity::NoParity);
-    serPort->setStopBits(QSerialPort::StopBits::OneStop);*/
 
     buffer = new QByteArray();
     message = new QByteArray();

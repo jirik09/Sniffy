@@ -238,7 +238,7 @@ void ScopeWindow::singleSamplingDone(){
 }
 
 void ScopeWindow::samplingOngoing(){
-    labelInfoPanel->setTriggerLabelText("Wait");
+    labelInfoPanel->setTriggerLabelText("Sampling");
 }
 
 void ScopeWindow::triggerCaptured(){

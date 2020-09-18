@@ -93,6 +93,7 @@ void DeviceMediator::ShowDeviceModule(){
     device->showModuleWindow();
     device->showModuleControl();
     device->hideModuleStatus();
+    ScanDevices(); //TODO temporairly here it will be in a thread
 }
 
 bool DeviceMediator::getIsConnected() const

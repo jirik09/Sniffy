@@ -25,6 +25,7 @@ private slots:
 private:
     QSerialPort *m_serialPort = nullptr;
     QByteArray m_readData;
+    qint64 sum =0;
 
 };
 

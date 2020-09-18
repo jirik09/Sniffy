@@ -19,6 +19,8 @@ public:
     int realSamplingRate = 1000;
     int ADCresolution = 12;
     int dataLength = 1200;
+    int rangeMin = 0; //mV
+    int rangeMax = 3300; //mv
 
     int numberOfChannels = 1;
     int triggerLevel = 32767; //16bit number

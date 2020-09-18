@@ -70,6 +70,11 @@ void Scope::parseData(QByteArray data){
             config->ADCresolution = resolution;
             streamBuffLeng>>length;
             config->dataLength = resolution>8?length/2:length;
+            streamBuffLeng>>tmpShort;
+            config->rangeMin = (qint16)tmpShort;
+            streamBuffLeng>>tmpShort;
+            config->rangeMax = (qint16)tmpShort;
+
             streamBuffLeng>>tmpByte;
             streamBuffLeng>>tmpByte;
             currentChannel = tmpByte;
@@ -94,7 +99,7 @@ void Scope::parseData(QByteArray data){
                     x = 0;
                     y = 0;
                     x=j*1.0/samplingFreq + minX;
-                    y=tmpShort*3.3/4095.0;
+                    y=(tmpShort*(float)(config->rangeMax-config->rangeMin)/(pow(2,config->ADCresolution)-1)+config->rangeMin)/1000;
                     points.append(QPointF(x,y));
                 }
                 maxX = x;

@@ -18,7 +18,6 @@ Device::Device(QObject *parent)
 //(keep it here bacause it is simpler and no need to use signals)
 void Device::deviceConnection(int buttonIndex){
     if(buttonIndex==1){
-        qDebug() << "scan clicked";
         emit ScanDevices();
         deviceWindow->deviceConnectButton->disableAll();
         deviceWindow->deviceSelection->addOption("Scanning...",0);

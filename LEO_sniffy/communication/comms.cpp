@@ -74,7 +74,11 @@ void Comms::parseMessage(QByteArray message){
     //CRC can be checked here but it is not implemented
     //just pass the data
 #ifdef DEBUG_COMMS
-    qDebug() << message;
+    if(message.length()>96){
+        qDebug() << message.left(64)<<"..."<<message.right(16);
+    }else{
+        qDebug() << message;
+    }
 #endif
     emit newData(message);
 }
