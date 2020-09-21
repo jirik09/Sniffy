@@ -35,9 +35,9 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
 
     hideHistoryChartArea();
 
-    historyData = new QVector<QPointF>;
+    historyData = new QVector<QVector<QPointF>>(historyTracesNum);
     createHistoryChart(historyTracesNum);
-    createHistoryList(historyTracesNum);
+    createHistoryList();
 
     setHistorySize(historySize);
 
@@ -198,7 +198,8 @@ void WidgetDisplay::clearHistoryChart(){
 }
 
 void WidgetDisplay::clearExpiredPointsFromChart(){
-    chart->clearPoint(0, 0);
+    for(int i = 0; i < historyData->length(); i++)
+        chart->clearPoint(i, 0);
 }
 
 void WidgetDisplay::clearExpiredPointsFromList(){
@@ -209,26 +210,32 @@ void WidgetDisplay::setHistorySize(int smplNumber){
     historySize = smplNumber;
 }
 
-void WidgetDisplay::appendNewHistorySample(double sample, float timeStep){
+void WidgetDisplay::appendNewHistorySample(QString prefix, double sample, QString affix, float timeStep){
     timeAxisMax += timeStep;
-    historyData->reserve(historyData->length());
-    historyData->append(QPointF(timeAxisMax, sample));
+    historyData[0][0].reserve(historyData[0].length());
+    historyData[0][0].append(QPointF(timeAxisMax, sample));
 
     if(sample > rememberMax){
         setHistoryMinMaxData(0, sample+(sample/10));
         rememberMax = sample;
     }
 
-    if(historyData->length() > historySize){
+    if(historyData[0][0].length() > historySize){
         timeAxisMin += timeStep;
-        historyData->removeFirst();
+        historyData[0][0].removeFirst();
         clearExpiredPointsFromChart();
         clearExpiredPointsFromList();
     }
 
     setHistoryMinMaxTime(timeAxisMin, timeAxisMax);
-    chart->appendToTrace(historyData, 0);
-    list->appendNumber(0, timeAxisMax, sample);
+    chart->appendToTrace(0, &historyData[0][0]);
+    list->appendNumber(timeAxisMax, prefix, sample, affix);
+}
+
+void WidgetDisplay::associateSample(int traceIndex, QString prefix, double sample, QString affix){
+    historyData[0][traceIndex].append(QPointF(timeAxisMax, sample));
+    chart->appendToTrace(traceIndex, &historyData[0][traceIndex]);
+    list->associateNumber(prefix, sample, affix);
 }
 
 void WidgetDisplay::setHistoryMinMaxTime(qreal minX, qreal maxX){
@@ -264,9 +271,10 @@ void WidgetDisplay::historyButtonClickedCallback(){
 }
 
 void WidgetDisplay::clearHistoryButtonClickedCallback(){
-    historyData->clear();
+    for (int i = 0; i < historyData->length(); i++)
+        historyData[0][i].clear();
     chart->clearAll();
-    list->clearAll();
+    list->clear();
     timeAxisMax = 0;
     timeAxisMin = 0;
 }
@@ -292,7 +300,7 @@ void WidgetDisplay::listChartSwitchClickedCallback(){
 void WidgetDisplay::showMenuOnRightClickCallback(const QPoint &mousePos){
     QMenu menu(tr("Context menu"), this);
     QAction action1("Some Action", this);
-//    connect(&action1, SIGNAL(triggered()), this, SLOT(slotFunction()));
+    //    connect(&action1, SIGNAL(triggered()), this, SLOT(slotFunction()));
     menu.addAction(&action1);
 
     menu.exec(mapToGlobal(mousePos));
@@ -312,8 +320,8 @@ void WidgetDisplay::createHistoryChart(int historyTracesNum){
     ui->horizontalWidget_graph_2->addWidget(chart);
 }
 
-void WidgetDisplay::createHistoryList(int historyTracesNum){
-    list = new WidgetList(ui->verticalWidget_history, historyTracesNum);
+void WidgetDisplay::createHistoryList(){
+    list = new WidgetList(ui->verticalWidget_history);
     list->hide();
     ui->horizontalWidget_graph_2->addWidget(list);
 }

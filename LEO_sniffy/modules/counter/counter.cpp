@@ -162,7 +162,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     if(movAvg->isBufferFull()){
         conf->hfState.hold = HFState::HoldOnState::OFF;
         cntWindow->hfSetColorRemainSec(QCOLOR_WHITE);
-        double avg = (isFrequency) ? movAvg->getAverage() : 1 / movAvg->getAverage();
+        avg = (isFrequency) ? movAvg->getAverage() : 1 / movAvg->getAverage();
         if (conf->hfState.error == HFState::ErrorType::AVERAGE){
             qerr = (isFrequency) ? qerr / movAvg->getBufferSize() : 1 / (1 / avg - movAvg->getBufferSize()) - avg;
             avgQerr = strQerr = formatErrNumber(display, qerr);
@@ -184,8 +184,12 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     display->updateProgressBar(val);
     conf->hfState.quantState = HFState::QuantitySwitched::NO;
 
-    /* History section - create a new object or just a method.. */
-    cntWindow->appendNewHistorySample(display, val, (float)conf->hfState.gateTime/1000);
+    /* History section */
+    QString pm(0x00B1);
+    cntWindow->appendNewHistorySample(display, "", val, " Hz", (float)conf->hfState.gateTime/(float)1000);
+    cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr, " Hz");
+    cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr, " Hz");
+    cntWindow->associateToHistorySample(display, 3, ", avg = ", avg);
 }
 
 void Counter::hfReloadState(){
@@ -278,6 +282,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
     streamBuffLeng >> val1 >> val2 >> qerr >> terr;
 
     WidgetDisplay *display = (channel == "IC1D") ? cntWindow->displayLFCh1 : cntWindow->displayLFCh2;
+    QString pm(0x00B1);
 
     if(mode == "FPME"){
         strVal = formatNumber(display, val1, qerr+terr);
@@ -296,6 +301,11 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
             cntWindow->showPMErrorSigns(display, true);
             cntWindow->displayFlagHoldOn(display, false);
             display->updateProgressBar(val1);
+
+            /* History section */
+            cntWindow->appendNewHistorySample(display, "", val1, " Hz");
+            cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr);
+            cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr);
         }
     }else if (mode == "DUTY") {
         strVal = display->formatNumber(val1, 'f', 3);
@@ -303,6 +313,11 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         cntWindow->showPMErrorSigns(display, true);
         cntWindow->displayFlagHoldOn(display, false);
         displayValues(display, strVal, strVal2, "", "");
+
+        /* History section */
+        cntWindow->appendNewHistorySample(display, "PW ", val1, " Sec");
+        cntWindow->associateToHistorySample(display, 1, ", DC ", val2, " \%");
+        //cntWindow->associateToHistorySample(display, 2, " ..", 0, "");
     }
 }
 
@@ -417,11 +432,14 @@ void Counter::parseRatioCounter(QByteArray data){
         display->displayString(strVal);
         double error = 1 / (double)conf->ratState.sampleCount;
         strVal = display->formatNumber(error, 'g', 6);
-        cntWindow->displayRat->displayTerrString(strVal);
+        display->displayTerrString(strVal);
 
-        cntWindow->displayFlagHoldOn(cntWindow->displayRat, false);
-        cntWindow->showPMErrorSigns(cntWindow->displayRat, true);
-        cntWindow->displayRat->drawIndicationFlag(LABELNUM_INDIC, "blue");
+        cntWindow->displayFlagHoldOn(display, false);
+        cntWindow->showPMErrorSigns(display, true);
+        display->drawIndicationFlag(LABELNUM_INDIC, "blue");
+
+        /* History section */
+        cntWindow->appendNewHistorySample(display, "Ratio: ", val, "");
     }
 }
 
@@ -462,6 +480,12 @@ void Counter::parseIntervalsCounter(QByteArray data){
 
         cntWindow->showPMErrorSigns(display, true);
         cntWindow->displayFlagHoldOn(display, false);
+
+        /* History section */
+        QString pm(0x00B1);
+        cntWindow->appendNewHistorySample(display, "Time interval: ", val, " Sec");
+        cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr);
+        cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr);
     }
 }
 

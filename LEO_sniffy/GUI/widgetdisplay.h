@@ -83,7 +83,8 @@ public:
 
     /* History area */
     void setHistorySize(int smplNumber);
-    void appendNewHistorySample(double sample, float timeStep);
+    void appendNewHistorySample(QString prefix, double sample, QString affix, float timeStep = 1);
+    void associateSample(int traceIndex, QString prefix, double sample, QString affix);
     void updateHistoryData(QVector<QPointF> *points, int index);
 
     widgetChart *chart;
@@ -102,7 +103,7 @@ private:
     QLocale loc;
 
     QChartView *chartView;
-    QVector<QPointF> *historyData;
+    QVector<QVector<QPointF>> *historyData;
     int historySize;
     float rememberMax = 0;
     qreal timeAxisMax = 0;
@@ -118,7 +119,7 @@ private:
 
     void hideHistoryChartArea();
     void createHistoryChart(int historyTracesNum);
-    void createHistoryList(int historyTracesNum);
+    void createHistoryList();
     void clearHistoryChart();
     void clearHistoryList();
     void clearExpiredPointsFromChart();

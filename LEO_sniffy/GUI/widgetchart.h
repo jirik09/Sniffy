@@ -33,7 +33,7 @@ public:
     void clearPoints(int startIndex, int endIndex);
     void clearPoint(int traceIndex, int index);
     void updateTrace(QVector<QPointF> *points, int index);
-    void appendToTrace(QVector<QPointF> *points, int index);
+    void appendToTrace(int index, QVector<QPointF> *points);
     void updateAxis();
     void setMaxX(float max);
     void setDataMinMax(qreal minX, qreal maxX);

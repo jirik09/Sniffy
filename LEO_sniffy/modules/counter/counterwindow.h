@@ -60,7 +60,8 @@ public:
 
     void hfSetColorRemainSec(QColor color);
 
-    void appendNewHistorySample(WidgetDisplay *display, double sample, float timeStep);
+    void appendNewHistorySample(WidgetDisplay *display, QString prefix, float sample, QString affix = "", float timeStep = 1);
+    void associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix, float sample, QString affix = "");
 
 private:
     Ui::CounterWindow *ui;

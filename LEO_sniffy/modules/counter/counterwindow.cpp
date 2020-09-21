@@ -77,7 +77,7 @@ void CounterWindow::createAllDisplays(void){
 
 WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
     QString styleSheet = IMAGE_UNITS_HZ;
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 1, HISTORY_SIZE, this);
+    WidgetDisplay *display  = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 4, HISTORY_SIZE, this);
     styleSheet = IMAGE_SIGN_AVG;
     display->setAvgStyle(styleSheet);
     configureErrorStyles(display);
@@ -86,7 +86,7 @@ WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
 
 WidgetDisplay *CounterWindow::createLowFreqDisplays(void){
     QString styleSheet = IMAGE_UNITS_HZ;
-    WidgetDisplay *display = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 1, HISTORY_SIZE, this);
+    WidgetDisplay *display = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
     return display;
@@ -106,7 +106,7 @@ WidgetDisplay *CounterWindow::createRatioDisplay(void){
 
 WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
     QString styleSheet = IMAGE_UNITS_SEC;
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_INTERVAL, styleSheet, false, 1, HISTORY_SIZE, this);
+    WidgetDisplay *display  = new WidgetDisplay(LITERAL_INTERVAL, styleSheet, false, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
     display->showQerrTerrStyle(false);
@@ -254,8 +254,12 @@ void CounterWindow::msleep(int msec){
     loop.exec();
 }
 
-void CounterWindow::appendNewHistorySample(WidgetDisplay *display, double sample, float timeStep){
-    display->appendNewHistorySample(sample, timeStep);
+void CounterWindow::appendNewHistorySample(WidgetDisplay *display, QString prefix, float sample, QString affix, float timeStep){
+    display->appendNewHistorySample(prefix, sample, affix, timeStep);
+}
+
+void CounterWindow::associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix, float sample, QString affix){
+    display->associateSample(traceIndex, prefix, sample, affix);
 }
 
 /************************************** HIGH FREQ FUNCTIONS ****************************************/

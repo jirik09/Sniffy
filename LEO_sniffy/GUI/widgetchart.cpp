@@ -57,13 +57,13 @@ void widgetChart::clearAll(){
 }
 
 void widgetChart::clearPoints(int startIndex, int endIndex){
-    for (int i = startIndex; i <= endIndex; i++) {
+    for (int i = startIndex; i <= endIndex; i++)
         seriesList[i]->clear();
-    }
 }
 
 void widgetChart::clearPoint(int traceIndex, int index){
-    seriesList[traceIndex]->remove(index);
+    if(seriesList[traceIndex]->count() != 0)
+        seriesList[traceIndex]->remove(index);
 }
 
 void widgetChart::updateTrace(QVector<QPointF> *points, int index){
@@ -71,7 +71,7 @@ void widgetChart::updateTrace(QVector<QPointF> *points, int index){
     seriesList[index]->replace(seriesData);
 }
 
-void widgetChart::appendToTrace(QVector<QPointF> *points, int index){    
+void widgetChart::appendToTrace(int index, QVector<QPointF> *points){
     seriesList[index]->append(points->at(points->length()-1));
 }
 
