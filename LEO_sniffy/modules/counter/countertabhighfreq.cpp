@@ -19,7 +19,7 @@ CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent
     destination->addWidget(buttonsErrorSwitch);
 
     dialAveraging = new WidgetDialRange(parent ,"Averaging");
-    dialAveraging->setRange(2, AVERAGE_RANGE, "Smpls", 1, 100, 2, false);
+    dialAveraging->setRange(2, AVERAGE_RANGE, "Smpls", 1, 1, 2, false);
     dialAveraging->hideUnitSelection();
     destination->addWidget(dialAveraging);
 

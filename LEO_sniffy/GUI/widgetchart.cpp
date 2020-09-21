@@ -50,9 +50,8 @@ widgetChart::~widgetChart()
 }
 
 void widgetChart::clearAll(){
-    for (int i = 0; i < maxTraces; i++) {
+    for (int i = 0; i < maxTraces; i++)
         seriesList[i]->clear();
-    }
     if(markers == ENABLED)
         markersHorizontal->clear();
 }

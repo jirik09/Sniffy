@@ -259,7 +259,7 @@ void Counter::hfSwitchErrorAvgCallback(int index){
 }
 
 void Counter::hfDialAvgChangedCallback(float val){
-    movAvg->setBufferSize(qFloor(val));
+    movAvg->setBufferSize(val);
     QString seconds = hfFormatRemainSec(movAvg->getSampleCountToFillBuff(), 0);
     cntWindow->displayHF->displayAvgString(seconds);
     hfDisplayErrors();
@@ -392,12 +392,12 @@ void Counter::lfSwitchDutyCycleCallback(int index){
 }
 
 void Counter::lfDialSampleCountCh1ChangedCallback(float val){
-    val = conf->lfState.chan1.sampleCount = qFloor(val);
+    conf->lfState.chan1.sampleCount = val;
     write(cmd->LF_CH1_SAMPLE_COUNT, val);
 }
 
 void Counter::lfDialSampleCountCh2ChangedCallback(float val){
-    val = conf->lfState.chan2.sampleCount = qFloor(val);
+    conf->lfState.chan2.sampleCount = val;
     write(cmd->LF_CH2_SAMPLE_COUNT, val);
 }
 
@@ -431,7 +431,7 @@ void Counter::ratReloadState(){
 
 void Counter::ratDialSampleCountChangedCallback(float val){
     cntWindow->clearDisplay(cntWindow->displayRat, true);
-    conf->ratState.sampleCount = val = qFloor(val);
+    conf->ratState.sampleCount = val;
     write(cmd->RAT_CH3_SAMPLE_COUNT, val);
 }
 
@@ -506,7 +506,7 @@ void Counter::intEventBChangedCallback(int index){
 }
 
 void Counter::intDialTimeoutChangedCallback(float val){
-    val = conf->intState.timeout = qFloor(val);
+    conf->intState.timeout = val;
     write(cmd->INT_TIMEOUT_SEC, val);
 }
 
