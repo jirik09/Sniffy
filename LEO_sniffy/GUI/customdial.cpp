@@ -15,17 +15,17 @@ Extends standard dial and just override the paint function
 CustomDial::CustomDial(QWidget* parent,
                        double knobRadius,
                        double knobMargin)
-: QDial(parent),
-  knobRadius_(knobRadius),
-  knobMargin_(knobMargin)
+    : QDial(parent),
+      knobRadius_(knobRadius),
+      knobMargin_(knobMargin)
 {
     // Default range
     QDial::setRange(0,100);
     QDial::setPageStep(5);
     QDial::setSingleStep(2);
- //   int size = parent->size().height();
-   // QDial::setMinimumSize(size,size);
-  //  QDial::setMaximumSize(size,size);
+    //   int size = parent->size().height();
+    // QDial::setMinimumSize(size,size);
+    //  QDial::setMaximumSize(size,size);
 }
 
 void CustomDial::setKnobRadius(double radius)
@@ -46,6 +46,11 @@ void CustomDial::setKnobMargin(double margin)
 double CustomDial::getKnobMargin() const
 {
     return knobMargin_;
+}
+
+void CustomDial::drawMarker(bool draw)
+{
+    drawMark = draw;
 }
 
 void CustomDial::mouseMoveEvent(QMouseEvent *me) {
@@ -87,10 +92,9 @@ void CustomDial::mouseReleaseEvent(QMouseEvent *me){
     QDial::update();
 }
 
-
 void CustomDial::paintEvent(QPaintEvent*)
 {
-    static const int margin = 10;
+    static const int margin = 7;
 
     QPainter painter(this);
 
@@ -110,7 +114,7 @@ void CustomDial::paintEvent(QPaintEvent*)
     painter.setPen(QPen(Qt::NoPen));
 
     // Draw first circle
-  //  painter.drawEllipse(0, 0, QDial::height(), QDial::height());
+    //  painter.drawEllipse(0, 0, QDial::height(), QDial::height());
 
     // Reset color to pointColor from stylesheet
     painter.setBrush(QBrush(pointColor));
@@ -123,24 +127,32 @@ void CustomDial::paintEvent(QPaintEvent*)
     int diffH = (QDial::width()>QDial::height())?QDial::width()-QDial::height():0;
     int diffV = (QDial::width()<QDial::height())?QDial::height()-QDial::width():0;
 
-
     const QRectF rect(marginHalf+diffH/2,marginHalf+diffV/2,size-margin,size-margin);
 
+    Qt::BrushStyle bs;
+
+    if(!drawMark)
+        bs = (Qt::BrushStyle)2;
+    else
+        bs = (Qt::BrushStyle)5;
+
     //draw background arc
-    painter.setPen(QPen(QBrush(QColor(48,48,48)),5));
+    painter.setPen(QPen(QBrush(QColor(48,48,48)),bs));
     painter.drawArc(rect,0,360*16);
 
     //draw actual value
-    painter.setPen(QPen(QBrush(pointColor),5));
+    painter.setPen(QPen(QBrush(pointColor),bs));
     painter.drawArc(rect,225*16,-ratio*16*270-5*16);
 
-    //draw marker
-    painter.setPen(QPen(QBrush(QColor(214,214,214)),8));    
-    painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
-
-    //draw click pointer
-    if(mousePressX!=0){
-        painter.setPen(QPen(QBrush(QColor(128,128,128)),4));
-        painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
+    if(drawMark){
+        //draw marker
+        painter.setPen(QPen(QBrush(QColor(214,214,214)),8));
+        painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
+        //draw click pointer
+        if(mousePressX!=0){
+            painter.setPen(QPen(QBrush(QColor(128,128,128)),4));
+            painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
+        }
     }
 }
+

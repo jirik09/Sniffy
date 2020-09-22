@@ -26,6 +26,8 @@ public:
 
     double getKnobMargin() const;
 
+    void drawMarker(bool draw);
+
 private:
 
     void mouseMoveEvent(QMouseEvent *me) override;
@@ -41,6 +43,9 @@ private:
     double knobRadius_;
 
     double knobMargin_;
+
+    bool drawMark = true;
+
 };
 
 #endif // CUSTOMDIAL_H

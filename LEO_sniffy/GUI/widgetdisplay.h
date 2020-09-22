@@ -91,12 +91,6 @@ public:
     widgetChart *chart;
     WidgetList *list;
 
-private slots:
-    void historyButtonClickedCallback();
-    void clearHistoryButtonClickedCallback();
-    void listChartSwitchClickedCallback();
-    void showMenuOnRightClickCallback(const QPoint &mousePos);
-
 private:
     Ui::WidgetDisplay *ui;
     QList<QLabel*> labelList;
@@ -104,13 +98,12 @@ private:
     QLocale loc;
 
     QChartView *chartView;
-    //QVector<QVector<QPointF>> *historyData;
+    QVector<QVector<QPointF>> *historyData;
     int historySize;
     int actualHistorySize = 0;
     float rememberMax = 0;
     qreal timeAxisMax = 0;
-    qreal timeAxisMin = 0;
-
+    qreal timeAxisMin = 0;    
     int drawFlag = 0;
 
     const int SPLITTER_LINE = 5;
@@ -119,17 +112,37 @@ private:
          historyView = DISABLED,
          listView = DISABLED;
 
-    void configureCustomDial();
     void hideHistoryChartArea();
+
+    void configureCustomDial();
+    void configureDialContextMenu();
     void createHistoryChart(int historyTracesNum);
     void createHistoryList();
+
     void clearHistoryChart();
     void clearHistoryList();
+    void clearHistoryData();
     void clearExpiredPointsFromChart();
-    void clearExpiredPointsFromList();        
+    void clearExpiredPointsFromList();
+    void clearExpiredData();
+    void recalcHistorySizeAndSetDial(int histSize);
 
     void setHistoryMinMaxTime(qreal minX, qreal maxX);
-    void setHistoryMinMaxData(qreal minY, qreal maxY);
+    void setHistoryMinMaxData(qreal minY, qreal maxY);        
+
+private slots:
+    void historyButtonClickedCallback();
+    void clearHistoryButtonClickedCallback();
+    void listChartSwitchClickedCallback();
+    void dialHistoryValueChangedCallback(int val);
+    void chartShowMenuOnRightClickCallback(const QPoint &mousePos);
+    void dialShowMenuOnRightClickCallback(const QPoint &mousePos);
+
+    void changeHistorySizeTo100();
+    void changeHistorySizeTo300();
+    void changeHistorySizeTo500();
+    void changeHistorySizeTo700();
+    void changeHistorySizeTo1000();
 };
 
 #endif // WIDGETDISPLAY_H

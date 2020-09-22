@@ -6,9 +6,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     ui(new Ui::widgetChart),
     maxTraces(maxTraces)
 {
-    ui->setupUi(this);
-
-    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->setupUi(this);   
 
     chart = new QChart();
     chart->legend()->hide();
@@ -40,6 +38,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QChartView *chartView = new QChartView(chart);
     ui->horizontalLayout_chart->addWidget(chartView);
 
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(chartRightClickCallback(const QPoint &)));
 }
