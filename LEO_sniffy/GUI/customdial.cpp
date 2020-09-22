@@ -135,7 +135,7 @@ void CustomDial::paintEvent(QPaintEvent*)
     painter.drawArc(rect,225*16,-ratio*16*270-5*16);
 
     //draw marker
-    painter.setPen(QPen(QBrush(QColor(214,214,214)),8));
+    painter.setPen(QPen(QBrush(QColor(214,214,214)),8));    
     painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
 
     //draw click pointer

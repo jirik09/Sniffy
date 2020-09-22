@@ -258,6 +258,12 @@ void CounterWindow::appendNewHistorySample(WidgetDisplay *display, QString prefi
     display->appendNewHistorySample(prefix, sample, affix, timeStep);
 }
 
+/* Brief: Appends a sample to the selected trace and associates it
+ * to the list next to the one added by appendNewHistorySample()
+ * traceIndex: ...
+ * prefix, affix: Strings added in front of and behind the sample in the list
+ * sample: sample to append
+ */
 void CounterWindow::associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix, float sample, QString affix){
     display->associateSample(traceIndex, prefix, sample, affix);
 }

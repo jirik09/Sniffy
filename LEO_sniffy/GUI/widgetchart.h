@@ -57,6 +57,8 @@ public:
     void createHorizontalMarkes();
     void setHorizontalMarker(int channelIndex, qreal value);
 
+    int getTraceNum();
+
 private:
     Ui::widgetChart *ui;
     QList<QXYSeries *> seriesList;

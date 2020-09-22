@@ -36,13 +36,11 @@ void WidgetDialRange::setDialButtonsColor(QString &bckgndStyleSheet){
     ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
 }
 
-float WidgetDialRange::getDefaultRealValue() const
-{
+float WidgetDialRange::getDefaultRealValue() const{
     return defaultRealValue;
 }
 
-void WidgetDialRange::setRealValue(float value)
-{
+void WidgetDialRange::setRealValue(float value){
     realValue = value;
     updateControls(0);
 }
@@ -61,7 +59,6 @@ void WidgetDialRange::hideUnitSelection(void){
     ui->widget_4->close();
     this->setMinimumSize(200,70);
 }
-
 
 void WidgetDialRange::plusClicked(){
     float tmpValue = labelValue + buttonStep;

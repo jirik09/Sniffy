@@ -20,6 +20,7 @@
 #include "GUI/clickablelabel.h"
 #include "GUI/widgetchart.h"
 #include "GUI/widgetlist.h"
+#include "GUI/widgetdialrange.h"
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
@@ -103,8 +104,9 @@ private:
     QLocale loc;
 
     QChartView *chartView;
-    QVector<QVector<QPointF>> *historyData;
+    //QVector<QVector<QPointF>> *historyData;
     int historySize;
+    int actualHistorySize = 0;
     float rememberMax = 0;
     qreal timeAxisMax = 0;
     qreal timeAxisMin = 0;
@@ -117,13 +119,14 @@ private:
          historyView = DISABLED,
          listView = DISABLED;
 
+    void configureCustomDial();
     void hideHistoryChartArea();
     void createHistoryChart(int historyTracesNum);
     void createHistoryList();
     void clearHistoryChart();
     void clearHistoryList();
     void clearExpiredPointsFromChart();
-    void clearExpiredPointsFromList();
+    void clearExpiredPointsFromList();        
 
     void setHistoryMinMaxTime(qreal minX, qreal maxX);
     void setHistoryMinMaxData(qreal minY, qreal maxY);

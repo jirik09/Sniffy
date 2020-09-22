@@ -35,11 +35,13 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
 
     hideHistoryChartArea();
 
-    historyData = new QVector<QVector<QPointF>>(historyTracesNum);
+    //historyData = new QVector<QVector<QPointF>>(historyTracesNum);
     createHistoryChart(historyTracesNum);
     createHistoryList();
 
     setHistorySize(historySize);
+
+    configureCustomDial();
 
     connect(ui->pushButton_history, SIGNAL(clicked()),
             this, SLOT(historyButtonClickedCallback()));
@@ -198,7 +200,7 @@ void WidgetDisplay::clearHistoryChart(){
 }
 
 void WidgetDisplay::clearExpiredPointsFromChart(){
-    for(int i = 0; i < historyData->length(); i++)
+    for(int i = 0; i < /*historyData->length()*/chart->getTraceNum(); i++)
         chart->clearPoint(i, 0);
 }
 
@@ -211,30 +213,36 @@ void WidgetDisplay::setHistorySize(int smplNumber){
 }
 
 void WidgetDisplay::appendNewHistorySample(QString prefix, double sample, QString affix, float timeStep){
-    timeAxisMax += timeStep;
-    historyData[0][0].reserve(historyData[0].length());
-    historyData[0][0].append(QPointF(timeAxisMax, sample));
+    timeAxisMax += timeStep;    
+//    historyData[0][0].reserve(historyData[0].length());
+//    historyData[0][0].append(QPointF(timeAxisMax, sample));
+    actualHistorySize++;
 
     if(sample > rememberMax){
         setHistoryMinMaxData(0, sample+(sample/10));
         rememberMax = sample;
     }
 
-    if(historyData[0][0].length() > historySize){
+    if(/*historyData[0][0].length()*/ actualHistorySize > historySize){
         timeAxisMin += timeStep;
-        historyData[0][0].removeFirst();
+        //historyData[0][0].removeFirst();
+        actualHistorySize--;
         clearExpiredPointsFromChart();
         clearExpiredPointsFromList();
     }
 
     setHistoryMinMaxTime(timeAxisMin, timeAxisMax);
-    chart->appendToTrace(0, &historyData[0][0]);
-    list->appendNumber(timeAxisMax, prefix, sample, affix);
+    QVector<QPointF> vector;
+    vector.append(QPointF(timeAxisMax, sample));
+    chart->appendToTrace(0, &vector /*&historyData[0][0]*/);
+    list->appendNumber(timeAxisMax, prefix, sample, affix);    
 }
 
 void WidgetDisplay::associateSample(int traceIndex, QString prefix, double sample, QString affix){
-    historyData[0][traceIndex].append(QPointF(timeAxisMax, sample));
-    chart->appendToTrace(traceIndex, &historyData[0][traceIndex]);
+    //historyData[0][traceIndex].append(QPointF(timeAxisMax, sample));
+    QVector<QPointF> vector;
+    vector.append(QPointF(timeAxisMax, sample));
+    chart->appendToTrace(traceIndex, &vector/*&historyData[0][traceIndex]*/);
     list->associateNumber(prefix, sample, affix);
 }
 
@@ -271,10 +279,11 @@ void WidgetDisplay::historyButtonClickedCallback(){
 }
 
 void WidgetDisplay::clearHistoryButtonClickedCallback(){
-    for (int i = 0; i < historyData->length(); i++)
-        historyData[0][i].clear();
+//    for (int i = 0; i < historyData->length(); i++)
+//        historyData[0][i].clear();
     chart->clearAll();
     list->clear();
+    actualHistorySize = 0;
     timeAxisMax = 0;
     timeAxisMin = 0;
 }
@@ -304,6 +313,10 @@ void WidgetDisplay::showMenuOnRightClickCallback(const QPoint &mousePos){
     menu.addAction(&action1);
 
     menu.exec(mapToGlobal(mousePos));
+}
+
+void WidgetDisplay::configureCustomDial(){
+
 }
 
 void WidgetDisplay::createHistoryChart(int historyTracesNum){    

@@ -214,6 +214,10 @@ void widgetChart::setHorizontalMarker(int channelIndex, qreal value){
     markersHorizontal->replace(seriesData);
 }
 
+int widgetChart::getTraceNum(){
+    return maxTraces;
+}
+
 void widgetChart::chartRightClickCallback(const QPoint &mousePos){
     emit chartRightClicked(mousePos);
 }
