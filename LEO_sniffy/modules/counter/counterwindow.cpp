@@ -248,12 +248,6 @@ void CounterWindow::switchQuantity(int index, WidgetDisplay *display){
     display->setUnitsStyle(unitsStyleSheet);
 }
 
-void CounterWindow::msleep(int msec){
-    QEventLoop loop;
-    QTimer::singleShot(msec, &loop, &QEventLoop::quit);
-    loop.exec();
-}
-
 void CounterWindow::appendNewHistorySample(WidgetDisplay *display, QString prefix, float sample, QString affix, float timeStep){
     display->appendNewHistorySample(prefix, sample, affix, timeStep);
 }

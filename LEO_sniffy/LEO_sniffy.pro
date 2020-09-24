@@ -47,6 +47,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     math/movingaverage.cpp \
+    math/timing.cpp \
     modules/abstractmodule.cpp \
     modules/abstractspecification.cpp \
     modules/counter/counter.cpp \
@@ -103,6 +104,7 @@ HEADERS += \
     graphics/styles.h \
     mainwindow.h \
     math/movingaverage.h \
+    math/timing.h \
     modules/abstractspecification.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \

@@ -78,12 +78,14 @@ void CustomDial::mouseMoveEvent(QMouseEvent *me) {
 }
 
 void CustomDial::mousePressEvent(QMouseEvent *me) {
+    emit dialPressed(me);
     mousePressX = me->x();
     mousePressY = me->y();
     initialDialValue = QDial::value();
 }
 
 void CustomDial::mouseReleaseEvent(QMouseEvent *me){
+    emit dialReleased(me);
     if(initialDialValue==QDial::value()){
         QDial::mouseReleaseEvent(me);
     }

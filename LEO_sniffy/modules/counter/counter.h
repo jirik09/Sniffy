@@ -4,7 +4,6 @@
 #include <QDebug>
 #include <QPointF>
 #include <QtMath>
-#include <QEventLoop>
 
 #include "counterwindow.h"
 #include "communication/commands.h"

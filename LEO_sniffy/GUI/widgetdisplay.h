@@ -22,6 +22,8 @@
 #include "GUI/widgetlist.h"
 #include "GUI/widgetdialrange.h"
 
+#include "math/timing.h"
+
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
 
@@ -99,12 +101,13 @@ private:
 
     QChartView *chartView;
     QVector<QVector<QPointF>> *historyData;
-    int historySize;
+    int historySize = 100;
     int actualHistorySize = 0;
     float rememberMax = 0;
     qreal timeAxisMax = 0;
     qreal timeAxisMin = 0;    
     int drawFlag = 0;
+    QLabel *labelFloatHistNum;
 
     const int SPLITTER_LINE = 5;
 
@@ -115,6 +118,7 @@ private:
     void hideHistoryChartArea();
 
     void configureCustomDial();
+    void configureFloatingHistoryNumber();
     void configureDialContextMenu();
     void createHistoryChart(int historyTracesNum);
     void createHistoryList();
@@ -130,13 +134,15 @@ private:
     void setHistoryMinMaxTime(qreal minX, qreal maxX);
     void setHistoryMinMaxData(qreal minY, qreal maxY);        
 
-private slots:
+private slots:    
     void historyButtonClickedCallback();
     void clearHistoryButtonClickedCallback();
     void listChartSwitchClickedCallback();
     void dialHistoryValueChangedCallback(int val);
     void chartShowMenuOnRightClickCallback(const QPoint &mousePos);
     void dialShowMenuOnRightClickCallback(const QPoint &mousePos);
+    void dialHistoryShowFloatingLabelCallback(QMouseEvent *me);
+    void dialHistoryHideFloatingLabelCallback(QMouseEvent *me);
 
     void changeHistorySizeTo100();
     void changeHistorySizeTo300();

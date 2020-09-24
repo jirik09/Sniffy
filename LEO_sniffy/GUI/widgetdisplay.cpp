@@ -9,7 +9,6 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
     ui->setupUi(this);
 
     loc = QLocale(QLocale::English);
-    ui->dial->setContextMenuPolicy(Qt::CustomContextMenu);
 
     palette = ui->lcdNumber_avg->palette();
 
@@ -35,13 +34,13 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
     displayAvgString("");
 
     hideHistoryChartArea();
-
     historyData = new QVector<QVector<QPointF>>(historyTracesNum);
     createHistoryChart(historyTracesNum);
     createHistoryList();
     setHistorySize(historySize);
 
     configureCustomDial();
+    configureFloatingHistoryNumber();
 
     connect(ui->pushButton_history, SIGNAL(clicked()),
             this, SLOT(historyButtonClickedCallback()));
@@ -52,12 +51,16 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
 
     connect(chart, &widgetChart::chartRightClicked,
             this, &WidgetDisplay::chartShowMenuOnRightClickCallback);
+
     connect(ui->dial, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(dialShowMenuOnRightClickCallback(const QPoint &)));
     connect(ui->dial, SIGNAL(valueChanged(int)),
-            this,SLOT(dialHistoryValueChangedCallback(int)));
-//    connect(ui->dial, SIGNAL(mouseMoveEvent(int)),
-//            this,SLOT(dialHistoryValueChangedCallback(int)));
+            this, SLOT(dialHistoryValueChangedCallback(int)));
+
+    connect(ui->dial, &CustomDial::dialPressed,
+            this, &WidgetDisplay::dialHistoryShowFloatingLabelCallback);
+    connect(ui->dial, &CustomDial::dialReleased,
+            this, &WidgetDisplay::dialHistoryHideFloatingLabelCallback);
 }
 
 WidgetDisplay::~WidgetDisplay()
@@ -304,10 +307,21 @@ void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){
 /******************************* HISTORY *********************************/
 
 void WidgetDisplay::configureCustomDial(){
+    ui->dial->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->dial->drawMarker(false);
     ui->dial->setRange(100, 1000);
     ui->dial->setPageStep(100);
     ui->dial->setSingleStep(20);
+}
+
+void WidgetDisplay::configureFloatingHistoryNumber(){
+    ui->dial->setEnabled(true);
+    ui->dial->setToolTip(QString::number(historySize));
+    labelFloatHistNum = new QLabel(this);
+    labelFloatHistNum->setGeometry(ui->dial->x()+10, ui->dial->y()+64, 30, 20);
+    labelFloatHistNum->setStyleSheet(QString::fromUtf8("QLabel{background-color: rgb(48, 48, 48);}"));
+    labelFloatHistNum->hide();
+    labelFloatHistNum->setNum(100);
 }
 
 void WidgetDisplay::createHistoryChart(int historyTracesNum){
@@ -469,6 +483,15 @@ void WidgetDisplay::listChartSwitchClickedCallback(){
 
 void WidgetDisplay::dialHistoryValueChangedCallback(int val){
     recalcHistorySizeAndSetDial(historySize = val);
+    QString str = QString::number(val);
+    ui->dial->setToolTip(str);
+    labelFloatHistNum->setText(str);
+    if (Qt::WheelFocus){
+        labelFloatHistNum->show();
+        Timing *timer = new Timing();
+        timer->nonBlockSleep(450);
+        labelFloatHistNum->hide();
+    }
 }
 
 void WidgetDisplay::chartShowMenuOnRightClickCallback(const QPoint &mousePos){
@@ -501,6 +524,16 @@ void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){
     menu.addAction(&s1000);
 
     menu.exec(mapToGlobal(mousePos));
+}
+
+void WidgetDisplay::dialHistoryShowFloatingLabelCallback(QMouseEvent *me){
+    if (me->buttons() & Qt::LeftButton)
+        labelFloatHistNum->show();
+}
+
+void WidgetDisplay::dialHistoryHideFloatingLabelCallback(QMouseEvent *me){
+    Q_UNUSED(me);
+    labelFloatHistNum->hide();
 }
 
 void WidgetDisplay::changeHistorySizeTo100(){

@@ -46,6 +46,11 @@ private:
 
     bool drawMark = true;
 
+signals:
+
+    void dialPressed(QMouseEvent *me);
+    void dialReleased(QMouseEvent *me);
+
 };
 
 #endif // CUSTOMDIAL_H

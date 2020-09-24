@@ -192,6 +192,22 @@ background-color: rgb(38, 38, 38);
           <height>20</height>
          </size>
         </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTipDuration">
+         <number>-1</number>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QToolTip {
+color: rgb(214, 214, 214);
+background-color: rgb(48, 48, 48);
+border: 0px;
+}</string>
+        </property>
         <property name="minimum">
          <number>20</number>
         </property>
