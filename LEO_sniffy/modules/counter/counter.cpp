@@ -14,6 +14,8 @@ Counter::Counter(QObject *parent)
     movAvg = new MovingAverage(2, cntWindow->tabHighFreq);
 
     /* Common Counter Signals/Slots */
+    connect(this, &AbstractModule::moduleCreated, this, &Counter::showHoldButtonCallback);
+    connect(this, &AbstractModule::holdClicked, this, &Counter::holdCounter);
     connect(cntWindow->tabs, &widgetTab::tabBarClicked, this, &Counter::switchCounterModeCallback);
 
     /* High Frequency Counter Signals/Slots */
@@ -48,6 +50,18 @@ void Counter::startModule(){
 
 void Counter::stopModule(){
     stopCounting();
+}
+
+void Counter::showHoldButtonCallback(){
+    this->showModuleHoldButton();
+}
+
+void Counter::holdCounter(bool held){
+    if(held){
+        stopCounting();
+    }else {
+        startCounting();
+    }
 }
 
 void Counter::startCounting(){
@@ -317,7 +331,6 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         /* History section */
         cntWindow->appendNewHistorySample(display, "PW ", val1, " Sec");
         cntWindow->associateToHistorySample(display, 1, ", DC ", val2, " \%");
-        //cntWindow->associateToHistorySample(display, 2, " ..", 0, "");
     }
 }
 

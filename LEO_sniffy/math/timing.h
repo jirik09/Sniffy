@@ -10,7 +10,7 @@ class Timing
 public:
     Timing();
 
-    void nonBlockSleep(int msec);
+    void sleep(int msec);
 
 private:
 

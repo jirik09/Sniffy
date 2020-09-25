@@ -5,7 +5,7 @@ Timing::Timing()
 
 }
 
-void Timing::nonBlockSleep(int msec){
+void Timing::sleep(int msec){
     QEventLoop loop;
     QTimer::singleShot(msec, &loop, &QEventLoop::quit);
     loop.exec();

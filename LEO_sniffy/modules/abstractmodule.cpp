@@ -35,7 +35,8 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
 void AbstractModule::setDockWidgetWindow(ModuleDockWidget *dockWidget){
     dockWidgetWindow = dockWidget;
 
-    connect(dockWidgetWindow, &ModuleDockWidget::moduleWindowClosing,this, &AbstractModule::closeModule);
+    connect(dockWidgetWindow, &ModuleDockWidget::moduleWindowClosing, this, &AbstractModule::closeModule);
+    connect(dockWidgetWindow, &ModuleDockWidget::holdClicked, this, &AbstractModule::held);
 }
 
 void AbstractModule::setModuleControlWidget(WidgetControlModule *controlWidget){
@@ -43,8 +44,9 @@ void AbstractModule::setModuleControlWidget(WidgetControlModule *controlWidget){
     connect(moduleControlWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetControlClicked(ModuleStatus)));
 
     moduleControlWidget->setIcon(moduleIconURI);
+    dockWinCreated = true;
+    emit moduleCreated();
 }
-
 
 QByteArray AbstractModule::getCommandPrefix()
 {
@@ -93,8 +95,19 @@ QString AbstractModule::getModuleName()
     return moduleName;
 }
 
-void AbstractModule::setModuleName(QString value)
-{
+void AbstractModule::setModuleName(QString value){
     moduleName = value;
     moduleControlWidget->setName(moduleName);
 }
+
+/* This function must be called after dockWidget is created.
+   Connect signal moduleCreated() in the module... */
+void AbstractModule::showModuleHoldButton(){
+    if(dockWinCreated)
+        dockWidgetWindow->showHoldButton();
+}
+
+void AbstractModule::held(bool held){
+    emit holdClicked(held);
+}
+

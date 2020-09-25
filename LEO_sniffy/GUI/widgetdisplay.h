@@ -88,7 +88,7 @@ public:
     void setHistorySize(int smplNumber);
     void appendNewHistorySample(QString prefix, double sample, QString affix, float timeStep = 1);
     void associateSample(int traceIndex, QString prefix, double sample, QString affix);
-    void updateHistoryData(QVector<QPointF> *points, int index);
+    void updateHistoryData(QVector<QPointF> *points, int index);        
 
     widgetChart *chart;
     WidgetList *list;
@@ -113,9 +113,10 @@ private:
 
     enum { ENABLED, DISABLED }
          historyView = DISABLED,
-         listView = DISABLED;
+         listView = DISABLED,
+         control = ENABLED;
 
-    void hideHistoryChartArea();
+    void hideHistoryChartArea();    
 
     void configureCustomDial();
     void configureFloatingHistoryNumber();
@@ -149,6 +150,7 @@ private slots:
     void changeHistorySizeTo500();
     void changeHistorySizeTo700();
     void changeHistorySizeTo1000();
+
 };
 
 #endif // WIDGETDISPLAY_H

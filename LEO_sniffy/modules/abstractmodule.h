@@ -38,6 +38,8 @@ public:
     QString getModuleName();
     void setModuleName(QString value);
 
+    void showModuleHoldButton();
+
 protected:
     QString moduleName;
     QString moduleIconURI;
@@ -48,9 +50,16 @@ protected:
 private:
     ModuleDockWidget *dockWidgetWindow;
     WidgetControlModule *moduleControlWidget;
+    bool dockWinCreated = false;
 
 public slots:
     void widgetControlClicked(ModuleStatus status);
+    void held(bool held);
+
+signals:
+    void moduleCreated();
+    void holdClicked(bool held);
+
 };
 
 #endif // ABSTRACTMODULE_H

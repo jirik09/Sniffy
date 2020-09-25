@@ -13,8 +13,15 @@ enum class CounterMode
     INTERVAL = 3,
 };
 
+enum class State
+{
+    RUNNING = 0,
+    PAUSED = 1
+};
+
 struct HFState
 {
+    //enum class State { RUNNING = 0, PAUSED = 1 } state;
     enum class Quantity { FREQUENCY = 0, PERIOD = 1 } quantity;
     enum class QuantitySwitched { NO = 0, YES = 1 } quantState;
     enum class ErrorType { SIMPLE = 0, AVERAGE = 1 } error;
@@ -23,6 +30,7 @@ struct HFState
                           GATE_TIME_1S   = 1000, GATE_TIME_5S  = 5000,
                           GATE_TIME_10S  = 10000 } gateTime;
 
+
     int gateTimeIndexBackup;
 };
 
@@ -30,7 +38,8 @@ struct HFState
 
 struct LFState
 {
-    enum class ActiveChan { CHAN1 = 0, CHAN2 = 1 } activeChan;
+    //enum class State { RUNNING = 0, PAUSED = 1 } state;
+    enum class ActiveChan { CHAN1 = 0, CHAN2 = 1 } activeChan;    
 
     struct Channel
     {
@@ -45,6 +54,7 @@ struct LFState
 
 struct RatState
 {
+    //enum class State { RUNNING = 0, PAUSED = 1 } state;
     int sampleCount;
 };
 
@@ -64,6 +74,7 @@ public:
 
     CounterMode mode;
     CounterMode modePrevIndex;
+    State hfStateControl, lfStateControl, ratStateControl;
 
     HFState hfState;
     LFState lfState;

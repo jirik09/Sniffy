@@ -484,12 +484,13 @@ void WidgetDisplay::listChartSwitchClickedCallback(){
 void WidgetDisplay::dialHistoryValueChangedCallback(int val){
     recalcHistorySizeAndSetDial(historySize = val);
     QString str = QString::number(val);
-    ui->dial->setToolTip(str);
     labelFloatHistNum->setText(str);
+    ui->dial->setToolTip(str);
+
     if (Qt::WheelFocus){
         labelFloatHistNum->show();
         Timing *timer = new Timing();
-        timer->nonBlockSleep(450);
+        timer->sleep(450);
         labelFloatHistNum->hide();
     }
 }

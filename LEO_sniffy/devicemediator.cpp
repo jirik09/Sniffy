@@ -92,7 +92,7 @@ void DeviceMediator::parseData(QByteArray data){
 void DeviceMediator::ShowDeviceModule(){
     device->showModuleWindow();
     device->showModuleControl();
-    device->hideModuleStatus();
+    device->hideModuleStatus();    
 }
 
 bool DeviceMediator::getIsConnected() const

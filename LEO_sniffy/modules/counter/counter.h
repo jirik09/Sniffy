@@ -10,8 +10,8 @@
 #include "communication/comms.h"
 #include "math/movingaverage.h"
 
+//#include "../../GUI/moduledockwidget.h"
 #include "../../GUI/widgetcontrolmodule.h"
-#include "../../GUI/moduledockwidget.h"
 
 #include "../abstractmodule.h"
 
@@ -71,8 +71,6 @@ private:
     void ratReloadState();
 
     /* Intervals Counter */
-//    bool seqAB = false, eventA = false, eventB = false;
-
     void parseIntervalsCounter(QByteArray data);
     void intReloadState();
 
@@ -84,8 +82,11 @@ private slots:
     void startModule();
     void stopModule();
 
+    void showHoldButtonCallback();
+    void holdCounter(bool held);
+
     /* Common functions */
-    void switchCounterModeCallback(int actualLength);
+    void switchCounterModeCallback(int actualLength);    
 
     /* High Frequency Counter */
     void hfSwitchGateTimeCallback(int actualLength);
