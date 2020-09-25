@@ -58,9 +58,9 @@ void Counter::showHoldButtonCallback(){
 
 void Counter::holdCounter(bool held){
     if(held){
-        stopCounting();
+        comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
     }else {
-        startCounting();
+        comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
     }
 }
 

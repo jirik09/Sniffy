@@ -31,8 +31,10 @@ public:
     static const QByteArray COMMS;
     static const QByteArray SYSTEM;
 
-    static const QByteArray STOP;
     static const QByteArray START;
+    static const QByteArray STOP;
+    static const QByteArray PAUSE;
+    static const QByteArray UNPAUSE;
     static const QByteArray NEXT;
 
     static const QByteArray GET_REAL_SMP_FREQ;

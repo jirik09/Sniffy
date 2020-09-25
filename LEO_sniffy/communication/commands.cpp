@@ -31,6 +31,8 @@ const QByteArray Commands::SYSTEM = "SYST";
 
 const QByteArray Commands::STOP = "STOP";
 const QByteArray Commands::START = "STRT";
+const QByteArray Commands::PAUSE = "PAUS";
+const QByteArray Commands::UNPAUSE = "UPAU";
 const QByteArray Commands::NEXT = "NEXT";
 
 const QByteArray Commands::GET_REAL_SMP_FREQ = "FRQ?";
