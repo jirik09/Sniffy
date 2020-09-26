@@ -7,7 +7,7 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   // ********************* Insert buttons and labels into Scan Window  **************************
+   // ********************* Insert buttons and labels into Scan Window  **************************          
    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);//horizontal , vertical
    scrollAreaSpecification = new QScrollArea();
    scrollAreaSpecification->setWidgetResizable(true);
@@ -59,7 +59,8 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
    verticalLayoutSpecification->addItem(verticalSpacer);
 
    // *************************** end adding widgets to specification area *************************
-    hideSpecification();
+
+   hideSpecification();
 }
 
 DeviceWindow::~DeviceWindow()

@@ -30,7 +30,7 @@ public:
     void addOption (QString unitString,float mult);
     void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false);
     void setRealValue(float value);
-    void hideUnitSelection(void);
+    void hideUnitSelection(void);    
     void setDialColor(QString &styleSheet);
     void setDialButtonsColor(QString &bckgndStyleSheet);
     float getDefaultRealValue() const;

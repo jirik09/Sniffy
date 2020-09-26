@@ -10,7 +10,7 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     destination->addWidget(buttonsStart);
 
     dialTimeout = new WidgetDialRange(parent ,"Timeout");
-    dialTimeout->setRange(1, INTERVAL_TIMEOUT_MAX, "ilometr", 1, 1000, INTERVAL_TIMEOUT_DEFAULT, true);
+    dialTimeout->setRange(1, INTERVAL_TIMEOUT_MAX, "Sec", 1, 1, INTERVAL_TIMEOUT_DEFAULT, true);
     dialTimeout->hideUnitSelection();
     destination->addWidget(dialTimeout);
 

@@ -9,7 +9,6 @@
 #include <QtCharts/QXYSeries>
 #include <QtCharts/QSplineSeries>
 #include <QtCharts/QScatterSeries>
-#include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QLogValueAxis>
@@ -20,6 +19,9 @@
 #include "GUI/clickablelabel.h"
 #include "GUI/widgetchart.h"
 #include "GUI/widgetlist.h"
+#include "GUI/widgetdialrange.h"
+
+#include "math/timing.h"
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
@@ -33,8 +35,8 @@ class WidgetDisplay : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar,
-                           int historyTracesNum = 1, int historySize = 100,
+    explicit WidgetDisplay(QString name, QString firstLabelText, QString &unitsStyleSheet,
+                           bool showPrgrssBar, int historyTracesNum = 1, int historySize = 100,
                            QWidget *parent = nullptr);
     ~WidgetDisplay();
 
@@ -83,17 +85,12 @@ public:
 
     /* History area */
     void setHistorySize(int smplNumber);
-    void appendNewHistorySample(double sample, float timeStep);
-    void updateHistoryData(QVector<QPointF> *points, int index);
+    void appendNewHistorySample(QString prefix, double sample, QString affix, float timeStep = 1);
+    void associateSample(int traceIndex, QString prefix, double sample, QString affix);
+    void updateHistoryData(QVector<QPointF> *points, int index);        
 
     widgetChart *chart;
     WidgetList *list;
-
-private slots:
-    void historyButtonClickedCallback();
-    void clearHistoryButtonClickedCallback();
-    void listChartSwitchClickedCallback();
-    void showMenuOnRightClickCallback(const QPoint &mousePos);
 
 private:
     Ui::WidgetDisplay *ui;
@@ -101,31 +98,64 @@ private:
     QPalette palette;
     QLocale loc;
 
-    QChartView *chartView;
-    QVector<QPointF> *historyData;
-    int historySize;
+    QVector<QVector<QPointF>> *historyData;
+    int historySize = 100;
+    QString name;
+    int actualHistorySize = 0;
     float rememberMax = 0;
     qreal timeAxisMax = 0;
-    qreal timeAxisMin = 0;
-
+    qreal timeAxisMin = 0;    
     int drawFlag = 0;
+    QLabel *labelFloatHistNum;
 
     const int SPLITTER_LINE = 5;
 
     enum { ENABLED, DISABLED }
          historyView = DISABLED,
-         listView = DISABLED;
+         listView = DISABLED,
+         control = ENABLED;
 
-    void hideHistoryChartArea();
+    void hideHistoryChartArea();    
+
+    void configureCustomDial();
+    void configureFloatingHistoryNumber();
+    void configureDialContextMenu();
     void createHistoryChart(int historyTracesNum);
-    void createHistoryList(int historyTracesNum);
+    void createHistoryList();
+
     void clearHistoryChart();
     void clearHistoryList();
+    void clearHistoryData();
     void clearExpiredPointsFromChart();
     void clearExpiredPointsFromList();
+    void clearExpiredData();
+    void clearHistoryDataAndList();
+    void recalcHistorySizeAndSetDial(int histSize);
 
     void setHistoryMinMaxTime(qreal minX, qreal maxX);
     void setHistoryMinMaxData(qreal minY, qreal maxY);
+
+    void clearHistoryExceptChart();
+
+private slots:    
+    void historyButtonClickedCallback();
+    void clearHistoryButtonClickedCallback();
+    void listChartSwitchClickedCallback();
+    void saveListClickedCallback();
+    void dialHistoryValueChangedCallback(int val);
+    void chartShowMenuOnRightClickCallback(const QPoint &mousePos);
+    void dialShowMenuOnRightClickCallback(const QPoint &mousePos);
+
+    void chartSwitchToSpline();
+    void chartSwitchToLine();
+    void chartSwitchToScatter();
+
+    void changeHistorySizeTo100();
+    void changeHistorySizeTo300();
+    void changeHistorySizeTo500();
+    void changeHistorySizeTo700();
+    void changeHistorySizeTo1000();
+
 };
 
 #endif // WIDGETDISPLAY_H

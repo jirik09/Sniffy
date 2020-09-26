@@ -55,11 +55,11 @@ void CounterWindow::createAllDisplays(void){
     displayHF->setContentsMargins(5, 5, 5, 5);
     ui->verticalLayout_display->addWidget(displayHF);
 
-    displayLFCh1 = createLowFreqDisplays();
+    displayLFCh1 = createLowFreqDisplays("LowFreqCh1Counter");
     displayLFCh1->setContentsMargins(5, 5, 5, 5);
     ui->verticalLayout_display->addWidget(displayLFCh1);
 
-    displayLFCh2 = createLowFreqDisplays();
+    displayLFCh2 = createLowFreqDisplays("LowFreqCh2Counter");
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
     QString style = "QProgressBar {border: 1px solid #777;border-radius: 1px;background: rgb(38, 38, 38);}"
                     "QProgressBar::chunk {background-color: rgb(124, 124, 124);width: 20px;}";
@@ -77,16 +77,16 @@ void CounterWindow::createAllDisplays(void){
 
 WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
     QString styleSheet = IMAGE_UNITS_HZ;
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 1, HISTORY_SIZE, this);
+    WidgetDisplay *display  = new WidgetDisplay("HighFreqCounter", LITERAL_FREQUENCY, styleSheet, true, 4, HISTORY_SIZE, this);
     styleSheet = IMAGE_SIGN_AVG;
     display->setAvgStyle(styleSheet);
     configureErrorStyles(display);
     return display;
 }
 
-WidgetDisplay *CounterWindow::createLowFreqDisplays(void){
+WidgetDisplay *CounterWindow::createLowFreqDisplays(QString name){
     QString styleSheet = IMAGE_UNITS_HZ;
-    WidgetDisplay *display = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 1, HISTORY_SIZE, this);
+    WidgetDisplay *display = new WidgetDisplay(name, LITERAL_FREQUENCY, styleSheet, true, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
     return display;
@@ -94,7 +94,7 @@ WidgetDisplay *CounterWindow::createLowFreqDisplays(void){
 
 WidgetDisplay *CounterWindow::createRatioDisplay(void){
     QString styleSheet = "";
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_RATIO, styleSheet, false, 1, HISTORY_SIZE, this);
+    WidgetDisplay *display  = new WidgetDisplay("RatioCounter", LITERAL_RATIO, styleSheet, false, 1, HISTORY_SIZE, this);
     styleSheet = IMAGE_SIGN_ERR;
     display->setErrStyle(styleSheet);
     styleSheet = IMAGE_SIGN_PLSMNS;
@@ -106,7 +106,7 @@ WidgetDisplay *CounterWindow::createRatioDisplay(void){
 
 WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
     QString styleSheet = IMAGE_UNITS_SEC;
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_INTERVAL, styleSheet, false, 1, HISTORY_SIZE, this);
+    WidgetDisplay *display  = new WidgetDisplay("IntervalsCounter", LITERAL_INTERVAL, styleSheet, false, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
     display->showQerrTerrStyle(false);
@@ -248,14 +248,18 @@ void CounterWindow::switchQuantity(int index, WidgetDisplay *display){
     display->setUnitsStyle(unitsStyleSheet);
 }
 
-void CounterWindow::msleep(int msec){
-    QEventLoop loop;
-    QTimer::singleShot(msec, &loop, &QEventLoop::quit);
-    loop.exec();
+void CounterWindow::appendNewHistorySample(WidgetDisplay *display, QString prefix, float sample, QString affix, float timeStep){
+    display->appendNewHistorySample(prefix, sample, affix, timeStep);
 }
 
-void CounterWindow::appendNewHistorySample(WidgetDisplay *display, double sample, float timeStep){
-    display->appendNewHistorySample(sample, timeStep);
+/* Brief: Appends a sample to the selected trace and associates it
+ * to the list next to the one added by appendNewHistorySample()
+ * traceIndex: ...
+ * prefix, affix: Strings added in front of and behind the sample in the list
+ * sample: sample to append
+ */
+void CounterWindow::associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix, float sample, QString affix){
+    display->associateSample(traceIndex, prefix, sample, affix);
 }
 
 /************************************** HIGH FREQ FUNCTIONS ****************************************/

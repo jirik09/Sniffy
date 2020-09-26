@@ -1,7 +1,7 @@
 #include "widgetlist.h"
 #include "ui_widgetlist.h"
 
-WidgetList::WidgetList(QWidget *parent, int traceCount) :
+WidgetList::WidgetList(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WidgetList)
 {
@@ -10,10 +10,7 @@ WidgetList::WidgetList(QWidget *parent, int traceCount) :
     model = new QStringListModel();
     ui->listView->setModel(model);
     ui->listView->setStyleSheet("alternate-background-color: rgb(58, 58, 58);");
-
-    lists.resize(traceCount);
-    for(int i = 0; i < traceCount; i++)
-        model->setStringList(lists[i]);
+    model->setStringList(list);
 }
 
 WidgetList::~WidgetList()
@@ -21,36 +18,53 @@ WidgetList::~WidgetList()
     delete ui;
 }
 
-void WidgetList::appendNumber(int listIndex, float timeMark, float num){
-    lists[listIndex].prepend(QString::number(timeMark, 'f', 1) + "; " + QString::number(num));
-    model->setStringList(lists[listIndex]);
+void WidgetList::appendNumber(float timeMark, QString prefix, float num, QString affix){
+    list.prepend(QString::number(timeMark, 'f', 1) + ": " + prefix + QString::number(num) + affix);
+    model->setStringList(list);
 }
 
-void WidgetList::appendString(int listIndex, QString timeMark, QString str){
-    lists[listIndex].prepend(timeMark + "; " + str);
-    model->setStringList(lists[listIndex]);
+void WidgetList::appendString(QString timeMark, QString str, QString affix){
+    list.prepend(timeMark + ": " + str + affix);
+    model->setStringList(list);
+}
+
+void WidgetList::associateNumber(QString prefix, float num, QString affix){
+    QString newStr = list.first() + prefix + QString::number(num, 'g') + affix;
+    list.removeFirst();
+    list.prepend(newStr);
+    model->setStringList(list);
+}
+
+void WidgetList::appendAssociatedString(QString str){
+    QString newStr = list.first() + str;
+    list.removeFirst();
+    list.prepend(newStr);
+    model->setStringList(list);
 }
 
 void WidgetList::clearSample(int index){
-    for(int i = 0; i < lists.length(); i++){
-        lists[i].removeAt(index);
-        model->setStringList(lists[i]);
-    }
+    list.removeAt(index);
+    model->setStringList(list);
 }
 
 void WidgetList::clearLast(){
-    for(int i = 0; i < lists.length(); i++){
-        lists[i].removeLast();
-        model->removeRow(0);
-        model->setStringList(lists[i]);
-    }
+    list.removeLast();
+    model->removeRow(0);
+    model->setStringList(list);
 }
 
-void WidgetList::clearAll(){
-    //model->setStringList(QStringList{});
+void WidgetList::clear(){
     model->removeRows(0, model->rowCount());
-    for(int i = 0; i < lists.length(); i++){
-        lists[i].clear();
-        model->setStringList(lists[i]);
+    list.clear();
+    model->setStringList(list);
+}
+
+void WidgetList::saveList(QString name){
+    QFile log("log_" + name + ".txt");
+    if (log.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&log);
+        for(int i = 0; i < list.length(); i++){
+            out << list.at(i) + "\n";
+        }
     }
 }

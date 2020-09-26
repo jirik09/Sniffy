@@ -4,15 +4,14 @@
 #include <QDebug>
 #include <QPointF>
 #include <QtMath>
-#include <QEventLoop>
 
 #include "counterwindow.h"
 #include "communication/commands.h"
 #include "communication/comms.h"
 #include "math/movingaverage.h"
 
+//#include "../../GUI/moduledockwidget.h"
 #include "../../GUI/widgetcontrolmodule.h"
-#include "../../GUI/moduledockwidget.h"
 
 #include "../abstractmodule.h"
 
@@ -52,6 +51,7 @@ private:
     /* High Frequency Counter */
     MovingAverage *movAvg;
     QString strQerr, strTerr, avgQerr;
+    float avg;
 
     void parseHighFrequencyCounter(QByteArray data);
     void hfReloadState();
@@ -71,8 +71,6 @@ private:
     void ratReloadState();
 
     /* Intervals Counter */
-//    bool seqAB = false, eventA = false, eventB = false;
-
     void parseIntervalsCounter(QByteArray data);
     void intReloadState();
 
@@ -84,8 +82,11 @@ private slots:
     void startModule();
     void stopModule();
 
+    void showHoldButtonCallback();
+    void holdCounter(bool held);
+
     /* Common functions */
-    void switchCounterModeCallback(int actualLength);
+    void switchCounterModeCallback(int actualLength);    
 
     /* High Frequency Counter */
     void hfSwitchGateTimeCallback(int actualLength);

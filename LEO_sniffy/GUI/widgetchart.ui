@@ -19,6 +19,13 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QToolTip {
+color: rgb(214, 214, 214);
+background-color: rgb(48, 48, 48);
+border: 0px;
+}</string>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout_chart">
    <property name="spacing">
     <number>0</number>

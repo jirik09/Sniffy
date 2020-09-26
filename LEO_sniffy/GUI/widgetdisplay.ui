@@ -60,7 +60,7 @@ color: rgb(214, 214, 214)
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="horizontalWidget_menu" native="true">
+    <widget class="QWidget" name="verticalWidget_menu" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -72,7 +72,7 @@ color: rgb(214, 214, 214)
 background-color: rgb(38, 38, 38);
 }</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_menu">
       <property name="spacing">
        <number>8</number>
       </property>
@@ -175,6 +175,53 @@ background-color: rgb(38, 38, 38);
           <width>19</width>
           <height>19</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="CustomDial" name="dial">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="toolTipDuration">
+         <number>-1</number>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QToolTip {
+color: rgb(214, 214, 214);
+background-color: rgb(48, 48, 48);
+border: 0px;
+}</string>
+        </property>
+        <property name="minimum">
+         <number>20</number>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="singleStep">
+         <number>20</number>
+        </property>
+        <property name="pageStep">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>100</number>
         </property>
        </widget>
       </item>
@@ -1031,6 +1078,13 @@ QProgressBar::chunk {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomDial</class>
+   <extends>QDial</extends>
+   <header location="global">GUI/customdial.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

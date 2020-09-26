@@ -21,4 +21,6 @@
 #define PATH_IMG_EVENT_BA_FR    ":/graphics/graphics/cnt_ba_fr.png"
 #define PATH_IMG_EVENT_BA_FF    ":/graphics/graphics/cnt_ba_ff.png"
 
+#define CONTEXT_MENU_HOVER      QString::fromUtf8("QMenu::item{background-color: rgb(38, 38, 38);} QMenu::item:selected{background-color: rgb(71, 76, 94);}")
+
 #endif // STYLES_H

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QStringListModel>
+#include <QTextStream>
+#include <QFile>
 
 namespace Ui {
 class WidgetList;
@@ -13,19 +15,22 @@ class WidgetList : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetList(QWidget *parent = nullptr, int traceCount = 1);
+    explicit WidgetList(QWidget *parent = nullptr);
     ~WidgetList();
 
-    void appendNumber(int listIndex, float timeMark, float num);
-    void appendString(int listIndex, QString timeMark, QString str);
+    void appendNumber(float timeMark, QString prefix, float num, QString affix = "");
+    void appendString(QString timeMark, QString str, QString affix = "");
+    void associateNumber(QString prefix, float num, QString affix = "");
+    void appendAssociatedString(QString str);
     void clearSample(int index);
     void clearLast();
-    void clearAll();
+    void clear();
+    void saveList(QString name);
 
 private:
     Ui::WidgetList *ui;
     QStringListModel *model;
-    QVector<QStringList> lists;
+    QStringList list;
 };
 
 #endif // WIDGETLIST_H

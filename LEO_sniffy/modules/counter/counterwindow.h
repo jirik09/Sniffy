@@ -6,7 +6,6 @@
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QDebug>
-#include <QTimer>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgettab.h"
@@ -60,7 +59,8 @@ public:
 
     void hfSetColorRemainSec(QColor color);
 
-    void appendNewHistorySample(WidgetDisplay *display, double sample, float timeStep);
+    void appendNewHistorySample(WidgetDisplay *display, QString prefix, float sample, QString affix = "", float timeStep = 1);
+    void associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix, float sample, QString affix = "");
 
 private:
     Ui::CounterWindow *ui;
@@ -70,7 +70,7 @@ private:
     void createCounterTabs(void);
     void configureCounterTabs(void);
     void createAllDisplays(void);
-    WidgetDisplay* createLowFreqDisplays(void);
+    WidgetDisplay* createLowFreqDisplays(QString name);
     WidgetDisplay* createRatioDisplay(void);
     WidgetDisplay* createHighFreqDisplay(void);
     WidgetDisplay* createIntervalsDisplay(void);
