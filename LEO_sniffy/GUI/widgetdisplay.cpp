@@ -58,11 +58,6 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
             this, SLOT(dialShowMenuOnRightClickCallback(const QPoint &)));
     connect(ui->dial, SIGNAL(valueChanged(int)),
             this, SLOT(dialHistoryValueChangedCallback(int)));
-
-    connect(ui->dial, &CustomDial::dialPressed,
-            this, &WidgetDisplay::dialHistoryShowFloatingLabelCallback);
-    connect(ui->dial, &CustomDial::dialReleased,
-            this, &WidgetDisplay::dialHistoryHideFloatingLabelCallback);
 }
 
 WidgetDisplay::~WidgetDisplay()
@@ -435,14 +430,18 @@ void WidgetDisplay::recalcHistorySizeAndSetDial(int reqSize)
     }
 }
 
-/*************************************** Callbacks *****************************************/
-
-void WidgetDisplay::clearHistoryButtonClickedCallback(){
-    clearHistoryData();
-    clearHistoryChart();
+void WidgetDisplay::clearHistoryExceptChart(){
     clearHistoryList();
+    clearHistoryData();
     timeAxisMax = 0;
     timeAxisMin = 0;
+}
+
+/*************************************** Callbacks *****************************************/
+
+void WidgetDisplay::clearHistoryButtonClickedCallback(){    
+    clearHistoryChart();
+    clearHistoryExceptChart();
 }
 
 void WidgetDisplay::historyButtonClickedCallback(){
@@ -493,37 +492,62 @@ void WidgetDisplay::dialHistoryValueChangedCallback(int val){
     labelFloatHistNum->setText(str);
     ui->dial->setToolTip(str);
 
-    if (Qt::WheelFocus){
-        labelFloatHistNum->show();
-        Timing *timer = new Timing();
-        timer->sleep(450);
-        labelFloatHistNum->hide();
-    }
+    labelFloatHistNum->show();
+    Timing *timer = new Timing();
+    timer->sleep(450);
+    labelFloatHistNum->hide();
 }
 
 void WidgetDisplay::chartShowMenuOnRightClickCallback(const QPoint &mousePos){
     QMenu menu(tr("Context menu"), this);
-    QAction action1("Some Action", this);
-    //    connect(&action1, SIGNAL(triggered()), this, SLOT(slotFunction()));
-    menu.addAction(&action1);
+    menu.setStyleSheet(CONTEXT_MENU_HOVER);
+
+    QAction spline("Spline", this);
+    QAction line("Line", this);
+    QAction scatter("Scatter", this);
+
+    connect(&spline, SIGNAL(triggered()), this, SLOT(chartSwitchToSpline()));
+    connect(&line, SIGNAL(triggered()), this, SLOT(chartSwitchToLine()));
+    connect(&scatter, SIGNAL(triggered()), this, SLOT(chartSwitchToScatter()));
+
+    menu.addAction(&spline);
+    menu.addAction(&line);
+    menu.addAction(&scatter);
 
     menu.exec(mapToGlobal(mousePos));
 }
 
+void WidgetDisplay::chartSwitchToSpline(){
+    clearHistoryExceptChart();
+    chart->switchToSplineSeries();
+}
+
+void WidgetDisplay::chartSwitchToLine(){
+    clearHistoryExceptChart();
+    chart->switchToLineSeries();
+}
+
+void WidgetDisplay::chartSwitchToScatter(){
+    clearHistoryExceptChart();
+    chart->switchToScatterSeries();
+}
+
 void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){
     QMenu menu(tr("Context menu"), this);
-    menu.setStyleSheet(QString::fromUtf8("QMenu::item{background-color: rgb(38, 38, 38);}"
-                                         "QMenu::item:selected{background-color: rgb(71, 76, 94);}"));
+    menu.setStyleSheet(CONTEXT_MENU_HOVER);
+
     QAction s100("100", this);
     QAction s300("300", this);
     QAction s500("500", this);
     QAction s700("700", this);
-    QAction s1000("1000", this);    
+    QAction s1000("1000", this);
+
     connect(&s100, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo100()));
     connect(&s300, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo300()));
     connect(&s500, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo500()));
     connect(&s700, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo700()));
     connect(&s1000, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo1000()));
+
     menu.addAction(&s100);
     menu.addAction(&s300);
     menu.addAction(&s500);
@@ -531,16 +555,6 @@ void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){
     menu.addAction(&s1000);
 
     menu.exec(mapToGlobal(mousePos));
-}
-
-void WidgetDisplay::dialHistoryShowFloatingLabelCallback(QMouseEvent *me){
-    if (me->buttons() & Qt::LeftButton)
-        labelFloatHistNum->show();
-}
-
-void WidgetDisplay::dialHistoryHideFloatingLabelCallback(QMouseEvent *me){
-    Q_UNUSED(me);
-    labelFloatHistNum->hide();
 }
 
 void WidgetDisplay::changeHistorySizeTo100(){

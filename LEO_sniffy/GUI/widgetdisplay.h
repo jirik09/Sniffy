@@ -9,7 +9,6 @@
 #include <QtCharts/QXYSeries>
 #include <QtCharts/QSplineSeries>
 #include <QtCharts/QScatterSeries>
-#include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QLogValueAxis>
@@ -99,7 +98,6 @@ private:
     QPalette palette;
     QLocale loc;
 
-    QChartView *chartView;
     QVector<QVector<QPointF>> *historyData;
     int historySize = 100;
     QString name;
@@ -131,10 +129,13 @@ private:
     void clearExpiredPointsFromChart();
     void clearExpiredPointsFromList();
     void clearExpiredData();
+    void clearHistoryDataAndList();
     void recalcHistorySizeAndSetDial(int histSize);
 
     void setHistoryMinMaxTime(qreal minX, qreal maxX);
-    void setHistoryMinMaxData(qreal minY, qreal maxY);        
+    void setHistoryMinMaxData(qreal minY, qreal maxY);
+
+    void clearHistoryExceptChart();
 
 private slots:    
     void historyButtonClickedCallback();
@@ -144,8 +145,10 @@ private slots:
     void dialHistoryValueChangedCallback(int val);
     void chartShowMenuOnRightClickCallback(const QPoint &mousePos);
     void dialShowMenuOnRightClickCallback(const QPoint &mousePos);
-    void dialHistoryShowFloatingLabelCallback(QMouseEvent *me);
-    void dialHistoryHideFloatingLabelCallback(QMouseEvent *me);
+
+    void chartSwitchToSpline();
+    void chartSwitchToLine();
+    void chartSwitchToScatter();
 
     void changeHistorySizeTo100();
     void changeHistorySizeTo300();

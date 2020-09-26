@@ -6,12 +6,15 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     ui(new Ui::widgetChart),
     maxTraces(maxTraces)
 {
-    ui->setupUi(this);   
+    ui->setupUi(this);
 
     chart = new QChart();
     chart->legend()->hide();
 
     chart->setBackgroundBrush(QCOLOR_BLACK);
+    chart->setAcceptHoverEvents(true);
+    this->setMouseTracking(true);
+    chart->setToolTip("¯\\_(ツ)_/¯");
 
     QMargins *chrtMargin = new QMargins(0,5,0,0);
     chart->setMargins(*chrtMargin);
@@ -23,14 +26,9 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->addAxis(axisY, Qt::AlignLeft);
 
     for (int i = 0; i < maxTraces; i++) {
-        QSplineSeries *series = 0;
-        series = new QSplineSeries;
-        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
-        seriesList.append(series);
-        series->setUseOpenGL(true);
-        chart->addSeries(series);
-        series->attachAxis(axisX);
-        series->attachAxis(axisY);
+        QSplineSeries *series = new QSplineSeries;
+        //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
+        createSeries(series, i);
     }
 
     formatAxisLabelsForScope();
@@ -46,6 +44,67 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 widgetChart::~widgetChart()
 {
     delete ui;
+}
+
+void widgetChart::useOpenGL(bool use){    
+    //series->setUseOpenGL(use);
+}
+
+void widgetChart::wipeAllOut(){
+    seriesList.clear();
+    chart->removeAllSeries();
+
+    /* chart->removeAllSeries function not working till chart resized */
+    chart->resize(chart->size() + QSize(1, 1));
+    chart->resize(chart->size() - QSize(1, 1));
+
+    /* First change from QSplineSeries prevents the app from repainting
+       One must start moving with mouse.. */
+//    QPoint pos = QCursor::pos();
+//    cursor.setPos(pos.x()+2,pos.y()+2);
+}
+
+void widgetChart::switchToSplineSeries(){
+    wipeAllOut();
+    for (int i = 0; i < maxTraces; i++) {
+        QSplineSeries *series = new QSplineSeries;
+        //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
+        createSeries(series, i);
+    }
+}
+
+void widgetChart::switchToLineSeries(){
+    wipeAllOut();
+    for (int i = 0; i < maxTraces; i++) {
+        QLineSeries *series = new QLineSeries;
+        //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
+        createSeries(series, i);
+    }
+}
+
+void widgetChart::switchToScatterSeries(){
+    wipeAllOut();
+    for (int i = 0; i < maxTraces; i++) {
+        QScatterSeries *series = new QScatterSeries;
+        //connect(series, &QScatterSeries::hovered, this, &widgetChart::hovered);
+        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
+        series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        series->setMarkerSize(3.8);
+        seriesList.append(series);
+        chart->addSeries(series);
+        series->attachAxis(axisX);
+        series->attachAxis(axisY);
+        series->setUseOpenGL(true);
+    }
+}
+
+void widgetChart::createSeries(QLineSeries *series, int traceIndex){
+    series->setPen(QPen(QBrush(QColor(colors[traceIndex%5])), 2.0));
+    seriesList.append(series);
+    chart->addSeries(series);
+    series->attachAxis(axisX);
+    series->attachAxis(axisY);
+    series->setUseOpenGL(true);
 }
 
 void widgetChart::clearAll(){
@@ -219,4 +278,9 @@ int widgetChart::getTraceNum(){
 
 void widgetChart::chartRightClickCallback(const QPoint &mousePos){
     emit chartRightClicked(mousePos);
+}
+
+void widgetChart::hovered(const QPointF &point){
+    QString coords = QString("X: %1\nY: %2").arg(point.x()).arg(point.y());
+    chart->setToolTip(coords);
 }

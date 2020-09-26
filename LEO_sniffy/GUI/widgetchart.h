@@ -13,6 +13,7 @@
 #include <QMenu>
 #include <QtMath>
 #include <QDateTimeAxis>
+#include <QCursor>
 
 #include "../graphics/colors.h"
 
@@ -29,6 +30,10 @@ class widgetChart : public QWidget
 public:
     explicit widgetChart(QWidget *parent = nullptr, int maxTraces = 1);
     ~widgetChart();
+    void useOpenGL(bool use);
+    void switchToSplineSeries();
+    void switchToLineSeries();
+    void switchToScatterSeries();
     void clearAll();
     void clearPoints(int startIndex, int endIndex);
     void clearPoint(int traceIndex, int index);
@@ -57,10 +62,11 @@ public:
     void createHorizontalMarkes();
     void setHorizontalMarker(int channelIndex, qreal value);
 
-    int getTraceNum();
+    int getTraceNum();       
 
 private:
     Ui::widgetChart *ui;
+    QCursor cursor;
     QList<QXYSeries *> seriesList;
     QScatterSeries *markersHorizontal;
     enum markers {ENABLED, DISABLED} markers = DISABLED;
@@ -72,7 +78,7 @@ private:
     qreal invZoom = 1;
     qreal shift = 0.5;
 
-    QChart *chart;
+    QChart *chart;       
 
     QValueAxis *axisX;   // QAbstractAxis
     QValueAxis *axisY;
@@ -81,12 +87,15 @@ private:
     QColor colors[4] = {QCOLOR_ORANGE, QCOLOR_BLUE,
                         QCOLOR_GREEN, QCOLOR_PURPLE};
 
+    void createSeries(QLineSeries *series, int traceIndex);
+    void wipeAllOut();
+
 signals:
     void chartRightClicked(const QPoint &pos);
 
 private slots:
     void chartRightClickCallback(const QPoint &mousePos);
-
+    void hovered(const QPointF &point);
 };
 
 #endif // WIDGETCHART_H

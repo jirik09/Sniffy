@@ -139,7 +139,7 @@ void CustomDial::paintEvent(QPaintEvent*)
         painter.setPen(QPen(QBrush(QColor(48,48,48)),bs));
     }else {
         bs = (Qt::BrushStyle)2;
-        painter.setPen(QPen(QBrush(QColor(58,58,58)),bs));
+        painter.setPen(QPen(QBrush(QColor(68,68,68)),bs));
     }
     painter.drawArc(rect,0,360*16);
 
