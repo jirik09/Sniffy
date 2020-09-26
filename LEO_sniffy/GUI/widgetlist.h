@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QStringListModel>
+#include <QTextStream>
+#include <QFile>
 
 namespace Ui {
 class WidgetList;
@@ -23,6 +25,7 @@ public:
     void clearSample(int index);
     void clearLast();
     void clear();
+    void saveList(QString name);
 
 private:
     Ui::WidgetList *ui;

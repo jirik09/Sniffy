@@ -58,3 +58,13 @@ void WidgetList::clear(){
     list.clear();
     model->setStringList(list);
 }
+
+void WidgetList::saveList(QString name){
+    QFile log("log_" + name + ".txt");
+    if (log.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&log);
+        for(int i = 0; i < list.length(); i++){
+            out << list.at(i) + "\n";
+        }
+    }
+}

@@ -70,7 +70,7 @@ private:
     void createCounterTabs(void);
     void configureCounterTabs(void);
     void createAllDisplays(void);
-    WidgetDisplay* createLowFreqDisplays(void);
+    WidgetDisplay* createLowFreqDisplays(QString name);
     WidgetDisplay* createRatioDisplay(void);
     WidgetDisplay* createHighFreqDisplay(void);
     WidgetDisplay* createIntervalsDisplay(void);

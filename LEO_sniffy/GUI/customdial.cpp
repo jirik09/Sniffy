@@ -133,13 +133,14 @@ void CustomDial::paintEvent(QPaintEvent*)
 
     Qt::BrushStyle bs;
 
-    if(!drawMark)
-        bs = (Qt::BrushStyle)2;
-    else
-        bs = (Qt::BrushStyle)5;
-
     //draw background arc
-    painter.setPen(QPen(QBrush(QColor(48,48,48)),bs));
+    if(drawMark){
+        bs = (Qt::BrushStyle)5;
+        painter.setPen(QPen(QBrush(QColor(48,48,48)),bs));
+    }else {
+        bs = (Qt::BrushStyle)2;
+        painter.setPen(QPen(QBrush(QColor(58,58,58)),bs));
+    }
     painter.drawArc(rect,0,360*16);
 
     //draw actual value

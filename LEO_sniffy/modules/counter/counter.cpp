@@ -57,11 +57,10 @@ void Counter::showHoldButtonCallback(){
 }
 
 void Counter::holdCounter(bool held){
-    if(held){
+    if(held)
         comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
-    }else {
+    else
         comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
-    }
 }
 
 void Counter::startCounting(){
@@ -117,11 +116,10 @@ QString Counter::formatNumber(WidgetDisplay *display, double valToFormat, double
 }
 
 QString Counter::formatErrNumber(WidgetDisplay *display, double errToFormat){
-    if(errToFormat != 0){
+    if(errToFormat != 0)
         return display->formatNumber(errToFormat, 'g', 4);
-    }else {
+    else
         return "0.0000";
-    }
 }
 
 void Counter::displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr){

@@ -36,8 +36,8 @@ class WidgetDisplay : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar,
-                           int historyTracesNum = 1, int historySize = 100,
+    explicit WidgetDisplay(QString name, QString firstLabelText, QString &unitsStyleSheet,
+                           bool showPrgrssBar, int historyTracesNum = 1, int historySize = 100,
                            QWidget *parent = nullptr);
     ~WidgetDisplay();
 
@@ -102,6 +102,7 @@ private:
     QChartView *chartView;
     QVector<QVector<QPointF>> *historyData;
     int historySize = 100;
+    QString name;
     int actualHistorySize = 0;
     float rememberMax = 0;
     qreal timeAxisMax = 0;
@@ -139,6 +140,7 @@ private slots:
     void historyButtonClickedCallback();
     void clearHistoryButtonClickedCallback();
     void listChartSwitchClickedCallback();
+    void saveListClickedCallback();
     void dialHistoryValueChangedCallback(int val);
     void chartShowMenuOnRightClickCallback(const QPoint &mousePos);
     void dialShowMenuOnRightClickCallback(const QPoint &mousePos);

@@ -1,10 +1,10 @@
 #include "widgetdisplay.h"
 #include "ui_widgetdisplay.h"
 
-WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar,
-                             int historyTracesNum, int historySize,
+WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unitsStyleSheet,
+                             bool showPrgrssBar, int historyTracesNum, int historySize,
                              QWidget *parent) :
-    QWidget(parent), ui(new Ui::WidgetDisplay), historySize(historySize)
+    QWidget(parent), ui(new Ui::WidgetDisplay), historySize(historySize), name(name)
 {
     ui->setupUi(this);
 
@@ -48,6 +48,8 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
             this, SLOT(clearHistoryButtonClickedCallback()));
     connect(ui->pushButton_list, SIGNAL(clicked()),
             this, SLOT(listChartSwitchClickedCallback()));
+    connect(ui->pushButton_save, SIGNAL(clicked()),
+            this, SLOT(saveListClickedCallback()));
 
     connect(chart, &widgetChart::chartRightClicked,
             this, &WidgetDisplay::chartShowMenuOnRightClickCallback);
@@ -481,6 +483,10 @@ void WidgetDisplay::listChartSwitchClickedCallback(){
     ui->pushButton_list->setStyleSheet(style);
 }
 
+void WidgetDisplay::saveListClickedCallback(){
+    list->saveList(name);
+}
+
 void WidgetDisplay::dialHistoryValueChangedCallback(int val){
     recalcHistorySizeAndSetDial(historySize = val);
     QString str = QString::number(val);
@@ -506,13 +512,13 @@ void WidgetDisplay::chartShowMenuOnRightClickCallback(const QPoint &mousePos){
 
 void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){
     QMenu menu(tr("Context menu"), this);
-    menu.setStyleSheet(QString::fromUtf8("QMenu{background-color: rgb(38, 38, 38);}"
-                                         "QMenu:hover{background-color: rgb(71, 76, 94);}"));
+    menu.setStyleSheet(QString::fromUtf8("QMenu::item{background-color: rgb(38, 38, 38);}"
+                                         "QMenu::item:selected{background-color: rgb(71, 76, 94);}"));
     QAction s100("100", this);
     QAction s300("300", this);
     QAction s500("500", this);
     QAction s700("700", this);
-    QAction s1000("1000", this);
+    QAction s1000("1000", this);    
     connect(&s100, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo100()));
     connect(&s300, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo300()));
     connect(&s500, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo500()));
