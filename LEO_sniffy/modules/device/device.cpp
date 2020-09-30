@@ -58,13 +58,13 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
 }
 
 void Device::connectDevice(int index){
-    emit deviceOpened(index);
+    emit openDevice(index);
     deviceWindow->deviceConnectButton->setText("Disconnect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(true,1);//disable scan
 }
 
 void Device::disconnectDevice(){
-    emit deviceClosed();
+    emit closeDevice();
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
     setIcon(":/graphics/graphics/icon_not_connected.png");
@@ -77,6 +77,8 @@ void Device::errorHandler(QByteArray error){
     messageBox.setFixedSize(500,200);
     disconnectDevice();
     deviceWindow->hideSpecification();
+    deviceWindow->deviceSelection->clear();
+    deviceWindow->deviceSelection->addOption("Connection lost", -1);
     deviceWindow->deviceConnectButton->setDisabledButton(true,0);//disable connect
 }
 

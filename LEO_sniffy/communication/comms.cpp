@@ -10,9 +10,13 @@ Comms::Comms(QObject *parent) : QObject(parent)
     connect(this,&Comms::dataWrite,serial,&SerialLine::write);
     connect(serial,&SerialLine::newMessage,this,&Comms::parseMessage);
     connect(serial,&SerialLine::serialLineError,this,&Comms::errorReceived);
-    connect(this,&Comms::openLine,serial,&SerialLine::openLine);
+    connect(this,&Comms::openLine,serial,&SerialLine::openSerialLine);
     connect(this,&Comms::closeLine,serial,&SerialLine::closeLine);
     serialThread->start();
+
+    connect(&devScanner,&DeviceScanner::newDevicesScanned,this,&Comms::devicesScanned);
+    devScanner.start();
+    devScanner.searchForDevices(true);
 
 }
 
@@ -25,6 +29,7 @@ Comms::~Comms()
 void Comms::open(DeviceDescriptor device){
         switch (device.connType) {
         case Connection::SERIAL:
+            devScanner.searchForDevices(false);
             emit openLine(device);
             break;
         default:
@@ -39,8 +44,8 @@ void Comms::scanForDevices(){
 }
 
 void Comms::close(){
-    isOpen = false;
     emit closeLine();
+    devScanner.searchForDevices(true);
 }
 
 void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
@@ -84,6 +89,13 @@ void Comms::write(QByteArray data){
 
 void Comms::errorReceived(QByteArray error){
     emit communicationError(error);
+    devScanner.searchForDevices(true);
+}
+
+
+void Comms::devicesScanned(QList<DeviceDescriptor> deviceList)
+{
+    emit devicesScaned(deviceList);
 }
 
 void Comms::parseMessage(QByteArray message){

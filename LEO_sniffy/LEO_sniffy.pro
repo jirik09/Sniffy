@@ -39,6 +39,7 @@ SOURCES += \
     GUI/widgettop.cpp \
     communication/commands.cpp \
     communication/comms.cpp \
+    communication/devicescanner.cpp \
     communication/serialline.cpp \
     communication/serialportreader.cpp \
     communication/serialportwriter.cpp \
@@ -94,6 +95,7 @@ HEADERS += \
     communication/commands.h \
     communication/comms.h \
     communication/connectiontype.h \
+    communication/devicescanner.h \
     communication/serialline.h \
     communication/serialportreader.h \
     communication/serialportwriter.h \

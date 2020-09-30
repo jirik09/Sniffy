@@ -29,7 +29,7 @@ public:
 
 public slots:
     void write(const QByteArray &writeData);
-    void openLine(DeviceDescriptor desc);
+    void openSerialLine(DeviceDescriptor desc);
     void closeLine();
 
 signals:
