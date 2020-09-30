@@ -56,7 +56,9 @@ QByteArray AbstractModule::getCommandPrefix()
 void AbstractModule::setComms(Comms *communication){
     comm = communication;
     cmd = new Commands();
-    comm->write(moduleCommandPrefix+":"+Commands::CONFIG_REQUEST+";");
+    if(moduleCommandPrefix!="SYST"){
+        comm->write(moduleCommandPrefix+":"+Commands::CONFIG_REQUEST+";");
+    }
 }
 
 void AbstractModule::hideModuleStatus(){

@@ -13,11 +13,13 @@ void SerialPortReader::handleReadyRead()
     QByteArray currentlyRead = m_serialPort->readAll();
     sum += currentlyRead.length();
 
-   /* if(currentlyRead.length()>96){
-        qDebug() << sum<<"SER:" <<currentlyRead.length()<<":"<< currentlyRead.left(32)<<"..."<<currentlyRead.right(16);
+#ifdef DEBUG_READER
+    if(currentlyRead.length()>48){
+        qDebug() <<"READ:" <<currentlyRead.length()<<":"<< currentlyRead.left(16)<<"..."<<currentlyRead.right(16);
     }else{
-        qDebug() << sum <<"SER:" <<currentlyRead.length()<<":"<< currentlyRead;
-    }*/
+        qDebug() <<"READ:" <<currentlyRead.length()<<":"<< currentlyRead;
+    }
+#endif
 
     emit newData(currentlyRead);
 }

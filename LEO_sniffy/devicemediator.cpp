@@ -37,7 +37,7 @@ void DeviceMediator::newDeviceList(QList<DeviceDescriptor> deviceList){
 
 void DeviceMediator::open(int deviceIndex){
     communication->open(deviceList.at(deviceIndex));
-
+    QThread::msleep(50);
     while (communication->getIsOpen()==false) {
         QThread::msleep(500);
         qDebug() << "ERROR wait for comm to be opened";
