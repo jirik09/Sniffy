@@ -31,17 +31,19 @@ void Comms::close(){
 }
 
 void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
-    serial->write(module+":"+feature+":"+param+";");
+
 #ifdef DEBUG_COMMS
-    qDebug() << module+":"+feature+":"+param+";";
+    qDebug() <<"COMM_WRITE:"<< module+":"+feature+":"+param+";";
 #endif
+    serial->write(module+":"+feature+":"+param+";");
 }
 
 void Comms::write(QByteArray module, QByteArray command){
-    serial->write(module+":"+command+";");
+
 #ifdef DEBUG_COMMS
-    qDebug() << module+":"+command;
+    qDebug() <<"COMM_WRITE:"<< module+":"+command;
 #endif
+    serial->write(module+":"+command+";");
 }
 
 void Comms::write(QByteArray module, QByteArray feature, int param){
@@ -50,20 +52,22 @@ void Comms::write(QByteArray module, QByteArray feature, int param){
     tmp[2] = (param>>16);
     tmp[1] = (param>>8);
     tmp[0] = (param);
+
+#ifdef DEBUG_COMMS
+    qDebug() << "COMM_WRITE:"<<module+":"+feature+":" << param <<";";
+#endif
+
     serial->write(module+":"+feature+" ");
     serial->write(tmp,4);
     serial->write(";");
-#ifdef DEBUG_COMMS
-    qDebug() << module+":"+feature+":" << param <<";";
-#endif
 }
 
 void Comms::write(QByteArray data){
-    serial->write(data);
-#ifdef DEBUG_COMMS
-    qDebug() << data;
-#endif
 
+#ifdef DEBUG_COMMS
+    qDebug() << "COMM_WRITE:"<<data;
+#endif
+    serial->write(data);
 }
 
 void Comms::errorReceived(QByteArray error){
@@ -75,9 +79,9 @@ void Comms::parseMessage(QByteArray message){
     //just pass the data
 #ifdef DEBUG_COMMS
     if(message.length()>96){
-        qDebug() << message.left(64)<<"..."<<message.right(16);
+        qDebug() <<"COMM_READ:"<< message.left(64)<<"..."<<message.right(16);
     }else{
-        qDebug() << message;
+        qDebug() <<"COMM_READ:"<< message;
     }
 #endif
     emit newData(message);

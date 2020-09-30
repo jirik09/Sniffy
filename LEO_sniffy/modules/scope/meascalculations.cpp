@@ -32,6 +32,7 @@ void MeasCalculations::calculate(QVector<QVector<QPointF>> scopeData, QList<Meas
 
 void MeasCalculations::run()
 {
+    qDebug()<< "thread vypoctu"<<this->thread(); //todo chceck if it is really done in separate thread
     forever {
         mutex.lock();
         QVector<QVector<QPointF>> data = this->data;
