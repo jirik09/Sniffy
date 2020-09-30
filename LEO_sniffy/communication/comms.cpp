@@ -2,14 +2,24 @@
 
 Comms::Comms(QObject *parent) : QObject(parent)
 {
+    //qDebug()<< "thread comms"<<this->thread();
+    serial = new SerialLine();
+    worker = new QThread(this);
+
+    serial->moveToThread(worker);
+    connect(this,&Comms::dataWrite,serial,&SerialLine::write);
+    connect(serial,&SerialLine::newMessage,this,&Comms::parseMessage);
+    connect(serial,&SerialLine::serialLineError,this,&Comms::errorReceived);
+    connect(this,&Comms::openLine,serial,&SerialLine::openLine);
+    connect(this,&Comms::closeLine,serial,&SerialLine::closeLine);
+    worker->start();
+
 }
 
 void Comms::open(DeviceDescriptor device){
         switch (device.connType) {
         case Connection::SERIAL:
-            isOpen = serial->openLine(device);
-            connect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
-            connect(serial,SIGNAL(serialLineError(QByteArray)),this,SLOT(errorReceived(QByteArray)));
+            emit openLine(device);
             break;
         default:
             break;
@@ -18,16 +28,13 @@ void Comms::open(DeviceDescriptor device){
 
 void Comms::scanForDevices(){
     QList<DeviceDescriptor> listDevices = *new QList<DeviceDescriptor>;
-    serial = new SerialLine();
-    serial->getAvailableDevices(&listDevices,0);   //scan for available devices on serial port
+    SerialLine::getAvailableDevices(&listDevices,0);   //scan for available devices on serial port
     emit devicesScaned(listDevices);
 }
 
 void Comms::close(){
     isOpen = false;
-    disconnect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
-    disconnect(serial,SIGNAL(serialLineError(QByteArray)),this,SLOT(errorReceived(QByteArray)));
-    serial->closeLine();
+    emit closeLine();
 }
 
 void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
@@ -35,7 +42,7 @@ void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
 #ifdef DEBUG_COMMS
     qDebug() <<"COMM_WRITE:"<< module+":"+feature+":"+param+";";
 #endif
-    serial->write(module+":"+feature+":"+param+";");
+    emit dataWrite(module+":"+feature+":"+param+";");
 }
 
 void Comms::write(QByteArray module, QByteArray command){
@@ -43,7 +50,7 @@ void Comms::write(QByteArray module, QByteArray command){
 #ifdef DEBUG_COMMS
     qDebug() <<"COMM_WRITE:"<< module+":"+command;
 #endif
-    serial->write(module+":"+command+";");
+    emit dataWrite(module+":"+command+";");
 }
 
 void Comms::write(QByteArray module, QByteArray feature, int param){
@@ -57,9 +64,8 @@ void Comms::write(QByteArray module, QByteArray feature, int param){
     qDebug() << "COMM_WRITE:"<<module+":"+feature+":" << param <<";";
 #endif
 
-    serial->write(module+":"+feature+" ");
-    serial->write(tmp,4);
-    serial->write(";");
+    QByteArray *qb = new QByteArray(tmp,4);
+    emit dataWrite(module+":"+feature+" "+qb->left(4)+";");
 }
 
 void Comms::write(QByteArray data){
@@ -67,7 +73,7 @@ void Comms::write(QByteArray data){
 #ifdef DEBUG_COMMS
     qDebug() << "COMM_WRITE:"<<data;
 #endif
-    serial->write(data);
+    emit dataWrite(data);
 }
 
 void Comms::errorReceived(QByteArray error){
@@ -89,6 +95,6 @@ void Comms::parseMessage(QByteArray message){
 
 bool Comms::getIsOpen() const
 {
-    return isOpen;
+    return serial->getIsOpen();
 }
 

@@ -12,7 +12,7 @@ class Comms : public QObject
 {
     Q_OBJECT
 
-#define DEBUG_COMMS
+//#define DEBUG_COMMS
 
 public:
     explicit Comms(QObject *parent = nullptr);
@@ -27,6 +27,9 @@ public:
     void write(QByteArray data);
 
 signals:
+    void dataWrite(const QByteArray &data);
+    void openLine(DeviceDescriptor desc);
+    void closeLine();
     void newData(QByteArray message);
     void devicesScaned(QList<DeviceDescriptor> deviceList);
     void communicationError(QByteArray);
@@ -38,6 +41,7 @@ private slots:
 private:
     SerialLine *serial;
     bool isOpen = false;
+    QThread *worker;
 };
 
 #endif // COMMS_H

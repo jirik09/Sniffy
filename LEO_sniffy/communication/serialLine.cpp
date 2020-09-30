@@ -69,9 +69,10 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
     return numberOfDevices;
 }
 
-bool SerialLine::openLine(DeviceDescriptor desc){
+void SerialLine::openLine(DeviceDescriptor desc){
 
-    bool ret = false;
+    //qDebug()<< "serial line open"<<this->thread();
+    bool success = false;
     serPort = new QSerialPort();
     serPort->setPortName(desc.port);
     serPort->setBaudRate(desc.speed);
@@ -80,7 +81,7 @@ bool SerialLine::openLine(DeviceDescriptor desc){
     message = new QByteArray();
 
     if(serPort->open(QIODevice::ReadWrite)){
-        ret=true;
+        success=true;
         serialReader = new SerialPortReader(serPort,this);
         serialWriter = new SerialPortWriter(serPort,this);
 
@@ -89,13 +90,15 @@ bool SerialLine::openLine(DeviceDescriptor desc){
     }else{
         qDebug () << "Serial port error opening";
     }
-    return ret;
+
+    isOpen=success;
 }
 
 void SerialLine::closeLine(){
     serPort->flush();
     serPort->close();
-    serPort->clear();
+    //serPort->clear();
+    isOpen = false;
 }
 
 void SerialLine::handleError(QSerialPort::SerialPortError error){
@@ -124,6 +127,11 @@ void SerialLine::receiveData(QByteArray data){
     }
 }
 
+bool SerialLine::getIsOpen() const
+{
+    return isOpen;
+}
+
 void SerialLine::write(const QByteArray &writeData){
     QDateTime date = QDateTime::currentDateTime();
     //qDebug() << "Sent" <<  date.time() <<":" << writeData;
@@ -134,7 +142,7 @@ void SerialLine::write(const QByteArray &writeData){
     }
 }
 
-void SerialLine::write(const char *data, qint32 len){
+/*void SerialLine::write(const char *data, qint32 len){
     QDateTime date = QDateTime::currentDateTime();
    // qDebug() << "Sent" <<  date.time() <<":" << data;
     if(serPort->isOpen()){
@@ -142,6 +150,6 @@ void SerialLine::write(const char *data, qint32 len){
     }else{
         qDebug() << "ERROR cannot send data: port is closed";
     }
-}
+}*/
 
 
