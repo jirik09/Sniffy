@@ -9,8 +9,8 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
     modules = createModulesList();
 
     connect(device,&Device::ScanDevices,this,&DeviceMediator::ScanDevices);
-    connect(device,&Device::opened,this,&DeviceMediator::open);
-    connect(device,&Device::closed,this,&DeviceMediator::close);
+    connect(device,&Device::deviceOpened,this,&DeviceMediator::open);
+    connect(device,&Device::deviceClosed,this,&DeviceMediator::close);
 }
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
@@ -54,11 +54,11 @@ void DeviceMediator::open(int deviceIndex){
 }
 
 void DeviceMediator::close(){
-    if(isConnected){
-        communication->close();
+    if(isConnected){  
         foreach(QSharedPointer<AbstractModule> mod, modules){
             mod->disableModule();
         }
+        communication->close();
         isConnected = communication->getIsOpen();
     }
     ShowDeviceModule();

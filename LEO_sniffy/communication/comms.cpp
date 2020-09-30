@@ -4,16 +4,22 @@ Comms::Comms(QObject *parent) : QObject(parent)
 {
     //qDebug()<< "thread comms"<<this->thread();
     serial = new SerialLine();
-    worker = new QThread(this);
+    serialThread = new QThread(this);
 
-    serial->moveToThread(worker);
+    serial->moveToThread(serialThread);
     connect(this,&Comms::dataWrite,serial,&SerialLine::write);
     connect(serial,&SerialLine::newMessage,this,&Comms::parseMessage);
     connect(serial,&SerialLine::serialLineError,this,&Comms::errorReceived);
     connect(this,&Comms::openLine,serial,&SerialLine::openLine);
     connect(this,&Comms::closeLine,serial,&SerialLine::closeLine);
-    worker->start();
+    serialThread->start();
 
+}
+
+Comms::~Comms()
+{
+    serialThread->quit();
+    serialThread->wait();
 }
 
 void Comms::open(DeviceDescriptor device){

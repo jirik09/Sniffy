@@ -16,6 +16,7 @@ class Comms : public QObject
 
 public:
     explicit Comms(QObject *parent = nullptr);
+    ~Comms();
     void close();
     void open(DeviceDescriptor device);
     bool getIsOpen() const;
@@ -41,7 +42,7 @@ private slots:
 private:
     SerialLine *serial;
     bool isOpen = false;
-    QThread *worker;
+    QThread *serialThread;
 };
 
 #endif // COMMS_H

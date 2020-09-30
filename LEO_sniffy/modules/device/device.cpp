@@ -58,13 +58,13 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
 }
 
 void Device::connectDevice(int index){
-    emit opened(index);
+    emit deviceOpened(index);
     deviceWindow->deviceConnectButton->setText("Disconnect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(true,1);//disable scan
 }
 
 void Device::disconnectDevice(){
-    emit closed();
+    emit deviceClosed();
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
     setIcon(":/graphics/graphics/icon_not_connected.png");

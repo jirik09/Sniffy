@@ -38,7 +38,7 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
             sPort->clear();
             sPort->write("IDN?;");
             sPort->waitForBytesWritten();
-            sPort->waitForReadyRead(200);
+            sPort->waitForReadyRead();
 
             received = sPort->readAll();
 
@@ -138,18 +138,8 @@ void SerialLine::write(const QByteArray &writeData){
     if(serPort->isOpen()){
         serialWriter->write(writeData);
     }else{
-        qDebug() << "ERROR cannot send data: port is closed";
+        qDebug() << "ERROR port is closed. Data cannot be send ("<<writeData<<")";
     }
 }
-
-/*void SerialLine::write(const char *data, qint32 len){
-    QDateTime date = QDateTime::currentDateTime();
-   // qDebug() << "Sent" <<  date.time() <<":" << data;
-    if(serPort->isOpen()){
-        serialWriter->write(data,len);
-    }else{
-        qDebug() << "ERROR cannot send data: port is closed";
-    }
-}*/
 
 
