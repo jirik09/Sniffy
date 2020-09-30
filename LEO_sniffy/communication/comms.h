@@ -6,6 +6,8 @@
 #include "connectiontype.h"
 #include "serialline.h"
 
+#include "devicescanner.h"
+
 
 
 class Comms : public QObject
@@ -16,6 +18,7 @@ class Comms : public QObject
 
 public:
     explicit Comms(QObject *parent = nullptr);
+    ~Comms();
     void close();
     void open(DeviceDescriptor device);
     bool getIsOpen() const;
@@ -37,11 +40,13 @@ signals:
 private slots:
     void parseMessage(QByteArray message);
     void errorReceived(QByteArray error);
+    void devicesScanned(QList<DeviceDescriptor> deviceList);
 
 private:
     SerialLine *serial;
-    bool isOpen = false;
-    QThread *worker;
+    //bool isOpen = false;
+    QThread *serialThread;
+    DeviceScanner devScanner;
 };
 
 #endif // COMMS_H

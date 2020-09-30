@@ -9,8 +9,8 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
     modules = createModulesList();
 
     connect(device,&Device::ScanDevices,this,&DeviceMediator::ScanDevices);
-    connect(device,&Device::opened,this,&DeviceMediator::open);
-    connect(device,&Device::closed,this,&DeviceMediator::close);
+    connect(device,&Device::openDevice,this,&DeviceMediator::open);
+    connect(device,&Device::closeDevice,this,&DeviceMediator::close);
 }
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
@@ -38,28 +38,36 @@ void DeviceMediator::newDeviceList(QList<DeviceDescriptor> deviceList){
 void DeviceMediator::open(int deviceIndex){
     communication->open(deviceList.at(deviceIndex));
     QThread::msleep(50);
+    int i = 0;
     while (communication->getIsOpen()==false) {
         QThread::msleep(500);
+        i++;
+        if(i>5){
+            device->errorHandler("Device cannot be opened");
+            break;
+        }
         qDebug() << "ERROR wait for comm to be opened";
     }
     isConnected = communication->getIsOpen();
 
-    connect(communication,&Comms::newData,this,&DeviceMediator::parseData);
-    connect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
+    if(isConnected){
+        connect(communication,&Comms::newData,this,&DeviceMediator::parseData);
+        connect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
 
-    communication->write(Commands::SYSTEM+":"+Commands::CONFIG_REQUEST+";");
-    foreach(QSharedPointer<AbstractModule> mod, modules){
-        mod->setComms(communication);
+        communication->write(Commands::SYSTEM+":"+Commands::CONFIG_REQUEST+";");
+        foreach(QSharedPointer<AbstractModule> mod, modules){
+            mod->setComms(communication);
+        }
     }
 }
 
 void DeviceMediator::close(){
     if(isConnected){
-        communication->close();
         foreach(QSharedPointer<AbstractModule> mod, modules){
             mod->disableModule();
         }
-        isConnected = communication->getIsOpen();
+        communication->close();
+        isConnected = false;
     }
     ShowDeviceModule();
 

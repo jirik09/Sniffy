@@ -30,8 +30,8 @@ private:
 
 signals:
     void ScanDevices();
-    void opened(int deviceIndex);
-    void closed();
+    void openDevice(int deviceIndex);
+    void closeDevice();
 
 public slots:
     void parseData(QByteArray);
