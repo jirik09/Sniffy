@@ -28,15 +28,19 @@ public:
     explicit WidgetDialRange(QWidget *parent = nullptr, QString name = "");
     ~WidgetDialRange();
     void addOption (QString unitString,float mult);
-    void setSelected(int index);
     void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false);
-    void hideUnitSelection(void);
+    void setRealValue(float value);
+    void hideUnitSelection(void);    
+    void setDialColor(QString &styleSheet);
+    void setDialButtonsColor(QString &bckgndStyleSheet);
+    float getDefaultRealValue() const;
 
 private:
     Ui::WidgetDialRange *ui;
     QList<params_unit> *units;
     const int dialMaxValue = 500;
     float realValue;
+    float defaultRealValue = 0;
     float labelValue;
 
     float unitMult;
@@ -51,10 +55,6 @@ private:
     bool logaritmic;
     float logOffset = 0;
     float logGain = 0;
-
-
-
-    CustomDial *dial;
 
     void updateControls(int except);
     float getRealValueFromDial(int in);

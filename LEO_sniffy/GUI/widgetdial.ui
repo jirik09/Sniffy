@@ -380,7 +380,7 @@ QPushButton{border: none;
           <number>0</number>
          </property>
          <item>
-          <widget class="QComboBox" name="comboBox">
+          <widget class="CustomComboBox" name="comboBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -443,11 +443,26 @@ width:5px;
       <property name="bottomMargin">
        <number>0</number>
       </property>
+      <item>
+       <widget class="CustomDial" name="dial"/>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">GUI/customcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomDial</class>
+   <extends>QDial</extends>
+   <header location="global">GUI/customdial.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

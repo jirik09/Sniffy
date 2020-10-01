@@ -10,7 +10,12 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QLogValueAxis>
+#include <QMenu>
 #include <QtMath>
+#include <QDateTimeAxis>
+#include <QCursor>
+
+#include "../graphics/colors.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -25,26 +30,46 @@ class widgetChart : public QWidget
 public:
     explicit widgetChart(QWidget *parent = nullptr, int maxTraces = 1);
     ~widgetChart();
+    void useOpenGL(bool use);
+    void switchToSplineSeries();
+    void switchToLineSeries();
+    void switchToScatterSeries();
     void clearAll();
+    void clearPoints(int startIndex, int endIndex);
+    void clearPoint(int traceIndex, int index);
     void updateTrace(QVector<QPointF> *points, int index);
+    void appendToTrace(int index, QVector<QPointF> *points);
     void updateAxis();
     void setMaxX(float max);
     void setDataMinMax(qreal minX, qreal maxX);
+    void setRangeX(qreal minX, qreal maxX);
+    void setRangeY(qreal minY, qreal maxY);
+    void setRange(qreal minX, qreal maxX, qreal minY, qreal maxY);
+    void setMargins(int left, int top, int right, int bottom);
 
     void setZoom(float invZoom);
     qreal getZoom();
     void setShift (float shift);
 
-    void setMarkerHorizontal(int channelIndex, qreal value);
+    void setGridLinesVisible(bool gridVisibleX, bool gridVisibleY);
+    void setGridDensity(int tickX, int tickY);
 
+    void formatAxisLabelsForScope();
+    void formatLabels(QString axisXLabelForm, QString axisYLabelForm);
+    void setGraphColor(QColor qColor);
+    void setLabelsVisible(bool lableVisibleX, bool lableVisibleY);
+    void setLabelsSize(int pointSize);
+    void createHorizontalMarkes();
+    void setHorizontalMarker(int channelIndex, qreal value);
 
-
-
+    int getTraceNum();       
 
 private:
     Ui::widgetChart *ui;
+    QCursor cursor;
     QList<QXYSeries *> seriesList;
     QScatterSeries *markersHorizontal;
+    enum markers {ENABLED, DISABLED} markers = DISABLED;
     int maxTraces;
 
     qreal minX = 0;
@@ -53,13 +78,24 @@ private:
     qreal invZoom = 1;
     qreal shift = 0.5;
 
-    QChart *chart;
+    QChart *chart;       
 
-    QValueAxis *axisX;
+    QValueAxis *axisX;   // QAbstractAxis
     QValueAxis *axisY;
     QValueAxis *axisMarkerHorizontal;
 
-    QColor colors[4];
+    QColor colors[4] = {QCOLOR_ORANGE, QCOLOR_BLUE,
+                        QCOLOR_GREEN, QCOLOR_PURPLE};
+
+    void createSeries(QLineSeries *series, int traceIndex);
+    void wipeAllOut();
+
+signals:
+    void chartRightClicked(const QPoint &pos);
+
+private slots:
+    void chartRightClickCallback(const QPoint &mousePos);
+    void hovered(const QPointF &point);
 };
 
 #endif // WIDGETCHART_H

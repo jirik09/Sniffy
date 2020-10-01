@@ -21,6 +21,14 @@ public:
 
 private:
     Ui::widgetTab *ui;
+
+private slots:
+    void on_tabWidget_currentChanged(int index);
+    void on_tabWidget_tabBarClicked(int index);
+
+signals:
+    void currentChanged(int index);
+    void tabBarClicked(int index);
 };
 
 #endif // WIDGETTAB_H

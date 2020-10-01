@@ -7,7 +7,7 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-   // ********************* Insert buttons and labels into Scan Window  **************************
+   // ********************* Insert buttons and labels into Scan Window  **************************          
    QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);//horizontal , vertical
    scrollAreaSpecification = new QScrollArea();
    scrollAreaSpecification->setWidgetResizable(true);
@@ -30,7 +30,7 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
 
    deviceSelection  = new WidgetSelection(WidgetSpecification);
    verticalLayoutSpecification->addWidget(deviceSelection);
-   deviceSelection->addOption("Scan for available devices",-1);
+   deviceSelection->addOption("Scanning for available devices",-1);
 
    deviceConnectButton = new WidgetButtons(WidgetSpecification,2);
    deviceConnectButton->setText("Connect",0);
@@ -59,7 +59,8 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
    verticalLayoutSpecification->addItem(verticalSpacer);
 
    // *************************** end adding widgets to specification area *************************
-    hideSpecification();
+
+   hideSpecification();
 }
 
 DeviceWindow::~DeviceWindow()

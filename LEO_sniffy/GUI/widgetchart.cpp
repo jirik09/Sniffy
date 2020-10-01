@@ -3,111 +3,42 @@
 
 widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QWidget(parent),
-    ui(new Ui::widgetChart)
+    ui(new Ui::widgetChart),
+    maxTraces(maxTraces)
 {
-    //QStringList colors;
-
-
-
-    this->maxTraces = maxTraces;
-
     ui->setupUi(this);
+
     chart = new QChart();
     chart->legend()->hide();
 
-    QMargins *chrtMargin = new QMargins(0,5,0,0);
+    chart->setBackgroundBrush(QCOLOR_BLACK);
+    chart->setAcceptHoverEvents(true);
+    this->setMouseTracking(true);
+    chart->setToolTip("¯\\_(ツ)_/¯");
 
+    QMargins *chrtMargin = new QMargins(0,5,0,0);
     chart->setMargins(*chrtMargin);
 
     axisX = new QValueAxis;
     axisY = new QValueAxis;
 
-
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignLeft);
 
-
-    colors[0] = QColor(255,170,0);
-    colors[1] = QColor(24,154,224);
-    colors[2] = QColor(54,154,24);
-    colors[3] = QColor(204,24,224);
-
-    axisX->setRange(-0.1, 0.1);
-    axisY->setRange(-0.1, 3.9);
-
-
-
     for (int i = 0; i < maxTraces; i++) {
-        QSplineSeries *series = 0; //spline
-        series = new QSplineSeries;
-
-      /*  QXYSeries *series = 0; //normal
-        series = new QLineSeries;*/
-
-        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
-
-        seriesList.append(series);
-        series->setUseOpenGL(true);
-        chart->addSeries(series);
-        series->attachAxis(axisX);
-        series->attachAxis(axisY);
+        QSplineSeries *series = new QSplineSeries;
+        //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
+        createSeries(series, i);
     }
 
-    //prepare markers on X axis
-    axisMarkerHorizontal = new QValueAxis;
-    chart->addAxis(axisMarkerHorizontal, Qt::AlignRight);
-    axisMarkerHorizontal->setRange(0, 1);
-    markersHorizontal = new QScatterSeries;
-
-    markersHorizontal->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
-    markersHorizontal->setMarkerSize(20.0);
-    markersHorizontal->setPen(QColor(Qt::transparent));
-   // markersHorizontal->setUseOpenGL(true);
-    chart->addSeries(markersHorizontal);
-    markersHorizontal->attachAxis(axisX);
-    markersHorizontal->attachAxis(axisMarkerHorizontal);
-
+    formatAxisLabelsForScope();
 
     QChartView *chartView = new QChartView(chart);
-    chartView->setMinimumSize(200,100);
-        //chartView->setStyleSheet(QString::fromUtf8("background-color: rgb(155, 155, 155);color: rgb(255, 255, 255);"));
+    ui->horizontalLayout_chart->addWidget(chartView);
 
-
-        // Customize plot area background
-
-        chart->setBackgroundBrush(QColor(38,38,38));
-
-        /*QPen axisPen(QRgb(0xf0f0f0));
-        axisPen.setWidth(2);
-        axisX->setLinePen(axisPen);
-        axisY->setLinePen(axisPen);*/
-
-        axisX->setLabelsBrush(QBrush(QColor(128,128,128)));
-        axisX->setLabelFormat("%.1e");
-        axisY->setLabelsBrush(QBrush(QColor(128,128,128)));
-        axisY->setLabelFormat("%.2g");
-
-        axisMarkerHorizontal->setLabelsVisible(false);
-
-        QFont font = axisX->labelsFont();
-        font.setPointSize(8);
-        axisX->setLabelsFont(font);
-        axisY->setLabelsFont(font);
-
-       // axisX->setMinorGridLineVisible(true);
-        axisX->setTickCount(11);
-        axisY->setTickCount(9);
-
-
-      //  axisX->setLabelsVisible(false);
-
-
-       // axisX->setShadesVisible(false);
-
-        //axisX->setLabelsBrush(axisBrush);
-        //axisY->setLabelsBrush(axisBrush);
-        ui->horizontalLayout_chart->addWidget(chartView);
-
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(chartRightClickCallback(const QPoint &)));
 }
 
 widgetChart::~widgetChart()
@@ -115,16 +46,91 @@ widgetChart::~widgetChart()
     delete ui;
 }
 
-void widgetChart::clearAll(){
+void widgetChart::useOpenGL(bool use){    
+    //series->setUseOpenGL(use);
+}
+
+void widgetChart::wipeAllOut(){
+    seriesList.clear();
+    chart->removeAllSeries();
+
+    /* chart->removeAllSeries function not working till chart resized */
+    chart->resize(chart->size() + QSize(1, 1));
+    chart->resize(chart->size() - QSize(1, 1));
+
+    /* First change from QSplineSeries prevents the app from repainting
+       One must start moving with mouse.. */
+//    QPoint pos = QCursor::pos();
+//    cursor.setPos(pos.x()+2,pos.y()+2);
+}
+
+void widgetChart::switchToSplineSeries(){
+    wipeAllOut();
     for (int i = 0; i < maxTraces; i++) {
-        seriesList[i]->clear();
+        QSplineSeries *series = new QSplineSeries;
+        //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
+        createSeries(series, i);
     }
-    markersHorizontal->clear();
+}
+
+void widgetChart::switchToLineSeries(){
+    wipeAllOut();
+    for (int i = 0; i < maxTraces; i++) {
+        QLineSeries *series = new QLineSeries;
+        //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
+        createSeries(series, i);
+    }
+}
+
+void widgetChart::switchToScatterSeries(){
+    wipeAllOut();
+    for (int i = 0; i < maxTraces; i++) {
+        QScatterSeries *series = new QScatterSeries;
+        //connect(series, &QScatterSeries::hovered, this, &widgetChart::hovered);
+        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
+        series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        series->setMarkerSize(3.8);
+        seriesList.append(series);
+        chart->addSeries(series);
+        series->attachAxis(axisX);
+        series->attachAxis(axisY);
+        series->setUseOpenGL(true);
+    }
+}
+
+void widgetChart::createSeries(QLineSeries *series, int traceIndex){
+    series->setPen(QPen(QBrush(QColor(colors[traceIndex%5])), 2.0));
+    seriesList.append(series);
+    chart->addSeries(series);
+    series->attachAxis(axisX);
+    series->attachAxis(axisY);
+    series->setUseOpenGL(true);
+}
+
+void widgetChart::clearAll(){
+    for (int i = 0; i < maxTraces; i++)
+        seriesList[i]->clear();
+    if(markers == ENABLED)
+        markersHorizontal->clear();
+}
+
+void widgetChart::clearPoints(int startIndex, int endIndex){
+    for (int i = startIndex; i <= endIndex; i++)
+        seriesList[i]->clear();
+}
+
+void widgetChart::clearPoint(int traceIndex, int index){
+    if(seriesList[traceIndex]->count() != 0)
+        seriesList[traceIndex]->remove(index);
 }
 
 void widgetChart::updateTrace(QVector<QPointF> *points, int index){
     const QVector<QPointF> &seriesData = *points;
     seriesList[index]->replace(seriesData);
+}
+
+void widgetChart::appendToTrace(int index, QVector<QPointF> *points){
+    seriesList[index]->append(points->at(points->length()-1));
 }
 
 void widgetChart::updateAxis(){
@@ -144,25 +150,109 @@ void widgetChart::setDataMinMax(qreal minX, qreal maxX){
     updateAxis();
 }
 
+void widgetChart::setRangeX(qreal minX, qreal maxX){
+    axisX->setRange(minX, maxX);
+}
+
+void widgetChart::setRangeY(qreal minY, qreal maxY){
+    axisY->setRange(minY, maxY);
+}
+
+void widgetChart::setRange(qreal minX, qreal maxX, qreal minY, qreal maxY){
+    axisX->setRange(minX, maxX);
+    axisY->setRange(minY, maxY);
+}
+
+void widgetChart::setMargins(int left, int top, int right, int bottom){
+    QMargins *chrtMargin = new QMargins(left, top, right, bottom);
+    chart->setMargins(*chrtMargin);
+}
+
 void widgetChart::setZoom(float zoom){
     this->invZoom = 1/zoom;
     updateAxis();
 }
 
-qreal widgetChart::getZoom()
-{
+qreal widgetChart::getZoom(){
     return 1/invZoom;
 }
 
-/*
-range -100 to 100 (represents percent value)
-*/
+/* range -100 to 100 (represents percent value) */
 void widgetChart::setShift (float shift){
     this->shift = (shift/2+50)/100;
     updateAxis();
 }
 
-void widgetChart::setMarkerHorizontal(int channelIndex, qreal value){
+void widgetChart::setGridLinesVisible(bool gridVisibleX, bool gridVisibleY){
+    axisX->setGridLineVisible(gridVisibleX);
+    axisY->setGridLineVisible(gridVisibleY);
+}
+
+void widgetChart::setGridDensity(int tickX, int tickY){
+    axisX->setTickCount(tickX);
+    axisY->setTickCount(tickY);
+}
+
+void widgetChart::setGraphColor(QColor qColor){
+    axisX->setLabelsBrush(QBrush(qColor));
+    axisY->setLabelsBrush(QBrush(qColor));
+    axisX->setGridLineColor(qColor);
+    axisY->setGridLineColor(qColor);
+    axisX->setLinePenColor(qColor);
+    axisY->setLinePenColor(qColor);
+}
+
+void widgetChart::formatAxisLabelsForScope(){
+    axisX->setLabelsBrush(QBrush(QColor(128,128,128)));
+    axisY->setLabelsBrush(QBrush(QColor(128,128,128)));
+    axisX->setLabelFormat("%.2g");
+    axisY->setLabelFormat("%.2g");
+
+    QFont font = axisX->labelsFont();
+    font.setPointSize(8);
+    axisX->setLabelsFont(font);
+    axisY->setLabelsFont(font);
+    axisX->setTickCount(11);
+    axisY->setTickCount(9);
+}
+
+void widgetChart::formatLabels(QString axisXLabelForm, QString axisYLabelForm){
+    axisX->setLabelFormat(axisXLabelForm);
+    axisY->setLabelFormat(axisYLabelForm);
+}
+
+void widgetChart::setLabelsVisible(bool lableVisibleX, bool lableVisibleY){
+    axisX->setLabelsVisible(lableVisibleX);
+    axisY->setLabelsVisible(lableVisibleY);
+}
+
+void widgetChart::setLabelsSize(int pointSize){
+    QFont font = axisX->labelsFont();
+    font.setPointSize(pointSize);
+    axisX->setLabelsFont(font);
+    axisY->setLabelsFont(font);
+}
+
+void widgetChart::createHorizontalMarkes(){
+    markers = ENABLED;
+    //prepare markers on X axis
+    axisMarkerHorizontal = new QValueAxis;
+    chart->addAxis(axisMarkerHorizontal, Qt::AlignRight);
+    axisMarkerHorizontal->setRange(0, 1);
+    markersHorizontal = new QScatterSeries;
+
+    markersHorizontal->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+    markersHorizontal->setMarkerSize(20.0);
+    markersHorizontal->setPen(QColor(Qt::transparent));
+    // markersHorizontal->setUseOpenGL(true);
+    chart->addSeries(markersHorizontal);
+    markersHorizontal->attachAxis(axisX);
+    markersHorizontal->attachAxis(axisMarkerHorizontal);
+
+    axisMarkerHorizontal->setLabelsVisible(false);
+}
+
+void widgetChart::setHorizontalMarker(int channelIndex, qreal value){
     QVector<QPointF> seriesData;
     QPainterPath arrowPath;
     arrowPath.lineTo(10,20);
@@ -180,4 +270,17 @@ void widgetChart::setMarkerHorizontal(int channelIndex, qreal value){
     markersHorizontal->setBrush(arrow);
     seriesData.append(QPointF(value,0.99));
     markersHorizontal->replace(seriesData);
+}
+
+int widgetChart::getTraceNum(){
+    return maxTraces;
+}
+
+void widgetChart::chartRightClickCallback(const QPoint &mousePos){
+    emit chartRightClicked(mousePos);
+}
+
+void widgetChart::hovered(const QPointF &point){
+    QString coords = QString("X: %1\nY: %2").arg(point.x()).arg(point.y());
+    chart->setToolTip(coords);
 }

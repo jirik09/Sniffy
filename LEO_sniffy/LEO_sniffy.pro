@@ -18,6 +18,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    GUI/clickablelabel.cpp \
+    GUI/customcombobox.cpp \
     GUI/customdial.cpp \
     GUI/moduledockwidget.cpp \
     GUI/widgetbuttons.cpp \
@@ -29,6 +31,7 @@ SOURCES += \
     GUI/widgetfooter.cpp \
     GUI/widgetlabel.cpp \
     GUI/widgetlabelarea.cpp \
+    GUI/widgetlist.cpp \
     GUI/widgetselection.cpp \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
@@ -36,6 +39,7 @@ SOURCES += \
     GUI/widgettop.cpp \
     communication/commands.cpp \
     communication/comms.cpp \
+    communication/devicescanner.cpp \
     communication/serialline.cpp \
     communication/serialportreader.cpp \
     communication/serialportwriter.cpp \
@@ -43,11 +47,18 @@ SOURCES += \
     devicemediator.cpp \
     main.cpp \
     mainwindow.cpp \
+    math/movingaverage.cpp \
+    math/timing.cpp \
     modules/abstractmodule.cpp \
+    modules/abstractspecification.cpp \
     modules/counter/counter.cpp \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
-    modules/counter/windowcounter.cpp \
+    modules/counter/countertabhighfreq.cpp \
+    modules/counter/countertabintervals.cpp \
+    modules/counter/countertablowfreq.cpp \
+    modules/counter/countertabratio.cpp \
+    modules/counter/counterwindow.cpp \
     modules/labelformator.cpp \
     modules/device/device.cpp \
     modules/device/devicewindow.cpp \
@@ -63,6 +74,8 @@ SOURCES += \
 
 
 HEADERS += \
+    GUI/clickablelabel.h \
+    GUI/customcombobox.h \
     GUI/customdial.h \
     GUI/moduledockwidget.h \
     GUI/widgetbuttons.h \
@@ -74,6 +87,7 @@ HEADERS += \
     GUI/widgetfooter.h \
     GUI/widgetlabel.h \
     GUI/widgetlabelarea.h \
+    GUI/widgetlist.h \
     GUI/widgetselection.h \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
@@ -82,19 +96,28 @@ HEADERS += \
     communication/commands.h \
     communication/comms.h \
     communication/connectiontype.h \
+    communication/devicescanner.h \
     communication/serialline.h \
     communication/serialportreader.h \
     communication/serialportwriter.h \
     devicedescriptor.h \
     devicemediator.h \
     graphics/colors.h \
+    graphics/styles.h \
     mainwindow.h \
+    math/movingaverage.h \
+    math/timing.h \
+    modules/abstractspecification.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
     modules/counter/counterdefs.h \
     modules/counter/counterspec.h \
     modules/abstractmodule.h \
-    modules/counter/windowcounter.h \
+    modules/counter/countertabhighfreq.h \
+    modules/counter/countertabintervals.h \
+    modules/counter/countertablowfreq.h \
+    modules/counter/countertabratio.h \
+    modules/counter/counterwindow.h \
     modules/labelformator.h \
     modules/device/device.h \
     modules/device/devicewindow.h \
@@ -120,6 +143,7 @@ FORMS += \
     GUI/widgetfooter.ui \
     GUI/widgetlabel.ui \
     GUI/widgetlabelarea.ui \
+    GUI/widgetlist.ui \
     GUI/widgetmodule.ui \
     GUI/widgetselection.ui \
     GUI/widgetseparator.ui \
@@ -127,7 +151,7 @@ FORMS += \
     GUI/widgettab.ui \
     GUI/widgettop.ui \
     mainwindow.ui \
-    modules/counter/windowcounter.ui \
+    modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \
     modules/scope/scopewindow.ui
 

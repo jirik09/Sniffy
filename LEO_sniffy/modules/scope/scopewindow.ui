@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1289</width>
-    <height>618</height>
+    <height>350</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -122,10 +122,16 @@ background-color: rgb(38, 38, 38);
              <string notr="true"/>
             </property>
             <property name="minimum">
-             <number>-100</number>
+             <number>-1000</number>
             </property>
             <property name="maximum">
-             <number>100</number>
+             <number>1000</number>
+            </property>
+            <property name="singleStep">
+             <number>5</number>
+            </property>
+            <property name="pageStep">
+             <number>10</number>
             </property>
             <property name="value">
              <number>0</number>
@@ -157,7 +163,7 @@ background-color: rgb(38, 38, 38);
 background-color: rgb(38, 38, 38);
 }</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_trace">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -173,6 +179,96 @@ background-color: rgb(38, 38, 38);
           <property name="bottomMargin">
            <number>0</number>
           </property>
+          <item>
+           <widget class="QWidget" name="widget_2" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>20</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>20</number>
+             </property>
+             <item>
+              <widget class="QSlider" name="verticalSlider_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_chart" native="true">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <layout class="QVBoxLayout" name="verticalLayout_chart">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>20</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>20</number>
+             </property>
+             <item>
+              <widget class="QSlider" name="verticalSlider">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -244,7 +340,7 @@ background-color: rgb(38, 38, 38);
       </property>
       <property name="maximumSize">
        <size>
-        <width>330</width>
+        <width>300</width>
         <height>16777215</height>
        </size>
       </property>

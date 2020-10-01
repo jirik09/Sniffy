@@ -7,23 +7,25 @@ Extends standard dial and just override the paint function
 
 #include <QPainter>
 #include <QColor>
+#include <QMouseEvent>
+#include <QDebug>
 
 #include <cmath>
 
 CustomDial::CustomDial(QWidget* parent,
                        double knobRadius,
                        double knobMargin)
-: QDial(parent),
-  knobRadius_(knobRadius),
-  knobMargin_(knobMargin)
+    : QDial(parent),
+      knobRadius_(knobRadius),
+      knobMargin_(knobMargin)
 {
     // Default range
     QDial::setRange(0,100);
     QDial::setPageStep(5);
     QDial::setSingleStep(2);
- //   int size = parent->size().height();
-   // QDial::setMinimumSize(size,size);
-  //  QDial::setMaximumSize(size,size);
+    //   int size = parent->size().height();
+    // QDial::setMinimumSize(size,size);
+    //  QDial::setMaximumSize(size,size);
 }
 
 void CustomDial::setKnobRadius(double radius)
@@ -46,13 +48,55 @@ double CustomDial::getKnobMargin() const
     return knobMargin_;
 }
 
+void CustomDial::drawMarker(bool draw)
+{
+    drawMark = draw;
+}
+
+void CustomDial::mouseMoveEvent(QMouseEvent *me) {
+    double relativeX = me->x() - mousePressX+0.01;
+    double relativeY = me->y() - mousePressY+0.01;
+
+    //double distance = sqrt(relativeX*relativeX + relativeY*relativeY); //distance from initial point
+    double distance = abs(relativeX - relativeY) /sqrt(2); //distance from -xy axis
+
+    double phi = atan(relativeX/relativeY)*180/3.14159;
+
+    double angle = 0;
+    if (relativeY>0){
+        angle = 90-phi;
+    }else {
+        angle = 270-phi;
+    }
+
+    //qDebug() << "dist"<<distance <<"angle" <<angle<<"(X" << relativeX << " Y" << relativeY << ")";
+    if (angle>225 || angle<45){
+        QDial::setValue(initialDialValue + distance/QDial::size().width()*QDial::maximum()*0.8);
+    }else {
+        QDial::setValue(initialDialValue - distance/QDial::size().width()*QDial::maximum()*0.8);
+    }
+}
+
+void CustomDial::mousePressEvent(QMouseEvent *me) {
+    emit dialPressed(me);
+    mousePressX = me->x();
+    mousePressY = me->y();
+    initialDialValue = QDial::value();
+}
+
+void CustomDial::mouseReleaseEvent(QMouseEvent *me){
+    emit dialReleased(me);
+    if(initialDialValue==QDial::value()){
+        QDial::mouseReleaseEvent(me);
+    }
+    mousePressX = 0;
+    mousePressY = 0;
+    QDial::update();
+}
+
 void CustomDial::paintEvent(QPaintEvent*)
 {
-  //  static const double degree270 = 1.5 * M_PI;
-
-  //  static const double degree225 = 1.25 * M_PI;
-
-    static const int margin = 10;
+    static const int margin = 7;
 
     QPainter painter(this);
 
@@ -72,7 +116,7 @@ void CustomDial::paintEvent(QPaintEvent*)
     painter.setPen(QPen(Qt::NoPen));
 
     // Draw first circle
-  //  painter.drawEllipse(0, 0, QDial::height(), QDial::height());
+    //  painter.drawEllipse(0, 0, QDial::height(), QDial::height());
 
     // Reset color to pointColor from stylesheet
     painter.setBrush(QBrush(pointColor));
@@ -80,43 +124,38 @@ void CustomDial::paintEvent(QPaintEvent*)
     // Get ratio between current value and maximum to calculate angle
     double ratio = static_cast<double>(QDial::value()) / QDial::maximum();
 
-    // The maximum amount of degrees is 270, offset by 225
-  //  double angle = ratio * degree270 - degree225;
-
-    // Radius of background circle
-  //  double r = QDial::height() / 2.0;
-
-    // Add r to have (0,0) in center of dial
- //   double y = sin(angle) * (r - knobRadius_ - knobMargin_) + r-5;
-
-  //  double x = cos(angle) * (r - knobRadius_ - knobMargin_) + r-5;
-
-    // Draw the ellipse
-   // painter.drawEllipse(QPointF(x,y),knobRadius_, knobRadius_);
-
-    //painter.setBrush(QBrush(QColor(10,200,150)));
-
     int marginHalf = margin/2;
     int size = (QDial::width()<QDial::height())?QDial::width():QDial::height();
     int diffH = (QDial::width()>QDial::height())?QDial::width()-QDial::height():0;
     int diffV = (QDial::width()<QDial::height())?QDial::height()-QDial::width():0;
 
-
     const QRectF rect(marginHalf+diffH/2,marginHalf+diffV/2,size-margin,size-margin);
 
+    Qt::BrushStyle bs;
 
     //draw background arc
-    painter.setPen(QPen(QBrush(QColor(48,48,48)),5));
+    if(drawMark){
+        bs = (Qt::BrushStyle)5;
+        painter.setPen(QPen(QBrush(QColor(48,48,48)),bs));
+    }else {
+        bs = (Qt::BrushStyle)2;
+        painter.setPen(QPen(QBrush(QColor(68,68,68)),bs));
+    }
     painter.drawArc(rect,0,360*16);
 
     //draw actual value
-    painter.setPen(QPen(QBrush(pointColor),5));
+    painter.setPen(QPen(QBrush(pointColor),bs));
     painter.drawArc(rect,225*16,-ratio*16*270-5*16);
 
-    //draw marker
-    painter.setPen(QPen(QBrush(QColor(214,214,214)),8));
-    painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
-
-
-
+    if(drawMark){
+        //draw marker
+        painter.setPen(QPen(QBrush(QColor(214,214,214)),8));
+        painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
+        //draw click pointer
+        if(mousePressX!=0){
+            painter.setPen(QPen(QBrush(QColor(128,128,128)),4));
+            painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
+        }
+    }
 }
+

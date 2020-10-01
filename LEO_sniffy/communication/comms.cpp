@@ -2,15 +2,35 @@
 
 Comms::Comms(QObject *parent) : QObject(parent)
 {
+    //qDebug()<< "thread comms"<<this->thread();
+    serial = new SerialLine();
+    serialThread = new QThread(this);
 
+    serial->moveToThread(serialThread);
+    connect(this,&Comms::dataWrite,serial,&SerialLine::write);
+    connect(serial,&SerialLine::newMessage,this,&Comms::parseMessage);
+    connect(serial,&SerialLine::serialLineError,this,&Comms::errorReceived);
+    connect(this,&Comms::openLine,serial,&SerialLine::openSerialLine);
+    connect(this,&Comms::closeLine,serial,&SerialLine::closeLine);
+    serialThread->start();
+
+    connect(&devScanner,&DeviceScanner::newDevicesScanned,this,&Comms::devicesScanned);
+    devScanner.start();
+    devScanner.searchForDevices(true);
+
+}
+
+Comms::~Comms()
+{
+    serialThread->quit();
+    serialThread->wait();
 }
 
 void Comms::open(DeviceDescriptor device){
         switch (device.connType) {
         case Connection::SERIAL:
-            isOpen = serial->openLine(device);
-            connect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
-            connect(serial,SIGNAL(serialLineError(QByteArray)),this,SLOT(errorReceived(QByteArray)));
+            devScanner.searchForDevices(false);
+            emit openLine(device);
             break;
         default:
             break;
@@ -19,24 +39,29 @@ void Comms::open(DeviceDescriptor device){
 
 void Comms::scanForDevices(){
     QList<DeviceDescriptor> listDevices = *new QList<DeviceDescriptor>;
-    serial = new SerialLine();
-    serial->getAvailableDevices(&listDevices,0);   //scan for available devices on serial port
+    SerialLine::getAvailableDevices(&listDevices,0);   //scan for available devices on serial port
     emit devicesScaned(listDevices);
 }
 
 void Comms::close(){
-    isOpen = false;
-    disconnect(serial,SIGNAL(newMessage(QByteArray)),this,SLOT(parseMessage(QByteArray)));
-    disconnect(serial,SIGNAL(serialLineError(QByteArray)),this,SLOT(errorReceived(QByteArray)));
-    serial->closeLine();
+    emit closeLine();
+    devScanner.searchForDevices(true);
 }
 
 void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
-    serial->write(module+":"+feature+":"+param+";");
+
+#ifdef DEBUG_COMMS
+    qDebug() <<"COMM_WRITE:"<< module+":"+feature+":"+param+";";
+#endif
+    emit dataWrite(module+":"+feature+":"+param+";");
 }
 
 void Comms::write(QByteArray module, QByteArray command){
-    serial->write(module+":"+command+";");
+
+#ifdef DEBUG_COMMS
+    qDebug() <<"COMM_WRITE:"<< module+":"+command;
+#endif
+    emit dataWrite(module+":"+command+";");
 }
 
 void Comms::write(QByteArray module, QByteArray feature, int param){
@@ -45,28 +70,49 @@ void Comms::write(QByteArray module, QByteArray feature, int param){
     tmp[2] = (param>>16);
     tmp[1] = (param>>8);
     tmp[0] = (param);
-    serial->write(module+":"+feature+" ");
-    serial->write(tmp,4);
-    serial->write(";");
+
+#ifdef DEBUG_COMMS
+    qDebug() << "COMM_WRITE:"<<module+":"+feature+":" << param <<";";
+#endif
+
+    QByteArray *qb = new QByteArray(tmp,4);
+    emit dataWrite(module+":"+feature+" "+qb->left(4)+";");
 }
 
 void Comms::write(QByteArray data){
-    serial->write(data);
+
+#ifdef DEBUG_COMMS
+    qDebug() << "COMM_WRITE:"<<data;
+#endif
+    emit dataWrite(data);
 }
 
 void Comms::errorReceived(QByteArray error){
     emit communicationError(error);
+    devScanner.searchForDevices(true);
+}
+
+
+void Comms::devicesScanned(QList<DeviceDescriptor> deviceList)
+{
+    emit devicesScaned(deviceList);
 }
 
 void Comms::parseMessage(QByteArray message){
     //CRC can be checked here but it is not implemented
     //just pass the data
-    //qDebug() << "parse massage in comms.cpp";
+#ifdef DEBUG_COMMS
+    if(message.length()>96){
+        qDebug() <<"COMM_READ:"<< message.left(64)<<"..."<<message.right(16);
+    }else{
+        qDebug() <<"COMM_READ:"<< message;
+    }
+#endif
     emit newData(message);
 }
 
 bool Comms::getIsOpen() const
 {
-    return isOpen;
+    return serial->getIsOpen();
 }
 

@@ -1,14 +1,578 @@
 #include "widgetdisplay.h"
 #include "ui_widgetdisplay.h"
 
-WidgetDisplay::WidgetDisplay(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::WidgetDisplay)
+WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unitsStyleSheet,
+                             bool showPrgrssBar, int historyTracesNum, int historySize,
+                             QWidget *parent) :
+    QWidget(parent), ui(new Ui::WidgetDisplay), historySize(historySize), name(name)
 {
     ui->setupUi(this);
+
+    loc = QLocale(QLocale::English);
+
+    palette = ui->lcdNumber_avg->palette();
+
+    labelList.append(ui->label_0);
+    labelList.append(ui->label_1);
+    labelList.append(ui->label_2);
+    labelList.append(ui->label_3);
+    labelList.append(ui->label_4);
+
+    foreach(QLabel* label, labelList)
+        label->hide();
+
+    ui->label_0->setText(firstLabelText);
+    ui->label_0->show();
+
+    /* One must hide the unnecessary displays
+       after the object construction */
+
+    setUnitsStyle(unitsStyleSheet);
+    showBarDisplay(showPrgrssBar);
+
+    displayString("");
+    displayAvgString("");
+
+    hideHistoryChartArea();
+    historyData = new QVector<QVector<QPointF>>(historyTracesNum);
+    createHistoryChart(historyTracesNum);
+    createHistoryList();
+    setHistorySize(historySize);
+
+    configureCustomDial();
+    configureFloatingHistoryNumber();
+
+    connect(ui->pushButton_history, SIGNAL(clicked()),
+            this, SLOT(historyButtonClickedCallback()));
+    connect(ui->pushButton_clear, SIGNAL(clicked()),
+            this, SLOT(clearHistoryButtonClickedCallback()));
+    connect(ui->pushButton_list, SIGNAL(clicked()),
+            this, SLOT(listChartSwitchClickedCallback()));
+    connect(ui->pushButton_save, SIGNAL(clicked()),
+            this, SLOT(saveListClickedCallback()));
+
+    connect(chart, &widgetChart::chartRightClicked,
+            this, &WidgetDisplay::chartShowMenuOnRightClickCallback);
+
+    connect(ui->dial, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(dialShowMenuOnRightClickCallback(const QPoint &)));
+    connect(ui->dial, SIGNAL(valueChanged(int)),
+            this, SLOT(dialHistoryValueChangedCallback(int)));
 }
 
 WidgetDisplay::~WidgetDisplay()
 {
     delete ui;
+}
+
+QString WidgetDisplay::formatNumber(double val, char f, int prec){
+    return loc.toString(val, f, prec).replace(loc.decimalPoint(), '.');
+}
+
+void WidgetDisplay::hideHistoryChartArea(){
+    QList<int> sizes = {0, ui->splitter->width()};
+    ui->splitter->setSizes(sizes);
+}
+
+void WidgetDisplay::setUnitsStyle(QString &unitsStyleSheet){
+    ui->styleUnits->setStyleSheet(unitsStyleSheet);
+}
+
+void WidgetDisplay::setAvgStyle(QString &avgStyleSheet){
+    ui->styleAvg->setStyleSheet(avgStyleSheet);
+}
+
+void WidgetDisplay::setErrStyle(QString &errStyleSheet){
+    ui->styleErr->setStyleSheet(errStyleSheet);
+}
+
+void WidgetDisplay::setQerrStyle(QString &qerrStyleSheet){
+    ui->styleQerr->setStyleSheet(qerrStyleSheet);
+}
+
+void WidgetDisplay::setTerrStyle(QString &terrStyleSheet){
+    ui->styleTerr->setStyleSheet(terrStyleSheet);
+}
+
+void WidgetDisplay::setBarStyle(QString &barStyleSheet){
+    ui->progressBar->setStyleSheet(barStyleSheet);
+}
+
+void WidgetDisplay::showQerrStyle(bool visible){
+    (visible) ? ui->styleQerr->show() : ui->styleQerr->hide();
+}
+
+void WidgetDisplay::showTerrStyle(bool visible){
+    (visible) ? ui->styleTerr->show() : ui->styleTerr->hide();
+}
+
+void WidgetDisplay::showQerrTerrStyle(bool visible){
+    showQerrStyle(visible);
+    showTerrStyle(visible);
+}
+
+void WidgetDisplay::showAvgDisplay(bool visible){
+    (visible) ? ui->horizontalWidget_avg->show() : ui->horizontalWidget_avg->hide();
+}
+
+void WidgetDisplay::showErrDisplay(bool visible){
+    (visible) ? ui->horizontalWidget_err->show() : ui->horizontalWidget_err->hide();
+}
+
+void WidgetDisplay::showBarDisplay(bool visible){
+    (visible) ? ui->horizontalWidget_bar->show() : ui->horizontalWidget_bar->hide();
+}
+
+void WidgetDisplay::displayNumber(double number){
+    ui->lcdNumber->display(number);
+}
+
+void WidgetDisplay::displayString(const QString &string){
+    ui->lcdNumber->display(string);
+}
+
+void WidgetDisplay::displayAvgNumber(double number){
+    ui->lcdNumber_avg->display(number);
+}
+
+void WidgetDisplay::displayAvgString(const QString &string){
+    ui->lcdNumber_avg->display(string);
+}
+
+void WidgetDisplay::displayQerrNumber(double number){
+    ui->lcdNumber_qerr->display(number);
+}
+
+void WidgetDisplay::displayQerrString(const QString &string){
+    ui->lcdNumber_qerr->display(string);
+}
+
+void WidgetDisplay::displayTerrNumber(double number){
+    ui->lcdNumber_terr->display(number);
+}
+
+void WidgetDisplay::displayTerrString(const QString &string){
+    ui->lcdNumber_terr->display(string);
+}
+
+void WidgetDisplay::changeAvgColor(QColor color){
+    palette.setColor(QPalette::WindowText, color);
+    ui->lcdNumber_avg->setPalette(palette);
+}
+
+void WidgetDisplay::showProgressBar(bool visible){
+    (visible) ? ui->progressBar->show() : ui->progressBar->hide();
+}
+
+void WidgetDisplay::setProgressBarRange(int min, int max){
+    ui->progressBar->setRange(min, max);
+}
+
+void WidgetDisplay::updateProgressBar(int value){
+    ui->progressBar->setValue(value);
+    //  ui->progressBar->repaint();
+    //  if progress bar not left with its default style
+    //  the chunks are around 5% instead of at least 1%
+}
+
+void WidgetDisplay::configLabel(int labelNumber, QString text, QString colorStyle, bool isVisible){
+    labelList.at(labelNumber)->setText(text);
+    labelList.at(labelNumber)->setStyleSheet(colorStyle);
+    isVisible ? labelList.at(labelNumber)->show() : labelList.at(labelNumber)->hide();
+}
+
+QString WidgetDisplay::getLabelText(int labelNumber){
+    return labelList.at(labelNumber)->text();
+}
+
+void WidgetDisplay::setLabelText(int labelNumber, const QString text){
+    labelList.at(labelNumber)->setText(text);
+    labelList.at(labelNumber)->show();
+}
+
+void WidgetDisplay::setLabelColor(int labelNumber, const QString &textStyleSheet){
+    labelList.at(labelNumber)->setStyleSheet(textStyleSheet);
+}
+
+void WidgetDisplay::hideLabel(int labelNumber){
+    labelList.at(labelNumber)->hide();
+}
+
+void WidgetDisplay::showLabel(int labelNumber){
+    labelList.at(labelNumber)->show();
+}
+
+void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){
+    if(color == "blue"){
+        if(drawFlag == 0){
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 1) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 2) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 3) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 4) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 5) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 6) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 7) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag = 0;
+        }
+    }else if (color == "grey") {
+        if(drawFlag == 0){
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(124,124,124);color:rgb(124,124,124);">--<span style="background-color:rgb(95,95,95);color:rgb(95,95,95);">--<span style="background-color:rgb(67,67,67);color:rgb(67,67,67);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 1) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(95,95,95);color:rgb(95,95,95);">--<span style="background-color:rgb(124,124,124);color:rgb(124,124,124);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 2) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(67,67,67);color:rgb(67,67,67);">--<span style="background-color:rgb(95,95,95);color:rgb(95,95,95);">--<span style="background-color:rgb(124,124,124);color:rgb(124,124,124);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 3) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(67,67,67);color:rgb(67,67,67);">--<span style="background-color:rgb(95,95,95);color:rgb(95,95,95);">--<span style="background-color:rgb(124,124,124);color:rgb(124,124,124);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 4) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(67,67,67);color:rgb(67,67,67);">--<span style="background-color:rgb(95,95,95);color:rgb(95,95,95);">--<span style="background-color:rgb(124,124,124);color:rgb(124,124,124);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 5) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(124,124,124);color:rgb(124,124,124);">--<span style="background-color:rgb(95,95,95);color:rgb(95,95,95);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 6) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(124,124,124);color:rgb(124,124,124);">--<span style="background-color:rgb(95,95,95);color:rgb(95,95,95);">--<span style="background-color:rgb(67,67,67);color:rgb(67,67,67);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 7) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(124,124,124);color:rgb(124,124,124);">--<span style="background-color:rgb(95,95,95);color:rgb(95,95,95);">--<span style="background-color:rgb(67,67,67);color:rgb(67,67,67);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag = 0;
+        }
+    }else if (color == "green") {
+        if(drawFlag == 0){
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(54,154,24);color:rgb(54,154,24);">--<span style="background-color:rgb(49,115,29);color:rgb(49,115,29);">--<span style="background-color:rgb(43,77,33);color:rgb(43,77,33);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 1) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(49,115,29);color:rgb(49,115,29);">--<span style="background-color:rgb(54,154,24);color:rgb(54,154,24);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 2) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(43,77,33);color:rgb(43,77,33);">--<span style="background-color:rgb(49,115,29);color:rgb(49,115,29);">--<span style="background-color:rgb(54,154,24);color:rgb(54,154,24);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 3) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(43,77,33);color:rgb(43,77,33);">--<span style="background-color:rgb(49,115,29);color:rgb(49,115,29);">--<span style="background-color:rgb(54,154,24);color:rgb(54,154,24);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 4) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(43,77,33);color:rgb(43,77,33);">--<span style="background-color:rgb(49,115,29);color:rgb(49,115,29);">--<span style="background-color:rgb(54,154,24);color:rgb(54,154,24);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 5) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(54,154,24);color:rgb(54,154,24);">--<span style="background-color:rgb(49,115,29);color:rgb(49,115,29);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 6) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(54,154,24);color:rgb(54,154,24);">--<span style="background-color:rgb(49,115,29);color:rgb(49,115,29);">--<span style="background-color:rgb(43,77,33);color:rgb(43,77,33);">--)**");
+            drawFlag++;
+        }else if (drawFlag == 7) {
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(54,154,24);color:rgb(54,154,24);">--<span style="background-color:rgb(49,115,29);color:rgb(49,115,29);">--<span style="background-color:rgb(43,77,33);color:rgb(43,77,33);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            drawFlag = 0;
+        }
+    }else if (color == "clear") {
+        labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+    }
+
+    /* BLUE   - rgb(24,154,224)
+     * Darker - rgb(29,115,162)
+     * Dark   - rgb(33,77,100)
+     * */
+
+    /* GREY   - rgb(124,124,124)
+     * Darker - rgb(49,115,29)
+     * Dark   - rgb(43,77,33)
+     * */
+
+    /* GREEN  - rgb(54,154,24)
+     * Darker - rgb(95,95,95)
+     * Dark   - rgb(67,67,67)
+     * */
+}
+
+/******************************* HISTORY *********************************/
+
+void WidgetDisplay::configureCustomDial(){
+    ui->dial->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->dial->drawMarker(false);
+    ui->dial->setRange(100, 1000);
+    ui->dial->setPageStep(100);
+    ui->dial->setSingleStep(20);
+}
+
+void WidgetDisplay::configureFloatingHistoryNumber(){
+    ui->dial->setEnabled(true);
+    ui->dial->setToolTip(QString::number(historySize));
+    labelFloatHistNum = new QLabel(this);
+    labelFloatHistNum->setGeometry(ui->dial->x()+10, ui->dial->y()+64, 30, 20);
+    labelFloatHistNum->setStyleSheet(QString::fromUtf8("QLabel{background-color: rgb(48, 48, 48);}"));
+    labelFloatHistNum->hide();
+    labelFloatHistNum->setNum(100);
+}
+
+void WidgetDisplay::createHistoryChart(int historyTracesNum){
+    chart = new widgetChart(ui->verticalWidget_history, historyTracesNum);
+    chart->setLabelsSize(7);
+    chart->formatLabels("%.1f", "%.2g");
+    chart->setGridLinesVisible(true, true);
+    chart->setGridDensity(5, 5);
+    chart->setLabelsVisible(true, true);
+    chart->setGraphColor(QCOLOR_GREY);
+    chart->setMargins(-12, -5, -6, -10);
+    chart->setRangeY(0, 3.3);
+    chart->setDataMinMax(0, 10);
+    ui->horizontalWidget_graph_2->addWidget(chart);
+}
+
+void WidgetDisplay::createHistoryList(){
+    list = new WidgetList(ui->verticalWidget_history);
+    list->hide();
+    ui->horizontalWidget_graph_2->addWidget(list);
+}
+
+void WidgetDisplay::setHistorySize(int smplNumber){
+    historySize = smplNumber;
+}
+
+void WidgetDisplay::clearHistoryChart(){
+    chart->clearAll();
+}
+
+void WidgetDisplay::clearHistoryList(){
+    list->clear();
+}
+
+void WidgetDisplay::clearHistoryData(){
+    for (int i = 0; i < historyData->length(); i++)
+        historyData[0][i].clear();
+}
+
+void WidgetDisplay::clearExpiredPointsFromChart(){
+    for(int i = 0; i < historyData->length(); i++)
+        chart->clearPoint(i, 0);
+}
+
+void WidgetDisplay::clearExpiredPointsFromList(){
+    list->clearLast();
+}
+
+void WidgetDisplay::clearExpiredData(){
+    for(int i = 0; i < historyData->length(); i++)
+        historyData[0][i].removeFirst();
+}
+
+void WidgetDisplay::appendNewHistorySample(QString prefix, double sample, QString affix, float timeStep){
+    timeAxisMax += timeStep;
+    historyData[0][0].reserve(historyData[0].length());
+    historyData[0][0].append(QPointF(timeAxisMax, sample));
+
+    if(sample > rememberMax){
+        setHistoryMinMaxData(0, sample+(sample/10));
+        rememberMax = sample;
+    }
+
+    if(historyData[0][0].length() > historySize){
+        timeAxisMin += timeStep;
+        clearExpiredData();
+        clearExpiredPointsFromChart();
+        clearExpiredPointsFromList();
+    }
+
+    setHistoryMinMaxTime(timeAxisMin, timeAxisMax);
+    chart->appendToTrace(0, &historyData[0][0]);
+    list->appendNumber(timeAxisMax, prefix, sample, affix);
+}
+
+void WidgetDisplay::associateSample(int traceIndex, QString prefix, double sample, QString affix){
+    historyData[0][traceIndex].append(QPointF(timeAxisMax, sample));
+    chart->appendToTrace(traceIndex, &historyData[0][traceIndex]);
+    list->associateNumber(prefix, sample, affix);
+}
+
+void WidgetDisplay::setHistoryMinMaxTime(qreal minX, qreal maxX){
+    chart->setRangeX(minX, maxX);
+}
+
+void WidgetDisplay::setHistoryMinMaxData(qreal minY, qreal maxY){
+    chart->setRangeY(minY, maxY);
+}
+
+void WidgetDisplay::updateHistoryData(QVector<QPointF> *points, int index){    
+    chart->updateTrace(points, index);
+}
+
+void WidgetDisplay::recalcHistorySizeAndSetDial(int reqSize)
+{
+    ui->dial->setValue(reqSize);
+
+    int actSize = historyData[0][0].length();
+
+    if(actSize > reqSize){
+        int difference = actSize - reqSize;
+        for(int i = 0; i < difference; i++){
+            clearExpiredData();
+            clearExpiredPointsFromList();
+            clearExpiredPointsFromChart();
+        }
+        timeAxisMin = historyData[0][0].first().x();
+        setHistoryMinMaxTime(timeAxisMin, timeAxisMax);
+    }
+}
+
+void WidgetDisplay::clearHistoryExceptChart(){
+    clearHistoryList();
+    clearHistoryData();
+    timeAxisMax = 0;
+    timeAxisMin = 0;
+}
+
+/*************************************** Callbacks *****************************************/
+
+void WidgetDisplay::clearHistoryButtonClickedCallback(){    
+    clearHistoryChart();
+    clearHistoryExceptChart();
+}
+
+void WidgetDisplay::historyButtonClickedCallback(){
+    QString style;
+    QList<int> sizes = ui->splitter->sizes();
+    int cmpltWidth = ui->splitter->width();
+
+    if(historyView == DISABLED){
+        sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
+        style = "QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        historyView = ENABLED;
+    }else {
+        sizes = {0, cmpltWidth};
+        style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        historyView = DISABLED;
+    }
+    ui->splitter->setSizes(sizes);
+    ui->pushButton_history->setStyleSheet(style);
+}
+
+void WidgetDisplay::listChartSwitchClickedCallback(){
+    QString style;
+    if(listView == DISABLED){
+        style = "QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        chart->hide();
+        list->show();
+        listView = ENABLED;
+    }else {
+        style = "QPushButton{image: url(:/graphics/graphics/icon_list.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        chart->show();
+        list->hide();
+        listView = DISABLED;
+    }
+    ui->pushButton_list->setStyleSheet(style);
+}
+
+void WidgetDisplay::saveListClickedCallback(){
+    list->saveList(name);
+}
+
+void WidgetDisplay::dialHistoryValueChangedCallback(int val){
+    recalcHistorySizeAndSetDial(historySize = val);
+    QString str = QString::number(val);
+    labelFloatHistNum->setText(str);
+    ui->dial->setToolTip(str);
+
+    labelFloatHistNum->show();
+    Timing *timer = new Timing();
+    timer->sleep(450);
+    labelFloatHistNum->hide();
+}
+
+void WidgetDisplay::chartShowMenuOnRightClickCallback(const QPoint &mousePos){
+    QMenu menu(tr("Context menu"), this);
+    menu.setStyleSheet(CONTEXT_MENU_HOVER);
+
+    QAction spline("Spline", this);
+    QAction line("Line", this);
+    QAction scatter("Scatter", this);
+
+    connect(&spline, SIGNAL(triggered()), this, SLOT(chartSwitchToSpline()));
+    connect(&line, SIGNAL(triggered()), this, SLOT(chartSwitchToLine()));
+    connect(&scatter, SIGNAL(triggered()), this, SLOT(chartSwitchToScatter()));
+
+    menu.addAction(&spline);
+    menu.addAction(&line);
+    menu.addAction(&scatter);
+
+    menu.exec(mapToGlobal(mousePos));
+}
+
+void WidgetDisplay::chartSwitchToSpline(){
+    clearHistoryExceptChart();
+    chart->switchToSplineSeries();
+}
+
+void WidgetDisplay::chartSwitchToLine(){
+    clearHistoryExceptChart();
+    chart->switchToLineSeries();
+}
+
+void WidgetDisplay::chartSwitchToScatter(){
+    clearHistoryExceptChart();
+    chart->switchToScatterSeries();
+}
+
+void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){
+    QMenu menu(tr("Context menu"), this);
+    menu.setStyleSheet(CONTEXT_MENU_HOVER);
+
+    QAction s100("100", this);
+    QAction s300("300", this);
+    QAction s500("500", this);
+    QAction s700("700", this);
+    QAction s1000("1000", this);
+
+    connect(&s100, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo100()));
+    connect(&s300, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo300()));
+    connect(&s500, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo500()));
+    connect(&s700, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo700()));
+    connect(&s1000, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo1000()));
+
+    menu.addAction(&s100);
+    menu.addAction(&s300);
+    menu.addAction(&s500);
+    menu.addAction(&s700);
+    menu.addAction(&s1000);
+
+    menu.exec(mapToGlobal(mousePos));
+}
+
+void WidgetDisplay::changeHistorySizeTo100(){
+    recalcHistorySizeAndSetDial(historySize = 100);
+}
+
+void WidgetDisplay::changeHistorySizeTo300(){
+    recalcHistorySizeAndSetDial(historySize = 300);
+}
+
+void WidgetDisplay::changeHistorySizeTo500(){
+    recalcHistorySizeAndSetDial(historySize = 500);
+}
+
+void WidgetDisplay::changeHistorySizeTo700(){
+    recalcHistorySizeAndSetDial(historySize = 700);
+}
+
+void WidgetDisplay::changeHistorySizeTo1000(){
+    recalcHistorySizeAndSetDial(historySize = 1000);
 }

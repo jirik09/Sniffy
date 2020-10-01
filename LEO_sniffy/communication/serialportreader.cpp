@@ -11,7 +11,15 @@ SerialPortReader::SerialPortReader(QSerialPort *serialPort, QObject *parent) :
 void SerialPortReader::handleReadyRead()
 {
     QByteArray currentlyRead = m_serialPort->readAll();
-  //  qDebug() << currentlyRead;
+    sum += currentlyRead.length();
+
+#ifdef DEBUG_READER
+    if(currentlyRead.length()>48){
+        qDebug() <<"READ:" <<currentlyRead.length()<<":"<< currentlyRead.left(16)<<"..."<<currentlyRead.right(16);
+    }else{
+        qDebug() <<"READ:" <<currentlyRead.length()<<":"<< currentlyRead;
+    }
+#endif
 
     emit newData(currentlyRead);
 }

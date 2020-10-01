@@ -13,8 +13,8 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
 
     QList<QSerialPortInfo> ports;
 
-  //  connect(serPort, SIGNAL(readyRead()), this, SLOT(receiveData()));
-  //  connect(serPort, &QSerialPort::errorOccurred, this, &SerialLine::handleError);
+    //  connect(serPort, SIGNAL(readyRead()), this, SLOT(receiveData()));
+    //  connect(serPort, &QSerialPort::errorOccurred, this, &SerialLine::handleError);
 
     ports = portInfo->availablePorts();
 
@@ -35,27 +35,27 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
         sPort->setStopBits(QSerialPort::StopBits::OneStop);
 
         if(sPort->open(QIODevice::ReadWrite)){
-
+            sPort->clear();
             sPort->write("IDN?;");
             sPort->waitForBytesWritten();
-
-            QThread::msleep(100);
-            sPort->waitForReadyRead(100);
+            sPort->waitForReadyRead();
+            QThread::msleep(350);
 
             received = sPort->readAll();
 
+            // qDebug() <<sPort->portName()<<received.length()<<received;
             if (received.length()>16 && received.left(4)=="SYST"){
                 sPort->write("RES!;");
                 sPort->waitForBytesWritten();
 
-                thread()->msleep(150);
+                /*  thread()->msleep(150);
                 sPort->write("IDN?;");
                 sPort->waitForBytesWritten();
 
-                thread()->msleep(100);
-                sPort->waitForReadyRead(50);
+                //thread()->msleep(100);
+                sPort->waitForReadyRead(150);
 
-                received = sPort->readAll();
+                received = sPort->readAll();*/
                 desc.port = sPort->portName();
                 desc.speed = sPort->baudRate();
                 desc.connType = Connection::SERIAL;
@@ -70,21 +70,27 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
     return numberOfDevices;
 }
 
-bool SerialLine::openLine(DeviceDescriptor desc){
+void SerialLine::openSerialLine(DeviceDescriptor desc){
 
-    bool ret = false;
+    //qDebug()<< "serial line open"<<this->thread();
+    bool success = false;
     serPort = new QSerialPort();
     serPort->setPortName(desc.port);
     serPort->setBaudRate(desc.speed);
-   /* serPort->setDataBits(QSerialPort::DataBits::Data8);
-    serPort->setParity(QSerialPort::Parity::NoParity);
-    serPort->setStopBits(QSerialPort::StopBits::OneStop);*/
 
     buffer = new QByteArray();
     message = new QByteArray();
 
-    if(serPort->open(QIODevice::ReadWrite)){
-        ret=true;
+    int i = 0;
+    while(!serPort->open(QIODevice::ReadWrite)){
+        QThread::msleep(500);
+        i++;
+        if(i>5){
+            break;
+        }
+    }
+    if(serPort->isOpen()){
+        success=true;
         serialReader = new SerialPortReader(serPort,this);
         serialWriter = new SerialPortWriter(serPort,this);
 
@@ -93,13 +99,14 @@ bool SerialLine::openLine(DeviceDescriptor desc){
     }else{
         qDebug () << "Serial port error opening";
     }
-    return ret;
+
+    isOpen=success;
 }
 
 void SerialLine::closeLine(){
     serPort->flush();
     serPort->close();
-    serPort->clear();
+    isOpen = false;
 }
 
 void SerialLine::handleError(QSerialPort::SerialPortError error){
@@ -119,7 +126,7 @@ void SerialLine::receiveData(QByteArray data){
     int i = buffer->indexOf(delimiter);
     while(i>0){
         message = new QByteArray(buffer->left(i));
-      //  qDebug() << "Received:" << *message;
+        //  qDebug() << "Received:" << *message;
         emit newMessage(*message);
         //remove message and delimiter from buffer
         buffer->remove(0,i+4);
@@ -128,23 +135,18 @@ void SerialLine::receiveData(QByteArray data){
     }
 }
 
+bool SerialLine::getIsOpen() const
+{
+    return isOpen;
+}
+
 void SerialLine::write(const QByteArray &writeData){
     QDateTime date = QDateTime::currentDateTime();
     //qDebug() << "Sent" <<  date.time() <<":" << writeData;
     if(serPort->isOpen()){
         serialWriter->write(writeData);
     }else{
-        qDebug() << "ERROR cannot send data: port is closed";
-    }
-}
-
-void SerialLine::write(const char *data, qint32 len){
-    QDateTime date = QDateTime::currentDateTime();
-   // qDebug() << "Sent" <<  date.time() <<":" << data;
-    if(serPort->isOpen()){
-        serialWriter->write(data,len);
-    }else{
-        qDebug() << "ERROR cannot send data: port is closed";
+        qDebug() << "ERROR port is closed. Data cannot be send ("<<writeData<<")";
     }
 }
 

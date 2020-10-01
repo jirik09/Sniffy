@@ -19,18 +19,30 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name) :
     ui->setupUi(this);
     ui->label_name->setText(name);
 
-    dial = new CustomDial(ui->widget_dial);
-
-    ui->horizontalLayout_2->addWidget(dial);
-
     units = new QList<params_unit>;
-
-
 }
 
 WidgetDialRange::~WidgetDialRange()
 {
     delete ui;
+}
+
+void WidgetDialRange::setDialColor(QString &textStyleSheet){
+    ui->widget_dial->setStyleSheet(textStyleSheet);
+}
+
+void WidgetDialRange::setDialButtonsColor(QString &bckgndStyleSheet){
+    ui->pushButton_plus->setStyleSheet(bckgndStyleSheet);
+    ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
+}
+
+float WidgetDialRange::getDefaultRealValue() const{
+    return defaultRealValue;
+}
+
+void WidgetDialRange::setRealValue(float value){
+    realValue = value;
+    updateControls(0);
 }
 
 void WidgetDialRange::addOption (QString unit,float mult){
@@ -39,7 +51,6 @@ void WidgetDialRange::addOption (QString unit,float mult){
     tmpUnit->unit = unit;
 
     units->append(*tmpUnit);
-
     ui->comboBox->addItem(unit);
 }
 
@@ -49,51 +60,38 @@ void WidgetDialRange::hideUnitSelection(void){
     this->setMinimumSize(200,70);
 }
 
-void WidgetDialRange::setSelected(int index){
-    ui->comboBox->setCurrentIndex(index);
-}
-
 void WidgetDialRange::plusClicked(){
     float tmpValue = labelValue + buttonStep;
     realValue = tmpValue * unitMult;
-    //qDebug ("plus action real:%f step:%f tmp:%f label:%f mult:%f",realValue,buttonStep, tmpValue,labelValue,unitMult);
     updateControls(0);
 }
 
 void WidgetDialRange::minusClicked(){
     float tmpValue = labelValue - buttonStep;
     realValue = tmpValue * unitMult;
-    //qDebug ("plus action real:%f step:%f tmp:%f label:%f mult:%f",realValue,buttonStep, tmpValue,labelValue,unitMult);
     updateControls(0);
-
 }
 
 void WidgetDialRange::dialValueChanged(int in){
-
-
     //dial change is marginal so do the action
     if(abs(realValue)>getRealValueFromDial(in+1.5) || abs(realValue)<getRealValueFromDial(in-1.5) ){
         realValue = getRealValueFromDial(in);
-        //qDebug ("dial action real:%f in:%d step:%f",realValue,in, dialStep);
+        realValue = (rangePrecision)*round(realValue/(rangePrecision));
         updateControls(0);
     }
 }
 
 void WidgetDialRange::unitChanged(int in){
-    //qDebug("unit changed : index:%d real:%f",in,realValue);
     realValue = realValue*units->at(in).mult/unitMult;
-    //qDebug("unit changed : new real:%f",realValue);
     updateControls(0);
 }
 
 
 void WidgetDialRange::textEditFinished(){
-    //qDebug("finished");
     updateControls(0);
 }
 
 void WidgetDialRange::textEditChanged(const QString & text){
-    //qDebug("plain text edited: %s",text.toUtf8().data());
     bool success = false ;
 
     //try local decimal separator
@@ -106,10 +104,7 @@ void WidgetDialRange::textEditChanged(const QString & text){
 
     if (success){
         realValue = flRead * unitMult;
-        //qDebug("succes: %f",realValue);
         updateControls(2);
-    }  else{
-        // ui->lineEdit->setText(QString::number(labelValue,'f',2));
     }
 }
 
@@ -121,32 +116,32 @@ min - minimum value
 max - maximum value
 baseUnit - base unit to be used e.g. 's' for seconds (don't use ms or mV!)
 buttonStep - one click step. Linked with curent label value -> not dependent on unit (1 by default)
-smalestUnitMult - smallest unit to be shown in comboBox unit selection (1 by default)
+smalestUnitMult -   smallest unit to be shown in comboBox unit selection (1 by default)
+                    this value is also used a minimum for value rounding when set by dial (0.1 (Volts) means dial will set only values rounded to 100mV)
 defaultValue - selected by default (0 by default)
 log - bool type true=log scale, false=lin scale (false by default)
 */
-void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool log ){
+void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic ){
     rangeMax = max;
     rangeMin = min;
     rangePrecision = smalestUnitMult;
     dialStep = (max-min)/dialMaxValue;
     this->buttonStep = buttonStep;
 
-    logaritmic = log;
+    logaritmic = isLogaritmic;
 
     //min cannot be 0 for log scale --> set 0.001
-    if(log && min==0){
+    if(isLogaritmic && min==0){
         rangeMin=0.001;
     }
 
-    if(log){
+    if(isLogaritmic){
         logGain = dialMaxValue/log2(rangeMax/rangeMin);
         logOffset = -logGain*log2(rangeMin);
     }
 
-
-    dial->setMinimum(0);
-    dial->setMaximum(dialMaxValue);
+    ui->dial->setMinimum(0);
+    ui->dial->setMaximum(dialMaxValue);
 
     if(defaultValue<min){
         realValue=rangeMin;
@@ -155,6 +150,8 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     }else{
         realValue= defaultValue;
     }
+
+    defaultRealValue = realValue;
 
 
     if (smalestUnitMult<1e-3){
@@ -173,35 +170,29 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
         unitMult = units->last().mult;
     }
 
-
     if(max>=1000){
         addOption("k"+baseUnit,1000);
     }if(max>1000000){
         addOption("M"+baseUnit,1000000);
     }
 
-
     connect(ui->pushButton_plus,SIGNAL(clicked()),this,SLOT(plusClicked()));
     connect(ui->pushButton_minus,SIGNAL(clicked()),this,SLOT(minusClicked()));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
-    connect(dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
+    connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
     connect(ui->lineEdit,SIGNAL(textEdited(const QString &)),this,SLOT(textEditChanged(const QString &)));
     connect(ui->lineEdit,SIGNAL(editingFinished()),this,SLOT(textEditFinished()));
 
     updateControls(0);
-
 }
 
 void WidgetDialRange::updateControls(int except){
-
     if(realValue>rangeMax){
         realValue = rangeMax;
     }
-
     if(realValue<rangeMin){
         realValue = rangeMin;
     }
-
     if(except!=2){
         //calculate the unit mult ans label value from real value and available ranges in units selection
         int i = 0;
@@ -226,38 +217,30 @@ void WidgetDialRange::updateControls(int except){
         ui->lineEdit->setText(QString::number(labelValue,'f',2));
     }
 
-
     if(except!=1){
-        // qDebug("Dial set : %f",(realValue-rangeMin)/dialStep);
-        disconnect(dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
-        dial->setValue(getValueForDial(realValue));
-        connect(dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
+        disconnect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
+        ui->dial->setValue(getValueForDial(realValue));
+        connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
     }
     emit valueChanged(realValue);
 }
 
 float WidgetDialRange::getRealValueFromDial(int in){
     if(!logaritmic){
-       // qDebug("real lin %f",in*dialStep);
         return rangeMin+in*dialStep;
     }else{
         float ret = pow(2,(in-logOffset)/logGain);
-        //qDebug("real log10 val:%f in:%d",ret,in);
         return ret;
     }
 }
 
 int WidgetDialRange::getValueForDial(float real){
-
     if(!logaritmic){
-        //qDebug("dial lin %f",real);
         return (real-rangeMin)/dialStep;//rangeMin+in*dialStep;
     }else{
         float ret = logOffset + logGain*log2(real);
-        //qDebug("dial log10 val:%f in:%f",ret,real);
         return ret;
     }
-
 };
 
 

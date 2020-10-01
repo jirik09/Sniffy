@@ -7,6 +7,7 @@
 #include <QtMath>
 
 #include "../graphics/colors.h"
+#include "../graphics/styles.h"
 
 namespace Ui {
 class WidgetButtons;
@@ -40,12 +41,14 @@ public:
     int getSelectedIndex();
     int getStatus();
     void setDisabledButton(bool disabled, int index);
+    void setEnabledButton(bool enabled, int index);
     void disableAll();
+    void enableAll(bool enable);
     void setChecked (bool checked, int index);
 
 private:
     Ui::WidgetButtons *ui;
-    QString buttonColors[8] = {BUTTON_COLOR_BLUE};
+    QString buttonColors[8] = {BCKGRND_COLOR_BLUE};
     ButtonTypes type = ButtonTypes::NORMAL;
 
     QList<QPushButton*> pushButtonsList;

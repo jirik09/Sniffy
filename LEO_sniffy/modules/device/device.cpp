@@ -18,7 +18,6 @@ Device::Device(QObject *parent)
 //(keep it here bacause it is simpler and no need to use signals)
 void Device::deviceConnection(int buttonIndex){
     if(buttonIndex==1){
-        qDebug() << "scan clicked";
         emit ScanDevices();
         deviceWindow->deviceConnectButton->disableAll();
         deviceWindow->deviceSelection->addOption("Scanning...",0);
@@ -59,13 +58,13 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
 }
 
 void Device::connectDevice(int index){
-    emit opened(index);
+    emit openDevice(index);
     deviceWindow->deviceConnectButton->setText("Disconnect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(true,1);//disable scan
 }
 
 void Device::disconnectDevice(){
-    emit closed();
+    emit closeDevice();
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
     setIcon(":/graphics/graphics/icon_not_connected.png");
@@ -77,6 +76,9 @@ void Device::errorHandler(QByteArray error){
     messageBox.critical(0,"Error","An error has occured:\n" + error + "\nPlease reconnect the device");
     messageBox.setFixedSize(500,200);
     disconnectDevice();
+    deviceWindow->hideSpecification();
+    deviceWindow->deviceSelection->clear();
+    deviceWindow->deviceSelection->addOption("Connection lost", -1);
     deviceWindow->deviceConnectButton->setDisabledButton(true,0);//disable connect
 }
 

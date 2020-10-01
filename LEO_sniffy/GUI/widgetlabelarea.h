@@ -20,6 +20,7 @@ public:
     ~WidgetLabelArea();
 
     void setChannelLabelVisible(int index, bool isVisible);
+    void setChannelScale(int index, QString Scale);
     void setTriggerLabelText(QString text);
     void setSamplingRateLabelText(QString text);
     void setScaleLabelText(QString text);
