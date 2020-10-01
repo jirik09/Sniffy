@@ -10,12 +10,11 @@ class WidgetFeature;
 
 enum class ModuleStatus
   {
-    STOP,
-    PAUSE,
-    PLAY,
-    HIDDEN_PAUSE,
-    HIDDEN_PLAY
-
+    STOP = 0,
+    PAUSE = 1,
+    PLAY = 2,
+    HIDDEN_PAUSE = 3,
+    HIDDEN_PLAY = 4
   };
 
 class WidgetControlModule : public QWidget

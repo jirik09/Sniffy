@@ -27,6 +27,7 @@ public:
     QByteArray getCommandPrefix();
     void hideModuleStatus();
     void setModuleStatus(ModuleStatus stat);
+    ModuleStatus getModuleStatus();
 
     void showModuleControl();
     void showModuleWindow();

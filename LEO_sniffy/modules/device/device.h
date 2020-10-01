@@ -17,6 +17,7 @@ public:
     explicit Device(QObject *parent = nullptr);
 
     QWidget* getWidget();
+    QString getName();
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
     void errorHandler(QByteArray error);

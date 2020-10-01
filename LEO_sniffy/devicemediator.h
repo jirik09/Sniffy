@@ -16,6 +16,10 @@ public:
     QList<QSharedPointer<AbstractModule>> getModulesList();   
     void ShowDeviceModule();
     bool getIsConnected() const;
+    QString getDeviceName();
+
+signals:
+    void loadLayout(QString Devicename);
 
 private:
     QList<DeviceDescriptor> deviceList;

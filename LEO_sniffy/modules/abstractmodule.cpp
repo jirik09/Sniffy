@@ -69,6 +69,11 @@ void AbstractModule::setModuleStatus(ModuleStatus stat){
     moduleControlWidget->setStatus(stat);
 }
 
+ModuleStatus AbstractModule::getModuleStatus()
+{
+    return moduleControlWidget->getStatus();
+}
+
 void AbstractModule::showModuleControl(){
     moduleControlWidget->show();
 }

@@ -104,3 +104,8 @@ void Device::stopModule(){}
 QWidget* Device::getWidget(){
     return deviceWindow;
 }
+
+QString Device::getName()
+{
+    return deviceSpec->device;
+}
