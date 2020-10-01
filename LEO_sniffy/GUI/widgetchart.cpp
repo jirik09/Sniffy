@@ -28,7 +28,9 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
-        createSeries(series, i);
+        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
+        seriesList.append(series);
+        createSeries(series);
     }
 
     formatAxisLabelsForScope();
@@ -36,9 +38,10 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QChartView *chartView = new QChartView(chart);
     ui->horizontalLayout_chart->addWidget(chartView);
 
+    initContextMenu();
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
-            this, SLOT(chartRightClickCallback(const QPoint &)));
+            this, SLOT(rightClickCallback(const QPoint &)));
 }
 
 widgetChart::~widgetChart()
@@ -46,61 +49,59 @@ widgetChart::~widgetChart()
     delete ui;
 }
 
-void widgetChart::useOpenGL(bool use){    
-    //series->setUseOpenGL(use);
-}
-
-void widgetChart::wipeAllOut(){
-    seriesList.clear();
-    chart->removeAllSeries();
-
-    /* chart->removeAllSeries function not working till chart resized */
-    chart->resize(chart->size() + QSize(1, 1));
-    chart->resize(chart->size() - QSize(1, 1));
-
-    /* First change from QSplineSeries prevents the app from repainting
-       One must start moving with mouse.. */
-//    QPoint pos = QCursor::pos();
-//    cursor.setPos(pos.x()+2,pos.y()+2);
-}
-
-void widgetChart::switchToSplineSeries(){
-    wipeAllOut();
+void widgetChart::switchToSplineSeriesCallback(){
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
-        createSeries(series, i);
+        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
+
+        series->append(seriesList[i]->points());
+        seriesList[i]->clear();
+        seriesList.replace(i, series);
+
+        createSeries(series);
     }
 }
 
-void widgetChart::switchToLineSeries(){
-    wipeAllOut();
+void widgetChart::switchToLineSeriesCallback(){
     for (int i = 0; i < maxTraces; i++) {
         QLineSeries *series = new QLineSeries;
         //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
-        createSeries(series, i);
+        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
+
+        series->append(seriesList[i]->points());
+        seriesList[i]->clear();
+        seriesList.replace(i, series);
+
+        createSeries(series);
     }
 }
 
-void widgetChart::switchToScatterSeries(){
-    wipeAllOut();
+void widgetChart::switchToScatterSeriesCallback(){
     for (int i = 0; i < maxTraces; i++) {
         QScatterSeries *series = new QScatterSeries;
         //connect(series, &QScatterSeries::hovered, this, &widgetChart::hovered);
         series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
         series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
         series->setMarkerSize(3.8);
-        seriesList.append(series);
-        chart->addSeries(series);
-        series->attachAxis(axisX);
-        series->attachAxis(axisY);
-        series->setUseOpenGL(true);
+
+        series->append(seriesList[i]->points());
+        seriesList[i]->clear();
+        seriesList.replace(i, series);
+
+        createSeries(series);
     }
 }
 
-void widgetChart::createSeries(QLineSeries *series, int traceIndex){
-    series->setPen(QPen(QBrush(QColor(colors[traceIndex%5])), 2.0));
-    seriesList.append(series);
+void widgetChart::useOpenGLCallback(){
+    bool use = btnOpenGL->isChecked();
+    btnOpenGL->setChecked(use);
+    for (int i = 0; i < maxTraces; i++) {
+        chart->series().at(i)->setUseOpenGL(use);
+    }
+}
+
+void widgetChart::createSeries(QAbstractSeries *series){
     chart->addSeries(series);
     series->attachAxis(axisX);
     series->attachAxis(axisY);
@@ -110,7 +111,7 @@ void widgetChart::createSeries(QLineSeries *series, int traceIndex){
 void widgetChart::clearAll(){
     for (int i = 0; i < maxTraces; i++)
         seriesList[i]->clear();
-    if(markers == ENABLED)
+    if(markers)
         markersHorizontal->clear();
 }
 
@@ -234,7 +235,7 @@ void widgetChart::setLabelsSize(int pointSize){
 }
 
 void widgetChart::createHorizontalMarkes(){
-    markers = ENABLED;
+    markers = true;
     //prepare markers on X axis
     axisMarkerHorizontal = new QValueAxis;
     chart->addAxis(axisMarkerHorizontal, Qt::AlignRight);
@@ -276,8 +277,30 @@ int widgetChart::getTraceNum(){
     return maxTraces;
 }
 
-void widgetChart::chartRightClickCallback(const QPoint &mousePos){
-    emit chartRightClicked(mousePos);
+void widgetChart::initContextMenu(){
+    menu = new QMenu(tr("Context menu"), this);
+    menu->setStyleSheet(CONTEXT_MENU_HOVER);
+
+    spline = new QAction("Spline", this);
+    line = new QAction("Line", this);
+    scatter  = new QAction("Scatter", this);
+    btnOpenGL = new QAction("Use OpenGL", this);
+    btnOpenGL->setCheckable(true);
+    btnOpenGL->setChecked(true);
+
+    connect(spline, SIGNAL(triggered()), this, SLOT(switchToSplineSeriesCallback()));
+    connect(line, SIGNAL(triggered()), this, SLOT(switchToLineSeriesCallback()));
+    connect(scatter, SIGNAL(triggered()), this, SLOT(switchToScatterSeriesCallback()));
+    connect(btnOpenGL, SIGNAL(triggered()), this, SLOT(useOpenGLCallback()));
+
+    menu->addAction(spline);
+    menu->addAction(line);
+    menu->addAction(scatter);
+    menu->addAction(btnOpenGL);
+}
+
+void widgetChart::rightClickCallback(const QPoint &mousePos){
+    menu->exec(mapToGlobal(mousePos));
 }
 
 void widgetChart::hovered(const QPointF &point){
