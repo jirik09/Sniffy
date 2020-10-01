@@ -15,6 +15,7 @@ QT_END_NAMESPACE
 class SerialPortWriter : public QObject
 {
     Q_OBJECT
+    //#define DEBUG_WRITER
 
 public:
     explicit SerialPortWriter(QSerialPort *serialPort, QObject *parent = nullptr);
