@@ -51,9 +51,6 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     connect(ui->pushButton_save, SIGNAL(clicked()),
             this, SLOT(saveListClickedCallback()));
 
-    connect(chart, &widgetChart::chartSeriesChanged,
-            this, &WidgetDisplay::chartSeriesChangedCallback);
-
     connect(ui->dial, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(dialShowMenuOnRightClickCallback(const QPoint &)));
     connect(ui->dial, SIGNAL(valueChanged(int)),
@@ -430,18 +427,14 @@ void WidgetDisplay::recalcHistorySizeAndSetDial(int reqSize)
     }
 }
 
-void WidgetDisplay::clearHistoryExceptChart(){
+/*************************************** Callbacks *****************************************/
+
+void WidgetDisplay::clearHistoryButtonClickedCallback(){
+    clearHistoryChart();
     clearHistoryList();
     clearHistoryData();
     timeAxisMax = 0;
     timeAxisMin = 0;
-}
-
-/*************************************** Callbacks *****************************************/
-
-void WidgetDisplay::clearHistoryButtonClickedCallback(){    
-    clearHistoryChart();
-    clearHistoryExceptChart();
 }
 
 void WidgetDisplay::historyButtonClickedCallback(){
@@ -496,10 +489,6 @@ void WidgetDisplay::dialHistoryValueChangedCallback(int val){
     Timing *timer = new Timing();
     timer->sleep(450);
     labelFloatHistNum->hide();
-}
-
-void WidgetDisplay::chartSeriesChangedCallback(){
-
 }
 
 void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){
