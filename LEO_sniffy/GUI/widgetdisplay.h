@@ -143,12 +143,8 @@ private slots:
     void listChartSwitchClickedCallback();
     void saveListClickedCallback();
     void dialHistoryValueChangedCallback(int val);
-    void chartShowMenuOnRightClickCallback(const QPoint &mousePos);
+    void chartSeriesChangedCallback();
     void dialShowMenuOnRightClickCallback(const QPoint &mousePos);
-
-    void chartSwitchToSpline();
-    void chartSwitchToLine();
-    void chartSwitchToScatter();
 
     void changeHistorySizeTo100();
     void changeHistorySizeTo300();
