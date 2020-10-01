@@ -13,7 +13,6 @@
 #include <QMenu>
 #include <QtMath>
 #include <QDateTimeAxis>
-#include <QCursor>
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
@@ -64,9 +63,13 @@ public:
 
 private:
     Ui::widgetChart *ui;
-    QCursor cursor;
     QList<QXYSeries *> seriesList;
     QScatterSeries *markersHorizontal;
+
+    QMenu *menu;
+    QAction *spline, *line, *scatter, *btnOpenGL;
+    enum enable {DISABLED, ENABLED} openGL = DISABLED;
+
     bool markers = 0;
     int maxTraces;
 

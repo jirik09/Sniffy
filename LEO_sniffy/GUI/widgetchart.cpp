@@ -38,6 +38,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QChartView *chartView = new QChartView(chart);
     ui->horizontalLayout_chart->addWidget(chartView);
 
+    initContextMenu();
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(rightClickCallback(const QPoint &)));
@@ -93,7 +94,11 @@ void widgetChart::switchToScatterSeriesCallback(){
 }
 
 void widgetChart::useOpenGLCallback(){
-
+    bool use = btnOpenGL->isChecked();
+    btnOpenGL->setChecked(use);
+    for (int i = 0; i < maxTraces; i++) {
+        chart->series().at(i)->setUseOpenGL(use);
+    }
 }
 
 void widgetChart::createSeries(QAbstractSeries *series){
@@ -273,31 +278,29 @@ int widgetChart::getTraceNum(){
 }
 
 void widgetChart::initContextMenu(){
+    menu = new QMenu(tr("Context menu"), this);
+    menu->setStyleSheet(CONTEXT_MENU_HOVER);
 
+    spline = new QAction("Spline", this);
+    line = new QAction("Line", this);
+    scatter  = new QAction("Scatter", this);
+    btnOpenGL = new QAction("Use OpenGL", this);
+    btnOpenGL->setCheckable(true);
+    btnOpenGL->setChecked(true);
+
+    connect(spline, SIGNAL(triggered()), this, SLOT(switchToSplineSeriesCallback()));
+    connect(line, SIGNAL(triggered()), this, SLOT(switchToLineSeriesCallback()));
+    connect(scatter, SIGNAL(triggered()), this, SLOT(switchToScatterSeriesCallback()));
+    connect(btnOpenGL, SIGNAL(triggered()), this, SLOT(useOpenGLCallback()));
+
+    menu->addAction(spline);
+    menu->addAction(line);
+    menu->addAction(scatter);
+    menu->addAction(btnOpenGL);
 }
 
 void widgetChart::rightClickCallback(const QPoint &mousePos){
-    QMenu menu(tr("Context menu"), this);
-    menu.setStyleSheet(CONTEXT_MENU_HOVER);
-
-    QAction spline("Spline", this);
-    QAction line("Line", this);
-    QAction scatter("Scatter", this);
-    QAction useOpenGL("Use OpenGL", this);
-    useOpenGL.setCheckable(true);
-    useOpenGL.setChecked(true);
-
-    connect(&spline, SIGNAL(triggered()), this, SLOT(switchToSplineSeriesCallback()));
-    connect(&line, SIGNAL(triggered()), this, SLOT(switchToLineSeriesCallback()));
-    connect(&scatter, SIGNAL(triggered()), this, SLOT(switchToScatterSeriesCallback()));
-    connect(&useOpenGL, SIGNAL(triggered()), this, SLOT(useOpenGLCallback()));
-
-    menu.addAction(&spline);
-    menu.addAction(&line);
-    menu.addAction(&scatter);
-    menu.addAction(&useOpenGL);
-
-    menu.exec(mapToGlobal(mousePos));
+    menu->exec(mapToGlobal(mousePos));
 }
 
 void widgetChart::hovered(const QPointF &point){
