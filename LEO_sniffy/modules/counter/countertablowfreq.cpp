@@ -6,6 +6,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     destination->addWidget(separatorChannelSwitch);
 
     buttonsChannelSwitch = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
+    buttonsChannelSwitch->setObjectName("cntBtnChannelSwitch");
     buttonsChannelSwitch->setText("CH1", 0);
     buttonsChannelSwitch->setText("CH2", 1);
     buttonsChannelSwitch->setColor(lfCh2BckgndColor, 1);
@@ -15,6 +16,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     destination->addWidget(separatorQuantitySwitch);
 
     buttonsQuantitySwitch = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
+    buttonsQuantitySwitch->setObjectName("quanSwitch");
     buttonsQuantitySwitch->setText("Frequency", 0);
     buttonsQuantitySwitch->setText("Period", 1);
     destination->addWidget(buttonsQuantitySwitch);
@@ -38,6 +40,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     destination->addWidget(separatorMultiplierSwitch);
 
     buttonsMultiplierSwitch = new WidgetButtons(parent, 4, ButtonTypes::RADIO, "", 0);
+    buttonsMultiplierSwitch->setObjectName("multSwitch");
     buttonsMultiplierSwitch->setText("1x", 0);
     buttonsMultiplierSwitch->setText("2x", 1);
     buttonsMultiplierSwitch->setText("4x", 2);
@@ -48,6 +51,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     destination->addWidget(separatorDutyCycleSwitch);
 
     buttonsDutyCycleSwitch = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
+    buttonsDutyCycleSwitch->setObjectName("dutyCycle");
     buttonsDutyCycleSwitch->setText("Disable", 0);
     buttonsDutyCycleSwitch->setText("Enable", 1);
     destination->addWidget(buttonsDutyCycleSwitch);

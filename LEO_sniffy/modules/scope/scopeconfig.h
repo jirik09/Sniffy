@@ -2,6 +2,9 @@
 #define SCOPECONFIG_H
 
 #include <QObject>
+#include <QDataStream>
+#include <QDebug>
+
 #include "scopedefs.h"
 
 
@@ -11,6 +14,9 @@ class ScopeConfig : public QObject
     Q_OBJECT
 public:
     explicit ScopeConfig(QObject *parent = nullptr);
+
+    void parse (QByteArray config);
+    QByteArray serialize ();
 
     //all parameters must be initialized to default values and also aligned with GUI (I know it is not good)
 
@@ -40,9 +46,12 @@ public:
     int triggerChannelIndex = 0;
     ScopeTriggerEdge triggerEdge = ScopeTriggerEdge::EDGE_RISING;
     float timeBase = 0.001;
-    float verticalScale[MAX_SCOPE_CHANNELS];
-    float verticalShift[MAX_SCOPE_CHANNELS];
 
+    int selectedChannelIndexVertical = 0;
+    float channelScale[MAX_SCOPE_CHANNELS]={1,1,1,1};
+    float channelOffset[MAX_SCOPE_CHANNELS]={0,0,0,0};
+    float channelScaleIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
+    float channelOffsetIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
 
 };
 

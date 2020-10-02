@@ -5,6 +5,7 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
     destination->addWidget(new WidgetSeparator(parent,"Measurement"));
 
     channelButtons = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Channel selection");
+    channelButtons->setObjectName("measChannSelection");
     destination->addWidget(channelButtons);
     channelButtons->setText("CH1",0);
     channelButtons->setColor(BCKGRND_COLOR_ORANGE,0);
@@ -104,6 +105,7 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
     destination->addWidget(new WidgetSeparator(parent,""));
 
     WidgetButtons *butClear = new WidgetButtons(parent,1,ButtonTypes::NORMAL,"");
+    butClear->setObjectName("measClearButton");
     destination->addWidget(butClear);
     butClear->setText("  Clear all measuremts  ",0);
 

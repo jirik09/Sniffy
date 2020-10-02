@@ -13,7 +13,10 @@ Right - area for dock widgets
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "GUI/widgetfooter.h"
+
+#include "GUI/widgetcontrolmodule.h"
+#include "GUI/widgetbuttons.h"
+
 
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
@@ -26,14 +29,17 @@ MainWindow::MainWindow(QWidget *parent):
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sep);
 
+
     createModulesWidgets();
     setupMainWindowComponents();
+
+    connect(deviceMediator,&DeviceMediator::loadLayout,this,&MainWindow::loadLayout);
 }
 
 void MainWindow::createModulesWidgets(){
     deviceMediator = new DeviceMediator(this);
 
-    QList<QSharedPointer<AbstractModule>> modulesList = deviceMediator->getModulesList();
+    modulesList = deviceMediator->getModulesList();
     QSharedPointer<AbstractModule> module;
     QString moduleName;
 
@@ -59,6 +65,7 @@ void MainWindow::createModulesWidgets(){
         dockWidget[index]->setWidget(module->getWidget());
 
         addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget[index]);
+        connect(module.data(),SIGNAL(loadModuleLayoutAndConfig(QString)),this,SLOT(loadModuleLayoutAndConfigCallback(QString)));
     }
 
     deviceMediator->ShowDeviceModule();
@@ -80,10 +87,10 @@ void MainWindow::setupMainWindowComponents(){
     horizontalLayout = new QVBoxLayout();
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
 
-//    animation = new QPropertyAnimation(ui->centralwidget, "size", this);
-//    animation->setDuration(355);
-//    animation->setStartValue(QSize(250, ui->centralwidget->height()));
-//    animation->setEndValue(QSize(90, ui->centralwidget->height()));
+    //    animation = new QPropertyAnimation(ui->centralwidget, "size", this);
+    //    animation->setDuration(355);
+    //    animation->setStartValue(QSize(250, ui->centralwidget->height()));
+    //    animation->setEndValue(QSize(90, ui->centralwidget->height()));
 }
 
 void MainWindow::setMenuSize(bool isWide){
@@ -98,18 +105,18 @@ void MainWindow::setMenuWide(){
     ui->centralwidget->setMinimumSize(250,200);
     ui->centralwidget->setMaximumSize(250,20000);
 
-//    animation->setStartValue(QSize(90, ui->centralwidget->height()));
-//    animation->setEndValue(QSize(250, ui->centralwidget->height()));
-//    animation->start();
+    //    animation->setStartValue(QSize(90, ui->centralwidget->height()));
+    //    animation->setEndValue(QSize(250, ui->centralwidget->height()));
+    //    animation->start();
 }
 
 void MainWindow::setMenuNarrow(){
     ui->centralwidget->setMinimumSize(90,200);
     ui->centralwidget->setMaximumSize(90,20000);
 
-//    animation->setStartValue(QSize(250, ui->centralwidget->height()));
-//    animation->setEndValue(QSize(90, ui->centralwidget->height()));
-//    animation->start();
+    //    animation->setStartValue(QSize(250, ui->centralwidget->height()));
+    //    animation->setEndValue(QSize(90, ui->centralwidget->height()));
+    //    animation->start();
 }
 
 
@@ -117,5 +124,91 @@ void MainWindow::setMenuNarrow(){
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent (QCloseEvent *event)
+{
+    saveLayout();
+    deviceMediator->close();
+    event->accept();
+}
+
+void MainWindow::saveLayout()
+{
+    if(deviceMediator->getIsConnected()){
+        QSharedPointer<AbstractModule> module;
+        layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
+        configFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".cfg";
+
+        QSettings layout(layoutFile, QSettings::IniFormat);
+        layout.setValue("geometry", saveGeometry());
+        layout.setValue("windowState", saveState());
+
+        foreach(module, modulesList){
+            module->saveGeometry(layout);
+        }
+
+        QSettings settings(configFile, QSettings::IniFormat);
+        foreach(module, modulesList){
+            settings.setValue(module->getModuleName()+"config",module->getConfiguration());
+            settings.setValue(module->getModuleName()+"status",(int)(module->getModuleStatus()));
+        }
+    }
+}
+
+void MainWindow::loadLayout(QString deviceName)
+{
+    layoutFile = QApplication::applicationDirPath() + "/"+deviceName+".lay";
+    QFile file(layoutFile);
+    if(!file.exists()){
+        return;
+    }
+    QSettings layout(layoutFile, QSettings::IniFormat);
+    restoreGeometry(layout.value("geometry").toByteArray());
+    restoreState(layout.value("windowState").toByteArray());
+}
+
+void MainWindow::loadModuleLayoutAndConfigCallback(QString modulName)
+{
+    QString layoutFile;
+    QString configFile;
+    layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
+    configFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".cfg";
+    QSharedPointer<AbstractModule> module;
+
+    QFile file(layoutFile);
+    QFile fileMod(configFile);
+
+    if(!file.exists() || !fileMod.exists()){
+        return;
+    }
+
+    QSettings layout(layoutFile, QSettings::IniFormat);
+    ModuleStatus status;
+    QByteArray config;
+
+    QSettings settings(configFile, QSettings::IniFormat);
+
+
+    foreach(module, modulesList){
+        if(module->getModuleName()==modulName){
+
+            //TO DO Counter causes MCU HF when geometry is restored
+//            if(modulName!="Counter"){
+                module->restoreGeometry(layout);
+//            }
+
+            status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
+            config = settings.value(module->getModuleName()+"config").toByteArray();
+
+            module->parseConfiguration(config);
+            module->writeConfiguration();
+
+            if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY){
+                module->startModule();
+            }
+            module->setModuleStatus(status);
+        }
+    }
 }
 

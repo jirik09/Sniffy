@@ -16,28 +16,24 @@ void DeviceScanner::searchForDevices(bool isSearchEnaled)
 
 void DeviceScanner::run()
 {
-    //qDebug () << "Thread scanning";
     isRunning = true;
     QList<DeviceDescriptor> tempDeviceList = *new QList<DeviceDescriptor>;
     while(isRunning){
         if(isSearchEnaled){
             tempDeviceList.clear();
-            SerialLine::getAvailableDevices(&tempDeviceList,0);
             QDateTime date = QDateTime::currentDateTime();
-            //qDebug() << date.time()<<"scanning" << isSearchEnaled <<"("<<currentDeviceList.length() << tempDeviceList.length()<<")";
+            //qDebug() << "SCANNING "<<date.time() <<"("<<currentDeviceList.length() << tempDeviceList.length()<<")";
+            SerialLine::getAvailableDevices(&tempDeviceList,0);
 
             if(!deviceListsEqual(tempDeviceList,currentDeviceList)){
                 currentDeviceList = tempDeviceList;
                // qDebug() << "new devices found"<<currentDeviceList.length();
-               // if(currentDeviceList.length()>0){
-                   // qDebug () << currentDeviceList.first();
-               // }
                 emit newDevicesScanned(currentDeviceList);
             }
         }else{
-            thread()->msleep(500);
+            thread()->msleep(1500);
         }
-        thread()->msleep(250);
+        thread()->msleep(1250);
     }
 }
 

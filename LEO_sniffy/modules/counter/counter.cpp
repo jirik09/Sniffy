@@ -78,9 +78,10 @@ void Counter::parseData(QByteArray data){
     QByteArray dataToPass = data.remove(0, 4);
 
     if(dataHeader == "CFG_"){
-        showModuleControl();
         spec = new CounterSpec(dataToPass, this);
         cntWindow->setSpecification(spec);
+        showModuleControl();
+
     }else {
 
         if(dataHeader == "HF_D"){
@@ -546,7 +547,19 @@ void Counter::intDialTimeoutChangedCallback(float val){
 }
 
 void Counter::writeConfiguration(){
+    //TO DO this is to write data from conf to device nad GUI
+}
 
+void Counter::parseConfiguration(QByteArray config)
+{
+    Q_UNUSED(config;)
+    //TO DO chceck how it is done in scope
+}
+
+QByteArray Counter::getConfiguration()
+{
+    //TO DO chceck how it is done in scope
+    return "none";
 }
 
 QWidget *Counter::getWidget(){
