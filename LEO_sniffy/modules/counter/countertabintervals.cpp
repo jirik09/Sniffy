@@ -6,6 +6,7 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     destination->addWidget(separatorStart);
 
     buttonsStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
+    buttonsStart->setObjectName("btnStart");
     buttonsStart->setText("Start", 0);
     destination->addWidget(buttonsStart);
 
@@ -18,6 +19,7 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     destination->addWidget(separatorEventSequence);
 
     buttonsEventsSeq = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
+    buttonsEventsSeq->setObjectName("evetnSeq");
     buttonsEventsSeq->setText("A -> B", 0);
     buttonsEventsSeq->setText("B -> A", 1);
     destination->addWidget(buttonsEventsSeq);

@@ -78,9 +78,10 @@ void Counter::parseData(QByteArray data){
     QByteArray dataToPass = data.remove(0, 4);
 
     if(dataHeader == "CFG_"){
-        showModuleControl();
         spec = new CounterSpec(dataToPass, this);
         cntWindow->setSpecification(spec);
+        showModuleControl();
+
     }else {
 
         if(dataHeader == "HF_D"){

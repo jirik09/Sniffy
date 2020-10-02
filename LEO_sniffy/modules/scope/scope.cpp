@@ -38,10 +38,9 @@ void Scope::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
 
     if(dataHeader=="CFG_"){
-        showModuleControl();
         data.remove(0,4);
         specification->parseSpecification(data);
-        config->memorySize = specification->memorySize;
+        showModuleControl();
 
     }else if(dataHeader=="SMPL"){
         if(config->triggerMode!=ScopeTriggerMode::TRIG_STOP){
@@ -237,9 +236,9 @@ void Scope::updateMemoryLength(int length){
         config->signalMegazoom = length==2?true:false;
 
         if(config->ADCresolution>8){
-            config->dataLength = config->memorySize/config->numberOfChannels/2;
+            config->dataLength = specification->memorySize/config->numberOfChannels/2;
         }else{
-            config->dataLength = config->memorySize/config->numberOfChannels;
+            config->dataLength = specification->memorySize/config->numberOfChannels;
         }
     }
     updateTimebase(config->timeBase);
