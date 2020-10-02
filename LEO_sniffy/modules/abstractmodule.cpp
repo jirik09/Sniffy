@@ -22,6 +22,13 @@ void AbstractModule::saveGeometry(QSettings &layout)
     QList<widgetTab*> listTab = getWidget()->findChildren<widgetTab*>();
     widgetTab *tab;
 
+    foreach(tab, listTab){
+        if (!tab->objectName().isEmpty()){
+            layout.setValue(moduleName+tab->objectName(),tab->saveGeometry());
+        }else{
+            qDebug () << "ERROR attempting to save layout of object without name: Tab in "<<moduleName;
+        }
+    }
     foreach(btn, listBtn){
         if (!btn->objectName().isEmpty()){
             layout.setValue(moduleName+btn->objectName(),btn->saveGeometry());
@@ -34,13 +41,6 @@ void AbstractModule::saveGeometry(QSettings &layout)
             layout.setValue(moduleName+sw->objectName(),sw->saveGeometry());
         }else{
             qDebug () << "ERROR attempting to save layout of object without name: Switch in "<<moduleName;
-        }
-    }
-    foreach(tab, listTab){
-        if (!tab->objectName().isEmpty()){
-            layout.setValue(moduleName+tab->objectName(),tab->saveGeometry());
-        }else{
-            qDebug () << "ERROR attempting to save layout of object without name: Tab in "<<moduleName;
         }
     }
     foreach(dial, listDial){
@@ -76,6 +76,13 @@ void AbstractModule::restoreGeometry(QSettings &layout)
     QList<widgetTab*> listTab = getWidget()->findChildren<widgetTab*>();
     widgetTab *tab;
 
+    foreach(tab, listTab){
+        if (!tab->objectName().isEmpty()){
+            tab->restoreGeometry(layout.value(moduleName+tab->objectName()).toByteArray());
+        }else{
+            qDebug () << "ERROR layout cannot be restored due to missing object name: tab in "<<moduleName;
+        }
+    }
     foreach(btn, listBtn){
         if (!btn->objectName().isEmpty()){
             btn->restoreGeometry(layout.value(moduleName+btn->objectName()).toByteArray());
@@ -88,13 +95,6 @@ void AbstractModule::restoreGeometry(QSettings &layout)
             sw->restoreGeometry(layout.value(moduleName+sw->objectName()).toByteArray());
         }else{
             qDebug () << "ERROR layout cannot be restored due to missing object name: switch in "<<moduleName;
-        }
-    }
-    foreach(tab, listTab){
-        if (!tab->objectName().isEmpty()){
-            tab->restoreGeometry(layout.value(moduleName+tab->objectName()).toByteArray());
-        }else{
-            qDebug () << "ERROR layout cannot be restored due to missing object name: tab in "<<moduleName;
         }
     }
     foreach(dial, listDial){

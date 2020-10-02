@@ -194,9 +194,9 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString modulName)
         if(module->getModuleName()==modulName){
 
             //TO DO Counter causes MCU HF when geometry is restored
-            if(modulName!="Counter"){
+//            if(modulName!="Counter"){
                 module->restoreGeometry(layout);
-            }
+//            }
 
             status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
             config = settings.value(module->getModuleName()+"config").toByteArray();
