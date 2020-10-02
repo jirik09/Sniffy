@@ -302,6 +302,7 @@ void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){
 
 void WidgetDisplay::configureCustomDial(){
     ui->dial->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->dial->setObjectName("dialHistory");
     ui->dial->drawMarker(false);
     ui->dial->setRange(100, 1000);
     ui->dial->setPageStep(100);
@@ -391,6 +392,12 @@ void WidgetDisplay::appendNewHistorySample(QString prefix, double sample, QStrin
     list->appendNumber(timeAxisMax, prefix, sample, affix);
 }
 
+/* Brief: Appends a sample to the selected trace and associates it
+ * to the list next to the one added by appendNewHistorySample()
+ * traceIndex: ...
+ * prefix, affix: Strings added in front of and behind the sample in the list
+ * sample: sample to append
+ */
 void WidgetDisplay::associateSample(int traceIndex, QString prefix, double sample, QString affix){
     historyData[0][traceIndex].append(QPointF(timeAxisMax, sample));
     chart->appendToTrace(traceIndex, &historyData[0][traceIndex]);

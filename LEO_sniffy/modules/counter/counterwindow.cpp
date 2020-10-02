@@ -128,10 +128,11 @@ void CounterWindow::configureAllDisplays(void){
     configureDisplaysStaticAttr(displayLFCh2, "CH2", LITERAL_FREQUENCY, TEXT_COLOR_GREY);
     configureDisplaysStaticAttr(displayRat, "CH3/CH1", LITERAL_RATIO, TEXT_COLOR_BLUE);
     configureDisplaysStaticAttr(displayInt, "CH1 - CH2", LITERAL_INTERVAL, TEXT_COLOR_BLUE);
-    displayLFCh1->hide();
-    displayLFCh2->hide();
+    //displayHF->hide();
     displayRat->hide();
     displayInt->hide();
+    displayLFCh1->hide();
+    displayLFCh2->hide();
 }
 
 void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor){
@@ -159,8 +160,7 @@ void CounterWindow::configureDisplaysDynamicAttr(){
     configureDisplaysDynamicLabels(displayInt, spec->pins.int_ch1 + " - " + spec->pins.int_ch2);
 }
 
-void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin)
-{
+void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin){
     display->configLabel(LABELNUM_PINS, pin, TEXT_COLOR_GREY, true);
     display->configLabel(LABELNUM_FLAG, "", TEXT_COLOR_ORANGE, true);
 }
@@ -172,9 +172,8 @@ void CounterWindow::switchCounterModeCallback(int index){
 }
 
 void CounterWindow::resetPreviousCounterMode(){
-    if(conf->modePrevIndex == CounterMode::HIGH_FREQUENCY){
-        displayHF->hide();
-    }else if(conf->modePrevIndex == CounterMode::LOW_FREQUENCY){
+    displayHF->hide();
+    if(conf->modePrevIndex == CounterMode::LOW_FREQUENCY){
         displayLFCh1->hide();
         displayLFCh2->hide();
     }else if(conf->modePrevIndex == CounterMode::RATIO) {
@@ -188,6 +187,7 @@ void CounterWindow::setNextCounterMode(int index){
     if(index == (int)CounterMode::HIGH_FREQUENCY){
         displayHF->show();
         clearDisplay(displayHF, true);
+
     }else if(index == (int)CounterMode::LOW_FREQUENCY) {
         if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
             displayLFCh1->displayAvgString("");
@@ -202,12 +202,16 @@ void CounterWindow::setNextCounterMode(int index){
         }else {
             clearDisplay(displayLFCh1, true);
             clearDisplay(displayLFCh2, true);
+            switchQuantity((int)conf->lfState.chan1.quantity, displayLFCh1);
+            switchQuantity((int)conf->lfState.chan2.quantity, displayLFCh2);
         }
         displayLFCh1->show();
         displayLFCh2->show();
+
     }else if(index == (int)CounterMode::RATIO) {
         displayRat->show();
         clearDisplay(displayRat, true);
+
     }else if(index == (int)CounterMode::INTERVAL) {
         displayInt->show();
         clearDisplay(displayInt, false);
@@ -252,12 +256,6 @@ void CounterWindow::appendNewHistorySample(WidgetDisplay *display, QString prefi
     display->appendNewHistorySample(prefix, sample, affix, timeStep);
 }
 
-/* Brief: Appends a sample to the selected trace and associates it
- * to the list next to the one added by appendNewHistorySample()
- * traceIndex: ...
- * prefix, affix: Strings added in front of and behind the sample in the list
- * sample: sample to append
- */
 void CounterWindow::associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix, float sample, QString affix){
     display->associateSample(traceIndex, prefix, sample, affix);
 }

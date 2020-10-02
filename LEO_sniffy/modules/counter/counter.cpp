@@ -57,10 +57,13 @@ void Counter::showHoldButtonCallback(){
 }
 
 void Counter::holdCounter(bool held){
-    if(held)
+    if(held){
         comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
-    else
+        setModuleStatus(ModuleStatus::PAUSE);
+    }else{
         comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
+        setModuleStatus(ModuleStatus::PLAY);
+    }
 }
 
 void Counter::startCounting(){
@@ -547,19 +550,15 @@ void Counter::intDialTimeoutChangedCallback(float val){
 }
 
 void Counter::writeConfiguration(){
-    //TO DO this is to write data from conf to device nad GUI
+
 }
 
-void Counter::parseConfiguration(QByteArray config)
-{
-    Q_UNUSED(config;)
-    //TO DO chceck how it is done in scope
+void Counter::parseConfiguration(QByteArray config){    
+    conf->parse(config);
 }
 
-QByteArray Counter::getConfiguration()
-{
-    //TO DO chceck how it is done in scope
-    return "none";
+QByteArray Counter::getConfiguration(){
+    return conf->serialize();
 }
 
 QWidget *Counter::getWidget(){

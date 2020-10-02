@@ -22,11 +22,13 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     destination->addWidget(buttonsQuantitySwitch);
 
     dialSampleCountCh1 = new WidgetDialRange(parent ,"Sample Count");
+    dialSampleCountCh1->setObjectName("dialLfCh1SampleCount");
     dialSampleCountCh1->setRange(1, SAMPLE_COUNT, "Smpls", 1, 1, 1, false);
     dialSampleCountCh1->hideUnitSelection();
     destination->addWidget(dialSampleCountCh1);
 
     dialSampleCountCh2 = new WidgetDialRange(parent ,"Sample Count");
+    dialSampleCountCh2->setObjectName("dialLfCh2SampleCount");
     dialSampleCountCh2->setRange(1, SAMPLE_COUNT, "Smpls", 1, 1, 1, false);
     dialSampleCountCh2->hideUnitSelection();
     destination->addWidget(dialSampleCountCh2);
