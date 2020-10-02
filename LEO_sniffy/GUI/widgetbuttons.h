@@ -33,6 +33,8 @@ class WidgetButtons : public QWidget
 public:
     explicit WidgetButtons(QWidget *parent = nullptr, int num = 1, ButtonTypes type = ButtonTypes::NORMAL, QString name = "", int defaultSelectedIndex = 0);
     ~WidgetButtons();
+    QByteArray saveGeometry();
+    void restoreGeometry(QByteArray geom);
     void setText(QString text, int index = 0);
     QString getText(int index);
     void setColor(QString text, int index);

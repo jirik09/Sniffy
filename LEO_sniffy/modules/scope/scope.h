@@ -6,6 +6,7 @@
 #include <QDataStream>
 #include <QPointF>
 #include <QList>
+#include <QSettings>
 
 #include "scopewindow.h"
 #include "scopeconfig.h"
@@ -36,6 +37,8 @@ signals:
 public slots:
     void parseData(QByteArray);
     void writeConfiguration();
+    void parseConfiguration(QByteArray config);
+    QByteArray getConfiguration();
 
     void startModule();
     void stopModule();
@@ -51,7 +54,6 @@ public slots:
     void addMeasurement(Measurement *m);
     void updateMeasurement(QList<Measurement*> m);
     void clearMeasurement();
-
 
 private:
     ScopeWindow *scpWindow;

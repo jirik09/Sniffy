@@ -4,6 +4,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
 {
     setMinimumSize(QSize(250, 150));
     setAllowedAreas(Qt::RightDockWidgetArea);
+    setObjectName(title);
     hide();
 
     setStyleSheet(QString::fromUtf8("QDockWidget{border: 3px solid gray; background-color: rgb(108, 108, 108);}"));

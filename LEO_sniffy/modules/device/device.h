@@ -17,6 +17,7 @@ public:
     explicit Device(QObject *parent = nullptr);
 
     QWidget* getWidget();
+    QString getName();
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
     void errorHandler(QByteArray error);
@@ -36,6 +37,8 @@ signals:
 public slots:
     void parseData(QByteArray);
     void writeConfiguration();
+    void parseConfiguration(QByteArray config);
+    QByteArray getConfiguration();
     void startModule();
     void stopModule();
 

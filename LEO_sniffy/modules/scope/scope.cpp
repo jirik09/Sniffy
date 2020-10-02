@@ -7,6 +7,8 @@ Scope::Scope(QObject *parent)
     specification = new ScopeSpec();
     measCalc = new MeasCalculations();
     scpWindow = new ScopeWindow();
+    scpWindow->setObjectName("scpWindow");
+    scpWindow->passConfig(*config);
 
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SCOPE;
@@ -29,6 +31,7 @@ Scope::Scope(QObject *parent)
     connect(scpWindow, &ScopeWindow::measurementChanged,this, &Scope::addMeasurement);
     connect(scpWindow, &ScopeWindow::measurementClearChanged, this, &Scope::clearMeasurement);
     connect(measCalc, &MeasCalculations::measCalculated, this, &Scope::updateMeasurement);
+
 }
 
 void Scope::parseData(QByteArray data){
@@ -38,6 +41,7 @@ void Scope::parseData(QByteArray data){
         showModuleControl();
         data.remove(0,4);
         specification->parseSpecification(data);
+        config->memorySize = specification->memorySize;
 
     }else if(dataHeader=="SMPL"){
         if(config->triggerMode!=ScopeTriggerMode::TRIG_STOP){
@@ -146,17 +150,25 @@ void Scope::writeConfiguration(){
     updateTimebase(config->timeBase);
 
     //this one will be done like others
-    config->dataLength = 1200;
-    setDataLength(1200);
+    setDataLength(config->dataLength);
 
     updateTriggerLevel(config->triggerLevelPercent);
     updatePretrigger(config->pretriggerPercent);
 
-    updateTriggerMode(config->triggerMode);
     updateTriggerEdge(config->triggerEdge);
 
     updateTriggerChannel(config->triggerChannelIndex);
-    updateChannelsEnable(1);
+
+    setNumberOfChannels(config->numberOfChannels);
+    updateTriggerMode(config->triggerMode);
+
+}
+
+void Scope::parseConfiguration(QByteArray config){
+    this->config->parse(config);
+}
+QByteArray Scope::getConfiguration(){
+    return config->serialize();
 }
 
 void Scope::stopModule(){
@@ -225,9 +237,9 @@ void Scope::updateMemoryLength(int length){
         config->signalMegazoom = length==2?true:false;
 
         if(config->ADCresolution>8){
-            config->dataLength = specification->memorySize/config->numberOfChannels/2;
+            config->dataLength = config->memorySize/config->numberOfChannels/2;
         }else{
-            config->dataLength = specification->memorySize/config->numberOfChannels;
+            config->dataLength = config->memorySize/config->numberOfChannels;
         }
     }
     updateTimebase(config->timeBase);

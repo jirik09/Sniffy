@@ -27,6 +27,17 @@ WidgetDialRange::~WidgetDialRange()
     delete ui;
 }
 
+QByteArray WidgetDialRange::saveGeometry()
+{
+    //TO DO pass all the data including the min max range color etc
+    return QByteArray::number(realValue);
+}
+
+void WidgetDialRange::restoreGeometry(QByteArray geom)
+{
+    setRealValue(geom.toFloat());
+}
+
 void WidgetDialRange::setDialColor(QString &textStyleSheet){
     ui->widget_dial->setStyleSheet(textStyleSheet);
 }

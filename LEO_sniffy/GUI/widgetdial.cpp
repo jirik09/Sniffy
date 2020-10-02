@@ -28,6 +28,17 @@ WidgetDial::~WidgetDial()
     delete ui;
 }
 
+QByteArray WidgetDial::saveGeometry()
+{
+    //TO DO pass all the data including the min max range color etc
+    return QByteArray::number(selectedIndex);
+}
+
+void WidgetDial::restoreGeometry(QByteArray geom)
+{
+    setSelectedIndex(geom.toInt());
+}
+
 void WidgetDial::addOption (QString shownValue, QString unit,float realValue){
 
     params_dial *par = new params_dial();
@@ -51,7 +62,6 @@ int WidgetDial::getSelectedIndex() const
 }
 
 void WidgetDial::setSelectedIndex(int index){
-
     ui->dial->setValue(index);
     ui->comboBox->setCurrentIndex(index);
 
