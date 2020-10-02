@@ -15,6 +15,8 @@ class widgetTab : public QWidget
 public:
     explicit widgetTab(QWidget *parent = nullptr, int num=2);
     ~widgetTab();
+    QByteArray saveGeometry();
+    void restoreGeometry(QByteArray geom);
 
     void setText(QString text, int index);
     QVBoxLayout * getLayout (int index);

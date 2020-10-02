@@ -36,6 +36,8 @@ private slots:
     void handleError(QByteArray error);
     void ScanDevices();
     void open(int deviceIndex);
+
+public slots:
     void close();
 };
 

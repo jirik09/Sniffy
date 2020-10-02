@@ -37,8 +37,8 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
         if(sPort->open(QIODevice::ReadWrite)){
             sPort->clear();
             sPort->write("IDN?;");
-            sPort->waitForBytesWritten();
-            sPort->waitForReadyRead();
+            sPort->waitForBytesWritten(1000);
+            sPort->waitForReadyRead(250);
             QThread::msleep(350);
 
             received = sPort->readAll();
@@ -48,14 +48,6 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
                 sPort->write("RES!;");
                 sPort->waitForBytesWritten();
 
-                /*  thread()->msleep(150);
-                sPort->write("IDN?;");
-                sPort->waitForBytesWritten();
-
-                //thread()->msleep(100);
-                sPort->waitForReadyRead(150);
-
-                received = sPort->readAll();*/
                 desc.port = sPort->portName();
                 desc.speed = sPort->baudRate();
                 desc.connType = Connection::SERIAL;
@@ -83,7 +75,7 @@ void SerialLine::openSerialLine(DeviceDescriptor desc){
 
     int i = 0;
     while(!serPort->open(QIODevice::ReadWrite)){
-        QThread::msleep(500);
+        QThread::msleep(1000);
         i++;
         if(i>5){
             break;
@@ -98,6 +90,7 @@ void SerialLine::openSerialLine(DeviceDescriptor desc){
         connect(serPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
     }else{
         qDebug () << "Serial port error opening";
+        handleError(QSerialPort::OpenError);
     }
 
     isOpen=success;

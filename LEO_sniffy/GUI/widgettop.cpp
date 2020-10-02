@@ -9,6 +9,8 @@ Comment: This could be done by tabs but I did it like this. It would be easier b
 #include "widgettop.h"
 #include "ui_widgettop.h"
 
+
+//obsolete can be erased
 WidgetTop::WidgetTop(QWidget *parent, int num) :
     QWidget(parent),
     ui(new Ui::WidgetTop)

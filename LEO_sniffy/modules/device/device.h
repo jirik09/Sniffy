@@ -37,6 +37,8 @@ signals:
 public slots:
     void parseData(QByteArray);
     void writeConfiguration();
+    void parseConfiguration(QByteArray config);
+    QByteArray getConfiguration();
     void startModule();
     void stopModule();
 

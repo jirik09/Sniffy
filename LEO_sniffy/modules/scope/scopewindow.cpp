@@ -37,6 +37,7 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
 
     // ************************* creating widget general settings *******************
     panelSet = new PanelSettings(tabs->getLayout(0),tabs);
+    panelSet->setObjectName("panelSet");
 
     connect(panelSet->dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
     connect(panelSet->dialPretrigger,SIGNAL(valueChanged(float)),this,SLOT(pretriggerCallback(float)));
@@ -79,6 +80,8 @@ void ScopeWindow::paintEvent(QPaintEvent *event){
     event->accept();
 }
 
+
+
 void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex){
     updateChartTimeScale(timeBase);
     labelInfoPanel->setTriggerLabelText("");
@@ -98,12 +101,12 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries){
 
             //put channel in scale
             for (int j = 0; j < dataSeries[i].length(); j++){
-                dataSeries[i][j].setY((dataSeries[i][j].y()+channelOffset[i])/channelScale[i]);
+                dataSeries[i][j].setY((dataSeries[i][j].y()+config->channelOffset[i])/config->channelScale[i]);
             }
 
             chart->updateTrace(&dataSeries[i], i);
             labelInfoPanel->setChannelLabelVisible(i,true);
-            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(channelScale[i],"V/div"));
+            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/div"));
         }
     }
 }
@@ -114,27 +117,27 @@ void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
 }
 
 void ScopeWindow::channelVerticalCallback(int index){
-    selectedChannelIndexVertical = index;
+    config->selectedChannelIndexVertical = index;
     panelSet->dialVerticalScale->setDialColor(channelTextColor[index]);
     panelSet->dialVerticalScale->setDialButtonsColor(channelBcgrColor[index]);
-    if(channelScaleIndex[index]==-1){
-        channelScaleIndex[index] = panelSet->dialVerticalScale->getDefaultIndex();
-        channelOffsetIndex[index] = panelSet->dialVerticalShift->getDefaultRealValue();
+    if(config->channelScaleIndex[index]==-1){
+        config->channelScaleIndex[index] = panelSet->dialVerticalScale->getDefaultIndex();
+        config->channelOffsetIndex[index] = panelSet->dialVerticalShift->getDefaultRealValue();
     }
-    panelSet->dialVerticalScale->setSelectedIndex(channelScaleIndex[index]);
+    panelSet->dialVerticalScale->setSelectedIndex(config->channelScaleIndex[index]);
 
     panelSet->dialVerticalShift->setDialColor(channelTextColor[index]);
     panelSet->dialVerticalShift->setDialButtonsColor(channelBcgrColor[index]);
-    panelSet->dialVerticalShift->setRealValue(channelOffset[index]);
+    panelSet->dialVerticalShift->setRealValue(config->channelOffset[index]);
 }
 
 void ScopeWindow::channelVerticalScaleCallback(float value){
-    channelScale[selectedChannelIndexVertical] = value;
-    channelScaleIndex[selectedChannelIndexVertical] = panelSet->dialVerticalScale->getSelectedIndex();
+    config->channelScale[config->selectedChannelIndexVertical] = value;
+    config->channelScaleIndex[config->selectedChannelIndexVertical] = panelSet->dialVerticalScale->getSelectedIndex();
     paintTraces(ChartData);
 }
 void ScopeWindow::channelVerticalShiftCallback(float value){
-    channelOffset[selectedChannelIndexVertical] = value;
+    config->channelOffset[config->selectedChannelIndexVertical] = value;
     paintTraces(ChartData);
 }
 
@@ -229,6 +232,11 @@ void ScopeWindow::sliderShiftCallback(int value){
 
 void ScopeWindow::updateMeasurement(QList<Measurement*> m){
     labelInfoPanel->setMeasurements(m);
+}
+
+void ScopeWindow::passConfig(ScopeConfig &conf)
+{
+    this->config = &conf;
 }
 
 void ScopeWindow::singleSamplingDone(){

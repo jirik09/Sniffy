@@ -14,6 +14,7 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
     ui(new Ui::WidgetButtons)
 {
     ui->setupUi(this);
+    setObjectName(name);
 
     this->type = type;
     if(name != ""){
@@ -86,6 +87,53 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
 WidgetButtons::~WidgetButtons()
 {
     delete ui;
+}
+
+QByteArray WidgetButtons::saveGeometry()
+{
+    return  QByteArray::number(getStatus());
+}
+
+void WidgetButtons::restoreGeometry(QByteArray geom)
+{
+    uncheckAll();
+    if(type == ButtonTypes::RADIO){
+        int index = 0;
+        if(geom.toInt()>2){
+            index = (int)(qLn(geom.toInt())/qLn(2)+0.01);
+        }else{
+            index = geom.toInt()-1;
+        }
+        setChecked(true,index);
+        emit clicked(index);
+    }else{
+        int status = geom.toInt();
+        if(status & 0x01){
+            setChecked(true,0);
+        }
+        if(status & 0x02){
+            setChecked(true,1);
+        }
+        if(status & 0x04){
+            setChecked(true,2);
+        }
+        if(status & 0x08){
+            setChecked(true,3);
+        }
+        if(status & 0x10){
+            setChecked(true,4);
+        }
+        if(status & 0x20){
+            setChecked(true,5);
+        }
+        if(status & 0x40){
+            setChecked(true,6);
+        }
+        if(status & 0x80){
+            setChecked(true,7);
+        }
+        emit statusChanged(status);
+    }
 }
 
 void WidgetButtons::setText(QString text, int index){

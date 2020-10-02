@@ -2,10 +2,17 @@
 #define ABSTRACTMODULE_H
 
 #include <QObject>
+#include <QSettings>
 #include "../GUI/moduledockwidget.h"
 #include "../GUI/widgetcontrolmodule.h"
 #include "../communication/comms.h"
 #include "../communication/commands.h"
+
+#include "../GUI/widgetbuttons.h"
+#include "../GUI/widgetdial.h"
+#include "../GUI/widgetdialrange.h"
+#include "../GUI/widgetswitch.h"
+#include "../GUI/widgettab.h"
 
 class AbstractModule : public QObject
 {
@@ -17,7 +24,12 @@ public:
     virtual void startModule() = 0; //module window has been opened - start the operation
     virtual void stopModule() = 0;  //module window has ben closed - stop it
     virtual void writeConfiguration() = 0; // configuration nas been loaded after startup (or default) - write it into device
+    virtual void parseConfiguration(QByteArray config) = 0;
+    virtual QByteArray getConfiguration() = 0;
     virtual QWidget* getWidget() = 0; //return pointer to widget - need to be able to dock it
+
+    void saveGeometry(QSettings &layout);
+    void restoreGeometry(QSettings &layout);
 
 
     void setDockWidgetWindow(ModuleDockWidget *dockWidget);

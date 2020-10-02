@@ -43,6 +43,16 @@ widgetTab::~widgetTab()
     delete ui;
 }
 
+QByteArray widgetTab::saveGeometry()
+{
+    return QByteArray::number(ui->tabWidget->currentIndex());
+}
+
+void widgetTab::restoreGeometry(QByteArray geom)
+{
+    ui->tabWidget->setCurrentIndex(geom.toInt());
+}
+
 void widgetTab::on_tabWidget_currentChanged(int index)
 {
     emit currentChanged(index);

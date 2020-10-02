@@ -15,6 +15,7 @@ Right - area for dock widgets
 #include "ui_mainwindow.h"
 
 #include "GUI/widgetcontrolmodule.h"
+#include "GUI/widgetbuttons.h"
 
 
 MainWindow::MainWindow(QWidget *parent):
@@ -27,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sep);
+
 
     createModulesWidgets();
     setupMainWindowComponents();
@@ -126,54 +128,30 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent (QCloseEvent *event)
 {
     saveLayout();
+    deviceMediator->close();
     event->accept();
-    /*QMessageBox::StandardButton resBtn = QMessageBox::question( this, "APP_NAME",
-                                                                tr("Are you sure?\n"),
-                                                                QMessageBox::Cancel | QMessageBox::No | QMessageBox::Yes,
-                                                                QMessageBox::Yes);
-    if (resBtn != QMessageBox::Yes) {
-        event->ignore();
-    } else {
-        event->accept();
-    }*/
 }
 
 void MainWindow::saveLayout()
 {
     if(deviceMediator->getIsConnected()){
-        layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
-        moduleFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".mod";
-
-        QFile file(layoutFile);
-        if (!file.open(QFile::WriteOnly)) {
-            QString msg = tr("Failed to open %1\n%2")
-                    .arg(QDir::toNativeSeparators(layoutFile), file.errorString());
-            QMessageBox::warning(this, tr("Error"), msg);
-            return;
-        }
-
-        QByteArray geo_data = saveGeometry();
-        QByteArray layout_data = saveState();
-
-        bool ok = file.putChar((uchar)geo_data.size());
-        if (ok)
-            ok = file.write(geo_data) == geo_data.size();
-        if (ok)
-            ok = file.write(layout_data) == layout_data.size();
-
-        if (!ok) {
-            QString msg = tr("Error writing to %1\n%2")
-                    .arg(QDir::toNativeSeparators(layoutFile), file.errorString());
-            QMessageBox::warning(this, tr("Error"), msg);
-            return;
-        }
-
-        file.close();
-
-        QSettings settings(moduleFile, QSettings::IniFormat);
         QSharedPointer<AbstractModule> module;
+        layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
+        configFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".cfg";
+
+
+        QSettings layout(layoutFile, QSettings::IniFormat);
+        layout.setValue("geometry", saveGeometry());
+        layout.setValue("windowState", saveState());
+
         foreach(module, modulesList){
-            settings.setValue(module->getModuleName(),(int)(module->getModuleStatus()));
+            module->saveGeometry(layout);
+        }
+
+        QSettings settings(configFile, QSettings::IniFormat);
+        foreach(module, modulesList){
+            settings.setValue(module->getModuleName()+"config",module->getConfiguration());
+            settings.setValue(module->getModuleName()+"status",(int)(module->getModuleStatus()));
         }
     }
 }
@@ -181,53 +159,37 @@ void MainWindow::saveLayout()
 void MainWindow::loadLayout(QString deviceName)
 {
     layoutFile = QApplication::applicationDirPath() + "/"+deviceName+".lay";
-    moduleFile = QApplication::applicationDirPath() + "/"+deviceName+".mod";
+    configFile = QApplication::applicationDirPath() + "/"+deviceName+".cfg";
+    QSharedPointer<AbstractModule> module;
 
     QFile file(layoutFile);
-    QFile fileMod(moduleFile);
+    QFile fileMod(configFile);
 
     if(!file.exists() || !fileMod.exists()){
         return;
     }
 
-    if (!file.open(QFile::ReadOnly)) {
-        QString msg = tr("Failed to open %1\n%2")
-                .arg(QDir::toNativeSeparators(layoutFile), file.errorString());
-        QMessageBox::warning(this, tr("Error"), msg);
-        return;
-    }
-
-    uchar geo_size;
-    QByteArray geo_data;
-    QByteArray layout_data;
-
-    bool ok = file.getChar((char*)&geo_size);
-    if (ok) {
-        geo_data = file.read(geo_size);
-        ok = geo_data.size() == geo_size;
-    }
-    if (ok) {
-        layout_data = file.readAll();
-        ok = layout_data.size() > 0;
-    }
-
-    if (ok)
-        ok = restoreGeometry(geo_data);
-    if (ok)
-        ok = restoreState(layout_data);
-
-    if (!ok) {
-        QString msg = tr("Error reading %1").arg(QDir::toNativeSeparators(layoutFile));
-        QMessageBox::warning(this, tr("Error"), msg);
-        return;
-    }
-
-
-    QSettings settings(moduleFile, QSettings::IniFormat);
-    QSharedPointer<AbstractModule> module;
-    ModuleStatus status;
+    QSettings layout(layoutFile, QSettings::IniFormat);
+    restoreGeometry(layout.value("geometry").toByteArray());
+    restoreState(layout.value("windowState").toByteArray());
     foreach(module, modulesList){
-        status = (ModuleStatus)settings.value(module->getModuleName()).toInt();
+        if(module->getModuleName()!="Counter"){
+            //qDebug ()<< "restore geo" << module->getModuleName();
+            module->restoreGeometry(layout);
+        }
+    }
+
+    QSettings settings(configFile, QSettings::IniFormat);
+
+    ModuleStatus status;
+    QByteArray config;
+    foreach(module, modulesList){
+        status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
+        config = settings.value(module->getModuleName()+"config").toByteArray();
+
+        module->parseConfiguration(config);
+        module->writeConfiguration();
+
         if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY){
             module->startModule();
         }

@@ -99,8 +99,13 @@ void Device::parseData(QByteArray data){
 
 }
 void Device::writeConfiguration(){}
+void Device::parseConfiguration(QByteArray config){Q_UNUSED(config)}
+QByteArray Device::getConfiguration(){return "none";}
+
 void Device::startModule(){}
 void Device::stopModule(){}
+
+
 QWidget* Device::getWidget(){
     return deviceWindow;
 }

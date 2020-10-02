@@ -32,7 +32,7 @@ private:
     QPropertyAnimation *animation;
     QList<QSharedPointer<AbstractModule>> modulesList;
     QString layoutFile;
-    QString moduleFile;
+    QString configFile;
     QString setingsFile;
 
     void setMenuNarrow();

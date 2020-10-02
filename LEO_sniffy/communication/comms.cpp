@@ -51,7 +51,8 @@ void Comms::close(){
 void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
 
 #ifdef DEBUG_COMMS
-    qDebug() <<"COMM_WRITE:"<< module+":"+feature+":"+param+";";
+    QDateTime date = QDateTime::currentDateTime();
+    qDebug() <<"COMM_WRITE ("<< date.time()<<"):"<< module+":"+feature+":"+param+";";
 #endif
     emit dataWrite(module+":"+feature+":"+param+";");
 }
@@ -59,7 +60,8 @@ void Comms::write(QByteArray module, QByteArray feature, QByteArray param){
 void Comms::write(QByteArray module, QByteArray command){
 
 #ifdef DEBUG_COMMS
-    qDebug() <<"COMM_WRITE:"<< module+":"+command;
+    QDateTime date = QDateTime::currentDateTime();
+    qDebug() <<"COMM_WRITE ("<< date.time()<<"):"<< module+":"+command;
 #endif
     emit dataWrite(module+":"+command+";");
 }
@@ -72,7 +74,8 @@ void Comms::write(QByteArray module, QByteArray feature, int param){
     tmp[0] = (param);
 
 #ifdef DEBUG_COMMS
-    qDebug() << "COMM_WRITE:"<<module+":"+feature+":" << param <<";";
+    QDateTime date = QDateTime::currentDateTime();
+    qDebug() << "COMM_WRITE ("<< date.time()<<"):"<<module+":"+feature+":" << param <<";";
 #endif
 
     QByteArray *qb = new QByteArray(tmp,4);
@@ -82,7 +85,8 @@ void Comms::write(QByteArray module, QByteArray feature, int param){
 void Comms::write(QByteArray data){
 
 #ifdef DEBUG_COMMS
-    qDebug() << "COMM_WRITE:"<<data;
+    QDateTime date = QDateTime::currentDateTime();
+    qDebug() << "COMM_WRITE ("<< date.time()<<"):"<<data;
 #endif
     emit dataWrite(data);
 }
@@ -102,10 +106,11 @@ void Comms::parseMessage(QByteArray message){
     //CRC can be checked here but it is not implemented
     //just pass the data
 #ifdef DEBUG_COMMS
+    QDateTime date = QDateTime::currentDateTime();
     if(message.length()>96){
-        qDebug() <<"COMM_READ:"<< message.left(64)<<"..."<<message.right(16);
+        qDebug() <<"COMM_READ ("<< date.time()<<"):"<< message.left(64)<<"..."<<message.right(16);
     }else{
-        qDebug() <<"COMM_READ:"<< message;
+        qDebug() <<"COMM_READ ("<< date.time()<<"):"<< message;
     }
 #endif
     emit newData(message);

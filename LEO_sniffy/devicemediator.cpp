@@ -55,7 +55,6 @@ void DeviceMediator::open(int deviceIndex){
         connect(communication,&Comms::newData,this,&DeviceMediator::parseData);
         connect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
 
-        communication->write(Commands::SYSTEM+":"+Commands::CONFIG_REQUEST+";");
         foreach(QSharedPointer<AbstractModule> mod, modules){
             mod->setComms(communication);
         }
