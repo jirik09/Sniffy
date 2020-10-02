@@ -51,8 +51,8 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     connect(ui->pushButton_save, SIGNAL(clicked()),
             this, SLOT(saveListClickedCallback()));
 
-    connect(chart, &widgetChart::chartRightClicked,
-            this, &WidgetDisplay::chartShowMenuOnRightClickCallback);
+    connect(chart, &widgetChart::chartSeriesChanged,
+            this, &WidgetDisplay::chartSeriesChangedCallback);
 
     connect(ui->dial, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(dialShowMenuOnRightClickCallback(const QPoint &)));
@@ -498,38 +498,8 @@ void WidgetDisplay::dialHistoryValueChangedCallback(int val){
     labelFloatHistNum->hide();
 }
 
-void WidgetDisplay::chartShowMenuOnRightClickCallback(const QPoint &mousePos){
-    QMenu menu(tr("Context menu"), this);
-    menu.setStyleSheet(CONTEXT_MENU_HOVER);
+void WidgetDisplay::chartSeriesChangedCallback(){
 
-    QAction spline("Spline", this);
-    QAction line("Line", this);
-    QAction scatter("Scatter", this);
-
-    connect(&spline, SIGNAL(triggered()), this, SLOT(chartSwitchToSpline()));
-    connect(&line, SIGNAL(triggered()), this, SLOT(chartSwitchToLine()));
-    connect(&scatter, SIGNAL(triggered()), this, SLOT(chartSwitchToScatter()));
-
-    menu.addAction(&spline);
-    menu.addAction(&line);
-    menu.addAction(&scatter);
-
-    menu.exec(mapToGlobal(mousePos));
-}
-
-void WidgetDisplay::chartSwitchToSpline(){
-    clearHistoryExceptChart();
-    chart->switchToSplineSeries();
-}
-
-void WidgetDisplay::chartSwitchToLine(){
-    clearHistoryExceptChart();
-    chart->switchToLineSeries();
-}
-
-void WidgetDisplay::chartSwitchToScatter(){
-    clearHistoryExceptChart();
-    chart->switchToScatterSeries();
 }
 
 void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){
