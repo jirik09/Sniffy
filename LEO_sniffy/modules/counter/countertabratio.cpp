@@ -14,6 +14,7 @@ CounterTabRatio::CounterTabRatio(QVBoxLayout *destination, QWidget *parent) : QO
     destination->addWidget(separatorRetrigButton);
 
     buttonRetrigger = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, 0);
+    buttonRetrigger->setObjectName("retrigger");
     buttonRetrigger->setText("Retrigger", 0);
     destination->addWidget(buttonRetrigger);
 

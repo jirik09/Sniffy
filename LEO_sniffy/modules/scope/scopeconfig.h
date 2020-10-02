@@ -53,11 +53,6 @@ public:
     float channelScaleIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
     float channelOffsetIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
 
-
-    //MCU data
-    int memorySize = 0;
-
-
 };
 
 #endif // SCOPECONFIG_H

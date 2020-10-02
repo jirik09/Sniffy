@@ -45,6 +45,7 @@ private:
 
 private slots:
     void loadLayout(QString deviceName);
+    void loadModuleLayoutAndConfigCallback(QString modulName);
     void setMenuSize(bool isWide);
 };
 #endif // MAINWINDOW_H

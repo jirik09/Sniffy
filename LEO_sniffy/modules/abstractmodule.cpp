@@ -113,6 +113,7 @@ void AbstractModule::restoreGeometry(QSettings &layout)
     }
 }
 
+
 void AbstractModule::widgetControlClicked(ModuleStatus status){
     switch (status) {
     case ModuleStatus::STOP:
@@ -181,6 +182,7 @@ ModuleStatus AbstractModule::getModuleStatus()
 }
 
 void AbstractModule::showModuleControl(){
+    emit loadModuleLayoutAndConfig(moduleName);
     moduleControlWidget->show();
 }
 

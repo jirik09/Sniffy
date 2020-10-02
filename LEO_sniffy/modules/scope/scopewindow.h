@@ -9,7 +9,6 @@
 #include <QDebug>
 
 #include "../../GUI/widgetcontrolmodule.h"
-#include "../../GUI/widgettop.h"
 #include "../../GUI/widgetseparator.h"
 #include "../../GUI/widgetdial.h"
 #include "../../GUI/widgetdialrange.h"

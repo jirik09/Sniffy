@@ -36,7 +36,6 @@ SOURCES += \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
     GUI/widgettab.cpp \
-    GUI/widgettop.cpp \
     communication/commands.cpp \
     communication/comms.cpp \
     communication/devicescanner.cpp \
@@ -92,7 +91,6 @@ HEADERS += \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
     GUI/widgettab.h \
-    GUI/widgettop.h \
     communication/commands.h \
     communication/comms.h \
     communication/connectiontype.h \
@@ -149,7 +147,6 @@ FORMS += \
     GUI/widgetseparator.ui \
     GUI/widgetswitch.ui \
     GUI/widgettab.ui \
-    GUI/widgettop.ui \
     mainwindow.ui \
     modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \

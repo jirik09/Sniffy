@@ -65,6 +65,7 @@ void MainWindow::createModulesWidgets(){
         dockWidget[index]->setWidget(module->getWidget());
 
         addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget[index]);
+        connect(module.data(),SIGNAL(loadModuleLayoutAndConfig(QString)),this,SLOT(loadModuleLayoutAndConfigCallback(QString)));
     }
 
     deviceMediator->ShowDeviceModule();
@@ -139,7 +140,6 @@ void MainWindow::saveLayout()
         layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
         configFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".cfg";
 
-
         QSettings layout(layoutFile, QSettings::IniFormat);
         layout.setValue("geometry", saveGeometry());
         layout.setValue("windowState", saveState());
@@ -159,7 +159,21 @@ void MainWindow::saveLayout()
 void MainWindow::loadLayout(QString deviceName)
 {
     layoutFile = QApplication::applicationDirPath() + "/"+deviceName+".lay";
-    configFile = QApplication::applicationDirPath() + "/"+deviceName+".cfg";
+    QFile file(layoutFile);
+    if(!file.exists()){
+        return;
+    }
+    QSettings layout(layoutFile, QSettings::IniFormat);
+    restoreGeometry(layout.value("geometry").toByteArray());
+    restoreState(layout.value("windowState").toByteArray());
+}
+
+void MainWindow::loadModuleLayoutAndConfigCallback(QString modulName)
+{
+    QString layoutFile;
+    QString configFile;
+    layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
+    configFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".cfg";
     QSharedPointer<AbstractModule> module;
 
     QFile file(layoutFile);
@@ -170,31 +184,31 @@ void MainWindow::loadLayout(QString deviceName)
     }
 
     QSettings layout(layoutFile, QSettings::IniFormat);
-    restoreGeometry(layout.value("geometry").toByteArray());
-    restoreState(layout.value("windowState").toByteArray());
-    foreach(module, modulesList){
-        if(module->getModuleName()!="Counter"){
-            //qDebug ()<< "restore geo" << module->getModuleName();
-            module->restoreGeometry(layout);
-        }
-    }
+    ModuleStatus status;
+    QByteArray config;
 
     QSettings settings(configFile, QSettings::IniFormat);
 
-    ModuleStatus status;
-    QByteArray config;
+
     foreach(module, modulesList){
-        status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
-        config = settings.value(module->getModuleName()+"config").toByteArray();
+        if(module->getModuleName()==modulName){
 
-        module->parseConfiguration(config);
-        module->writeConfiguration();
+            //TO DO Counter causes MCU HF when geometry is restored
+            if(modulName!="Counter"){
+                module->restoreGeometry(layout);
+            }
 
-        if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY){
-            module->startModule();
+            status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
+            config = settings.value(module->getModuleName()+"config").toByteArray();
+
+            module->parseConfiguration(config);
+            module->writeConfiguration();
+
+            if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY){
+                module->startModule();
+            }
+            module->setModuleStatus(status);
         }
-        module->setModuleStatus(status);
     }
 }
-
 

@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QSettings>
+#include <QApplication>
+#include <QFile>
 #include "../GUI/moduledockwidget.h"
 #include "../GUI/widgetcontrolmodule.h"
 #include "../communication/comms.h"
@@ -30,7 +32,6 @@ public:
 
     void saveGeometry(QSettings &layout);
     void restoreGeometry(QSettings &layout);
-
 
     void setDockWidgetWindow(ModuleDockWidget *dockWidget);
     void setModuleControlWidget(WidgetControlModule *scpWidget);
@@ -72,6 +73,7 @@ public slots:
 signals:
     void moduleCreated();
     void holdClicked(bool held);
+    void loadModuleLayoutAndConfig(QString moduleName);
 
 };
 
