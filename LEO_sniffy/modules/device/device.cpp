@@ -94,10 +94,10 @@ void Device::parseData(QByteArray data){
     }else if(feature=="ACK_"){
         //  qDebug() << "ACK";
     }else{
-        qDebug() << "ERROR: unparsable data for system" << feature << " "<< data;
+        qDebug() << "WARNING: Device error message received: " <<ErrorList::GetErrMessage((uint8_t)(feature.at(2)));//<< feature << " "<< data;
     }
-
 }
+
 void Device::writeConfiguration(){}
 void Device::parseConfiguration(QByteArray config){Q_UNUSED(config)}
 QByteArray Device::getConfiguration(){return "none";}

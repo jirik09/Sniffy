@@ -74,9 +74,9 @@ void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom();;
     ui->sliderSignal->setStyleSheet(QString::fromUtf8(
                                         "QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
-                                        "background-color: rgb(38, 38, 38);border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
+                                        "background-color: ")+BACKGROUND_COLOR_DATA_AREA+"border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
                                         "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
-                                        "margin-bottom: -3px;border-radius: 4px;width:")+QString::number(handleW)+QString::fromUtf8("px;}"));
+                                        "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+QString::fromUtf8("px;}"));
     event->accept();
 }
 
@@ -118,16 +118,20 @@ void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
 
 void ScopeWindow::channelVerticalCallback(int index){
     config->selectedChannelIndexVertical = index;
-    panelSet->dialVerticalScale->setDialColor(channelTextColor[index]);
-    panelSet->dialVerticalScale->setDialButtonsColor(channelBcgrColor[index]);
+    QString style = QString::fromUtf8("color:"+Colors::getChannelColorString(index));
+    QString styleBcg = QString::fromUtf8("background-color:"+Colors::getChannelColorString(index));
+
+    panelSet->dialVerticalScale->setDialColor(style);
+    panelSet->dialVerticalScale->setDialButtonsColor(styleBcg);
     if(config->channelScaleIndex[index]==-1){
         config->channelScaleIndex[index] = panelSet->dialVerticalScale->getDefaultIndex();
         config->channelOffsetIndex[index] = panelSet->dialVerticalShift->getDefaultRealValue();
     }
     panelSet->dialVerticalScale->setSelectedIndex(config->channelScaleIndex[index]);
 
-    panelSet->dialVerticalShift->setDialColor(channelTextColor[index]);
-    panelSet->dialVerticalShift->setDialButtonsColor(channelBcgrColor[index]);
+    style = (QString::fromUtf8("color:"+Colors::getChannelColorString(index)));
+    panelSet->dialVerticalShift->setDialColor(style);
+    panelSet->dialVerticalShift->setDialButtonsColor(styleBcg);
     panelSet->dialVerticalShift->setRealValue(config->channelOffset[index]);
 }
 
@@ -174,14 +178,14 @@ void ScopeWindow::triggerEdgeCallback(int index){
 void ScopeWindow::triggerModeCallback(int index){
     if(index==0){
         if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-            panelSet->buttonsTriggerMode->setColor(BCKGRND_COLOR_ORANGE,0);
+            panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_ORANGE),0);
             emit triggerModeChanged(ScopeTriggerMode::TRIG_STOP);
             panelSet->buttonsTriggerMode->setText("Single",0);
             labelInfoPanel->setTriggerLabelText("");
 
         }else if(panelSet->buttonsTriggerMode->getText(0)=="Single"){
             emit triggerModeChanged(ScopeTriggerMode::TRIG_SINGLE);
-            panelSet->buttonsTriggerMode->setColor(BCKGRND_COLOR_GREEN,0);
+            panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
             panelSet->buttonsTriggerMode->setText("Stop",0);
         }
     }else if(index==1){
@@ -241,7 +245,7 @@ void ScopeWindow::passConfig(ScopeConfig &conf)
 
 void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
-    panelSet->buttonsTriggerMode->setColor(BCKGRND_COLOR_ORANGE,0);
+    panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_ORANGE),0);
     labelInfoPanel->setTriggerLabelText("");
 }
 

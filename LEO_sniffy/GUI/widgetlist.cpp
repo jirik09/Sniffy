@@ -9,7 +9,7 @@ WidgetList::WidgetList(QWidget *parent) :
 
     model = new QStringListModel();
     ui->listView->setModel(model);
-    ui->listView->setStyleSheet("alternate-background-color: rgb(58, 58, 58);");
+    ui->listView->setStyleSheet("alternate-background-color: "+QString::fromUtf8(BACKGROUND_COLOR_CONTROL));
     model->setStringList(list);
 }
 

@@ -63,14 +63,14 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
     }
 
 
-    setColor(BCKGRND_COLOR_BLUE,0);
-    setColor(BCKGRND_COLOR_BLUE,1);
-    setColor(BCKGRND_COLOR_BLUE,2);
-    setColor(BCKGRND_COLOR_BLUE,3);
-    setColor(BCKGRND_COLOR_BLUE,4);
-    setColor(BCKGRND_COLOR_BLUE,5);
-    setColor(BCKGRND_COLOR_BLUE,6);
-    setColor(BCKGRND_COLOR_BLUE,7);
+    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},0);
+    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},1);
+    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},2);
+    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},3);
+    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},4);
+    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},5);
+    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},6);
+    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},7);
 
 
 
@@ -149,9 +149,9 @@ void WidgetButtons::setColor(QString text, int index){
     QString tempStyleSheet = "";
     if (index>=0 && index<8){
         if(type == ButtonTypes::CHECKABLE || type == ButtonTypes::RADIO){
-            tempStyleSheet += "QPushButton:disabled{background-color: rgb(48,48,48);color: rgb(128,128,128);} QPushButton{border: none;"+QString::fromUtf8(NOT_CHECKED_BACKGROUND)+"} QPushButton:checked{border: none;"+ text +"}";
+            tempStyleSheet += "QPushButton:disabled{background-color: "+QString::fromUtf8(BACKGROUND_COLOR_BUTTON_DISABLED)+" color: "+QString::fromUtf8(COLOR_GREY)+"} QPushButton{border: none;background-color: "+QString::fromUtf8(BACKGROUND_COLOR_BUTTON)+"} QPushButton:checked{border: none;"+ text +"}";
         }else{
-            tempStyleSheet += "QPushButton:disabled{background-color: rgb(48,48,48);color: rgb(128,128,128);} QPushButton:pressed{border: 2px solid rgb(48,48,48)} QPushButton{border: none;"+text +"}";
+            tempStyleSheet += "QPushButton:disabled{background-color: "+QString::fromUtf8(BACKGROUND_COLOR_BUTTON_DISABLED)+" color: "+QString::fromUtf8(COLOR_GREY)+"} QPushButton:pressed{border: 2px solid "+QString::fromUtf8(BACKGROUND_COLOR_APP)+"} QPushButton{border: none;"+text +"}";
         }
         pushButtonsList.at(index)->setStyleSheet(tempStyleSheet);
     }

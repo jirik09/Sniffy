@@ -168,7 +168,7 @@ void MainWindow::loadLayout(QString deviceName)
     restoreState(layout.value("windowState").toByteArray());
 }
 
-void MainWindow::loadModuleLayoutAndConfigCallback(QString modulName)
+void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 {
     QString layoutFile;
     QString configFile;
@@ -182,27 +182,20 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString modulName)
     if(!file.exists() || !fileMod.exists())
         return;
 
+    QSettings settings(configFile, QSettings::IniFormat);
     QSettings layout(layoutFile, QSettings::IniFormat);
     ModuleStatus status;
     QByteArray config;
 
-    QSettings settings(configFile, QSettings::IniFormat);
-
-
     foreach(module, modulesList){
-        if(module->getModuleName()==modulName){
-
+        if(module->getModuleName()==moduleName){
             status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
             config = settings.value(module->getModuleName()+"config").toByteArray();
-
             module->parseConfiguration(config);
             module->writeConfiguration();
-
             module->restoreGeometry(layout);
-
             if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY)
                 module->startModule();
-
             module->setModuleStatus(status);
         }
     }

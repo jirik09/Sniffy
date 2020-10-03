@@ -44,6 +44,7 @@ SOURCES += \
     communication/serialportwriter.cpp \
     devicedescriptor.cpp \
     devicemediator.cpp \
+    graphics/colors.cpp \
     main.cpp \
     mainwindow.cpp \
     math/movingaverage.cpp \
@@ -58,6 +59,7 @@ SOURCES += \
     modules/counter/countertablowfreq.cpp \
     modules/counter/countertabratio.cpp \
     modules/counter/counterwindow.cpp \
+    modules/errorlist.cpp \
     modules/labelformator.cpp \
     modules/device/device.cpp \
     modules/device/devicewindow.cpp \
@@ -116,6 +118,7 @@ HEADERS += \
     modules/counter/countertablowfreq.h \
     modules/counter/countertabratio.h \
     modules/counter/counterwindow.h \
+    modules/errorlist.h \
     modules/labelformator.h \
     modules/device/device.h \
     modules/device/devicewindow.h \

@@ -85,9 +85,6 @@ private:
     QValueAxis *axisY;
     QValueAxis *axisMarkerHorizontal;
 
-    QColor colors[4] = {QCOLOR_ORANGE, QCOLOR_BLUE,
-                        QCOLOR_GREEN, QCOLOR_PURPLE};
-
     void initContextMenu();
     void createSeries(QAbstractSeries *series);
 

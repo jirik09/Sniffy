@@ -80,6 +80,7 @@ void SerialLine::openSerialLine(DeviceDescriptor desc){
         if(i>5){
             break;
         }
+         qDebug() << "ERROR wait for serport to be opened";
     }
     if(serPort->isOpen()){
         success=true;

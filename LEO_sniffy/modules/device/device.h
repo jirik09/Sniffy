@@ -9,6 +9,7 @@
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
 #include "../abstractmodule.h"
+#include "../errorlist.h"
 
 class Device : public AbstractModule
 {
