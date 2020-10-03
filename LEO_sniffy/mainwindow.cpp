@@ -179,9 +179,8 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString modulName)
     QFile file(layoutFile);
     QFile fileMod(configFile);
 
-    if(!file.exists() || !fileMod.exists()){
+    if(!file.exists() || !fileMod.exists())
         return;
-    }
 
     QSettings layout(layoutFile, QSettings::IniFormat);
     ModuleStatus status;
@@ -193,20 +192,17 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString modulName)
     foreach(module, modulesList){
         if(module->getModuleName()==modulName){
 
-            //TO DO Counter causes MCU HF when geometry is restored
-            if(modulName!="Counter"){
-                module->restoreGeometry(layout);
-            }
-
             status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
             config = settings.value(module->getModuleName()+"config").toByteArray();
 
             module->parseConfiguration(config);
             module->writeConfiguration();
 
-            if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY){
+            module->restoreGeometry(layout);
+
+            if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY)
                 module->startModule();
-            }
+
             module->setModuleStatus(status);
         }
     }
