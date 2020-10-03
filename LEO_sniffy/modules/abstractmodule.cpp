@@ -9,16 +9,12 @@ void AbstractModule::saveGeometry(QSettings &layout)
 {
     QList<WidgetButtons*> listBtn = getWidget()->findChildren<WidgetButtons*>();
     WidgetButtons *btn;
-
     QList<WidgetDial*> listDial = getWidget()->findChildren<WidgetDial*>();
     WidgetDial *dial;
-
     QList<WidgetDialRange*> listDialRange = getWidget()->findChildren<WidgetDialRange*>();
     WidgetDialRange *dialRange;
-
     QList<WidgetSwitch*> listSw = getWidget()->findChildren<WidgetSwitch*>();
     WidgetSwitch *sw;
-
     QList<widgetTab*> listTab = getWidget()->findChildren<widgetTab*>();
     widgetTab *tab;
 
@@ -26,35 +22,35 @@ void AbstractModule::saveGeometry(QSettings &layout)
         if (!tab->objectName().isEmpty()){
             layout.setValue(moduleName+tab->objectName(),tab->saveGeometry());
         }else{
-            qDebug () << "ERROR attempting to save layout of object without name: Tab in "<<moduleName;
+            qDebug () << "WARNING attempting to save layout of object without name: Tab in "<<moduleName;
         }
     }
     foreach(btn, listBtn){
         if (!btn->objectName().isEmpty()){
             layout.setValue(moduleName+btn->objectName(),btn->saveGeometry());
         }else{
-            qDebug () << "ERROR attempting to save layout of object without name: Button in "<<moduleName;
+            qDebug () << "WARNING attempting to save layout of object without name: Button in "<<moduleName;
         }
     }
     foreach(sw, listSw){
         if (!sw->objectName().isEmpty()){
             layout.setValue(moduleName+sw->objectName(),sw->saveGeometry());
         }else{
-            qDebug () << "ERROR attempting to save layout of object without name: Switch in "<<moduleName;
+            qDebug () << "WARNING attempting to save layout of object without name: Switch in "<<moduleName;
         }
     }
     foreach(dial, listDial){
         if (!dial->objectName().isEmpty()){
             layout.setValue(moduleName+dial->objectName(),dial->saveGeometry());
         }else{
-            qDebug () << "ERROR attempting to save layout of object without name: Dial in "<<moduleName;
+            qDebug () << "WARNING attempting to save layout of object without name: Dial in "<<moduleName;
         }
     }
     foreach(dialRange, listDialRange){
         if (!dialRange->objectName().isEmpty()){
             layout.setValue(moduleName+dialRange->objectName(),dialRange->saveGeometry());
         }else{
-            qDebug () << "ERROR attempting to save layout of object without name: Dial range in "<<moduleName;
+            qDebug () << "WARNING attempting to save layout of object without name: Dial range in "<<moduleName;
         }
     }
 }
@@ -63,16 +59,12 @@ void AbstractModule::restoreGeometry(QSettings &layout)
 {
     QList<WidgetButtons*> listBtn = getWidget()->findChildren<WidgetButtons*>();
     WidgetButtons *btn;
-
     QList<WidgetDial*> listDial = getWidget()->findChildren<WidgetDial*>();
     WidgetDial *dial;
-
     QList<WidgetDialRange*> listDialRange = getWidget()->findChildren<WidgetDialRange*>();
     WidgetDialRange *dialRange;
-
     QList<WidgetSwitch*> listSw = getWidget()->findChildren<WidgetSwitch*>();
     WidgetSwitch *sw;
-
     QList<widgetTab*> listTab = getWidget()->findChildren<widgetTab*>();
     widgetTab *tab;
 
@@ -80,35 +72,35 @@ void AbstractModule::restoreGeometry(QSettings &layout)
         if (!tab->objectName().isEmpty()){
             tab->restoreGeometry(layout.value(moduleName+tab->objectName()).toByteArray());
         }else{
-            qDebug () << "ERROR layout cannot be restored due to missing object name: tab in "<<moduleName;
+            qDebug () << "WARNING layout cannot be restored due to missing object name: tab in "<<moduleName;
         }
     }
     foreach(btn, listBtn){
         if (!btn->objectName().isEmpty()){
             btn->restoreGeometry(layout.value(moduleName+btn->objectName()).toByteArray());
         }else{
-            qDebug () << "ERROR layout cannot be restored due to missing object name: button in "<<moduleName;
+            qDebug () << "WARNING layout cannot be restored due to missing object name: button in "<<moduleName;
         }
     }
     foreach(sw, listSw){
         if (!sw->objectName().isEmpty()){
             sw->restoreGeometry(layout.value(moduleName+sw->objectName()).toByteArray());
         }else{
-            qDebug () << "ERROR layout cannot be restored due to missing object name: switch in "<<moduleName;
+            qDebug () << "WARNING layout cannot be restored due to missing object name: switch in "<<moduleName;
         }
     }
     foreach(dial, listDial){
         if (!dial->objectName().isEmpty()){
             dial->restoreGeometry(layout.value(moduleName+dial->objectName()).toByteArray());
         }else{
-            qDebug () << "ERROR layout cannot be restored due to missing object name: dial in "<<moduleName;
+            qDebug () << "WARNING layout cannot be restored due to missing object name: dial in "<<moduleName;
         }
     }
     foreach(dialRange, listDialRange){
         if (!dialRange->objectName().isEmpty()){
             dialRange->restoreGeometry(layout.value(moduleName+dialRange->objectName()).toByteArray());
         }else{
-            qDebug () << "ERROR layout cannot be restored due to missing object name: dialRange in "<<moduleName;
+            qDebug () << "WARNING layout cannot be restored due to missing object name: dialRange in "<<moduleName;
         }
     }
 }
