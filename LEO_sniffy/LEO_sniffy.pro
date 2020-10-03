@@ -44,6 +44,7 @@ SOURCES += \
     communication/serialportwriter.cpp \
     devicedescriptor.cpp \
     devicemediator.cpp \
+    graphics/colors.cpp \
     main.cpp \
     mainwindow.cpp \
     math/movingaverage.cpp \

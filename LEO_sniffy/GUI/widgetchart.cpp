@@ -11,7 +11,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart = new QChart();
     chart->legend()->hide();
 
-    chart->setBackgroundBrush(QCOLOR_BLACK);
+    chart->setBackgroundBrush(BACKGROUND_QCOLOR_DATA_AREA);
     chart->setAcceptHoverEvents(true);
     this->setMouseTracking(true);
     chart->setToolTip("¯\\_(ツ)_/¯");
@@ -28,7 +28,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
+        series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
         seriesList.append(series);
         createSeries(series);
     }
@@ -53,7 +53,7 @@ void widgetChart::switchToSplineSeriesCallback(){
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
+        series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
 
         series->append(seriesList[i]->points());
         seriesList[i]->clear();
@@ -67,7 +67,7 @@ void widgetChart::switchToLineSeriesCallback(){
     for (int i = 0; i < maxTraces; i++) {
         QLineSeries *series = new QLineSeries;
         //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
+        series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
 
         series->append(seriesList[i]->points());
         seriesList[i]->clear();
@@ -81,7 +81,7 @@ void widgetChart::switchToScatterSeriesCallback(){
     for (int i = 0; i < maxTraces; i++) {
         QScatterSeries *series = new QScatterSeries;
         //connect(series, &QScatterSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(colors[i%5])), 2.0));
+        series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
         series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
         series->setMarkerSize(3.8);
 
@@ -264,7 +264,7 @@ void widgetChart::setHorizontalMarker(int channelIndex, qreal value){
 
     QPainter painter(&arrow);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(QPen(QBrush(QColor(colors[channelIndex%5])), 1.0));
+    painter.setPen(QPen(QBrush(Colors::getChannelColor(channelIndex)), 1.0));
     painter.setBrush(painter.pen().color());
     painter.drawPath(arrowPath);
 

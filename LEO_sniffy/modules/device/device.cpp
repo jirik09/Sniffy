@@ -96,8 +96,8 @@ void Device::parseData(QByteArray data){
     }else{
         qDebug() << "WARNING: Device error message received: " <<ErrorList::GetErrMessage((uint8_t)(feature.at(2)));//<< feature << " "<< data;
     }
-
 }
+
 void Device::writeConfiguration(){}
 void Device::parseConfiguration(QByteArray config){Q_UNUSED(config)}
 QByteArray Device::getConfiguration(){return "none";}

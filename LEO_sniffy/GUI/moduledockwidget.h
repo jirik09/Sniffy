@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QLabel>
 
+#include "../graphics/colors.h"
+
 class ModuleDockWidget : public QDockWidget
 {
     Q_OBJECT

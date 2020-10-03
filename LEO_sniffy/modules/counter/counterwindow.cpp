@@ -61,8 +61,8 @@ void CounterWindow::createAllDisplays(void){
 
     displayLFCh2 = createLowFreqDisplays("LowFreqCh2Counter");
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
-    QString style = "QProgressBar {border: 1px solid #777;border-radius: 1px;background: rgb(38, 38, 38);}"
-                    "QProgressBar::chunk {background-color: rgb(124, 124, 124);width: 20px;}";
+    QString style = "QProgressBar {border: 1px solid #777;border-radius: 1px;background: "+QString::fromUtf8(BACKGROUND_COLOR_DATA_AREA)+"}"
+                    "QProgressBar::chunk {background-color: "+QString::fromUtf8(COLOR_GREY)+"width: 20px;}";
     displayLFCh2->setBarStyle(style);
     ui->verticalLayout_display->addWidget(displayLFCh2);
 
@@ -123,11 +123,11 @@ void CounterWindow::configureErrorStyles(WidgetDisplay *display){
 }
 
 void CounterWindow::configureAllDisplays(void){
-    configureDisplaysStaticAttr(displayHF, "CH1", LITERAL_FREQUENCY, TEXT_COLOR_BLUE);
-    configureDisplaysStaticAttr(displayLFCh1, "CH1", LITERAL_FREQUENCY, TEXT_COLOR_BLUE);
-    configureDisplaysStaticAttr(displayLFCh2, "CH2", LITERAL_FREQUENCY, TEXT_COLOR_GREY);
-    configureDisplaysStaticAttr(displayRat, "CH3/CH1", LITERAL_RATIO, TEXT_COLOR_BLUE);
-    configureDisplaysStaticAttr(displayInt, "CH1 - CH2", LITERAL_INTERVAL, TEXT_COLOR_BLUE);
+    configureDisplaysStaticAttr(displayHF, "CH1", LITERAL_FREQUENCY, "color:"+QString::fromUtf8(COLOR_BLUE));
+    configureDisplaysStaticAttr(displayLFCh1, "CH1", LITERAL_FREQUENCY, "color:"+QString::fromUtf8(COLOR_BLUE));
+    configureDisplaysStaticAttr(displayLFCh2, "CH2", LITERAL_FREQUENCY, "color:"+QString::fromUtf8(COLOR_GREY));
+    configureDisplaysStaticAttr(displayRat, "CH3/CH1", LITERAL_RATIO, "color:"+QString::fromUtf8(COLOR_BLUE));
+    configureDisplaysStaticAttr(displayInt, "CH1 - CH2", LITERAL_INTERVAL, "color:"+QString::fromUtf8(COLOR_BLUE));
     //displayHF->hide();
     displayRat->hide();
     displayInt->hide();
@@ -136,7 +136,7 @@ void CounterWindow::configureAllDisplays(void){
 }
 
 void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor){
-    display->configLabel(LABELNUM_QUAN, quantity, TEXT_COLOR_GREY, true);
+    display->configLabel(LABELNUM_QUAN, quantity, "color:"+QString::fromUtf8(COLOR_GREY), true);
     display->configLabel(LABELNUM_CHAN, channel, sideLabelsColor, true);
     display->configLabel(LABELNUM_INDIC, "    ", sideLabelsColor, true);
 }
@@ -161,8 +161,8 @@ void CounterWindow::configureDisplaysDynamicAttr(){
 }
 
 void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin){
-    display->configLabel(LABELNUM_PINS, pin, TEXT_COLOR_GREY, true);
-    display->configLabel(LABELNUM_FLAG, "", TEXT_COLOR_ORANGE, true);
+    display->configLabel(LABELNUM_PINS, pin, "color:"+QString::fromUtf8(COLOR_GREY), true);
+    display->configLabel(LABELNUM_FLAG, "", "color:"+QString::fromUtf8(COLOR_ORANGE), true);
 }
 
 void CounterWindow::switchCounterModeCallback(int index){
@@ -281,7 +281,7 @@ void CounterWindow::lfSwitchChannelCallback(int index){
     QString bckgndColor;
 
     if(index == 0){
-        bckgndColor = BCKGRND_COLOR_BLUE;
+        bckgndColor = "background-color:"+QString::fromUtf8(COLOR_BLUE);
         tabLowFreq->showDialInChannel(CHANNEL_1, true);
         tabLowFreq->showDialInChannel(CHANNEL_2, false);
     }else if (index == 1) {
