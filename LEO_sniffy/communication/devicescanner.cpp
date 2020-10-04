@@ -28,6 +28,7 @@ void DeviceScanner::run()
             if(!deviceListsEqual(tempDeviceList,currentDeviceList)){
                 currentDeviceList = tempDeviceList;
                // qDebug() << "new devices found"<<currentDeviceList.length();
+                isSearchEnaled = false;
                 emit newDevicesScanned(currentDeviceList);
             }
         }else{

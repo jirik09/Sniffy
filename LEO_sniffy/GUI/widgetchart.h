@@ -13,6 +13,7 @@
 #include <QMenu>
 #include <QtMath>
 #include <QDateTimeAxis>
+#include <QDebug>
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
@@ -23,9 +24,16 @@ namespace Ui {
 class widgetChart;
 }
 
+enum class MarkerType
+{
+ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK
+};
+
 class widgetChart : public QWidget
 {
     Q_OBJECT
+
+
 
 public:
     explicit widgetChart(QWidget *parent = nullptr, int maxTraces = 1);
@@ -37,7 +45,6 @@ public:
     void appendToTrace(int index, QVector<QPointF> *points);
     void updateAxis();
 
-    void setMaxX(float max);
     void setDataMinMax(qreal minX, qreal maxX);
     void setRangeX(qreal minX, qreal maxX);
     void setRangeY(qreal minY, qreal maxY);
@@ -56,21 +63,21 @@ public:
     void setGraphColor(QColor qColor);
     void setLabelsVisible(bool lableVisibleX, bool lableVisibleY);
     void setLabelsSize(int pointSize);
-    void createHorizontalMarkes();
-    void setHorizontalMarker(int channelIndex, qreal value);
-
-    int getTraceNum();
+    void setHorizontalMarker(int channelIndex, qreal value, MarkerType type = MarkerType::TICK);
+    void setVerticalMarker(int channelIndex, qreal value);
 
 private:
     Ui::widgetChart *ui;
     QList<QXYSeries *> seriesList;
-    QScatterSeries *markersHorizontal;
+    QList<QScatterSeries *> markersHorizontal;
+    int markerHorizontalIndex=0;
+    QList<QScatterSeries *> markersVertical;
+    int markerVerticalIndex=0;
 
     QMenu *menu;
     QAction *spline, *line, *scatter, *btnOpenGL;
     enum enable {DISABLED, ENABLED} openGL = DISABLED;
 
-    bool markers = 0;
     int maxTraces;
 
     qreal minX = 0;
@@ -83,9 +90,21 @@ private:
 
     QValueAxis *axisX;   // QAbstractAxis
     QValueAxis *axisY;
-    QValueAxis *axisMarkerHorizontal;
+    QValueAxis *axisX_MarkerHorizontal;
+    QValueAxis *axisY_MarkerVertical;
+    QValueAxis *axisX_FFT;
+
+    QPainterPath *MarkerPath_ArrowDownBig;
+    QPainterPath *MarkerPath_ArrowDownSmall;
+    QPainterPath *MarkerPath_ArrowUpSmall;
+    QPainterPath *MarkerPath_Tick;
 
     void initContextMenu();
+    void createHorizontalMarkers();
+    void createVerticalMarkers();
+    void initBrushes();
+    QBrush getBrush (int channelIndex, MarkerType type);
+
     void createSeries(QAbstractSeries *series);
 
 signals:

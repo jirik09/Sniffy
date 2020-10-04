@@ -20,8 +20,8 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
     ui->verticalSlider_2->hide();
 
     chart = new widgetChart(ui->widget_chart, 4);
-    chart->setRange(-0.1, 0.1, 0, 8);
-    chart->createHorizontalMarkes();
+    chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
+
     ui->verticalLayout_chart->addWidget(chart);
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
@@ -87,11 +87,13 @@ void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float tim
     labelInfoPanel->setTriggerLabelText("");
     labelInfoPanel->hideChannelLabels();
 
+    this->triggerChannelIndex = triggerChannelIndex;
+
     ChartData = dataSeries;
 
     paintTraces(ChartData);
 
-    chart->setHorizontalMarker(triggerChannelIndex,0);
+
 }
 
 void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries){
@@ -105,10 +107,21 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries){
             }
 
             chart->updateTrace(&dataSeries[i], i);
+
+            float zeroMarkerPosition = config->channelOffset[i]/config->channelScale[i];
+            if(zeroMarkerPosition>=CHART_MAX_Y){
+                chart-> setHorizontalMarker(i,CHART_MAX_Y,MarkerType::ARROW_UP_SMALL);
+            }else if(zeroMarkerPosition<=CHART_MIN_Y){
+                chart-> setHorizontalMarker(i,CHART_MIN_Y,MarkerType::ARROW_DOWN_SMALL);
+            }else{
+                 chart-> setHorizontalMarker(i,zeroMarkerPosition,MarkerType::TICK);
+            }
+
             labelInfoPanel->setChannelLabelVisible(i,true);
             labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/div"));
         }
     }
+    chart->setVerticalMarker(triggerChannelIndex,0);
 }
 
 void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){

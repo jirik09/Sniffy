@@ -28,6 +28,9 @@
 #include "panelmeasurement.h"
 #include "scopeconfig.h"
 
+#define CHART_MAX_Y 7
+#define CHART_MIN_Y -1
+
 namespace Ui {
 class ScopeWindow;
 }
@@ -92,7 +95,9 @@ public:
 private:
     ScopeConfig *config;
     widgetChart *chart;
+
     QVector<QVector<QPointF>> ChartData;
+    int triggerChannelIndex =0;
 
     WidgetLabelArea *labelInfoPanel;
 
