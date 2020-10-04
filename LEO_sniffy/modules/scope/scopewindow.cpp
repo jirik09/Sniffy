@@ -37,6 +37,7 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
 
     // ************************* creating widget general settings *******************
     panelSet = new PanelSettings(tabs->getLayout(0),tabs);
+    panelSet->setObjectName("panelSet");
 
     connect(panelSet->dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
     connect(panelSet->dialPretrigger,SIGNAL(valueChanged(float)),this,SLOT(pretriggerCallback(float)));
@@ -73,11 +74,13 @@ void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom();;
     ui->sliderSignal->setStyleSheet(QString::fromUtf8(
                                         "QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
-                                        "background-color: rgb(38, 38, 38);border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
+                                        "background-color: ")+BACKGROUND_COLOR_DATA_AREA+"border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
                                         "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
-                                        "margin-bottom: -3px;border-radius: 4px;width:")+QString::number(handleW)+QString::fromUtf8("px;}"));
+                                        "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+QString::fromUtf8("px;}"));
     event->accept();
 }
+
+
 
 void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex){
     updateChartTimeScale(timeBase);
@@ -98,12 +101,12 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries){
 
             //put channel in scale
             for (int j = 0; j < dataSeries[i].length(); j++){
-                dataSeries[i][j].setY((dataSeries[i][j].y()+channelOffset[i])/channelScale[i]);
+                dataSeries[i][j].setY((dataSeries[i][j].y()+config->channelOffset[i])/config->channelScale[i]);
             }
 
             chart->updateTrace(&dataSeries[i], i);
             labelInfoPanel->setChannelLabelVisible(i,true);
-            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(channelScale[i],"V/div"));
+            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/div"));
         }
     }
 }
@@ -114,27 +117,31 @@ void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
 }
 
 void ScopeWindow::channelVerticalCallback(int index){
-    selectedChannelIndexVertical = index;
-    panelSet->dialVerticalScale->setDialColor(channelTextColor[index]);
-    panelSet->dialVerticalScale->setDialButtonsColor(channelBcgrColor[index]);
-    if(channelScaleIndex[index]==-1){
-        channelScaleIndex[index] = panelSet->dialVerticalScale->getDefaultIndex();
-        channelOffsetIndex[index] = panelSet->dialVerticalShift->getDefaultRealValue();
-    }
-    panelSet->dialVerticalScale->setSelectedIndex(channelScaleIndex[index]);
+    config->selectedChannelIndexVertical = index;
+    QString style = QString::fromUtf8("color:"+Colors::getChannelColorString(index));
+    QString styleBcg = QString::fromUtf8("background-color:"+Colors::getChannelColorString(index));
 
-    panelSet->dialVerticalShift->setDialColor(channelTextColor[index]);
-    panelSet->dialVerticalShift->setDialButtonsColor(channelBcgrColor[index]);
-    panelSet->dialVerticalShift->setRealValue(channelOffset[index]);
+    panelSet->dialVerticalScale->setDialColor(style);
+    panelSet->dialVerticalScale->setDialButtonsColor(styleBcg);
+    if(config->channelScaleIndex[index]==-1){
+        config->channelScaleIndex[index] = panelSet->dialVerticalScale->getDefaultIndex();
+        config->channelOffsetIndex[index] = panelSet->dialVerticalShift->getDefaultRealValue();
+    }
+    panelSet->dialVerticalScale->setSelectedIndex(config->channelScaleIndex[index]);
+
+    style = (QString::fromUtf8("color:"+Colors::getChannelColorString(index)));
+    panelSet->dialVerticalShift->setDialColor(style);
+    panelSet->dialVerticalShift->setDialButtonsColor(styleBcg);
+    panelSet->dialVerticalShift->setRealValue(config->channelOffset[index]);
 }
 
 void ScopeWindow::channelVerticalScaleCallback(float value){
-    channelScale[selectedChannelIndexVertical] = value;
-    channelScaleIndex[selectedChannelIndexVertical] = panelSet->dialVerticalScale->getSelectedIndex();
+    config->channelScale[config->selectedChannelIndexVertical] = value;
+    config->channelScaleIndex[config->selectedChannelIndexVertical] = panelSet->dialVerticalScale->getSelectedIndex();
     paintTraces(ChartData);
 }
 void ScopeWindow::channelVerticalShiftCallback(float value){
-    channelOffset[selectedChannelIndexVertical] = value;
+    config->channelOffset[config->selectedChannelIndexVertical] = value;
     paintTraces(ChartData);
 }
 
@@ -171,14 +178,14 @@ void ScopeWindow::triggerEdgeCallback(int index){
 void ScopeWindow::triggerModeCallback(int index){
     if(index==0){
         if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-            panelSet->buttonsTriggerMode->setColor(BCKGRND_COLOR_ORANGE,0);
+            panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_ORANGE),0);
             emit triggerModeChanged(ScopeTriggerMode::TRIG_STOP);
             panelSet->buttonsTriggerMode->setText("Single",0);
             labelInfoPanel->setTriggerLabelText("");
 
         }else if(panelSet->buttonsTriggerMode->getText(0)=="Single"){
             emit triggerModeChanged(ScopeTriggerMode::TRIG_SINGLE);
-            panelSet->buttonsTriggerMode->setColor(BCKGRND_COLOR_GREEN,0);
+            panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
             panelSet->buttonsTriggerMode->setText("Stop",0);
         }
     }else if(index==1){
@@ -231,9 +238,14 @@ void ScopeWindow::updateMeasurement(QList<Measurement*> m){
     labelInfoPanel->setMeasurements(m);
 }
 
+void ScopeWindow::passConfig(ScopeConfig &conf)
+{
+    this->config = &conf;
+}
+
 void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
-    panelSet->buttonsTriggerMode->setColor(BCKGRND_COLOR_ORANGE,0);
+    panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_ORANGE),0);
     labelInfoPanel->setTriggerLabelText("");
 }
 

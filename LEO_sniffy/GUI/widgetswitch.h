@@ -7,9 +7,6 @@ namespace Ui {
 class WidgetSwitch;
 }
 
-
-
-
 class WidgetSwitch : public QWidget
 {
     Q_OBJECT
@@ -17,6 +14,8 @@ class WidgetSwitch : public QWidget
 public:
     explicit WidgetSwitch(QWidget *parent = nullptr, QString leftName = "", QString rightName = "", QString name = "");
     ~WidgetSwitch();
+    QByteArray saveGeometry();
+    void restoreGeometry(QByteArray geom);
 
     bool isCheckedRight();
     bool isCheckedLeft();

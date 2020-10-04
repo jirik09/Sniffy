@@ -4,9 +4,10 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
 {
     setMinimumSize(QSize(250, 150));
     setAllowedAreas(Qt::RightDockWidgetArea);
+    setObjectName(title);
     hide();
 
-    setStyleSheet(QString::fromUtf8("QDockWidget{border: 3px solid gray; background-color: rgb(108, 108, 108);}"));
+    setStyleSheet(QString::fromUtf8("QDockWidget{border: 2px solid gray; background-color: ")+QString::fromUtf8(COLOR_GREY)+";}");
 
     // ***************** create title bar and window contorl icons *************
     QWidget *titleBar = new QWidget();
@@ -25,11 +26,11 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     btnHold->resize(38, 12);
     btnHold->setMaximumSize(36, 13);
     btnHold->setText("HOLD");
-    btnHold->setStyleSheet("QPushButton{padding-top: 0px; padding-bottom: 1px; padding-left: 0px; padding-right: 0px; font-size: 10px;}"
-                           "QPushButton{background-color: rgb(58, 58, 58); color: rgb(124, 124, 124);"
-                           "border-style: solid; border-color: rgb(124, 124, 124); border-width: 1px; border-radius: 1px;}"
-                           "QPushButton:checked{background-color: rgb(58, 58, 58); color: rgb(224, 154, 24);"
-                           "border-style: solid; border-color: rgb(224, 154, 24); border-width: 1px; border-radius: 1px;}"
+    btnHold->setStyleSheet(QString::fromUtf8("QPushButton{padding-top: 0px; padding-bottom: 1px; padding-left: 0px; padding-right: 0px; font-size: 10px;}"
+                           "QPushButton{background-color: ")+BACKGROUND_COLOR_CONTROL+" color: "+COLOR_GREY+
+                           "border-style: solid; border-color: "+COLOR_GREY+" border-width: 1px; border-radius: 1px;}"
+                           "QPushButton:checked{background-color: "+BACKGROUND_COLOR_CONTROL+" color: "+COLOR_ORANGE+
+                           "border-style: solid; border-color: "+COLOR_ORANGE+"; border-width: 1px; border-radius: 1px;}"
                            "QPushButton:hover{border-width: 2px;}");
     btnHold->hide();
     titleBarLayout->addWidget(btnHold);

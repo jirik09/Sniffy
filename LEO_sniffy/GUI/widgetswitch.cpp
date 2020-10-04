@@ -29,6 +29,24 @@ WidgetSwitch::~WidgetSwitch()
     delete ui;
 }
 
+QByteArray WidgetSwitch::saveGeometry()
+{
+    if(isCheckedLeft()){
+        return "L";
+    }else{
+        return "R";
+    }
+}
+
+void WidgetSwitch::restoreGeometry(QByteArray geom)
+{
+    if (geom == "L"){
+        setLeft();
+    }else{
+        setRight();
+    }
+}
+
 void WidgetSwitch::setLeft(){
     ui->pushButton_left->setStyleSheet(SELECTED_STYLE);
     ui->pushButton_right->setStyleSheet(NOT_SELECTED_STYLE);

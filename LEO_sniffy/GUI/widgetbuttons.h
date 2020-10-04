@@ -5,6 +5,7 @@
 #include <QList>
 #include <QPushButton>
 #include <QtMath>
+#include <QString>
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
@@ -20,12 +21,6 @@ enum class ButtonTypes
     RADIO
   };
 
-
-
-//#define SELECTED_STYLE "border: none;"
-
-#define NOT_CHECKED_BACKGROUND "background-color: rgb(38,38,38);"
-
 class WidgetButtons : public QWidget
 {
     Q_OBJECT
@@ -33,6 +28,8 @@ class WidgetButtons : public QWidget
 public:
     explicit WidgetButtons(QWidget *parent = nullptr, int num = 1, ButtonTypes type = ButtonTypes::NORMAL, QString name = "", int defaultSelectedIndex = 0);
     ~WidgetButtons();
+    QByteArray saveGeometry();
+    void restoreGeometry(QByteArray geom);
     void setText(QString text, int index = 0);
     QString getText(int index);
     void setColor(QString text, int index);
@@ -48,7 +45,8 @@ public:
 
 private:
     Ui::WidgetButtons *ui;
-    QString buttonColors[8] = {BCKGRND_COLOR_BLUE};
+
+    QString buttonColors[8] = {"background-color:"+QString::fromUtf8(COLOR_BLUE)};
     ButtonTypes type = ButtonTypes::NORMAL;
 
     QList<QPushButton*> pushButtonsList;

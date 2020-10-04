@@ -57,10 +57,13 @@ void Counter::showHoldButtonCallback(){
 }
 
 void Counter::holdCounter(bool held){
-    if(held)
+    if(held){
         comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
-    else
+        setModuleStatus(ModuleStatus::PAUSE);
+    }else{
         comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
+        setModuleStatus(ModuleStatus::PLAY);
+    }
 }
 
 void Counter::startCounting(){
@@ -78,9 +81,10 @@ void Counter::parseData(QByteArray data){
     QByteArray dataToPass = data.remove(0, 4);
 
     if(dataHeader == "CFG_"){
-        showModuleControl();
         spec = new CounterSpec(dataToPass, this);
         cntWindow->setSpecification(spec);
+        showModuleControl();
+
     }else {
 
         if(dataHeader == "HF_D"){
@@ -547,6 +551,14 @@ void Counter::intDialTimeoutChangedCallback(float val){
 
 void Counter::writeConfiguration(){
 
+}
+
+void Counter::parseConfiguration(QByteArray config){    
+    conf->parse(config);
+}
+
+QByteArray Counter::getConfiguration(){
+    return conf->serialize();
 }
 
 QWidget *Counter::getWidget(){

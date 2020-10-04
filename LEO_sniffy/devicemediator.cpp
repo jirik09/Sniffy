@@ -37,6 +37,7 @@ void DeviceMediator::newDeviceList(QList<DeviceDescriptor> deviceList){
 
 void DeviceMediator::open(int deviceIndex){
     communication->open(deviceList.at(deviceIndex));
+
     QThread::msleep(50);
     int i = 0;
     while (communication->getIsOpen()==false) {
@@ -54,10 +55,10 @@ void DeviceMediator::open(int deviceIndex){
         connect(communication,&Comms::newData,this,&DeviceMediator::parseData);
         connect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
 
-        communication->write(Commands::SYSTEM+":"+Commands::CONFIG_REQUEST+";");
         foreach(QSharedPointer<AbstractModule> mod, modules){
             mod->setComms(communication);
         }
+        emit loadLayout(deviceList.at(deviceIndex).deviceName);
     }
 }
 
@@ -106,5 +107,9 @@ void DeviceMediator::ShowDeviceModule(){
 bool DeviceMediator::getIsConnected() const
 {
     return isConnected;
+}
+
+QString DeviceMediator::getDeviceName(){
+    return device->getName();
 }
 

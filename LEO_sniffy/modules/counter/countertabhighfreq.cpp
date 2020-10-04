@@ -6,6 +6,7 @@ CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent
     destination->addWidget(separatorQuantitySwitch);
 
     buttonsQuantitySwitch = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
+    buttonsQuantitySwitch->setObjectName("quantitySwitch");
     buttonsQuantitySwitch->setText("Frequency", 0);
     buttonsQuantitySwitch->setText("Period", 1);
     destination->addWidget(buttonsQuantitySwitch);
@@ -14,11 +15,13 @@ CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent
     destination->addWidget(separatorErrorSwitch);
 
     buttonsErrorSwitch = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
+    buttonsErrorSwitch->setObjectName("errorSwitch");
     buttonsErrorSwitch->setText("Err", 0);
     buttonsErrorSwitch->setText("Err AVG", 1);
     destination->addWidget(buttonsErrorSwitch);
 
     dialAveraging = new WidgetDialRange(parent ,"Averaging");
+    dialAveraging->setObjectName("dialHfAveraging");
     dialAveraging->setRange(2, AVERAGE_RANGE, "Smpls", 1, 1, 2, false);
     dialAveraging->hideUnitSelection();
     destination->addWidget(dialAveraging);
@@ -27,6 +30,7 @@ CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent
     destination->addWidget(separatorGateTime);
 
     buttonsGateTime = new WidgetButtons(parent, 5, ButtonTypes::RADIO, "", 0);
+    buttonsGateTime->setObjectName("gateTime");
     buttonsGateTime->setText("0.1", 0);
     buttonsGateTime->setText("0.5", 1);
     buttonsGateTime->setText("1.0", 2);

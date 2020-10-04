@@ -33,6 +33,7 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
    deviceSelection->addOption("Scanning for available devices",-1);
 
    deviceConnectButton = new WidgetButtons(WidgetSpecification,2);
+   deviceConnectButton->setObjectName("connectbutton");
    deviceConnectButton->setText("Connect",0);
    deviceConnectButton->setDisabledButton(true,0);
    deviceConnectButton->setText("Scan",1);

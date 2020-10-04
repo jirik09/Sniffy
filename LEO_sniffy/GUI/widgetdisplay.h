@@ -89,14 +89,14 @@ public:
     void associateSample(int traceIndex, QString prefix, double sample, QString affix);
     void updateHistoryData(QVector<QPointF> *points, int index);        
 
+private:
+    QLocale loc;
+    QPalette palette;
+
+    Ui::WidgetDisplay *ui;    
     widgetChart *chart;
     WidgetList *list;
-
-private:
-    Ui::WidgetDisplay *ui;
     QList<QLabel*> labelList;
-    QPalette palette;
-    QLocale loc;
 
     QVector<QVector<QPointF>> *historyData;
     int historySize = 100;
@@ -135,20 +135,13 @@ private:
     void setHistoryMinMaxTime(qreal minX, qreal maxX);
     void setHistoryMinMaxData(qreal minY, qreal maxY);
 
-    void clearHistoryExceptChart();
-
 private slots:    
     void historyButtonClickedCallback();
     void clearHistoryButtonClickedCallback();
     void listChartSwitchClickedCallback();
     void saveListClickedCallback();
     void dialHistoryValueChangedCallback(int val);
-    void chartShowMenuOnRightClickCallback(const QPoint &mousePos);
     void dialShowMenuOnRightClickCallback(const QPoint &mousePos);
-
-    void chartSwitchToSpline();
-    void chartSwitchToLine();
-    void chartSwitchToScatter();
 
     void changeHistorySizeTo100();
     void changeHistorySizeTo300();

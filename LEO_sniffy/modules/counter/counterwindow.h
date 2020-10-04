@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QDebug>
+#include <QString>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgettab.h"

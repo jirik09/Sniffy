@@ -51,9 +51,6 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     connect(ui->pushButton_save, SIGNAL(clicked()),
             this, SLOT(saveListClickedCallback()));
 
-    connect(chart, &widgetChart::chartRightClicked,
-            this, &WidgetDisplay::chartShowMenuOnRightClickCallback);
-
     connect(ui->dial, SIGNAL(customContextMenuRequested(const QPoint &)),
             this, SLOT(dialShowMenuOnRightClickCallback(const QPoint &)));
     connect(ui->dial, SIGNAL(valueChanged(int)),
@@ -205,7 +202,7 @@ void WidgetDisplay::showLabel(int labelNumber){
 void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){
     if(color == "blue"){
         if(drawFlag == 0){
-            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
             drawFlag++;
         }else if (drawFlag == 1) {
             labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
@@ -305,6 +302,7 @@ void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){
 
 void WidgetDisplay::configureCustomDial(){
     ui->dial->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->dial->setObjectName("dialHistory");
     ui->dial->drawMarker(false);
     ui->dial->setRange(100, 1000);
     ui->dial->setPageStep(100);
@@ -394,6 +392,12 @@ void WidgetDisplay::appendNewHistorySample(QString prefix, double sample, QStrin
     list->appendNumber(timeAxisMax, prefix, sample, affix);
 }
 
+/* Brief: Appends a sample to the selected trace and associates it
+ * to the list next to the one added by appendNewHistorySample()
+ * traceIndex: ...
+ * prefix, affix: Strings added in front of and behind the sample in the list
+ * sample: sample to append
+ */
 void WidgetDisplay::associateSample(int traceIndex, QString prefix, double sample, QString affix){
     historyData[0][traceIndex].append(QPointF(timeAxisMax, sample));
     chart->appendToTrace(traceIndex, &historyData[0][traceIndex]);
@@ -430,18 +434,14 @@ void WidgetDisplay::recalcHistorySizeAndSetDial(int reqSize)
     }
 }
 
-void WidgetDisplay::clearHistoryExceptChart(){
+/*************************************** Callbacks *****************************************/
+
+void WidgetDisplay::clearHistoryButtonClickedCallback(){
+    clearHistoryChart();
     clearHistoryList();
     clearHistoryData();
     timeAxisMax = 0;
     timeAxisMin = 0;
-}
-
-/*************************************** Callbacks *****************************************/
-
-void WidgetDisplay::clearHistoryButtonClickedCallback(){    
-    clearHistoryChart();
-    clearHistoryExceptChart();
 }
 
 void WidgetDisplay::historyButtonClickedCallback(){
@@ -496,40 +496,6 @@ void WidgetDisplay::dialHistoryValueChangedCallback(int val){
     Timing *timer = new Timing();
     timer->sleep(450);
     labelFloatHistNum->hide();
-}
-
-void WidgetDisplay::chartShowMenuOnRightClickCallback(const QPoint &mousePos){
-    QMenu menu(tr("Context menu"), this);
-    menu.setStyleSheet(CONTEXT_MENU_HOVER);
-
-    QAction spline("Spline", this);
-    QAction line("Line", this);
-    QAction scatter("Scatter", this);
-
-    connect(&spline, SIGNAL(triggered()), this, SLOT(chartSwitchToSpline()));
-    connect(&line, SIGNAL(triggered()), this, SLOT(chartSwitchToLine()));
-    connect(&scatter, SIGNAL(triggered()), this, SLOT(chartSwitchToScatter()));
-
-    menu.addAction(&spline);
-    menu.addAction(&line);
-    menu.addAction(&scatter);
-
-    menu.exec(mapToGlobal(mousePos));
-}
-
-void WidgetDisplay::chartSwitchToSpline(){
-    clearHistoryExceptChart();
-    chart->switchToSplineSeries();
-}
-
-void WidgetDisplay::chartSwitchToLine(){
-    clearHistoryExceptChart();
-    chart->switchToLineSeries();
-}
-
-void WidgetDisplay::chartSwitchToScatter(){
-    clearHistoryExceptChart();
-    chart->switchToScatterSeries();
 }
 
 void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){

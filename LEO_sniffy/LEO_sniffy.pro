@@ -36,7 +36,6 @@ SOURCES += \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
     GUI/widgettab.cpp \
-    GUI/widgettop.cpp \
     communication/commands.cpp \
     communication/comms.cpp \
     communication/devicescanner.cpp \
@@ -45,6 +44,7 @@ SOURCES += \
     communication/serialportwriter.cpp \
     devicedescriptor.cpp \
     devicemediator.cpp \
+    graphics/colors.cpp \
     main.cpp \
     mainwindow.cpp \
     math/movingaverage.cpp \
@@ -59,6 +59,7 @@ SOURCES += \
     modules/counter/countertablowfreq.cpp \
     modules/counter/countertabratio.cpp \
     modules/counter/counterwindow.cpp \
+    modules/errorlist.cpp \
     modules/labelformator.cpp \
     modules/device/device.cpp \
     modules/device/devicewindow.cpp \
@@ -92,7 +93,6 @@ HEADERS += \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
     GUI/widgettab.h \
-    GUI/widgettop.h \
     communication/commands.h \
     communication/comms.h \
     communication/connectiontype.h \
@@ -118,6 +118,7 @@ HEADERS += \
     modules/counter/countertablowfreq.h \
     modules/counter/countertabratio.h \
     modules/counter/counterwindow.h \
+    modules/errorlist.h \
     modules/labelformator.h \
     modules/device/device.h \
     modules/device/devicewindow.h \
@@ -149,7 +150,6 @@ FORMS += \
     GUI/widgetseparator.ui \
     GUI/widgetswitch.ui \
     GUI/widgettab.ui \
-    GUI/widgettop.ui \
     mainwindow.ui \
     modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \

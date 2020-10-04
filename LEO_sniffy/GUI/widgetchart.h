@@ -13,9 +13,9 @@
 #include <QMenu>
 #include <QtMath>
 #include <QDateTimeAxis>
-#include <QCursor>
 
 #include "../graphics/colors.h"
+#include "../graphics/styles.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -30,16 +30,13 @@ class widgetChart : public QWidget
 public:
     explicit widgetChart(QWidget *parent = nullptr, int maxTraces = 1);
     ~widgetChart();
-    void useOpenGL(bool use);
-    void switchToSplineSeries();
-    void switchToLineSeries();
-    void switchToScatterSeries();
     void clearAll();
     void clearPoints(int startIndex, int endIndex);
     void clearPoint(int traceIndex, int index);
     void updateTrace(QVector<QPointF> *points, int index);
     void appendToTrace(int index, QVector<QPointF> *points);
     void updateAxis();
+
     void setMaxX(float max);
     void setDataMinMax(qreal minX, qreal maxX);
     void setRangeX(qreal minX, qreal maxX);
@@ -62,14 +59,18 @@ public:
     void createHorizontalMarkes();
     void setHorizontalMarker(int channelIndex, qreal value);
 
-    int getTraceNum();       
+    int getTraceNum();
 
 private:
     Ui::widgetChart *ui;
-    QCursor cursor;
     QList<QXYSeries *> seriesList;
     QScatterSeries *markersHorizontal;
-    enum markers {ENABLED, DISABLED} markers = DISABLED;
+
+    QMenu *menu;
+    QAction *spline, *line, *scatter, *btnOpenGL;
+    enum enable {DISABLED, ENABLED} openGL = DISABLED;
+
+    bool markers = 0;
     int maxTraces;
 
     qreal minX = 0;
@@ -78,23 +79,25 @@ private:
     qreal invZoom = 1;
     qreal shift = 0.5;
 
-    QChart *chart;       
+    QChart *chart;
 
     QValueAxis *axisX;   // QAbstractAxis
     QValueAxis *axisY;
     QValueAxis *axisMarkerHorizontal;
 
-    QColor colors[4] = {QCOLOR_ORANGE, QCOLOR_BLUE,
-                        QCOLOR_GREEN, QCOLOR_PURPLE};
-
-    void createSeries(QLineSeries *series, int traceIndex);
-    void wipeAllOut();
+    void initContextMenu();
+    void createSeries(QAbstractSeries *series);
 
 signals:
-    void chartRightClicked(const QPoint &pos);
+    void chartSeriesChanged();
 
 private slots:
-    void chartRightClickCallback(const QPoint &mousePos);
+    void switchToSplineSeriesCallback();
+    void switchToLineSeriesCallback();
+    void switchToScatterSeriesCallback();
+    void useOpenGLCallback();
+
+    void rightClickCallback(const QPoint &mousePos);
     void hovered(const QPointF &point);
 };
 
