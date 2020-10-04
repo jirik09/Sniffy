@@ -10,6 +10,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 
     chart = new QChart();
     chart->legend()->hide();
+    chart->installEventFilter(this);
 
     chart->setBackgroundBrush(BACKGROUND_QCOLOR_DATA_AREA);
     chart->setAcceptHoverEvents(true);
@@ -138,6 +139,71 @@ void widgetChart::createSeries(QAbstractSeries *series){
     series->setUseOpenGL(true);
 }
 
+
+bool widgetChart::eventFilter(QObject *obj, QEvent *event)
+{
+    if(event->type() == QEvent::GraphicsSceneWheel){
+        QGraphicsSceneWheelEvent *ev = (QGraphicsSceneWheelEvent*) event;
+        qreal tmp = ev->delta();
+        if(tmp>=0){
+            localZoom = localZoom *qPow(1.001,tmp);
+        }else{
+            localZoom = localZoom / qPow(1.001,-tmp);
+            if(localZoom<1){
+                localZoom=1;
+            }
+        }
+        updateAxis();
+    }
+    if(event->type() == QEvent::GraphicsSceneMouseDoubleClick){
+        localZoom = 1;
+        updateAxis();
+    }
+
+    if(event->type() == QEvent::GraphicsSceneMousePress){
+        QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+        mousePressed = true;
+        mousePressedPoint = ev->pos();
+        initMouseShift = shift;
+
+        qDebug () <<"Press"<< ev->pos();
+        while (mousePressed) {
+            Timing *timer = new Timing();
+            timer->sleep(100);
+        }
+    }
+    if(event->type() == QEvent::GraphicsSceneMouseRelease){
+        mousePressed = false;
+        QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+        qDebug () <<"Release"<< ev->pos();
+    }
+    if(event->type() == QEvent::GraphicsSceneMouseMove){
+
+        QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+        qreal distance = ((ev->pos().x()- mousePressedPoint.x())/chart->geometry().width())/localZoom;
+        shift = initMouseShift - distance;
+        if(shift>1){
+            shift = 1;
+        }else if(shift<0){
+            shift = 0;
+        }
+        updateAxis();
+    }
+    if(event->type() == QEvent::NonClientAreaMouseMove){
+        QMouseEvent *ev = (QMouseEvent*) event;
+        qDebug () <<"NC Area"<< ev->pos();
+    }
+//    qDebug () << event->type();
+
+    return QObject::eventFilter(obj, event);
+}
+
+void widgetChart::moveEvent(QMoveEvent *event)
+{
+    qDebug () << "event" << event->type();
+    event->accept();
+}
+
 void widgetChart::clearAll(){
     for (int i = 0; i < maxTraces; i++){
         seriesList[i]->clear();
@@ -171,9 +237,9 @@ void widgetChart::appendToTrace(int index, QVector<QPointF> *points){
 }
 
 void widgetChart::updateAxis(){
-    qreal subMax = (maxX - minX) * (1-invZoom);
+    qreal subMax = (maxX - minX) * (1-invZoom/localZoom);
     qreal tmpMin = subMax * shift+minX;
-    qreal tmpMax = (maxX-minX)*invZoom+tmpMin;
+    qreal tmpMax = (maxX-minX)*invZoom/localZoom+tmpMin;
     axisX->setRange(tmpMin,tmpMax);
 }
 
@@ -210,10 +276,19 @@ qreal widgetChart::getZoom(){
     return 1/invZoom;
 }
 
+qreal widgetChart::getLocalZoom(){
+    return localZoom;
+}
+
 /* range -100 to 100 (represents percent value) */
 void widgetChart::setShift (float shift){
     this->shift = (shift/2+50)/100;
     updateAxis();
+}
+
+qreal widgetChart::getShift()
+{
+    return shift;
 }
 
 void widgetChart::setGridLinesVisible(bool gridVisibleX, bool gridVisibleY){
@@ -314,8 +389,6 @@ void widgetChart::initBrushes()
 
     MarkerPath_Circle = new QPainterPath(QPointF(10,10));
     MarkerPath_Circle->arcTo(QRectF(8,8,4,4),0,360*16);
-
-
 }
 
 QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
@@ -348,7 +421,6 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
         painter.drawPath(*MarkerPath_Circle);
         break;
     }
-
     return marker;
 }
 

@@ -10,6 +10,9 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QLogValueAxis>
+#include <QGraphicsSceneWheelEvent>
+#include <QGraphicsSceneMouseEvent>
+
 #include <QMenu>
 #include <QtMath>
 #include <QDateTimeAxis>
@@ -17,6 +20,7 @@
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
+#include "../math/timing.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -53,7 +57,9 @@ public:
 
     void setZoom(float invZoom);
     qreal getZoom();
+    qreal getLocalZoom();
     void setShift (float shift);
+    qreal getShift();
 
     void setGridLinesVisible(bool gridVisibleX, bool gridVisibleY);
     void setGridDensity(int tickX, int tickY);
@@ -85,6 +91,10 @@ private:
 
     qreal invZoom = 1;
     qreal shift = 0.5;
+    qreal localZoom = 1;
+    bool mousePressed = false;
+    QPointF mousePressedPoint;
+    qreal initMouseShift;
 
     QChart *chart;
 
@@ -108,6 +118,9 @@ private:
     QBrush getBrush (int channelIndex, MarkerType type);
 
     void createSeries(QAbstractSeries *series);
+
+    bool eventFilter(QObject *obj, QEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
 
 signals:
     void chartSeriesChanged();

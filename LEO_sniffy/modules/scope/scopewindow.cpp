@@ -71,7 +71,9 @@ ScopeWindow::~ScopeWindow()
 }
 
 void ScopeWindow::paintEvent(QPaintEvent *event){
-    int handleW = ui->sliderSignal->size().width()/chart->getZoom();;
+    int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
+    qDebug () << "shift to set" << chart->getShift();
+   // ui->sliderSignal->setValue(chart->getShift()*10);
     ui->sliderSignal->setStyleSheet(QString::fromUtf8(
                                         "QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
                                         "background-color: ")+BACKGROUND_COLOR_DATA_AREA+"border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
