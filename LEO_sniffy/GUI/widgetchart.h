@@ -26,7 +26,7 @@ class widgetChart;
 
 enum class MarkerType
 {
-ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK
+ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK, CROSS, CIRCLE
 };
 
 class widgetChart : public QWidget
@@ -98,6 +98,8 @@ private:
     QPainterPath *MarkerPath_ArrowDownSmall;
     QPainterPath *MarkerPath_ArrowUpSmall;
     QPainterPath *MarkerPath_Tick;
+    QPainterPath *MarkerPath_Cross;
+    QPainterPath *MarkerPath_Circle;
 
     void initContextMenu();
     void createHorizontalMarkers();

@@ -101,7 +101,7 @@ void widgetChart::switchToLineSeriesCallback(){
         seriesList.replace(i, series);
 
         createSeries(series);
-       // series->setUseOpenGL(true);
+        series->setUseOpenGL(true);
     }
 }
 
@@ -109,15 +109,17 @@ void widgetChart::switchToScatterSeriesCallback(){
     for (int i = 0; i < maxTraces; i++) {
         QScatterSeries *series = new QScatterSeries;
         //connect(series, &QScatterSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
-        series->setMarkerShape(QScatterSeries::MarkerShapeCircle);
-        series->setMarkerSize(3.8);
+        series->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
+        series->setMarkerSize(20.0);
+        series->setPen(QColor(Qt::transparent));
 
+        series->setBrush(getBrush(i,MarkerType::CIRCLE));
         series->append(seriesList[i]->points());
         seriesList[i]->clear();
         seriesList.replace(i, series);
 
         createSeries(series);
+        series->setUseOpenGL(false);
     }
 }
 
@@ -304,6 +306,16 @@ void widgetChart::initBrushes()
     MarkerPath_ArrowUpSmall->lineTo(10,10);
     MarkerPath_ArrowUpSmall->lineTo(15,20);
 
+
+    MarkerPath_Cross = new QPainterPath(QPointF(7,7));
+    MarkerPath_Cross->lineTo(13,13);
+    MarkerPath_Cross->moveTo(7,13);
+    MarkerPath_Cross->lineTo(13,7);
+
+    MarkerPath_Circle = new QPainterPath(QPointF(10,10));
+    MarkerPath_Circle->arcTo(QRectF(8,8,4,4),0,360*16);
+
+
 }
 
 QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
@@ -328,7 +340,13 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
     case MarkerType::TICK:
         painter.drawPath(*MarkerPath_Tick);
         break;
-
+    case MarkerType::CROSS:
+        painter.setPen(QPen(QBrush(Colors::getChannelColor(channelIndex)), 2.0));
+        painter.drawPath(*MarkerPath_Cross);
+        break;
+    case MarkerType::CIRCLE:
+        painter.drawPath(*MarkerPath_Circle);
+        break;
     }
 
     return marker;
@@ -361,7 +379,7 @@ void widgetChart::initContextMenu(){
 
     spline = new QAction("Spline", this);
     line = new QAction("Line", this);
-    scatter  = new QAction("Scatter", this);
+    scatter  = new QAction("Points (slow)", this);
     btnOpenGL = new QAction("Use OpenGL", this);
     btnOpenGL->setCheckable(true);
     btnOpenGL->setChecked(true);
