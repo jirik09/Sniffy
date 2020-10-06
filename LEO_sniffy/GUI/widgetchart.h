@@ -33,6 +33,11 @@ enum class MarkerType
 ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK, CROSS, CIRCLE
 };
 
+enum class Cursor
+{
+CURSOR_A, CURSOR_B
+};
+
 class widgetChart : public QWidget
 {
     Q_OBJECT
@@ -60,6 +65,7 @@ public:
     qreal getLocalZoom();
     void setShift (float shift);
     qreal getShift();
+    void enableLocalMouseZoom();
 
     void setGridLinesVisible(bool gridVisibleX, bool gridVisibleY);
     void setGridDensity(int tickX, int tickY);
@@ -72,6 +78,10 @@ public:
     void setHorizontalMarker(int channelIndex, qreal value, MarkerType type = MarkerType::TICK);
     void setVerticalMarker(int channelIndex, qreal value);
 
+    void setHorizontalCursor(int channelIndex, qreal value, Cursor type);
+    void setVerticalCursor(int channelIndex, qreal value, Cursor type);
+
+
 private:
     Ui::widgetChart *ui;
     QList<QXYSeries *> seriesList;
@@ -79,6 +89,9 @@ private:
     int markerHorizontalIndex=0;
     QList<QScatterSeries *> markersVertical;
     int markerVerticalIndex=0;
+
+    QList<QXYSeries *> cursorsHorizontal;
+    QList<QXYSeries *> cursorsVertical;
 
     QMenu *menu;
     QAction *spline, *line, *scatter, *btnOpenGL;
@@ -100,8 +113,8 @@ private:
 
     QValueAxis *axisX;   // QAbstractAxis
     QValueAxis *axisY;
-    QValueAxis *axisX_MarkerHorizontal;
-    QValueAxis *axisY_MarkerVertical;
+    QValueAxis *axisX_UnitRange;
+    QValueAxis *axisY_UnitRange;
     QValueAxis *axisX_FFT;
 
     QPainterPath *MarkerPath_ArrowDownBig;
@@ -120,10 +133,10 @@ private:
     void createSeries(QAbstractSeries *series);
 
     bool eventFilter(QObject *obj, QEvent *event) override;
-    void moveEvent(QMoveEvent *event) override;
 
 signals:
     void chartSeriesChanged();
+    void localZoomChanged();
 
 private slots:
     void switchToSplineSeriesCallback();

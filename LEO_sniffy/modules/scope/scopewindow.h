@@ -22,7 +22,6 @@
 
 #include "../labelformator.h"
 
-
 #include "scopedefs.h"
 #include "panelsettings.h"
 #include "panelmeasurement.h"
@@ -88,6 +87,8 @@ private slots:
     void measurementClearCallback();
     void sliderShiftCallback(int value);
 
+    void chartLocalZoomCallback();
+
 
 public:
     Ui::ScopeWindow *ui;
@@ -101,16 +102,12 @@ private:
 
     WidgetLabelArea *labelInfoPanel;
 
-
     PanelMeasurement *panelMeas;
 
     void updateChartTimeScale(float timeBase);
     void fillTimeBase();
 
     float previousTimeBase = 0;
-
-    //QString channelBcgrColor[MAX_SCOPE_CHANNELS] = {BCKGRND_COLOR_ORANGE,BCKGRND_COLOR_BLUE,BCKGRND_COLOR_GREEN,BCKGRND_COLOR_PURPLE};
-    //QString channelTextColor[MAX_SCOPE_CHANNELS] = {TEXT_COLOR_ORANGE,TEXT_COLOR_BLUE,TEXT_COLOR_GREEN,TEXT_COLOR_PURPLE};
 };
 
 #endif // WINDOWSCOPE_H

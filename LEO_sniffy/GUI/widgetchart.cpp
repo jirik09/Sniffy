@@ -10,7 +10,6 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 
     chart = new QChart();
     chart->legend()->hide();
-    chart->installEventFilter(this);
 
     chart->setBackgroundBrush(BACKGROUND_QCOLOR_DATA_AREA);
     chart->setAcceptHoverEvents(true);
@@ -26,6 +25,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignLeft);
 
+    //init traces
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
@@ -36,6 +36,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 
     formatAxisLabelsForScope();
 
+    //init markers
     createHorizontalMarkers();
     createVerticalMarkers();
     initBrushes();
@@ -55,12 +56,29 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
         seriesV->setPen(QColor(Qt::transparent));
 
         chart->addSeries(seriesH);
-        seriesH->attachAxis(axisX_MarkerHorizontal);
+        seriesH->attachAxis(axisX_UnitRange);
         seriesH->attachAxis(axisY);
         chart->addSeries(seriesV);
         seriesV->attachAxis(axisX);
-        seriesV->attachAxis(axisY_MarkerVertical);
+        seriesV->attachAxis(axisY_UnitRange);
     }
+
+    //init cursors
+    for (int i = 0; i < 2; i++){
+        QLineSeries *seriesCursor = new QLineSeries;
+        cursorsHorizontal.append(seriesCursor);
+        chart->addSeries(seriesCursor);
+        seriesCursor->attachAxis(axisX);
+        seriesCursor->attachAxis(axisY_UnitRange);
+    }
+    for (int i = 0; i < 2; i++){
+        QLineSeries *seriesCursor = new QLineSeries;
+        cursorsVertical.append(seriesCursor);
+        chart->addSeries(seriesCursor);
+        seriesCursor->attachAxis(axisX_UnitRange);
+        seriesCursor->attachAxis(axisY);
+    }
+
 
     QChartView *chartView = new QChartView(chart);
     ui->horizontalLayout_chart->addWidget(chartView);
@@ -142,6 +160,7 @@ void widgetChart::createSeries(QAbstractSeries *series){
 
 bool widgetChart::eventFilter(QObject *obj, QEvent *event)
 {
+    Q_UNUSED(obj);
     if(event->type() == QEvent::GraphicsSceneWheel){
         QGraphicsSceneWheelEvent *ev = (QGraphicsSceneWheelEvent*) event;
         qreal tmp = ev->delta();
@@ -165,18 +184,16 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         mousePressed = true;
         mousePressedPoint = ev->pos();
         initMouseShift = shift;
-
-        qDebug () <<"Press"<< ev->pos();
         while (mousePressed) {
             Timing *timer = new Timing();
             timer->sleep(100);
         }
     }
+
     if(event->type() == QEvent::GraphicsSceneMouseRelease){
         mousePressed = false;
-        QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
-        qDebug () <<"Release"<< ev->pos();
     }
+
     if(event->type() == QEvent::GraphicsSceneMouseMove){
 
         QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
@@ -187,22 +204,12 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         }else if(shift<0){
             shift = 0;
         }
+        emit localZoomChanged();
         updateAxis();
     }
-    if(event->type() == QEvent::NonClientAreaMouseMove){
-        QMouseEvent *ev = (QMouseEvent*) event;
-        qDebug () <<"NC Area"<< ev->pos();
-    }
-//    qDebug () << event->type();
-
-    return QObject::eventFilter(obj, event);
+    return NULL;//QObject::eventFilter(obj, event);
 }
 
-void widgetChart::moveEvent(QMoveEvent *event)
-{
-    qDebug () << "event" << event->type();
-    event->accept();
-}
 
 void widgetChart::clearAll(){
     for (int i = 0; i < maxTraces; i++){
@@ -291,6 +298,11 @@ qreal widgetChart::getShift()
     return shift;
 }
 
+void widgetChart::enableLocalMouseZoom()
+{
+    chart->installEventFilter(this);
+}
+
 void widgetChart::setGridLinesVisible(bool gridVisibleX, bool gridVisibleY){
     axisX->setGridLineVisible(gridVisibleX);
     axisY->setGridLineVisible(gridVisibleY);
@@ -304,8 +316,8 @@ void widgetChart::setGridDensity(int tickX, int tickY){
 void widgetChart::setGraphColor(QColor qColor){
     axisX->setLabelsBrush(QBrush(qColor));
     axisY->setLabelsBrush(QBrush(qColor));
-    axisY_MarkerVertical->setLinePenColor(qColor);
-    axisX_MarkerHorizontal->setLinePenColor(qColor);
+    axisY_UnitRange->setLinePenColor(qColor);
+    axisX_UnitRange->setLinePenColor(qColor);
     axisX->setGridLineColor(qColor);
     axisY->setGridLineColor(qColor);
     axisX->setLinePenColor(qColor);
@@ -345,20 +357,20 @@ void widgetChart::setLabelsSize(int pointSize){
 
 void widgetChart::createHorizontalMarkers(){
     //prepare markers on Y axis
-    axisX_MarkerHorizontal = new QValueAxis;
-    axisX_MarkerHorizontal->setRange(0, 1);
-    axisX_MarkerHorizontal->setLabelsVisible(false);
-    axisX_MarkerHorizontal->setTickCount(2);
-    chart->addAxis(axisX_MarkerHorizontal, Qt::AlignTop);
+    axisX_UnitRange = new QValueAxis;
+    axisX_UnitRange->setRange(0, 1);
+    axisX_UnitRange->setLabelsVisible(false);
+    axisX_UnitRange->setTickCount(2);
+    chart->addAxis(axisX_UnitRange, Qt::AlignTop);
 }
 
 void widgetChart::createVerticalMarkers(){
     //prepare markers on X axis
-    axisY_MarkerVertical = new QValueAxis;
-    axisY_MarkerVertical->setRange(0, 1);
-    axisY_MarkerVertical->setLabelsVisible(false);
-    axisY_MarkerVertical->setTickCount(2);
-    chart->addAxis(axisY_MarkerVertical, Qt::AlignRight);
+    axisY_UnitRange = new QValueAxis;
+    axisY_UnitRange->setRange(0, 1);
+    axisY_UnitRange->setLabelsVisible(false);
+    axisY_UnitRange->setTickCount(2);
+    chart->addAxis(axisY_UnitRange, Qt::AlignRight);
 }
 
 void widgetChart::initBrushes()
@@ -389,6 +401,8 @@ void widgetChart::initBrushes()
 
     MarkerPath_Circle = new QPainterPath(QPointF(10,10));
     MarkerPath_Circle->arcTo(QRectF(8,8,4,4),0,360*16);
+
+
 }
 
 QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
@@ -428,21 +442,63 @@ void widgetChart::setHorizontalMarker(int channelIndex, qreal value, MarkerType 
     QPointF pt = QPointF(0.005,value);
     QList<QPointF> *lst = new QList<QPointF>;
     lst->append(pt);
-
     markersHorizontal[markerHorizontalIndex]->setBrush(getBrush(channelIndex,type));
     markersHorizontal[markerHorizontalIndex]->replace(*lst);
     markerHorizontalIndex++;
 }
 
 void widgetChart::setVerticalMarker(int channelIndex, qreal value){
-
     QPointF pt = QPointF(value,0.99);
     QList<QPointF> *lst = new QList<QPointF>;
     lst->append(pt);
-
     markersVertical[markerVerticalIndex]->setBrush(getBrush(channelIndex,MarkerType::ARROW_DOWN_BIG));
     markersVertical[markerVerticalIndex]->replace(*lst);
     markerVerticalIndex++;
+}
+
+void widgetChart::setHorizontalCursor(int channelIndex, qreal value, Cursor type)
+{
+    QPointF start = QPointF(value,0.0);
+    QPointF end = QPointF(value,1.0);
+    QList<QPointF> *lst = new QList<QPointF>;
+    lst->append(start);
+    lst->append(end);
+
+    QPen *pen = new QPen();
+    pen->setColor(Colors::getChannelColor(channelIndex));
+    pen->setWidth(1);
+    if(type == Cursor::CURSOR_A){
+        pen->setStyle(Qt::DashLine);
+        cursorsHorizontal[0]->setPen(*pen);
+        cursorsHorizontal[0]->replace(*lst);
+    }else{
+        pen->setStyle(Qt::DashDotLine);
+        cursorsHorizontal[1]->setPen(*pen);
+        cursorsHorizontal[1]->replace(*lst);
+    }
+}
+
+void widgetChart::setVerticalCursor(int channelIndex, qreal value, Cursor type)
+{
+    QPointF start = QPointF(0.0,value);
+    QPointF end = QPointF(1.0,value);
+    QList<QPointF> *lst = new QList<QPointF>;
+    lst->append(start);
+    lst->append(end);
+
+    QPen *pen = new QPen();
+    pen->setColor(Colors::getChannelColor(channelIndex));
+    pen->setWidth(1);
+
+    if(type == Cursor::CURSOR_A){
+        pen->setStyle(Qt::DashLine);
+        cursorsVertical[0]->setPen(*pen);
+        cursorsVertical[0]->replace(*lst);
+    }else{
+        pen->setStyle(Qt::DashDotLine);
+        cursorsVertical[1]->setPen(*pen);
+        cursorsVertical[1]->replace(*lst);
+    }
 }
 
 void widgetChart::initContextMenu(){
