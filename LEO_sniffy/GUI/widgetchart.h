@@ -10,12 +10,17 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QLogValueAxis>
+#include <QGraphicsSceneWheelEvent>
+#include <QGraphicsSceneMouseEvent>
+
 #include <QMenu>
 #include <QtMath>
 #include <QDateTimeAxis>
+#include <QDebug>
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
+#include "../math/timing.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -23,9 +28,21 @@ namespace Ui {
 class widgetChart;
 }
 
+enum class MarkerType
+{
+ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK, CROSS, CIRCLE
+};
+
+enum class Cursor
+{
+CURSOR_A, CURSOR_B
+};
+
 class widgetChart : public QWidget
 {
     Q_OBJECT
+
+
 
 public:
     explicit widgetChart(QWidget *parent = nullptr, int maxTraces = 1);
@@ -37,7 +54,6 @@ public:
     void appendToTrace(int index, QVector<QPointF> *points);
     void updateAxis();
 
-    void setMaxX(float max);
     void setDataMinMax(qreal minX, qreal maxX);
     void setRangeX(qreal minX, qreal maxX);
     void setRangeY(qreal minY, qreal maxY);
@@ -46,7 +62,10 @@ public:
 
     void setZoom(float invZoom);
     qreal getZoom();
+    qreal getLocalZoom();
     void setShift (float shift);
+    qreal getShift();
+    void enableLocalMouseZoom();
 
     void setGridLinesVisible(bool gridVisibleX, bool gridVisibleY);
     void setGridDensity(int tickX, int tickY);
@@ -56,21 +75,28 @@ public:
     void setGraphColor(QColor qColor);
     void setLabelsVisible(bool lableVisibleX, bool lableVisibleY);
     void setLabelsSize(int pointSize);
-    void createHorizontalMarkes();
-    void setHorizontalMarker(int channelIndex, qreal value);
+    void setHorizontalMarker(int channelIndex, qreal value, MarkerType type = MarkerType::TICK);
+    void setVerticalMarker(int channelIndex, qreal value);
 
-    int getTraceNum();
+    void setHorizontalCursor(int channelIndex, qreal value, Cursor type);
+    void setVerticalCursor(int channelIndex, qreal value, Cursor type);
+
 
 private:
     Ui::widgetChart *ui;
     QList<QXYSeries *> seriesList;
-    QScatterSeries *markersHorizontal;
+    QList<QScatterSeries *> markersHorizontal;
+    int markerHorizontalIndex=0;
+    QList<QScatterSeries *> markersVertical;
+    int markerVerticalIndex=0;
+
+    QList<QXYSeries *> cursorsHorizontal;
+    QList<QXYSeries *> cursorsVertical;
 
     QMenu *menu;
     QAction *spline, *line, *scatter, *btnOpenGL;
     enum enable {DISABLED, ENABLED} openGL = DISABLED;
 
-    bool markers = 0;
     int maxTraces;
 
     qreal minX = 0;
@@ -78,18 +104,39 @@ private:
 
     qreal invZoom = 1;
     qreal shift = 0.5;
+    qreal localZoom = 1;
+    bool mousePressed = false;
+    QPointF mousePressedPoint;
+    qreal initMouseShift;
 
     QChart *chart;
 
     QValueAxis *axisX;   // QAbstractAxis
     QValueAxis *axisY;
-    QValueAxis *axisMarkerHorizontal;
+    QValueAxis *axisX_UnitRange;
+    QValueAxis *axisY_UnitRange;
+    QValueAxis *axisX_FFT;
+
+    QPainterPath *MarkerPath_ArrowDownBig;
+    QPainterPath *MarkerPath_ArrowDownSmall;
+    QPainterPath *MarkerPath_ArrowUpSmall;
+    QPainterPath *MarkerPath_Tick;
+    QPainterPath *MarkerPath_Cross;
+    QPainterPath *MarkerPath_Circle;
 
     void initContextMenu();
+    void createHorizontalMarkers();
+    void createVerticalMarkers();
+    void initBrushes();
+    QBrush getBrush (int channelIndex, MarkerType type);
+
     void createSeries(QAbstractSeries *series);
+
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 signals:
     void chartSeriesChanged();
+    void localZoomChanged();
 
 private slots:
     void switchToSplineSeriesCallback();

@@ -22,11 +22,13 @@
 
 #include "../labelformator.h"
 
-
 #include "scopedefs.h"
 #include "panelsettings.h"
 #include "panelmeasurement.h"
 #include "scopeconfig.h"
+
+#define CHART_MAX_Y 7
+#define CHART_MIN_Y -1
 
 namespace Ui {
 class ScopeWindow;
@@ -85,6 +87,8 @@ private slots:
     void measurementClearCallback();
     void sliderShiftCallback(int value);
 
+    void chartLocalZoomCallback();
+
 
 public:
     Ui::ScopeWindow *ui;
@@ -92,10 +96,11 @@ public:
 private:
     ScopeConfig *config;
     widgetChart *chart;
+
     QVector<QVector<QPointF>> ChartData;
+    int triggerChannelIndex =0;
 
     WidgetLabelArea *labelInfoPanel;
-
 
     PanelMeasurement *panelMeas;
 
@@ -103,9 +108,6 @@ private:
     void fillTimeBase();
 
     float previousTimeBase = 0;
-
-    //QString channelBcgrColor[MAX_SCOPE_CHANNELS] = {BCKGRND_COLOR_ORANGE,BCKGRND_COLOR_BLUE,BCKGRND_COLOR_GREEN,BCKGRND_COLOR_PURPLE};
-    //QString channelTextColor[MAX_SCOPE_CHANNELS] = {TEXT_COLOR_ORANGE,TEXT_COLOR_BLUE,TEXT_COLOR_GREEN,TEXT_COLOR_PURPLE};
 };
 
 #endif // WINDOWSCOPE_H

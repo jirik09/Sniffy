@@ -323,7 +323,7 @@ void WidgetDisplay::createHistoryChart(int historyTracesNum){
     chart = new widgetChart(ui->verticalWidget_history, historyTracesNum);
     chart->setLabelsSize(7);
     chart->formatLabels("%.1f", "%.2g");
-    chart->setGridLinesVisible(true, true);
+   // chart->setGridLinesVisible(true, true);
     chart->setGridDensity(5, 5);
     chart->setLabelsVisible(true, true);
     chart->setGraphColor(QCOLOR_GREY);
