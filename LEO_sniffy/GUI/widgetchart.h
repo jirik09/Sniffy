@@ -146,6 +146,8 @@ private slots:
 
     void rightClickCallback(const QPoint &mousePos);
     void hovered(const QPointF &point);
+    void handleCursorPress();
+    void handleCursorRelease();
 };
 
 #endif // WIDGETCHART_H

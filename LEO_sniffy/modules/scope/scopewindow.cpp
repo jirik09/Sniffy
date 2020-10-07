@@ -16,9 +16,6 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->verticalSlider->hide();
-    ui->verticalSlider_2->hide();
-
     chart = new widgetChart(ui->widget_chart, 4);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseZoom();
@@ -53,18 +50,18 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
     connect(panelSet->dialVerticalScale,&WidgetDial::valueChanged,this,&ScopeWindow::channelVerticalScaleCallback);
     connect(panelSet->dialVerticalShift,&WidgetDialRange::valueChanged,this,&ScopeWindow::channelVerticalShiftCallback);
 
-    connect(chart,&widgetChart::localZoomChanged,this,&ScopeWindow::chartLocalZoomCallback);
-
-
-
     // ************************* creating widget measurement *******************
     panelMeas = new PanelMeasurement(tabs->getLayout(1),tabs);
 
     connect(panelMeas, &PanelMeasurement::measurementAdded, this,&ScopeWindow::measurementAddedCallback);
     connect(panelMeas, &PanelMeasurement::measurementClearAll, this, &ScopeWindow::measurementClearCallback);
 
+    // ********************* create panel Cursors ****************
+    panelCursors = new PanelCursors(tabs->getLayout(2),tabs);
 
+    //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
+    connect(chart,&widgetChart::localZoomChanged,this,&ScopeWindow::chartLocalZoomCallback);
 }
 
 ScopeWindow::~ScopeWindow()
@@ -275,7 +272,7 @@ void ScopeWindow::triggerCaptured(){
 }
 
 void ScopeWindow::setRealSamplingRate(int smpl){
-    labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS"));
+    labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS") + "  ("+LabelFormator::formatOutout(config->dataLength,"")+")");
 }
 
 void ScopeWindow::updateChartTimeScale(float timeBase){
@@ -287,7 +284,6 @@ void ScopeWindow::updateChartTimeScale(float timeBase){
     }else{
         labelInfoPanel->setStyleSheet(QString::fromUtf8("color:")+COLOR_WHITE);
     }
-
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/div"));
 }
 

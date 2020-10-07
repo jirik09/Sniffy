@@ -25,6 +25,7 @@
 #include "scopedefs.h"
 #include "panelsettings.h"
 #include "panelmeasurement.h"
+#include "panelcursors.h"
 #include "scopeconfig.h"
 
 #define CHART_MAX_Y 7
@@ -103,6 +104,8 @@ private:
     WidgetLabelArea *labelInfoPanel;
 
     PanelMeasurement *panelMeas;
+
+    PanelCursors *panelCursors;
 
     void updateChartTimeScale(float timeBase);
     void fillTimeBase();
