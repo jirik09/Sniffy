@@ -5,7 +5,8 @@ CounterTabRatio::CounterTabRatio(QVBoxLayout *destination, QWidget *parent) : QO
     WidgetSeparator *separatorSampleCounte = new WidgetSeparator(parent,"Sampling of the reference input");
     destination->addWidget(separatorSampleCounte);
 
-    dialSampleCount = new WidgetDialRange(parent ,"Sample Count");
+    dialSampleCount = new WidgetDialRange(parent, "Sample Count");
+    dialSampleCount->setObjectName("dialRatSampleCount");
     dialSampleCount->setRange(2, REFERENCE_COUNT_MAX, "Smpls", 1, 1, REFERENCE_COUNT_DEFAULT, true);
     dialSampleCount->hideUnitSelection();
     destination->addWidget(dialSampleCount);
@@ -14,6 +15,7 @@ CounterTabRatio::CounterTabRatio(QVBoxLayout *destination, QWidget *parent) : QO
     destination->addWidget(separatorRetrigButton);
 
     buttonRetrigger = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, 0);
+    buttonRetrigger->setObjectName("retrigger");
     buttonRetrigger->setText("Retrigger", 0);
     destination->addWidget(buttonRetrigger);
 

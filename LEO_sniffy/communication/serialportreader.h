@@ -12,6 +12,7 @@ QT_END_NAMESPACE
 class SerialPortReader : public QObject
 {
     Q_OBJECT
+    //#define DEBUG_READER
 
 public:
     explicit SerialPortReader(QSerialPort *serialPort, QObject *parent = nullptr);

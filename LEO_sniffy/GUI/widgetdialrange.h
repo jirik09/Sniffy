@@ -27,10 +27,13 @@ class WidgetDialRange : public QWidget
 public:
     explicit WidgetDialRange(QWidget *parent = nullptr, QString name = "");
     ~WidgetDialRange();
+    QByteArray saveGeometry();
+    void restoreGeometry(QByteArray geom);
     void addOption (QString unitString,float mult);
     void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false);
+    void updateRange(float min, float max);
     void setRealValue(float value);
-    void hideUnitSelection(void);
+    void hideUnitSelection(void);    
     void setDialColor(QString &styleSheet);
     void setDialButtonsColor(QString &bckgndStyleSheet);
     float getDefaultRealValue() const;

@@ -6,11 +6,13 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     destination->addWidget(separatorStart);
 
     buttonsStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
+    buttonsStart->setObjectName("btnStart");
     buttonsStart->setText("Start", 0);
     destination->addWidget(buttonsStart);
 
     dialTimeout = new WidgetDialRange(parent ,"Timeout");
-    dialTimeout->setRange(1, INTERVAL_TIMEOUT_MAX, "ilometr", 1, 1000, INTERVAL_TIMEOUT_DEFAULT, true);
+    dialTimeout->setObjectName("dialIntTimeout");
+    dialTimeout->setRange(1, INTERVAL_TIMEOUT_MAX, "Sec", 1, 1, INTERVAL_TIMEOUT_DEFAULT, true);
     dialTimeout->hideUnitSelection();
     destination->addWidget(dialTimeout);
 
@@ -18,6 +20,7 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     destination->addWidget(separatorEventSequence);
 
     buttonsEventsSeq = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
+    buttonsEventsSeq->setObjectName("evetnSeq");
     buttonsEventsSeq->setText("A -> B", 0);
     buttonsEventsSeq->setText("B -> A", 1);
     destination->addWidget(buttonsEventsSeq);

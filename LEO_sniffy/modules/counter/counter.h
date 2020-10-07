@@ -4,15 +4,14 @@
 #include <QDebug>
 #include <QPointF>
 #include <QtMath>
-#include <QEventLoop>
 
 #include "counterwindow.h"
 #include "communication/commands.h"
 #include "communication/comms.h"
 #include "math/movingaverage.h"
 
+//#include "../../GUI/moduledockwidget.h"
 #include "../../GUI/widgetcontrolmodule.h"
-#include "../../GUI/moduledockwidget.h"
 
 #include "../abstractmodule.h"
 
@@ -31,7 +30,6 @@ private:
     CounterWindow *cntWindow;
     CounterConfig *conf;
     CounterSpec *spec;
-    QLocale loc;
 
     void startCounting();
     void stopCounting();
@@ -43,8 +41,8 @@ private:
 //                                          &Counter::ratReloadState,
 //                                          &Counter::intReloadState };
 
-    QString formatNumber(double valToFormat, double error);
-    QString formatErrNumber(double errToFormat);
+    QString formatNumber(WidgetDisplay *display, double valToFormat, double error);
+    QString formatErrNumber(WidgetDisplay *display, double errToFormat);
     void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);
     void specReceived();
     void write(QByteArray feature, QByteArray param);
@@ -53,11 +51,7 @@ private:
     /* High Frequency Counter */
     MovingAverage *movAvg;
     QString strQerr, strTerr, avgQerr;
-
-    QVector<QPointF> *historyData;
-    int histDataLength = 1000;
-    float rememberMax = 0;
-    qreal timeAxisMax = 0, timeAxisMin = 0;
+    float avg;
 
     void parseHighFrequencyCounter(QByteArray data);
     void hfReloadState();
@@ -77,8 +71,6 @@ private:
     void ratReloadState();
 
     /* Intervals Counter */
-//    bool seqAB = false, eventA = false, eventB = false;
-
     void parseIntervalsCounter(QByteArray data);
     void intReloadState();
 
@@ -86,12 +78,17 @@ private slots:
 
     void parseData(QByteArray);
     void writeConfiguration();
+    void parseConfiguration(QByteArray config);
+    QByteArray getConfiguration();
 
     void startModule();
     void stopModule();
 
+    void showHoldButtonCallback();
+    void holdCounter(bool held);
+
     /* Common functions */
-    void switchCounterModeCallback(int actualLength);
+    void switchCounterModeCallback(int actualLength);    
 
     /* High Frequency Counter */
     void hfSwitchGateTimeCallback(int actualLength);

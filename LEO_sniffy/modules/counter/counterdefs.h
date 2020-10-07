@@ -4,6 +4,7 @@
 #include <QtGlobal>
 
 /* COMMON defines */
+#define HISTORY_SIZE        100
 #define LITERAL_FREQUENCY   "FREQUENCY"
 #define LITERAL_PERIOD      "PERIOD"
 #define LITERAL_NO_DATA     " "

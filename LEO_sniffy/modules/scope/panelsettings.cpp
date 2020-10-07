@@ -7,51 +7,57 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     destination->addWidget(separatorChannelEnable);
 
     buttonsChannelEnable = new WidgetButtons(parent,4,ButtonTypes::CHECKABLE);
+    buttonsChannelEnable->setObjectName("ChannelEnable");
     destination->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
-    buttonsChannelEnable->setColor(BCKGRND_COLOR_ORANGE,0);
+    buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
     buttonsChannelEnable->setText("CH2",1);
-    buttonsChannelEnable->setColor(BCKGRND_COLOR_BLUE,1);
+    buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),1);
     buttonsChannelEnable->setText("CH3",2);
-    buttonsChannelEnable->setColor(BCKGRND_COLOR_GREEN,2);
+    buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
     buttonsChannelEnable->setText("CH4",3);
-    buttonsChannelEnable->setColor(BCKGRND_COLOR_PURPLE,3);
+    buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);
 
     WidgetSeparator *separatorTrig = new WidgetSeparator(parent,"Trigger");
     destination->addWidget(separatorTrig);
 
     buttonsTriggerMode = new WidgetButtons(parent,3,ButtonTypes::RADIO,"",2);
+    buttonsTriggerMode->setObjectName("TriggerMode");
     destination->addWidget(buttonsTriggerMode);
     buttonsTriggerMode->setText("Stop",0);
-    buttonsTriggerMode->setColor(BCKGRND_COLOR_ORANGE,0);
+    buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_ORANGE),0);
     buttonsTriggerMode->setText("Normal",1);
     buttonsTriggerMode->setText("Auto",2);
 
     buttonsTriggerChannel = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Channel");
+    buttonsTriggerChannel->setObjectName("TriggerChannel");
     destination->addWidget(buttonsTriggerChannel);
     buttonsTriggerChannel->setText("CH1",0);
     buttonsTriggerChannel->setText("CH2",1);
     buttonsTriggerChannel->setText("CH3",2);
     buttonsTriggerChannel->setText("CH4",3);
-    buttonsTriggerChannel->setColor(BCKGRND_COLOR_ORANGE,0);
-    buttonsTriggerChannel->setColor(BCKGRND_COLOR_BLUE,1);
-    buttonsTriggerChannel->setColor(BCKGRND_COLOR_GREEN,2);
-    buttonsTriggerChannel->setColor(BCKGRND_COLOR_PURPLE,3);
+    buttonsTriggerChannel->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
+    buttonsTriggerChannel->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),1);
+    buttonsTriggerChannel->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
+    buttonsTriggerChannel->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);
 
     buttonsTriggerChannel->disableAll();
     buttonsTriggerChannel->setDisabledButton(false,0);
 
     buttonsTriggerEdge = new WidgetButtons(parent,2,ButtonTypes::RADIO,"Edge");
+    buttonsTriggerEdge->setObjectName("TriggerEdge");
     destination->addWidget(buttonsTriggerEdge);
     buttonsTriggerEdge->setText("Rise",0);
     buttonsTriggerEdge->setText("Fall",1);
 
     dialPretrigger = new WidgetDialRange(parent ,"Pretrigger");
+    dialPretrigger->setObjectName("Pretrigger");
     dialPretrigger->setRange(0,100,"%",1,1,50);
     dialPretrigger->hideUnitSelection();
     destination->addWidget(dialPretrigger);
 
     dialTriggerValue = new WidgetDialRange(parent ,"Level");
+    dialTriggerValue->setObjectName("TriggerValue");
     dialTriggerValue->setRange(0,3.3,"V",10,0.01,1.65);
     dialTriggerValue->hideUnitSelection();
     destination->addWidget(dialTriggerValue);
@@ -60,11 +66,13 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     destination->addWidget(separatorHorizontal);
 
     dialTimeBase = new WidgetDial(parent ,"Time base");
+    dialTimeBase->setObjectName("TimeBase");
     destination->addWidget(dialTimeBase);
     fillTimeBase();
     dialTimeBase->setDefaultIndex(10);
 
     buttonsMemorySet = new WidgetButtons(parent,3,ButtonTypes::RADIO,"Memory");
+    buttonsMemorySet->setObjectName("MemorySet");
     destination->addWidget(buttonsMemorySet);
     buttonsMemorySet->setText(" Normal ",0);
     buttonsMemorySet->setText(" Long ",1);
@@ -74,18 +82,20 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     destination->addWidget(separatorVertical);
 
     buttonsChannelVertical = new WidgetButtons(parent,4,ButtonTypes::RADIO);
+    buttonsChannelVertical->setObjectName("ChannelVertival");
     destination->addWidget(buttonsChannelVertical);
     buttonsChannelVertical->setText("CH1",0);
     buttonsChannelVertical->setText("CH2",1);
     buttonsChannelVertical->setText("CH3",2);
     buttonsChannelVertical->setText("CH4",3);
-    buttonsChannelVertical->setColor(BCKGRND_COLOR_ORANGE,0);
-    buttonsChannelVertical->setColor(BCKGRND_COLOR_BLUE,1);
-    buttonsChannelVertical->setColor(BCKGRND_COLOR_GREEN,2);
-    buttonsChannelVertical->setColor(BCKGRND_COLOR_PURPLE,3);
+    buttonsChannelVertical->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
+    buttonsChannelVertical->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),1);
+    buttonsChannelVertical->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
+    buttonsChannelVertical->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);
 
 
     dialVerticalScale = new WidgetDial(parent ,"Scale");
+    dialVerticalScale->setObjectName("VerticalScale");
     destination->addWidget(dialVerticalScale);
     QString colorStyleSheet = verticalControlColor;
     dialVerticalScale->setDialColor(colorStyleSheet);
@@ -104,6 +114,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     dialVerticalScale->setDefaultIndex(6);
 
     dialVerticalShift = new WidgetDialRange(parent ,"Shift");
+    dialVerticalShift->setObjectName("VerticalShift");
     dialVerticalShift->setRange(-3.3,6.6,"V",10,0.01,0);
     colorStyleSheet = verticalControlColor;
     dialVerticalShift->setDialColor(colorStyleSheet);

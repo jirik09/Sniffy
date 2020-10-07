@@ -31,21 +31,24 @@ SOURCES += \
     GUI/widgetfooter.cpp \
     GUI/widgetlabel.cpp \
     GUI/widgetlabelarea.cpp \
+    GUI/widgetlist.cpp \
     GUI/widgetselection.cpp \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
     GUI/widgettab.cpp \
-    GUI/widgettop.cpp \
     communication/commands.cpp \
     communication/comms.cpp \
+    communication/devicescanner.cpp \
     communication/serialline.cpp \
     communication/serialportreader.cpp \
     communication/serialportwriter.cpp \
     devicedescriptor.cpp \
     devicemediator.cpp \
+    graphics/colors.cpp \
     main.cpp \
     mainwindow.cpp \
     math/movingaverage.cpp \
+    math/timing.cpp \
     modules/abstractmodule.cpp \
     modules/abstractspecification.cpp \
     modules/counter/counter.cpp \
@@ -56,12 +59,14 @@ SOURCES += \
     modules/counter/countertablowfreq.cpp \
     modules/counter/countertabratio.cpp \
     modules/counter/counterwindow.cpp \
+    modules/errorlist.cpp \
     modules/labelformator.cpp \
     modules/device/device.cpp \
     modules/device/devicewindow.cpp \
     modules/device/devicespec.cpp \
     modules/scope/meascalculations.cpp \
     modules/scope/measurement.cpp \
+    modules/scope/panelcursors.cpp \
     modules/scope/panelmeasurement.cpp \
     modules/scope/panelsettings.cpp \
     modules/scope/scope.cpp \
@@ -84,14 +89,15 @@ HEADERS += \
     GUI/widgetfooter.h \
     GUI/widgetlabel.h \
     GUI/widgetlabelarea.h \
+    GUI/widgetlist.h \
     GUI/widgetselection.h \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
     GUI/widgettab.h \
-    GUI/widgettop.h \
     communication/commands.h \
     communication/comms.h \
     communication/connectiontype.h \
+    communication/devicescanner.h \
     communication/serialline.h \
     communication/serialportreader.h \
     communication/serialportwriter.h \
@@ -101,6 +107,7 @@ HEADERS += \
     graphics/styles.h \
     mainwindow.h \
     math/movingaverage.h \
+    math/timing.h \
     modules/abstractspecification.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
@@ -112,12 +119,14 @@ HEADERS += \
     modules/counter/countertablowfreq.h \
     modules/counter/countertabratio.h \
     modules/counter/counterwindow.h \
+    modules/errorlist.h \
     modules/labelformator.h \
     modules/device/device.h \
     modules/device/devicewindow.h \
     modules/device/devicespec.h \
     modules/scope/meascalculations.h \
     modules/scope/measurement.h \
+    modules/scope/panelcursors.h \
     modules/scope/panelmeasurement.h \
     modules/scope/panelsettings.h \
     modules/scope/scope.h \
@@ -137,12 +146,12 @@ FORMS += \
     GUI/widgetfooter.ui \
     GUI/widgetlabel.ui \
     GUI/widgetlabelarea.ui \
+    GUI/widgetlist.ui \
     GUI/widgetmodule.ui \
     GUI/widgetselection.ui \
     GUI/widgetseparator.ui \
     GUI/widgetswitch.ui \
     GUI/widgettab.ui \
-    GUI/widgettop.ui \
     mainwindow.ui \
     modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \

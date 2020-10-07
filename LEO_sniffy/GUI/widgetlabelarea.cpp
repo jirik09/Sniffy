@@ -34,10 +34,10 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     channLabelList.append(ui->label_math1);
     channLabelList.append(ui->label_math2);
 
-    ui->label_ch1->setStyleSheet(QString::fromUtf8(TEXT_COLOR_ORANGE));
-    ui->label_ch2->setStyleSheet(QString::fromUtf8(TEXT_COLOR_BLUE));
-    ui->label_ch3->setStyleSheet(QString::fromUtf8(TEXT_COLOR_GREEN));
-    ui->label_ch4->setStyleSheet(QString::fromUtf8(TEXT_COLOR_PURPLE));
+    ui->label_ch1->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(0)));
+    ui->label_ch2->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(1)));
+    ui->label_ch3->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(2)));
+    ui->label_ch4->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(3)));
 
     foreach(QLabel *label, channLabelList){
         label->hide();
@@ -98,13 +98,13 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
         measLabelList.at(fillIndex)->setText(m->getLabel()+" "+m->getValue());
         measLabelList.at(fillIndex)->show();
         if(m->getChannelIndex()==0)
-            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8(TEXT_COLOR_ORANGE));
+            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(0)));
         if(m->getChannelIndex()==1)
-            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8(TEXT_COLOR_BLUE));
+            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(1)));
         if(m->getChannelIndex()==2)
-            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8(TEXT_COLOR_GREEN));
+            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(2)));
         if(m->getChannelIndex()==3)
-            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8(TEXT_COLOR_PURPLE));
+            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(3)));
         fillIndex++;
     }
 }

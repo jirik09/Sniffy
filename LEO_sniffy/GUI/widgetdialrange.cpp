@@ -27,6 +27,17 @@ WidgetDialRange::~WidgetDialRange()
     delete ui;
 }
 
+QByteArray WidgetDialRange::saveGeometry()
+{
+    //TO DO pass all the data including the min max range color etc
+    return QByteArray::number(realValue);
+}
+
+void WidgetDialRange::restoreGeometry(QByteArray geom)
+{
+    setRealValue(geom.toFloat());
+}
+
 void WidgetDialRange::setDialColor(QString &textStyleSheet){
     ui->widget_dial->setStyleSheet(textStyleSheet);
 }
@@ -36,13 +47,11 @@ void WidgetDialRange::setDialButtonsColor(QString &bckgndStyleSheet){
     ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
 }
 
-float WidgetDialRange::getDefaultRealValue() const
-{
+float WidgetDialRange::getDefaultRealValue() const{
     return defaultRealValue;
 }
 
-void WidgetDialRange::setRealValue(float value)
-{
+void WidgetDialRange::setRealValue(float value){
     realValue = value;
     updateControls(0);
 }
@@ -61,7 +70,6 @@ void WidgetDialRange::hideUnitSelection(void){
     ui->widget_4->close();
     this->setMinimumSize(200,70);
 }
-
 
 void WidgetDialRange::plusClicked(){
     float tmpValue = labelValue + buttonStep;
@@ -189,6 +197,31 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     updateControls(0);
 }
 
+void WidgetDialRange::updateRange(float min, float max)
+{
+    rangeMax = max;
+    rangeMin = min;
+    dialStep = (max-min)/dialMaxValue;
+
+    //min cannot be 0 for log scale --> set 0.001
+    if(logaritmic && min==0){
+        rangeMin=0.001;
+    }
+
+    if(logaritmic){
+        logGain = dialMaxValue/log2(rangeMax/rangeMin);
+        logOffset = -logGain*log2(rangeMin);
+    }
+
+    if(defaultRealValue<min){
+        realValue=rangeMin;
+        defaultRealValue = realValue;
+    }else if(defaultRealValue>max){
+        realValue=rangeMax;
+        defaultRealValue = realValue;
+    }
+}
+
 void WidgetDialRange::updateControls(int except){
     if(realValue>rangeMax){
         realValue = rangeMax;
@@ -215,7 +248,6 @@ void WidgetDialRange::updateControls(int except){
                 break;
             }
         }
-
         ui->label_unit->setText(unitString);
         ui->lineEdit->setText(QString::number(labelValue,'f',2));
     }

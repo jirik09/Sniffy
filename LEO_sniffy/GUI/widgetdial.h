@@ -27,6 +27,8 @@ class WidgetDial : public QWidget
 public:
     explicit WidgetDial(QWidget *parent = nullptr, QString name = "");
     ~WidgetDial();
+    QByteArray saveGeometry();
+    void restoreGeometry(QByteArray geom);
     void addOption (QString shownValue, QString unit,float realValue);
     int getSelectedIndex() const;
     void setSelectedIndex(int index);

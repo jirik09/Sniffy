@@ -58,13 +58,13 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
 }
 
 void Device::connectDevice(int index){
-    emit opened(index);
+    emit openDevice(index);
     deviceWindow->deviceConnectButton->setText("Disconnect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(true,1);//disable scan
 }
 
 void Device::disconnectDevice(){
-    emit closed();
+    emit closeDevice();
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
     setIcon(":/graphics/graphics/icon_not_connected.png");
@@ -77,6 +77,8 @@ void Device::errorHandler(QByteArray error){
     messageBox.setFixedSize(500,200);
     disconnectDevice();
     deviceWindow->hideSpecification();
+    deviceWindow->deviceSelection->clear();
+    deviceWindow->deviceSelection->addOption("Connection lost", -1);
     deviceWindow->deviceConnectButton->setDisabledButton(true,0);//disable connect
 }
 
@@ -92,13 +94,23 @@ void Device::parseData(QByteArray data){
     }else if(feature=="ACK_"){
         //  qDebug() << "ACK";
     }else{
-        qDebug() << "ERROR: unparsable data for system" << feature << " "<< data;
+        qDebug() << "WARNING: Device error message received: " <<ErrorList::GetErrMessage((uint8_t)(feature.at(2)));//<< feature << " "<< data;
     }
-
 }
+
 void Device::writeConfiguration(){}
+void Device::parseConfiguration(QByteArray config){Q_UNUSED(config)}
+QByteArray Device::getConfiguration(){return "none";}
+
 void Device::startModule(){}
 void Device::stopModule(){}
+
+
 QWidget* Device::getWidget(){
     return deviceWindow;
+}
+
+QString Device::getName()
+{
+    return deviceSpec->device;
 }

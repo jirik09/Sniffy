@@ -1,11 +1,14 @@
 #include "widgetdisplay.h"
 #include "ui_widgetdisplay.h"
 
-WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, bool showPrgrssBar, int maxTraces, QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::WidgetDisplay)
+WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unitsStyleSheet,
+                             bool showPrgrssBar, int historyTracesNum, int historySize,
+                             QWidget *parent) :
+    QWidget(parent), ui(new Ui::WidgetDisplay), historySize(historySize), name(name)
 {
     ui->setupUi(this);
+
+    loc = QLocale(QLocale::English);
 
     palette = ui->lcdNumber_avg->palette();
 
@@ -25,17 +28,33 @@ WidgetDisplay::WidgetDisplay(QString firstLabelText, QString &unitsStyleSheet, b
        after the object construction */
 
     setUnitsStyle(unitsStyleSheet);
-
-    if(!showPrgrssBar)
-        showBarDisplay(false);
+    showBarDisplay(showPrgrssBar);
 
     displayString("");
     displayAvgString("");
 
-    createHistoryChart(maxTraces);
-    hideHistoryChart();
+    hideHistoryChartArea();
+    historyData = new QVector<QVector<QPointF>>(historyTracesNum);
+    createHistoryChart(historyTracesNum);
+    createHistoryList();
+    setHistorySize(historySize);
 
-    connect(ui->pushButton_history, SIGNAL(clicked()), this, SLOT(historyButtonClickedCallback()));
+    configureCustomDial();
+    configureFloatingHistoryNumber();
+
+    connect(ui->pushButton_history, SIGNAL(clicked()),
+            this, SLOT(historyButtonClickedCallback()));
+    connect(ui->pushButton_clear, SIGNAL(clicked()),
+            this, SLOT(clearHistoryButtonClickedCallback()));
+    connect(ui->pushButton_list, SIGNAL(clicked()),
+            this, SLOT(listChartSwitchClickedCallback()));
+    connect(ui->pushButton_save, SIGNAL(clicked()),
+            this, SLOT(saveListClickedCallback()));
+
+    connect(ui->dial, SIGNAL(customContextMenuRequested(const QPoint &)),
+            this, SLOT(dialShowMenuOnRightClickCallback(const QPoint &)));
+    connect(ui->dial, SIGNAL(valueChanged(int)),
+            this, SLOT(dialHistoryValueChangedCallback(int)));
 }
 
 WidgetDisplay::~WidgetDisplay()
@@ -43,7 +62,11 @@ WidgetDisplay::~WidgetDisplay()
     delete ui;
 }
 
-void WidgetDisplay::hideHistoryChart(){
+QString WidgetDisplay::formatNumber(double val, char f, int prec){
+    return loc.toString(val, f, prec).replace(loc.decimalPoint(), '.');
+}
+
+void WidgetDisplay::hideHistoryChartArea(){
     QList<int> sizes = {0, ui->splitter->width()};
     ui->splitter->setSizes(sizes);
 }
@@ -176,53 +199,10 @@ void WidgetDisplay::showLabel(int labelNumber){
     labelList.at(labelNumber)->show();
 }
 
-void WidgetDisplay::clearHistoryChart(){
-    chart->clearAll();
-}
-
-void WidgetDisplay::updateHistoryData(QVector<QPointF> *points, int index){    
-    chart->updateTrace(points, index);
-}
-
-void WidgetDisplay::historyButtonClickedCallback()
-{
-    QString style;
-    QList<int> sizes = ui->splitter->sizes();
-    int cmpltWidth = ui->splitter->width();
-
-    if(history == DISABLED){
-        sizes[0] = cmpltWidth / 3;
-        sizes[1] = cmpltWidth / 3 * 2;
-        style = "QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
-        history = ENABLED;
-    }else {
-        sizes = {0, cmpltWidth};
-        style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
-        history = DISABLED;
-    }
-    ui->splitter->setSizes(sizes);
-    ui->pushButton_history->setStyleSheet(style);
-}
-
-void WidgetDisplay::createHistoryChart(int maxTraces)
-{
-    chart = new widgetChart(ui->verticalWidget_history, maxTraces);
-    chart->setGridLinesVisible(true, true);
-    chart->setGridDensity(5, 5);
-    chart->setLabelsVisible(true, true);
-    chart->setGraphColor(QCOLOR_GREY);
-    chart->setMargins(-14, -5, -12, -11);
-    chart->setRangeY(0, 3.3);
-    chart->setDataMinMax(0, 10);
-    ui->horizontalWidget_graph_2->addWidget(chart);
-}
-
 void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){
     if(color == "blue"){
         if(drawFlag == 0){
-            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
+            labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(33,77,100);color:rgb(33,77,100);">--<span style="background-color:color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
             drawFlag++;
         }else if (drawFlag == 1) {
             labelList.at(labelNumber)->setText(R"**(<span style="background-color:rgb(29,115,162);color:rgb(29,115,162);">--<span style="background-color:rgb(24,154,224);color:rgb(24,154,224);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--<span style="background-color:rgb(38, 38, 38);color:rgb(38, 38, 38);">--)**");
@@ -318,4 +298,247 @@ void WidgetDisplay::drawIndicationFlag(int labelNumber, QString color){
      * */
 }
 
+/******************************* HISTORY *********************************/
 
+void WidgetDisplay::configureCustomDial(){
+    ui->dial->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->dial->setObjectName("dialHistory");
+    ui->dial->drawMarker(false);
+    ui->dial->setRange(100, 1000);
+    ui->dial->setPageStep(100);
+    ui->dial->setSingleStep(20);
+}
+
+void WidgetDisplay::configureFloatingHistoryNumber(){
+    ui->dial->setEnabled(true);
+    ui->dial->setToolTip(QString::number(historySize));
+    labelFloatHistNum = new QLabel(this);
+    labelFloatHistNum->setGeometry(ui->dial->x()+10, ui->dial->y()+64, 30, 20);
+    labelFloatHistNum->setStyleSheet(QString::fromUtf8("QLabel{background-color: rgb(48, 48, 48);}"));
+    labelFloatHistNum->hide();
+    labelFloatHistNum->setNum(100);
+}
+
+void WidgetDisplay::createHistoryChart(int historyTracesNum){
+    chart = new widgetChart(ui->verticalWidget_history, historyTracesNum);
+    chart->setLabelsSize(7);
+    chart->formatLabels("%.1f", "%.2g");
+   // chart->setGridLinesVisible(true, true);
+    chart->setGridDensity(5, 5);
+    chart->setLabelsVisible(true, true);
+    chart->setGraphColor(QCOLOR_GREY);
+    chart->setMargins(-12, -5, -6, -10);
+    chart->setRangeY(0, 3.3);
+    chart->setDataMinMax(0, 10);
+    ui->horizontalWidget_graph_2->addWidget(chart);
+}
+
+void WidgetDisplay::createHistoryList(){
+    list = new WidgetList(ui->verticalWidget_history);
+    list->hide();
+    ui->horizontalWidget_graph_2->addWidget(list);
+}
+
+void WidgetDisplay::setHistorySize(int smplNumber){
+    historySize = smplNumber;
+}
+
+void WidgetDisplay::clearHistoryChart(){
+    chart->clearAll();
+}
+
+void WidgetDisplay::clearHistoryList(){
+    list->clear();
+}
+
+void WidgetDisplay::clearHistoryData(){
+    for (int i = 0; i < historyData->length(); i++)
+        historyData[0][i].clear();
+}
+
+void WidgetDisplay::clearExpiredPointsFromChart(){
+    for(int i = 0; i < historyData->length(); i++)
+        chart->clearPoint(i, 0);
+}
+
+void WidgetDisplay::clearExpiredPointsFromList(){
+    list->clearLast();
+}
+
+void WidgetDisplay::clearExpiredData(){
+    for(int i = 0; i < historyData->length(); i++)
+        historyData[0][i].removeFirst();
+}
+
+void WidgetDisplay::appendNewHistorySample(QString prefix, double sample, QString affix, float timeStep){
+    timeAxisMax += timeStep;
+    historyData[0][0].reserve(historyData[0].length());
+    historyData[0][0].append(QPointF(timeAxisMax, sample));
+
+    if(sample > rememberMax){
+        setHistoryMinMaxData(0, sample+(sample/10));
+        rememberMax = sample;
+    }
+
+    if(historyData[0][0].length() > historySize){
+        timeAxisMin += timeStep;
+        clearExpiredData();
+        clearExpiredPointsFromChart();
+        clearExpiredPointsFromList();
+    }
+
+    setHistoryMinMaxTime(timeAxisMin, timeAxisMax);
+    chart->appendToTrace(0, &historyData[0][0]);
+    list->appendNumber(timeAxisMax, prefix, sample, affix);
+}
+
+/* Brief: Appends a sample to the selected trace and associates it
+ * to the list next to the one added by appendNewHistorySample()
+ * traceIndex: ...
+ * prefix, affix: Strings added in front of and behind the sample in the list
+ * sample: sample to append
+ */
+void WidgetDisplay::associateSample(int traceIndex, QString prefix, double sample, QString affix){
+    historyData[0][traceIndex].append(QPointF(timeAxisMax, sample));
+    chart->appendToTrace(traceIndex, &historyData[0][traceIndex]);
+    list->associateNumber(prefix, sample, affix);
+}
+
+void WidgetDisplay::setHistoryMinMaxTime(qreal minX, qreal maxX){
+    chart->setRangeX(minX, maxX);
+}
+
+void WidgetDisplay::setHistoryMinMaxData(qreal minY, qreal maxY){
+    chart->setRangeY(minY, maxY);
+}
+
+void WidgetDisplay::updateHistoryData(QVector<QPointF> *points, int index){    
+    chart->updateTrace(points, index);
+}
+
+void WidgetDisplay::recalcHistorySizeAndSetDial(int reqSize)
+{
+    ui->dial->setValue(reqSize);
+
+    int actSize = historyData[0][0].length();
+
+    if(actSize > reqSize){
+        int difference = actSize - reqSize;
+        for(int i = 0; i < difference; i++){
+            clearExpiredData();
+            clearExpiredPointsFromList();
+            clearExpiredPointsFromChart();
+        }
+        timeAxisMin = historyData[0][0].first().x();
+        setHistoryMinMaxTime(timeAxisMin, timeAxisMax);
+    }
+}
+
+/*************************************** Callbacks *****************************************/
+
+void WidgetDisplay::clearHistoryButtonClickedCallback(){
+    clearHistoryChart();
+    clearHistoryList();
+    clearHistoryData();
+    timeAxisMax = 0;
+    timeAxisMin = 0;
+}
+
+void WidgetDisplay::historyButtonClickedCallback(){
+    QString style;
+    QList<int> sizes = ui->splitter->sizes();
+    int cmpltWidth = ui->splitter->width();
+
+    if(historyView == DISABLED){
+        sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
+        style = "QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        historyView = ENABLED;
+    }else {
+        sizes = {0, cmpltWidth};
+        style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        historyView = DISABLED;
+    }
+    ui->splitter->setSizes(sizes);
+    ui->pushButton_history->setStyleSheet(style);
+}
+
+void WidgetDisplay::listChartSwitchClickedCallback(){
+    QString style;
+    if(listView == DISABLED){
+        style = "QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        chart->hide();
+        list->show();
+        listView = ENABLED;
+    }else {
+        style = "QPushButton{image: url(:/graphics/graphics/icon_list.png);}"
+                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        chart->show();
+        list->hide();
+        listView = DISABLED;
+    }
+    ui->pushButton_list->setStyleSheet(style);
+}
+
+void WidgetDisplay::saveListClickedCallback(){
+    list->saveList(name);
+}
+
+void WidgetDisplay::dialHistoryValueChangedCallback(int val){
+    recalcHistorySizeAndSetDial(historySize = val);
+    QString str = QString::number(val);
+    labelFloatHistNum->setText(str);
+    ui->dial->setToolTip(str);
+
+    labelFloatHistNum->show();
+    Timing *timer = new Timing();
+    timer->sleep(450);
+    labelFloatHistNum->hide();
+}
+
+void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){
+    QMenu menu(tr("Context menu"), this);
+    menu.setStyleSheet(CONTEXT_MENU_HOVER);
+
+    QAction s100("100", this);
+    QAction s300("300", this);
+    QAction s500("500", this);
+    QAction s700("700", this);
+    QAction s1000("1000", this);
+
+    connect(&s100, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo100()));
+    connect(&s300, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo300()));
+    connect(&s500, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo500()));
+    connect(&s700, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo700()));
+    connect(&s1000, SIGNAL(triggered()), this, SLOT(changeHistorySizeTo1000()));
+
+    menu.addAction(&s100);
+    menu.addAction(&s300);
+    menu.addAction(&s500);
+    menu.addAction(&s700);
+    menu.addAction(&s1000);
+
+    menu.exec(mapToGlobal(mousePos));
+}
+
+void WidgetDisplay::changeHistorySizeTo100(){
+    recalcHistorySizeAndSetDial(historySize = 100);
+}
+
+void WidgetDisplay::changeHistorySizeTo300(){
+    recalcHistorySizeAndSetDial(historySize = 300);
+}
+
+void WidgetDisplay::changeHistorySizeTo500(){
+    recalcHistorySizeAndSetDial(historySize = 500);
+}
+
+void WidgetDisplay::changeHistorySizeTo700(){
+    recalcHistorySizeAndSetDial(historySize = 700);
+}
+
+void WidgetDisplay::changeHistorySizeTo1000(){
+    recalcHistorySizeAndSetDial(historySize = 1000);
+}

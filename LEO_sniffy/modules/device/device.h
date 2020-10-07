@@ -9,6 +9,7 @@
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
 #include "../abstractmodule.h"
+#include "../errorlist.h"
 
 class Device : public AbstractModule
 {
@@ -17,6 +18,7 @@ public:
     explicit Device(QObject *parent = nullptr);
 
     QWidget* getWidget();
+    QString getName();
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
     void errorHandler(QByteArray error);
@@ -30,12 +32,14 @@ private:
 
 signals:
     void ScanDevices();
-    void opened(int deviceIndex);
-    void closed();
+    void openDevice(int deviceIndex);
+    void closeDevice();
 
 public slots:
     void parseData(QByteArray);
     void writeConfiguration();
+    void parseConfiguration(QByteArray config);
+    QByteArray getConfiguration();
     void startModule();
     void stopModule();
 

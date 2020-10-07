@@ -55,14 +55,14 @@ void CounterWindow::createAllDisplays(void){
     displayHF->setContentsMargins(5, 5, 5, 5);
     ui->verticalLayout_display->addWidget(displayHF);
 
-    displayLFCh1 = createLowFreqDisplays();
+    displayLFCh1 = createLowFreqDisplays("LowFreqCh1Counter");
     displayLFCh1->setContentsMargins(5, 5, 5, 5);
     ui->verticalLayout_display->addWidget(displayLFCh1);
 
-    displayLFCh2 = createLowFreqDisplays();
+    displayLFCh2 = createLowFreqDisplays("LowFreqCh2Counter");
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
-    QString style = "QProgressBar {border: 1px solid #777;border-radius: 1px;background: rgb(38, 38, 38);}"
-                    "QProgressBar::chunk {background-color: rgb(124, 124, 124);width: 20px;}";
+    QString style = "QProgressBar {border: 1px solid #777;border-radius: 1px;background: "+QString::fromUtf8(BACKGROUND_COLOR_DATA_AREA)+"}"
+                    "QProgressBar::chunk {background-color: "+QString::fromUtf8(COLOR_GREY)+"width: 20px;}";
     displayLFCh2->setBarStyle(style);
     ui->verticalLayout_display->addWidget(displayLFCh2);
 
@@ -77,16 +77,16 @@ void CounterWindow::createAllDisplays(void){
 
 WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
     QString styleSheet = IMAGE_UNITS_HZ;
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 1, this);
+    WidgetDisplay *display  = new WidgetDisplay("HighFreqCounter", LITERAL_FREQUENCY, styleSheet, true, 4, HISTORY_SIZE, this);
     styleSheet = IMAGE_SIGN_AVG;
     display->setAvgStyle(styleSheet);
     configureErrorStyles(display);
     return display;
 }
 
-WidgetDisplay *CounterWindow::createLowFreqDisplays(void){
+WidgetDisplay *CounterWindow::createLowFreqDisplays(QString name){
     QString styleSheet = IMAGE_UNITS_HZ;
-    WidgetDisplay *display = new WidgetDisplay(LITERAL_FREQUENCY, styleSheet, true, 1, this);
+    WidgetDisplay *display = new WidgetDisplay(name, LITERAL_FREQUENCY, styleSheet, true, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
     return display;
@@ -94,7 +94,7 @@ WidgetDisplay *CounterWindow::createLowFreqDisplays(void){
 
 WidgetDisplay *CounterWindow::createRatioDisplay(void){
     QString styleSheet = "";
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_RATIO, styleSheet, false, 1, this);
+    WidgetDisplay *display  = new WidgetDisplay("RatioCounter", LITERAL_RATIO, styleSheet, false, 1, HISTORY_SIZE, this);
     styleSheet = IMAGE_SIGN_ERR;
     display->setErrStyle(styleSheet);
     styleSheet = IMAGE_SIGN_PLSMNS;
@@ -106,7 +106,7 @@ WidgetDisplay *CounterWindow::createRatioDisplay(void){
 
 WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
     QString styleSheet = IMAGE_UNITS_SEC;
-    WidgetDisplay *display  = new WidgetDisplay(LITERAL_INTERVAL, styleSheet, false, 1, this);
+    WidgetDisplay *display  = new WidgetDisplay("IntervalsCounter", LITERAL_INTERVAL, styleSheet, false, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
     display->showQerrTerrStyle(false);
@@ -123,19 +123,20 @@ void CounterWindow::configureErrorStyles(WidgetDisplay *display){
 }
 
 void CounterWindow::configureAllDisplays(void){
-    configureDisplaysStaticAttr(displayHF, "CH1", LITERAL_FREQUENCY, TEXT_COLOR_BLUE);
-    configureDisplaysStaticAttr(displayLFCh1, "CH1", LITERAL_FREQUENCY, TEXT_COLOR_BLUE);
-    configureDisplaysStaticAttr(displayLFCh2, "CH2", LITERAL_FREQUENCY, TEXT_COLOR_GREY);
-    configureDisplaysStaticAttr(displayRat, "CH3/CH1", LITERAL_RATIO, TEXT_COLOR_BLUE);
-    configureDisplaysStaticAttr(displayInt, "CH1 - CH2", LITERAL_INTERVAL, TEXT_COLOR_BLUE);
-    displayLFCh1->hide();
-    displayLFCh2->hide();
+    configureDisplaysStaticAttr(displayHF, "CH1", LITERAL_FREQUENCY, "color:"+QString::fromUtf8(COLOR_BLUE));
+    configureDisplaysStaticAttr(displayLFCh1, "CH1", LITERAL_FREQUENCY, "color:"+QString::fromUtf8(COLOR_BLUE));
+    configureDisplaysStaticAttr(displayLFCh2, "CH2", LITERAL_FREQUENCY, "color:"+QString::fromUtf8(COLOR_GREY));
+    configureDisplaysStaticAttr(displayRat, "CH3/CH1", LITERAL_RATIO, "color:"+QString::fromUtf8(COLOR_BLUE));
+    configureDisplaysStaticAttr(displayInt, "CH1 - CH2", LITERAL_INTERVAL, "color:"+QString::fromUtf8(COLOR_BLUE));
+    //displayHF->hide();
     displayRat->hide();
     displayInt->hide();
+    displayLFCh1->hide();
+    displayLFCh2->hide();
 }
 
 void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor){
-    display->configLabel(LABELNUM_QUAN, quantity, TEXT_COLOR_GREY, true);
+    display->configLabel(LABELNUM_QUAN, quantity, "color:"+QString::fromUtf8(COLOR_GREY), true);
     display->configLabel(LABELNUM_CHAN, channel, sideLabelsColor, true);
     display->configLabel(LABELNUM_INDIC, "    ", sideLabelsColor, true);
 }
@@ -159,10 +160,9 @@ void CounterWindow::configureDisplaysDynamicAttr(){
     configureDisplaysDynamicLabels(displayInt, spec->pins.int_ch1 + " - " + spec->pins.int_ch2);
 }
 
-void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin)
-{
-    display->configLabel(LABELNUM_PINS, pin, TEXT_COLOR_GREY, true);
-    display->configLabel(LABELNUM_FLAG, "", TEXT_COLOR_ORANGE, true);
+void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin){
+    display->configLabel(LABELNUM_PINS, pin, "color:"+QString::fromUtf8(COLOR_GREY), true);
+    display->configLabel(LABELNUM_FLAG, "", "color:"+QString::fromUtf8(COLOR_ORANGE), true);
 }
 
 void CounterWindow::switchCounterModeCallback(int index){
@@ -172,9 +172,8 @@ void CounterWindow::switchCounterModeCallback(int index){
 }
 
 void CounterWindow::resetPreviousCounterMode(){
-    if(conf->modePrevIndex == CounterMode::HIGH_FREQUENCY){
-        displayHF->hide();
-    }else if(conf->modePrevIndex == CounterMode::LOW_FREQUENCY){
+    displayHF->hide();
+    if(conf->modePrevIndex == CounterMode::LOW_FREQUENCY){
         displayLFCh1->hide();
         displayLFCh2->hide();
     }else if(conf->modePrevIndex == CounterMode::RATIO) {
@@ -188,6 +187,7 @@ void CounterWindow::setNextCounterMode(int index){
     if(index == (int)CounterMode::HIGH_FREQUENCY){
         displayHF->show();
         clearDisplay(displayHF, true);
+
     }else if(index == (int)CounterMode::LOW_FREQUENCY) {
         if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
             displayLFCh1->displayAvgString("");
@@ -202,12 +202,16 @@ void CounterWindow::setNextCounterMode(int index){
         }else {
             clearDisplay(displayLFCh1, true);
             clearDisplay(displayLFCh2, true);
+            switchQuantity((int)conf->lfState.chan1.quantity, displayLFCh1);
+            switchQuantity((int)conf->lfState.chan2.quantity, displayLFCh2);
         }
         displayLFCh1->show();
         displayLFCh2->show();
+
     }else if(index == (int)CounterMode::RATIO) {
         displayRat->show();
         clearDisplay(displayRat, true);
+
     }else if(index == (int)CounterMode::INTERVAL) {
         displayInt->show();
         clearDisplay(displayInt, false);
@@ -248,23 +252,12 @@ void CounterWindow::switchQuantity(int index, WidgetDisplay *display){
     display->setUnitsStyle(unitsStyleSheet);
 }
 
-void CounterWindow::msleep(int msec){
-    QEventLoop loop;
-    QTimer::singleShot(msec, &loop, &QEventLoop::quit);
-    loop.exec();
+void CounterWindow::appendNewHistorySample(WidgetDisplay *display, QString prefix, float sample, QString affix, float timeStep){
+    display->appendNewHistorySample(prefix, sample, affix, timeStep);
 }
 
-void CounterWindow::paintHistory(WidgetDisplay *display, QVector<QPointF> dataSeries){
-    //display->clearHistoryChart();
-    display->chart->appendToTrace(&dataSeries, 0);
-}
-
-void CounterWindow::setMinMaxTime(WidgetDisplay *display, qreal minX, qreal maxX){
-    display->chart->setRangeX(minX, maxX);
-}
-
-void CounterWindow::setMinMaxData(WidgetDisplay *display, qreal minY, qreal maxY){
-    display->chart->setRangeY(minY, maxY);
+void CounterWindow::associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix, float sample, QString affix){
+    display->associateSample(traceIndex, prefix, sample, affix);
 }
 
 /************************************** HIGH FREQ FUNCTIONS ****************************************/
@@ -288,7 +281,7 @@ void CounterWindow::lfSwitchChannelCallback(int index){
     QString bckgndColor;
 
     if(index == 0){
-        bckgndColor = BCKGRND_COLOR_BLUE;
+        bckgndColor = "background-color:"+QString::fromUtf8(COLOR_BLUE);
         tabLowFreq->showDialInChannel(CHANNEL_1, true);
         tabLowFreq->showDialInChannel(CHANNEL_2, false);
     }else if (index == 1) {

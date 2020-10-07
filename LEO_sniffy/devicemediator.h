@@ -16,6 +16,10 @@ public:
     QList<QSharedPointer<AbstractModule>> getModulesList();   
     void ShowDeviceModule();
     bool getIsConnected() const;
+    QString getDeviceName();
+
+signals:
+    void loadLayout(QString Devicename);
 
 private:
     QList<DeviceDescriptor> deviceList;
@@ -32,6 +36,8 @@ private slots:
     void handleError(QByteArray error);
     void ScanDevices();
     void open(int deviceIndex);
+
+public slots:
     void close();
 };
 

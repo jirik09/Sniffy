@@ -9,7 +9,6 @@
 #include <QDebug>
 
 #include "../../GUI/widgetcontrolmodule.h"
-#include "../../GUI/widgettop.h"
 #include "../../GUI/widgetseparator.h"
 #include "../../GUI/widgetdial.h"
 #include "../../GUI/widgetdialrange.h"
@@ -23,10 +22,14 @@
 
 #include "../labelformator.h"
 
-
 #include "scopedefs.h"
 #include "panelsettings.h"
 #include "panelmeasurement.h"
+#include "panelcursors.h"
+#include "scopeconfig.h"
+
+#define CHART_MAX_Y 7
+#define CHART_MIN_Y -1
 
 namespace Ui {
 class ScopeWindow;
@@ -41,6 +44,7 @@ public:
     ~ScopeWindow();
     void paintEvent(QPaintEvent *event);
 
+
     void showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex);
     void paintTraces(QVector<QVector<QPointF>> dataSeries);
     void setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom);
@@ -51,6 +55,7 @@ public:
     void setRealSamplingRate(int smpl);
 
     void updateMeasurement(QList<Measurement*> m);
+    void passConfig(ScopeConfig &conf);
 
 
 signals:
@@ -64,6 +69,7 @@ signals:
     void channelEnableChanged(int buttonStatus);
     void measurementChanged(Measurement *m);
     void measurementClearChanged();
+    void verticalChanged();
 
 
 private slots:
@@ -82,30 +88,29 @@ private slots:
     void measurementClearCallback();
     void sliderShiftCallback(int value);
 
+    void chartLocalZoomCallback();
 
-private:
+
+public:
     Ui::ScopeWindow *ui;
-
+    PanelSettings *panelSet;
+private:
+    ScopeConfig *config;
     widgetChart *chart;
+
     QVector<QVector<QPointF>> ChartData;
+    int triggerChannelIndex =0;
 
     WidgetLabelArea *labelInfoPanel;
 
-    PanelSettings *panelSet;
     PanelMeasurement *panelMeas;
+
+    PanelCursors *panelCursors;
 
     void updateChartTimeScale(float timeBase);
     void fillTimeBase();
 
     float previousTimeBase = 0;
-
-    int selectedChannelIndexVertical = 0;
-    QString channelBcgrColor[MAX_SCOPE_CHANNELS] = {BCKGRND_COLOR_ORANGE,BCKGRND_COLOR_BLUE,BCKGRND_COLOR_GREEN,BCKGRND_COLOR_PURPLE};
-    QString channelTextColor[MAX_SCOPE_CHANNELS] = {TEXT_COLOR_ORANGE,TEXT_COLOR_BLUE,TEXT_COLOR_GREEN,TEXT_COLOR_PURPLE};
-    float channelScale[MAX_SCOPE_CHANNELS]={1,1,1,1};
-    float channelOffset[MAX_SCOPE_CHANNELS]={0,0,0,0};
-    float channelScaleIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
-    float channelOffsetIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
 };
 
 #endif // WINDOWSCOPE_H
