@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>584</width>
-    <height>105</height>
+    <height>85</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -107,6 +107,12 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>12</height>
+           </size>
           </property>
           <property name="styleSheet">
            <string notr="true">QLabel{text-align:center}</string>
@@ -211,7 +217,7 @@
           <number>0</number>
          </property>
          <property name="topMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <property name="rightMargin">
           <number>5</number>
@@ -221,6 +227,9 @@
          </property>
          <item>
           <layout class="QGridLayout" name="gridLayout">
+           <property name="spacing">
+            <number>5</number>
+           </property>
            <item row="2" column="2">
             <widget class="QLabel" name="label_meas9">
              <property name="text">
@@ -230,6 +239,12 @@
            </item>
            <item row="0" column="1">
             <widget class="QLabel" name="label_meas2">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>TextLabel</string>
              </property>
@@ -237,6 +252,18 @@
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="label_meas7">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>TextLabel</string>
              </property>
@@ -244,6 +271,18 @@
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_meas1">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>TextLabel</string>
              </property>
@@ -258,6 +297,18 @@
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_meas4">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>TextLabel</string>
              </property>
@@ -305,7 +356,7 @@
           <number>0</number>
          </property>
          <property name="topMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <property name="rightMargin">
           <number>0</number>
@@ -367,7 +418,7 @@
           <number>5</number>
          </property>
          <property name="topMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <property name="rightMargin">
           <number>0</number>

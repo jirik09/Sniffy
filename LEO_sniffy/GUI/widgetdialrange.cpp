@@ -197,6 +197,31 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     updateControls(0);
 }
 
+void WidgetDialRange::updateRange(float min, float max)
+{
+    rangeMax = max;
+    rangeMin = min;
+    dialStep = (max-min)/dialMaxValue;
+
+    //min cannot be 0 for log scale --> set 0.001
+    if(logaritmic && min==0){
+        rangeMin=0.001;
+    }
+
+    if(logaritmic){
+        logGain = dialMaxValue/log2(rangeMax/rangeMin);
+        logOffset = -logGain*log2(rangeMin);
+    }
+
+    if(defaultRealValue<min){
+        realValue=rangeMin;
+        defaultRealValue = realValue;
+    }else if(defaultRealValue>max){
+        realValue=rangeMax;
+        defaultRealValue = realValue;
+    }
+}
+
 void WidgetDialRange::updateControls(int except){
     if(realValue>rangeMax){
         realValue = rangeMax;
@@ -223,7 +248,6 @@ void WidgetDialRange::updateControls(int except){
                 break;
             }
         }
-
         ui->label_unit->setText(unitString);
         ui->lineEdit->setText(QString::number(labelValue,'f',2));
     }

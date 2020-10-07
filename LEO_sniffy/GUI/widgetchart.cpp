@@ -10,6 +10,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 
     chart = new QChart();
     chart->legend()->hide();
+    chart->setObjectName("chart");
 
     chart->setBackgroundBrush(BACKGROUND_QCOLOR_DATA_AREA);
     chart->setAcceptHoverEvents(true);
@@ -70,6 +71,8 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
         chart->addSeries(seriesCursor);
         seriesCursor->attachAxis(axisX);
         seriesCursor->attachAxis(axisY_UnitRange);
+        connect(seriesCursor,&QLineSeries::pressed,this,&widgetChart::handleCursorPress);
+        connect(seriesCursor,&QLineSeries::released,this,&widgetChart::handleCursorRelease);
     }
     for (int i = 0; i < 2; i++){
         QLineSeries *seriesCursor = new QLineSeries;
@@ -172,6 +175,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
                 localZoom=1;
             }
         }
+        emit localZoomChanged();
         updateAxis();
     }
     if(event->type() == QEvent::GraphicsSceneMouseDoubleClick){
@@ -184,6 +188,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         mousePressed = true;
         mousePressedPoint = ev->pos();
         initMouseShift = shift;
+        QApplication::setOverrideCursor(QCursor(Qt::ClosedHandCursor));
         while (mousePressed) {
             Timing *timer = new Timing();
             timer->sleep(100);
@@ -192,6 +197,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
 
     if(event->type() == QEvent::GraphicsSceneMouseRelease){
         mousePressed = false;
+        QApplication::restoreOverrideCursor();
     }
 
     if(event->type() == QEvent::GraphicsSceneMouseMove){
@@ -206,6 +212,18 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         }
         emit localZoomChanged();
         updateAxis();
+    }
+
+    if(event->type() == QEvent::GraphicsSceneHoverEnter){
+        QApplication::setOverrideCursor(QCursor(Qt::OpenHandCursor));
+    }
+    if(event->type() == QEvent::GraphicsSceneHoverLeave){
+        QApplication::restoreOverrideCursor();
+    }
+
+
+    if(event->type() != QEvent::LayoutRequest && event->type()!=QEvent::GraphicsSceneHoverMove){
+     // qDebug() <<"Sereies event"<< event->type() << obj->objectName();
     }
     return NULL;//QObject::eventFilter(obj, event);
 }
@@ -401,8 +419,6 @@ void widgetChart::initBrushes()
 
     MarkerPath_Circle = new QPainterPath(QPointF(10,10));
     MarkerPath_Circle->arcTo(QRectF(8,8,4,4),0,360*16);
-
-
 }
 
 QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
@@ -466,7 +482,7 @@ void widgetChart::setHorizontalCursor(int channelIndex, qreal value, Cursor type
 
     QPen *pen = new QPen();
     pen->setColor(Colors::getChannelColor(channelIndex));
-    pen->setWidth(1);
+    pen->setWidth(2);
     if(type == Cursor::CURSOR_A){
         pen->setStyle(Qt::DashLine);
         cursorsHorizontal[0]->setPen(*pen);
@@ -488,7 +504,7 @@ void widgetChart::setVerticalCursor(int channelIndex, qreal value, Cursor type)
 
     QPen *pen = new QPen();
     pen->setColor(Colors::getChannelColor(channelIndex));
-    pen->setWidth(1);
+    pen->setWidth(2);
 
     if(type == Cursor::CURSOR_A){
         pen->setStyle(Qt::DashLine);
@@ -530,4 +546,15 @@ void widgetChart::rightClickCallback(const QPoint &mousePos){
 void widgetChart::hovered(const QPointF &point){
     QString coords = QString("X: %1\nY: %2").arg(point.x()).arg(point.y());
     chart->setToolTip(coords);
+}
+
+void widgetChart::handleCursorPress()
+{
+    QApplication::setOverrideCursor(QCursor(Qt::SizeHorCursor));
+    qDebug () << "cursor clicked";
+}
+
+void widgetChart::handleCursorRelease()
+{
+    QApplication::restoreOverrideCursor();
 }
