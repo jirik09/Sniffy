@@ -32,8 +32,7 @@ public:
     void addOption (QString shownValue, QString unit,float realValue);
     int getSelectedIndex() const;
     void setSelectedIndex(int index);
-    void setDialColor(QString &textStyleSheet);
-    void setDialButtonsColor(QString &bckgndStyleSheet);
+    void setColor(QString color);
 
     int getDefaultIndex() const;
     void setDefaultIndex(int value);

@@ -7,6 +7,8 @@
 
 #include "scopedefs.h"
 
+#include "measurement.h"
+
 
 
 class ScopeConfig : public QObject
@@ -47,11 +49,20 @@ public:
     ScopeTriggerEdge triggerEdge = ScopeTriggerEdge::EDGE_RISING;
     float timeBase = 0.001;
 
+
+    //parems from GUI
     int selectedChannelIndexVertical = 0;
     float channelScale[MAX_SCOPE_CHANNELS]={1,1,1,1};
     float channelOffset[MAX_SCOPE_CHANNELS]={0,0,0,0};
     float channelScaleIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
     float channelOffsetIndex[MAX_SCOPE_CHANNELS] = {-1,-1,-1,-1};
+    int cursorChannelIndex = 0;
+    int cursorsActiveIndex = 0;
+    float timeMin = -0.01;
+    float timeMax = 0.01;
+
+    int measCount = 0;
+    QList<Measurement *> scopeMeas;
 
 };
 

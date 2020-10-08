@@ -58,6 +58,12 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
 
     // ********************* create panel Cursors ****************
     panelCursors = new PanelCursors(tabs->getLayout(2),tabs);
+    connect(panelCursors->cursorTypeButtons,&WidgetButtons::clicked,this,&ScopeWindow::cursorTypeCallback);
+    connect(panelCursors->channelButtons,&WidgetButtons::clicked,this,&ScopeWindow::cursorChannelCallback);
+    connect(panelCursors->cursorHorADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueHorACallback);
+    connect(panelCursors->cursorHorBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueHorBCallback);
+    connect(panelCursors->cursorVerADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerACallback);
+    connect(panelCursors->cursorVerBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerBCallback);
 
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
@@ -74,8 +80,8 @@ void ScopeWindow::paintEvent(QPaintEvent *event){
     ui->sliderSignal->setStyleSheet(QString::fromUtf8(
                                         "QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
                                         "background-color: ")+BACKGROUND_COLOR_DATA_AREA+"border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
-                                        "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
-                                        "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+QString::fromUtf8("px;}"));
+                                                                                         "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
+                                                                                         "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+QString::fromUtf8("px;}"));
     event->accept();
 }
 
@@ -108,36 +114,37 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries){
             }else if(zeroMarkerPosition<=CHART_MIN_Y){
                 chart-> setHorizontalMarker(i,CHART_MIN_Y,MarkerType::ARROW_DOWN_SMALL);
             }else{
-                 chart-> setHorizontalMarker(i,zeroMarkerPosition,MarkerType::TICK);
+                chart-> setHorizontalMarker(i,zeroMarkerPosition,MarkerType::TICK);
             }
 
             labelInfoPanel->setChannelLabelVisible(i,true);
             labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/div"));
+
+            panelCursors->cursorHorADial->updateRange(config->timeMin,config->timeMax);
+            panelCursors->cursorHorBDial->updateRange(config->timeMin,config->timeMax);
+            panelCursors->cursorVerADial->updateRange(config->rangeMin,(float)(config->rangeMax)/1000);
+            panelCursors->cursorVerBDial->updateRange(config->rangeMin,(float)(config->rangeMax)/1000);
+
         }
     }
     chart->setVerticalMarker(triggerChannelIndex,0);
 }
 
 void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
-     chart->setDataMinMax(minX,maxX);
-     chart->setZoom(zoom*1.2);
+    chart->setDataMinMax(minX,maxX);
+    chart->setZoom(zoom*1.2);
 }
 
 void ScopeWindow::channelVerticalCallback(int index){
     config->selectedChannelIndexVertical = index;
-    QString style = QString::fromUtf8("color:"+Colors::getChannelColorString(index));
-    QString styleBcg = QString::fromUtf8("background-color:"+Colors::getChannelColorString(index));
-
-    panelSet->dialVerticalScale->setDialColor(style);
-    panelSet->dialVerticalScale->setDialButtonsColor(styleBcg);
+    panelSet->dialVerticalScale->setColor(Colors::getChannelColorString(index));
     if(config->channelScaleIndex[index]==-1){
         config->channelScaleIndex[index] = panelSet->dialVerticalScale->getDefaultIndex();
         config->channelOffsetIndex[index] = panelSet->dialVerticalShift->getDefaultRealValue();
     }
     panelSet->dialVerticalScale->setSelectedIndex(config->channelScaleIndex[index]);
 
-    panelSet->dialVerticalShift->setDialColor(style);
-    panelSet->dialVerticalShift->setDialButtonsColor(styleBcg);
+    panelSet->dialVerticalShift->setColor(Colors::getChannelColorString(index));
     panelSet->dialVerticalShift->setRealValue(config->channelOffset[index]);
 }
 
@@ -246,6 +253,104 @@ void ScopeWindow::chartLocalZoomCallback()
         ui->sliderSignal->setValue((chart->getShift()*2000)-1000);
     }
     updateChartTimeScale(config->timeBase);
+}
+
+void ScopeWindow::cursorTypeCallback(int index)
+{
+    chart->clearAllCursors();
+    if(index==0){
+        config->cursorsActiveIndex = 0;
+        panelCursors->channelButtons->setEnabled(false);
+        panelCursors->cursorHorADial->hide();
+        panelCursors->cursorHorBDial->hide();
+        panelCursors->cursorVerADial->hide();
+        panelCursors->cursorVerBDial->hide();
+    }else if(index==1){ //Horizontal
+        config->cursorsActiveIndex = 1;
+        panelCursors->channelButtons->setEnabled(true);
+        panelCursors->cursorHorADial->show();
+        panelCursors->cursorHorBDial->show();
+        panelCursors->cursorVerADial->hide();
+        panelCursors->cursorVerBDial->hide();
+    }else if(index==2){ //Vertical
+        config->cursorsActiveIndex = 2;
+        panelCursors->channelButtons->setEnabled(true);
+        panelCursors->cursorHorADial->hide();
+        panelCursors->cursorHorBDial->hide();
+        panelCursors->cursorVerADial->show();
+        panelCursors->cursorVerBDial->show();
+    }
+    labelInfoPanel->hideCursorReadings();
+    cursorChannelCallback(config->cursorChannelIndex);
+    updateCursorReadings();
+}
+
+void ScopeWindow::cursorChannelCallback(int index)
+{
+    config->cursorChannelIndex = index;
+    panelCursors->cursorHorADial->setColor(Colors::getChannelColorString(index));
+    panelCursors->cursorHorBDial->setColor(Colors::getChannelColorString(index));
+    panelCursors->cursorVerADial->setColor(Colors::getChannelColorString(index));
+    panelCursors->cursorVerBDial->setColor(Colors::getChannelColorString(index));
+    if(config->cursorsActiveIndex == 2){
+        chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
+        chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
+    }
+    if(config->cursorsActiveIndex == 1){
+        chart->setHorizontalCursor(config->cursorChannelIndex,panelCursors->cursorHorADial->getRealValue(),Cursor::CURSOR_A);
+        chart->setHorizontalCursor(config->cursorChannelIndex,panelCursors->cursorHorBDial->getRealValue(),Cursor::CURSOR_B);
+    }
+    labelInfoPanel->setCursorReadingsColor(config->cursorChannelIndex);
+}
+
+void ScopeWindow::cursorValueHorACallback(float value)
+{
+    if(config->cursorsActiveIndex == 1){
+        chart->setHorizontalCursor(config->cursorChannelIndex,value,Cursor::CURSOR_A);
+        updateCursorReadings();
+    }
+}
+
+void ScopeWindow::cursorValueHorBCallback(float value)
+{
+    if(config->cursorsActiveIndex == 1){
+        chart->setHorizontalCursor(config->cursorChannelIndex,value,Cursor::CURSOR_B);
+        updateCursorReadings();
+    }
+}
+
+void ScopeWindow::cursorValueVerACallback(float value)
+{
+    if(config->cursorsActiveIndex == 2){
+        chart->setVerticalCursor(config->cursorChannelIndex,(value+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
+        updateCursorReadings();
+    }
+}
+
+void ScopeWindow::cursorValueVerBCallback(float value)
+{
+    if(config->cursorsActiveIndex == 2){
+        chart->setVerticalCursor(config->cursorChannelIndex,(value+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
+        updateCursorReadings();
+    }
+}
+
+void ScopeWindow::updateCursorReadings()
+{
+    if(config->cursorsActiveIndex == 2){
+        qreal curA = panelCursors->cursorVerADial->getRealValue();
+        qreal curB = panelCursors->cursorVerBDial->getRealValue();
+        labelInfoPanel->setCursorVoltageReadings(curA,curB);
+    }
+    if(config->cursorsActiveIndex == 1){
+        qreal curA = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorADial->getRealValue());
+        qreal curB = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorBDial->getRealValue());
+        curA = (curA * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
+        curB = (curB * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
+
+        labelInfoPanel->setCursorVoltageReadings(curA,curB);
+        labelInfoPanel->setCursorTimeReadings(panelCursors->cursorHorADial->getRealValue(),panelCursors->cursorHorBDial->getRealValue());
+    }
 }
 
 void ScopeWindow::updateMeasurement(QList<Measurement*> m){

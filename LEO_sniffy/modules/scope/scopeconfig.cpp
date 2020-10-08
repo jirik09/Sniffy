@@ -2,7 +2,6 @@
 
 ScopeConfig::ScopeConfig(QObject *parent) : QObject(parent)
 {
-
 }
 
 void ScopeConfig::parse(QByteArray config)
@@ -48,6 +47,11 @@ void ScopeConfig::parse(QByteArray config)
     for(int i = 0; i<MAX_SCOPE_CHANNELS;i++){
         stream >> channelScaleIndex[i];
     }
+
+    stream >> cursorChannelIndex;
+    stream >> cursorsActiveIndex;
+    stream >> timeMin;// = -0.01;
+    stream >> timeMax;// = 0.01;
 
    // qDebug() << "Cofig from scope is being parsed "+config;
 }
@@ -98,6 +102,11 @@ QByteArray ScopeConfig::serialize()
     for(int i = 0; i<MAX_SCOPE_CHANNELS;i++){
         stream << channelScaleIndex[i];
     }
+
+    stream << cursorChannelIndex;
+    stream << cursorsActiveIndex;
+    stream << timeMin;// = -0.01;
+    stream << timeMax;// = 0.01;
  //   qDebug() << "Cofig from scope is being serialized "+*data;
     return *data;
 

@@ -7,7 +7,6 @@
 #include "../../GUI/widgetseparator.h"
 #include "../../GUI/widgetdial.h"
 #include "../../GUI/widgetdialrange.h"
-#include "../../GUI/widgetswitch.h"
 #include "../../GUI/widgetbuttons.h"
 #include "../../GUI/widgetlabel.h"
 #include "../../GUI/widgetselection.h"

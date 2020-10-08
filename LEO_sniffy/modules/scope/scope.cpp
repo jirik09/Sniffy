@@ -94,6 +94,7 @@ void Scope::parseData(QByteArray data){
 
             if(resolution>8){
                 minX = float(config->dataLength)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
+                config->timeMin = minX;
                 for (int j(0); j < length/2; j++){
                     streamBuffLeng>>tmpByte;
                     tmpShort = tmpByte;
@@ -106,6 +107,7 @@ void Scope::parseData(QByteArray data){
                     points.append(QPointF(x,y));
                 }
                 maxX = x;
+                config->timeMax = maxX;
             }else{
                 qDebug() << "TODO <8bit data parser";
             }
@@ -186,7 +188,6 @@ void Scope::updateTimebase(float div){
     config->timeBase = div;
     if(config->signalMegazoom==true){
         config->requestedSamplingRate = round(float(config->dataLength)/(12.0*div)+0.49);
-        qDebug() << config->requestedSamplingRate;
     }else{
         config->requestedSamplingRate = round(float(100)/(div)+0.49);
     }

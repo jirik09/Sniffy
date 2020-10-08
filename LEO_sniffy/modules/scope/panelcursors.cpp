@@ -4,7 +4,18 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
 {
     destination->addWidget(new WidgetSeparator(parent,"Cursors"));
 
-    channelButtons = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Channel selection");
+    cursorTypeButtons = new WidgetButtons(parent,3,ButtonTypes::RADIO,"");
+    cursorTypeButtons->setObjectName("cursortypeSel");
+    destination->addWidget(cursorTypeButtons);
+    cursorTypeButtons->setText("None",0);
+    cursorTypeButtons->setColor(QString::fromUtf8("background-color:")+COLOR_GREY,0);
+    cursorTypeButtons->setText("Horizontal",1);
+    cursorTypeButtons->setText("Vertical",2);
+
+    destination->addWidget(new WidgetSeparator(parent,""));
+
+
+    channelButtons = new WidgetButtons(parent,4,ButtonTypes::RADIO,"");
     channelButtons->setObjectName("cursorChannSelection");
     destination->addWidget(channelButtons);
     channelButtons->setText("CH1",0);
@@ -15,6 +26,40 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(2)),2);
     channelButtons->setText("CH4",3);
     channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(3)),3);
+    channelButtons->setEnabled(false);
+
+    cursorHorADial = new WidgetDialRange(parent ,"Cursor A");
+    cursorHorADial->setRange(-0.0001,0.0001,"s",0.05,0.00000001,0);
+    cursorHorADial->setColor(Colors::getChannelColorString(0));
+    cursorHorADial->hideUnitSelection();
+    cursorHorADial->enableFineMousePrecision();
+    destination->addWidget(cursorHorADial);
+    cursorHorADial->hide();
+
+    cursorHorBDial = new WidgetDialRange(parent ,"Cursor B");
+    cursorHorBDial->setRange(-0.0001,0.0001,"s",0.05,0.00000001,0);
+    cursorHorBDial->setColor(Colors::getChannelColorString(0));
+    cursorHorBDial->hideUnitSelection();
+    cursorHorBDial->enableFineMousePrecision();
+    destination->addWidget(cursorHorBDial);
+    cursorHorBDial->hide();
+
+    cursorVerADial = new WidgetDialRange(parent ,"Cursor A");
+    cursorVerADial->setRange(-1,1,"V",10,0.01,0);
+    cursorVerADial->setColor(Colors::getChannelColorString(0));
+    cursorVerADial->hideUnitSelection();
+    cursorVerADial->enableFineMousePrecision();
+    destination->addWidget(cursorVerADial);
+    cursorVerADial->hide();
+
+    cursorVerBDial = new WidgetDialRange(parent ,"Cursor B");
+    cursorVerBDial->setRange(-1,1,"V",10,0.01,0);
+    cursorVerBDial->setColor(Colors::getChannelColorString(0));
+    cursorVerBDial->hideUnitSelection();
+    cursorVerBDial->enableFineMousePrecision();
+    destination->addWidget(cursorVerBDial);
+    cursorVerBDial->hide();
+
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
     QSpacerItem *verticalSpacer;
