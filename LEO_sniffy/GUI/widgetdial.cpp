@@ -15,6 +15,7 @@ WidgetDial::WidgetDial(QWidget *parent, QString name) :
     ui->setupUi(this);
     ui->label_name->setText(name);
     ui->dial->setPageStep(1);
+    setObjectName(name);
 
     connect(ui->pushButton_plus,SIGNAL(clicked()),this,SLOT(plusClicked()));
     connect(ui->pushButton_minus,SIGNAL(clicked()),this,SLOT(minusClicked()));
@@ -71,13 +72,13 @@ void WidgetDial::setSelectedIndex(int index){
     emit valueChanged(options->at(index).realValue);
 }
 
-void WidgetDial::setDialColor(QString &textStyleSheet){
-    ui->widget_dial->setStyleSheet(textStyleSheet);
-}
+void WidgetDial::setColor(QString color){
+    QString style = "color:"+color;
+    ui->widget_dial->setStyleSheet(style);
 
-void WidgetDial::setDialButtonsColor(QString &bckgndStyleSheet){
-    ui->pushButton_plus->setStyleSheet(bckgndStyleSheet);
-    ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
+    style = "background-color:"+color;
+    ui->pushButton_plus->setStyleSheet(style);
+    ui->pushButton_minus->setStyleSheet(style);
 }
 
 int WidgetDial::getDefaultIndex() const

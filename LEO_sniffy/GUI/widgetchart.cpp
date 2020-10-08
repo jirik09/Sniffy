@@ -225,7 +225,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     if(event->type() != QEvent::LayoutRequest && event->type()!=QEvent::GraphicsSceneHoverMove){
      // qDebug() <<"Sereies event"<< event->type() << obj->objectName();
     }
-    return NULL;//QObject::eventFilter(obj, event);
+    return QObject::eventFilter(obj, event);
 }
 
 
@@ -285,6 +285,25 @@ void widgetChart::setRangeY(qreal minY, qreal maxY){
 void widgetChart::setRange(qreal minX, qreal maxX, qreal minY, qreal maxY){
     axisX->setRange(minX, maxX);
     axisY->setRange(minY, maxY);
+}
+
+qreal widgetChart::getSignalValue(int traceIndex, qreal time)
+{
+    qreal closestSmaller = -10000;
+    int closestSmallerIndex = 0;
+    for (int i =0;i<seriesList[traceIndex]->count();i++) {
+        if (seriesList[traceIndex]->at(i).x() < time && seriesList[traceIndex]->at(i).x()>closestSmaller ){
+            closestSmaller = seriesList[traceIndex]->at(i).x();
+            closestSmallerIndex = i;
+        }
+    }
+    if (closestSmallerIndex == seriesList[traceIndex]->count()-1){
+        return seriesList[traceIndex]->at(closestSmallerIndex).y();
+    }
+    qreal divY = seriesList[traceIndex]->at(closestSmallerIndex+1).y()-seriesList[traceIndex]->at(closestSmallerIndex).y();
+    qreal divX = seriesList[traceIndex]->at(closestSmallerIndex+1).x()-seriesList[traceIndex]->at(closestSmallerIndex).x();
+    qreal tmp = seriesList[traceIndex]->at(closestSmallerIndex).y()+(time-seriesList[traceIndex]->at(closestSmallerIndex).x())/divX*divY;
+    return tmp;
 }
 
 void widgetChart::setMargins(int left, int top, int right, int bottom){
@@ -515,6 +534,14 @@ void widgetChart::setVerticalCursor(int channelIndex, qreal value, Cursor type)
         cursorsVertical[1]->setPen(*pen);
         cursorsVertical[1]->replace(*lst);
     }
+}
+
+void widgetChart::clearAllCursors()
+{
+    cursorsVertical[0]->clear();
+    cursorsVertical[1]->clear();
+    cursorsHorizontal[0]->clear();
+    cursorsHorizontal[1]->clear();
 }
 
 void widgetChart::initContextMenu(){

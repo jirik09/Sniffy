@@ -12,7 +12,6 @@
 #include "../../GUI/widgetseparator.h"
 #include "../../GUI/widgetdial.h"
 #include "../../GUI/widgetdialrange.h"
-#include "../../GUI/widgetswitch.h"
 #include "../../GUI/widgetbuttons.h"
 #include "../../GUI/widgetlabel.h"
 #include "../../GUI/widgetselection.h"
@@ -90,11 +89,21 @@ private slots:
 
     void chartLocalZoomCallback();
 
+    void cursorTypeCallback(int index);
+    void cursorChannelCallback(int index);
+    void cursorValueHorACallback(float value);
+    void cursorValueHorBCallback(float value);
+    void cursorValueVerACallback(float value);
+    void cursorValueVerBCallback(float value);
+
+    void updateCursorReadings();
+
 
 public:
+
+private:
     Ui::ScopeWindow *ui;
     PanelSettings *panelSet;
-private:
     ScopeConfig *config;
     widgetChart *chart;
 

@@ -6,6 +6,7 @@
 
 #include "../modules/scope/measurement.h"
 #include "../graphics/colors.h"
+#include "../modules/labelformator.h"
 
 namespace Ui {
 class widgetLabelArea;
@@ -25,6 +26,11 @@ public:
     void setSamplingRateLabelText(QString text);
     void setScaleLabelText(QString text);
     void setMeasurements(QList<Measurement *> meas);
+    void setCursorVoltageReadings(qreal curA, qreal curB);
+    void setCursorTimeReadings(qreal curA, qreal curB);
+    void setCursorReadingsColor(int channelIndex);
+    void hideCursorReadings();
+
     void hideChannelLabels();
 
 

@@ -4,7 +4,7 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
 {
     destination->addWidget(new WidgetSeparator(parent,"Measurement"));
 
-    channelButtons = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Channel selection");
+    channelButtons = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Channel");
     channelButtons->setObjectName("measChannSelection");
     destination->addWidget(channelButtons);
     channelButtons->setText("CH1",0);

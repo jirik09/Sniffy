@@ -18,7 +18,7 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name) :
 {
     ui->setupUi(this);
     ui->label_name->setText(name);
-
+    setObjectName(name);
     units = new QList<params_unit>;
 }
 
@@ -29,26 +29,55 @@ WidgetDialRange::~WidgetDialRange()
 
 QByteArray WidgetDialRange::saveGeometry()
 {
-    //TO DO pass all the data including the min max range color etc
-    return QByteArray::number(realValue);
+    QByteArray *data;
+    data = new QByteArray();
+    QDataStream stream(data,QIODevice::WriteOnly);
+
+    stream << realValue;
+    stream << dialMaxValue;
+    stream << rangeMin;
+    stream << rangeMax;
+    return *data;
 }
 
 void WidgetDialRange::restoreGeometry(QByteArray geom)
 {
-    setRealValue(geom.toFloat());
+    QDataStream stream(geom);
+    stream >> realValue;
+    stream >> dialMaxValue;
+    stream >> rangeMin;
+    stream >> rangeMax;
+    updateRange(rangeMin,rangeMax);
+    setRealValue(realValue);
+}
+
+void WidgetDialRange::setColor(QString color){
+    QString style = "color:"+color;
+    ui->widget_dial->setStyleSheet(style);
+
+    style = "background-color:"+color;
+    ui->pushButton_plus->setStyleSheet(style);
+    ui->pushButton_minus->setStyleSheet(style);
 }
 
 void WidgetDialRange::setDialColor(QString &textStyleSheet){
     ui->widget_dial->setStyleSheet(textStyleSheet);
+    qDebug () << "OBSOLETE use setColor instead";
 }
 
 void WidgetDialRange::setDialButtonsColor(QString &bckgndStyleSheet){
     ui->pushButton_plus->setStyleSheet(bckgndStyleSheet);
     ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
+    qDebug () << "OBSOLETE use setColor instead";
 }
 
 float WidgetDialRange::getDefaultRealValue() const{
     return defaultRealValue;
+}
+
+float WidgetDialRange::getRealValue() const
+{
+    return realValue;
 }
 
 void WidgetDialRange::setRealValue(float value){
@@ -73,12 +102,26 @@ void WidgetDialRange::hideUnitSelection(void){
 
 void WidgetDialRange::plusClicked(){
     float tmpValue = labelValue + buttonStep;
+    if(abs(labelValue)>1000){
+        tmpValue = labelValue + buttonStep*10;
+    }else if(abs(labelValue)>500){
+        tmpValue = labelValue + buttonStep*5;
+    }else if(abs(labelValue)>200){
+        tmpValue = labelValue + buttonStep*2;
+    }
     realValue = tmpValue * unitMult;
     updateControls(0);
 }
 
 void WidgetDialRange::minusClicked(){
     float tmpValue = labelValue - buttonStep;
+    if(abs(labelValue)>1000){
+        tmpValue = labelValue - buttonStep*10;
+    }else if(abs(labelValue)>500){
+        tmpValue = labelValue - buttonStep*5;
+    }else if(abs(labelValue)>200){
+        tmpValue = labelValue - buttonStep*2;
+    }
     realValue = tmpValue * unitMult;
     updateControls(0);
 }
@@ -104,21 +147,15 @@ void WidgetDialRange::textEditFinished(){
 
 void WidgetDialRange::textEditChanged(const QString & text){
     bool success = false ;
-
-    //try local decimal separator
-    float flRead = QLocale().toFloat(text,&success);
-
-    //try . as a separator
-    if(!success){
+    float flRead = QLocale().toFloat(text,&success); //try local decimal separator
+    if(!success){  //try . as a separator
         flRead = text.toFloat(&success);
     }
-
     if (success){
         realValue = flRead * unitMult;
         updateControls(2);
     }
 }
-
 
 /*
 Set range fills the dial with options.
@@ -138,7 +175,6 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     rangePrecision = smalestUnitMult;
     dialStep = (max-min)/dialMaxValue;
     this->buttonStep = buttonStep;
-
     logaritmic = isLogaritmic;
 
     //min cannot be 0 for log scale --> set 0.001
@@ -151,8 +187,7 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
         logOffset = -logGain*log2(rangeMin);
     }
 
-    ui->dial->setMinimum(0);
-    ui->dial->setMaximum(dialMaxValue);
+    ui->dial->setRange(0,dialMaxValue);
 
     if(defaultValue<min){
         realValue=rangeMin;
@@ -193,7 +228,6 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
     connect(ui->lineEdit,SIGNAL(textEdited(const QString &)),this,SLOT(textEditChanged(const QString &)));
     connect(ui->lineEdit,SIGNAL(editingFinished()),this,SLOT(textEditFinished()));
-
     updateControls(0);
 }
 
@@ -220,6 +254,14 @@ void WidgetDialRange::updateRange(float min, float max)
         realValue=rangeMax;
         defaultRealValue = realValue;
     }
+    updateControls(0);
+}
+
+void WidgetDialRange::enableFineMousePrecision()
+{
+    dialMaxValue = 2500;
+    ui->dial->setRange(0,dialMaxValue);
+    updateRange(rangeMin,rangeMax);
 }
 
 void WidgetDialRange::updateControls(int except){

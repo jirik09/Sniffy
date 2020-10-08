@@ -7,7 +7,7 @@
 #include "math.h"
 
 #include "customdial.h"
-
+#include "../graphics/colors.h"
 
 
 namespace Ui {
@@ -32,16 +32,19 @@ public:
     void addOption (QString unitString,float mult);
     void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false);
     void updateRange(float min, float max);
+    void enableFineMousePrecision();
     void setRealValue(float value);
-    void hideUnitSelection(void);    
+    void hideUnitSelection(void);
+    void setColor(QString color);
     void setDialColor(QString &styleSheet);
     void setDialButtonsColor(QString &bckgndStyleSheet);
     float getDefaultRealValue() const;
+    float getRealValue() const;
 
 private:
     Ui::WidgetDialRange *ui;
     QList<params_unit> *units;
-    const int dialMaxValue = 500;
+    int dialMaxValue = 500;
     float realValue;
     float defaultRealValue = 0;
     float labelValue;

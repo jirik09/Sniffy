@@ -58,6 +58,7 @@ public:
     void setRangeX(qreal minX, qreal maxX);
     void setRangeY(qreal minY, qreal maxY);
     void setRange(qreal minX, qreal maxX, qreal minY, qreal maxY);
+    qreal getSignalValue (int traceIndex, qreal time);
     void setMargins(int left, int top, int right, int bottom);
 
     void setZoom(float invZoom);
@@ -80,6 +81,7 @@ public:
 
     void setHorizontalCursor(int channelIndex, qreal value, Cursor type);
     void setVerticalCursor(int channelIndex, qreal value, Cursor type);
+    void clearAllCursors();
 
 
 private:

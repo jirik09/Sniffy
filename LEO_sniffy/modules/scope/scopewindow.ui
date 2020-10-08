@@ -10,13 +10,13 @@
     <x>0</x>
     <y>0</y>
     <width>1289</width>
-    <height>350</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>400</width>
-    <height>350</height>
+    <width>600</width>
+    <height>480</height>
    </size>
   </property>
   <property name="contextMenuPolicy">
@@ -227,7 +227,7 @@ background-color: rgb(38, 38, 38);
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>10</height>
+           <height>25</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -278,7 +278,7 @@ background-color: rgb(38, 38, 38);
       </property>
       <property name="minimumSize">
        <size>
-        <width>150</width>
+        <width>200</width>
         <height>0</height>
        </size>
       </property>

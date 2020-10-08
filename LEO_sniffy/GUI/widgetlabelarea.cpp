@@ -9,9 +9,6 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     ui->widget_Hcursors->hide();
     ui->widget_Vcursors->hide();
     ui->widget_meas->hide();
-    ui->widget_measAndCursors->hide();
-
-   // labelList = new QList<QLabel*>();
 
     measLabelList.append(ui->label_meas1);
     measLabelList.append(ui->label_meas2);
@@ -85,13 +82,11 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
 
     if(meas.length()==0){
         ui->widget_meas->hide();
-        ui->widget_measAndCursors->hide();
         foreach(QLabel *label, measLabelList){
             label->hide();
         }
     }else{
         ui->widget_meas->show();
-        ui->widget_measAndCursors->show();
     }
 
     foreach(Measurement* m, meas){
@@ -107,5 +102,37 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
             measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(3)));
         fillIndex++;
     }
+}
+
+
+
+void WidgetLabelArea::setCursorVoltageReadings(qreal curA, qreal curB)
+{
+    ui->label_Vcursor_title->setText("Cursors:");
+    ui->label_Vcursor1->setText("A: "+ LabelFormator::formatOutout(curA,"V"));
+    ui->label_Vcursor2->setText("B: "+ LabelFormator::formatOutout(curB,"V"));
+    ui->label_Vcursor3->setText("Diff: "+ LabelFormator::formatOutout(curA-curB,"V"));
+    ui->widget_Vcursors->show();
+}
+
+void WidgetLabelArea::setCursorTimeReadings(qreal curA, qreal curB)
+{
+    ui->label_Hcursor_title->setText("A: "+ LabelFormator::formatOutout(curA,"s"));
+    ui->label_Hcursor1->setText("B: "+ LabelFormator::formatOutout(curB,"s"));
+    ui->label_Hcursor2->setText("Diff: "+ LabelFormator::formatOutout(curA-curB,"s"));
+    ui->label_Hcursor3->setText("Freq: "+ LabelFormator::formatOutout(abs(1/(curA-curB)),"Hz"));
+    ui->widget_Hcursors->show();
+}
+
+void WidgetLabelArea::setCursorReadingsColor(int channelIndex)
+{
+    ui->widget_Hcursors->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(channelIndex)));
+    ui->widget_Vcursors->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(channelIndex)));
+}
+
+void WidgetLabelArea::hideCursorReadings()
+{
+    ui->widget_Vcursors->hide();
+    ui->widget_Hcursors->hide();
 }
 

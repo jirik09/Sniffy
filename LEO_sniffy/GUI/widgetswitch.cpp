@@ -13,6 +13,7 @@ WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftName, QString rightName,
     ui->setupUi(this);
 
     ui->label_name->setText(name);
+    setObjectName(name);
 
     ui->pushButton_left->setStyleSheet(SELECTED_STYLE);
     ui->pushButton_right->setStyleSheet(NOT_SELECTED_STYLE);
