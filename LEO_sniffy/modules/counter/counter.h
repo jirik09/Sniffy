@@ -28,7 +28,7 @@ public:
 private:
 
     CounterWindow *cntWindow;
-    CounterConfig *conf;
+    CounterConfig *config;
     CounterSpec *spec;
 
     void startCounting();

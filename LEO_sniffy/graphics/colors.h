@@ -36,6 +36,7 @@
 #define COLOR_DARK_CYAN "rgb(30,170,100);"
 #define COLOR_PINK "rgb(255,18,108);"
 #define COLOR_BLACK "rgb(0,0,0);"
+#define COLOR_HOVER "rgb(71,76,94);"
 
 #define QCOLOR_RED QColor(224,24,0)
 #define QCOLOR_BROWN QColor(170,105,39)

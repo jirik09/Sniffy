@@ -41,13 +41,13 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     QPushButton *down = new QPushButton();
     down->resize(10,10);
     down->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/dock.png);}"
-                                          "QPushButton:hover{background-color: rgb(71, 76, 94);}"));
+                                          "QPushButton:hover{background-color: ")+COLOR_HOVER+"}");
     titleBarLayout->addWidget(down);
 
     QPushButton *up = new QPushButton();
     up->resize(10,10);
     up->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/unDock.png);}"
-                                        "QPushButton:hover{background-color: rgb(71, 76, 94);}"));
+                                        "QPushButton:hover{background-color: ")+COLOR_HOVER+"}");
     titleBarLayout->addWidget(up);
 
     QPushButton *exit = new QPushButton();
