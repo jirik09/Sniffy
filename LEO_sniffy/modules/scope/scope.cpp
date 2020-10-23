@@ -303,8 +303,7 @@ void Scope::updateMeasurement(QList<Measurement*> m){
 
 void Scope::updateMath(int errorPosition)
 {
-    if(errorPosition==0)
-        scpWindow->updateMath(mathCalc->getCalculatedMathTrace());
+    scpWindow->updateMath(mathCalc->getCalculatedMathTrace());
     scpWindow->mathError(errorPosition);
 }
 

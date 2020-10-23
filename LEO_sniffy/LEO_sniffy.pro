@@ -50,6 +50,7 @@ SOURCES += \
     mainwindow.cpp \
     math/movingaverage.cpp \
     math/timing.cpp \
+    math/tinyexpr.c \
     modules/abstractmodule.cpp \
     modules/abstractspecification.cpp \
     modules/counter/counter.cpp \

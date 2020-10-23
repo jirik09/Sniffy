@@ -46,8 +46,11 @@ void MathCalculations::run()
         qint32 samplingFreq = this->samplingFreq;
         mutex.unlock();
 
-        if(expression == "")return;
-       // qDebug () << expression;
+        if(expression == ""){
+            outputData = tmpTrace;
+            return;
+        }
+        // qDebug () << expression;
 
         this->errorPosition=calcSymbolic(data,tmpTrace,expression);
 
@@ -89,9 +92,14 @@ int MathCalculations::calcSymbolic(QVector<QVector<QPointF> > inData, QVector<QP
 
     std::string ex = expression.toStdString();
     const char *expChar = ex.data();
-    /* This will compile the expression and check for errors. */
     int err;
     te_expr *n = te_compile(expChar, vars, variableCount, &err);
+
+    if(err!=0){
+        te_free(n);
+        outData.clear();
+        return  err;
+    }
 
     for (int i = 0;i<inData[0].length();i++) {
         if(variableCount>=2){

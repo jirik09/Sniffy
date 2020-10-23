@@ -91,8 +91,6 @@ void ScopeWindow::paintEvent(QPaintEvent *event){
 
 void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex){
     updateChartTimeScale(timeBase);
-    labelInfoPanel->setTriggerLabelText("");
-    labelInfoPanel->hideChannelLabels();
 
     this->triggerChannelIndex = triggerChannelIndex;
     ChartData = dataSeries;
@@ -101,6 +99,8 @@ void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float tim
 
 void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPointF> mathSeries){
     chart->clearAll();
+    labelInfoPanel->setTriggerLabelText("");
+    labelInfoPanel->hideChannelLabels();
 
     //paint math
     paintMath(mathSeries);
@@ -139,6 +139,9 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
 }
 
 void ScopeWindow::paintMath(QVector<QPointF> mathSeries){
+    if(mathSeries.length()<=1){
+        return;
+    }
     for (int k = 0; k < ChartMathData.length(); k++){
         mathSeries[k].setY((mathSeries[k].y()+config->channelOffset[4])/config->channelScale[4]);
     }
@@ -151,6 +154,9 @@ void ScopeWindow::paintMath(QVector<QPointF> mathSeries){
     }else{
         chart-> setHorizontalMarker(4,zeroMarkerPosition,MarkerType::TICK);
     }
+
+    labelInfoPanel->setChannelLabelVisible(4,true);
+    labelInfoPanel->setChannelScale(4,LabelFormator::formatOutout(config->channelScale[4],"V/div"));
 }
 
 void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
