@@ -36,6 +36,7 @@ SOURCES += \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
     GUI/widgettab.cpp \
+    GUI/widgettextinput.cpp \
     communication/commands.cpp \
     communication/comms.cpp \
     communication/devicescanner.cpp \
@@ -64,9 +65,11 @@ SOURCES += \
     modules/device/device.cpp \
     modules/device/devicewindow.cpp \
     modules/device/devicespec.cpp \
+    modules/scope/mathcalculations.cpp \
     modules/scope/meascalculations.cpp \
     modules/scope/measurement.cpp \
     modules/scope/panelcursors.cpp \
+    modules/scope/panelmath.cpp \
     modules/scope/panelmeasurement.cpp \
     modules/scope/panelsettings.cpp \
     modules/scope/scope.cpp \
@@ -94,6 +97,7 @@ HEADERS += \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
     GUI/widgettab.h \
+    GUI/widgettextinput.h \
     communication/commands.h \
     communication/comms.h \
     communication/connectiontype.h \
@@ -108,6 +112,7 @@ HEADERS += \
     mainwindow.h \
     math/movingaverage.h \
     math/timing.h \
+    math/tinyexpr.h \
     modules/abstractspecification.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
@@ -124,9 +129,11 @@ HEADERS += \
     modules/device/device.h \
     modules/device/devicewindow.h \
     modules/device/devicespec.h \
+    modules/scope/mathcalculations.h \
     modules/scope/meascalculations.h \
     modules/scope/measurement.h \
     modules/scope/panelcursors.h \
+    modules/scope/panelmath.h \
     modules/scope/panelmeasurement.h \
     modules/scope/panelsettings.h \
     modules/scope/scope.h \
@@ -152,6 +159,7 @@ FORMS += \
     GUI/widgetseparator.ui \
     GUI/widgetswitch.ui \
     GUI/widgettab.ui \
+    GUI/widgettextinput.ui \
     mainwindow.ui \
     modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \
