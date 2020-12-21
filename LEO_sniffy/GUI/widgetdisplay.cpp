@@ -451,13 +451,13 @@ void WidgetDisplay::historyButtonClickedCallback(){
 
     if(historyView == DISABLED){
         sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
-        style = "QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
+                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
         historyView = ENABLED;
     }else {
         sizes = {0, cmpltWidth};
-        style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
+                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
         historyView = DISABLED;
     }
     ui->splitter->setSizes(sizes);
@@ -467,14 +467,14 @@ void WidgetDisplay::historyButtonClickedCallback(){
 void WidgetDisplay::listChartSwitchClickedCallback(){
     QString style;
     if(listView == DISABLED){
-        style = "QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"
+                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
         chart->hide();
         list->show();
         listView = ENABLED;
     }else {
-        style = "QPushButton{image: url(:/graphics/graphics/icon_list.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_list.png);}"
+                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
         chart->show();
         list->hide();
         listView = DISABLED;
