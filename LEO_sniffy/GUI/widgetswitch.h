@@ -30,8 +30,8 @@ signals:
     void clicked(int index);
 
 private slots:
-    void setRight();
-    void setLeft();
+    void setRight(bool silent = false);
+    void setLeft(bool silent = false);
 };
 
 #endif // WIDGETSWITCH_H

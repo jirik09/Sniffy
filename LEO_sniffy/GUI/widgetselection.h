@@ -20,6 +20,8 @@ class WidgetSelection : public QWidget
 public:
     explicit WidgetSelection(QWidget *parent = nullptr, QString name = "");
     ~WidgetSelection();
+    QByteArray saveGeometry();
+    void restoreGeometry(QByteArray geom);
 
 private:
     Ui::WidgetSelection *ui;

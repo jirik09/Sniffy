@@ -322,6 +322,11 @@ qreal widgetChart::getLocalZoom(){
     return localZoom;
 }
 
+void widgetChart::setLocalZoom(const qreal &value)
+{
+    localZoom = value;
+}
+
 /* range -100 to 100 (represents percent value) */
 void widgetChart::setShift (float shift){
     this->shift = (shift/2+50)/100;
@@ -541,6 +546,8 @@ void widgetChart::clearAllCursors()
     cursorsHorizontal[0]->clear();
     cursorsHorizontal[1]->clear();
 }
+
+
 
 void widgetChart::initContextMenu(){
     menu = new QMenu(tr("Context menu"), this);

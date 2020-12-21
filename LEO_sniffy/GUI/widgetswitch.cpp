@@ -42,22 +42,24 @@ QByteArray WidgetSwitch::saveGeometry()
 void WidgetSwitch::restoreGeometry(QByteArray geom)
 {
     if (geom == "L"){
-        setLeft();
+        setLeft(true);
     }else{
-        setRight();
+        setRight(true);
     }
 }
 
-void WidgetSwitch::setLeft(){
+void WidgetSwitch::setLeft(bool silent){
     ui->pushButton_left->setStyleSheet(SELECTED_STYLE);
     ui->pushButton_right->setStyleSheet(NOT_SELECTED_STYLE);
-    emit clicked(0);
+    if (!silent)
+        emit clicked(0);
 }
 
-void WidgetSwitch::setRight(){
+void WidgetSwitch::setRight(bool silent){
     ui->pushButton_right->setStyleSheet(SELECTED_STYLE);
     ui->pushButton_left->setStyleSheet(NOT_SELECTED_STYLE);
-    emit clicked(1);
+    if(!silent)
+        emit clicked(1);
 }
 
 bool WidgetSwitch::isCheckedLeft(){

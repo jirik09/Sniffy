@@ -64,6 +64,7 @@ public:
     void setZoom(float invZoom);
     qreal getZoom();
     qreal getLocalZoom();
+    void setLocalZoom(const qreal &value);
     void setShift (float shift);
     qreal getShift();
     void enableLocalMouseZoom();
@@ -82,6 +83,8 @@ public:
     void setHorizontalCursor(int channelIndex, qreal value, Cursor type);
     void setVerticalCursor(int channelIndex, qreal value, Cursor type);
     void clearAllCursors();
+
+
 
 
 private:

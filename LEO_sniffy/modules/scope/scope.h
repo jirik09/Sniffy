@@ -65,7 +65,6 @@ private:
     MeasCalculations *measCalc;
     MathCalculations *mathCalc;
     QVector<QVector<QPointF>> *scopeData;
-    QList<Measurement *> scopeMeas;
     QString mathExpression;
 
     //private functions - writing into device only - no logic

@@ -60,9 +60,11 @@ public:
     int cursorsActiveIndex = 0;
     float timeMin = -0.01;
     float timeMax = 0.01;
+    qreal chartLocalZoom = 1;
+    qreal chartShift = 1;
 
     int measCount = 0;
-    QList<Measurement *> scopeMeas;
+    QList<Measurement *> scopeMeasList;
 
 };
 

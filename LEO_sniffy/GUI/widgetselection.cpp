@@ -20,6 +20,16 @@ WidgetSelection::~WidgetSelection()
     delete ui;
 }
 
+QByteArray WidgetSelection::saveGeometry()
+{
+    return  QByteArray::number(getSelected());
+}
+
+void WidgetSelection::restoreGeometry(QByteArray geom)
+{
+    setSelected(geom.toInt());
+}
+
 void WidgetSelection::addOption (QString shownValue,float realValue){
     params_sel *par = new params_sel();
     par->shownValue = shownValue;

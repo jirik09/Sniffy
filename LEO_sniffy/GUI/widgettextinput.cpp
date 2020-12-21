@@ -19,6 +19,16 @@ WidgetTextInput::~WidgetTextInput()
     delete ui;
 }
 
+QByteArray WidgetTextInput::saveGeometry()
+{
+    return getText().toUtf8();
+}
+
+void WidgetTextInput::restoreGeometry(QByteArray geom)
+{
+    ui->lineEdit->setText(geom);
+}
+
 QString WidgetTextInput::getText()
 {
     return  ui->lineEdit->text();

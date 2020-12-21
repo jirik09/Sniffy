@@ -31,7 +31,7 @@ public:
     void restoreGeometry(QByteArray geom);
     void addOption (QString unitString,float mult);
     void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false);
-    void updateRange(float min, float max);
+    void updateRange(float min, float max, bool silent = false);
     void enableFineMousePrecision();
     void setRealValue(float value);
     void hideUnitSelection(void);
@@ -62,7 +62,7 @@ private:
     float logOffset = 0;
     float logGain = 0;
 
-    void updateControls(int except);
+    void updateControls(int except, bool silent = false);
     float getRealValueFromDial(int in);
     int getValueForDial(float real);
 

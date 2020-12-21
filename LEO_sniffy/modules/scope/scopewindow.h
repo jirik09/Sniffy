@@ -58,6 +58,7 @@ public:
     void updateMath(QVector<QPointF> mathTrace);
     void mathError(int errorPosition);
     void passConfig(ScopeConfig &conf);
+    void restoreGUIAfterStartup();
 
 
 signals:

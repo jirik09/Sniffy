@@ -37,11 +37,12 @@ private slots:
     void lowClicked();
     void phaseClicked();
     void clearClicked();
-
+public slots:
     void setMeasButtonsColor(int index);
 
-private:
+public:
     WidgetButtons *channelButtons;
+private:
     WidgetButtons *channelButtonPhaseA;
     WidgetButtons *channelButtonPhaseB;
 

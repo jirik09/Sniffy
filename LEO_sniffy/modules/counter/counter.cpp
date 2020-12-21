@@ -550,6 +550,12 @@ void Counter::intDialTimeoutChangedCallback(float val){
 }
 
 void Counter::writeConfiguration(){
+    cntWindow->restoreGUIAfterStartup();
+
+    //TODO
+    //zapsat predchozi konfiguraci do MCU (config je nacteny)
+    //geometrie a GUI je nactene ale do MCU se nic neposlalo
+    //tahle funkce se vola vzdy pri otevreni modulu
 
 }
 

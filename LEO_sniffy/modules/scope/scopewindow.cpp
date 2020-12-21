@@ -134,7 +134,6 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
             panelCursors->cursorVerBDial->updateRange(config->rangeMin,(float)(config->rangeMax)/1000);
         }
     }
-
     chart->setVerticalMarker(triggerChannelIndex,0);
 }
 
@@ -281,6 +280,7 @@ void ScopeWindow::mathExpressionCallback(QString exp)
 
 void ScopeWindow::sliderShiftCallback(int value){
     chart->setShift((float)value/10);
+    config->chartShift = (float)value/10;
 }
 
 void ScopeWindow::chartLocalZoomCallback()
@@ -409,6 +409,23 @@ void ScopeWindow::passConfig(ScopeConfig &conf)
     this->config = &conf;
 }
 
+void ScopeWindow::restoreGUIAfterStartup()
+{
+    chart->setLocalZoom(config->chartLocalZoom);
+    chart->setShift(config->chartShift);
+    ui->sliderSignal->setValue((chart->getShift()*2000)-1000);
+
+    int vertical = panelSet->buttonsChannelVertical->getSelectedIndex();
+    panelSet->dialVerticalScale->setColor(Colors::getChannelColorString(vertical));
+    panelSet->dialVerticalShift->setColor(Colors::getChannelColorString(vertical));
+
+    channelEnableCallback(panelSet->buttonsChannelEnable->getStatus());
+    cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());
+
+    panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
+    panelMath->typeChanged(panelMath->mathType->getSelectedIndex());
+}
+
 void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
     panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_ORANGE),0);
@@ -436,6 +453,7 @@ void ScopeWindow::updateChartTimeScale(float timeBase){
     }else{
         labelInfoPanel->setStyleSheet(QString::fromUtf8("color:")+COLOR_WHITE);
     }
+    config->chartLocalZoom = chart->getLocalZoom();
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/div"));
 }
 

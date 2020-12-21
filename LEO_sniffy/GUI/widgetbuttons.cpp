@@ -105,7 +105,7 @@ void WidgetButtons::restoreGeometry(QByteArray geom)
             index = geom.toInt()-1;
         }
         setChecked(true,index);
-        emit clicked(index);
+        //emit clicked(index);
     }else{
         int status = geom.toInt();
         if(status & 0x01){
@@ -132,7 +132,7 @@ void WidgetButtons::restoreGeometry(QByteArray geom)
         if(status & 0x80){
             setChecked(true,7);
         }
-        emit statusChanged(status);
+      //  emit statusChanged(status);
     }
 }
 
