@@ -199,7 +199,9 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
 
     defaultRealValue = realValue;
 
-
+    if (smalestUnitMult<=1e-6){
+        addOption("n"+baseUnit,0.000000001);
+    }
     if (smalestUnitMult<1e-3){
         addOption("u"+baseUnit,0.000001);
     }
@@ -286,7 +288,7 @@ void WidgetDialRange::updateControls(int except){
             ui->comboBox->setCurrentIndex(i);
             connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
 
-            if(tempLabelVal>=1 && tempLabelVal<1000){
+            if(abs(tempLabelVal)>=1 && abs(tempLabelVal)<1000){
                 break;
             }
         }
