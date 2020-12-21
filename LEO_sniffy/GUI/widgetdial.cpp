@@ -97,7 +97,7 @@ void WidgetDial::plusClicked(){
     if(selectedIndex>=options->length()){
         selectedIndex = options->length()-1;
     }
-    setSelectedIndex(selectedIndex);
+    ui->comboBox->setCurrentIndex(selectedIndex);
 }
 
 void WidgetDial::minusClicked(){
@@ -105,7 +105,7 @@ void WidgetDial::minusClicked(){
     if(selectedIndex<0){
         selectedIndex = 0;
     }
-    setSelectedIndex(selectedIndex);
+    ui->comboBox->setCurrentIndex(selectedIndex);
 }
 
 void WidgetDial::valChanged(int in){

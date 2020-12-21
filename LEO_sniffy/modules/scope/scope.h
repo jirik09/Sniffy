@@ -16,6 +16,7 @@
 #include "communication/comms.h"
 #include "measurement.h"
 #include "meascalculations.h"
+#include "mathcalculations.h"
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
@@ -53,6 +54,8 @@ public slots:
     void updateChannelsEnable(int buttonStatus);
     void addMeasurement(Measurement *m);
     void updateMeasurement(QList<Measurement*> m);
+    void updateMath(int errorPosition);
+    void updateMathExpression(QString exp);
     void clearMeasurement();
 
 private:
@@ -60,8 +63,10 @@ private:
     ScopeConfig *config;
     ScopeSpec *specification;
     MeasCalculations *measCalc;
+    MathCalculations *mathCalc;
     QVector<QVector<QPointF>> *scopeData;
     QList<Measurement *> scopeMeas;
+    QString mathExpression;
 
     //private functions - writing into device only - no logic
     void stopSampling();

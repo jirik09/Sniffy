@@ -21,6 +21,9 @@
 class SerialLine : public QObject
 {
     Q_OBJECT
+
+#define delimiterRaw  "\xCA\xFE\xFA\xDE"
+
 public:
     explicit SerialLine(QObject *parent = nullptr);
 
@@ -46,8 +49,7 @@ private:
 
     QByteArray *message;
 
-    const char delimiterRaw[4] = { '\xCA', '\xFE', '\xFA', '\xDE'};
-    const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
+   const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
 
     SerialPortReader *serialReader;
     SerialPortWriter *serialWriter;

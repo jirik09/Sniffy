@@ -35,6 +35,8 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     ui->label_ch2->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(1)));
     ui->label_ch3->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(2)));
     ui->label_ch4->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(3)));
+    ui->label_math1->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(4)));
+    ui->label_math2->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(5)));
 
     foreach(QLabel *label, channLabelList){
         label->hide();
@@ -62,7 +64,11 @@ void WidgetLabelArea::hideChannelLabels(){
 
 void WidgetLabelArea::setChannelScale(int index, QString Scale){
     int ch = index +1;
-    channLabelList[index]->setText("CH"+QString::number(ch)+" "+Scale+" ");
+    if(index>3){
+        channLabelList[index]->setText("Math "+Scale+" ");
+    }else{
+        channLabelList[index]->setText("CH"+QString::number(ch)+" "+Scale+" ");
+    }
 }
 
 void WidgetLabelArea::setTriggerLabelText(QString text){
