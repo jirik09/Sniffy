@@ -9,9 +9,11 @@
 
 #include "measurement.h"
 
+#include "../abstractconfiguration.h"
 
 
-class ScopeConfig : public QObject
+
+class ScopeConfig : public AbstractConfiguration
 {
     Q_OBJECT
 public:
@@ -23,12 +25,11 @@ public:
     //all parameters must be initialized to default values and also aligned with GUI (I know it is not good)
 
     //parameters really in HW (received each time with data)
-
-    int realSamplingRate = 1000;
-    int ADCresolution = 12;
+    int realSamplingRate;
+    int ADCresolution;
     int dataLength = 1200;
-    int rangeMin = 0; //mV
-    int rangeMax = 3300; //mv
+    int rangeMin; //mV
+    int rangeMax; //mv
 
     int numberOfChannels = 1;
     int triggerLevel = 32767; //16bit number

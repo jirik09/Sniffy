@@ -1,7 +1,8 @@
 #include "scopeconfig.h"
 
-ScopeConfig::ScopeConfig(QObject *parent) : QObject(parent)
+ScopeConfig::ScopeConfig(QObject *parent)
 {
+    Q_UNUSED(parent);
 }
 
 void ScopeConfig::parse(QByteArray config)
@@ -68,6 +69,7 @@ void ScopeConfig::parse(QByteArray config)
         m->setLabel(label);
         scopeMeasList.append(m);
     }
+    isConfigurationLoaded = true;
 
    // qDebug() << "Cofig from scope is being parsed "+config;
 }

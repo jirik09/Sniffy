@@ -18,9 +18,6 @@
 #include "meascalculations.h"
 #include "mathcalculations.h"
 
-#include "../../GUI/widgetcontrolmodule.h"
-#include "../../GUI/moduledockwidget.h"
-
 #include "../abstractmodule.h"
 
 class Scope : public AbstractModule
@@ -36,7 +33,7 @@ signals:
     //(must be done in abstract module and handled in device.cpp)
 
 public slots:
-    void parseData(QByteArray);
+    void parseData(QByteArray data);
     void writeConfiguration();
     void parseConfiguration(QByteArray config);
     QByteArray getConfiguration();

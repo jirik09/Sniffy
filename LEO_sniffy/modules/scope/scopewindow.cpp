@@ -10,9 +10,10 @@ But it can be easily coppied so we can keep some template file.
 #include "scopewindow.h"
 #include "ui_scopewindow.h"
 
-ScopeWindow::ScopeWindow(QWidget *parent) :
+ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ScopeWindow)
+    ui(new Ui::ScopeWindow),
+    config(config)
 {
     ui->setupUi(this);
 
@@ -404,11 +405,6 @@ void ScopeWindow::mathError(int errorPosition)
     panelMath->symbolicError(errorPosition);
 }
 
-void ScopeWindow::passConfig(ScopeConfig &conf)
-{
-    this->config = &conf;
-}
-
 void ScopeWindow::restoreGUIAfterStartup()
 {
     chart->setLocalZoom(config->chartLocalZoom);
@@ -424,6 +420,9 @@ void ScopeWindow::restoreGUIAfterStartup()
 
     panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
     panelMath->typeChanged(panelMath->mathType->getSelectedIndex());
+    if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
+        panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+    }
 }
 
 void ScopeWindow::singleSamplingDone(){

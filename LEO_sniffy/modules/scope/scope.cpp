@@ -7,9 +7,8 @@ Scope::Scope(QObject *parent)
     specification = new ScopeSpec();
     measCalc = new MeasCalculations();
     mathCalc = new MathCalculations();
-    scpWindow = new ScopeWindow();
+    scpWindow = new ScopeWindow(config);
     scpWindow->setObjectName("scpWindow");
-    scpWindow->passConfig(*config);
 
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SCOPE;

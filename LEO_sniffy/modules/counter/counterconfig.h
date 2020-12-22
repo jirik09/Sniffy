@@ -6,6 +6,8 @@
 
 #include "counterdefs.h"
 
+#include "../abstractconfiguration.h"
+
 enum class CounterMode
 {
     HIGH_FREQUENCY = 0,
@@ -57,7 +59,7 @@ struct IntState
 };
 
 
-class CounterConfig : public QObject
+class CounterConfig : public AbstractConfiguration
 {
     Q_OBJECT
 public:
