@@ -29,10 +29,12 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     destination->addLayout(horizontalLayout_switchArea);
 
     switchEdgeEventA = new WidgetSwitch(parent, "Rising", "Falling", "");
+    switchEdgeEventA->setObjectName("edgeEventA");
     switchEdgeEventA->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
     horizontalLayout_switchArea->addWidget(switchEdgeEventA);
 
     switchEdgeEventB = new WidgetSwitch(parent, "Rising", "Falling", "");
+    switchEdgeEventB->setObjectName("edgeEventB");
     switchEdgeEventB->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
     horizontalLayout_switchArea->addWidget(switchEdgeEventB);
 

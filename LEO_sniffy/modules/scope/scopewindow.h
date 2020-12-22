@@ -40,7 +40,7 @@ class ScopeWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit ScopeWindow(QWidget *parent = nullptr);
+    explicit ScopeWindow(ScopeConfig *config, QWidget *parent = nullptr);
     ~ScopeWindow();
     void paintEvent(QPaintEvent *event);
 
@@ -57,7 +57,7 @@ public:
     void updateMeasurement(QList<Measurement*> m);
     void updateMath(QVector<QPointF> mathTrace);
     void mathError(int errorPosition);
-    void passConfig(ScopeConfig &conf);
+    void restoreGUIAfterStartup();
 
 
 signals:

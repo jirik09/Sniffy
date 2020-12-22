@@ -7,9 +7,8 @@ Scope::Scope(QObject *parent)
     specification = new ScopeSpec();
     measCalc = new MeasCalculations();
     mathCalc = new MathCalculations();
-    scpWindow = new ScopeWindow();
+    scpWindow = new ScopeWindow(config);
     scpWindow->setObjectName("scpWindow");
-    scpWindow->passConfig(*config);
 
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SCOPE;
@@ -128,7 +127,7 @@ void Scope::parseData(QByteArray data){
         }
 
         if(currentChannel==numChannels){
-            measCalc->calculate(*scopeData,scopeMeas,config->realSamplingRate);
+            measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
             mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
             scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
 
@@ -153,9 +152,9 @@ void Scope::parseData(QByteArray data){
 }
 
 void Scope::writeConfiguration(){
+    scpWindow->restoreGUIAfterStartup();
     updateTimebase(config->timeBase);
 
-    //this one will be done like others
     setDataLength(config->dataLength);
 
     updateTriggerLevel(config->triggerLevelPercent);
@@ -167,7 +166,6 @@ void Scope::writeConfiguration(){
 
     setNumberOfChannels(config->numberOfChannels);
     updateTriggerMode(config->triggerMode);
-
 }
 
 void Scope::parseConfiguration(QByteArray config){
@@ -285,16 +283,18 @@ void Scope::updateChannelsEnable(int buttonStatus){
 }
 
 void Scope::addMeasurement(Measurement *m){
-    scopeMeas.append(m);
-    if(scopeMeas.length()>9){
-        scopeMeas.removeFirst();
+    config->scopeMeasList.append(m);
+    if(config->scopeMeasList.length()>9){
+        config->scopeMeasList.removeFirst();
     }
-    measCalc->calculate(*scopeData,scopeMeas,config->realSamplingRate);
+    config->measCount= config->scopeMeasList.length();
+    measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
 }
 
 void Scope::clearMeasurement(){
-    scopeMeas.clear();
-    updateMeasurement(scopeMeas);
+    config->scopeMeasList.clear();
+    config->measCount = 0;
+    updateMeasurement(config->scopeMeasList);
 }
 
 void Scope::updateMeasurement(QList<Measurement*> m){

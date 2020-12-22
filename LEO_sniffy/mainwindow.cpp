@@ -137,8 +137,8 @@ void MainWindow::saveLayout()
 {
     if(deviceMediator->getIsConnected()){
         QSharedPointer<AbstractModule> module;
-        layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
-        configFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".cfg";
+        layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
+        configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
 
         QSettings layout(layoutFile, QSettings::IniFormat);
         layout.setValue("geometry", saveGeometry());
@@ -158,7 +158,7 @@ void MainWindow::saveLayout()
 
 void MainWindow::loadLayout(QString deviceName)
 {
-    layoutFile = QApplication::applicationDirPath() + "/"+deviceName+".lay";
+    layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".lay";
     QFile file(layoutFile);
     if(!file.exists()){
         return;
@@ -172,8 +172,8 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 {
     QString layoutFile;
     QString configFile;
-    layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
-    configFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".cfg";
+    layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
+    configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
     QSharedPointer<AbstractModule> module;
 
     QFile file(layoutFile);
@@ -192,10 +192,14 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
             status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
             config = settings.value(module->getModuleName()+"config").toByteArray();
             module->parseConfiguration(config);
-            module->writeConfiguration();
+
             module->restoreGeometry(layout);
-            if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY)
+            if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE){
+                if(status == ModuleStatus::PAUSE)
+                    status = ModuleStatus::PLAY;
+                module->writeConfiguration();
                 module->startModule();
+            }
             module->setModuleStatus(status);
         }
     }

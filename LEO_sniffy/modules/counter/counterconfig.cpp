@@ -1,7 +1,9 @@
 #include "counterconfig.h"
 
-CounterConfig::CounterConfig(QObject *parent) : QObject(parent)
+CounterConfig::CounterConfig(QObject *parent)
 {
+    Q_UNUSED(parent);
+    //if param tak parse else
     mode = CounterMode::HIGH_FREQUENCY;
     modePrevIndex = CounterMode::HIGH_FREQUENCY;
 

@@ -37,9 +37,9 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
         if(sPort->open(QIODevice::ReadWrite)){
             sPort->clear();
             sPort->write("IDN?;");
-            sPort->waitForBytesWritten(1000);
-            sPort->waitForReadyRead(250);
-            QThread::msleep(350);
+            sPort->waitForBytesWritten(100);
+            sPort->waitForReadyRead(150);
+            QThread::msleep(250);
 
             received = sPort->readAll();
 

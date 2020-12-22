@@ -51,6 +51,7 @@ SOURCES += \
     math/movingaverage.cpp \
     math/timing.cpp \
     math/tinyexpr.c \
+    modules/abstractconfiguration.cpp \
     modules/abstractmodule.cpp \
     modules/abstractspecification.cpp \
     modules/counter/counter.cpp \
@@ -76,7 +77,11 @@ SOURCES += \
     modules/scope/scope.cpp \
     modules/scope/scopeconfig.cpp \
     modules/scope/scopespec.cpp \
-    modules/scope/scopewindow.cpp
+    modules/scope/scopewindow.cpp \
+    modules/template/templatemodule.cpp \
+    modules/template/templatemoduleconfig.cpp \
+    modules/template/templatemodulespec.cpp \
+    modules/template/templatemodulewindow.cpp
 
 
 HEADERS += \
@@ -114,6 +119,7 @@ HEADERS += \
     math/movingaverage.h \
     math/timing.h \
     math/tinyexpr.h \
+    modules/abstractconfiguration.h \
     modules/abstractspecification.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
@@ -141,7 +147,11 @@ HEADERS += \
     modules/scope/scopeconfig.h \
     modules/scope/scopedefs.h \
     modules/scope/scopespec.h \
-    modules/scope/scopewindow.h
+    modules/scope/scopewindow.h \
+    modules/template/templatemodule.h \
+    modules/template/templatemoduleconfig.h \
+    modules/template/templatemodulespec.h \
+    modules/template/templatemodulewindow.h
 
 
 
@@ -164,7 +174,8 @@ FORMS += \
     mainwindow.ui \
     modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \
-    modules/scope/scopewindow.ui
+    modules/scope/scopewindow.ui \
+    modules/template/templatemodulewindow.ui
 
 
 TRANSLATIONS += \

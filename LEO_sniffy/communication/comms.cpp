@@ -107,8 +107,8 @@ void Comms::parseMessage(QByteArray message){
     //just pass the data
 #ifdef DEBUG_COMMS
     QDateTime date = QDateTime::currentDateTime();
-    if(message.length()>96){
-        qDebug() <<"COMM_READ ("<< date.time()<<"):"<< message.left(64)<<"..."<<message.right(16);
+    if(message.length()>64){
+        qDebug() <<"COMM_READ ("<< date.time()<<"):"<< message.left(40)<<"..."<<message.right(16);
     }else{
         qDebug() <<"COMM_READ ("<< date.time()<<"):"<< message;
     }
