@@ -2,6 +2,8 @@
 
 CounterConfig::CounterConfig(QObject *parent) : QObject(parent)
 {
+    isCounterHeld = false;
+
     mode = CounterMode::HIGH_FREQUENCY;
     modePrevIndex = CounterMode::HIGH_FREQUENCY;
 
@@ -34,6 +36,7 @@ void CounterConfig::parse(QByteArray config)
 {
     QDataStream stream(config);
     /* General settings */
+    stream >> isCounterHeld;
     stream >> mode >> modePrevIndex;
 
     /* High Freq settings */
@@ -61,6 +64,7 @@ QByteArray CounterConfig::serialize()
     QDataStream stream(data,QIODevice::WriteOnly);
 
     /* General settings */
+    stream << isCounterHeld;
     stream << mode << modePrevIndex;
 
     /* High Freq settings */

@@ -58,9 +58,11 @@ void Counter::showHoldButtonCallback(){
 
 void Counter::holdCounter(bool held){
     if(held){
+        config->isCounterHeld = true;
         comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
         setModuleStatus(ModuleStatus::PAUSE);
     }else{
+        config->isCounterHeld = false;
         comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
         setModuleStatus(ModuleStatus::PLAY);
     }
@@ -149,6 +151,11 @@ void Counter::switchCounterModeCallback(int index){
     }else if (index == 3) {
         intReloadState();
     }
+
+//    if(this->config->isCounterHeld == true){
+//        config->isCounterHeld = false;
+//        setModuleStatus(ModuleStatus::PLAY);
+//    }
 }
 
 void Counter::write(QByteArray feature, QByteArray param){
@@ -169,13 +176,17 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     streamBuffLeng >> val >> qerr >> terr;
 
     WidgetDisplay *display = cntWindow->displayHF;
+
     bool isFrequency = (freqPer == "QFRE") ? true : false;
+
     uint countToGo = (isFrequency) ? movAvg->prepend(val) : movAvg->prepend(1/val);
     this->strQerr = strQerr = formatErrNumber(display, qerr);
     this->strTerr = strTerr = formatErrNumber(display, terr);
     cntWindow->showPMErrorSigns(display, true);
 
-    if(movAvg->isBufferFull()){
+    bool isAvgBuffFull = movAvg->isBufferFull();
+
+    if(isAvgBuffFull){
         config->hfState.hold = HFState::HoldOnState::OFF;
         cntWindow->hfSetColorRemainSec(QCOLOR_WHITE);
         avg = (isFrequency) ? movAvg->getAverage() : 1 / movAvg->getAverage();
@@ -195,17 +206,24 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
 
     displayValues(display, formatNumber(display, val, qerr+terr), strAvg, strQerr, strTerr);
 
-    if(!isFrequency)
-        val = 1 / val;
-    display->updateProgressBar(val);
-    config->hfState.quantState = HFState::QuantitySwitched::NO;
-
     /* History section */
     QString pm(0x00B1);
-    cntWindow->appendNewHistorySample(display, "", val, " Hz", (float)config->hfState.gateTime/(float)1000);
-    cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr, " Hz");
-    cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr, " Hz");
-    cntWindow->associateToHistorySample(display, 3, ", avg = ", avg);
+    QString quant = (isFrequency) ? " Hz": " s";
+
+    cntWindow->appendNewHistorySample(display, "", val, quant, (float)config->hfState.gateTime/(float)1000);
+    cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr, quant);
+    cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr, quant);
+
+    if(isAvgBuffFull)
+        cntWindow->associateToHistorySample(display, 3, ", avg = ", avg, quant);
+    else
+        cntWindow->associateToHistorySample(display, 3, ", avg unavailable ", -1);
+
+    if(!isFrequency)
+        val = 1 / val;
+
+    display->updateProgressBar(val);
+    config->hfState.quantState = HFState::QuantitySwitched::NO;
 }
 
 void Counter::hfReloadState(){
@@ -305,7 +323,8 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         strQerr = formatErrNumber(display, qerr);
         strTerr = formatErrNumber(display, terr);
 
-        if(quantity == "QPER")
+        bool isFrequency = (quantity != "QPER");
+        if(!isFrequency)
             val1 = 1 / val1;
 
         if(isRangeExceeded(val1)){
@@ -318,8 +337,16 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
             cntWindow->displayFlagHoldOn(display, false);
             display->updateProgressBar(val1);
 
+            QString quant;
+            if(isFrequency){
+                quant = " Hz";
+            }else {
+                quant = " s";
+                val1 = 1 / val1;
+            }
+
             /* History section */
-            cntWindow->appendNewHistorySample(display, "", val1, " Hz");
+            cntWindow->appendNewHistorySample(display, "", val1, quant);
             cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr);
             cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr);
         }
@@ -331,7 +358,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         displayValues(display, strVal, strVal2, "", "");
 
         /* History section */
-        cntWindow->appendNewHistorySample(display, "PW ", val1, " Sec");
+        cntWindow->appendNewHistorySample(display, "PW ", val1, " s");
         cntWindow->associateToHistorySample(display, 1, ", DC ", val2, " \%");
     }
 }
