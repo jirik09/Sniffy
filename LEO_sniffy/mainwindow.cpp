@@ -30,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent):
     ui->verticalLayout_internal->addWidget(sep);
 
     deviceMediator = new DeviceMediator(this);
-   // createModulesWidgets();
     attachWidgets();
     setupMainWindowComponents();
 
@@ -176,7 +175,6 @@ void MainWindow::attachWidgets()
     QSharedPointer<AbstractModule> module;
     QString moduleName;
 
-    int listSize = modulesList.size();
     WidgetControlModule *WidgetModule;
     ModuleDockWidget *dockWidget;
 
@@ -198,10 +196,5 @@ void MainWindow::attachWidgets()
     }
 
     deviceMediator->ShowDeviceModule();
-}
-
-void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
-{
-
 }
 

@@ -6,11 +6,10 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 
     connect(communication,SIGNAL(devicesScaned(QList<DeviceDescriptor>)),this,SLOT(newDeviceList(QList<DeviceDescriptor>)),Qt::QueuedConnection);
 
-
+    //create device module
     modulesControlWidgets.append(new WidgetControlModule(nullptr,"Device"));
     modulesDockWidgets.append(new ModuleDockWidget(nullptr, "Device"));
     modules.append(QSharedPointer<AbstractModule> (device = new Device(this,nullptr,nullptr,modulesControlWidgets.last(),modulesDockWidgets.last())));
-    //modules = createModulesList();
 
     connect(device,&Device::ScanDevices,this,&DeviceMediator::ScanDevices);
     connect(device,&Device::openDevice,this,&DeviceMediator::open);
@@ -63,11 +62,6 @@ void DeviceMediator::open(int deviceIndex){
     if(isConnected){
         connect(communication,&Comms::newData,this,&DeviceMediator::parseData);
         connect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
-
-        /*  foreach(QSharedPointer<AbstractModule> mod, modules){
-            mod->setComms(communication);
-        }*/
-
     }
 }
 
