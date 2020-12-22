@@ -569,16 +569,9 @@ void Counter::intDialTimeoutChangedCallback(float val){
     write(cmd->INT_TIMEOUT_SEC, val);
 }
 
-void Counter::writeConfiguration(){
+void Counter::writeConfiguration(){ //tahle funkce se vola vzdy pri otevreni modulu
     cntWindow->restoreGUIAfterStartup();
-
-    switchCounterModeCallback((int)config->mode);
-
-    //TODO
-    //zapsat predchozi konfiguraci do MCU (config je nacteny)
-    //geometrie a GUI je nactene ale do MCU se nic neposlalo
-    //tahle funkce se vola vzdy pri otevreni modulu
-
+    switchCounterModeCallback((int)config->mode);    
 }
 
 void Counter::parseConfiguration(QByteArray config){    
