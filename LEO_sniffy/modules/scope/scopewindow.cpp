@@ -10,9 +10,10 @@ But it can be easily coppied so we can keep some template file.
 #include "scopewindow.h"
 #include "ui_scopewindow.h"
 
-ScopeWindow::ScopeWindow(QWidget *parent) :
+ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ScopeWindow)
+    ui(new Ui::ScopeWindow),
+    config(config)
 {
     ui->setupUi(this);
 
@@ -134,7 +135,6 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
             panelCursors->cursorVerBDial->updateRange(config->rangeMin,(float)(config->rangeMax)/1000);
         }
     }
-
     chart->setVerticalMarker(triggerChannelIndex,0);
 }
 
@@ -281,6 +281,7 @@ void ScopeWindow::mathExpressionCallback(QString exp)
 
 void ScopeWindow::sliderShiftCallback(int value){
     chart->setShift((float)value/10);
+    config->chartShift = (float)value/10;
 }
 
 void ScopeWindow::chartLocalZoomCallback()
@@ -404,9 +405,24 @@ void ScopeWindow::mathError(int errorPosition)
     panelMath->symbolicError(errorPosition);
 }
 
-void ScopeWindow::passConfig(ScopeConfig &conf)
+void ScopeWindow::restoreGUIAfterStartup()
 {
-    this->config = &conf;
+    chart->setLocalZoom(config->chartLocalZoom);
+    chart->setShift(config->chartShift);
+    ui->sliderSignal->setValue((chart->getShift()*2000)-1000);
+
+    int vertical = panelSet->buttonsChannelVertical->getSelectedIndex();
+    panelSet->dialVerticalScale->setColor(Colors::getChannelColorString(vertical));
+    panelSet->dialVerticalShift->setColor(Colors::getChannelColorString(vertical));
+
+    channelEnableCallback(panelSet->buttonsChannelEnable->getStatus());
+    cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());
+
+    panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
+    panelMath->typeChanged(panelMath->mathType->getSelectedIndex());
+    if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
+        panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+    }
 }
 
 void ScopeWindow::singleSamplingDone(){
@@ -436,6 +452,7 @@ void ScopeWindow::updateChartTimeScale(float timeBase){
     }else{
         labelInfoPanel->setStyleSheet(QString::fromUtf8("color:")+COLOR_WHITE);
     }
+    config->chartLocalZoom = chart->getLocalZoom();
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/div"));
 }
 

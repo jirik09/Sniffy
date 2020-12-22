@@ -17,6 +17,10 @@ void AbstractModule::saveGeometry(QSettings &layout)
     WidgetSwitch *sw;
     QList<widgetTab*> listTab = getWidget()->findChildren<widgetTab*>();
     widgetTab *tab;
+    QList<WidgetSelection*> listSel = getWidget()->findChildren<WidgetSelection*>();
+    WidgetSelection *sel;
+    QList<WidgetTextInput*> listText = getWidget()->findChildren<WidgetTextInput*>();
+    WidgetTextInput *text;
 
     foreach(tab, listTab){
         if (!tab->objectName().isEmpty()){
@@ -53,6 +57,20 @@ void AbstractModule::saveGeometry(QSettings &layout)
             qDebug () << "WARNING attempting to save layout of object without name: Dial range in "<<moduleName;
         }
     }
+    foreach(sel, listSel){
+        if (!sel->objectName().isEmpty()){
+            layout.setValue(moduleName+sel->objectName(),sel->saveGeometry());
+        }else{
+            qDebug () << "WARNING attempting to save layout of object without name: selection in "<<moduleName;
+        }
+    }
+    foreach(text, listText){
+        if (!text->objectName().isEmpty()){
+            layout.setValue(moduleName+text->objectName(),text->saveGeometry());
+        }else{
+            qDebug () << "WARNING attempting to save layout of object without name: Tect input in "<<moduleName;
+        }
+    }
 }
 
 void AbstractModule::restoreGeometry(QSettings &layout)
@@ -67,6 +85,10 @@ void AbstractModule::restoreGeometry(QSettings &layout)
     WidgetSwitch *sw;
     QList<widgetTab*> listTab = getWidget()->findChildren<widgetTab*>();
     widgetTab *tab;
+    QList<WidgetSelection*> listSel = getWidget()->findChildren<WidgetSelection*>();
+    WidgetSelection *sel;
+    QList<WidgetTextInput*> listText = getWidget()->findChildren<WidgetTextInput*>();
+    WidgetTextInput *text;
 
     foreach(tab, listTab){
         if (!tab->objectName().isEmpty()){
@@ -98,9 +120,23 @@ void AbstractModule::restoreGeometry(QSettings &layout)
     }
     foreach(dialRange, listDialRange){
         if (!dialRange->objectName().isEmpty()){
-            dialRange->restoreGeometry(layout.value(moduleName+dialRange->objectName()).toByteArray());
+             dialRange->restoreGeometry(layout.value(moduleName+dialRange->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: dialRange in "<<moduleName;
+        }
+    }
+    foreach(sel, listSel){
+        if (!sel->objectName().isEmpty()){
+             sel->restoreGeometry(layout.value(moduleName+sel->objectName()).toByteArray());
+        }else{
+            qDebug () << "WARNING layout cannot be restored due to missing object name: selection in "<<moduleName;
+        }
+    }
+    foreach(text, listText){
+        if (!text->objectName().isEmpty()){
+             text->restoreGeometry(layout.value(moduleName+text->objectName()).toByteArray());
+        }else{
+            qDebug () << "WARNING layout cannot be restored due to missing object name: textInput in "<<moduleName;
         }
     }
 }

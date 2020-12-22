@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     qRegisterMetaType<QList<Measurement *>>();
+   // qRegisterMetaType<MeasurementType>();
     qRegisterMetaType<QList<DeviceDescriptor>>();
     qRegisterMetaType<QSerialPort::SerialPortError>();
     MainWindow w;

@@ -43,7 +43,6 @@ void MathCalculations::run()
         QVector<QVector<QPointF>> data = this->data;
         tmpTrace.clear();
         QString expression = this->expression;
-        qint32 samplingFreq = this->samplingFreq;
         mutex.unlock();
 
         if(expression == ""){

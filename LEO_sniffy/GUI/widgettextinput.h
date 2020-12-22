@@ -19,6 +19,8 @@ class WidgetTextInput : public QWidget
 public:
     explicit WidgetTextInput(QWidget *parent = nullptr, QString name = "", QString value = "");
     ~WidgetTextInput();
+    QByteArray saveGeometry();
+    void restoreGeometry(QByteArray geom);
     QString getText();
 
 signals:

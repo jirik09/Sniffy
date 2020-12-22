@@ -15,6 +15,8 @@
 #include "../GUI/widgetdialrange.h"
 #include "../GUI/widgetswitch.h"
 #include "../GUI/widgettab.h"
+#include "../GUI/widgetselection.h"
+#include "../GUI/widgettextinput.h"
 
 class AbstractModule : public QObject
 {
