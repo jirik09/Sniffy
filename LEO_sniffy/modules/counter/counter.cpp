@@ -1,15 +1,20 @@
 #include "counter.h"
 
-Counter::Counter(QObject *parent/*, config param*/)
+Counter::Counter(QObject *parent, QByteArray configString,Comms *communication,WidgetControlModule *WidgetModule,ModuleDockWidget *dockWidget)
 {
     Q_UNUSED(parent);
         //JIRI TODO parse config here (load config before making modules)
-    config = new CounterConfig(this/*, param*/);
+    this->config = new CounterConfig(this,configString/*, param*/);
     cntWindow = new CounterWindow(config);
 
-    moduleCommandPrefix = cmd->COUNTER;
     moduleName = "Counter";
     moduleIconURI = ":/graphics/graphics/icon_counter.png";
+    setDockWidgetWindow(dockWidget);
+    setModuleControlWidget(WidgetModule);
+
+    moduleCommandPrefix = cmd->COUNTER;
+    setComms(communication);
+
 
     movAvg = new MovingAverage(2, cntWindow->tabHighFreq);
 

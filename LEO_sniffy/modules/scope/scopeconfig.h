@@ -17,7 +17,7 @@ class ScopeConfig : public AbstractConfiguration
 {
     Q_OBJECT
 public:
-    explicit ScopeConfig(QObject *parent = nullptr);
+    explicit ScopeConfig(QObject *parent = nullptr, QByteArray configString = nullptr);
 
     void parse (QByteArray config);
     QByteArray serialize ();
