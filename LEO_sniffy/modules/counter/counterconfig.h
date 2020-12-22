@@ -66,8 +66,6 @@ public:
     void parse (QByteArray config);
     QByteArray serialize ();
 
-    bool isCounterHeld;
-
     CounterMode mode;
     CounterMode modePrevIndex;
 

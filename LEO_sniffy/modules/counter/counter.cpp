@@ -58,11 +58,9 @@ void Counter::showHoldButtonCallback(){
 
 void Counter::holdCounter(bool held){
     if(held){
-        config->isCounterHeld = true;
         comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
         setModuleStatus(ModuleStatus::PAUSE);
     }else{
-        config->isCounterHeld = false;
         comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
         setModuleStatus(ModuleStatus::PLAY);
     }
@@ -151,11 +149,6 @@ void Counter::switchCounterModeCallback(int index){
     }else if (index == 3) {
         intReloadState();
     }
-
-//    if(this->config->isCounterHeld == true){
-//        config->isCounterHeld = false;
-//        setModuleStatus(ModuleStatus::PLAY);
-//    }
 }
 
 void Counter::write(QByteArray feature, QByteArray param){
