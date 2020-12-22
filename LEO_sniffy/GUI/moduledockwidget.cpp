@@ -7,7 +7,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     setObjectName(title);
     hide();
 
-    setStyleSheet(QString::fromUtf8("QDockWidget{border: 2px solid gray; background-color: ")+QString::fromUtf8(COLOR_GREY)+";}");
+    setStyleSheet(QString::fromUtf8("QDockWidget{border: 3px solid gray; background-color: ")+QString::fromUtf8(COLOR_GREY)+";}");
 
     // ***************** create title bar and window contorl icons *************
     QWidget *titleBar = new QWidget();

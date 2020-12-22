@@ -7,7 +7,7 @@ SerialLine::SerialLine(QObject *parent) : QObject(parent)
 
 int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstIndex){
 
-
+    QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
     QSerialPortInfo *portInfo = new QSerialPortInfo();
     QSerialPort *sPort;
 
@@ -37,14 +37,14 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
         if(sPort->open(QIODevice::ReadWrite)){
             sPort->clear();
             sPort->write("IDN?;");
-            sPort->waitForBytesWritten(1000);
-            sPort->waitForReadyRead(250);
-            QThread::msleep(350);
+            sPort->waitForBytesWritten(100);
+            sPort->waitForReadyRead(150);
+            QThread::msleep(250);
 
             received = sPort->readAll();
 
             // qDebug() <<sPort->portName()<<received.length()<<received;
-            if (received.length()>16 && received.left(4)=="SYST"){
+            if (received.length()>16 && received.left(4)=="SYST" && received.right(4)==delimiter){
                 sPort->write("RES!;");
                 sPort->waitForBytesWritten();
 

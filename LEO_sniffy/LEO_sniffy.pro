@@ -36,6 +36,7 @@ SOURCES += \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
     GUI/widgettab.cpp \
+    GUI/widgettextinput.cpp \
     communication/commands.cpp \
     communication/comms.cpp \
     communication/devicescanner.cpp \
@@ -49,6 +50,8 @@ SOURCES += \
     mainwindow.cpp \
     math/movingaverage.cpp \
     math/timing.cpp \
+    math/tinyexpr.c \
+    modules/abstractconfiguration.cpp \
     modules/abstractmodule.cpp \
     modules/abstractspecification.cpp \
     modules/counter/counter.cpp \
@@ -64,15 +67,21 @@ SOURCES += \
     modules/device/device.cpp \
     modules/device/devicewindow.cpp \
     modules/device/devicespec.cpp \
+    modules/scope/mathcalculations.cpp \
     modules/scope/meascalculations.cpp \
     modules/scope/measurement.cpp \
     modules/scope/panelcursors.cpp \
+    modules/scope/panelmath.cpp \
     modules/scope/panelmeasurement.cpp \
     modules/scope/panelsettings.cpp \
     modules/scope/scope.cpp \
     modules/scope/scopeconfig.cpp \
     modules/scope/scopespec.cpp \
-    modules/scope/scopewindow.cpp
+    modules/scope/scopewindow.cpp \
+    modules/template/templatemodule.cpp \
+    modules/template/templatemoduleconfig.cpp \
+    modules/template/templatemodulespec.cpp \
+    modules/template/templatemodulewindow.cpp
 
 
 HEADERS += \
@@ -94,6 +103,7 @@ HEADERS += \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
     GUI/widgettab.h \
+    GUI/widgettextinput.h \
     communication/commands.h \
     communication/comms.h \
     communication/connectiontype.h \
@@ -108,6 +118,8 @@ HEADERS += \
     mainwindow.h \
     math/movingaverage.h \
     math/timing.h \
+    math/tinyexpr.h \
+    modules/abstractconfiguration.h \
     modules/abstractspecification.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
@@ -124,16 +136,22 @@ HEADERS += \
     modules/device/device.h \
     modules/device/devicewindow.h \
     modules/device/devicespec.h \
+    modules/scope/mathcalculations.h \
     modules/scope/meascalculations.h \
     modules/scope/measurement.h \
     modules/scope/panelcursors.h \
+    modules/scope/panelmath.h \
     modules/scope/panelmeasurement.h \
     modules/scope/panelsettings.h \
     modules/scope/scope.h \
     modules/scope/scopeconfig.h \
     modules/scope/scopedefs.h \
     modules/scope/scopespec.h \
-    modules/scope/scopewindow.h
+    modules/scope/scopewindow.h \
+    modules/template/templatemodule.h \
+    modules/template/templatemoduleconfig.h \
+    modules/template/templatemodulespec.h \
+    modules/template/templatemodulewindow.h
 
 
 
@@ -152,10 +170,12 @@ FORMS += \
     GUI/widgetseparator.ui \
     GUI/widgetswitch.ui \
     GUI/widgettab.ui \
+    GUI/widgettextinput.ui \
     mainwindow.ui \
     modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \
-    modules/scope/scopewindow.ui
+    modules/scope/scopewindow.ui \
+    modules/template/templatemodulewindow.ui
 
 
 TRANSLATIONS += \

@@ -47,8 +47,7 @@ void WidgetDialRange::restoreGeometry(QByteArray geom)
     stream >> dialMaxValue;
     stream >> rangeMin;
     stream >> rangeMax;
-    updateRange(rangeMin,rangeMax);
-    setRealValue(realValue);
+    updateRange(rangeMin,rangeMax,true);
 }
 
 void WidgetDialRange::setColor(QString color){
@@ -199,7 +198,9 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
 
     defaultRealValue = realValue;
 
-
+    if (smalestUnitMult<=1e-6){
+        addOption("n"+baseUnit,0.000000001);
+    }
     if (smalestUnitMult<1e-3){
         addOption("u"+baseUnit,0.000001);
     }
@@ -231,7 +232,7 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     updateControls(0);
 }
 
-void WidgetDialRange::updateRange(float min, float max)
+void WidgetDialRange::updateRange(float min, float max, bool silent)
 {
     rangeMax = max;
     rangeMin = min;
@@ -254,7 +255,7 @@ void WidgetDialRange::updateRange(float min, float max)
         realValue=rangeMax;
         defaultRealValue = realValue;
     }
-    updateControls(0);
+    updateControls(0,silent);
 }
 
 void WidgetDialRange::enableFineMousePrecision()
@@ -264,7 +265,7 @@ void WidgetDialRange::enableFineMousePrecision()
     updateRange(rangeMin,rangeMax);
 }
 
-void WidgetDialRange::updateControls(int except){
+void WidgetDialRange::updateControls(int except, bool silent){
     if(realValue>rangeMax){
         realValue = rangeMax;
     }
@@ -286,7 +287,7 @@ void WidgetDialRange::updateControls(int except){
             ui->comboBox->setCurrentIndex(i);
             connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
 
-            if(tempLabelVal>=1 && tempLabelVal<1000){
+            if(abs(tempLabelVal)>=1 && abs(tempLabelVal)<1000){
                 break;
             }
         }
@@ -299,7 +300,8 @@ void WidgetDialRange::updateControls(int except){
         ui->dial->setValue(getValueForDial(realValue));
         connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
     }
-    emit valueChanged(realValue);
+    if(!silent)
+        emit valueChanged(realValue);
 }
 
 float WidgetDialRange::getRealValueFromDial(int in){

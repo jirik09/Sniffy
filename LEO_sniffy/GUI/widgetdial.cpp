@@ -37,7 +37,9 @@ QByteArray WidgetDial::saveGeometry()
 
 void WidgetDial::restoreGeometry(QByteArray geom)
 {
-    setSelectedIndex(geom.toInt());
+    disconnect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
+    setSelectedIndex(geom.toInt(),true);
+    connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
 }
 
 void WidgetDial::addOption (QString shownValue, QString unit,float realValue){
@@ -62,14 +64,16 @@ int WidgetDial::getSelectedIndex() const
     return selectedIndex;
 }
 
-void WidgetDial::setSelectedIndex(int index){
+void WidgetDial::setSelectedIndex(int index, bool silent){
     ui->dial->setValue(index);
     ui->comboBox->setCurrentIndex(index);
 
     ui->label_unit->setText(options->at(index).unit);
     ui->label_value->setText(options->at(index).shownValue);
     selectedIndex = index;
-    emit valueChanged(options->at(index).realValue);
+    if(!silent){
+        emit valueChanged(options->at(index).realValue);
+    }
 }
 
 void WidgetDial::setColor(QString color){
@@ -97,7 +101,7 @@ void WidgetDial::plusClicked(){
     if(selectedIndex>=options->length()){
         selectedIndex = options->length()-1;
     }
-    setSelectedIndex(selectedIndex);
+    ui->comboBox->setCurrentIndex(selectedIndex);
 }
 
 void WidgetDial::minusClicked(){
@@ -105,7 +109,7 @@ void WidgetDial::minusClicked(){
     if(selectedIndex<0){
         selectedIndex = 0;
     }
-    setSelectedIndex(selectedIndex);
+    ui->comboBox->setCurrentIndex(selectedIndex);
 }
 
 void WidgetDial::valChanged(int in){

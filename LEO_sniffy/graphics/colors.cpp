@@ -6,7 +6,7 @@ Colors::Colors(QObject *parent) : QObject(parent)
 
 QColor Colors::getChannelColor(int channelIndex)
 {
-    int index = channelIndex%10;
+    int index = channelIndex;
 
     switch (index) {
     case 0:
@@ -33,14 +33,16 @@ QColor Colors::getChannelColor(int channelIndex)
         return CHANNEL_11_QCOLOR;
     case 11:
         return CHANNEL_12_QCOLOR;
+    case 12:
+        return CHANNEL_13_QCOLOR;
     default:
-        return QCOLOR_GREY;
+        return QCOLOR_BLACK;
     }
 }
 
 QByteArray Colors::getChannelColorString(int channelIndex)
 {
-    int index = channelIndex%10;
+    int index = channelIndex;
 
     switch (index) {
     case 0:
@@ -67,7 +69,9 @@ QByteArray Colors::getChannelColorString(int channelIndex)
         return CHANNEL_11_COLOR;
     case 11:
         return CHANNEL_12_COLOR;
+    case 12:
+        return CHANNEL_13_COLOR;
     default:
-        return COLOR_GREY;
+        return COLOR_BLACK;
     }
 }

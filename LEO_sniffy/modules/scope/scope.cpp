@@ -6,9 +6,9 @@ Scope::Scope(QObject *parent)
     config = new ScopeConfig();
     specification = new ScopeSpec();
     measCalc = new MeasCalculations();
-    scpWindow = new ScopeWindow();
+    mathCalc = new MathCalculations();
+    scpWindow = new ScopeWindow(config);
     scpWindow->setObjectName("scpWindow");
-    scpWindow->passConfig(*config);
 
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SCOPE;
@@ -31,6 +31,9 @@ Scope::Scope(QObject *parent)
     connect(scpWindow, &ScopeWindow::measurementChanged,this, &Scope::addMeasurement);
     connect(scpWindow, &ScopeWindow::measurementClearChanged, this, &Scope::clearMeasurement);
     connect(measCalc, &MeasCalculations::measCalculated, this, &Scope::updateMeasurement);
+
+    connect(scpWindow, &ScopeWindow::mathExpressionChanged,this,&Scope::updateMathExpression);
+    connect(mathCalc, &MathCalculations::mathCalculated, this, &Scope::updateMath);
 
 }
 
@@ -124,7 +127,8 @@ void Scope::parseData(QByteArray data){
         }
 
         if(currentChannel==numChannels){
-            measCalc->calculate(*scopeData,scopeMeas,config->realSamplingRate);
+            measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
+            mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
             scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
 
             //signal sometimes need to be zoomed to show correct value V/div
@@ -148,9 +152,9 @@ void Scope::parseData(QByteArray data){
 }
 
 void Scope::writeConfiguration(){
+    scpWindow->restoreGUIAfterStartup();
     updateTimebase(config->timeBase);
 
-    //this one will be done like others
     setDataLength(config->dataLength);
 
     updateTriggerLevel(config->triggerLevelPercent);
@@ -162,7 +166,6 @@ void Scope::writeConfiguration(){
 
     setNumberOfChannels(config->numberOfChannels);
     updateTriggerMode(config->triggerMode);
-
 }
 
 void Scope::parseConfiguration(QByteArray config){
@@ -175,6 +178,7 @@ QByteArray Scope::getConfiguration(){
 void Scope::stopModule(){
     stopSampling();
     measCalc->exit();
+    mathCalc->exit();
 }
 void Scope::startModule(){
     startSampling();
@@ -192,6 +196,7 @@ void Scope::updateTimebase(float div){
         config->requestedSamplingRate = round(float(100)/(div)+0.49);
     }
     setSamplingFrequency(config->requestedSamplingRate);
+    updateTriggerMode(config->triggerMode);
 }
 
 void Scope::updatePretrigger(float percentage){
@@ -274,24 +279,38 @@ void Scope::updateChannelsEnable(int buttonStatus){
     }else{
         setNumberOfChannels(config->numberOfChannels);
     }
-    scpWindow->paintTraces(*scopeData);
+    scpWindow->showDataTraces(*scopeData,config->timeBase,config->triggerChannelIndex);
 }
 
 void Scope::addMeasurement(Measurement *m){
-    scopeMeas.append(m);
-    if(scopeMeas.length()>9){
-        scopeMeas.removeFirst();
+    config->scopeMeasList.append(m);
+    if(config->scopeMeasList.length()>9){
+        config->scopeMeasList.removeFirst();
     }
-    measCalc->calculate(*scopeData,scopeMeas,config->realSamplingRate);
+    config->measCount= config->scopeMeasList.length();
+    measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
 }
 
 void Scope::clearMeasurement(){
-    scopeMeas.clear();
-    updateMeasurement(scopeMeas);
+    config->scopeMeasList.clear();
+    config->measCount = 0;
+    updateMeasurement(config->scopeMeasList);
 }
 
 void Scope::updateMeasurement(QList<Measurement*> m){
     scpWindow->updateMeasurement(m);
+}
+
+void Scope::updateMath(int errorPosition)
+{
+    scpWindow->updateMath(mathCalc->getCalculatedMathTrace());
+    scpWindow->mathError(errorPosition);
+}
+
+void Scope::updateMathExpression(QString exp)
+{
+    mathExpression = exp;
+    mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
 }
 
 void Scope::stopSampling(){
@@ -339,6 +358,10 @@ void Scope::setTriggerChannel(int chan){
 }
 
 void Scope::setTriggerMode(ScopeTriggerMode mode){
+    if (mode == ScopeTriggerMode::TRIG_AUTO && (float)(config->dataLength)/config->requestedSamplingRate>0.5 ){
+        mode = ScopeTriggerMode::TRIG_AUTO_FAST;
+    }
+
     switch(mode){
     case ScopeTriggerMode::TRIG_SINGLE:
         comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_MODE+":"+cmd->MODE_SINGLE+";");

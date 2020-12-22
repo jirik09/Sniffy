@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QtMath>
 #include <QString>
+#include <QDebug>
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"

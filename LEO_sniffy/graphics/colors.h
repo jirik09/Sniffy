@@ -17,6 +17,12 @@
 #define BACKGROUND_COLOR_APP "rgb(48,48,48);"
 #define BACKGROUND_COLOR_BUTTON_DISABLED "rgb(48,48,48);"
 
+//Text colors
+#define COLOR_GREY   "rgb(124,124,124);"
+#define COLOR_WHITE  "rgb(214,214,214);"
+#define QCOLOR_GREY   QColor(124,124,124)
+#define QCOLOR_WHITE  QColor(214,214,214)
+
 // basic Channel colors
 #define COLOR_BLUE   "rgb(24,154,224);"
 #define COLOR_ORANGE "rgb(255,154,0);"
@@ -37,6 +43,7 @@
 #define COLOR_PINK "rgb(255,18,108);"
 #define COLOR_BLACK "rgb(0,0,0);"
 #define COLOR_HOVER "rgb(71,76,94);"
+
 
 #define QCOLOR_RED QColor(224,24,0)
 #define QCOLOR_BROWN QColor(170,105,39)
@@ -63,6 +70,7 @@
 #define CHANNEL_10_COLOR COLOR_BROWN
 #define CHANNEL_11_COLOR COLOR_DARK_CYAN
 #define CHANNEL_12_COLOR COLOR_YELLOW
+#define CHANNEL_13_COLOR COLOR_GREY
 
 #define CHANNEL_1_QCOLOR QCOLOR_ORANGE
 #define CHANNEL_2_QCOLOR QCOLOR_BLUE
@@ -76,13 +84,9 @@
 #define CHANNEL_10_QCOLOR QCOLOR_BROWN
 #define CHANNEL_11_QCOLOR QCOLOR_DARK_CYAN
 #define CHANNEL_12_QCOLOR QCOLOR_YELLOW
+#define CHANNEL_13_QCOLOR QCOLOR_GREY
 
 
-//Text colors
-#define COLOR_GREY   "rgb(124,124,124);"
-#define COLOR_WHITE  "rgb(214,214,214);"
-#define QCOLOR_GREY   QColor(124,124,124)
-#define QCOLOR_WHITE  QColor(214,214,214)
 
 
 class Colors : public QObject

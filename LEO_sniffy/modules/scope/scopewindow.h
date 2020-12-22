@@ -25,6 +25,7 @@
 #include "panelsettings.h"
 #include "panelmeasurement.h"
 #include "panelcursors.h"
+#include "panelmath.h"
 #include "scopeconfig.h"
 
 #define CHART_MAX_Y 7
@@ -39,13 +40,13 @@ class ScopeWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit ScopeWindow(QWidget *parent = nullptr);
+    explicit ScopeWindow(ScopeConfig *config, QWidget *parent = nullptr);
     ~ScopeWindow();
     void paintEvent(QPaintEvent *event);
 
 
     void showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex);
-    void paintTraces(QVector<QVector<QPointF>> dataSeries);
+
     void setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom);
 
     void singleSamplingDone();
@@ -54,7 +55,9 @@ public:
     void setRealSamplingRate(int smpl);
 
     void updateMeasurement(QList<Measurement*> m);
-    void passConfig(ScopeConfig &conf);
+    void updateMath(QVector<QPointF> mathTrace);
+    void mathError(int errorPosition);
+    void restoreGUIAfterStartup();
 
 
 signals:
@@ -67,6 +70,7 @@ signals:
     void triggerChannelChanged(int index);
     void channelEnableChanged(int buttonStatus);
     void measurementChanged(Measurement *m);
+    void mathExpressionChanged(QString exp);
     void measurementClearChanged();
     void verticalChanged();
 
@@ -85,6 +89,7 @@ private slots:
     void triggerModeCallback(int index);
     void measurementAddedCallback(Measurement *m);
     void measurementClearCallback();
+    void mathExpressionCallback(QString exp);
     void sliderShiftCallback(int value);
 
     void chartLocalZoomCallback();
@@ -108,16 +113,18 @@ private:
     widgetChart *chart;
 
     QVector<QVector<QPointF>> ChartData;
+    QVector<QPointF> ChartMathData;
     int triggerChannelIndex =0;
 
     WidgetLabelArea *labelInfoPanel;
-
     PanelMeasurement *panelMeas;
-
     PanelCursors *panelCursors;
+    PanelMath *panelMath;
 
     void updateChartTimeScale(float timeBase);
     void fillTimeBase();
+    void paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPointF> mathSeries);
+    void paintMath(QVector<QPointF> mathSeries);
 
     float previousTimeBase = 0;
 };

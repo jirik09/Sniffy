@@ -1,10 +1,10 @@
 #include "counter.h"
 
-Counter::Counter(QObject *parent)
+Counter::Counter(QObject *parent/*, config param*/)
 {
     Q_UNUSED(parent);
-
-    config = new CounterConfig(this);
+        //JIRI TODO parse config here (load config before making modules)
+    config = new CounterConfig(this/*, param*/);
     cntWindow = new CounterWindow(config);
 
     moduleCommandPrefix = cmd->COUNTER;
@@ -570,6 +570,14 @@ void Counter::intDialTimeoutChangedCallback(float val){
 }
 
 void Counter::writeConfiguration(){
+    cntWindow->restoreGUIAfterStartup();
+
+    switchCounterModeCallback((int)config->mode);
+
+    //TODO
+    //zapsat predchozi konfiguraci do MCU (config je nacteny)
+    //geometrie a GUI je nactene ale do MCU se nic neposlalo
+    //tahle funkce se vola vzdy pri otevreni modulu
 
 }
 
