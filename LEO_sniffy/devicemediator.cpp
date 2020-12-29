@@ -6,7 +6,10 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 
     connect(communication,SIGNAL(devicesScaned(QList<DeviceDescriptor>)),this,SLOT(newDeviceList(QList<DeviceDescriptor>)),Qt::QueuedConnection);
 
-    modules = createModulesList();
+    //create device module
+    modulesControlWidgets.append(new WidgetControlModule(nullptr,"Device"));
+    modulesDockWidgets.append(new ModuleDockWidget(nullptr, "Device"));
+    modules.append(QSharedPointer<AbstractModule> (device = new Device(this,nullptr,nullptr,modulesControlWidgets.last(),modulesDockWidgets.last())));
 
     connect(device,&Device::ScanDevices,this,&DeviceMediator::ScanDevices);
     connect(device,&Device::openDevice,this,&DeviceMediator::open);
@@ -15,7 +18,7 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     QList<QSharedPointer<AbstractModule>> modules;
-    modules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
+    //modules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
     modules.append(QSharedPointer<AbstractModule> (new Scope(this)));
     modules.append(QSharedPointer<AbstractModule> (new Counter(this)));
     modules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
@@ -51,15 +54,14 @@ void DeviceMediator::open(int deviceIndex){
         qDebug() << "ERROR wait for comm to be opened";
     }
     isConnected = communication->getIsOpen();
+    if(isConnected){
+        buildModules(deviceList.at(deviceIndex).deviceName,communication);
+        emit loadLayout(deviceList.at(deviceIndex).deviceName);
+    }
 
     if(isConnected){
         connect(communication,&Comms::newData,this,&DeviceMediator::parseData);
         connect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
-
-        foreach(QSharedPointer<AbstractModule> mod, modules){
-            mod->setComms(communication);
-        }
-        emit loadLayout(deviceList.at(deviceIndex).deviceName);
     }
 }
 
@@ -102,7 +104,7 @@ void DeviceMediator::parseData(QByteArray data){
 void DeviceMediator::ShowDeviceModule(){
     device->showModuleWindow();
     device->showModuleControl();
-    device->hideModuleStatus();    
+    device->hideModuleStatus();
 }
 
 bool DeviceMediator::getIsConnected() const
@@ -112,5 +114,77 @@ bool DeviceMediator::getIsConnected() const
 
 QString DeviceMediator::getDeviceName(){
     return device->getName();
+}
+
+void DeviceMediator::buildModules(QString deviceName,Comms *communication)
+{
+    bool configExist = false;
+    QString layoutFile;
+    QString configFile;
+    QSettings *settings = nullptr;
+    QSettings *layout = nullptr;
+    layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".lay";
+    configFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".cfg";
+    QSharedPointer<AbstractModule> module;
+
+    QFile file(layoutFile);
+    QFile fileMod(configFile);
+
+    if(file.exists() && fileMod.exists()){
+        configExist = true;
+        qDebug () << "seesion found";
+    }
+
+    if(configExist){
+        settings = new QSettings(configFile, QSettings::IniFormat);
+        layout = new QSettings(layoutFile, QSettings::IniFormat);
+    }
+    ModuleStatus status = ModuleStatus::STOP;
+    QByteArray config = nullptr;
+
+
+    //set communication for device
+    modules.at(0)->setComms(communication);
+
+    //init counter and all its stuff
+    if(configExist){
+        status = (ModuleStatus)settings->value("Counterstatus").toInt();
+        config = settings->value("Counterconfig").toByteArray();
+    }
+    modulesControlWidgets.append(new WidgetControlModule(nullptr,"Counter"));
+    modulesDockWidgets.append(new ModuleDockWidget(nullptr, "Counter"));
+    module = QSharedPointer<AbstractModule>(new Counter(this,config,communication,modulesControlWidgets.last(),modulesDockWidgets.last()));
+    modules.append(module);
+    if(configExist)
+        module->restoreGeometry(*layout);
+    handleStatus(module,status);
+
+    //init scope and all its stuff
+    if(configExist){
+        status = (ModuleStatus)settings->value("Oscilloscopestatus").toInt();
+        config = settings->value("Oscilloscopeconfig").toByteArray();
+    }
+    modulesControlWidgets.append(new WidgetControlModule(nullptr,"Oscilloscope"));
+    modulesDockWidgets.append(new ModuleDockWidget(nullptr, "Oscilloscope"));
+    module = QSharedPointer<AbstractModule>(new Scope(this,config,communication,modulesControlWidgets.last(),modulesDockWidgets.last()));
+    modules.append(module);
+    if(configExist)
+        module->restoreGeometry(*layout);
+    handleStatus(module,status);
+
+
+    emit modulesBuilt();
+}
+
+void DeviceMediator::handleStatus(QSharedPointer<AbstractModule> module, ModuleStatus status)
+{
+
+    if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE){
+        if(status == ModuleStatus::PAUSE)
+            status = ModuleStatus::PLAY;
+        module->writeConfiguration();
+        module->startModule();
+    }
+    module->setModuleStatus(status);
 }
 

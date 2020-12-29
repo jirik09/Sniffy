@@ -14,13 +14,17 @@ class DeviceMediator : public QObject
 public:
     explicit DeviceMediator(QObject *parent = nullptr);
     QList<QSharedPointer<AbstractModule>> createModulesList();
-    QList<QSharedPointer<AbstractModule>> getModulesList();   
+    QList<QSharedPointer<AbstractModule>> getModulesList();
     void ShowDeviceModule();
     bool getIsConnected() const;
     QString getDeviceName();
 
+    QList<WidgetControlModule*> modulesControlWidgets;
+    QList<ModuleDockWidget*> modulesDockWidgets;
+
 signals:
     void loadLayout(QString Devicename);
+    void modulesBuilt();
 
 private:
     QList<DeviceDescriptor> deviceList;
@@ -30,6 +34,9 @@ private:
     Comms *communication;
 
     bool isConnected = false;
+
+    void buildModules(QString deviceName, Comms *communication);
+    void handleStatus(QSharedPointer<AbstractModule> module, ModuleStatus status);
 
 private slots:
     void parseData(QByteArray data);

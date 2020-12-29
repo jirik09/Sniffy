@@ -1,20 +1,24 @@
 #include "scope.h"
 
-Scope::Scope(QObject *parent)
+Scope::Scope(QObject *parent, QByteArray configString,Comms *communication,WidgetControlModule *WidgetModule,ModuleDockWidget *dockWidget)
 {
     Q_UNUSED(parent);
-    config = new ScopeConfig();
-    specification = new ScopeSpec();
-    measCalc = new MeasCalculations();
-    mathCalc = new MathCalculations();
+    config = new ScopeConfig(this,configString);
     scpWindow = new ScopeWindow(config);
     scpWindow->setObjectName("scpWindow");
+    moduleName = "Oscilloscope";
+    moduleIconURI = ":/graphics/graphics/icon_scope.png";
+    setDockWidgetWindow(dockWidget);
+    setModuleControlWidget(WidgetModule);
+
 
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SCOPE;
-    moduleName = "Oscilloscope";
-    moduleIconURI = ":/graphics/graphics/icon_scope.png";
+    setComms(communication);
 
+    specification = new ScopeSpec();
+    measCalc = new MeasCalculations();
+    mathCalc = new MathCalculations();
 
     scopeData = new QVector<QVector<QPointF>>;
 

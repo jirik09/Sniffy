@@ -63,7 +63,7 @@ class CounterConfig : public AbstractConfiguration
 {
     Q_OBJECT
 public:
-    explicit CounterConfig(QObject *parent = nullptr);
+    explicit CounterConfig(QObject *parent = nullptr, QByteArray configString = nullptr);
 
     void parse (QByteArray config);
     QByteArray serialize ();
