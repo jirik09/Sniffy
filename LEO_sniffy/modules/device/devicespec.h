@@ -21,6 +21,8 @@ public:
     uint32_t UID2;
     uint32_t UID3;
 
+    QString MCU_ID;
+    QString Build_Date;
     QString FW_Version;
     QString FREE_RTOS_Version;
     QString HAL_Version;
