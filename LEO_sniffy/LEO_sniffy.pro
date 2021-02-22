@@ -158,6 +158,7 @@ HEADERS += \
     modules/template/templatemodulewindow.h \
     modules/voltmeter/voltmeter.h \
     modules/voltmeter/voltmeterconfig.h \
+    modules/voltmeter/voltmeterdefs.h \
     modules/voltmeter/voltmeterspec.h \
     modules/voltmeter/voltmeterwindow.h
 

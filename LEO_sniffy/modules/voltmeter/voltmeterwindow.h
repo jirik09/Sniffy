@@ -16,8 +16,11 @@
 #include "../../GUI/widgetchart.h"
 #include "../../GUI/widgettab.h"
 #include "../../GUI/widgetlabelarea.h"
+#include "../../GUI/widgetdisplay.h"
+#include "../../GUI/widgetswitch.h"
 
 #include "voltmeterconfig.h"
+#include "voltmeterdefs.h"
 
 namespace Ui {
 class VoltmeterWindow;
@@ -36,6 +39,25 @@ public:
 private:
     Ui::VoltmeterWindow *ui;
     VoltmeterConfig *config;
+
+    QList<WidgetDisplay *> displays;
+
+    widgetTab *tabs;
+    WidgetButtons *buttonsChannelEnable;
+    WidgetDialRange *dialAveraging;
+    WidgetButtons *buttonsChannelSettings;
+
+    WidgetButtons *voltageACDC;
+    WidgetButtons *buttonsClac;
+
+private slots:
+    void channelEnableCallback(int status);
+    void averagingCallback(int value);
+    void channelSettingsCallback(int clicked);
+    void voltageCallback(int clicked);
+    void buttonsCalsCallback(int clicked);
+
+
 };
 
 #endif // VOLTMETERWINDOW_H

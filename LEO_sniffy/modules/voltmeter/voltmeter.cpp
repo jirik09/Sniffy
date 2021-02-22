@@ -17,6 +17,7 @@ Voltmeter::Voltmeter(QObject *parent)
 //In case hold button should be shown insert this and connect callback to handle hold/pause
     connect(this, &AbstractModule::moduleCreated, this, &Voltmeter::showHoldButtonCallback);
     connect(this, &AbstractModule::holdClicked, this, &Voltmeter::holdButtonCallback);
+
 }
 
 QWidget *Voltmeter::getWidget()

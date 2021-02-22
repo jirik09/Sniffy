@@ -3,6 +3,7 @@
 
 #define IMAGE_UNITS_HZ    "image: url(:/graphics/graphics/units_hz.png); border: none;"
 #define IMAGE_UNITS_SEC   "image: url(:/graphics/graphics/units_sec.png); border: none;"
+#define IMAGE_UNITS_VOLT   "image: url(:/graphics/graphics/units_v.png); border: none;"
 
 #define IMAGE_SIGN_PERCENT "image: url(:/graphics/graphics/units_perc.png); border: none;"
 #define IMAGE_SIGN_ERR     "image: url(:/graphics/graphics/units_err.png); border: none;"

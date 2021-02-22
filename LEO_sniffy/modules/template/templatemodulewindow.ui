@@ -47,11 +47,41 @@ background-color: rgb(58, 58, 58);
         <height>150</height>
        </size>
       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="spacing">
+        <number>5</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_display">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+        </layout>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="widget_settings" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>255</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="minimumSize">
        <size>
-        <width>150</width>
+        <width>200</width>
         <height>150</height>
        </size>
       </property>

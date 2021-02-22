@@ -9,18 +9,20 @@ void VoltmeterSpec::parseSpecification(QByteArray spec)
 {
     QDataStream stream(spec);
 
-    stream >> resources;
+    int tmpVref;
+    int tmpVrefInt;
 
-    //TODO parse spec into public variables
-    //example:
-    /*
-    stream >> resources >> maxSamplingRate12B ;
+    stream >> resources >> maxSamplingRate12B >> maxSamplingRate8BInterleaved ;
+    stream >> memorySize>> maxADCChannels >> tmpVref >> tmpVrefInt;
+
+    Vref = tmpVref;
+    VrefInt = tmpVrefInt;
+
     char chars[4] = "";
     for(int i = 0; i < maxADCChannels; i++){
         stream.readRawData(chars, 4);
         channelPins[i] = QString(chars);
         channelPins[i].remove('_');
     }
-    */
 
 }
