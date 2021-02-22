@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent):
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sep);
 
-
     createModulesWidgets();
     setupMainWindowComponents();
 
@@ -129,7 +128,7 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent (QCloseEvent *event)
 {
     saveLayout();
-    deviceMediator->close();
+   // deviceMediator->close();
     event->accept();
 }
 
@@ -153,19 +152,24 @@ void MainWindow::saveLayout()
             settings.setValue(module->getModuleName()+"config",module->getConfiguration());
             settings.setValue(module->getModuleName()+"status",(int)(module->getModuleStatus()));
         }
+        settings.setValue("resourcesInUse",deviceMediator->getResourcesInUse());
     }
 }
 
 void MainWindow::loadLayout(QString deviceName)
 {
     layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".lay";
+    configFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".cfg";
     QFile file(layoutFile);
     if(!file.exists()){
         return;
     }
     QSettings layout(layoutFile, QSettings::IniFormat);
+    QSettings settings(configFile, QSettings::IniFormat);
     restoreGeometry(layout.value("geometry").toByteArray());
     restoreState(layout.value("windowState").toByteArray());
+
+    deviceMediator->setResourcesInUse(settings.value("resourcesInUse").toInt());
 }
 
 void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)

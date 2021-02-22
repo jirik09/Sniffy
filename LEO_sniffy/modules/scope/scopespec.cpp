@@ -10,35 +10,22 @@ ScopeSpec::ScopeSpec(QObject *parent)
 
 void ScopeSpec::parseSpecification(QByteArray spec){
 
-    QList<QByteArray> specParams = spec.split(':');
+    QDataStream stream(spec);
 
-    if(specParams.length()>=7){
-        QDataStream streamSampling12B(specParams[0]);
-        streamSampling12B>>maxSamplingRate12B;
+    int tmpVref;
+    int tmpVrefInt;
 
-        QDataStream streamSampling8BInt(specParams[1]);
-        streamSampling8BInt>>maxSamplingRate8BInterleaved;
+    stream >> resources >> maxSamplingRate12B >> maxSamplingRate8BInterleaved ;
+    stream >> memorySize>> maxADCChannels >> tmpVref >> tmpVrefInt;
 
-        QDataStream streamBufferSize(specParams[2]);
-        streamBufferSize>>memorySize;
+    Vref = tmpVref;
+    VrefInt = tmpVrefInt;
 
-        QDataStream streamADCChannels(specParams[3]);
-        streamADCChannels>>maxADCChannels;
-
-        QDataStream streamVref(specParams[4]);
-        int tmpVref;
-        streamVref>>tmpVref;
-        Vref = tmpVref;
-
-        QDataStream streamVrefInt(specParams[5]);
-        int tmpVrefInt;
-        streamVrefInt>>tmpVrefInt;
-        VrefInt = tmpVrefInt;
-
-        for (int i = 0;i<maxADCChannels;i++){
-            channelPins[i]=specParams[6+i];
-        }
-        isSpecificationLoaded = true;
+    char chars[4] = "";
+    for(int i = 0; i < maxADCChannels; i++){
+        stream.readRawData(chars, 4);
+        channelPins[i] = QString(chars);
+        channelPins[i].remove('_');
     }
 }
 

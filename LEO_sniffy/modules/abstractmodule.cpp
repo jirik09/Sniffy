@@ -2,7 +2,6 @@
 
 AbstractModule::AbstractModule(QObject *parent) : QObject(parent)
 {
-
 }
 
 void AbstractModule::saveGeometry(QSettings &layout)
@@ -145,6 +144,7 @@ void AbstractModule::restoreGeometry(QSettings &layout)
 void AbstractModule::widgetControlClicked(ModuleStatus status){
     switch (status) {
     case ModuleStatus::STOP:
+        emit blockConflictingModules(moduleName, moduleSpecification->getResources());
         dockWidgetWindow->show();
         writeConfiguration();
         startModule();
@@ -165,6 +165,9 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
     case ModuleStatus::HIDDEN_PAUSE:
         dockWidgetWindow->show();
         moduleControlWidget->setStatus(ModuleStatus::PAUSE);
+        break;
+    case ModuleStatus::LOCKED:
+        //TODO decide whether to close used resources or not open
         break;
     }
 }
@@ -222,6 +225,7 @@ void AbstractModule::closeModule(){
     dockWidgetWindow->hide();
     stopModule();
     moduleControlWidget->setStatus(ModuleStatus::STOP);
+    emit releaseConflictingModules(moduleName, moduleSpecification->getResources());
 }
 
 void AbstractModule::disableModule(){
@@ -248,6 +252,11 @@ void AbstractModule::setModuleName(QString value){
 void AbstractModule::showModuleHoldButton(){
     if(dockWinCreated)
         dockWidgetWindow->showHoldButton();
+}
+
+int AbstractModule::getResources()
+{
+    return moduleSpecification->getResources();
 }
 
 void AbstractModule::held(bool held){

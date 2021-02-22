@@ -10,9 +10,11 @@ public:
     explicit AbstractSpecification(QObject *parent = nullptr);
 
     virtual void parseSpecification(QByteArray spec) = 0;
+    int getResources();
     bool isLoaded() const;
 
 protected:
+    int resources = 0;
     bool isSpecificationLoaded = false;
 
 };

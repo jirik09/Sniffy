@@ -11,9 +11,9 @@ class TemplateModuleSpec : public AbstractSpecification
     Q_OBJECT
 public:
     explicit TemplateModuleSpec(QObject *parent = nullptr);
-        void parseSpecification(QByteArray spec);
+    void parseSpecification(QByteArray spec);
 
-signals:
+    int specificationVariable;
 
 };
 

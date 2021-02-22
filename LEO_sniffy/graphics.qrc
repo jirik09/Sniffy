@@ -46,6 +46,7 @@
         <file>graphics/icon_save.png</file>
         <file>graphics/icon_chart.png</file>
         <file>graphics/icon_list.png</file>
+        <file>graphics/status_locked.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

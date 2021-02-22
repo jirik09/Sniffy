@@ -4,7 +4,7 @@ Scope::Scope(QObject *parent)
 {
     Q_UNUSED(parent);
     config = new ScopeConfig();
-    specification = new ScopeSpec();
+    moduleSpecification = new ScopeSpec();
     measCalc = new MeasCalculations();
     mathCalc = new MathCalculations();
     scpWindow = new ScopeWindow(config);
@@ -42,7 +42,7 @@ void Scope::parseData(QByteArray data){
 
     if(dataHeader=="CFG_"){
         data.remove(0,4);
-        specification->parseSpecification(data);
+        moduleSpecification->parseSpecification(data);
         showModuleControl();
 
     }else if(dataHeader=="SMPL"){
@@ -103,8 +103,6 @@ void Scope::parseData(QByteArray data){
                     tmpShort = tmpByte;
                     streamBuffLeng>>tmpByte;
                     tmpShort += tmpByte*256;
-                    x = 0;
-                    y = 0;
                     x=j*1.0/samplingFreq + minX;
                     y=(tmpShort*(float)(config->rangeMax-config->rangeMin)/(pow(2,config->ADCresolution)-1)+config->rangeMin)/1000;
                     points.append(QPointF(x,y));
@@ -242,9 +240,9 @@ void Scope::updateMemoryLength(int length){
         config->signalMegazoom = length==2?true:false;
 
         if(config->ADCresolution>8){
-            config->dataLength = specification->memorySize/config->numberOfChannels/2;
+            config->dataLength = static_cast<ScopeSpec*>(moduleSpecification)->memorySize/config->numberOfChannels/2;
         }else{
-            config->dataLength = specification->memorySize/config->numberOfChannels;
+            config->dataLength = static_cast<ScopeSpec*>(moduleSpecification)->memorySize/config->numberOfChannels;
         }
     }
     updateTimebase(config->timeBase);

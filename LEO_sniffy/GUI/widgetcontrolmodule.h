@@ -14,7 +14,8 @@ enum class ModuleStatus
     PAUSE = 1,
     PLAY = 2,
     HIDDEN_PAUSE = 3,
-    HIDDEN_PLAY = 4
+    HIDDEN_PLAY = 4,
+    LOCKED = 5
   };
 
 class WidgetControlModule : public QWidget

@@ -26,7 +26,7 @@ void DeviceSpec::parseSpecification(QByteArray spec){
         streamUID>>UID2;
         streamUID>>UID3;
 
-        MCU_ID = QString::number(UID2 + (UID3>>16),16);
+        MCU_ID = "0x"+QString::number(UID2 + (UID3>>16),16);
 
         Build_Date = specParams[5];
 

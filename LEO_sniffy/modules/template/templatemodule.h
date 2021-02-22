@@ -34,7 +34,6 @@ private slots:
 
 
 private:
-    TemplateModuleSpec *specification;
     TemplateModuleConfig *config;
     TemplateModuleWindow *tempWindow;
    // scpWindow = new ScopeWindow();

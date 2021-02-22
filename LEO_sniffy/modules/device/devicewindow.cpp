@@ -92,6 +92,8 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
     labelRTOSVer->setValue(spec->FREE_RTOS_Version);
     labelCoreFreq->show();
     labelCoreFreq->setValue(QString::number(spec->CoreClock/1000000) + "MHz");
+    labelMCU_ID->show();
+    labelMCU_ID->setValue(spec->MCU_ID);
 }
 
 void DeviceWindow::hideSpecification(){
@@ -103,5 +105,6 @@ void DeviceWindow::hideSpecification(){
     labelHALVer->hide();
     labelRTOSVer->hide();
     labelCoreFreq->hide();
+    labelMCU_ID->hide();
 }
 

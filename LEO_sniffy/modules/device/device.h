@@ -27,7 +27,7 @@ private:
     void connectDevice(int index);
     void disconnectDevice();
 
-    DeviceSpec *deviceSpec;
+  //  DeviceSpec *deviceSpec;
     DeviceWindow *deviceWindow;
 
 signals:

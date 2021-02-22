@@ -3,7 +3,7 @@
 TemplateModule::TemplateModule(QObject *parent)
 {
     Q_UNUSED(parent);
-    specification = new TemplateModuleSpec();
+    moduleSpecification = new TemplateModuleSpec();
     config = new TemplateModuleConfig();
     tempWindow = new TemplateModuleWindow(config);
     tempWindow->setObjectName("tmpWindow");
@@ -30,7 +30,7 @@ void TemplateModule::parseData(QByteArray data)
 
     if(dataHeader=="CFG_"){
         data.remove(0,4);
-        specification->parseSpecification(data);
+        moduleSpecification->parseSpecification(data);
         showModuleControl();
 //TODO parse message from MCU
     }else if(dataHeader=="xxxx"){
