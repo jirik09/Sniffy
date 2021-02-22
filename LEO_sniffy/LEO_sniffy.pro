@@ -81,7 +81,11 @@ SOURCES += \
     modules/template/templatemodule.cpp \
     modules/template/templatemoduleconfig.cpp \
     modules/template/templatemodulespec.cpp \
-    modules/template/templatemodulewindow.cpp
+    modules/template/templatemodulewindow.cpp \
+    modules/voltmeter/voltmeter.cpp \
+    modules/voltmeter/voltmeterconfig.cpp \
+    modules/voltmeter/voltmeterspec.cpp \
+    modules/voltmeter/voltmeterwindow.cpp
 
 
 HEADERS += \
@@ -151,7 +155,11 @@ HEADERS += \
     modules/template/templatemodule.h \
     modules/template/templatemoduleconfig.h \
     modules/template/templatemodulespec.h \
-    modules/template/templatemodulewindow.h
+    modules/template/templatemodulewindow.h \
+    modules/voltmeter/voltmeter.h \
+    modules/voltmeter/voltmeterconfig.h \
+    modules/voltmeter/voltmeterspec.h \
+    modules/voltmeter/voltmeterwindow.h
 
 
 
@@ -175,7 +183,8 @@ FORMS += \
     modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \
     modules/scope/scopewindow.ui \
-    modules/template/templatemodulewindow.ui
+    modules/template/templatemodulewindow.ui \
+    modules/voltmeter/voltmeterwindow.ui
 
 
 TRANSLATIONS += \
