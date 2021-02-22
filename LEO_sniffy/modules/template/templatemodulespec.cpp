@@ -7,17 +7,19 @@ TemplateModuleSpec::TemplateModuleSpec(QObject *parent)
 
 void TemplateModuleSpec::parseSpecification(QByteArray spec)
 {
-    QList<QByteArray> specParams = spec.split(':');
-    foreach (QByteArray param, specParams){
-        qDebug () << param;
-    }
+    QDataStream stream(spec);
+
+    stream >> specificationVariable;
 
     //TODO parse spec into public variables
     //example:
     /*
-    if(specParams.length()>=xx){
-        QDataStream paramA_Stream(specParams[0]);
-        paramA_Stream >> paramA_Variable;
+    stream >> resources >> maxSamplingRate12B ;
+    char chars[4] = "";
+    for(int i = 0; i < maxADCChannels; i++){
+        stream.readRawData(chars, 4);
+        channelPins[i] = QString(chars);
+        channelPins[i].remove('_');
     }
     */
 

@@ -40,6 +40,7 @@ private:
     WidgetLabel *labelFWVer;
     WidgetLabel *labelRTOSVer;
     WidgetLabel *labelHALVer;
+    WidgetLabel *labelMCU_ID;
     Ui::DeviceWindow *ui;
 };
 

@@ -52,6 +52,8 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
    verticalLayoutSpecification->addWidget(labelRTOSVer);
    labelHALVer = new WidgetLabel(WidgetSpecification,"ST HAL");
    verticalLayoutSpecification->addWidget(labelHALVer);
+   labelMCU_ID = new WidgetLabel(WidgetSpecification,"MCU_ID");
+   verticalLayoutSpecification->addWidget(labelMCU_ID);
 
   // WidgetSeparator *scopeParameters = new WidgetSeparator(WidgetSpecification,"Scope Parameters");
   // verticalLayoutSpecification->addWidget(scopeParameters);
@@ -83,13 +85,15 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
     labelMCU->show();
     labelMCU->setValue(spec->MCU);
     labelFWVer->show();
-    labelFWVer->setValue(spec->FW_Version);
+    labelFWVer->setValue(spec->FW_Version + " ("+spec->Build_Date+")");
     labelHALVer->show();
     labelHALVer->setValue(spec->HAL_Version);
     labelRTOSVer->show();
     labelRTOSVer->setValue(spec->FREE_RTOS_Version);
     labelCoreFreq->show();
     labelCoreFreq->setValue(QString::number(spec->CoreClock/1000000) + "MHz");
+    labelMCU_ID->show();
+    labelMCU_ID->setValue(spec->MCU_ID);
 }
 
 void DeviceWindow::hideSpecification(){
@@ -101,5 +105,6 @@ void DeviceWindow::hideSpecification(){
     labelHALVer->hide();
     labelRTOSVer->hide();
     labelCoreFreq->hide();
+    labelMCU_ID->hide();
 }
 

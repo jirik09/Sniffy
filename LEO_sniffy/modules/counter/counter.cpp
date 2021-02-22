@@ -81,12 +81,12 @@ void Counter::parseData(QByteArray data){
     QByteArray dataToPass = data.remove(0, 4);
 
     if(dataHeader == "CFG_"){
-        spec = new CounterSpec(dataToPass, this);
-        cntWindow->setSpecification(spec);
+        moduleSpecification = new CounterSpec(this);
+        moduleSpecification->parseSpecification(dataToPass);
+        cntWindow->setSpecification(static_cast<CounterSpec*>(moduleSpecification));
         showModuleControl();
 
     }else {
-
         if(dataHeader == "HF_D"){
             parseHighFrequencyCounter(dataToPass);
         }else if(dataHeader=="LF_D"){
@@ -323,7 +323,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         if(isRangeExceeded(val1)){
             cntWindow->clearDisplay(display, false);
             cntWindow->displayFlagSwitchMode(display, true);
-            display->updateProgressBar(spec->lf_max);
+            display->updateProgressBar(static_cast<CounterSpec*>(moduleSpecification)->lf_max);
         }else {
             displayValues(display, strVal, "", strQerr, strTerr);
             cntWindow->showPMErrorSigns(display, true);
@@ -375,7 +375,7 @@ void Counter::lfReloadStateQuantMeasurement(){
 }
 
 bool Counter::isRangeExceeded(double frequency){
-    return (frequency > spec->lf_max) ? true : false;
+    return (frequency > static_cast<CounterSpec*>(moduleSpecification)->lf_max) ? true : false;
 }
 
 void Counter::lfSwitchChannelCallback(int index){

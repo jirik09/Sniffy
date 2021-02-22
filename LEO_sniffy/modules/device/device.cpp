@@ -4,7 +4,7 @@ Device::Device(QObject *parent)
 {
     Q_UNUSED(parent);
     deviceWindow = new DeviceWindow();
-    deviceSpec = new DeviceSpec();
+    moduleSpecification = new DeviceSpec();
 
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SYSTEM;
@@ -87,10 +87,10 @@ void Device::parseData(QByteArray data){
     data.remove(0,4);
 
     if(feature=="CFG_"){
-        deviceSpec->parseSpecification(data);
-        deviceWindow->showSpecification(deviceSpec);
+        static_cast<DeviceSpec*>(moduleSpecification)->parseSpecification(data);
+        deviceWindow->showSpecification(static_cast<DeviceSpec*>(moduleSpecification));
         setIcon(":/graphics/graphics/icon_connected.png");
-        setModuleName(deviceSpec->device);
+        setModuleName(static_cast<DeviceSpec*>(moduleSpecification)->device);
     }else if(feature=="ACK_"){
         //  qDebug() << "ACK";
     }else{
@@ -112,5 +112,5 @@ QWidget* Device::getWidget(){
 
 QString Device::getName()
 {
-    return deviceSpec->device;
+    return static_cast<DeviceSpec*>(moduleSpecification)->device;
 }
