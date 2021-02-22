@@ -9,7 +9,7 @@ void VoltmeterSpec::parseSpecification(QByteArray spec)
 {
     QDataStream stream(spec);
 
-    stream >> specificationVariable;
+    stream >> resources;
 
     //TODO parse spec into public variables
     //example:

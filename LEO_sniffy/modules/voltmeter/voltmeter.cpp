@@ -10,7 +10,7 @@ Voltmeter::Voltmeter(QObject *parent)
 
 //Set the comm prefix, window name and icon
     //module is not fully initialized - control widget and dock wodget cannot be modified
-    moduleCommandPrefix = "SYST";//cmd->SCOPE;
+    moduleCommandPrefix = cmd->SCOPE;
     moduleName = "Voltmeter";
     moduleIconURI = ":/graphics/graphics/icon_voltmeter.png";
 
