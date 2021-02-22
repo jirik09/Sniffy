@@ -3,12 +3,14 @@
 
 #include <QObject>
 #include <QDataStream>
+#include "../abstractspecification.h"
 
-class CounterSpec : public QObject
+class CounterSpec : public AbstractSpecification
 {
     Q_OBJECT
 public:
-    explicit CounterSpec(QByteArray data, QObject *parent = nullptr);
+    explicit CounterSpec(QObject *parent = nullptr);
+    void parseSpecification(QByteArray spec);
 
     int hf_max;
     int hf_min_Tg100ms;

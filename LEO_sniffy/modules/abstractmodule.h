@@ -18,6 +18,8 @@
 #include "../GUI/widgetselection.h"
 #include "../GUI/widgettextinput.h"
 
+#include "abstractspecification.h"
+
 class AbstractModule : public QObject
 {
     Q_OBJECT
@@ -56,12 +58,16 @@ public:
 
     void showModuleHoldButton();
 
+    int getResources();
+
 protected:
     QString moduleName;
     QString moduleIconURI;
     Commands *cmd;
     Comms *comm;
     QByteArray moduleCommandPrefix;
+
+    AbstractSpecification* moduleSpecification;
 
 private:
     ModuleDockWidget *dockWidgetWindow;
@@ -76,6 +82,8 @@ signals:
     void moduleCreated();
     void holdClicked(bool held);
     void loadModuleLayoutAndConfig(QString moduleName);
+    void blockConflictingModules(QString moduleName, int resources);
+    void releaseConflictingModules(QString moduleName, int resources);
 
 };
 

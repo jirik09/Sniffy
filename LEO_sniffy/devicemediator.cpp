@@ -14,12 +14,18 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 }
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
-    QList<QSharedPointer<AbstractModule>> modules;
-    modules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
-    modules.append(QSharedPointer<AbstractModule> (new Scope(this)));
-    modules.append(QSharedPointer<AbstractModule> (new Counter(this)));
-    modules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
-    return modules;
+    QList<QSharedPointer<AbstractModule>> tmpModules;
+    tmpModules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Scope(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Counter(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
+
+    foreach(QSharedPointer<AbstractModule> mod, tmpModules){
+        connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
+        connect(mod.data(), &AbstractModule::releaseConflictingModules, this, &DeviceMediator::releaseConflictingModulesCallback);
+    }
+
+    return tmpModules;
 }
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::getModulesList(){
@@ -63,6 +69,27 @@ void DeviceMediator::open(int deviceIndex){
     }
 }
 
+void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int resources)
+{
+    if(resourcesInUse & resources){
+        qDebug () << "FATAL ERROR - trying to open conflicting resources";
+    }
+    foreach(QSharedPointer<AbstractModule> mod, modules){
+        if(mod->getResources() & resources && mod->getModuleName()!=moduleName)
+            mod->setModuleStatus(ModuleStatus::LOCKED);
+    }
+    resourcesInUse = resourcesInUse | resources;
+}
+
+void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int resources)
+{
+    foreach(QSharedPointer<AbstractModule> mod, modules){
+        if(mod->getResources() & resources && mod->getModuleName()!=moduleName)
+            mod->setModuleStatus(ModuleStatus::STOP);
+    }
+    resourcesInUse = (resourcesInUse ^ resources) & resourcesInUse;
+}
+
 void DeviceMediator::close(){
     if(isConnected){
         foreach(QSharedPointer<AbstractModule> mod, modules){
@@ -102,7 +129,7 @@ void DeviceMediator::parseData(QByteArray data){
 void DeviceMediator::ShowDeviceModule(){
     device->showModuleWindow();
     device->showModuleControl();
-    device->hideModuleStatus();    
+    device->hideModuleStatus();
 }
 
 bool DeviceMediator::getIsConnected() const
@@ -112,5 +139,15 @@ bool DeviceMediator::getIsConnected() const
 
 QString DeviceMediator::getDeviceName(){
     return device->getName();
+}
+
+int DeviceMediator::getResourcesInUse() const
+{
+    return resourcesInUse;
+}
+
+void DeviceMediator::setResourcesInUse(int value)
+{
+    resourcesInUse = value;
 }
 

@@ -19,6 +19,9 @@ public:
     bool getIsConnected() const;
     QString getDeviceName();
 
+    int getResourcesInUse() const;
+    void setResourcesInUse(int value);
+
 signals:
     void loadLayout(QString Devicename);
 
@@ -30,6 +33,7 @@ private:
     Comms *communication;
 
     bool isConnected = false;
+    int resourcesInUse = 0;
 
 private slots:
     void parseData(QByteArray data);
@@ -37,6 +41,8 @@ private slots:
     void handleError(QByteArray error);
     void ScanDevices();
     void open(int deviceIndex);
+    void blockConflictingModulesCallback(QString moduleName, int resources);
+    void releaseConflictingModulesCallback(QString moduleName, int resources);
 
 public slots:
     void close();

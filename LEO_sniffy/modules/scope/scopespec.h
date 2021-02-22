@@ -11,7 +11,6 @@ class ScopeSpec : public AbstractSpecification
 
 public:
     explicit ScopeSpec(QObject *parent = nullptr);
-
     void parseSpecification(QByteArray spec);
 
     int maxSamplingRate12B;

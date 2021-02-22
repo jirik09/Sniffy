@@ -58,7 +58,7 @@ public slots:
 private:
     ScopeWindow *scpWindow;
     ScopeConfig *config;
-    ScopeSpec *specification;
+   // ScopeSpec *specification;
     MeasCalculations *measCalc;
     MathCalculations *mathCalc;
     QVector<QVector<QPointF>> *scopeData;
