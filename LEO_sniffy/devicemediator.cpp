@@ -18,6 +18,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new Scope(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new Counter(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Voltmeter(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
     foreach(QSharedPointer<AbstractModule> mod, tmpModules){

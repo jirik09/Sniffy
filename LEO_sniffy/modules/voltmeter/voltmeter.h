@@ -35,7 +35,7 @@ private slots:
 
 private:
     VoltmeterConfig *config;
-    VoltmeterWindow *tempWindow;
+    VoltmeterWindow *voltWindow;
    // scpWindow = new ScopeWindow();
 
 };

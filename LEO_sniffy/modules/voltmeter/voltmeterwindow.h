@@ -1,5 +1,5 @@
-#ifndef TEMPLATEMODULEWINDOW_H
-#define TEMPLATEMODULEWINDOW_H
+#ifndef VOLTMETERWINDOW_H
+#define VOLTMETERWINDOW_H
 
 #include <QWidget>
 #include <QScrollArea>
@@ -38,4 +38,4 @@ private:
     VoltmeterConfig *config;
 };
 
-#endif // TEMPLATEMODULEWINDOW_H
+#endif // VOLTMETERWINDOW_H

@@ -5,13 +5,13 @@ Voltmeter::Voltmeter(QObject *parent)
     Q_UNUSED(parent);
     moduleSpecification = new VoltmeterSpec();
     config = new VoltmeterConfig();
-    tempWindow = new VoltmeterWindow(config);
-    tempWindow->setObjectName("tmpWindow");
+    voltWindow = new VoltmeterWindow(config);
+    voltWindow->setObjectName("voltWindow");
 
 //Set the comm prefix, window name and icon
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = "SYST";//cmd->SCOPE;
-    moduleName = "Template Module";
+    moduleName = "Voltmeter";
     moduleIconURI = ":/graphics/graphics/icon_voltmeter.png";
 
 //In case hold button should be shown insert this and connect callback to handle hold/pause
@@ -21,7 +21,7 @@ Voltmeter::Voltmeter(QObject *parent)
 
 QWidget *Voltmeter::getWidget()
 {
-    return tempWindow;
+    return voltWindow;
 }
 
 void Voltmeter::parseData(QByteArray data)
@@ -42,7 +42,7 @@ void Voltmeter::parseData(QByteArray data)
 
 void Voltmeter::writeConfiguration()
 {
-    tempWindow->restoreGUIAfterStartup();
+    voltWindow->restoreGUIAfterStartup();
 //TODO this function is called when module is opened
 }
 
