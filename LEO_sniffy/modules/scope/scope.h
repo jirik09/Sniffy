@@ -24,7 +24,8 @@ class Scope : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit Scope(QObject *parent = nullptr, QByteArray configString = nullptr,Comms *communication = nullptr,WidgetControlModule *WidgetModule = nullptr,ModuleDockWidget *dockWidget = nullptr);
+    explicit Scope(QObject *parent = nullptr);
+
     QWidget* getWidget();
 
 signals:

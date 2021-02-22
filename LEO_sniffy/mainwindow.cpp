@@ -27,20 +27,19 @@ MainWindow::MainWindow(QWidget *parent):
     setWindowTitle("LEO sniffy");
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
-    ui->verticalLayout_internal->addWidget(sep);
+    ui->verticalLayout_modules->addWidget(sep);
 
-    deviceMediator = new DeviceMediator(this);
-    attachWidgets();
+
+    createModulesWidgets();
     setupMainWindowComponents();
 
-    connect(deviceMediator,&DeviceMediator::loadLayout,this,&MainWindow::loadMainLayout);
-    connect(deviceMediator,&DeviceMediator::modulesBuilt,this,&MainWindow::attachWidgets);
-
+    connect(deviceMediator,&DeviceMediator::loadLayout,this,&MainWindow::loadLayout);
 }
 
 void MainWindow::createModulesWidgets(){
+    deviceMediator = new DeviceMediator(this);
 
-    QList<QSharedPointer<AbstractModule>> modulesList = deviceMediator->getModulesList();
+    modulesList = deviceMediator->getModulesList();
     QSharedPointer<AbstractModule> module;
     QString moduleName;
 
@@ -73,7 +72,8 @@ void MainWindow::createModulesWidgets(){
 }
 
 void MainWindow::setupMainWindowComponents(){
-
+    WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
+    ui->verticalLayout_modules->addWidget(sep);
     QSpacerItem * verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ui->verticalLayout_modules->addItem(verticalSpacer);
     WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget);
@@ -136,7 +136,6 @@ void MainWindow::closeEvent (QCloseEvent *event)
 void MainWindow::saveLayout()
 {
     if(deviceMediator->getIsConnected()){
-        QList<QSharedPointer<AbstractModule>> modulesList = deviceMediator->getModulesList();
         QSharedPointer<AbstractModule> module;
         layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
         configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
@@ -157,7 +156,7 @@ void MainWindow::saveLayout()
     }
 }
 
-void MainWindow::loadMainLayout(QString deviceName)
+void MainWindow::loadLayout(QString deviceName)
 {
     layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".lay";
     QFile file(layoutFile);
@@ -169,32 +168,40 @@ void MainWindow::loadMainLayout(QString deviceName)
     restoreState(layout.value("windowState").toByteArray());
 }
 
-void MainWindow::attachWidgets()
+void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 {
-    QList<QSharedPointer<AbstractModule>> modulesList = deviceMediator->getModulesList();
+    QString layoutFile;
+    QString configFile;
+    layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
+    configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
     QSharedPointer<AbstractModule> module;
-    QString moduleName;
 
-    WidgetControlModule *WidgetModule;
-    ModuleDockWidget *dockWidget;
+    QFile file(layoutFile);
+    QFile fileMod(configFile);
 
-    int index;
+    if(!file.exists() || !fileMod.exists())
+        return;
+
+    QSettings settings(configFile, QSettings::IniFormat);
+    QSettings layout(layoutFile, QSettings::IniFormat);
+    ModuleStatus status;
+    QByteArray config;
+
     foreach(module, modulesList){
-        index = modulesList.indexOf(module);
-        moduleName = module->getModuleName();
+        if(module->getModuleName()==moduleName){
+            status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
+            config = settings.value(module->getModuleName()+"config").toByteArray();
+            module->parseConfiguration(config);
 
-        WidgetModule = deviceMediator->modulesControlWidgets.at(index);
-        ui->verticalLayout_internal->addWidget(WidgetModule);
-        //WidgetModule->setStatus(ModuleStatus::STOP);
-        //WidgetModule->hide();
-
-        dockWidget = deviceMediator->modulesDockWidgets.at(index);
-        dockWidget->setWidget(module->getWidget());
-
-        addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget);
-        connect(module.data(),SIGNAL(loadModuleLayoutAndConfig(QString)),this,SLOT(loadModuleLayoutAndConfigCallback(QString)));
+            module->restoreGeometry(layout);
+            if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE){
+                if(status == ModuleStatus::PAUSE)
+                    status = ModuleStatus::PLAY;
+                module->writeConfiguration();
+                module->startModule();
+            }
+            module->setModuleStatus(status);
+        }
     }
-
-    deviceMediator->ShowDeviceModule();
 }
 

@@ -1,19 +1,15 @@
 #include "device.h"
 
-Device::Device(QObject *parent, QByteArray configString,Comms *communication,WidgetControlModule *WidgetModule,ModuleDockWidget *dockWidget)
+Device::Device(QObject *parent)
 {
     Q_UNUSED(parent);
-    Q_UNUSED(configString);
     deviceWindow = new DeviceWindow();
     deviceSpec = new DeviceSpec();
 
-    moduleName = "Device";
-    moduleIconURI = ":/graphics/graphics/icon_not_connected.png";
-    setDockWidgetWindow(dockWidget);
-    setModuleControlWidget(WidgetModule);
-
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SYSTEM;
+    moduleName = "Device";
+    moduleIconURI = ":/graphics/graphics/icon_not_connected.png";
 
     connect(deviceWindow->deviceConnectButton,SIGNAL(clicked(int)),this,SLOT(deviceConnection(int)));
 }

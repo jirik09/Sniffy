@@ -20,7 +20,7 @@ class Counter : public AbstractModule
     Q_OBJECT
 
 public:
-    explicit Counter(QObject *parent = nullptr, QByteArray configString = nullptr,Comms *communication = nullptr,WidgetControlModule *WidgetModule = nullptr,ModuleDockWidget *dockWidget= nullptr);
+    explicit Counter(QObject *parent = nullptr);
     ~Counter();
 
     QWidget* getWidget();

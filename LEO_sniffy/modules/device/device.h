@@ -15,7 +15,7 @@ class Device : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit Device(QObject *parent = nullptr, QByteArray configString = nullptr,Comms *communication = nullptr,WidgetControlModule *WidgetModule = nullptr,ModuleDockWidget *dockWidget= nullptr);
+    explicit Device(QObject *parent = nullptr);
 
     QWidget* getWidget();
     QString getName();

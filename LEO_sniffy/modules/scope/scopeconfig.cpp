@@ -1,11 +1,8 @@
 #include "scopeconfig.h"
 
-ScopeConfig::ScopeConfig(QObject *parent, QByteArray configString)
+ScopeConfig::ScopeConfig(QObject *parent)
 {
     Q_UNUSED(parent);
-    if(!configString.isEmpty()){
-        parse(configString);
-    }
 }
 
 void ScopeConfig::parse(QByteArray config)

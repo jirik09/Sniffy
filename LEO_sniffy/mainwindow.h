@@ -30,6 +30,7 @@ private:
     Ui::MainWindow *ui;
     DeviceMediator *deviceMediator;
     QPropertyAnimation *animation;
+    QList<QSharedPointer<AbstractModule>> modulesList;
     QString layoutFile;
     QString configFile;
     QString setingsFile;
@@ -43,8 +44,8 @@ private:
     void saveLayout();
 
 private slots:
-    void loadMainLayout(QString deviceName);
-    void attachWidgets();
+    void loadLayout(QString deviceName);
+    void loadModuleLayoutAndConfigCallback(QString moduleName);
     void setMenuSize(bool isWide);
 };
 #endif // MAINWINDOW_H
