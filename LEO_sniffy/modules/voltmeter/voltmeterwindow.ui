@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TemplateModuleWindow</class>
- <widget class="QWidget" name="TemplateModuleWindow">
+ <class>VoltmeterWindow</class>
+ <widget class="QWidget" name="VoltmeterWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
