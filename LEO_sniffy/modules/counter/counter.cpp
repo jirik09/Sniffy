@@ -164,7 +164,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     QByteArray freqPer = data.left(4); data.remove(0, 4);
 
     double val, qerr, terr;
-    QString strVal, strAvg, strQerr, strTerr;
+    QString strAvg, strQerr, strTerr; // strVal
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val >> qerr >> terr;
 
@@ -353,6 +353,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         /* History section */
         cntWindow->appendNewHistorySample(display, "PW ", val1, " s");
         cntWindow->associateToHistorySample(display, 1, ", DC ", val2, " \%");
+        cntWindow->associateToHistorySample(display, 2, " ");
     }
 }
 

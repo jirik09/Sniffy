@@ -260,20 +260,16 @@ void CounterWindow::associateToHistorySample(WidgetDisplay *display, int traceIn
     display->associateSample(traceIndex, prefix, sample, affix);
 }
 
-void CounterWindow::restoreGUIAfterStartup()
-{
-    //TODO tahle funkce se vola pri otevreni GUI modulu. Geometrie GUI je nactena tak jak byla
-    //ale zobrazit spravne ovadani/display podle toho co ma byt videt je potreba udelat zde
-
-    //nastavit ovladani podle toho jaky kanal je v LF vybran
-    int index = tabLowFreq->buttonsChannelSwitch->getSelectedIndex();
-    lfSwitchChannelCallback(index);
-
-    //nastavit mode podle toho jaky je nacten v konfiguraci.
-    //tohle je prasarna ptz se enum pretipuje na int a pouzije jako index.
-    //V cnt se nevyznam tak jsem hned nenasel jak to udelat lip
-    index = static_cast<int>(conf->mode);
-    switchCounterModeCallback(index);
+void CounterWindow::restoreGUIAfterStartup(){
+    switchCounterModeCallback((int)conf->mode);
+    if(conf->mode == CounterMode::LOW_FREQUENCY){
+        lfSwitchChannelCallback((int)conf->lfState.activeChan);
+        if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
+            lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
+        }else if(conf->lfState.chan2.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
+            lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
+        }
+    }
 }
 
 /************************************** HIGH FREQ FUNCTIONS ****************************************/
@@ -318,7 +314,7 @@ void CounterWindow::lfSwitchQuantityCallback(int index){
 
 void CounterWindow::lfSwitchDutyCycleCallback(int index){
     WidgetDisplay *display, *unavailDisplay;
-    QString unitsStyleSheet;
+    //QString unitsStyleSheet;
     QString pin;
 
     if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){

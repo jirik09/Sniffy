@@ -380,7 +380,7 @@ void WidgetDisplay::appendNewHistorySample(QString prefix, double sample, QStrin
         rememberMax = sample;
     }
 
-    if(historyData[0][0].length() > historySize){
+    if(historyData[0].at(0).length() > historySize){
         timeAxisMin += timeStep;
         clearExpiredData();
         clearExpiredPointsFromChart();
