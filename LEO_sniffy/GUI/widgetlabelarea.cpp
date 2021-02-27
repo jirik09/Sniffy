@@ -96,7 +96,7 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
     }
 
     foreach(Measurement* m, meas){
-        measLabelList.at(fillIndex)->setText(m->getLabel()+" "+m->getValue());
+        measLabelList.at(fillIndex)->setText(m->getLabel()+" "+m->getValueString());
         measLabelList.at(fillIndex)->show();
         if(m->getChannelIndex()==0)
             measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(0)));

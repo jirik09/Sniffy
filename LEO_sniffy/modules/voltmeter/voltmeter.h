@@ -8,6 +8,10 @@
 #include "voltmeterconfig.h"
 #include "voltmeterwindow.h"
 
+#include "../scope/measurement.h"
+#include "../scope/meascalculations.h"
+
+
 class Voltmeter : public AbstractModule
 {
     Q_OBJECT
@@ -31,12 +35,43 @@ private slots:
 
     void showHoldButtonCallback();
     void holdButtonCallback(bool held);
+    void updateMeasurement(QList<Measurement*> m);
 
 
 private:
     VoltmeterConfig *config;
     VoltmeterWindow *voltWindow;
-   // scpWindow = new ScopeWindow();
+
+
+
+    double realVdd = 1;
+    bool isReferenceMeasured = false;
+    int samplesTaken = 0;
+    int samplesToTakeTotal = 4;
+    int numChannelsEnabled = 1;
+
+    QList<qreal> dataRawVoltage[MAX_VOLTMETER_CHANNELS];
+    qreal dataVoltage[MAX_VOLTMETER_CHANNELS];
+    qreal dataRipple[MAX_VOLTMETER_CHANNELS];
+    qreal dataFrequency[MAX_VOLTMETER_CHANNELS];
+    qreal dataMax[MAX_VOLTMETER_CHANNELS];
+    qreal dataMin[MAX_VOLTMETER_CHANNELS];
+
+    QList<Measurement *> voltMeasList;
+    MeasCalculations *measCalc;
+
+    QVector<QVector<QPointF>> *voltmeterData;
+
+    void stopSampling();
+    void startSampling();
+    void restartSampling();
+    void setNumberOfChannels(int num);
+    void setVDDSampling();
+    void setDefaultSampling();
+
+    qreal getAverage(QList<qreal> *list);
+
+
 
 };
 

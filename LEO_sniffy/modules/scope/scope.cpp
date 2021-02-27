@@ -151,6 +151,8 @@ void Scope::parseData(QByteArray data){
 
 void Scope::writeConfiguration(){
     scpWindow->restoreGUIAfterStartup();
+
+    comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
     updateTimebase(config->timeBase);
 
     setDataLength(config->dataLength);

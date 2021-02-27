@@ -20,7 +20,7 @@ public:
     int maxADCChannels;
     QString channelPins[MAX_VOLTMETER_CHANNELS];
     qreal Vref;
-    qreal VrefInt;
+    qreal VrefCalibration;
 
 };
 

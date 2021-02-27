@@ -233,6 +233,14 @@ void AbstractModule::disableModule(){
     closeModule();
 }
 
+bool AbstractModule::isActive()
+{
+    if (moduleControlWidget->getStatus()==ModuleStatus::STOP || moduleControlWidget->getStatus()==ModuleStatus::LOCKED){
+        return false;
+    }
+    return true;
+}
+
 void AbstractModule::setIcon (QString ImageURI){
     moduleControlWidget->setIcon(ImageURI);
 }

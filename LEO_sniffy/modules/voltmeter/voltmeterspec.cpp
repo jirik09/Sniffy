@@ -16,7 +16,7 @@ void VoltmeterSpec::parseSpecification(QByteArray spec)
     stream >> memorySize>> maxADCChannels >> tmpVref >> tmpVrefInt;
 
     Vref = tmpVref;
-    VrefInt = tmpVrefInt;
+    VrefCalibration = tmpVrefInt;
 
     char chars[4] = "";
     for(int i = 0; i < maxADCChannels; i++){
