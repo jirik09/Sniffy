@@ -61,7 +61,7 @@ public:
     void hfSetColorRemainSec(QColor color);
 
     void appendNewHistorySample(WidgetDisplay *display, QString prefix, float sample, QString affix = "", float timeStep = 1);
-    void associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix, float sample, QString affix = "");
+    void associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix = "", float sample = 0, QString affix = "");
 
     void restoreGUIAfterStartup();
 private:

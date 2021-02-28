@@ -36,6 +36,7 @@ public:
 
 private:
     bool seqAB = false, eventA = false, eventB = false;
+    int width, height;
 
     void setSeqPicture();
 
