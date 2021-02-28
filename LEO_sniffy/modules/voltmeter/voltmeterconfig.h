@@ -6,6 +6,7 @@
 #include <QDebug>
 
 #include "../abstractconfiguration.h"
+#include "voltmeterdefs.h"
 
 class VoltmeterConfig : public AbstractConfiguration
 {
@@ -14,6 +15,14 @@ public:
     explicit VoltmeterConfig(QObject *parent = nullptr);
     void parse (QByteArray config);
     QByteArray serialize ();
+
+    int realSamplingRate;
+    int ADCresolution;
+    int dataLength;
+
+    int rangeMin; //mV
+    int rangeMax; //mv
+    int numberOfChannels = 1;
 };
 
 #endif // VOLTMETERCONFIG_H

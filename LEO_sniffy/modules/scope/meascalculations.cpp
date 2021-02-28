@@ -58,42 +58,50 @@ void MeasCalculations::run()
             case MeasurementType::LOW:
                 calculateTime(data[channelIndex],channelIndex,samplingFreq);
                 m->setLabel("Duty Low");
-                m->setValue(LabelFormator::formatOutout(100-High[channelIndex]*100,"%"));
+                m->setValueString(LabelFormator::formatOutout(100-High[channelIndex]*100,"%"));
+                m->setValue(100-High[channelIndex]*100);
                 break;
             case MeasurementType::HIGH:
                 calculateTime(data[channelIndex],channelIndex,samplingFreq);
                 m->setLabel("Duty High");
-                m->setValue(LabelFormator::formatOutout(High[channelIndex]*100,"%"));
+                m->setValueString(LabelFormator::formatOutout(High[channelIndex]*100,"%"));
+                m->setValue(High[channelIndex]*100);
                 break;
             case MeasurementType::MIN:
                 calculateVolt(data[channelIndex],channelIndex);
                 m->setLabel("Min");
-                m->setValue(LabelFormator::formatOutout(Min[channelIndex],"V"));
+                m->setValueString(LabelFormator::formatOutout(Min[channelIndex],"V"));
+                m->setValue(Min[channelIndex]);
                 break;
             case MeasurementType::MAX:
                 calculateVolt(data[channelIndex],channelIndex);
                 m->setLabel("Max");
-                m->setValue(LabelFormator::formatOutout(Max[channelIndex],"V"));
+                m->setValueString(LabelFormator::formatOutout(Max[channelIndex],"V"));
+                m->setValue(Max[channelIndex]);
                 break;
             case MeasurementType::DUTY:
                 calculateTime(data[channelIndex],channelIndex,samplingFreq);
                 m->setLabel("Duty");
-                m->setValue(LabelFormator::formatOutout(High[channelIndex]*100,"%"));
+                m->setValueString(LabelFormator::formatOutout(High[channelIndex]*100,"%"));
+                m->setValue(High[channelIndex]*100);
                 break;
             case MeasurementType::RMS:
                 calculateVolt(data[channelIndex],channelIndex);
                 m->setLabel("RMS");
-                m->setValue(LabelFormator::formatOutout(RMS[channelIndex],"V"));
+                m->setValueString(LabelFormator::formatOutout(RMS[channelIndex],"V"));
+                m->setValue(RMS[channelIndex]);
                 break;
             case MeasurementType::MEAN:
                 calculateVolt(data[channelIndex],channelIndex);
                 m->setLabel("Mean");
-                m->setValue(LabelFormator::formatOutout(Mean[channelIndex],"V"));
+                m->setValueString(LabelFormator::formatOutout(Mean[channelIndex],"V"));
+                m->setValue(Mean[channelIndex]);
                 break;
             case MeasurementType::PKPK:
                 calculateVolt(data[channelIndex],channelIndex);
                 m->setLabel("Pk Pk");
-                m->setValue(LabelFormator::formatOutout(Max[channelIndex] - Min[channelIndex] ,"V"));
+                m->setValueString(LabelFormator::formatOutout(Max[channelIndex] - Min[channelIndex] ,"V"));
+                m->setValue(Max[channelIndex] - Min[channelIndex]);
                 break;
             case MeasurementType::PHASE:
                 channA = m->getChannelIndex()/10;
@@ -103,18 +111,20 @@ void MeasCalculations::run()
                     break;
                 }else{
                     m->setLabel("Phase ("+QString::number(channA+1)+"->"+QString::number(channB+1)+")");
-                    m->setValue("TODO");
+                    m->setValueString("TODO");
                 }
                 break;
             case MeasurementType::PERIOD:
                 calculateTime(data[channelIndex],channelIndex,samplingFreq);
                 m->setLabel("Period");
-                m->setValue(LabelFormator::formatOutout(1.0/Freq[channelIndex],"s"));
+                m->setValueString(LabelFormator::formatOutout(1.0/Freq[channelIndex],"s"));
+                m->setValue(1.0/Freq[channelIndex]);
                 break;
             case MeasurementType::FREQUENCY:
                 calculateTime(data[channelIndex],channelIndex,samplingFreq);
                 m->setLabel("Freq.");
-                m->setValue(LabelFormator::formatOutout(Freq[channelIndex],"Hz"));
+                m->setValueString(LabelFormator::formatOutout(Freq[channelIndex],"Hz"));
+                m->setValue(Freq[channelIndex]);
                 break;
             }
         }

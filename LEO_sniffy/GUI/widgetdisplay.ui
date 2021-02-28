@@ -830,14 +830,14 @@ color: rgb(214, 214, 214);
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>10</width>
+                 <width>30</width>
                  <height>0</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>20</width>
-                 <height>22</height>
+                 <width>80</width>
+                 <height>35</height>
                 </size>
                </property>
               </widget>
@@ -877,14 +877,14 @@ color: rgb(214, 214, 214);
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>10</width>
+                 <width>30</width>
                  <height>0</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>20</width>
-                 <height>22</height>
+                 <width>80</width>
+                 <height>35</height>
                 </size>
                </property>
               </widget>
@@ -937,7 +937,7 @@ color: rgb(214, 214, 214);
                <property name="maximumSize">
                 <size>
                  <width>80</width>
-                 <height>40</height>
+                 <height>35</height>
                 </size>
                </property>
               </widget>

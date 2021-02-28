@@ -49,6 +49,9 @@
         <file>graphics/status_locked.png</file>
         <file>graphics/icon_unknown.png</file>
         <file>graphics/units_v.png</file>
+        <file>graphics/units_Vripple.png</file>
+        <file>graphics/units_Vmax.png</file>
+        <file>graphics/units_Vmin.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

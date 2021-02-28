@@ -21,6 +21,9 @@
 
 #include "voltmeterconfig.h"
 #include "voltmeterdefs.h"
+#include "channeldata.h"
+#include "./graphics/colors.h"
+#include "../labelformator.h"
 
 namespace Ui {
 class VoltmeterWindow;
@@ -35,6 +38,11 @@ public:
     ~VoltmeterWindow();
 
     void restoreGUIAfterStartup();
+    void showData(ChannelData data[], int numChannels);
+    void showEmptyCalcs();
+    void showVddValue(qreal value);
+    void showProgress(int current, int max);
+    void setPins(QString pins[], int numOfCh);
 
 private:
     Ui::VoltmeterWindow *ui;
@@ -44,20 +52,23 @@ private:
 
     widgetTab *tabs;
     WidgetButtons *buttonsChannelEnable;
+    WidgetLabel *labelVdd;
     WidgetDialRange *dialAveraging;
+    WidgetLabel *labelProgress;
     WidgetButtons *buttonsChannelSettings;
 
     WidgetButtons *voltageACDC;
-    WidgetButtons *buttonsClac;
+    WidgetButtons *buttonsCalc;
 
 private slots:
     void channelEnableCallback(int status);
     void averagingCallback(int value);
-    void channelSettingsCallback(int clicked);
-    void voltageCallback(int clicked);
-    void buttonsCalsCallback(int clicked);
+    void buttonsCalcsCallback(int clicked);
 
-
+signals:
+    void averagingChanged(int value);
+    void numChannelsEnabledChanged(int numChEnabled);
+    void resetMinMax();
 };
 
 #endif // VOLTMETERWINDOW_H

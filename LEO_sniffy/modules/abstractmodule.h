@@ -50,6 +50,7 @@ public:
     void showModuleWindow();
     void closeModule();
     void disableModule();
+    bool isActive();
 
     void setIcon (QString ImageURI);
 

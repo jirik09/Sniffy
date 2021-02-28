@@ -16,12 +16,12 @@ void VoltmeterSpec::parseSpecification(QByteArray spec)
     stream >> memorySize>> maxADCChannels >> tmpVref >> tmpVrefInt;
 
     Vref = tmpVref;
-    VrefInt = tmpVrefInt;
+    VrefCalibration = tmpVrefInt;
 
     char chars[4] = "";
     for(int i = 0; i < maxADCChannels; i++){
         stream.readRawData(chars, 4);
-        channelPins[i] = QString(chars);
+        channelPins[i] = QString::fromUtf8(chars,4);
         channelPins[i].remove('_');
     }
 
