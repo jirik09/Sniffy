@@ -4,6 +4,9 @@
 #define IMAGE_UNITS_HZ    "image: url(:/graphics/graphics/units_hz.png); border: none;"
 #define IMAGE_UNITS_SEC   "image: url(:/graphics/graphics/units_sec.png); border: none;"
 #define IMAGE_UNITS_VOLT   "image: url(:/graphics/graphics/units_v.png); border: none;"
+#define IMAGE_UNITS_VRIPPLE   "image: url(:/graphics/graphics/units_Vripple.png); border: none;"
+#define IMAGE_UNITS_VMAX   "image: url(:/graphics/graphics/units_Vmax.png); border: none;"
+#define IMAGE_UNITS_VMIN   "image: url(:/graphics/graphics/units_Vmin.png); border: none;"
 
 #define IMAGE_SIGN_PERCENT "image: url(:/graphics/graphics/units_perc.png); border: none;"
 #define IMAGE_SIGN_ERR     "image: url(:/graphics/graphics/units_err.png); border: none;"

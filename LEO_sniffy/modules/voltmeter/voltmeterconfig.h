@@ -23,7 +23,6 @@ public:
     int rangeMin; //mV
     int rangeMax; //mv
     int numberOfChannels = 1;
-    int enabledChannels[MAX_VOLTMETER_CHANNELS] = {1,0 ,0, 0};
 };
 
 #endif // VOLTMETERCONFIG_H

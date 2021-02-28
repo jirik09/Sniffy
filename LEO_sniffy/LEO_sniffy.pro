@@ -82,6 +82,7 @@ SOURCES += \
     modules/template/templatemoduleconfig.cpp \
     modules/template/templatemodulespec.cpp \
     modules/template/templatemodulewindow.cpp \
+    modules/voltmeter/channeldata.cpp \
     modules/voltmeter/voltmeter.cpp \
     modules/voltmeter/voltmeterconfig.cpp \
     modules/voltmeter/voltmeterspec.cpp \
@@ -156,6 +157,7 @@ HEADERS += \
     modules/template/templatemoduleconfig.h \
     modules/template/templatemodulespec.h \
     modules/template/templatemodulewindow.h \
+    modules/voltmeter/channeldata.h \
     modules/voltmeter/voltmeter.h \
     modules/voltmeter/voltmeterconfig.h \
     modules/voltmeter/voltmeterdefs.h \
