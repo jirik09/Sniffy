@@ -30,7 +30,7 @@ class widgetChart;
 
 enum class MarkerType
 {
-ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK, CROSS, CIRCLE
+ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK, CROSS, CIRCLE,TRIGGER
 };
 
 enum class Cursor
@@ -106,8 +106,11 @@ private:
 
     qreal minX = 0;
     qreal maxX = 1;
+    qreal lastMinX = 0;
+    qreal lastMaxX = 1;
 
     qreal invZoom = 1;
+    qreal lastInvZoom = 1;
     qreal shift = 0.5;
     qreal localZoom = 1;
     bool mousePressed = false;
@@ -128,6 +131,7 @@ private:
     QPainterPath *MarkerPath_Tick;
     QPainterPath *MarkerPath_Cross;
     QPainterPath *MarkerPath_Circle;
+    QPainterPath *MarkerPath_Trigger;
 
     void initContextMenu();
     void createHorizontalMarkers();

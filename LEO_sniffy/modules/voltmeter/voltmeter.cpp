@@ -160,6 +160,7 @@ void Voltmeter::startModule()
 
 void Voltmeter::stopModule()
 {
+    voltWindow->stopDatalog();
     stopSampling();
 }
 

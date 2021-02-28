@@ -88,9 +88,36 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     tabs->getLayout(0)->addItem(verticalSpacer);
 
+
+    WidgetSeparator *separatorLogger = new WidgetSeparator(this,"Data Logger");
+    tabs->getLayout(1)->addWidget(separatorLogger);
+
+    buttonSelectFile = new WidgetButtons(this,1,ButtonTypes::NORMAL,"File");
+    buttonSelectFile->setObjectName("buttonselectfile");
+    tabs->getLayout(1)->addWidget(buttonSelectFile);
+    buttonSelectFile->setText("   Select   ");
+
+    labelFile = new WidgetLabel(this,"","No File selected");
+    tabs->getLayout(1)->addWidget(labelFile);
+
+    buttonStartLog = new WidgetButtons(this,1,ButtonTypes::NORMAL);
+    buttonStartLog->setObjectName("buttonlogcontrol");
+    tabs->getLayout(1)->addWidget(buttonStartLog);
+    buttonStartLog->setText("Start",0);
+    buttonStartLog->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+    buttonStartLog->enableAll(false);
+
+    // Separator at the end is very important otherwise controls would not be nicely shown when maximized
+    QSpacerItem *verticalSpacerLog;
+    verticalSpacerLog = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    tabs->getLayout(1)->addItem(verticalSpacerLog);
+
     connect(buttonsChannelEnable,&WidgetButtons::statusChanged,this,&VoltmeterWindow::channelEnableCallback);
     connect(dialAveraging,&WidgetDialRange::valueChanged,this,&VoltmeterWindow::averagingCallback);
     connect(buttonsCalc,&WidgetButtons::statusChanged,this,&VoltmeterWindow::buttonsCalcsCallback);
+    connect(buttonSelectFile,&WidgetButtons::clicked,this,&VoltmeterWindow::selectFileCallback);
+    connect(buttonStartLog,&WidgetButtons::clicked,this,&VoltmeterWindow::datalogCallback);
+
 }
 
 VoltmeterWindow::~VoltmeterWindow()
@@ -103,6 +130,7 @@ void VoltmeterWindow::restoreGUIAfterStartup()
     channelEnableCallback(buttonsChannelEnable->getStatus());
     averagingCallback(dialAveraging->getRealValue());
     showEmptyCalcs();
+    buttonStartLog->setChecked(true,1);
     //TODO GUI is loaded to previous state
     //validate the GUI appereance (colors according to selected channel
     //disabled/enabled buttons accordign to selected function
@@ -139,6 +167,9 @@ void VoltmeterWindow::showData(ChannelData data[], int numChannels){
             displays.at(i)->displayTerrString("");
         }
     }
+    if(isDataLogRunning){
+        appendDatalog(data, numChannels);
+    }
 }
 
 void VoltmeterWindow::showEmptyCalcs(){
@@ -172,6 +203,7 @@ void VoltmeterWindow::showEmptyCalcs(){
 
 void VoltmeterWindow::showVddValue(qreal value){
     labelVdd->setValue(QString::number(value)+" V");
+    currentVdd = value;
 }
 
 void VoltmeterWindow::showProgress(int current, int max){
@@ -182,6 +214,67 @@ void VoltmeterWindow::setPins(QString pins[], int numOfCh)
 {
     for(int i = 0;i<numOfCh;i++){
         displays.at(i)->configLabel(1,"pin "+pins[i],"color:"+QString::fromUtf8(COLOR_GREY),true);
+    }
+}
+
+void VoltmeterWindow::appendDatalog(ChannelData data[], int numChannels)
+{
+    QDateTime now;
+    *logStream << QString::number(logSampleIndex)+","+now.currentDateTime().toString("dd.MM.yyyy") + "," +now.currentDateTime().toString("hh:mm:ss.zzz") + ","+ QString::number(currentVdd) ;
+
+    for(int i = 0; i < numChannels; i++){
+        *logStream << ","+QString::number(data[i].voltage);
+       // *logStream << ","+QString::number(data[i].min);
+       // *logStream << ","+QString::number(data[i].max);
+       // *logStream << ","+QString::number(data[i].ripple);
+       // *logStream << ","+QString::number(data[i].frequency);
+    }
+    *logStream << "\n";
+
+    logSampleIndex++;
+    labelFile->setValue("Logging active (" + QString::number(logSampleIndex) + " smpl)");
+}
+
+void VoltmeterWindow::stopDatalog()
+{
+    if(isDataLogRunning){
+        logFile->close();
+        isDataLogRunning = false;
+        buttonStartLog->setText("Start",0);
+        buttonStartLog->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+        buttonSelectFile->enableAll(true);
+        labelFile->setValue("Log stopped (" + QString::number(logSampleIndex) + " smpl)");
+    }
+}
+
+void VoltmeterWindow::startDatalog()
+{
+    if(!isDataLogRunning){
+        logSampleIndex = 0;
+        logFile = new QFile(config->datalogFileName);
+        if(logFile->exists()){
+            logFile->remove();
+        }
+        if(logFile->open(QFile::WriteOnly | QFile::Truncate)){
+            logStream = new QTextStream(logFile);
+            *logStream << "sample ID,date,time,Vdd";
+            //logStream->operator<<("sample,date,time,");
+            for(int i = 0; i < MAX_VOLTMETER_CHANNELS; i++){
+                *logStream << ",Voltage CH"+QString::number(i+1);
+               // *logStream << ",Min CH"+QString::number(i+1);
+               // *logStream << ",Max CH"+QString::number(i+1);
+               // *logStream << ",Ripple CH"+QString::number(i+1);
+               // *logStream << ",Frequency CH"+QString::number(i+1);
+            }
+            *logStream << "\n";
+            isDataLogRunning = true;
+            buttonStartLog->setText("Stop",0);
+            buttonStartLog->setColor("background-color:"+QString::fromUtf8(COLOR_RED),0);
+            buttonSelectFile->enableAll(false);
+        }else{
+            labelFile->setValue("Error opening file");
+            qDebug ()<< "ERROR log file could not be opened";
+        }
     }
 }
 
@@ -209,5 +302,30 @@ void VoltmeterWindow::buttonsCalcsCallback(int clicked)
     showEmptyCalcs();
     if(clicked!=0){
         emit resetMinMax();
+    }
+}
+
+void VoltmeterWindow::selectFileCallback()
+{
+    QString fileName;
+    fileName = QFileDialog::getSaveFileName(this,"Select output file","","Text files (*.csv *.txt)");
+    config->datalogFileName = fileName;
+    qDebug() << fileName;
+    if(fileName.length()>=25){
+        fileName = fileName.left(8)+" ... "+fileName.right(12);
+    }
+    if(fileName.length()>3){
+        labelFile->setValue(fileName);
+        buttonStartLog->enableAll(true);
+    }
+
+}
+
+void VoltmeterWindow::datalogCallback(int index)
+{
+    if(buttonStartLog->getText(0)=="Start"){
+        startDatalog();
+    }else if(buttonStartLog->getText(0)=="Stop"){
+        stopDatalog();
     }
 }
