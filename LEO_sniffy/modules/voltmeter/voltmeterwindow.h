@@ -5,6 +5,8 @@
 #include <QScrollArea>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QFileDialog>
+#include <QDateTime>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"
@@ -43,6 +45,9 @@ public:
     void showVddValue(qreal value);
     void showProgress(int current, int max);
     void setPins(QString pins[], int numOfCh);
+    void appendDatalog(ChannelData data[], int numChannels);
+    void stopDatalog();
+    void startDatalog();
 
 private:
     Ui::VoltmeterWindow *ui;
@@ -55,15 +60,25 @@ private:
     WidgetLabel *labelVdd;
     WidgetDialRange *dialAveraging;
     WidgetLabel *labelProgress;
-    WidgetButtons *buttonsChannelSettings;
-
-    WidgetButtons *voltageACDC;
     WidgetButtons *buttonsCalc;
+
+    WidgetButtons *buttonSelectFile;
+    WidgetLabel *labelFile;
+    WidgetButtons *buttonStartLog;
+
+    bool isDataLogRunning = false;
+    qreal currentVdd;
+    QFile *logFile;
+    int logSampleIndex;
+    QTextStream *logStream;
+
 
 private slots:
     void channelEnableCallback(int status);
     void averagingCallback(int value);
     void buttonsCalcsCallback(int clicked);
+    void selectFileCallback();
+    void datalogCallback(int index);
 
 signals:
     void averagingChanged(int value);

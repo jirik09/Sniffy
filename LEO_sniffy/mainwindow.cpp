@@ -128,7 +128,7 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent (QCloseEvent *event)
 {
     saveLayout();
-   // deviceMediator->close();
+    deviceMediator->close();
     event->accept();
 }
 

@@ -23,6 +23,8 @@ public:
     int rangeMin; //mV
     int rangeMax; //mv
     int numberOfChannels = 1;
+
+    QString datalogFileName;
 };
 
 #endif // VOLTMETERCONFIG_H
