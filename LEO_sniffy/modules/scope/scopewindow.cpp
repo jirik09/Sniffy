@@ -126,6 +126,11 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
                 chart-> setHorizontalMarker(i,zeroMarkerPosition,MarkerType::TICK);
             }
 
+            float triggerMarkerPosition = (config->channelOffset[i]+(qreal(config->triggerLevel)/65535*(config->rangeMax-config->rangeMin)/1000))/config->channelScale[i];
+            if(panelSet->buttonsTriggerChannel->getSelectedIndex()==i){
+                chart-> setHorizontalMarker(i,triggerMarkerPosition,MarkerType::TRIGGER);
+            }
+
             labelInfoPanel->setChannelLabelVisible(i,true);
             labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/div"));
 
@@ -207,6 +212,11 @@ void ScopeWindow::triggerValueCallback(float value){
 
 void ScopeWindow::triggerChannelCallback(int index){
     emit triggerChannelChanged(index);
+
+    panelSet->dialPretrigger->setColor(Colors::getChannelColorString(index));
+    panelSet->dialTriggerValue->setColor(Colors::getChannelColorString(index));
+    panelSet->buttonsTriggerEdge->setColor("background-color:"+Colors::getChannelColorString(index),0);
+    panelSet->buttonsTriggerEdge->setColor("background-color:"+Colors::getChannelColorString(index),1);
 }
 
 void ScopeWindow::triggerEdgeCallback(int index){

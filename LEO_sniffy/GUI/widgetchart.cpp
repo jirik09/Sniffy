@@ -441,6 +441,23 @@ void widgetChart::initBrushes()
 
     MarkerPath_Circle = new QPainterPath(QPointF(10,10));
     MarkerPath_Circle->arcTo(QRectF(8,8,4,4),0,360*16);
+
+    MarkerPath_Trigger = new QPainterPath(QPointF(0,5));
+    MarkerPath_Trigger->lineTo(15,5);
+    MarkerPath_Trigger->lineTo(20,10);
+    MarkerPath_Trigger->lineTo(15,15);
+
+    MarkerPath_Trigger->lineTo(13,15);
+    MarkerPath_Trigger->lineTo(13,10);
+    MarkerPath_Trigger->lineTo(16,10);
+    MarkerPath_Trigger->lineTo(16,7);
+    MarkerPath_Trigger->lineTo(7,7);
+    MarkerPath_Trigger->lineTo(7,10);
+    MarkerPath_Trigger->lineTo(10,10);
+    MarkerPath_Trigger->lineTo(10,15);
+
+    MarkerPath_Trigger->lineTo(0,15);
+
 }
 
 QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
@@ -471,6 +488,9 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
         break;
     case MarkerType::CIRCLE:
         painter.drawPath(*MarkerPath_Circle);
+        break;
+    case MarkerType::TRIGGER:
+        painter.drawPath(*MarkerPath_Trigger);
         break;
     }
     return marker;
