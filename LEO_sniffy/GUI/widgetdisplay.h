@@ -82,6 +82,7 @@ public:
     void showProgressBar(bool visible);
     void setProgressBarRange(int min, int max);
     void updateProgressBar(int value);
+    void setProgressBarColor(QString color);
 
     /* History area */
     void setHistorySize(int smplNumber);
