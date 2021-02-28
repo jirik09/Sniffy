@@ -164,7 +164,6 @@ void Voltmeter::stopModule()
 }
 
 //In case hold is needed
-
 void Voltmeter::showHoldButtonCallback(){
     this->showModuleHoldButton();
 }

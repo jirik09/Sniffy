@@ -8,23 +8,26 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
 {
     ui->setupUi(this);
 
-
     //setup displays
     QString styleSheet = IMAGE_UNITS_VOLT;
     WidgetDisplay *display;
 
     display  = new WidgetDisplay("Voltmeter_CH1", "Channel 1", styleSheet, true, 1, HISTORY_SIZE, this);
     display->configLabel(0,"CH1","color:"+Colors::getChannelColorString(0),true);
+    display->setProgressBarColor(Colors::getChannelColorString(0));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH2", "Channel 2", styleSheet, true, 1, HISTORY_SIZE, this);
     display->configLabel(0,"CH2","color:"+Colors::getChannelColorString(1),true);
+    display->setProgressBarColor(Colors::getChannelColorString(1));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH3", "Channel 3", styleSheet, true, 1, HISTORY_SIZE, this);
     display->configLabel(0,"CH3","color:"+Colors::getChannelColorString(2),true);
+    display->setProgressBarColor(Colors::getChannelColorString(2));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH4", "Channel 4", styleSheet, true, 1, HISTORY_SIZE, this);
     displays.append(display);
     display->configLabel(0,"CH4","color:"+Colors::getChannelColorString(3),true);
+    display->setProgressBarColor(Colors::getChannelColorString(3));
 
     foreach(WidgetDisplay * dis, displays){
         dis->setContentsMargins(5, 5, 5, 5);
@@ -72,24 +75,6 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     WidgetSeparator *separatorSet = new WidgetSeparator(this,"Display");
     tabs->getLayout(0)->addWidget(separatorSet);
 
-  /*  buttonsChannelSettings = new WidgetButtons(this,4,ButtonTypes::RADIO);
-    buttonsChannelSettings->setObjectName("Channelsettings");
-    tabs->getLayout(0)->addWidget(buttonsChannelSettings);
-    buttonsChannelSettings->setText("CH1",0);
-    buttonsChannelSettings->setText("CH2",1);
-    buttonsChannelSettings->setText("CH3",2);
-    buttonsChannelSettings->setText("CH4",3);
-    buttonsChannelSettings->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
-    buttonsChannelSettings->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),1);
-    buttonsChannelSettings->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
-    buttonsChannelSettings->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);*/
-
-   /* voltageACDC = new WidgetButtons(this,2,ButtonTypes::RADIO,"Voltage",0);
-    tabs->getLayout(0)->addWidget(voltageACDC);
-    voltageACDC->setText("   DC   ",0);
-    voltageACDC->setText("   AC   ",1);
-    voltageACDC->enableAll(false);*/
-
     buttonsCalc = new WidgetButtons(this,3,ButtonTypes::RADIO,"",0);
     buttonsCalc->setObjectName("buttonscalc");
     tabs->getLayout(0)->addWidget(buttonsCalc);
@@ -103,9 +88,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     tabs->getLayout(0)->addItem(verticalSpacer);
 
-
     connect(buttonsChannelEnable,&WidgetButtons::statusChanged,this,&VoltmeterWindow::channelEnableCallback);
-    //connect(buttonsChannelSettings,&WidgetButtons::clicked,this,&VoltmeterWindow::channelSettingsCallback);
     connect(dialAveraging,&WidgetDialRange::valueChanged,this,&VoltmeterWindow::averagingCallback);
     connect(buttonsCalc,&WidgetButtons::statusChanged,this,&VoltmeterWindow::buttonsCalcsCallback);
 }
@@ -115,11 +98,9 @@ VoltmeterWindow::~VoltmeterWindow()
     delete ui;
 }
 
-
 void VoltmeterWindow::restoreGUIAfterStartup()
 {
     channelEnableCallback(buttonsChannelEnable->getStatus());
-    //channelSettingsCallback(buttonsChannelSettings->getSelectedIndex());
     averagingCallback(dialAveraging->getRealValue());
     showEmptyCalcs();
     //TODO GUI is loaded to previous state
@@ -132,7 +113,6 @@ void VoltmeterWindow::showData(ChannelData data[], int numChannels){
         displays.at(i)->displayString(displays.at(i)->formatNumber(data[i].voltage,'f',4));
         displays.at(i)->updateProgressBar(data[i].percent);
         displays.at(i)->appendNewHistorySample("",data[i].voltage , "V", 1);
-
 
         if(buttonsCalc->getSelectedIndex()==0){
             displays.at(i)->displayQerrString(displays.at(i)->formatNumber(data[i].min,'f',4));
@@ -222,20 +202,6 @@ void VoltmeterWindow::channelEnableCallback(int status)
 void VoltmeterWindow::averagingCallback(int value)
 {
     emit averagingChanged(value);
-}
-
-void VoltmeterWindow::channelSettingsCallback(int clicked)
-{
-  /*  buttonsCalc->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(clicked)),0);
-    buttonsCalc->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(clicked)),1);
-
-    voltageACDC->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(clicked)),0);
-    voltageACDC->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(clicked)),1);*/
-}
-
-void VoltmeterWindow::voltageCallback(int clicked)
-{
-
 }
 
 void VoltmeterWindow::buttonsCalcsCallback(int clicked)

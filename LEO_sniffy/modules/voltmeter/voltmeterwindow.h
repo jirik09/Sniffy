@@ -60,13 +60,9 @@ private:
     WidgetButtons *voltageACDC;
     WidgetButtons *buttonsCalc;
 
-
-
 private slots:
     void channelEnableCallback(int status);
     void averagingCallback(int value);
-    void channelSettingsCallback(int clicked);
-    void voltageCallback(int clicked);
     void buttonsCalcsCallback(int clicked);
 
 signals:
