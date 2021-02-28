@@ -61,9 +61,9 @@ void CounterWindow::createAllDisplays(void){
 
     displayLFCh2 = createLowFreqDisplays("LowFreqCh2Counter");
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
-    QString style = "QProgressBar {border: 1px solid #777;border-radius: 1px;background: "+QString::fromUtf8(BACKGROUND_COLOR_DATA_AREA)+"}"
-                    "QProgressBar::chunk {background-color: "+QString::fromUtf8(COLOR_GREY)+"width: 20px;}";
-    displayLFCh2->setBarStyle(style);
+//    QString style = "QProgressBar {border: 1px solid #777;border-radius: 1px;background: "+QString::fromUtf8(BACKGROUND_COLOR_DATA_AREA)+"}"
+//                    "QProgressBar::chunk {background-color: "+QString::fromUtf8(COLOR_GREY)+"width: 20px;}";
+//    displayLFCh2->setBarStyle(style);
     ui->verticalLayout_display->addWidget(displayLFCh2);
 
     displayRat = createRatioDisplay();
@@ -101,6 +101,8 @@ WidgetDisplay *CounterWindow::createRatioDisplay(void){
     display->setTerrStyle(styleSheet);
     display->showAvgDisplay(false);
     display->showTerrStyle(false);
+  //  QString color = COLOR_ORANGE;
+  //  display->setProgressBarColor(color);
     return display;
 }
 
