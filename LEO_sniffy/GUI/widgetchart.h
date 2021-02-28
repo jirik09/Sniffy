@@ -106,8 +106,11 @@ private:
 
     qreal minX = 0;
     qreal maxX = 1;
+    qreal lastMinX = 0;
+    qreal lastMaxX = 1;
 
     qreal invZoom = 1;
+    qreal lastInvZoom = 1;
     qreal shift = 0.5;
     qreal localZoom = 1;
     bool mousePressed = false;

@@ -208,10 +208,12 @@ void ScopeWindow::pretriggerCallback(float value){
 
 void ScopeWindow::triggerValueCallback(float value){
     emit triggerValueChanged(value/3.3*100);
+    paintTraces(ChartData,ChartMathData);
 }
 
 void ScopeWindow::triggerChannelCallback(int index){
     emit triggerChannelChanged(index);
+    paintTraces(ChartData,ChartMathData);
 
     panelSet->dialPretrigger->setColor(Colors::getChannelColorString(index));
     panelSet->dialTriggerValue->setColor(Colors::getChannelColorString(index));
@@ -427,6 +429,7 @@ void ScopeWindow::restoreGUIAfterStartup()
 
     channelEnableCallback(panelSet->buttonsChannelEnable->getStatus());
     cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());
+    triggerChannelCallback(panelSet->buttonsTriggerChannel->getSelectedIndex());
 
     panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
     panelMath->typeChanged(panelMath->mathType->getSelectedIndex());

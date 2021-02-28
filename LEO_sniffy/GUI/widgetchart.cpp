@@ -102,13 +102,10 @@ void widgetChart::switchToSplineSeriesCallback(){
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
         series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
-
         series->append(seriesList[i]->points());
         seriesList[i]->clear();
         seriesList.replace(i, series);
-
         createSeries(series);
-        series->setUseOpenGL(true);
     }
 }
 
@@ -117,13 +114,10 @@ void widgetChart::switchToLineSeriesCallback(){
         QLineSeries *series = new QLineSeries;
         //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
         series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
-
         series->append(seriesList[i]->points());
         seriesList[i]->clear();
         seriesList.replace(i, series);
-
         createSeries(series);
-        series->setUseOpenGL(true);
     }
 }
 
@@ -134,14 +128,11 @@ void widgetChart::switchToScatterSeriesCallback(){
         series->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
         series->setMarkerSize(20.0);
         series->setPen(QColor(Qt::transparent));
-
         series->setBrush(getBrush(i,MarkerType::CIRCLE));
         series->append(seriesList[i]->points());
         seriesList[i]->clear();
         seriesList.replace(i, series);
-
         createSeries(series);
-        series->setUseOpenGL(false);
     }
 }
 
@@ -164,7 +155,7 @@ void widgetChart::createSeries(QAbstractSeries *series){
 bool widgetChart::eventFilter(QObject *obj, QEvent *event)
 {
     Q_UNUSED(obj);
-    if(event->type() == QEvent::GraphicsSceneWheel){ //zoomby wheel
+    if(event->type() == QEvent::GraphicsSceneWheel){ //zoom by wheel
         QGraphicsSceneWheelEvent *ev = (QGraphicsSceneWheelEvent*) event;
         qreal tmp = ev->delta();
         if(tmp>=0){
@@ -221,7 +212,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     }
 
     if(event->type() != QEvent::LayoutRequest && event->type()!=QEvent::GraphicsSceneHoverMove){
-     // qDebug() <<"Sereies event"<< event->type() << obj->objectName();
+        // qDebug() <<"Sereies event"<< event->type() << obj->objectName();
     }
     return QObject::eventFilter(obj, event);
 }
@@ -264,12 +255,28 @@ void widgetChart::updateAxis(){
     qreal tmpMin = subMax * shift+minX;
     qreal tmpMax = (maxX-minX)*invZoom/localZoom+tmpMin;
     axisX->setRange(tmpMin,tmpMax);
+
+    if(!seriesList.isEmpty() && seriesList.at(0)->count()>1){
+        qreal percent = (tmpMax-tmpMin)/(seriesList.at(0)->points().last().x()-seriesList.at(0)->points().first().x());
+        int samplesshown = percent*seriesList.at(0)->count();
+        //qDebug() << "shown" +QString::number(samplesshown) <<"update" << QString::number(val);
+        if(samplesshown<400){
+            switchToSplineSeriesCallback();
+        }else{
+            switchToLineSeriesCallback();
+        }
+    }
 }
 
 void widgetChart::setDataMinMax(qreal minX, qreal maxX){
     this->minX = minX;
     this->maxX = maxX;
-    updateAxis();
+
+    if(lastMaxX!=maxX || lastMinX!=minX){
+        lastMaxX = maxX;
+        lastMinX = minX;
+        updateAxis();
+    }
 }
 
 void widgetChart::setRangeX(qreal minX, qreal maxX){
@@ -311,7 +318,10 @@ void widgetChart::setMargins(int left, int top, int right, int bottom){
 
 void widgetChart::setZoom(float zoom){
     this->invZoom = 1/zoom;
-    updateAxis();
+    if(invZoom!=lastInvZoom){
+        lastInvZoom = invZoom;
+        updateAxis();
+    }
 }
 
 qreal widgetChart::getZoom(){
