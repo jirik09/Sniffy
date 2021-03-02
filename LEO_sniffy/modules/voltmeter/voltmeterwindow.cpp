@@ -46,7 +46,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     tabs->getLayout(0)->addWidget(separatorChannelEnable);
 
     buttonsChannelEnable = new WidgetButtons(this,4,ButtonTypes::CHECKABLE);
-    buttonsChannelEnable->setObjectName("ChannelEnable");
+    buttonsChannelEnable->setObjectName("ChannelvoltmeterEnable");
     tabs->getLayout(0)->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
     buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
@@ -56,6 +56,12 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
     buttonsChannelEnable->setText("CH4",3);
     buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);
+
+    buttonsMode = new WidgetButtons(this,2,ButtonTypes::RADIO,"Speed");
+    buttonsMode->setObjectName("ChannelVoltmode");
+    tabs->getLayout(0)->addWidget(buttonsMode);
+    buttonsMode->setText("Normal",0);
+    buttonsMode->setText("Fast",1);
 
     labelVdd = new WidgetLabel(this,"Measured Vcc","--V");
     tabs->getLayout(0)->addWidget(labelVdd);
@@ -117,6 +123,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     connect(buttonsCalc,&WidgetButtons::statusChanged,this,&VoltmeterWindow::buttonsCalcsCallback);
     connect(buttonSelectFile,&WidgetButtons::clicked,this,&VoltmeterWindow::selectFileCallback);
     connect(buttonStartLog,&WidgetButtons::clicked,this,&VoltmeterWindow::datalogCallback);
+    connect(buttonsMode,&WidgetButtons::clicked,this,&VoltmeterWindow::modeCallback);
 
 }
 
@@ -129,8 +136,9 @@ void VoltmeterWindow::restoreGUIAfterStartup()
 {
     channelEnableCallback(buttonsChannelEnable->getStatus());
     averagingCallback(dialAveraging->getRealValue());
+    modeCallback(buttonsMode->getSelectedIndex());
     showEmptyCalcs();
-    buttonStartLog->setChecked(true,1);
+    //buttonStartLog->setChecked(true,1);
     //TODO GUI is loaded to previous state
     //validate the GUI appereance (colors according to selected channel
     //disabled/enabled buttons accordign to selected function
@@ -323,9 +331,15 @@ void VoltmeterWindow::selectFileCallback()
 
 void VoltmeterWindow::datalogCallback(int index)
 {
+    Q_UNUSED(index);
     if(buttonStartLog->getText(0)=="Start"){
         startDatalog();
     }else if(buttonStartLog->getText(0)=="Stop"){
         stopDatalog();
     }
+}
+
+void VoltmeterWindow::modeCallback(int index)
+{
+    emit modeChanged(index);
 }

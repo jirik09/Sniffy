@@ -64,6 +64,9 @@ private:
     QVector<QVector<QPointF>> *scopeData;
     QString mathExpression;
 
+    bool isConfigurationWritten = false;
+    bool isModuleStarted = false;
+
     //private functions - writing into device only - no logic
     void stopSampling();
     void startSampling();

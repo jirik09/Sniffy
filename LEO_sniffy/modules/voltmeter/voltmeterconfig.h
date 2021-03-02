@@ -8,6 +8,12 @@
 #include "../abstractconfiguration.h"
 #include "voltmeterdefs.h"
 
+enum class VoltmeterMode
+{
+    NORMAL = 0,
+    FAST = 1,
+};
+
 class VoltmeterConfig : public AbstractConfiguration
 {
     Q_OBJECT
@@ -18,13 +24,15 @@ public:
 
     int realSamplingRate;
     int ADCresolution;
-    int dataLength;
 
     int rangeMin; //mV
     int rangeMax; //mv
     int numberOfChannels = 1;
 
     QString datalogFileName;
+
+    int targetDataLength = 200;
+    VoltmeterMode mode;
 };
 
 #endif // VOLTMETERCONFIG_H

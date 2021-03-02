@@ -150,6 +150,9 @@ void Scope::parseData(QByteArray data){
 }
 
 void Scope::writeConfiguration(){
+    if(isConfigurationWritten)return;
+
+    isConfigurationWritten = true;
     scpWindow->restoreGUIAfterStartup();
 
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
@@ -176,11 +179,16 @@ QByteArray Scope::getConfiguration(){
 }
 
 void Scope::stopModule(){
+    isModuleStarted = false;
+    isConfigurationWritten = false;
     stopSampling();
     measCalc->exit();
     mathCalc->exit();
 }
 void Scope::startModule(){
+    if (isModuleStarted)return;
+
+    isModuleStarted = true;
     startSampling();
 }
 

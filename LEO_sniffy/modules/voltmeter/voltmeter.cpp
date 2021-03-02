@@ -28,11 +28,12 @@ Voltmeter::Voltmeter(QObject *parent)
     connect(this, &AbstractModule::moduleCreated, this, &Voltmeter::showHoldButtonCallback);
     connect(this, &AbstractModule::holdClicked, this, &Voltmeter::holdButtonCallback);
 
-    connect(measCalc, &MeasCalculations::measCalculated, this, &Voltmeter::updateMeasurement);
+    connect(measCalc, &MeasCalculations::measCalculated, this, &Voltmeter::updateMeasurementGUI);
 
     connect(voltWindow, &VoltmeterWindow::averagingChanged, this,&Voltmeter::setAveraging);
     connect(voltWindow, &VoltmeterWindow::numChannelsEnabledChanged, this,&Voltmeter::setNumChannelsEnabled);
     connect(voltWindow, &VoltmeterWindow::resetMinMax, this,&Voltmeter::resetMinMax);
+    connect(voltWindow, &VoltmeterWindow::modeChanged, this,&Voltmeter::setMode);
 
 }
 
@@ -67,14 +68,10 @@ void Voltmeter::parseData(QByteArray data)
             streamBuffLeng>>samplingFreq;
             streamBuffLeng>>samplingFreq;
             config->realSamplingRate = samplingFreq;
-            // config->realSamplingRate = samplingFreq;
             streamBuffLeng>>tmpByte;
             resolution = tmpByte;
             config->ADCresolution = resolution;
-            //config->ADCresolution = resolution;
             streamBuffLeng>>length;
-            config->dataLength = resolution>8?length/2:length;
-            //config->dataLength = resolution>8?length/2:length;
             streamBuffLeng>>tmpShort;
             config->rangeMin = (qint16)tmpShort;
             streamBuffLeng>>tmpShort;
@@ -129,6 +126,10 @@ void Voltmeter::parseData(QByteArray data)
 
 void Voltmeter::writeConfiguration()
 {
+    if(isConfigurationWritten)return;
+
+    isConfigurationWritten = true;
+    qDebug() << "WRITE CONFIGURATION";
     //workaround first data was corrupted on channels > 1
     numChannelsEnabled = MAX_VOLTMETER_CHANNELS;
     setDefaultSampling();
@@ -155,11 +156,17 @@ QByteArray Voltmeter::getConfiguration()
 
 void Voltmeter::startModule()
 {
+    if (isModuleStarted)return;
+
+    isModuleStarted = true;
+    qDebug() << "START MODULE";
     startSampling();
 }
 
 void Voltmeter::stopModule()
 {
+    isModuleStarted = false;
+    isConfigurationWritten = false;
     voltWindow->stopDatalog();
     stopSampling();
 }
@@ -178,28 +185,41 @@ void Voltmeter::holdButtonCallback(bool held){
         setModuleStatus(ModuleStatus::PLAY);
     }
 }
-
-void Voltmeter::updateMeasurement(QList<Measurement *> m)
-{
+void Voltmeter::updateSamplingChannel(void){
     if(isReferenceMeasured){
         setDefaultSampling();
+    }else{
+        switch (config->mode){
+        case VoltmeterMode::NORMAL:
+            config->targetDataLength = 200;
+            setVDDSampling();
+            break;
+        case VoltmeterMode::FAST:
+            config->targetDataLength = 200;
+            break;
+        }
+    }
+}
+
+void Voltmeter::updateMeasurementGUI(QList<Measurement *> m)
+{
+    if(isReferenceMeasured){
+        updateSamplingChannel();
         qreal VrefReal = static_cast<VoltmeterSpec*>(moduleSpecification)->VrefCalibration / (pow(2,config->ADCresolution)-1) * static_cast<VoltmeterSpec*>(moduleSpecification)->Vref;
         realVdd = VrefReal / m.at(0)->getValue() * static_cast<VoltmeterSpec*>(moduleSpecification)->Vref/1000;
         voltWindow->showVddValue(qreal(int(realVdd))/1000);
 
-        for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
-            dataRawVoltage[i].clear();
-        }
-
     }else{
         samplesTaken++;
+        voltWindow->showProgress(samplesTaken,samplesToTakeTotal);
         foreach(Measurement* meas, m){
             if(meas->getType() == MeasurementType::MEAN){
-                dataRawVoltage[meas->getChannelIndex()].append(meas->getValue());
+                dataRawVoltage[meas->getChannelIndex()].append(meas->getValue()*(realVdd/static_cast<VoltmeterSpec*>(moduleSpecification)->Vref));
             }
         }
 
         if(samplesTaken>=samplesToTakeTotal || isStartup == true){
+            updateSamplingChannel();
             samplesTaken = 0;
             isStartup = false;
             for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
@@ -220,7 +240,11 @@ void Voltmeter::updateMeasurement(QList<Measurement *> m)
                     data[meas->getChannelIndex()].frequency = meas->getValue();
                 }
             }
-            setVDDSampling();
+
+            for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
+                dataRawVoltage[i].clear();
+            }
+
             voltWindow->showData(data,numChannelsEnabled);
         }
     }
@@ -256,6 +280,22 @@ void Voltmeter::resetMinMax()
     for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
         data[i].max = -10000;
     }
+}
+
+void Voltmeter::setMode(int index)
+{
+    switch (index){
+    case 0:
+        config->mode = VoltmeterMode::NORMAL;
+        break;
+    case 1:
+        config->mode = VoltmeterMode::FAST;
+        break;
+    default:
+        config->mode = VoltmeterMode::NORMAL;
+        break;
+    }
+    qDebug () << "mode set" << QString::number(index);
 }
 
 
@@ -305,7 +345,7 @@ void Voltmeter::setVDDSampling(){
 void Voltmeter::setDefaultSampling()
 {
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
-    comm->write(cmd->SCOPE,cmd->DATA_LENGTH,200);
+    comm->write(cmd->SCOPE,cmd->DATA_LENGTH,config->targetDataLength);
     setNumberOfChannels(numChannelsEnabled);
     isReferenceMeasured = false;
 }

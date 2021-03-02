@@ -98,6 +98,10 @@ widgetChart::~widgetChart()
 }
 
 void widgetChart::switchToSplineSeriesCallback(){
+    chartMode = ChartMode::SPLINE;
+    line->setChecked(false);
+    spline->setChecked(true);
+    scatter->setChecked(false);
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
@@ -110,6 +114,15 @@ void widgetChart::switchToSplineSeriesCallback(){
 }
 
 void widgetChart::switchToLineSeriesCallback(){
+    chartMode = ChartMode::LINE;
+    line->setChecked(true);
+    spline->setChecked(false);
+    scatter->setChecked(false);
+    switchToLineSeriesSeamless();
+}
+
+void widgetChart::switchToLineSeriesSeamless()
+{
     for (int i = 0; i < maxTraces; i++) {
         QLineSeries *series = new QLineSeries;
         //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
@@ -122,6 +135,10 @@ void widgetChart::switchToLineSeriesCallback(){
 }
 
 void widgetChart::switchToScatterSeriesCallback(){
+    line->setChecked(false);
+    spline->setChecked(false);
+    scatter->setChecked(true);
+    chartMode = ChartMode::SCATTER;
     for (int i = 0; i < maxTraces; i++) {
         QScatterSeries *series = new QScatterSeries;
         //connect(series, &QScatterSeries::hovered, this, &widgetChart::hovered);
@@ -133,6 +150,7 @@ void widgetChart::switchToScatterSeriesCallback(){
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
+        series->setUseOpenGL(false);
     }
 }
 
@@ -170,6 +188,10 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     }
     if(event->type() == QEvent::GraphicsSceneMouseDoubleClick){ //restore zoom on double click
         localZoom = 1;
+        shift = abs(minX)/(maxX-minX);
+        if(shift>1)shift = 1;
+        if(shift<0)shift = 0;
+        emit localZoomChanged();
         updateAxis();
     }
 
@@ -260,10 +282,20 @@ void widgetChart::updateAxis(){
         qreal percent = (tmpMax-tmpMin)/(seriesList.at(0)->points().last().x()-seriesList.at(0)->points().first().x());
         int samplesshown = percent*seriesList.at(0)->count();
         //qDebug() << "shown" +QString::number(samplesshown) <<"update" << QString::number(val);
-        if(samplesshown<400){
-            switchToSplineSeriesCallback();
+        if(samplesshown<NUM_SAMPLES_TO_SWITCH){
+            switch (chartMode) {
+            case ChartMode::LINE:
+                switchToLineSeriesCallback();
+                break;
+            case ChartMode::SPLINE:
+                switchToSplineSeriesCallback();
+                break;
+            case ChartMode::SCATTER:
+                switchToScatterSeriesCallback();
+                break;
+            }
         }else{
-            switchToLineSeriesCallback();
+            switchToLineSeriesSeamless();
         }
     }
 }
@@ -517,6 +549,7 @@ void widgetChart::setHorizontalMarker(int channelIndex, qreal value, MarkerType 
 
 void widgetChart::setVerticalMarker(int channelIndex, qreal value){
     QPointF pt = QPointF(value,0.99);
+    triggerShift = value;
     QList<QPointF> *lst = new QList<QPointF>;
     lst->append(pt);
     markersVertical[markerVerticalIndex]->setBrush(getBrush(channelIndex,MarkerType::ARROW_DOWN_BIG));
@@ -584,21 +617,27 @@ void widgetChart::initContextMenu(){
     menu->setStyleSheet(CONTEXT_MENU_HOVER);
 
     spline = new QAction("Spline", this);
+    spline->setCheckable(true);
+    spline->setChecked(true);
     line = new QAction("Line", this);
+    line->setCheckable(true);
+    line->setChecked(false);
     scatter  = new QAction("Points", this);
-    btnOpenGL = new QAction("Use OpenGL", this);
+    scatter->setCheckable(true);
+    scatter->setChecked(false);
+   /* btnOpenGL = new QAction("Use OpenGL", this);
     btnOpenGL->setCheckable(true);
-    btnOpenGL->setChecked(true);
+    btnOpenGL->setChecked(true);*/
 
     connect(spline, SIGNAL(triggered()), this, SLOT(switchToSplineSeriesCallback()));
     connect(line, SIGNAL(triggered()), this, SLOT(switchToLineSeriesCallback()));
     connect(scatter, SIGNAL(triggered()), this, SLOT(switchToScatterSeriesCallback()));
-    connect(btnOpenGL, SIGNAL(triggered()), this, SLOT(useOpenGLCallback()));
+    //connect(btnOpenGL, SIGNAL(triggered()), this, SLOT(useOpenGLCallback()));
 
     menu->addAction(spline);
     menu->addAction(line);
     menu->addAction(scatter);
-    menu->addAction(btnOpenGL);
+    //menu->addAction(btnOpenGL);
 }
 
 void widgetChart::rightClickCallback(const QPoint &mousePos){
