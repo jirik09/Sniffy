@@ -34,14 +34,19 @@ private slots:
 
     void showHoldButtonCallback();
     void holdButtonCallback(bool held);
-    void updateMeasurement(QList<Measurement*> m);
+    void updateSamplingChannel(void);
+    void updateMeasurementGUI(QList<Measurement*> m);
     void setAveraging(int value);
     void setNumChannelsEnabled(int value);
     void resetMinMax();
+    void setMode(int index);
 
 private:
     VoltmeterConfig *config;
     VoltmeterWindow *voltWindow;
+
+    bool isConfigurationWritten = false;
+    bool isModuleStarted = false;
 
     double realVdd = 1;
     bool isReferenceMeasured = false;

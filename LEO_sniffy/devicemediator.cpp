@@ -19,7 +19,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (new Scope(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new Counter(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new Voltmeter(this)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
+  //  tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
     foreach(QSharedPointer<AbstractModule> mod, tmpModules){
         connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
@@ -123,7 +123,12 @@ void DeviceMediator::parseData(QByteArray data){
         }
     }
     if(!isDataPassed){
-        qDebug() << "ERROR: this data was not passed to any module" << data;
+        if(data.length()<30){
+            qDebug() << "ERROR: this data was not passed to any module" << data;
+        }else{
+            qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
+        }
+
     }
 }
 

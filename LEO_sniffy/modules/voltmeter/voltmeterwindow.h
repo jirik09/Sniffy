@@ -57,6 +57,7 @@ private:
 
     widgetTab *tabs;
     WidgetButtons *buttonsChannelEnable;
+    WidgetButtons *buttonsMode;
     WidgetLabel *labelVdd;
     WidgetDialRange *dialAveraging;
     WidgetLabel *labelProgress;
@@ -79,11 +80,13 @@ private slots:
     void buttonsCalcsCallback(int clicked);
     void selectFileCallback();
     void datalogCallback(int index);
+    void modeCallback(int index);
 
 signals:
     void averagingChanged(int value);
     void numChannelsEnabledChanged(int numChEnabled);
     void resetMinMax();
+    void modeChanged(int index);
 };
 
 #endif // VOLTMETERWINDOW_H

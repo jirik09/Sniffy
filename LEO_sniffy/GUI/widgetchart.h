@@ -24,6 +24,8 @@
 
 QT_CHARTS_USE_NAMESPACE
 
+
+
 namespace Ui {
 class widgetChart;
 }
@@ -36,6 +38,11 @@ ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK, CROSS, CIRCLE,TRIGGER
 enum class Cursor
 {
 CURSOR_A, CURSOR_B
+};
+
+enum class ChartMode
+{
+LINE, SPLINE, SCATTER
 };
 
 class widgetChart : public QWidget
@@ -84,10 +91,8 @@ public:
     void setVerticalCursor(int channelIndex, qreal value, Cursor type);
     void clearAllCursors();
 
-
-
-
 private:
+    const int NUM_SAMPLES_TO_SWITCH=450;
     Ui::widgetChart *ui;
     QList<QXYSeries *> seriesList;
     QList<QScatterSeries *> markersHorizontal;
@@ -101,6 +106,7 @@ private:
     QMenu *menu;
     QAction *spline, *line, *scatter, *btnOpenGL;
     enum enable {DISABLED, ENABLED} openGL = DISABLED;
+    ChartMode chartMode = ChartMode::SPLINE;
 
     int maxTraces;
 
@@ -112,6 +118,7 @@ private:
     qreal invZoom = 1;
     qreal lastInvZoom = 1;
     qreal shift = 0.5;
+    qreal triggerShift = 0.5;
     qreal localZoom = 1;
     bool mousePressed = false;
     QPointF mousePressedPoint;
@@ -150,6 +157,7 @@ signals:
 private slots:
     void switchToSplineSeriesCallback();
     void switchToLineSeriesCallback();
+    void switchToLineSeriesSeamless();
     void switchToScatterSeriesCallback();
     void useOpenGLCallback();
 
