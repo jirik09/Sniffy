@@ -82,12 +82,12 @@ int MathCalculations::calcSymbolic(QVector<QVector<QPointF> > inData, QVector<QP
 
     te_variable vars[variableCount];
     if(variableCount>=2){
-        vars[0]= {"t", &t};
-        vars[1]= {"a", &a};
+        vars[0] = {"t", &t,TE_VARIABLE,NULL};
+        vars[1] = {"a", &a,TE_VARIABLE,NULL};
     }
-    if(variableCount>=3)vars[2]= {"b", &b};
-    if(variableCount>=4)vars[3]= {"c", &c};
-    if(variableCount>=5)vars[4]= {"d", &d};
+    if(variableCount>=3)vars[2]= {"b", &b,TE_VARIABLE,NULL};
+    if(variableCount>=4)vars[3]= {"c", &c,TE_VARIABLE,NULL};
+    if(variableCount>=5)vars[4]= {"d", &d,TE_VARIABLE,NULL};
 
     std::string ex = expression.toStdString();
     const char *expChar = ex.data();
