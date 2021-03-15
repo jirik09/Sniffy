@@ -106,7 +106,7 @@ private:
     QMenu *menu;
     QAction *spline, *line, *scatter, *btnOpenGL;
     enum enable {DISABLED, ENABLED} openGL = DISABLED;
-    ChartMode chartMode = ChartMode::SPLINE;
+    ChartMode chartMode = ChartMode::LINE;
 
     int maxTraces;
 
