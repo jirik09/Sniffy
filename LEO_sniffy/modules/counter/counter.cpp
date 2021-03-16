@@ -308,7 +308,15 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val1 >> val2 >> qerr >> terr;
 
-    WidgetDisplay *display = (channel == "IC1D") ? cntWindow->displayLFCh1 : cntWindow->displayLFCh2;
+    WidgetDisplay *display;
+    if(channel == "IC1D"){
+        display = cntWindow->displayLFCh1;
+    }else if(channel == "IC2D"){
+        display = cntWindow->displayLFCh2;
+    }else {
+        mode = "xx";
+    }
+
     QString pm(0x00B1);
 
     if(mode == "FPME"){

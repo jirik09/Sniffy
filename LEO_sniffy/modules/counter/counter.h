@@ -50,7 +50,7 @@ private:
     /* High Frequency Counter */
     MovingAverage *movAvg;
     QString strQerr, strTerr, avgQerr;
-    float avg;
+    float avg;    
 
     void parseHighFrequencyCounter(QByteArray data);
     void hfReloadState();
