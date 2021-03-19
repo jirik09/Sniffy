@@ -2,7 +2,7 @@
 
 CounterSpec::CounterSpec(QObject *parent)
 {
-Q_UNUSED(parent);
+    Q_UNUSED(parent);
 }
 void CounterSpec::parseSpecification(QByteArray spec){
     QDataStream stream(spec);

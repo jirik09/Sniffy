@@ -1,10 +1,10 @@
 #include "counter.h"
 
-Counter::Counter(QObject *parent/*, config param*/)
+Counter::Counter(QObject *parent)
 {
     Q_UNUSED(parent);
-        //JIRI TODO parse config here (load config before making modules)
-    config = new CounterConfig(this/*, param*/);
+
+    config = new CounterConfig(this);
     cntWindow = new CounterWindow(config);
 
     moduleCommandPrefix = cmd->COUNTER;
@@ -44,7 +44,7 @@ Counter::Counter(QObject *parent/*, config param*/)
     connect(cntWindow->tabInter->switchEdgeEventB, &WidgetSwitch::clicked, this, &Counter::intEventBChangedCallback);
 }
 
-void Counter::startModule(){
+void Counter::startModule(){    
     startCounting();
 }
 
