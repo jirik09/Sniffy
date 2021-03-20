@@ -26,6 +26,7 @@
 #include "panelmeasurement.h"
 #include "panelcursors.h"
 #include "panelmath.h"
+#include "paneladvanced.h"
 #include "scopeconfig.h"
 
 #define CHART_MAX_Y 7
@@ -73,6 +74,7 @@ signals:
     void mathExpressionChanged(QString exp);
     void measurementClearChanged();
     void verticalChanged();
+    void resolutionChanged(int resolution);
 
 
 private slots:
@@ -100,6 +102,7 @@ private slots:
     void cursorValueHorBCallback(float value);
     void cursorValueVerACallback(float value);
     void cursorValueVerBCallback(float value);
+    void resolutionChangedCallback(int index);
 
     void updateCursorReadings();
 
@@ -120,6 +123,7 @@ private:
     PanelMeasurement *panelMeas;
     PanelCursors *panelCursors;
     PanelMath *panelMath;
+    PanelAdvanced *panelAdvanced;
 
     void updateChartTimeScale(float timeBase);
     void fillTimeBase();

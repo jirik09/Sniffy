@@ -278,6 +278,7 @@ void Voltmeter::resetMinMax()
 {
     for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
         data[i].max = -10000;
+        data[i].min = 10000;
     }
 }
 

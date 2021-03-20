@@ -70,6 +70,7 @@ SOURCES += \
     modules/scope/mathcalculations.cpp \
     modules/scope/meascalculations.cpp \
     modules/scope/measurement.cpp \
+    modules/scope/paneladvanced.cpp \
     modules/scope/panelcursors.cpp \
     modules/scope/panelmath.cpp \
     modules/scope/panelmeasurement.cpp \
@@ -144,6 +145,7 @@ HEADERS += \
     modules/scope/mathcalculations.h \
     modules/scope/meascalculations.h \
     modules/scope/measurement.h \
+    modules/scope/paneladvanced.h \
     modules/scope/panelcursors.h \
     modules/scope/panelmath.h \
     modules/scope/panelmeasurement.h \

@@ -27,12 +27,13 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************
-    widgetTab *tabs = new widgetTab(ui->widget_settings,4);
+    widgetTab *tabs = new widgetTab(ui->widget_settings,5);
     ui->verticalLayout_settings->addWidget(tabs);
     tabs->setText("Set",0);
     tabs->setText("Meas",1);
     tabs->setText("Cursors",2);
     tabs->setText("Math",3);
+    tabs->setText("Adv",4);
 
     // ************************* creating widget general settings *******************
     panelSet = new PanelSettings(tabs->getLayout(0),tabs);
@@ -66,8 +67,14 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     connect(panelCursors->cursorVerADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerACallback);
     connect(panelCursors->cursorVerBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerBCallback);
 
+    // ********************* create panel Math ****************
     panelMath = new PanelMath(tabs->getLayout(3),tabs);
     connect(panelMath,&PanelMath::expressionChanged,this,&ScopeWindow::mathExpressionCallback);
+
+    // ********************* create panel Advanced ****************
+    panelAdvanced = new PanelAdvanced(tabs->getLayout(4),tabs);
+    connect(panelAdvanced->resolutionButtons,&WidgetButtons::clicked,this,&ScopeWindow::resolutionChangedCallback);
+
 
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
@@ -381,6 +388,14 @@ void ScopeWindow::cursorValueVerBCallback(float value)
     if(config->cursorsActiveIndex == 2){
         chart->setVerticalCursor(config->cursorChannelIndex,(value+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
         updateCursorReadings();
+    }
+}
+
+void resolutionChangedCallback(int index){
+    if(index==0){
+        emit resolutionChanged(8);
+    }else{
+        emit resolutionChanged(12);
     }
 }
 

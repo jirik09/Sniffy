@@ -55,8 +55,8 @@ void Scope::parseData(QByteArray data){
     }else if(dataHeader=="OSC_"){
         quint8 tmpByte;
         quint16 tmpShort;
-        qreal minX;
-        qreal maxX;
+        qreal minX = 0;
+        qreal maxX = 0.1;
         qreal x(0);
         qreal y(0);
         int resolution;

@@ -1,7 +1,7 @@
 #include "widgettextinput.h"
 #include "ui_widgettextinput.h"
 
-WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value) :
+WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, InputTextType type) :
     QWidget(parent),
     ui(new Ui::WidgetTextInput)
 {
@@ -12,6 +12,7 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value) :
 
     ui->lineEdit->installEventFilter(this);
     ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+BACKGROUND_COLOR_DATA_AREA+";}");
+    inputType = type;
 }
 
 WidgetTextInput::~WidgetTextInput()
