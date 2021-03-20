@@ -1,16 +1,16 @@
 #include "syncpwmconfig.h"
 
-SyncPWMConfig::SyncPWMConfig(QObject *parent)
+SyncPwmConfig::SyncPwmConfig(QObject *parent)
 {
     Q_UNUSED(parent);
 
 
 }
 
-void SyncPWMConfig::parse(QByteArray config){
+void SyncPwmConfig::parse(QByteArray config){
 
 }
 
-QByteArray SyncPWMConfig::serialize(){
+QByteArray SyncPwmConfig::serialize(){
 
 }

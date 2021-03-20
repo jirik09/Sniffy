@@ -3,26 +3,42 @@
 
 #include <QWidget>
 
+#include "../../GUI/widgetcontrolmodule.h"
+#include "../../GUI/widgetseparator.h"
+#include "../../GUI/widgetdial.h"
+#include "../../GUI/widgetdialrange.h"
+#include "../../GUI/widgetdisplay.h"
+#include "../../GUI/widgetswitch.h"
+#include "../../GUI/widgetbuttons.h"
+
 #include "syncpwmspec.h"
 #include "syncpwmconfig.h"
+#include "syncpwmsettings.h"
 #include "syncpwmdefs.h"
 
 namespace Ui {
-class SyncPWMWindow;
+class SyncPwmWindow;
 }
 
-class SyncPWMWindow : public QWidget
+class SyncPwmWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit SyncPWMWindow(QWidget *parent = nullptr);
-    ~SyncPWMWindow();
+    explicit SyncPwmWindow(SyncPwmConfig *conf, QWidget *parent = nullptr);
+    ~SyncPwmWindow();
 
 private slots:
 
 private:
-    Ui::SyncPWMWindow *ui;
+    Ui::SyncPwmWindow *ui;
+    SyncPwmConfig *config;
+    SyncPwmSettings *settings;
+
+    widgetChart *chart;
+
+    void updateChartTimeScale(float timeBase);
+    //void paintTraces();
 };
 
 #endif // SYNCPWMWINDOW_H

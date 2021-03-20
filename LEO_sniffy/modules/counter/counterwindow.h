@@ -64,6 +64,7 @@ public:
     void associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix = "", float sample = 0, QString affix = "");
 
     void restoreGUIAfterStartup();
+
 private:
     Ui::CounterWindow *ui;
     CounterConfig *conf;

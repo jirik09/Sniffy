@@ -5,11 +5,11 @@
 #include <QDataStream>
 #include "../abstractspecification.h"
 
-class SyncPWMSpec : public AbstractSpecification
+class SyncPwmSpec : public AbstractSpecification
 {
     Q_OBJECT
 public:
-    explicit SyncPWMSpec(QObject *parent = nullptr);
+    explicit SyncPwmSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);
 
     int max_freq;

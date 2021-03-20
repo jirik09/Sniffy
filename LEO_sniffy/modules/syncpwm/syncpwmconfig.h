@@ -8,11 +8,11 @@
 
 #include "../abstractconfiguration.h"
 
-class SyncPWMConfig : public AbstractConfiguration
+class SyncPwmConfig : public AbstractConfiguration
 {
     Q_OBJECT
 public:
-    explicit SyncPWMConfig(QObject *parent = nullptr);
+    explicit SyncPwmConfig(QObject *parent = nullptr);
 
     void parse (QByteArray config);
     QByteArray serialize ();

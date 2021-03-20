@@ -4,3 +4,15 @@
 #include <QtGlobal>
 
 #endif // SYNCPWMDEFS_H
+
+#define CHANNELS_NUM 4
+#define PI_HALF 90
+
+#define RANGE_CHAN1_LOG1 12
+#define RANGE_CHAN1_LOG0 10
+#define RANGE_CHAN2_LOG1 9
+#define RANGE_CHAN2_LOG0 7
+#define RANGE_CHAN3_LOG1 6
+#define RANGE_CHAN3_LOG0 4
+#define RANGE_CHAN4_LOG1 3
+#define RANGE_CHAN4_LOG0 1

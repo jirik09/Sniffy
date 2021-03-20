@@ -1,11 +1,11 @@
 #include "syncpwmspec.h"
 
-SyncPWMSpec::SyncPWMSpec(QObject *parent)
+SyncPwmSpec::SyncPwmSpec(QObject *parent)
 {
     Q_UNUSED(parent);
 }
 
-void SyncPWMSpec::parseSpecification(QByteArray spec){
+void SyncPwmSpec::parseSpecification(QByteArray spec){
     QDataStream stream(spec);
     stream >> max_freq >> chan_num;
 

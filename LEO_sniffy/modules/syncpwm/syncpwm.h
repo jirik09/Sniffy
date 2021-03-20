@@ -9,21 +9,25 @@
 
 #include "../abstractmodule.h"
 
-class SyncPWM : public AbstractModule
+class SyncPwm : public AbstractModule
 {
     Q_OBJECT
 
 public:
-    explicit SyncPWM(QObject *parent = nullptr);
-    ~SyncPWM();
+    explicit SyncPwm(QObject *parent = nullptr);
+    ~SyncPwm();
 
     QWidget* getWidget();
 
 private:
-    SyncPWMWindow *spwmWindow;
+    SyncPwmWindow *spwmWindow;
+    SyncPwmConfig *config;
 
     void write(QByteArray feature, QByteArray param);
     void write(QByteArray feature, int param);
+
+    void start();
+    void stop();
 
 signals:
 
