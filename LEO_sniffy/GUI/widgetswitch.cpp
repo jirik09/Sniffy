@@ -70,8 +70,10 @@ void WidgetSwitch::setColor(QString color){
     styleSelected = color;
     if(ui->pushButton_right->isChecked()){
         ui->pushButton_right->setStyleSheet(styleSelected);
-    }else {
         ui->pushButton_left->setStyleSheet(styleNotSelected);
+    }else {
+        ui->pushButton_left->setStyleSheet(styleSelected);
+        ui->pushButton_right->setStyleSheet(styleNotSelected);
     }
 }
 
