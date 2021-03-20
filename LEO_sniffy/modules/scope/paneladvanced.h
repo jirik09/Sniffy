@@ -2,7 +2,6 @@
 #define PANELADVANCED_H
 
 #include <QObject>
-
 #include <QVBoxLayout>
 
 #include "../../GUI/widgetseparator.h"
@@ -19,8 +18,7 @@ public:
     PanelAdvanced(QVBoxLayout *destination, QWidget *parent = nullptr);
 
     WidgetButtons *resolutionButtons;
-    WidgetButtons *samplingOverwriteButtons;
-    WidgetTextInput *samlingFrequencyInput;
+    WidgetTextInput *samplingFrequencyInput;
     WidgetTextInput *dataLengthInput;
 };
 

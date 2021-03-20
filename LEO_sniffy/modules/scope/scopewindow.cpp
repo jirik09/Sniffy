@@ -74,7 +74,8 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     // ********************* create panel Advanced ****************
     panelAdvanced = new PanelAdvanced(tabs->getLayout(4),tabs);
     connect(panelAdvanced->resolutionButtons,&WidgetButtons::clicked,this,&ScopeWindow::resolutionChangedCallback);
-
+    connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::samplingFreqInputCallback);
+    connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::longMemoryCallback);
 
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
@@ -203,6 +204,14 @@ void ScopeWindow::timeBaseCallback(float value){
     emit timeBaseChanged(value);
     updateChartTimeScale(value);
     previousTimeBase = value;
+}
+void ScopeWindow::samplingFreqInputCallback(int freq){
+    timeBaseCallback(1.0/(qreal)(freq)*100);
+}
+
+void ScopeWindow::dataLengthInputCallback(int length)
+{
+    if (length>=100) emit memoryLengthChanged(length);
 }
 
 void ScopeWindow::longMemoryCallback(int index){
@@ -391,7 +400,7 @@ void ScopeWindow::cursorValueVerBCallback(float value)
     }
 }
 
-void resolutionChangedCallback(int index){
+void ScopeWindow::resolutionChangedCallback(int index){
     if(index==0){
         emit resolutionChanged(8);
     }else{
@@ -445,6 +454,7 @@ void ScopeWindow::restoreGUIAfterStartup()
     channelEnableCallback(panelSet->buttonsChannelEnable->getStatus());
     cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());
     triggerChannelCallback(panelSet->buttonsTriggerChannel->getSelectedIndex());
+    resolutionChangedCallback(panelAdvanced->resolutionButtons->getSelectedIndex());
 
     panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
     panelMath->typeChanged(panelMath->mathType->getSelectedIndex());

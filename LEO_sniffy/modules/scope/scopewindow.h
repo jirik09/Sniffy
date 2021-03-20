@@ -82,6 +82,8 @@ private slots:
     void channelVerticalScaleCallback(float value);
     void channelVerticalShiftCallback(float value);
     void timeBaseCallback(float value);
+    void samplingFreqInputCallback (int freq);
+    void dataLengthInputCallback (int length);
     void channelEnableCallback(int buttonStatus);
     void longMemoryCallback(int index);
     void pretriggerCallback(float value);

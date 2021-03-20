@@ -12,16 +12,10 @@ PanelAdvanced::PanelAdvanced(QVBoxLayout *destination, QWidget *parent)
 
     destination->addWidget(new WidgetSeparator(parent,"Sampling"));
 
-    samplingOverwriteButtons = new WidgetButtons(parent,2,ButtonTypes::RADIO,"");
-    samplingOverwriteButtons->setObjectName("scoperesolution");
-    destination->addWidget(samplingOverwriteButtons);
-    samplingOverwriteButtons->setText("Auto",0);
-    samplingOverwriteButtons->setText("Overwrite",1);
+    samplingFrequencyInput = new WidgetTextInput(parent,"Sampling","100000",InputTextType::NUMBER);
+    destination->addWidget(samplingFrequencyInput);
 
-    samlingFrequencyInput = new WidgetTextInput(parent,"Sampling","10000");
-    destination->addWidget(samlingFrequencyInput);
-
-    dataLengthInput = new WidgetTextInput(parent,"Length","10000");
+    dataLengthInput = new WidgetTextInput(parent,"Length","1000",InputTextType::NUMBER);
     destination->addWidget(dataLengthInput);
 
     QSpacerItem *verticalSpacer;

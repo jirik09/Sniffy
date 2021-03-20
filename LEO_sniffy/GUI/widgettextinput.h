@@ -29,13 +29,19 @@ public:
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
     QString getText();
+    qreal getValue();
 
 signals:
     void textChanged(QString text);
+    void numberChanged(qreal number);
 
 private:
+    void processInput();
     Ui::WidgetTextInput *ui;
     InputTextType inputType;
+    QString lastParsed = "1";
+    qreal number = 0;
+
 
 private slots:
     bool eventFilter(QObject *obj, QEvent *event) override;
