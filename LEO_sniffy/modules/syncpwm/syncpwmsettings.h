@@ -40,4 +40,6 @@ signals:
 
 };
 
+#define VERT0_HORIZ1_LAYOUT 1
+
 #endif // SYNCPWMSETTINGS_H

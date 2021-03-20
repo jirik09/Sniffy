@@ -32,53 +32,105 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, QWidget *parent) : QO
     /* Channels ------------------------------------------------------------- */
     int phase = 0;
 
-    for(int i = 0; i < CHANNELS_NUM; i++){
-        QString chNStr = QString::number(i + 1);
+    if(VERT0_HORIZ1_LAYOUT == 1){
 
-        WidgetSeparator *separator = new WidgetSeparator(parent, "Channel " + chNStr);
-        destination->addWidget(separator);
+        for(int i = 0; i < CHANNELS_NUM; i++){
+            QString chNStr = QString::number(i + 1);
 
-        QHBoxLayout *horBoxButtons = new QHBoxLayout();
-        QHBoxLayout *horBoxDials = new QHBoxLayout();
-        destination->addLayout(horBoxButtons);
-        destination->addLayout(horBoxDials);
+            WidgetSeparator *separator = new WidgetSeparator(parent, "Channel " + chNStr);
+            destination->addWidget(separator);
 
-        onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "");
-        onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);
-        onOffCh[i]->setColor("background-color:" + chanColor[i]);
-        horBoxButtons->addWidget(onOffCh[i]);
+            QHBoxLayout *horBoxButtons = new QHBoxLayout();
+            QHBoxLayout *horBoxDials = new QHBoxLayout();
+            destination->addLayout(horBoxButtons);
+            destination->addLayout(horBoxDials);
 
-        horBoxButtons->addItem(spacer);
+            onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "");
+            onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);
+            onOffCh[i]->setColor("background-color:" + chanColor[i]);
+            horBoxButtons->addWidget(onOffCh[i]);
 
-        inverCh[i] = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
-        inverCh[i]->setText("Invert");
-        inverCh[i]->setObjectName("syncPwmInverCh" + chNStr);
-        inverCh[i]->setChecked(false, 0);
-        inverCh[i]->setColor("background-color:" + chanColor[i], 0);
-        horBoxButtons->addWidget(inverCh[i]);
+            horBoxButtons->addItem(spacer);
 
-        dialFreqCh[i] = new WidgetDialRange(parent, "Frequency");
-        dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
-        dialFreqCh[i]->setRange(0, 1000, "Hz", 1, 1, 333, false);
-        dialFreqCh[i]->setColor(chanColor[i]);
-        dialFreqCh[i]->hideUnitSelection();
-        horBoxDials->addWidget(dialFreqCh[i]);
+            inverCh[i] = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
+            inverCh[i]->setText("Invert");
+            inverCh[i]->setObjectName("syncPwmInverCh" + chNStr);
+            inverCh[i]->setChecked(false, 0);
+            inverCh[i]->setColor("background-color:" + chanColor[i], 0);
+            horBoxButtons->addWidget(inverCh[i]);
 
-        dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle");
-        dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
-        dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, 25, false);
-        dialDutyCh[i]->setColor(chanColor[i]);
-        dialDutyCh[i]->hideUnitSelection();
-        horBoxDials->addWidget(dialDutyCh[i]);
+            dialFreqCh[i] = new WidgetDialRange(parent, "Frequency");
+            dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
+            dialFreqCh[i]->setRange(0, 1000, "Hz", 1, 1, 333, false);
+            dialFreqCh[i]->setColor(chanColor[i]);
+            dialFreqCh[i]->hideUnitSelection();
+            horBoxDials->addWidget(dialFreqCh[i]);
 
-        dialPhaseCh[i] = new WidgetDialRange(parent, "Phase");
-        dialPhaseCh[i]->setObjectName("syncPwmPhaseCh" + chNStr);
-        dialPhaseCh[i]->setRange(0, 360, "°", 1, 1, phase, false);
-        dialPhaseCh[i]->setColor(chanColor[i]);
-        dialPhaseCh[i]->hideUnitSelection();
-        horBoxDials->addWidget(dialPhaseCh[i]);
+            dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle");
+            dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
+            dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, 25, false);
+            dialDutyCh[i]->setColor(chanColor[i]);
+            dialDutyCh[i]->hideUnitSelection();
+            horBoxDials->addWidget(dialDutyCh[i]);
 
-        phase += PI_HALF;
+            dialPhaseCh[i] = new WidgetDialRange(parent, "Phase");
+            dialPhaseCh[i]->setObjectName("syncPwmPhaseCh" + chNStr);
+            dialPhaseCh[i]->setRange(0, 360, "°", 1, 1, phase, false);
+            dialPhaseCh[i]->setColor(chanColor[i]);
+            dialPhaseCh[i]->hideUnitSelection();
+            horBoxDials->addWidget(dialPhaseCh[i]);
+
+            phase += PI_HALF;
+        }
+    }else {
+
+        QHBoxLayout *horBox = new QHBoxLayout();
+        destination->addLayout(horBox);
+
+        for(int i = 0; i < CHANNELS_NUM; i++){
+            QString chNStr = QString::number(i + 1);
+
+            QVBoxLayout *verChanBox = new QVBoxLayout();
+            horBox->addLayout(verChanBox);
+
+            WidgetSeparator *separator = new WidgetSeparator(parent, "Channel " + chNStr);
+            verChanBox->addWidget(separator);
+
+            onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "");
+            onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);
+            onOffCh[i]->setColor("background-color:" + chanColor[i]);
+            verChanBox->addWidget(onOffCh[i]);
+
+            inverCh[i] = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
+            inverCh[i]->setText("Invert");
+            inverCh[i]->setObjectName("syncPwmInverCh" + chNStr);
+            inverCh[i]->setChecked(false, 0);
+            inverCh[i]->setColor("background-color:" + chanColor[i], 0);
+            verChanBox->addWidget(inverCh[i]);
+
+            dialFreqCh[i] = new WidgetDialRange(parent, "Frequency");
+            dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
+            dialFreqCh[i]->setRange(0, 1000, "Hz", 1, 1, 333, false);
+            dialFreqCh[i]->setColor(chanColor[i]);
+            dialFreqCh[i]->hideUnitSelection();
+            verChanBox->addWidget(dialFreqCh[i]);
+
+            dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle");
+            dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
+            dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, 25, false);
+            dialDutyCh[i]->setColor(chanColor[i]);
+            dialDutyCh[i]->hideUnitSelection();
+            verChanBox->addWidget(dialDutyCh[i]);
+
+            dialPhaseCh[i] = new WidgetDialRange(parent, "Phase");
+            dialPhaseCh[i]->setObjectName("syncPwmPhaseCh" + chNStr);
+            dialPhaseCh[i]->setRange(0, 360, "°", 1, 1, phase, false);
+            dialPhaseCh[i]->setColor(chanColor[i]);
+            dialPhaseCh[i]->hideUnitSelection();
+            verChanBox->addWidget(dialPhaseCh[i]);
+
+            phase += PI_HALF;
+        }
     }
 
     QSpacerItem *verticalSpacer;
