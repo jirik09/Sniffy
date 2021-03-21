@@ -48,6 +48,7 @@ public slots:
     void updateTriggerEdge(ScopeTriggerEdge edge);
     void updateTriggerChannel(int index);
     void updateMemoryLength(int length);
+    void updateResolution(int resolution);
     void updateChannelsEnable(int buttonStatus);
     void addMeasurement(Measurement *m);
     void updateMeasurement(QList<Measurement*> m);
@@ -72,6 +73,7 @@ private:
     void startSampling();
     void restartSampling();
     void setNumberOfChannels(int num);
+    void setResolution(int res);
     void setTriggerChannel(int chan);
     void setTriggerMode(ScopeTriggerMode mode);
     void setTriggerEdge(ScopeTriggerEdge edge);

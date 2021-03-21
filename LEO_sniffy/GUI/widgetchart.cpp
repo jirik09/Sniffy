@@ -28,7 +28,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 
     //init traces
     for (int i = 0; i < maxTraces; i++) {
-        QSplineSeries *series = new QSplineSeries;
+        QLineSeries *series = new QLineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
         series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
         seriesList.append(series);
@@ -107,9 +107,11 @@ void widgetChart::switchToSplineSeriesCallback(){
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
         series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
         series->append(seriesList[i]->points());
+        chart->removeSeries(seriesList[i]);
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
+        series->clear();
     }
 }
 
@@ -128,9 +130,11 @@ void widgetChart::switchToLineSeriesSeamless()
         //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
         series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
         series->append(seriesList[i]->points());
+        chart->removeSeries(seriesList[i]);
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
+        series->clear();
     }
 }
 
@@ -147,9 +151,11 @@ void widgetChart::switchToScatterSeriesCallback(){
         series->setPen(QColor(Qt::transparent));
         series->setBrush(getBrush(i,MarkerType::CIRCLE));
         series->append(seriesList[i]->points());
+        chart->removeSeries(seriesList[i]);
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
+        series->clear();
         series->setUseOpenGL(false);
     }
 }
@@ -278,26 +284,29 @@ void widgetChart::updateAxis(){
     qreal tmpMax = (maxX-minX)*invZoom/localZoom+tmpMin;
     axisX->setRange(tmpMin,tmpMax);
 
-    if(!seriesList.isEmpty() && seriesList.at(0)->count()>1){
+  /*  if(!seriesList.isEmpty() && seriesList.at(0)->count()>1){
         qreal percent = (tmpMax-tmpMin)/(seriesList.at(0)->points().last().x()-seriesList.at(0)->points().first().x());
         int samplesshown = percent*seriesList.at(0)->count();
-        //qDebug() << "shown" +QString::number(samplesshown) <<"update" << QString::number(val);
+       // qDebug() << "Update axis " +QString::number(samplesshown)<<"points";
         if(samplesshown<NUM_SAMPLES_TO_SWITCH){
             switch (chartMode) {
             case ChartMode::LINE:
                 switchToLineSeriesCallback();
+              //  qDebug() << "LINE";
                 break;
             case ChartMode::SPLINE:
                 switchToSplineSeriesCallback();
+              //  qDebug() << "SPLINE";
                 break;
             case ChartMode::SCATTER:
                 switchToScatterSeriesCallback();
+               // qDebug() << "SCATTER";
                 break;
             }
         }else{
-            switchToLineSeriesSeamless();
+            switchToLineSeriesSeamless(); //todo no need to call this every time
         }
-    }
+    }*/
 }
 
 void widgetChart::setDataMinMax(qreal minX, qreal maxX){

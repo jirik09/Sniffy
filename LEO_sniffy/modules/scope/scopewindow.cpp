@@ -27,12 +27,13 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************
-    widgetTab *tabs = new widgetTab(ui->widget_settings,4);
+    widgetTab *tabs = new widgetTab(ui->widget_settings,5);
     ui->verticalLayout_settings->addWidget(tabs);
     tabs->setText("Set",0);
     tabs->setText("Meas",1);
     tabs->setText("Cursors",2);
     tabs->setText("Math",3);
+    tabs->setText("Adv",4);
 
     // ************************* creating widget general settings *******************
     panelSet = new PanelSettings(tabs->getLayout(0),tabs);
@@ -66,8 +67,15 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     connect(panelCursors->cursorVerADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerACallback);
     connect(panelCursors->cursorVerBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerBCallback);
 
+    // ********************* create panel Math ****************
     panelMath = new PanelMath(tabs->getLayout(3),tabs);
     connect(panelMath,&PanelMath::expressionChanged,this,&ScopeWindow::mathExpressionCallback);
+
+    // ********************* create panel Advanced ****************
+    panelAdvanced = new PanelAdvanced(tabs->getLayout(4),tabs);
+    connect(panelAdvanced->resolutionButtons,&WidgetButtons::clicked,this,&ScopeWindow::resolutionChangedCallback);
+    connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::samplingFreqInputCallback);
+    connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::longMemoryCallback);
 
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
@@ -196,6 +204,14 @@ void ScopeWindow::timeBaseCallback(float value){
     emit timeBaseChanged(value);
     updateChartTimeScale(value);
     previousTimeBase = value;
+}
+void ScopeWindow::samplingFreqInputCallback(int freq){
+    timeBaseCallback(1.0/(qreal)(freq)*100);
+}
+
+void ScopeWindow::dataLengthInputCallback(int length)
+{
+    if (length>=100) emit memoryLengthChanged(length);
 }
 
 void ScopeWindow::longMemoryCallback(int index){
@@ -384,6 +400,14 @@ void ScopeWindow::cursorValueVerBCallback(float value)
     }
 }
 
+void ScopeWindow::resolutionChangedCallback(int index){
+    if(index==0){
+        emit resolutionChanged(8);
+    }else{
+        emit resolutionChanged(12);
+    }
+}
+
 void ScopeWindow::updateCursorReadings()
 {
     if(config->cursorsActiveIndex == 2){
@@ -430,6 +454,7 @@ void ScopeWindow::restoreGUIAfterStartup()
     channelEnableCallback(panelSet->buttonsChannelEnable->getStatus());
     cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());
     triggerChannelCallback(panelSet->buttonsTriggerChannel->getSelectedIndex());
+    resolutionChangedCallback(panelAdvanced->resolutionButtons->getSelectedIndex());
 
     panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
     panelMath->typeChanged(panelMath->mathType->getSelectedIndex());

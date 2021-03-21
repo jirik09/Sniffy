@@ -31,6 +31,7 @@ public:
     void restoreGeometry(QByteArray geom);
     void addOption (QString shownValue, QString unit,float realValue);
     int getSelectedIndex() const;
+    qreal getRealValue() const;
     void setSelectedIndex(int index, bool silent = false);
     void setColor(QString color);
 

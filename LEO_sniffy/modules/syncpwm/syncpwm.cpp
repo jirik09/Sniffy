@@ -47,7 +47,7 @@ void SyncPwm::startModule(){
 
 void SyncPwm::stopModule(){
     stop();
-    write(cmd->SPWM_COMMAND, cmd->SPWM_DEINIT);
+   // write(cmd->SPWM_COMMAND, cmd->SPWM_DEINIT);
 }
 
 void SyncPwm::start(){
@@ -55,7 +55,7 @@ void SyncPwm::start(){
 }
 
 void SyncPwm::stop(){
-    write(cmd->SPWM_COMMAND, cmd->STOP);
+ //   write(cmd->SPWM_COMMAND, cmd->STOP);
 }
 
 void SyncPwm::parseData(QByteArray data){

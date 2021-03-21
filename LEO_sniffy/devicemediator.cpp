@@ -20,7 +20,11 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (new Counter(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new Voltmeter(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new SyncPwm(this)));
-  //  tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new PWMGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
     foreach(QSharedPointer<AbstractModule> mod, tmpModules){
         connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
