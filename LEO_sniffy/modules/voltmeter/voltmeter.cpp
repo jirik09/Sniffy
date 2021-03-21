@@ -129,7 +129,6 @@ void Voltmeter::writeConfiguration()
     if(isConfigurationWritten)return;
 
     isConfigurationWritten = true;
-    qDebug() << "WRITE CONFIGURATION";
     //workaround first data was corrupted on channels > 1
     numChannelsEnabled = MAX_VOLTMETER_CHANNELS;
     setDefaultSampling();
@@ -159,7 +158,6 @@ void Voltmeter::startModule()
     if (isModuleStarted)return;
 
     isModuleStarted = true;
-    qDebug() << "START MODULE";
     startSampling();
 }
 
@@ -196,6 +194,7 @@ void Voltmeter::updateSamplingChannel(void){
             break;
         case VoltmeterMode::FAST:
             config->targetDataLength = 200;
+            setDefaultSampling();
             break;
         }
     }
@@ -279,6 +278,7 @@ void Voltmeter::resetMinMax()
 {
     for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
         data[i].max = -10000;
+        data[i].min = 10000;
     }
 }
 
@@ -295,7 +295,6 @@ void Voltmeter::setMode(int index)
         config->mode = VoltmeterMode::NORMAL;
         break;
     }
-    qDebug () << "mode set" << QString::number(index);
 }
 
 

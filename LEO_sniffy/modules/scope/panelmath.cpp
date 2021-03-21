@@ -85,7 +85,7 @@ void PanelMath::symbolicError(int errorPosition)
         symbolicExample->setStyleSheet("font: 10pt \"Courier New\";");
         symbolicExample->setName("here ");
         QString out;// = QString("^%*s").arg(symbolicExpression->getText().length()-errorPosition).arg("");
-        out.sprintf("^%*s", errorExp.length()-errorPosition, "");
+        out = QString::asprintf("^%*s", errorExp.length()-errorPosition, "");
         symbolicExample->setValue(out);
     }
 }

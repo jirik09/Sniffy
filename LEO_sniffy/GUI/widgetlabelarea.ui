@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>584</width>
-    <height>85</height>
+    <height>97</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -209,6 +209,12 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>45</height>
+         </size>
+        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <property name="spacing">
           <number>0</number>
@@ -351,7 +357,7 @@
         <property name="minimumSize">
          <size>
           <width>120</width>
-          <height>0</height>
+          <height>60</height>
          </size>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -419,7 +425,7 @@
         <property name="minimumSize">
          <size>
           <width>120</width>
-          <height>0</height>
+          <height>60</height>
          </size>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">

@@ -64,6 +64,11 @@ int WidgetDial::getSelectedIndex() const
     return selectedIndex;
 }
 
+qreal WidgetDial::getRealValue() const
+{
+    return options->at(selectedIndex).realValue;
+}
+
 void WidgetDial::setSelectedIndex(int index, bool silent){
     ui->dial->setValue(index);
     ui->comboBox->setCurrentIndex(index);
