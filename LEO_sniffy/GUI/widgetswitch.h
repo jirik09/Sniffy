@@ -24,6 +24,8 @@ public:
 
     void setColor(QString color);    
 
+    void setBonusToSignal(QVariant bonus);
+
 private:
     Ui::WidgetSwitch *ui;
 

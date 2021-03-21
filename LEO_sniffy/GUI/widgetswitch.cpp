@@ -71,6 +71,10 @@ bool WidgetSwitch::isCheckedLeft(){
     return (ui->pushButton_left->isChecked());
 }
 
+bool WidgetSwitch::isCheckedRight(){
+    return (ui->pushButton_right->isChecked());
+}
+
 void WidgetSwitch::setColor(QString color){
     styleSelected = color;
     if(ui->pushButton_right->isChecked()){
@@ -80,9 +84,8 @@ void WidgetSwitch::setColor(QString color){
     }
 }
 
-bool WidgetSwitch::isCheckedRight(){
-    return (ui->pushButton_right->isChecked());
-}
+
+
 
 
 
