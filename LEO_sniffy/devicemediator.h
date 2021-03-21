@@ -8,6 +8,10 @@
 #include "modules/counter/counter.h"
 #include "modules/voltmeter/voltmeter.h"
 #include "modules/syncpwm/syncpwm.h"
+#include "modules/arbgenerator/arbgenerator.h"
+#include "modules/patterngenerator/patterngenerator.h"
+#include "modules/pwmgenerator/pwmgenerator.h"
+#include "modules/voltagesource/voltagesource.h"
 #include "modules/template/templatemodule.h"
 
 
