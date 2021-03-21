@@ -191,6 +191,33 @@ public:
     static const QByteArray INT_EVENT_FALL_CH2;
     static const QByteArray INT_EVENT_SEQUENCE_AB;
     static const QByteArray INT_EVENT_SEQUENCE_BA;
+
+    /************************ SYNC PWM GENERATOR ***********************/
+    //Syncronized PWM generator general commands
+    static const QByteArray SPWM_COMMAND;
+
+    static const QByteArray SPWM_INIT;
+    static const QByteArray SPWM_DEINIT;
+
+    //Set frequency command
+    static const QByteArray SPWM_FREQ_CH12;
+    static const QByteArray SPWM_FREQ_CH34;
+    static const QByteArray SPWM_DUTYPHASE_CONFIG;
+
+    //Individual channels run or not
+    static const QByteArray SPWM_CHANNEL_INVERT;
+    static const QByteArray SPWM_CHANNEL_STATE;
+    static const int SPWM_CHANNEL_ENABLE;
+    static const int SPWM_CHANNEL_DISABLE;
+    static const int SPWM_CHANNEL1;
+    static const int SPWM_CHANNEL2;
+    static const int SPWM_CHANNEL3;
+    static const int SPWM_CHANNEL4;
+
+    // One pulse mode to let the timer disable after overflow
+    static const QByteArray SPWM_STEP_MODE;
+    static const QByteArray SPWM_STEP_ENABLE;
+    static const QByteArray SPWM_STEP_DISABLE;
 };
 
 #endif // COMMANDS_H

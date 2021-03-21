@@ -52,6 +52,7 @@
         <file>graphics/units_Vripple.png</file>
         <file>graphics/units_Vmax.png</file>
         <file>graphics/units_Vmin.png</file>
+        <file>graphics/icon_syncpwm.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

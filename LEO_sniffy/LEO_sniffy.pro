@@ -78,6 +78,11 @@ SOURCES += \
     modules/scope/scopeconfig.cpp \
     modules/scope/scopespec.cpp \
     modules/scope/scopewindow.cpp \
+    modules/syncpwm/syncpwm.cpp \
+    modules/syncpwm/syncpwmconfig.cpp \
+    modules/syncpwm/syncpwmsettings.cpp \
+    modules/syncpwm/syncpwmspec.cpp \
+    modules/syncpwm/syncpwmwindow.cpp \
     modules/template/templatemodule.cpp \
     modules/template/templatemoduleconfig.cpp \
     modules/template/templatemodulespec.cpp \
@@ -153,6 +158,12 @@ HEADERS += \
     modules/scope/scopedefs.h \
     modules/scope/scopespec.h \
     modules/scope/scopewindow.h \
+    modules/syncpwm/syncpwm.h \
+    modules/syncpwm/syncpwmconfig.h \
+    modules/syncpwm/syncpwmdefs.h \
+    modules/syncpwm/syncpwmsettings.h \
+    modules/syncpwm/syncpwmspec.h \
+    modules/syncpwm/syncpwmwindow.h \
     modules/template/templatemodule.h \
     modules/template/templatemoduleconfig.h \
     modules/template/templatemodulespec.h \
@@ -186,6 +197,7 @@ FORMS += \
     modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \
     modules/scope/scopewindow.ui \
+    modules/syncpwm/syncpwmwindow.ui \
     modules/template/templatemodulewindow.ui \
     modules/voltmeter/voltmeterwindow.ui
 

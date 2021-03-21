@@ -21,7 +21,7 @@ const QByteArray Commands::RESET_DEVICE = "RES!";
 
 const QByteArray Commands::GENERATOR = "GEN_";
 const QByteArray Commands::PWM_GENERATOR = "GENP";
-const QByteArray Commands::SYNC_PWM_GEN = "SYNP";
+const QByteArray Commands::SYNC_PWM_GEN = "SPWM";
 const QByteArray Commands::LOG_ANLYS = "LOGA";
 const QByteArray Commands::COUNTER = "CNT_";
 const QByteArray Commands::SCOPE = "OSCP";
@@ -180,3 +180,31 @@ const QByteArray Commands::INT_EVENT_FALL_CH1 = "FO1_";
 const QByteArray Commands::INT_EVENT_FALL_CH2 = "FO2_";
 const QByteArray Commands::INT_EVENT_SEQUENCE_AB = "SQAB";
 const QByteArray Commands::INT_EVENT_SEQUENCE_BA = "SQBA";
+
+/************************ SYNC PWM GENERATOR ***********************/
+//Syncronized PWM generator general commands
+const QByteArray Commands::SPWM_COMMAND = "SCOM";
+
+const QByteArray Commands::SPWM_INIT = "INIT";
+const QByteArray Commands::SPWM_DEINIT = "DINI";
+
+//Set frequency command
+const QByteArray Commands::SPWM_FREQ_CH12 = "SP12";
+const QByteArray Commands::SPWM_FREQ_CH34 = "SP34";
+const QByteArray Commands::SPWM_DUTYPHASE_CONFIG = "SPDP";
+
+//Individual channels run or not
+const QByteArray Commands::SPWM_CHANNEL_INVERT = "SPCI";
+const QByteArray Commands::SPWM_CHANNEL_STATE = "SSTA";
+const int Commands::SPWM_CHANNEL_ENABLE = 1;
+const int Commands::SPWM_CHANNEL_DISABLE = 0;
+const int Commands::SPWM_CHANNEL1 = 1;
+const int Commands::SPWM_CHANNEL2 = 2;
+const int Commands::SPWM_CHANNEL3 = 3;
+const int Commands::SPWM_CHANNEL4 = 4;
+
+// One pulse mode to let the timer disable after overflow
+const QByteArray Commands::SPWM_STEP_MODE = "STEP";
+const QByteArray Commands::SPWM_STEP_ENABLE = "STEE";
+const QByteArray Commands::SPWM_STEP_DISABLE = "STED";
+

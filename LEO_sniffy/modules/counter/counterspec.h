@@ -35,7 +35,7 @@ public:
     QList<QString> pinsList = { pins.hf_ch1,
                                 pins.lf_ch1, pins.lf_ch2,
                                 pins.rat_ref, pins.rat_ch3,
-                                pins.int_ch1, pins.int_ch2,};
+                                pins.int_ch1, pins.int_ch2 };
 
 signals:
 
