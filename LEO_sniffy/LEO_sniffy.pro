@@ -54,6 +54,10 @@ SOURCES += \
     modules/abstractconfiguration.cpp \
     modules/abstractmodule.cpp \
     modules/abstractspecification.cpp \
+    modules/arbgenerator/arbgenerator.cpp \
+    modules/arbgenerator/arbgeneratorconfig.cpp \
+    modules/arbgenerator/arbgeneratorspec.cpp \
+    modules/arbgenerator/arbgeneratorwindow.cpp \
     modules/counter/counter.cpp \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
@@ -67,6 +71,14 @@ SOURCES += \
     modules/device/device.cpp \
     modules/device/devicewindow.cpp \
     modules/device/devicespec.cpp \
+    modules/patterngenerator/patterngenerator.cpp \
+    modules/patterngenerator/patterngeneratorconfig.cpp \
+    modules/patterngenerator/patterngeneratorspec.cpp \
+    modules/patterngenerator/patterngeneratorwindow.cpp \
+    modules/pwmgenerator/pwmgeneratorconfig.cpp \
+    modules/pwmgenerator/pwmgeneratorspec.cpp \
+    modules/pwmgenerator/pwmgeneratorwindow.cpp \
+    modules/pwmgenerator/pwngenerator.cpp \
     modules/scope/mathcalculations.cpp \
     modules/scope/meascalculations.cpp \
     modules/scope/measurement.cpp \
@@ -92,6 +104,10 @@ SOURCES += \
     modules/voltmeter/voltmeterconfig.cpp \
     modules/voltmeter/voltmeterspec.cpp \
     modules/voltmeter/voltmeterwindow.cpp
+    modules/voltagesource/voltagesource.cpp \
+    modules/voltagesource/voltagesourceconfig.cpp \
+    modules/voltagesource/voltagesourcespec.cpp \
+    modules/voltagesource/voltagesourcewindow.cpp \
 
 
 HEADERS += \
@@ -131,6 +147,10 @@ HEADERS += \
     math/tinyexpr.h \
     modules/abstractconfiguration.h \
     modules/abstractspecification.h \
+    modules/arbgenerator/arbgenerator.h \
+    modules/arbgenerator/arbgeneratorconfig.h \
+    modules/arbgenerator/arbgeneratorspec.h \
+    modules/arbgenerator/arbgeneratorwindow.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
     modules/counter/counterdefs.h \
@@ -146,6 +166,14 @@ HEADERS += \
     modules/device/device.h \
     modules/device/devicewindow.h \
     modules/device/devicespec.h \
+    modules/patterngenerator/patterngenerator.h \
+    modules/patterngenerator/patterngeneratorconfig.h \
+    modules/patterngenerator/patterngeneratorspec.h \
+    modules/patterngenerator/patterngeneratorwindow.h \
+    modules/pwmgenerator/pwmgenerator.h \
+    modules/pwmgenerator/pwmgeneratorconfig.h \
+    modules/pwmgenerator/pwmgeneratorspec.h \
+    modules/pwmgenerator/pwmgeneratorwindow.h \
     modules/scope/mathcalculations.h \
     modules/scope/meascalculations.h \
     modules/scope/measurement.h \
@@ -174,6 +202,10 @@ HEADERS += \
     modules/voltmeter/voltmeterdefs.h \
     modules/voltmeter/voltmeterspec.h \
     modules/voltmeter/voltmeterwindow.h
+    modules/voltagesource/voltagesource.h \
+    modules/voltagesource/voltagesourceconfig.h \
+    modules/voltagesource/voltagesourcespec.h \
+    modules/voltagesource/voltagesourcewindow.h
 
 
 
@@ -194,12 +226,17 @@ FORMS += \
     GUI/widgettab.ui \
     GUI/widgettextinput.ui \
     mainwindow.ui \
+    modules/arbgenerator/arbgeneratorwindow.ui \
     modules/counter/counterwindow.ui \
     modules/device/devicewindow.ui \
+    modules/patterngenerator/patterngeneratorwindow.ui \
+    modules/pwmgenerator/pwmgeneratorwindow.ui \
     modules/scope/scopewindow.ui \
     modules/syncpwm/syncpwmwindow.ui \
     modules/template/templatemodulewindow.ui \
     modules/voltmeter/voltmeterwindow.ui
+    modules/template/templatemodulewindow.ui \
+    modules/voltagesource/voltagesourcewindow.ui
 
 
 TRANSLATIONS += \
