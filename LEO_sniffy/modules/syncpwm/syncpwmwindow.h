@@ -29,12 +29,13 @@ public:
     explicit SyncPwmWindow(SyncPwmConfig *conf, QWidget *parent = nullptr);
     ~SyncPwmWindow();
 
+    SyncPwmSettings *settings;
+
 private slots:
 
 private:
     Ui::SyncPwmWindow *ui;
-    SyncPwmConfig *config;
-    SyncPwmSettings *settings;
+    SyncPwmConfig *config;    
 
     widgetChart *chart;
 
