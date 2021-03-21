@@ -8,6 +8,21 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *pare
 {
     ui->setupUi(this);
     //TODO setup the GUI here
+
+    QWidget *widget_settings = new QWidget(this, Qt::Window);
+    QVBoxLayout *verticalLayout_settings = new QVBoxLayout();
+    widget_settings->setLayout(verticalLayout_settings);
+
+    widget_settings->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    verticalLayout_settings->setContentsMargins(4,4,4,4);
+    verticalLayout_settings->setSpacing(2);
+
+    setting = new ArbGenPanelSettings(verticalLayout_settings,config,this);
+
+    ui->widget_settings->setLayout(verticalLayout_settings);
+
+
+
 }
 
 ArbGeneratorWindow::~ArbGeneratorWindow()

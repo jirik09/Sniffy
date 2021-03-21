@@ -4,9 +4,9 @@
 #include <QObject>
 
 #include "../abstractmodule.h"
-#include "ArbGeneratorspec.h"
-#include "ArbGeneratorconfig.h"
-#include "ArbGeneratorwindow.h"
+#include "arbgeneratorspec.h"
+#include "arbgeneratorconfig.h"
+#include "arbgeneratorwindow.h"
 
 class ArbGenerator : public AbstractModule
 {
