@@ -99,15 +99,15 @@ SOURCES += \
     modules/template/templatemoduleconfig.cpp \
     modules/template/templatemodulespec.cpp \
     modules/template/templatemodulewindow.cpp \
+    modules/voltagesource/voltagesource.cpp \
+    modules/voltagesource/voltagesourceconfig.cpp \
+    modules/voltagesource/voltagesourcespec.cpp \
+    modules/voltagesource/voltagesourcewindow.cpp \
     modules/voltmeter/channeldata.cpp \
     modules/voltmeter/voltmeter.cpp \
     modules/voltmeter/voltmeterconfig.cpp \
     modules/voltmeter/voltmeterspec.cpp \
     modules/voltmeter/voltmeterwindow.cpp
-    modules/voltagesource/voltagesource.cpp \
-    modules/voltagesource/voltagesourceconfig.cpp \
-    modules/voltagesource/voltagesourcespec.cpp \
-    modules/voltagesource/voltagesourcewindow.cpp \
 
 
 HEADERS += \
@@ -196,16 +196,16 @@ HEADERS += \
     modules/template/templatemoduleconfig.h \
     modules/template/templatemodulespec.h \
     modules/template/templatemodulewindow.h \
+    modules/voltagesource/voltagesource.h \
+    modules/voltagesource/voltagesourceconfig.h \
+    modules/voltagesource/voltagesourcespec.h \
+    modules/voltagesource/voltagesourcewindow.h \
     modules/voltmeter/channeldata.h \
     modules/voltmeter/voltmeter.h \
     modules/voltmeter/voltmeterconfig.h \
     modules/voltmeter/voltmeterdefs.h \
     modules/voltmeter/voltmeterspec.h \
     modules/voltmeter/voltmeterwindow.h
-    modules/voltagesource/voltagesource.h \
-    modules/voltagesource/voltagesourceconfig.h \
-    modules/voltagesource/voltagesourcespec.h \
-    modules/voltagesource/voltagesourcewindow.h
 
 
 
@@ -234,9 +234,8 @@ FORMS += \
     modules/scope/scopewindow.ui \
     modules/syncpwm/syncpwmwindow.ui \
     modules/template/templatemodulewindow.ui \
+    modules/voltagesource/voltagesourcewindow.ui \
     modules/voltmeter/voltmeterwindow.ui
-    modules/template/templatemodulewindow.ui \
-    modules/voltagesource/voltagesourcewindow.ui
 
 
 TRANSLATIONS += \
