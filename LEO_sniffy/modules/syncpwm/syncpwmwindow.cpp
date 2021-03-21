@@ -8,14 +8,47 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    chart = new widgetChart(ui->widget_chart, 4);
-    chart->setRange(0, 1, 0, RANGE_CHAN1_LOG1 + 1);
-    ui->verticalLayout_chart->addWidget(chart);
+    QSplitter *splitter = nullptr;
+    QWidget *widget_chart = new QWidget(this, Qt::Window);
+    QWidget *widget_settings = new QWidget(this, Qt::Window);
+    QVBoxLayout *verticalLayout_chart = new QVBoxLayout();
+    QVBoxLayout *verticalLayout_settings = new QVBoxLayout();
 
-    settings = new SyncPwmSettings(ui->verticalLayout_settings, this);
+    widget_chart->setLayout(verticalLayout_chart);
+    widget_settings->setLayout(verticalLayout_settings);
+
+    if(config->layout == SyncPwmLayout::HORIZONTAL){
+        splitter = new QSplitter(Qt::Horizontal, this);
+        splitter->addWidget(widget_chart);
+        splitter->addWidget(widget_settings);
+    }else {
+        splitter = new QSplitter(Qt::Vertical, this);
+        splitter->addWidget(widget_settings);
+        splitter->addWidget(widget_chart);
+    }
+
+    ui->horizontalLayout->addWidget(splitter);
+
+    splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    splitter->setContentsMargins(0,0,0,0);
+
+    widget_chart->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+    widget_chart->setContentsMargins(0,0,0,0);
+    verticalLayout_chart->setContentsMargins(0,0,0,0);
+    verticalLayout_chart->setSpacing(0);
+
+    widget_settings->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    verticalLayout_settings->setContentsMargins(4,4,4,4);
+    verticalLayout_settings->setSpacing(2);
+
+    chart = new widgetChart(widget_chart, 4);
+    //chart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    chart->setRange(0, 1, 0, RANGE_CHAN1_LOG1 + 1);
+    verticalLayout_chart->addWidget(chart);
+
+    settings = new SyncPwmSettings(verticalLayout_settings, config, this);
 }
 
-SyncPwmWindow::~SyncPwmWindow()
-{
+SyncPwmWindow::~SyncPwmWindow(){
     delete ui;
 }

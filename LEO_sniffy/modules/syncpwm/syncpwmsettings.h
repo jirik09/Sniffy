@@ -10,13 +10,14 @@
 #include "../../GUI/widgetswitch.h"
 #include "../../GUI/widgetbuttons.h"
 
+#include "syncpwmconfig.h"
 #include "syncpwmdefs.h"
 
 class SyncPwmSettings : public QObject
 {
     Q_OBJECT
 public:
-    explicit SyncPwmSettings(QVBoxLayout *destination, QWidget *parent = nullptr);
+    explicit SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config, QWidget *parent = nullptr);
 
     WidgetButtons *buttonStart;
     WidgetButtons *buttonEquidist;
@@ -32,14 +33,14 @@ public:
     const QString chanColor[CHANNELS_NUM] =  {COLOR_BLUE,
                                               COLOR_GREEN,
                                               COLOR_ORANGE,
-                                              COLOR_PURPLE};
+                                              COLOR_PURPLE};    
 
 private:
+
+    SyncPwmConfig *config;
 
 signals:
 
 };
-
-#define VERT0_HORIZ1_LAYOUT 1
 
 #endif // SYNCPWMSETTINGS_H

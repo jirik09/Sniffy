@@ -8,6 +8,12 @@
 
 #include "../abstractconfiguration.h"
 
+enum class SyncPwmLayout
+{
+    HORIZONTAL = 0,
+    VERTICAL = 1
+};
+
 class SyncPwmConfig : public AbstractConfiguration
 {
     Q_OBJECT
@@ -16,6 +22,8 @@ public:
 
     void parse (QByteArray config);
     QByteArray serialize ();
+
+    SyncPwmLayout layout;
 
 signals:
 

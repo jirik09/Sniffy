@@ -1,6 +1,8 @@
 #include "syncpwmsettings.h"
 
-SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, QWidget *parent) : QObject(parent)
+SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config, QWidget *parent) :
+    QObject(parent),
+    config(config)
 {
     QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -32,7 +34,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, QWidget *parent) : QO
     /* Channels ------------------------------------------------------------- */
     int phase = 0;
 
-    if(VERT0_HORIZ1_LAYOUT == 1){
+    if(config->layout == SyncPwmLayout::HORIZONTAL){
 
         for(int i = 0; i < CHANNELS_NUM; i++){
             QString chNStr = QString::number(i + 1);
@@ -82,6 +84,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, QWidget *parent) : QO
 
             phase += PI_HALF;
         }
+
     }else {
 
         QHBoxLayout *horBox = new QHBoxLayout();
@@ -133,7 +136,6 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, QWidget *parent) : QO
         }
     }
 
-    QSpacerItem *verticalSpacer;
-    verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     destination->addItem(verticalSpacer);
 }

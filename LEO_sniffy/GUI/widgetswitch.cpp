@@ -15,8 +15,9 @@ WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftName, QString rightName,
     ui->label_name->setText(name);
     setObjectName(name);
 
-    ui->pushButton_left->setStyleSheet(styleSelected);
-    ui->pushButton_right->setStyleSheet(styleNotSelected);
+    ui->pushButton_left->setCheckable(true);
+    ui->pushButton_right->setCheckable(true);
+    setLeft(true);
 
     ui->pushButton_left->setText(leftName);
     ui->pushButton_right->setText(rightName);
@@ -51,6 +52,8 @@ void WidgetSwitch::restoreGeometry(QByteArray geom)
 void WidgetSwitch::setLeft(bool silent){
     ui->pushButton_left->setStyleSheet(styleSelected);
     ui->pushButton_right->setStyleSheet(styleNotSelected);
+    ui->pushButton_left->setChecked(true);
+    ui->pushButton_right->setChecked(false);
     if (!silent)
         emit clicked(0);
 }
@@ -58,6 +61,8 @@ void WidgetSwitch::setLeft(bool silent){
 void WidgetSwitch::setRight(bool silent){
     ui->pushButton_right->setStyleSheet(styleSelected);
     ui->pushButton_left->setStyleSheet(styleNotSelected);
+    ui->pushButton_right->setChecked(true);
+    ui->pushButton_left->setChecked(false);
     if(!silent)
         emit clicked(1);
 }
@@ -69,16 +74,10 @@ bool WidgetSwitch::isCheckedLeft(){
 void WidgetSwitch::setColor(QString color){
     styleSelected = color;
     if(ui->pushButton_right->isChecked()){
-        ui->pushButton_right->setStyleSheet(styleSelected);
-        ui->pushButton_left->setStyleSheet(styleNotSelected);
+        setRight(true);
     }else {
-        ui->pushButton_left->setStyleSheet(styleSelected);
-        ui->pushButton_right->setStyleSheet(styleNotSelected);
+        setLeft(true);
     }
-}
-
-void WidgetSwitch::enable(){
-    setLeft(true);
 }
 
 bool WidgetSwitch::isCheckedRight(){

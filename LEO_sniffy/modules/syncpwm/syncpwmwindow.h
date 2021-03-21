@@ -2,6 +2,7 @@
 #define SYNCPWMWINDOW_H
 
 #include <QWidget>
+#include <QSplitter>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"

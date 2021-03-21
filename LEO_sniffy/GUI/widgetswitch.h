@@ -22,8 +22,7 @@ public:
     bool isCheckedRight();
     bool isCheckedLeft();
 
-    void setColor(QString color);
-    void enable();
+    void setColor(QString color);    
 
 private:
     Ui::WidgetSwitch *ui;
