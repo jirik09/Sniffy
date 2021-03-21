@@ -37,7 +37,7 @@
 #define COLOR_RED "rgb(224,24,0);"
 #define COLOR_BROWN "rgb(170,105,39);"
 #define COLOR_DARK_BLUE "rgb(24,0,185);"
-#define COLOR_YELLOW "rgb(255,255,54);"
+#define COLOR_YELLOW "rgb(255,217,15);"
 #define COLOR_LIGHT_GREEN "rgb(24,224,0);"
 #define COLOR_DARK_CYAN "rgb(30,170,100);"
 #define COLOR_PINK "rgb(255,18,108);"
@@ -48,7 +48,7 @@
 #define QCOLOR_RED QColor(224,24,0)
 #define QCOLOR_BROWN QColor(170,105,39)
 #define QCOLOR_DARK_BLUE QColor(24,0,185)
-#define QCOLOR_YELLOW QColor(255,255,54)
+#define QCOLOR_YELLOW QColor(255,217,15)
 #define QCOLOR_LIGHT_GREEN QColor(24,224,0)
 #define QCOLOR_DARK_CYAN QColor(30,170,100)
 #define QCOLOR_PINK QColor(255,18,108)

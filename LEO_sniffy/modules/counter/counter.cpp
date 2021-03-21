@@ -1,10 +1,10 @@
 #include "counter.h"
 
-Counter::Counter(QObject *parent/*, config param*/)
+Counter::Counter(QObject *parent)
 {
     Q_UNUSED(parent);
-        //JIRI TODO parse config here (load config before making modules)
-    config = new CounterConfig(this/*, param*/);
+
+    config = new CounterConfig(this);
     cntWindow = new CounterWindow(config);
 
     moduleCommandPrefix = cmd->COUNTER;
@@ -44,7 +44,7 @@ Counter::Counter(QObject *parent/*, config param*/)
     connect(cntWindow->tabInter->switchEdgeEventB, &WidgetSwitch::clicked, this, &Counter::intEventBChangedCallback);
 }
 
-void Counter::startModule(){
+void Counter::startModule(){    
     startCounting();
 }
 
@@ -164,18 +164,22 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     QByteArray freqPer = data.left(4); data.remove(0, 4);
 
     double val, qerr, terr;
-    QString strVal, strAvg, strQerr, strTerr;
+    QString strAvg, strQerr, strTerr; // strVal
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val >> qerr >> terr;
 
     WidgetDisplay *display = cntWindow->displayHF;
+
     bool isFrequency = (freqPer == "QFRE") ? true : false;
+
     uint countToGo = (isFrequency) ? movAvg->prepend(val) : movAvg->prepend(1/val);
     this->strQerr = strQerr = formatErrNumber(display, qerr);
     this->strTerr = strTerr = formatErrNumber(display, terr);
     cntWindow->showPMErrorSigns(display, true);
 
-    if(movAvg->isBufferFull()){
+    bool isAvgBuffFull = movAvg->isBufferFull();
+
+    if(isAvgBuffFull){
         config->hfState.hold = HFState::HoldOnState::OFF;
         cntWindow->hfSetColorRemainSec(QCOLOR_WHITE);
         avg = (isFrequency) ? movAvg->getAverage() : 1 / movAvg->getAverage();
@@ -195,17 +199,24 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
 
     displayValues(display, formatNumber(display, val, qerr+terr), strAvg, strQerr, strTerr);
 
-    if(!isFrequency)
-        val = 1 / val;
-    display->updateProgressBar(val);
-    config->hfState.quantState = HFState::QuantitySwitched::NO;
-
     /* History section */
     QString pm(0x00B1);
-    cntWindow->appendNewHistorySample(display, "", val, " Hz", (float)config->hfState.gateTime/(float)1000);
-    cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr, " Hz");
-    cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr, " Hz");
-    cntWindow->associateToHistorySample(display, 3, ", avg = ", avg);
+    QString quant = (isFrequency) ? " Hz": " s";
+
+    cntWindow->appendNewHistorySample(display, "", val, quant, (float)config->hfState.gateTime/(float)1000);
+    cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr, quant);
+    cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr, quant);
+
+    if(isAvgBuffFull)
+        cntWindow->associateToHistorySample(display, 3, ", avg = ", avg, quant);
+    else
+        cntWindow->associateToHistorySample(display, 3, ", avg unavailable ", -1);
+
+    if(!isFrequency)
+        val = 1 / val;
+
+    display->updateProgressBar(val);
+    config->hfState.quantState = HFState::QuantitySwitched::NO;
 }
 
 void Counter::hfReloadState(){
@@ -297,7 +308,15 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val1 >> val2 >> qerr >> terr;
 
-    WidgetDisplay *display = (channel == "IC1D") ? cntWindow->displayLFCh1 : cntWindow->displayLFCh2;
+    WidgetDisplay *display;
+    if(channel == "IC1D"){
+        display = cntWindow->displayLFCh1;
+    }else if(channel == "IC2D"){
+        display = cntWindow->displayLFCh2;
+    }else {
+        mode = "xx";
+    }
+
     QString pm(0x00B1);
 
     if(mode == "FPME"){
@@ -305,7 +324,8 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         strQerr = formatErrNumber(display, qerr);
         strTerr = formatErrNumber(display, terr);
 
-        if(quantity == "QPER")
+        bool isFrequency = (quantity != "QPER");
+        if(!isFrequency)
             val1 = 1 / val1;
 
         if(isRangeExceeded(val1)){
@@ -318,8 +338,16 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
             cntWindow->displayFlagHoldOn(display, false);
             display->updateProgressBar(val1);
 
+            QString quant;
+            if(isFrequency){
+                quant = " Hz";
+            }else {
+                quant = " s";
+                val1 = 1 / val1;
+            }
+
             /* History section */
-            cntWindow->appendNewHistorySample(display, "", val1, " Hz");
+            cntWindow->appendNewHistorySample(display, "", val1, quant);
             cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr);
             cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr);
         }
@@ -331,8 +359,9 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         displayValues(display, strVal, strVal2, "", "");
 
         /* History section */
-        cntWindow->appendNewHistorySample(display, "PW ", val1, " Sec");
+        cntWindow->appendNewHistorySample(display, "PW ", val1, " s");
         cntWindow->associateToHistorySample(display, 1, ", DC ", val2, " \%");
+        cntWindow->associateToHistorySample(display, 2, " ");
     }
 }
 
@@ -549,16 +578,9 @@ void Counter::intDialTimeoutChangedCallback(float val){
     write(cmd->INT_TIMEOUT_SEC, val);
 }
 
-void Counter::writeConfiguration(){
+void Counter::writeConfiguration(){ //tahle funkce se vola vzdy pri otevreni modulu
     cntWindow->restoreGUIAfterStartup();
-
-    switchCounterModeCallback((int)config->mode);
-
-    //TODO
-    //zapsat predchozi konfiguraci do MCU (config je nacteny)
-    //geometrie a GUI je nactene ale do MCU se nic neposlalo
-    //tahle funkce se vola vzdy pri otevreni modulu
-
+    switchCounterModeCallback((int)config->mode);    
 }
 
 void Counter::parseConfiguration(QByteArray config){    

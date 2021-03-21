@@ -13,8 +13,6 @@ public:
     explicit TemplateModuleSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);
 
-    int specificationVariable;
-
 };
 
 #endif // TEMPLATEMODULESPEC_H

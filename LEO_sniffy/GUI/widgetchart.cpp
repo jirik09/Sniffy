@@ -98,48 +98,57 @@ widgetChart::~widgetChart()
 }
 
 void widgetChart::switchToSplineSeriesCallback(){
+    chartMode = ChartMode::SPLINE;
+    line->setChecked(false);
+    spline->setChecked(true);
+    scatter->setChecked(false);
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
         series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
-
         series->append(seriesList[i]->points());
         seriesList[i]->clear();
         seriesList.replace(i, series);
-
         createSeries(series);
-        series->setUseOpenGL(true);
     }
 }
 
 void widgetChart::switchToLineSeriesCallback(){
+    chartMode = ChartMode::LINE;
+    line->setChecked(true);
+    spline->setChecked(false);
+    scatter->setChecked(false);
+    switchToLineSeriesSeamless();
+}
+
+void widgetChart::switchToLineSeriesSeamless()
+{
     for (int i = 0; i < maxTraces; i++) {
         QLineSeries *series = new QLineSeries;
         //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
         series->setPen(QPen(QBrush(Colors::getChannelColor(i)), 2.0));
-
         series->append(seriesList[i]->points());
         seriesList[i]->clear();
         seriesList.replace(i, series);
-
         createSeries(series);
-        series->setUseOpenGL(true);
     }
 }
 
 void widgetChart::switchToScatterSeriesCallback(){
+    line->setChecked(false);
+    spline->setChecked(false);
+    scatter->setChecked(true);
+    chartMode = ChartMode::SCATTER;
     for (int i = 0; i < maxTraces; i++) {
         QScatterSeries *series = new QScatterSeries;
         //connect(series, &QScatterSeries::hovered, this, &widgetChart::hovered);
         series->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
         series->setMarkerSize(20.0);
         series->setPen(QColor(Qt::transparent));
-
         series->setBrush(getBrush(i,MarkerType::CIRCLE));
         series->append(seriesList[i]->points());
         seriesList[i]->clear();
         seriesList.replace(i, series);
-
         createSeries(series);
         series->setUseOpenGL(false);
     }
@@ -164,7 +173,7 @@ void widgetChart::createSeries(QAbstractSeries *series){
 bool widgetChart::eventFilter(QObject *obj, QEvent *event)
 {
     Q_UNUSED(obj);
-    if(event->type() == QEvent::GraphicsSceneWheel){ //zoomby wheel
+    if(event->type() == QEvent::GraphicsSceneWheel){ //zoom by wheel
         QGraphicsSceneWheelEvent *ev = (QGraphicsSceneWheelEvent*) event;
         qreal tmp = ev->delta();
         if(tmp>=0){
@@ -179,6 +188,10 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     }
     if(event->type() == QEvent::GraphicsSceneMouseDoubleClick){ //restore zoom on double click
         localZoom = 1;
+        shift = abs(minX)/(maxX-minX);
+        if(shift>1)shift = 1;
+        if(shift<0)shift = 0;
+        emit localZoomChanged();
         updateAxis();
     }
 
@@ -221,7 +234,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     }
 
     if(event->type() != QEvent::LayoutRequest && event->type()!=QEvent::GraphicsSceneHoverMove){
-     // qDebug() <<"Sereies event"<< event->type() << obj->objectName();
+        // qDebug() <<"Sereies event"<< event->type() << obj->objectName();
     }
     return QObject::eventFilter(obj, event);
 }
@@ -264,12 +277,38 @@ void widgetChart::updateAxis(){
     qreal tmpMin = subMax * shift+minX;
     qreal tmpMax = (maxX-minX)*invZoom/localZoom+tmpMin;
     axisX->setRange(tmpMin,tmpMax);
+
+    if(!seriesList.isEmpty() && seriesList.at(0)->count()>1){
+        qreal percent = (tmpMax-tmpMin)/(seriesList.at(0)->points().last().x()-seriesList.at(0)->points().first().x());
+        int samplesshown = percent*seriesList.at(0)->count();
+        //qDebug() << "shown" +QString::number(samplesshown) <<"update" << QString::number(val);
+        if(samplesshown<NUM_SAMPLES_TO_SWITCH){
+            switch (chartMode) {
+            case ChartMode::LINE:
+                switchToLineSeriesCallback();
+                break;
+            case ChartMode::SPLINE:
+                switchToSplineSeriesCallback();
+                break;
+            case ChartMode::SCATTER:
+                switchToScatterSeriesCallback();
+                break;
+            }
+        }else{
+            switchToLineSeriesSeamless();
+        }
+    }
 }
 
 void widgetChart::setDataMinMax(qreal minX, qreal maxX){
     this->minX = minX;
     this->maxX = maxX;
-    updateAxis();
+
+    if(lastMaxX!=maxX || lastMinX!=minX){
+        lastMaxX = maxX;
+        lastMinX = minX;
+        updateAxis();
+    }
 }
 
 void widgetChart::setRangeX(qreal minX, qreal maxX){
@@ -311,7 +350,10 @@ void widgetChart::setMargins(int left, int top, int right, int bottom){
 
 void widgetChart::setZoom(float zoom){
     this->invZoom = 1/zoom;
-    updateAxis();
+    if(invZoom!=lastInvZoom){
+        lastInvZoom = invZoom;
+        updateAxis();
+    }
 }
 
 qreal widgetChart::getZoom(){
@@ -441,6 +483,23 @@ void widgetChart::initBrushes()
 
     MarkerPath_Circle = new QPainterPath(QPointF(10,10));
     MarkerPath_Circle->arcTo(QRectF(8,8,4,4),0,360*16);
+
+    MarkerPath_Trigger = new QPainterPath(QPointF(0,5));
+    MarkerPath_Trigger->lineTo(15,5);
+    MarkerPath_Trigger->lineTo(20,10);
+    MarkerPath_Trigger->lineTo(15,15);
+
+    MarkerPath_Trigger->lineTo(13,15);
+    MarkerPath_Trigger->lineTo(13,10);
+    MarkerPath_Trigger->lineTo(16,10);
+    MarkerPath_Trigger->lineTo(16,7);
+    MarkerPath_Trigger->lineTo(7,7);
+    MarkerPath_Trigger->lineTo(7,10);
+    MarkerPath_Trigger->lineTo(10,10);
+    MarkerPath_Trigger->lineTo(10,15);
+
+    MarkerPath_Trigger->lineTo(0,15);
+
 }
 
 QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
@@ -472,6 +531,9 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
     case MarkerType::CIRCLE:
         painter.drawPath(*MarkerPath_Circle);
         break;
+    case MarkerType::TRIGGER:
+        painter.drawPath(*MarkerPath_Trigger);
+        break;
     }
     return marker;
 }
@@ -487,6 +549,7 @@ void widgetChart::setHorizontalMarker(int channelIndex, qreal value, MarkerType 
 
 void widgetChart::setVerticalMarker(int channelIndex, qreal value){
     QPointF pt = QPointF(value,0.99);
+    triggerShift = value;
     QList<QPointF> *lst = new QList<QPointF>;
     lst->append(pt);
     markersVertical[markerVerticalIndex]->setBrush(getBrush(channelIndex,MarkerType::ARROW_DOWN_BIG));
@@ -554,21 +617,27 @@ void widgetChart::initContextMenu(){
     menu->setStyleSheet(CONTEXT_MENU_HOVER);
 
     spline = new QAction("Spline", this);
+    spline->setCheckable(true);
+    spline->setChecked(true);
     line = new QAction("Line", this);
+    line->setCheckable(true);
+    line->setChecked(false);
     scatter  = new QAction("Points", this);
-    btnOpenGL = new QAction("Use OpenGL", this);
+    scatter->setCheckable(true);
+    scatter->setChecked(false);
+   /* btnOpenGL = new QAction("Use OpenGL", this);
     btnOpenGL->setCheckable(true);
-    btnOpenGL->setChecked(true);
+    btnOpenGL->setChecked(true);*/
 
     connect(spline, SIGNAL(triggered()), this, SLOT(switchToSplineSeriesCallback()));
     connect(line, SIGNAL(triggered()), this, SLOT(switchToLineSeriesCallback()));
     connect(scatter, SIGNAL(triggered()), this, SLOT(switchToScatterSeriesCallback()));
-    connect(btnOpenGL, SIGNAL(triggered()), this, SLOT(useOpenGLCallback()));
+    //connect(btnOpenGL, SIGNAL(triggered()), this, SLOT(useOpenGLCallback()));
 
     menu->addAction(spline);
     menu->addAction(line);
     menu->addAction(scatter);
-    menu->addAction(btnOpenGL);
+    //menu->addAction(btnOpenGL);
 }
 
 void widgetChart::rightClickCallback(const QPoint &mousePos){

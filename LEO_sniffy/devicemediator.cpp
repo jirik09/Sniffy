@@ -18,7 +18,9 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new Scope(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new Counter(this)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Voltmeter(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new SyncPwm(this)));
+  //  tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
     foreach(QSharedPointer<AbstractModule> mod, tmpModules){
         connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
@@ -116,13 +118,18 @@ void DeviceMediator::parseData(QByteArray data){
     //What if data belongs to voltmeter and scope???????????
     //Solution1: each module has to know if it is running or not and handle data correctly.
     foreach(QSharedPointer<AbstractModule> module, modules){
-        if(dataHeader == module->getCommandPrefix()){
+        if(dataHeader == module->getCommandPrefix() && (module->isActive() || dataToPass.left(4) == "CFG_" || dataToPass.left(4) == "ACK_")){
             module->parseData(dataToPass);
             isDataPassed=true;
         }
     }
     if(!isDataPassed){
-        qDebug() << "ERROR: this data was not passed to any module" << data;
+        if(data.length()<30){
+            qDebug() << "ERROR: this data was not passed to any module" << data;
+        }else{
+            qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
+        }
+
     }
 }
 

@@ -12,7 +12,7 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
 
     dialTimeout = new WidgetDialRange(parent ,"Timeout");
     dialTimeout->setObjectName("dialIntTimeout");
-    dialTimeout->setRange(1, INTERVAL_TIMEOUT_MAX, "Sec", 1, 1, INTERVAL_TIMEOUT_DEFAULT, true);
+    dialTimeout->setRange(1, INTERVAL_TIMEOUT_MAX, "Sec", 1, 1, INTERVAL_TIMEOUT_DEFAULT, false);
     dialTimeout->hideUnitSelection();
     destination->addWidget(dialTimeout);
 
@@ -40,8 +40,8 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
 
     labelPicEventsSeq = new QLabel(parent);
     labelPicEventsSeq->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-    int width = labelPicEventsSeq->width() * 3;
-    int height = labelPicEventsSeq->height() * 3;
+    width = labelPicEventsSeq->width() * 3;
+    height = labelPicEventsSeq->height() * 3;
     labelPicEventsSeq->setAlignment(Qt::AlignCenter);
     destination->addWidget(labelPicEventsSeq);
 
@@ -100,8 +100,6 @@ void CounterTabIntervals::setSeqPicture(){
     }
 
     pixmapEventsSeq->load(picPath);
-    int width = labelPicEventsSeq->width();
-    int height = labelPicEventsSeq->height();
     labelPicEventsSeq->setPixmap(pixmapEventsSeq->scaled(width, height, Qt::KeepAspectRatio));
 }
 

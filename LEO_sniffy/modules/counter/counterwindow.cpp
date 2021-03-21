@@ -57,13 +57,12 @@ void CounterWindow::createAllDisplays(void){
 
     displayLFCh1 = createLowFreqDisplays("LowFreqCh1Counter");
     displayLFCh1->setContentsMargins(5, 5, 5, 5);
+    displayLFCh1->setProgressBarColor(COLOR_BLUE);
     ui->verticalLayout_display->addWidget(displayLFCh1);
 
     displayLFCh2 = createLowFreqDisplays("LowFreqCh2Counter");
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
-    QString style = "QProgressBar {border: 1px solid #777;border-radius: 1px;background: "+QString::fromUtf8(BACKGROUND_COLOR_DATA_AREA)+"}"
-                    "QProgressBar::chunk {background-color: "+QString::fromUtf8(COLOR_GREY)+"width: 20px;}";
-    displayLFCh2->setBarStyle(style);
+    displayLFCh2->setProgressBarColor(COLOR_GREY);
     ui->verticalLayout_display->addWidget(displayLFCh2);
 
     displayRat = createRatioDisplay();
@@ -101,6 +100,8 @@ WidgetDisplay *CounterWindow::createRatioDisplay(void){
     display->setTerrStyle(styleSheet);
     display->showAvgDisplay(false);
     display->showTerrStyle(false);
+    //  QString color = COLOR_ORANGE;
+    //  display->setProgressBarColor(color);
     return display;
 }
 
@@ -189,12 +190,18 @@ void CounterWindow::setNextCounterMode(int index){
         clearDisplay(displayHF, true);
 
     }else if(index == (int)CounterMode::LOW_FREQUENCY) {
+        if(isAfterStart == true)
+            lfSwitchChannelCallback((int)conf->lfState.activeChan);
         if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
+            if(isAfterStart == true)
+                lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
             displayLFCh1->displayAvgString("");
             clearDisplay(displayLFCh1, true);
             displayLFCh2->setLabelText(LABELNUM_FLAG, LITERAL_NO_DATA);
             clearDisplay(displayLFCh2, false);
         }else if(conf->lfState.chan2.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
+            if(isAfterStart == true)
+                lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
             displayLFCh2->displayAvgString("");
             clearDisplay(displayLFCh2, true);
             displayLFCh1->setLabelText(LABELNUM_FLAG, LITERAL_NO_DATA);
@@ -205,6 +212,8 @@ void CounterWindow::setNextCounterMode(int index){
             switchQuantity((int)conf->lfState.chan1.quantity, displayLFCh1);
             switchQuantity((int)conf->lfState.chan2.quantity, displayLFCh2);
         }
+        if(isAfterStart == true)
+            isAfterStart = false;
         displayLFCh1->show();
         displayLFCh2->show();
 
@@ -260,20 +269,8 @@ void CounterWindow::associateToHistorySample(WidgetDisplay *display, int traceIn
     display->associateSample(traceIndex, prefix, sample, affix);
 }
 
-void CounterWindow::restoreGUIAfterStartup()
-{
-    //TODO tahle funkce se vola pri otevreni GUI modulu. Geometrie GUI je nactena tak jak byla
-    //ale zobrazit spravne ovadani/display podle toho co ma byt videt je potreba udelat zde
-
-    //nastavit ovladani podle toho jaky kanal je v LF vybran
-    int index = tabLowFreq->buttonsChannelSwitch->getSelectedIndex();
-    lfSwitchChannelCallback(index);
-
-    //nastavit mode podle toho jaky je nacten v konfiguraci.
-    //tohle je prasarna ptz se enum pretipuje na int a pouzije jako index.
-    //V cnt se nevyznam tak jsem hned nenasel jak to udelat lip
-    index = static_cast<int>(conf->mode);
-    switchCounterModeCallback(index);
+void CounterWindow::restoreGUIAfterStartup(){
+    switchCounterModeCallback((int)conf->mode);
 }
 
 /************************************** HIGH FREQ FUNCTIONS ****************************************/
@@ -318,7 +315,7 @@ void CounterWindow::lfSwitchQuantityCallback(int index){
 
 void CounterWindow::lfSwitchDutyCycleCallback(int index){
     WidgetDisplay *display, *unavailDisplay;
-    QString unitsStyleSheet;
+    //QString unitsStyleSheet;
     QString pin;
 
     if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){

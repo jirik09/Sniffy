@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "../graphics/colors.h"
+
 namespace Ui {
 class WidgetSwitch;
 }
@@ -20,11 +22,15 @@ public:
     bool isCheckedRight();
     bool isCheckedLeft();
 
+    void setColor(QString color);    
+
 private:
     Ui::WidgetSwitch *ui;
 
-    const QString SELECTED_STYLE = "background-color: rgb(24,154,224);border: none;";
-    const QString NOT_SELECTED_STYLE = "background-color: rgb(38,38,38);border: none;";    
+    QString styleSelected =
+            QString::fromUtf8("background-color:") + COLOR_BLUE + QString::fromUtf8("border: none;");
+    QString styleNotSelected =
+            QString::fromUtf8("background-color:") + BACKGROUND_COLOR_BUTTON + QString::fromUtf8("border: none;");
 
 signals:
     void clicked(int index);

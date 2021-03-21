@@ -6,7 +6,10 @@
 #include "modules/device/device.h"
 #include "modules/scope/scope.h"
 #include "modules/counter/counter.h"
+#include "modules/voltmeter/voltmeter.h"
+#include "modules/syncpwm/syncpwm.h"
 #include "modules/template/templatemodule.h"
+
 
 class DeviceMediator : public QObject
 {
