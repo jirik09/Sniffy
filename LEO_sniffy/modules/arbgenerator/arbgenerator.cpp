@@ -5,19 +5,19 @@ ArbGenerator::ArbGenerator(QObject *parent)
     Q_UNUSED(parent);
     moduleSpecification = new ArbGeneratorSpec();
     config = new ArbGeneratorConfig();
-    tempWindow = new ArbGeneratorWindow(config);
-    tempWindow->setObjectName("arbGenWindow");
+    arbGenWindow = new ArbGeneratorWindow(config);
+    arbGenWindow->setObjectName("arbGenWindow");
 
 //Set the comm prefix, window name and icon
     //module is not fully initialized - control widget and dock wodget cannot be modified
-    moduleCommandPrefix = "SYST";//cmd->SCOPE;
+    moduleCommandPrefix = "GEN_";//cmd->SCOPE;
     moduleName = "Arbitrary generator";
     moduleIconURI = ":/graphics/graphics/icon_signal_generator.png";
 }
 
 QWidget *ArbGenerator::getWidget()
 {
-    return tempWindow;
+    return arbGenWindow;
 }
 
 void ArbGenerator::parseData(QByteArray data)
@@ -27,6 +27,7 @@ void ArbGenerator::parseData(QByteArray data)
     if(dataHeader=="CFG_"){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
+        arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
         showModuleControl();
 //TODO parse message from MCU
     }else if(dataHeader=="xxxx"){
@@ -38,13 +39,13 @@ void ArbGenerator::parseData(QByteArray data)
 
 void ArbGenerator::writeConfiguration()
 {
-    tempWindow->restoreGUIAfterStartup();
+    arbGenWindow->restoreGUIAfterStartup();
 //TODO this function is called when module is opened
 }
 
 void ArbGenerator::parseConfiguration(QByteArray config)
 {
-    this->config->parse(config);
+    this->config->parse(config);  
 }
 
 QByteArray ArbGenerator::getConfiguration()
@@ -62,19 +63,4 @@ void ArbGenerator::stopModule()
 //TODO stop the module
 }
 
-//In case hold is needed
-
-void ArbGenerator::showHoldButtonCallback(){
-    this->showModuleHoldButton();
-}
-
-void ArbGenerator::holdButtonCallback(bool held){
-    if(held){
-        comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
-        setModuleStatus(ModuleStatus::PAUSE);
-    }else{
-        comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
-        setModuleStatus(ModuleStatus::PLAY);
-    }
-}
 

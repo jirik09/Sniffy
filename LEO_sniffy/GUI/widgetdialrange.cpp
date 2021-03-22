@@ -80,9 +80,9 @@ float WidgetDialRange::getRealValue() const
     return realValue;
 }
 
-void WidgetDialRange::setRealValue(float value){
+void WidgetDialRange::setRealValue(float value, bool silent){
     realValue = value;
-    updateControls(0);
+    updateControls(0,silent);
 }
 
 void WidgetDialRange::addOption (QString unit,float mult){

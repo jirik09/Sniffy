@@ -11,4 +11,11 @@ enum class SignalShape
     ARB = 3
 };
 
+enum class MemoryLength
+{
+    BEST_FIT = 0,
+    LONG = 1,
+    CUSTOM = 2,
+};
+
 #endif // ARBGENERATORDEFS_H

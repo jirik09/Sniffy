@@ -27,15 +27,11 @@ public slots:
     void stopModule();
 
 private slots:
-    //In case hold is needed
-
-    void showHoldButtonCallback();
-    void holdButtonCallback(bool held);
 
 
 private:
     ArbGeneratorConfig *config;
-    ArbGeneratorWindow *tempWindow;
+    ArbGeneratorWindow *arbGenWindow;
    // scpWindow = new ScopeWindow();
 
 };

@@ -20,6 +20,8 @@
 
 #include "arbgeneratorconfig.h"
 #include "arbgenpanelsettings.h"
+#include "arbgeneratorspec.h"
+#include "signalcreator.h"
 
 namespace Ui {
 class ArbGeneratorWindow;
@@ -34,13 +36,18 @@ public:
     ~ArbGeneratorWindow();
 
     void restoreGUIAfterStartup();
+    void setSpecification(ArbGeneratorSpec* spec);
 
 private:
 
     Ui::ArbGeneratorWindow *ui;
     ArbGeneratorConfig *config;
-
+    ArbGeneratorSpec *spec;
     ArbGenPanelSettings *setting;
+
+    widgetChart *chart;
+    QVector<QVector<QPointF>> *generatorChartData;
+    QList<QList<int>> *generatorDACData;
 
 private slots:
     void generateSignalCallback();

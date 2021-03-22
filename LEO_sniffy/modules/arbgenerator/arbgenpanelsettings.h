@@ -13,6 +13,8 @@
 #include "../../GUI/widgettextinput.h"
 #include "../../GUI/widgetlabel.h"
 
+#include "../labelformator.h"
+
 #include "arbgeneratordefs.h"
 #include "arbgeneratorconfig.h"
 
@@ -26,6 +28,9 @@ public:
 
     void setChannelShown(int index, bool isShown);
     void setChannelShapeControl(int index, int shape);
+    void restoreGUI();
+    void setMaxNumChannels(int numChannels);
+    void setLabels(QString freq, QString length, int index);
 
 signals:
 
@@ -38,6 +43,8 @@ public:
     WidgetTextInput *customLengthInput;
 
     int numChannelsEnabled = 0;
+    MemoryLength memorySet = MemoryLength::BEST_FIT;
+    int customLength = 0;
 
     //for each channel
     QScrollArea *verChannArea[MAX_ARB_CHANNELS_NUM];
@@ -58,6 +65,7 @@ public:
 
 
 private:
+    void setCopyFreq(int fromCh, int toCh);
 
 signals:
     void signalChanged();
@@ -66,7 +74,10 @@ private slots:
     void buttonEnableChannelCallback(int status);
     void buttonShapeCallback(int clicked, int channel);
     void syncWithCH1Callback(int clicked, int channel);
+    void signalFrequencyCallback(qreal value, int channel);
     void signalChangedCallback();
+    void memoryCallback(int index);
+    void customLenghtCallback(qreal value);
 };
 
 #endif // ARBGENPANELSETTINGS_H

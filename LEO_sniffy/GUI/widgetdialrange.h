@@ -33,7 +33,7 @@ public:
     void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false);
     void updateRange(float min, float max, bool silent = false);
     void enableFineMousePrecision();
-    void setRealValue(float value);
+    void setRealValue(float value, bool silent = false);
     void hideUnitSelection(void);
     void setColor(QString color);
     void setDialColor(QString &styleSheet);
