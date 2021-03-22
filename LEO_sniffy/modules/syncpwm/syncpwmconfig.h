@@ -8,22 +8,29 @@
 
 #include "../abstractconfiguration.h"
 
-enum class SyncPwmLayout
+enum class Layout
 {
     HORIZONTAL = 0,
     VERTICAL = 1
 };
 
-enum class SyncPwmState
+enum class State
 {
     STOPPED = 0,
     RUNNING = 1
 };
 
-enum class SyncPwmModeEqui
+struct Common
 {
-    EQUI_DISABLED = 0,
-    EQUI_ENABLED = 1
+    bool stepMode;
+    bool equiMode;
+};
+
+struct Channel
+{
+    double frequency;
+    float dutyCycle;
+    float phase;
 };
 
 class SyncPwmConfig : public AbstractConfiguration
@@ -35,9 +42,10 @@ public:
     void parse (QByteArray config);
     QByteArray serialize ();
 
-    SyncPwmLayout layout;
-    SyncPwmState state;
-    SyncPwmModeEqui equiMode;
+    Layout layout;
+    State state;
+    Common common;
+    Channel chan[CHANNELS_NUM];
 
 signals:
 

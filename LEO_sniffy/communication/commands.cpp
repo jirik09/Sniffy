@@ -189,8 +189,7 @@ const QByteArray Commands::SPWM_INIT = "INIT";
 const QByteArray Commands::SPWM_DEINIT = "DINI";
 
 //Set frequency command
-const QByteArray Commands::SPWM_FREQ_CH12 = "SP12";
-const QByteArray Commands::SPWM_FREQ_CH34 = "SP34";
+const QByteArray Commands::SPWM_FREQ_CONFIG = "SPCF";
 const QByteArray Commands::SPWM_DUTYPHASE_CONFIG = "SPDP";
 
 //Individual channels run or not
@@ -198,10 +197,6 @@ const QByteArray Commands::SPWM_CHANNEL_INVERT = "SPCI";
 const QByteArray Commands::SPWM_CHANNEL_STATE = "SSTA";
 const int Commands::SPWM_CHANNEL_ENABLE = 1;
 const int Commands::SPWM_CHANNEL_DISABLE = 0;
-const int Commands::SPWM_CHANNEL1 = 1;
-const int Commands::SPWM_CHANNEL2 = 2;
-const int Commands::SPWM_CHANNEL3 = 3;
-const int Commands::SPWM_CHANNEL4 = 4;
 
 // One pulse mode to let the timer disable after overflow
 const QByteArray Commands::SPWM_STEP_MODE = "STEP";

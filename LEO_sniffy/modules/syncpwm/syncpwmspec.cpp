@@ -7,7 +7,7 @@ SyncPwmSpec::SyncPwmSpec(QObject *parent)
 
 void SyncPwmSpec::parseSpecification(QByteArray spec){
     QDataStream stream(spec);
-    stream >> max_freq >> chan_num;
+    stream >> chan_dependency >> max_freq >> chan_num;
 
     char chars[4] = "";
     for(int i = 0; i < pinsList.size(); i++){

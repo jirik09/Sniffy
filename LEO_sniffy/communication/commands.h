@@ -200,8 +200,7 @@ public:
     static const QByteArray SPWM_DEINIT;
 
     //Set frequency command
-    static const QByteArray SPWM_FREQ_CH12;
-    static const QByteArray SPWM_FREQ_CH34;
+    static const QByteArray SPWM_FREQ_CONFIG;
     static const QByteArray SPWM_DUTYPHASE_CONFIG;
 
     //Individual channels run or not
@@ -209,10 +208,6 @@ public:
     static const QByteArray SPWM_CHANNEL_STATE;
     static const int SPWM_CHANNEL_ENABLE;
     static const int SPWM_CHANNEL_DISABLE;
-    static const int SPWM_CHANNEL1;
-    static const int SPWM_CHANNEL2;
-    static const int SPWM_CHANNEL3;
-    static const int SPWM_CHANNEL4;
 
     // One pulse mode to let the timer disable after overflow
     static const QByteArray SPWM_STEP_MODE;
