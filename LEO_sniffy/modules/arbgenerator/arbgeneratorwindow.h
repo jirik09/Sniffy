@@ -35,12 +35,16 @@ public:
 
     void restoreGUIAfterStartup();
 
-
 private:
+
     Ui::ArbGeneratorWindow *ui;
     ArbGeneratorConfig *config;
 
     ArbGenPanelSettings *setting;
+
+private slots:
+    void generateSignalCallback();
+
 };
 
 #endif // ARBGENERATORWINDOW_H

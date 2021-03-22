@@ -9,9 +9,10 @@ Class for buttons.
 #include "widgetbuttons.h"
 #include "ui_widgetbuttons.h"
 
-WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString name, int defaultSelectedIndex) :
+WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString name, int defaultSelectedIndex, int optionalEmitParam) :
     QWidget(parent),
-    ui(new Ui::WidgetButtons)
+    ui(new Ui::WidgetButtons),
+    optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
     setObjectName(name);
@@ -162,7 +163,7 @@ void WidgetButtons::clickedInternal (int index){
         uncheckAll();
         setChecked(true, index);
     }
-    emit clicked(index);
+    emit clicked(index,optionalEmitParam);
 
     int status = 0;
 
@@ -171,7 +172,7 @@ void WidgetButtons::clickedInternal (int index){
             status += qPow(2,i);
         }
     }
-    emit statusChanged(status);
+    emit statusChanged(status, optionalEmitParam);
 }
 
 bool WidgetButtons::isChecked (int index){

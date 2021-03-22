@@ -13,10 +13,6 @@ ArbGenerator::ArbGenerator(QObject *parent)
     moduleCommandPrefix = "SYST";//cmd->SCOPE;
     moduleName = "Arbitrary generator";
     moduleIconURI = ":/graphics/graphics/icon_signal_generator.png";
-
-//In case hold button should be shown insert this and connect callback to handle hold/pause
-    connect(this, &AbstractModule::moduleCreated, this, &ArbGenerator::showHoldButtonCallback);
-    connect(this, &AbstractModule::holdClicked, this, &ArbGenerator::holdButtonCallback);
 }
 
 QWidget *ArbGenerator::getWidget()

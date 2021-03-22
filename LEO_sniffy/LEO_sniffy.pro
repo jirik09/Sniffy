@@ -59,6 +59,7 @@ SOURCES += \
     modules/arbgenerator/arbgeneratorspec.cpp \
     modules/arbgenerator/arbgeneratorwindow.cpp \
     modules/arbgenerator/arbgenpanelsettings.cpp \
+    modules/arbgenerator/signalcreator.cpp \
     modules/counter/counter.cpp \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
@@ -155,6 +156,7 @@ HEADERS += \
     modules/arbgenerator/arbgeneratorspec.h \
     modules/arbgenerator/arbgeneratorwindow.h \
     modules/arbgenerator/arbgenpanelsettings.h \
+    modules/arbgenerator/signalcreator.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
     modules/counter/counterdefs.h \
