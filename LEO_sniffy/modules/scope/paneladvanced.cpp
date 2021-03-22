@@ -4,7 +4,7 @@ PanelAdvanced::PanelAdvanced(QVBoxLayout *destination, QWidget *parent)
 {
     destination->addWidget(new WidgetSeparator(parent,"Resolution"));
 
-    resolutionButtons = new WidgetButtons(parent,2,ButtonTypes::RADIO,"");
+    resolutionButtons = new WidgetButtons(parent,2,ButtonTypes::RADIO,"",1);
     resolutionButtons->setObjectName("scoperesolution");
     destination->addWidget(resolutionButtons);
     resolutionButtons->setText("8 bit",0);

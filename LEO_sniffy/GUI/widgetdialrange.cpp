@@ -12,9 +12,10 @@ Class for widget with dial and controls with range
 #include "ui_widgetdialrange.h"
 
 
-WidgetDialRange::WidgetDialRange(QWidget *parent, QString name) :
+WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmitParam) :
     QWidget(parent),
-    ui(new Ui::WidgetDialRange)
+    ui(new Ui::WidgetDialRange),
+    optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
     ui->label_name->setText(name);
@@ -168,7 +169,7 @@ smalestUnitMult -   smallest unit to be shown in comboBox unit selection (1 by d
 defaultValue - selected by default (0 by default)
 log - bool type true=log scale, false=lin scale (false by default)
 */
-void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic ){
+void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic){
     rangeMax = max;
     rangeMin = min;
     rangePrecision = smalestUnitMult;
@@ -210,12 +211,12 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
         unitMult = units->last().mult;
     }
 
-    if(max>9 && max<1000){
-        addOption(baseUnit,1);
-        ui->comboBox->setCurrentIndex(units->length()-1);
-        // unitString = units->last().unit;
-        unitMult = units->last().mult;
-    }
+    //  if(max>9 && max<1000){
+    addOption(baseUnit,1);
+    ui->comboBox->setCurrentIndex(units->length()-1);
+    // unitString = units->last().unit;
+    unitMult = units->last().mult;
+    //  }
 
     if(max>=1000){
         addOption("k"+baseUnit,1000);
@@ -301,7 +302,7 @@ void WidgetDialRange::updateControls(int except, bool silent){
         connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
     }
     if(!silent)
-        emit valueChanged(realValue);
+        emit valueChanged(realValue,optionalEmitParam);
 }
 
 float WidgetDialRange::getRealValueFromDial(int in){

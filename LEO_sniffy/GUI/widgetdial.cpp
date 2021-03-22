@@ -8,9 +8,10 @@ Class for widget with dial and controls
 #include "ui_widgetdial.h"
 
 
-WidgetDial::WidgetDial(QWidget *parent, QString name) :
+WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     QWidget(parent),
-    ui(new Ui::WidgetDial)
+    ui(new Ui::WidgetDial),
+    optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
     ui->label_name->setText(name);
@@ -77,7 +78,7 @@ void WidgetDial::setSelectedIndex(int index, bool silent){
     ui->label_value->setText(options->at(index).shownValue);
     selectedIndex = index;
     if(!silent){
-        emit valueChanged(options->at(index).realValue);
+        emit valueChanged(options->at(index).realValue,optionalEmitParam);
     }
 }
 
