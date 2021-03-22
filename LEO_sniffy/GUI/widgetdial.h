@@ -25,7 +25,7 @@ class WidgetDial : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetDial(QWidget *parent = nullptr, QString name = "");
+    explicit WidgetDial(QWidget *parent = nullptr, QString name = "", int optionalEmitParam = 0);
     ~WidgetDial();
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
@@ -40,6 +40,7 @@ public:
 
 private:
     Ui::WidgetDial *ui;
+    int optionalEmitParam = 0;
     QList<params_dial> *options;
     int selectedIndex;
     int defaultIndex = 0;
@@ -50,7 +51,7 @@ private slots:
     void valChanged(int in);
 
 signals:
-    void valueChanged(float val);
+    void valueChanged(float val, int optionalEmitParam = 0);
 };
 
 #endif // WIDGETDIAL_H

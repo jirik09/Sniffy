@@ -16,8 +16,10 @@
 #include "../../GUI/widgetchart.h"
 #include "../../GUI/widgettab.h"
 #include "../../GUI/widgetlabelarea.h"
+#include "../../GUI/widgettextinput.h"
 
-#include "ArbGeneratorconfig.h"
+#include "arbgeneratorconfig.h"
+#include "arbgenpanelsettings.h"
 
 namespace Ui {
 class ArbGeneratorWindow;
@@ -34,8 +36,15 @@ public:
     void restoreGUIAfterStartup();
 
 private:
+
     Ui::ArbGeneratorWindow *ui;
     ArbGeneratorConfig *config;
+
+    ArbGenPanelSettings *setting;
+
+private slots:
+    void generateSignalCallback();
+
 };
 
 #endif // ARBGENERATORWINDOW_H

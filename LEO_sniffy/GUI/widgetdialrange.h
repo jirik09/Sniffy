@@ -25,7 +25,7 @@ class WidgetDialRange : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetDialRange(QWidget *parent = nullptr, QString name = "");
+    explicit WidgetDialRange(QWidget *parent = nullptr, QString name = "", int optionalEmitParam = 0);
     ~WidgetDialRange();
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
@@ -42,6 +42,7 @@ public:
     float getRealValue() const;
 
 private:
+    int optionalEmitParam;
     Ui::WidgetDialRange *ui;
     QList<params_unit> *units;
     int dialMaxValue = 500;
@@ -75,7 +76,7 @@ private slots:
     void textEditFinished();
 
 signals:
-    void valueChanged(float val);
+    void valueChanged(float val,int optionalEmitParam = 0);
 };
 
 #endif // WIDGETDIALRANGE_H
