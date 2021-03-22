@@ -8,45 +8,62 @@ SignalCreator::SignalCreator(QObject *parent) : QObject(parent)
 QList<qreal> SignalCreator::createSignal(SignalShape shape, int numSamples, qreal amplitude, qreal offset, qreal duty, qreal phase, qreal rangeMin, qreal rangeMax)
 {
     QList<qreal> signal;
-    qreal shift = (int)(phase / 360 * numSamples);
+    qreal tmpPoint;
+    int shift = (int)(phase / 360 * numSamples);
     switch (shape) {
     case SignalShape::SINE:
         for(int i = 0;i<numSamples;i++){
-            qreal tmp = sin(2*M_PI*i/numSamples+phase/180*M_PI)*amplitude+offset;
-            if(tmp<rangeMin){
-                tmp = rangeMin;
-            }
-            if(tmp >rangeMax){
-                tmp = rangeMax;
-            }
+            tmpPoint = sin(2*M_PI*i/numSamples+phase/180*M_PI)*amplitude+offset;
 
-            signal.append(tmp);
+            if(tmpPoint<rangeMin){
+                tmpPoint = rangeMin;
+            }
+            if(tmpPoint >rangeMax){
+                tmpPoint = rangeMax;
+            }
+            signal.append(tmpPoint);
         }
         break;
     case SignalShape::SAW:
         for (int j = 0; j < numSamples; j++){
-            if (j > numSamples * duty / 100){
-                signal.append(offset - amplitude + amplitude * 2 - amplitude * 2 / (numSamples - (duty / 100 * numSamples)) * (j - (numSamples * duty / 100)));
+
+            if ((j+shift)%numSamples >= numSamples * duty / 100.0){
+                tmpPoint = offset - amplitude + amplitude * 2 - amplitude * 2 / (numSamples - (duty / 100.0 * numSamples)) * ((j+shift)%numSamples - (numSamples * duty / 100.0));
             }
             else{
-                signal.append(offset - amplitude + amplitude * 2 / (duty / 100 * numSamples) * j);
-                //tmpSignal[(j + shift) % tmpSignal.Length] =
+                tmpPoint = offset - amplitude + amplitude * 2 / (duty / 100.0 * numSamples) * ((j+shift)%numSamples);
             }
+
+            if(tmpPoint<rangeMin){
+                tmpPoint = rangeMin;
+            }
+            if(tmpPoint >rangeMax){
+                tmpPoint = rangeMax;
+            }
+            signal.append(tmpPoint);
         }
         break;
     case SignalShape::RECT:
         for (int j = 0; j < numSamples; j++){
-            if (j < duty / 100 * numSamples){
-                signal.append(offset - amplitude);
+            if ((j+shift)%numSamples > (duty) / 100 * numSamples){
+                tmpPoint = offset - amplitude;
             }
             else{
-                signal.append(offset + amplitude);
+                tmpPoint = offset + amplitude;
             }
+
+            if(tmpPoint<rangeMin){
+                tmpPoint = rangeMin;
+            }
+            if(tmpPoint >rangeMax){
+                tmpPoint = rangeMax;
+            }
+            signal.append(tmpPoint);
         }
         break;
     case SignalShape::ARB:
+        //Do nothing
         break;
-
     }
 
     return signal;
@@ -109,7 +126,6 @@ QList<int> SignalCreator::calculateSignalLengths(MemoryLength memSet, int custom
                 div++;
                 iter++;
             }
-            qDebug () << bestDiv;
             outputLeng->append(bestLeng);
         }
 
