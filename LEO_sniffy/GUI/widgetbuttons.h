@@ -42,7 +42,7 @@ public:
     void setEnabledButton(bool enabled, int index);
     void disableAll();
     void enableAll(bool enable);
-    void setChecked (bool checked, int index);
+    void setChecked (bool checked, int index);    
 
 private:
     Ui::WidgetButtons *ui;

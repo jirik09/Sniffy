@@ -16,6 +16,7 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
 
     widget_chart->setLayout(verticalLayout_chart);
     widget_settings->setLayout(verticalLayout_settings);
+    widget_settings->setMaximumHeight(400);
 
     if(config->layout == SyncPwmLayout::HORIZONTAL){
         splitter = new QSplitter(Qt::Horizontal, this);

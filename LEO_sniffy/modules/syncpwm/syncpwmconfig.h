@@ -14,6 +14,18 @@ enum class SyncPwmLayout
     VERTICAL = 1
 };
 
+enum class SyncPwmState
+{
+    STOPPED = 0,
+    RUNNING = 1
+};
+
+enum class SyncPwmModeEqui
+{
+    EQUI_DISABLED = 0,
+    EQUI_ENABLED = 1
+};
+
 class SyncPwmConfig : public AbstractConfiguration
 {
     Q_OBJECT
@@ -24,6 +36,8 @@ public:
     QByteArray serialize ();
 
     SyncPwmLayout layout;
+    SyncPwmState state;
+    SyncPwmModeEqui equiMode;
 
 signals:
 

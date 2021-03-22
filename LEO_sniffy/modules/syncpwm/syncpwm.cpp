@@ -47,7 +47,7 @@ void SyncPwm::startModule(){
 
 void SyncPwm::stopModule(){
     stop();
-   // write(cmd->SPWM_COMMAND, cmd->SPWM_DEINIT);
+    // write(cmd->SPWM_COMMAND, cmd->SPWM_DEINIT);
 }
 
 void SyncPwm::start(){
@@ -55,7 +55,7 @@ void SyncPwm::start(){
 }
 
 void SyncPwm::stop(){
- //   write(cmd->SPWM_COMMAND, cmd->STOP);
+    //   write(cmd->SPWM_COMMAND, cmd->STOP);
 }
 
 void SyncPwm::parseData(QByteArray data){
@@ -109,11 +109,25 @@ void SyncPwm::setPhaseChannel(int chanIndex, float val){
 /****************************** Callbacks ******************************/
 
 void SyncPwm::buttonStartCallback(int index){
-
+    Q_UNUSED(index);
+    if(config->state == SyncPwmState::RUNNING){
+        spwmWindow->settings->buttonStart->setText("STOP");
+        spwmWindow->settings->buttonStart->setChecked(true, 0);
+        stop();
+    }else {
+        spwmWindow->settings->buttonStart->setText("START");
+        spwmWindow->settings->buttonStart->setChecked(false, 0);
+        start();
+    }
 }
 
 void SyncPwm::buttonEquidistantModeCallback(int index){
+    Q_UNUSED(index);
+    if(config->equiMode == SyncPwmModeEqui::EQUI_ENABLED){
 
+    }else {
+
+    }
 }
 
 void SyncPwm::switchOnOffCh1Callback(int index){
