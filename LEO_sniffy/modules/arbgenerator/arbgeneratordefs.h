@@ -18,4 +18,6 @@ enum class MemoryLength
     CUSTOM = 2,
 };
 
+const int DATA_BLOCK_SIZE = 64;
+
 #endif // ARBGENERATORDEFS_H

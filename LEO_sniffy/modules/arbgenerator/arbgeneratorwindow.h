@@ -38,7 +38,15 @@ public:
     void restoreGUIAfterStartup();
     void setSpecification(ArbGeneratorSpec* spec);
 
+    QList<QList<int> > *getGeneratorDACData() const;
+    qreal getFrequency(int channel);
+    void setProgress(int percent);
+    void setGeneratorRuning();
+    void setFrequencyLabels(int channel, qreal freq);
+
+
 private:
+    void setGenerateButton (QString text, QString color);
 
     Ui::ArbGeneratorWindow *ui;
     ArbGeneratorConfig *config;
@@ -49,9 +57,16 @@ private:
     QVector<QVector<QPointF>> *generatorChartData;
     QList<QList<int>> *generatorDACData;
 
-private slots:
-    void generateSignalCallback();
+    bool isGenerating = false;
 
+private slots:
+    void runGeneratorCallback();
+    void createSignalCallback();
+
+signals:
+    void runGenerator();
+    void stopGenerator();
+    void updateFrequency();
 };
 
 #endif // ARBGENERATORWINDOW_H

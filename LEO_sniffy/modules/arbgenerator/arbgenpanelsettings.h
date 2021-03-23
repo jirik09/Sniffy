@@ -31,6 +31,7 @@ public:
     void restoreGUI();
     void setMaxNumChannels(int numChannels);
     void setLabels(QString freq, QString length, int index);
+    void setFreqLabel(QString freq, int index);
 
 signals:
 

@@ -7,9 +7,6 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *pare
     config(config)
 {
     ui->setupUi(this);
-    //TODO setup the GUI here
-
-    //ui->widget_module->resize(500,ui->widget_settings->height());
 
     QWidget *widget_settings = new QWidget(this, Qt::Window);
     QWidget *widget_chart = new QWidget(this, Qt::Window);
@@ -41,8 +38,8 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *pare
     generatorChartData = new QVector<QVector<QPointF>>;
     generatorDACData = new QList<QList<int>>;
 
-    connect(setting,&ArbGenPanelSettings::signalChanged,this,&ArbGeneratorWindow::generateSignalCallback);
-
+    connect(setting,&ArbGenPanelSettings::signalChanged,this,&ArbGeneratorWindow::createSignalCallback);
+    connect(setting->buttonsGenerate,&WidgetButtons::clicked,this,&ArbGeneratorWindow::runGeneratorCallback);
 }
 
 ArbGeneratorWindow::~ArbGeneratorWindow()
@@ -54,9 +51,6 @@ ArbGeneratorWindow::~ArbGeneratorWindow()
 void ArbGeneratorWindow::restoreGUIAfterStartup()
 {
     setting->restoreGUI();
-    //TODO GUI is loaded to previous state
-    //validate the GUI appereance (colors according to selected channel
-    //disabled/enabled buttons accordign to selected function
 }
 
 
@@ -66,7 +60,51 @@ void ArbGeneratorWindow::setSpecification(ArbGeneratorSpec* spec)
     setting->setMaxNumChannels(spec->maxDACChannels);
 }
 
-void ArbGeneratorWindow::generateSignalCallback()
+QList<QList<int>> *ArbGeneratorWindow::getGeneratorDACData() const
+{
+    return generatorDACData;
+}
+
+qreal ArbGeneratorWindow::getFrequency(int channel)
+{
+    return setting->dialFreqCh[channel]->getRealValue();
+}
+
+void ArbGeneratorWindow::setProgress(int percent)
+{
+    setGenerateButton("Uploading "+ QString::number(percent)+ "%",COLOR_ORANGE);
+}
+
+void ArbGeneratorWindow::setGeneratorRuning()
+{
+    setGenerateButton("Stop",COLOR_GREEN);
+    isGenerating = true;
+}
+
+void ArbGeneratorWindow::setFrequencyLabels(int channel, qreal freq)
+{
+    setting->setFreqLabel(LabelFormator::formatOutout(freq,"Hz",4),channel);
+}
+
+void ArbGeneratorWindow::setGenerateButton(QString text, QString color)
+{
+    setting->buttonsGenerate->setText(text);
+    setting->buttonsGenerate->setColor(QString::fromUtf8("background-color:")+color,0);
+}
+
+void ArbGeneratorWindow::runGeneratorCallback()
+{
+    if(setting->buttonsGenerate->getText(0) == "Start"){
+        emit runGenerator();
+        setGenerateButton("Uploading",COLOR_ORANGE);
+    }else{
+        emit stopGenerator();
+        setGenerateButton("Start",COLOR_BLUE);
+        isGenerating = false;
+    }
+}
+
+void ArbGeneratorWindow::createSignalCallback()
 {
     QList<qreal> *freq = new QList<qreal>;
     QList<int> lengths;
@@ -132,5 +170,8 @@ void ArbGeneratorWindow::generateSignalCallback()
     }
     chart->setRange(0,maxX,spec->rangeMin,spec->rangeMax);
 
+    if(isGenerating){
+        emit updateFrequency();
+    }
 }
 

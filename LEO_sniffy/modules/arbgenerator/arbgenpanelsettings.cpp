@@ -180,6 +180,11 @@ void ArbGenPanelSettings::setLabels(QString freq, QString length, int index)
     labelDataLength[index]->setValue(length);
 }
 
+void ArbGenPanelSettings::setFreqLabel(QString freq, int index)
+{
+    labelRealFreq[index]->setValue(freq);
+}
+
 void ArbGenPanelSettings::setCopyFreq(int fromCh, int toCh)
 {
     qreal value = dialFreqCh[fromCh]->getRealValue();
