@@ -1,6 +1,8 @@
 #ifndef SYNCPWM_H
 #define SYNCPWM_H
 
+#include <QtEndian>
+
 #include "syncpwmwindow.h"
 #include "communication/commands.h"
 #include "communication/comms.h"
@@ -21,13 +23,18 @@ public:
 
 private:
     SyncPwmWindow *spwmWindow;
-    SyncPwmConfig *config;       
+    SyncPwmConfig *config;
+
+    void setDutyPhase(quint32 dutyCycle, quint32 phase, quint32 chanIndex);
 
     void write(QByteArray feature, QByteArray param);
     void write(QByteArray feature, int param);
+    QByteArray intToSend(int param);
 
     void start();
     void stop();
+
+    void stepGenEndNotif();
 
 signals:
 

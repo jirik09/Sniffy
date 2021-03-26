@@ -33,7 +33,9 @@ public:
     const QString chanColor[CHANNELS_NUM] =  {COLOR_BLUE,
                                               COLOR_GREEN,
                                               COLOR_ORANGE,
-                                              COLOR_PURPLE};    
+                                              COLOR_PURPLE};
+
+    void greyOutComplementChanFreqDials(int chanIndex);
 
 private:
 

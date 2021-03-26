@@ -31,11 +31,19 @@ public:
 
     SyncPwmSettings *settings;
 
+    void setSpecification(SyncPwmSpec *spec);
+    void restoreGUIAfterStartup();
+    void setStartTxt();
+    void setStopTxt();
+    void uncheckStartButton();
+
 private slots:
+    void dialFreqCallback(float val, int chanIndex);
 
 private:
     Ui::SyncPwmWindow *ui;
-    SyncPwmConfig *config;    
+    SyncPwmConfig *config;
+    SyncPwmSpec *spec;
 
     widgetChart *chart;
 

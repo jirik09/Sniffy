@@ -14,6 +14,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
     buttonStart = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonStart->setText("Start", 0);
+    buttonStart->setChecked(false, 0);
     buttonStart->setObjectName("syncPwmStartButton");
     //QString bckgndColor = "background-color:"+QString::fromUtf8(COLOR_DARK_CYAN);
     //buttonStart->setColor(bckgndColor, 0);
@@ -37,7 +38,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
     if(config->layout == Layout::HORIZONTAL){
 
         for(int i = 0; i < CHANNELS_NUM; i++){
-            QString chNStr = QString::number(i + 1);
+            QString chNStr = QString::number(i);
 
             WidgetSeparator *separator = new WidgetSeparator(parent, "Channel " + chNStr);
             destination->addWidget(separator);
@@ -91,7 +92,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
         destination->addLayout(horBox);
 
         for(int i = 0; i < CHANNELS_NUM; i++){
-            QString chNStr = QString::number(i + 1);
+            QString chNStr = QString::number(i);
 
             QVBoxLayout *verChanBox = new QVBoxLayout();
             horBox->addLayout(verChanBox);
@@ -138,4 +139,10 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     destination->addItem(verticalSpacer);
+}
+
+void SyncPwmSettings::greyOutComplementChanFreqDials(int chanIndex){
+    QString colDisable = BACKGROUND_COLOR_BUTTON_DISABLED;
+    dialFreqCh[chanIndex]->setDisabled(true);
+    dialFreqCh[chanIndex]->setColor(colDisable);
 }

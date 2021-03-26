@@ -50,6 +50,40 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
     settings = new SyncPwmSettings(verticalLayout_settings, config, this);
 }
 
+void SyncPwmWindow::setSpecification(SyncPwmSpec *spec){
+    this->spec = spec;
+    if(spec->chans_depend){
+        connect(settings->dialFreqCh[spec->drive_chx], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
+        connect(settings->dialFreqCh[spec->drive_chy], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
+        settings->greyOutComplementChanFreqDials(spec->driven_chx);
+        settings->greyOutComplementChanFreqDials(spec->driven_chy);
+    }
+}
+
+void SyncPwmWindow::restoreGUIAfterStartup(){
+
+}
+
+void SyncPwmWindow::setStartTxt(){
+    settings->buttonStart->setText("START");
+}
+
+void SyncPwmWindow::setStopTxt(){
+    settings->buttonStart->setText("STOP");
+}
+
+void SyncPwmWindow::uncheckStartButton(){
+    settings->buttonStart->setChecked(false, 0);
+}
+
+void SyncPwmWindow::dialFreqCallback(float val, int chanIndex){
+    if(chanIndex == spec->drive_chx){
+        settings->dialFreqCh[spec->driven_chx]->setRealValue(val);
+    }else {
+        settings->dialFreqCh[spec->driven_chy]->setRealValue(val);
+    }
+}
+
 SyncPwmWindow::~SyncPwmWindow(){
     delete ui;
 }

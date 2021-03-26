@@ -43,7 +43,6 @@ SyncPwm::SyncPwm(QObject *parent)
 
 void SyncPwm::startModule(){
     write(cmd->SPWM_COMMAND, cmd->SPWM_INIT);
-    start();
 }
 
 void SyncPwm::stopModule(){
@@ -56,7 +55,7 @@ void SyncPwm::start(){
 }
 
 void SyncPwm::stop(){
-    //   write(cmd->SPWM_COMMAND, cmd->STOP);
+    write(cmd->SPWM_COMMAND, cmd->STOP);
 }
 
 void SyncPwm::parseData(QByteArray data){
@@ -66,35 +65,48 @@ void SyncPwm::parseData(QByteArray data){
     if(dataHeader == "CFG_"){
         moduleSpecification = new SyncPwmSpec(this);
         moduleSpecification->parseSpecification(dataToPass);
-        //spwmWindow->setSpecification(static_cast<SyncPWMSpec*>(moduleSpecification));
+        spwmWindow->setSpecification(static_cast<SyncPwmSpec*>(moduleSpecification));
         showModuleControl();
     }else {
+        if(dataHeader == "SPPE"){
+            stepGenEndNotif();
+        }else if (dataHeader == "SPRF"){
+            int chanIndex = data.remove(0, 4).toUInt();
 
+        }
     }
 }
 
 void SyncPwm::writeConfiguration(){
-
+    spwmWindow->restoreGUIAfterStartup();
 }
 
 void SyncPwm::parseConfiguration(QByteArray config){
     Q_UNUSED(config);
+    this->config->parse(config);
 }
 
 QByteArray SyncPwm::getConfiguration(){
-
+    return config->serialize();
 }
 
 /****************************** Callbacks ******************************/
+void SyncPwm::stepGenEndNotif(){
+    spwmWindow->setStartTxt();
+    spwmWindow->uncheckStartButton();
+    config->state = State::STOPPED;
+}
 
 void SyncPwm::buttonStartCallback(int index){
     Q_UNUSED(index);
-    if(config->state == State::RUNNING){
-        spwmWindow->settings->buttonStart->setText("STOP");
+    if(config->state == State::RUNNING/*!spwmWindow->settings->buttonStart->isChecked(0)*/){
+        spwmWindow->setStartTxt();
         stop();
+        config->state = State::STOPPED;
     }else {
-        spwmWindow->settings->buttonStart->setText("START");
+        spwmWindow->setStopTxt();
         start();
+        config->state = State::RUNNING;
     }
 }
 
@@ -103,6 +115,8 @@ void SyncPwm::switchStepModeCallback(int index){
         write(cmd->SPWM_STEP_MODE, cmd->SPWM_STEP_DISABLE);
     else
         write(cmd->SPWM_STEP_MODE, cmd->SPWM_STEP_ENABLE);
+
+    stepGenEndNotif();
 }
 
 void SyncPwm::buttonEquidistantModeCallback(int index){
@@ -125,38 +139,30 @@ void SyncPwm::buttonInvertCallback(int index, int chanIndex){
 }
 
 void SyncPwm::dialFreqCallback(float val, int chanIndex){
-    /*TODO: based on chan_dependency grey out dialFreq channel 2 and 4 */
-    //    if(static_cast<SyncPwmSpec*>(moduleSpecification)->chan_dependency){
-
-    //    }
-    QByteArray freq = QByteArray::fromRawData(reinterpret_cast<char *>(&val), sizeof(float));
-
-    switch(chanIndex){
-    case 0:
-        comm->write(cmd->SYNC_PWM_GEN+":"+cmd->SPWM_FREQ_CONFIG+":"+cmd->CHANNELS_1+":"+freq+";");
-        break;
-    case 1:
-        comm->write(cmd->SYNC_PWM_GEN+":"+cmd->SPWM_FREQ_CONFIG+":"+cmd->CHANNELS_2+":"+freq+";");
-        break;
-    case 2:
-        comm->write(cmd->SYNC_PWM_GEN+":"+cmd->SPWM_FREQ_CONFIG+":"+cmd->CHANNELS_3+":"+freq+";");
-        break;
-    case 3:
-        comm->write(cmd->SYNC_PWM_GEN+":"+cmd->SPWM_FREQ_CONFIG+":"+cmd->CHANNELS_4+":"+freq+";");
-        break;
-    }
-
+    quint32 freq = (quint32)(val * FREQ_PRECISION);
+    QByteArray data = intToSend(freq)+":"+intToSend(FREQ_PRECISION)+":"+intToSend(chanIndex);
+    comm->write(cmd->SYNC_PWM_GEN+":"+cmd->SPWM_FREQ_CONFIG+":"+data+";");
 }
 
 void SyncPwm::dialDutyCallback(float val, int chanIndex){
-    QByteArray dutyCycle = QByteArray::fromRawData(reinterpret_cast<char *>(&val), sizeof(float));
-    QByteArray phase = QByteArray::fromRawData(reinterpret_cast<char *>(&config->chan[chanIndex].phase), sizeof(float));
-    QByteArray idx = QByteArray::fromRawData(reinterpret_cast<char *>(&chanIndex), sizeof(int));
-    comm->write(cmd->SYNC_PWM_GEN+":"+cmd->SPWM_DUTYPHASE_CONFIG+":"+dutyCycle+":"+phase+":"+idx);
+    quint32 dutyCycle = (quint32)(val * DUTY_PRECISION);
+    quint32 phase = (quint32)(config->chan[chanIndex].phase * PHASE_PRECISION);
+    setDutyPhase(dutyCycle, phase, chanIndex);
 }
 
 void SyncPwm::dialPhaseCallback(float val, int chanIndex){
+    quint32 phase = (quint32)(val * PHASE_PRECISION);
+    quint32 dutyCycle = (quint32)(config->chan[chanIndex].dutyCycle * DUTY_PRECISION);
+    setDutyPhase(dutyCycle, phase, chanIndex);
+}
 
+void SyncPwm::setDutyPhase(quint32 dutyCycle, quint32 phase, quint32 chanIndex){
+    comm->write(cmd->SYNC_PWM_GEN+":"+cmd->SPWM_DUTYPHASE_CONFIG
+                +":"+intToSend(dutyCycle)
+                +":"+intToSend(DUTY_PRECISION)
+                +":"+intToSend(phase)
+                +":"+intToSend(PHASE_PRECISION)
+                +":"+intToSend(chanIndex)+";");
 }
 
 void SyncPwm::write(QByteArray feature, QByteArray param){
@@ -165,6 +171,16 @@ void SyncPwm::write(QByteArray feature, QByteArray param){
 
 void SyncPwm::write(QByteArray feature, int param){
     comm->write(moduleCommandPrefix, feature, param);
+}
+
+QByteArray SyncPwm::intToSend(int param){
+    char tmp[4] = {0};
+    tmp[3] = (param>>24);
+    tmp[2] = (param>>16);
+    tmp[1] = (param>>8);
+    tmp[0] = (param);
+
+    return QByteArray(tmp,4);
 }
 
 QWidget *SyncPwm::getWidget(){
