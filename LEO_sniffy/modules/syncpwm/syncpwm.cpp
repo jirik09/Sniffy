@@ -129,13 +129,13 @@ void SyncPwm::buttonEquidistantModeCallback(int index){
 }
 
 void SyncPwm::switchOnOffCallback(int index, int chanIndex){
-    write(cmd->SPWM_CHANNEL_STATE, (chanIndex+1)<<8 | !(bool)index);
+    write(cmd->SPWM_CHANNEL_STATE, (chanIndex)<<8 | !(bool)index);
 }
 
 void SyncPwm::buttonInvertCallback(int index, int chanIndex){
     Q_UNUSED(index);
     bool invert = spwmWindow->settings->inverCh[chanIndex]->isChecked(0);
-    write(cmd->SPWM_CHANNEL_INVERT, (chanIndex+1)<<8 | invert);
+    write(cmd->SPWM_CHANNEL_INVERT, (chanIndex)<<8 | invert);
 }
 
 void SyncPwm::dialFreqCallback(float val, int chanIndex){

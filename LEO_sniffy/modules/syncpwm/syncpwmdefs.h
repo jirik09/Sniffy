@@ -7,6 +7,8 @@
 
 #define CHANNELS_NUM 4
 #define PI_HALF 90
+#define DEFAULT_FREQUENCY 1000
+#define DEFAULT_DC     25
 
 #define RANGE_CHAN1_LOG1 12
 #define RANGE_CHAN1_LOG0 10

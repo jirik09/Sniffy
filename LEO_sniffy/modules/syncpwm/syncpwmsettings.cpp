@@ -38,7 +38,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
     if(config->layout == Layout::HORIZONTAL){
 
         for(int i = 0; i < CHANNELS_NUM; i++){
-            QString chNStr = QString::number(i);
+            QString chNStr = QString::number(i+1);
 
             WidgetSeparator *separator = new WidgetSeparator(parent, "Channel " + chNStr);
             destination->addWidget(separator);
@@ -64,14 +64,14 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
             dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
             dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
-            dialFreqCh[i]->setRange(0, 1000, "Hz", 1, 1, 333, false);
+            dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, false);
             dialFreqCh[i]->setColor(chanColor[i]);
             dialFreqCh[i]->hideUnitSelection();
             horBoxDials->addWidget(dialFreqCh[i]);
 
             dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);
             dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
-            dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, 25, false);
+            dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, DEFAULT_DC, false);
             dialDutyCh[i]->setColor(chanColor[i]);
             dialDutyCh[i]->hideUnitSelection();
             horBoxDials->addWidget(dialDutyCh[i]);
@@ -92,7 +92,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
         destination->addLayout(horBox);
 
         for(int i = 0; i < CHANNELS_NUM; i++){
-            QString chNStr = QString::number(i);
+            QString chNStr = QString::number(i+1);
 
             QVBoxLayout *verChanBox = new QVBoxLayout();
             horBox->addLayout(verChanBox);
@@ -114,14 +114,14 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
             dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
             dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
-            dialFreqCh[i]->setRange(0, 1000, "Hz", 1, 1, 333, false);
+            dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, false);
             dialFreqCh[i]->setColor(chanColor[i]);
             dialFreqCh[i]->hideUnitSelection();
             verChanBox->addWidget(dialFreqCh[i]);
 
             dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);
             dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
-            dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, 25, false);
+            dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, DEFAULT_DC, false);
             dialDutyCh[i]->setColor(chanColor[i]);
             dialDutyCh[i]->hideUnitSelection();
             verChanBox->addWidget(dialDutyCh[i]);

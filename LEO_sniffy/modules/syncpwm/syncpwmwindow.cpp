@@ -61,7 +61,8 @@ void SyncPwmWindow::setSpecification(SyncPwmSpec *spec){
 }
 
 void SyncPwmWindow::restoreGUIAfterStartup(){
-
+    uncheckStartButton();
+    setStartTxt();
 }
 
 void SyncPwmWindow::setStartTxt(){

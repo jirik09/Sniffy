@@ -11,8 +11,8 @@ SyncPwmConfig::SyncPwmConfig(QObject *parent)
 
     int phase = 0;
     for(int i = 1; i < CHANNELS_NUM; i++){
-        SyncPwmConfig::chan[i].frequency = 1;
-        SyncPwmConfig::chan[i].dutyCycle = 25;
+        SyncPwmConfig::chan[i].frequency = DEFAULT_FREQUENCY;
+        SyncPwmConfig::chan[i].dutyCycle = DEFAULT_DC;
         SyncPwmConfig::chan[i].phase = phase;
         phase += PI_HALF;
     }
@@ -22,6 +22,7 @@ void SyncPwmConfig::parse(QByteArray config)
 {
     QDataStream stream(config);
     /* General settings */
+    SyncPwmConfig::state = State::STOPPED;
     stream >> layout >> state >> common.stepMode >> common.equiMode;
 
     /* Channels settings */
@@ -38,6 +39,7 @@ QByteArray SyncPwmConfig::serialize()
     data = new QByteArray();
     QDataStream stream(data,QIODevice::WriteOnly);
 
+    SyncPwmConfig::state = State::STOPPED;
     stream << layout << state << common.stepMode << common.equiMode;
 
     for(int i = 1; i < CHANNELS_NUM; i++){
