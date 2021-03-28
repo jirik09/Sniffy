@@ -47,7 +47,7 @@ void SyncPwm::startModule(){
 
 void SyncPwm::stopModule(){
     stop();
-    // write(cmd->SPWM_COMMAND, cmd->SPWM_DEINIT);
+    write(cmd->SPWM_COMMAND, cmd->SPWM_DEINIT);
 }
 
 void SyncPwm::start(){
@@ -79,6 +79,18 @@ void SyncPwm::parseData(QByteArray data){
 
 void SyncPwm::writeConfiguration(){
     spwmWindow->restoreGUIAfterStartup();
+
+    write(cmd->SPWM_COMMAND, cmd->SPWM_INIT);
+
+    if(config->common.stepMode)
+        switchStepModeCallback(1);
+
+    for(int ch = 0; ch < CHANNELS_NUM; ch++){
+        switchOnOffCallback(config->chan[ch].enabled, ch);
+        buttonInvertCallback(ch, ch);
+        dialFreqCallback(config->chan[ch].frequency, ch);
+        dialDutyCallback(config->chan[ch].dutyCycle, ch);
+    }
 }
 
 void SyncPwm::parseConfiguration(QByteArray config){
@@ -100,57 +112,63 @@ void SyncPwm::stepGenEndNotif(){
 void SyncPwm::buttonStartCallback(int index){
     Q_UNUSED(index);
     if(config->state == State::RUNNING/*!spwmWindow->settings->buttonStart->isChecked(0)*/){
-        spwmWindow->setStartTxt();
         stop();
+        spwmWindow->setStartTxt();
         config->state = State::STOPPED;
     }else {
-        spwmWindow->setStopTxt();
         start();
+        spwmWindow->setStopTxt();
         config->state = State::RUNNING;
     }
 }
 
 void SyncPwm::switchStepModeCallback(int index){
-    if((!(bool)index))
+    if((!(bool)index)) {
+        config->common.stepMode = false;
         write(cmd->SPWM_STEP_MODE, cmd->SPWM_STEP_DISABLE);
-    else
+    }else {
+        config->common.stepMode = true;
         write(cmd->SPWM_STEP_MODE, cmd->SPWM_STEP_ENABLE);
-
+    }
     stepGenEndNotif();
 }
 
 void SyncPwm::buttonEquidistantModeCallback(int index){
     Q_UNUSED(index);
-    if(config->common.equiMode == true){
-        /*TODO: equi calculation and callbacks call */
+    if(config->common.equiMode){
+        config->common.equiMode = false;
     }else {
-
+        config->common.equiMode = true;
     }
 }
 
 void SyncPwm::switchOnOffCallback(int index, int chanIndex){
-    write(cmd->SPWM_CHANNEL_STATE, (chanIndex)<<8 | !(bool)index);
+    config->chan[chanIndex].enabled = !(bool)index;
+    write(cmd->SPWM_CHANNEL_STATE, (chanIndex)<<8 | config->chan[chanIndex].enabled);
 }
 
 void SyncPwm::buttonInvertCallback(int index, int chanIndex){
     Q_UNUSED(index);
-    bool invert = spwmWindow->settings->inverCh[chanIndex]->isChecked(0);
-    write(cmd->SPWM_CHANNEL_INVERT, (chanIndex)<<8 | invert);
+    config->chan[chanIndex].inverted = spwmWindow->settings->inverCh[chanIndex]->isChecked(0);
+    write(cmd->SPWM_CHANNEL_INVERT, (chanIndex)<<8 | config->chan[chanIndex].inverted);
 }
 
 void SyncPwm::dialFreqCallback(float val, int chanIndex){
+    config->chan[chanIndex].frequency = val;
     quint32 freq = (quint32)(val * FREQ_PRECISION);
     QByteArray data = intToSend(freq)+":"+intToSend(FREQ_PRECISION)+":"+intToSend(chanIndex);
     comm->write(cmd->SYNC_PWM_GEN+":"+cmd->SPWM_FREQ_CONFIG+":"+data+";");
 }
 
 void SyncPwm::dialDutyCallback(float val, int chanIndex){
+    config->chan[chanIndex].dutyCycle = val;
     quint32 dutyCycle = (quint32)(val * DUTY_PRECISION);
     quint32 phase = (quint32)(config->chan[chanIndex].phase * PHASE_PRECISION);
     setDutyPhase(dutyCycle, phase, chanIndex);
 }
 
 void SyncPwm::dialPhaseCallback(float val, int chanIndex){
+    config->chan[chanIndex].phase = val;
     quint32 phase = (quint32)(val * PHASE_PRECISION);
     quint32 dutyCycle = (quint32)(config->chan[chanIndex].dutyCycle * DUTY_PRECISION);
     setDutyPhase(dutyCycle, phase, chanIndex);

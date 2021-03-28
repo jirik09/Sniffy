@@ -16,6 +16,7 @@
 #include "syncpwmconfig.h"
 #include "syncpwmsettings.h"
 #include "syncpwmdefs.h"
+#include "syncpwmpainter.h"
 
 namespace Ui {
 class SyncPwmWindow;
@@ -43,7 +44,9 @@ private slots:
 private:
     Ui::SyncPwmWindow *ui;
     SyncPwmConfig *config;
+    SyncPwmPainter *painter;
     SyncPwmSpec *spec;
+
 
     widgetChart *chart;
 

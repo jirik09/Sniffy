@@ -9,15 +9,13 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
     WidgetSeparator *separatorCommon = new WidgetSeparator(parent, "Common");
     destination->addWidget(separatorCommon);
 
-    switchStepMode = new WidgetSwitch(parent, " Continuous ", "    Step    ", "");
+    switchStepMode = new WidgetSwitch(parent, " Continuous ", "     Step     ", "");
     switchStepMode->setObjectName("syncPwmStepButton");
 
     buttonStart = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonStart->setText("Start", 0);
     buttonStart->setChecked(false, 0);
     buttonStart->setObjectName("syncPwmStartButton");
-    //QString bckgndColor = "background-color:"+QString::fromUtf8(COLOR_DARK_CYAN);
-    //buttonStart->setColor(bckgndColor, 0);
 
     buttonEquidist = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonEquidist->setText("Equidistant", 0);
@@ -64,7 +62,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
             dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
             dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
-            dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, false);
+            dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, true);
             dialFreqCh[i]->setColor(chanColor[i]);
             dialFreqCh[i]->hideUnitSelection();
             horBoxDials->addWidget(dialFreqCh[i]);
@@ -114,7 +112,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
             dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
             dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
-            dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, false);
+            dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, true);
             dialFreqCh[i]->setColor(chanColor[i]);
             dialFreqCh[i]->hideUnitSelection();
             verChanBox->addWidget(dialFreqCh[i]);

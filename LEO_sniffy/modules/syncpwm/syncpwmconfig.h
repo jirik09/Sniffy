@@ -31,6 +31,8 @@ struct Channel
     double frequency;
     float dutyCycle;
     float phase;
+    bool enabled;
+    bool inverted;
 };
 
 class SyncPwmConfig : public AbstractConfiguration
@@ -40,7 +42,7 @@ public:
     explicit SyncPwmConfig(QObject *parent = nullptr);
 
     void parse (QByteArray config);
-    QByteArray serialize ();
+    QByteArray serialize ();    
 
     Layout layout;
     State state;
