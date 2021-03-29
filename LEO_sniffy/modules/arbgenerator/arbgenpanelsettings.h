@@ -13,6 +13,8 @@
 #include "../../GUI/widgettextinput.h"
 #include "../../GUI/widgetlabel.h"
 
+#include "../labelformator.h"
+
 #include "arbgeneratordefs.h"
 #include "arbgeneratorconfig.h"
 
@@ -26,6 +28,10 @@ public:
 
     void setChannelShown(int index, bool isShown);
     void setChannelShapeControl(int index, int shape);
+    void restoreGUI();
+    void setMaxNumChannels(int numChannels);
+    void setLabels(QString freq, QString length, int index);
+    void setFreqLabel(QString freq, int index);
 
 signals:
 
@@ -36,12 +42,17 @@ public:
     WidgetButtons *buttonsEnable;
     WidgetButtons *buttonsMemory;
     WidgetTextInput *customLengthInput;
+    WidgetButtons *buttonSelectFile;
+    int arbChannelsEnabled = 0;
 
     int numChannelsEnabled = 0;
+    MemoryLength memorySet = MemoryLength::BEST_FIT;
+    int customLength = 0;
 
     //for each channel
     QScrollArea *verChannArea[MAX_ARB_CHANNELS_NUM];
     WidgetButtons *buttonsShape[MAX_ARB_CHANNELS_NUM];
+
     WidgetDialRange *dialFreqCh[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialOffsetCh[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialAmplitudeCh[MAX_ARB_CHANNELS_NUM];
@@ -58,15 +69,19 @@ public:
 
 
 private:
+    void setCopyFreq(int fromCh, int toCh);
 
 signals:
     void signalChanged();
 
 private slots:
-    void buttonEnableChannelCallback(int status);
+    void buttonEnableChannelCallback(int index);
     void buttonShapeCallback(int clicked, int channel);
     void syncWithCH1Callback(int clicked, int channel);
+    void signalFrequencyCallback(qreal value, int channel);
     void signalChangedCallback();
+    void memoryCallback(int index);
+    void customLenghtCallback(qreal value);
 };
 
 #endif // ARBGENPANELSETTINGS_H

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>943</width>
-    <height>375</height>
+    <width>556</width>
+    <height>189</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -41,6 +41,12 @@ background-color: rgb(58, 58, 58);
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QWidget" name="widget_module" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="minimumSize">
        <size>
         <width>150</width>
@@ -49,9 +55,15 @@ background-color: rgb(58, 58, 58);
       </property>
      </widget>
      <widget class="QWidget" name="widget_settings" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="minimumSize">
        <size>
-        <width>350</width>
+        <width>400</width>
         <height>150</height>
        </size>
       </property>

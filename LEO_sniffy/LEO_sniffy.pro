@@ -56,6 +56,7 @@ SOURCES += \
     modules/abstractspecification.cpp \
     modules/arbgenerator/arbgenerator.cpp \
     modules/arbgenerator/arbgeneratorconfig.cpp \
+    modules/arbgenerator/arbgeneratorfileloader.cpp \
     modules/arbgenerator/arbgeneratorspec.cpp \
     modules/arbgenerator/arbgeneratorwindow.cpp \
     modules/arbgenerator/arbgenpanelsettings.cpp \
@@ -153,6 +154,7 @@ HEADERS += \
     modules/arbgenerator/arbgenerator.h \
     modules/arbgenerator/arbgeneratorconfig.h \
     modules/arbgenerator/arbgeneratordefs.h \
+    modules/arbgenerator/arbgeneratorfileloader.h \
     modules/arbgenerator/arbgeneratorspec.h \
     modules/arbgenerator/arbgeneratorwindow.h \
     modules/arbgenerator/arbgenpanelsettings.h \

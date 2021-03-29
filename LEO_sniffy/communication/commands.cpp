@@ -34,6 +34,7 @@ const QByteArray Commands::START = "STRT";
 const QByteArray Commands::PAUSE = "PAUS";
 const QByteArray Commands::UNPAUSE = "UPAU";
 const QByteArray Commands::NEXT = "NEXT";
+const QByteArray Commands::CONFIG = "CFG_";
 
 const QByteArray Commands::GET_REAL_SMP_FREQ = "FRQ?";
 const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";
@@ -114,6 +115,34 @@ const QByteArray Commands::CHANNELS_1 = "1CH_";
 const QByteArray Commands::CHANNELS_2 = "2CH_";
 const QByteArray Commands::CHANNELS_3 = "3CH_";
 const QByteArray Commands::CHANNELS_4 = "4CH_";
+
+/**************************** GENERATOR ****************************/
+const QByteArray Commands::CMD_GEN_MODE = "MODE";
+const QByteArray Commands::CMD_MODE_PWM = "PWM_";
+const QByteArray Commands::CMD_MODE_DAC = "DAC_";
+const QByteArray Commands::CMD_GEN_DATA = "DATA";
+const QByteArray Commands::CMD_GEN_OK = "G_OK";
+const QByteArray Commands::CMD_GEN_NEXT = "G_NX";
+const QByteArray Commands::CMD_GEN_SAMPLING_FREQ = "FREQ";
+const QByteArray Commands::CMD_GEN_OUTBUFF_ON =	"B_ON";
+const QByteArray Commands::CMD_GEN_OUTBUFF_OFF = "B_OF";
+const QByteArray Commands::CMD_GEN_DATA_LENGTH_CH1 = "LCH1";
+const QByteArray Commands::CMD_GEN_DATA_LENGTH_CH2 = "LCH2";
+const QByteArray Commands::CMD_GEN_CHANNELS = "CHAN";
+const QByteArray Commands::CMD_GEN_START = "STRT";
+const QByteArray Commands::CMD_GEN_STOP = "STOP";
+const QByteArray Commands::CMD_GEN_RESET = "RSET";
+const QByteArray Commands::CMD_GET_PWM_CONFIG = "PCF?";
+const QByteArray Commands::CMD_GEN_PWM_DEINIT =	"GPDI";
+//onst QByteArray Commands::CMD_GEN_PWM_FREQ_PSC = "FPWP";
+//const QByteArray Commands::CMD_GEN_PWM_FREQ_ARR =	"FPWA";
+const QByteArray Commands::CMD_GEN_PWM_FREQ_CH1 = "GFR1";
+const QByteArray Commands::CMD_GEN_PWM_FREQ_CH2	= "GFR2";
+const QByteArray Commands::CMD_GEN_DAC_VAL = "DAC_";
+const QByteArray Commands::CMD_GEN_PWM_REAL_FREQ_CH1 = "GPR1";
+const QByteArray Commands::CMD_GEN_PWM_REAL_FREQ_CH2 = "GPR2";
+const QByteArray Commands::CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH1 = "GSR1";
+const QByteArray Commands::CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH2 = "GSR2";
 
 /************************ COUNTER ***********************/
 // Counter complete deinit

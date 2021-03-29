@@ -5,41 +5,68 @@ ArbGenerator::ArbGenerator(QObject *parent)
     Q_UNUSED(parent);
     moduleSpecification = new ArbGeneratorSpec();
     config = new ArbGeneratorConfig();
-    tempWindow = new ArbGeneratorWindow(config);
-    tempWindow->setObjectName("arbGenWindow");
+    arbGenWindow = new ArbGeneratorWindow(config);
+    arbGenWindow->setObjectName("arbGenWindow");
 
-//Set the comm prefix, window name and icon
-    //module is not fully initialized - control widget and dock wodget cannot be modified
-    moduleCommandPrefix = "SYST";//cmd->SCOPE;
+    moduleCommandPrefix = cmd->GENERATOR;
     moduleName = "Arbitrary generator";
     moduleIconURI = ":/graphics/graphics/icon_signal_generator.png";
+
+    connect(arbGenWindow, &ArbGeneratorWindow::runGenerator, this,&ArbGenerator::sendSignalCallback);
+    connect(arbGenWindow, &ArbGeneratorWindow::stopGenerator, this,&ArbGenerator::stopCallback);
+    connect(arbGenWindow, &ArbGeneratorWindow::updateFrequency, this,&ArbGenerator::updateFrequencyCallback);
 }
 
 QWidget *ArbGenerator::getWidget()
 {
-    return tempWindow;
+    return arbGenWindow;
 }
 
 void ArbGenerator::parseData(QByteArray data)
 {
     QByteArray dataHeader = data.left(4);
 
-    if(dataHeader=="CFG_"){
+    if(dataHeader==cmd->CONFIG){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
+        arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
         showModuleControl();
-//TODO parse message from MCU
-    }else if(dataHeader=="xxxx"){
+    }else if(dataHeader==cmd->CMD_GEN_NEXT){
+        if (lengthToSend == 0){
+            if (sendingChannel == 1 && numChannelsUsed == 2) {
+                lengthToSend = GeneratorData[1].length();
+                lengthSent = 0;
+                memoryIndex = 0;
+                actualSend = 0;
+                sendingChannel = 2;
+                sendNextData();
+            }else if (sendingChannel == numChannelsUsed) {
+                genAskForFreq();
+                startGenerator();
+            }
+        }else {
+            sendNextData();
+        }
+        arbGenWindow->setProgress(totalSent*100/totalToSend);
 
+    }else if(dataHeader==cmd->CMD_GEN_OK){
+        arbGenWindow->setGeneratorRuning();
+    }else if(dataHeader==cmd->CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH1){
+        quint32 freq;
+        freq = qFromBigEndian<quint32>(data.right(4));
+        arbGenWindow->setFrequencyLabels(0,(qreal)(freq)/signalLengths[0]);
+    }else if(dataHeader==cmd->CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH2){
+        quint32 freq;
+        freq = qFromBigEndian<quint32>(data.right(4));
+        arbGenWindow->setFrequencyLabels(1,(qreal)(freq)/signalLengths[1]);
     }else{
-        //qDebug()<<data;
+        qDebug()<<"UNHANDLED"<<data;
     }
 }
 
 void ArbGenerator::writeConfiguration()
 {
-    tempWindow->restoreGUIAfterStartup();
-//TODO this function is called when module is opened
+    arbGenWindow->restoreGUIAfterStartup();
 }
 
 void ArbGenerator::parseConfiguration(QByteArray config)
@@ -54,27 +81,156 @@ QByteArray ArbGenerator::getConfiguration()
 
 void ArbGenerator::startModule()
 {
-//TODO start the module
+    restartGenerator();
+    setGeneratorDACMode();
+    setModuleStatus(ModuleStatus::PAUSE);
 }
 
 void ArbGenerator::stopModule()
 {
-//TODO stop the module
+    stopGenerator();
+    arbGenWindow->setGeneratorStopped();
 }
 
-//In case hold is needed
+void ArbGenerator::sendSignalCallback(){
+    GeneratorData = *arbGenWindow->getGeneratorDACData();
+    numChannelsUsed = GeneratorData.length();
+    totalToSend = totalSent = 0;
 
-void ArbGenerator::showHoldButtonCallback(){
-    this->showModuleHoldButton();
-}
-
-void ArbGenerator::holdButtonCallback(bool held){
-    if(held){
-        comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
-        setModuleStatus(ModuleStatus::PAUSE);
+    //Memory demand (#Chan * length) has to be reduced first
+    if (numChannelsUsed > 1) {
+        for(int i = 0;i<numChannelsUsed;i++){
+            signalLengths[i] = GeneratorData[i].length();
+            setDataLength(i, signalLengths[i]);
+            totalToSend +=  signalLengths[i];
+        }
+        setNumChannels(numChannelsUsed);
     }else{
-        comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
-        setModuleStatus(ModuleStatus::PLAY);
+        setNumChannels(numChannelsUsed);
+        signalLengths[0] = GeneratorData[0].length();
+        setDataLength(0,signalLengths[0]);
+        totalToSend =  signalLengths[0];
+    }
+
+
+    for(int i = 0;i<numChannelsUsed;i++){
+        setFrequency(i,arbGenWindow->getFrequency(i));
+    }
+
+    lengthToSend = signalLengths[0];
+    lengthSent = memoryIndex = actualSend = 0;
+    sendingChannel = 1;
+    sendNextData();
+}
+
+void ArbGenerator::stopCallback()
+{
+    stopGenerator();
+}
+
+void ArbGenerator::updateFrequencyCallback()
+{
+    for (int i = 0;i<numChannelsUsed;i++){
+        setFrequency(i,arbGenWindow->getFrequency(i));
+    }
+    genAskForFreq();
+}
+
+void ArbGenerator::sendNextData()
+{
+    comm->write(cmd->GENERATOR+":"+cmd->CMD_GEN_DATA + " ");
+    if (lengthToSend > DATA_BLOCK_SIZE){
+        actualSend = DATA_BLOCK_SIZE;
+    }else{
+        actualSend = lengthToSend;
+    }
+
+    QByteArray tmpHeader;
+    QDataStream dataStreamHeader(&tmpHeader, QIODevice::WriteOnly);
+    int tmp = ((memoryIndex / 256)*256*256*256 + (memoryIndex % 256) * 256*256 + (actualSend * 256) + (sendingChannel));
+    dataStreamHeader << tmp;
+    comm->write(tmpHeader+":");
+
+    QByteArray tmpData;
+    QDataStream dataStreamData(&tmpData, QIODevice::WriteOnly);
+    for (int i = 0; i < actualSend; i++){
+        qint16  sample = qFromBigEndian<qint16>(GeneratorData[sendingChannel-1][lengthSent+i]);
+        dataStreamData <<sample;
+    }
+    comm->write(tmpData+";");
+    lengthSent += actualSend;
+    lengthToSend -= actualSend;
+    memoryIndex += actualSend;
+    totalSent += actualSend;
+}
+
+
+void ArbGenerator::startGenerator()
+{
+    setModuleStatus(ModuleStatus::PLAY);
+    comm->write(cmd->GENERATOR,cmd->START);
+}
+
+void ArbGenerator::stopGenerator()
+{
+    setModuleStatus(ModuleStatus::PAUSE);
+    comm->write(cmd->GENERATOR,cmd->CMD_GEN_STOP);
+}
+
+void ArbGenerator::restartGenerator()
+{
+    comm->write(cmd->GENERATOR,cmd->CMD_GEN_RESET);
+}
+
+void ArbGenerator::setGeneratorDACMode()
+{
+    comm->write(cmd->GENERATOR,cmd->CMD_GEN_MODE,cmd->CMD_MODE_DAC);
+}
+
+void ArbGenerator::setDataLength(int channel, int length)
+{
+    if(channel==0){
+        comm->write(cmd->GENERATOR,cmd->DATA_LENGTH_CH1,length);
+    }else if(channel==1){
+        comm->write(cmd->GENERATOR,cmd->DATA_LENGTH_CH2,length);
+    }else{
+        qDebug () << "More channels not yet implemented";
     }
 }
+
+void ArbGenerator::setNumChannels(int numChannels)
+{
+    if(numChannels==1){
+        comm->write(cmd->GENERATOR,cmd->CHANNELS,cmd->CHANNELS_1);
+    }else if(numChannels==2){
+        comm->write(cmd->GENERATOR,cmd->CHANNELS,cmd->CHANNELS_2);
+    }else{
+        qDebug () << "More channels not yet implemented";
+    }
+}
+
+void ArbGenerator::setFrequency(int channel, qreal freq)
+{
+    int tmp = ((int)(round(freq*signalLengths[channel])))*256 + (channel+1)%256;
+    if(round(freq*signalLengths[channel])> static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate){
+        tmp = static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate*256 + (channel+1)%256;
+    }
+    comm->write(cmd->GENERATOR,cmd->SAMPLING_FREQ,tmp);
+}
+
+void ArbGenerator::genAskForFreq()
+{
+    comm->write(cmd->GENERATOR,cmd->GET_REAL_SMP_FREQ);
+}
+
+void ArbGenerator::setOutputBuffer(bool isEnabled)
+{
+    if(isEnabled){
+        comm->write(cmd->GENERATOR,cmd->CMD_GEN_OUTBUFF_ON);
+    }else{
+        comm->write(cmd->GENERATOR,cmd->CMD_GEN_OUTBUFF_OFF);
+    }
+}
+
+
 

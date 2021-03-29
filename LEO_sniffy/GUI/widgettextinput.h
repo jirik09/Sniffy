@@ -30,13 +30,14 @@ public:
     void restoreGeometry(QByteArray geom);
     QString getText();
     qreal getValue();
+    void processInput();
 
 signals:
     void textChanged(QString text);
     void numberChanged(qreal number);
 
 private:
-    void processInput();
+
     Ui::WidgetTextInput *ui;
     InputTextType inputType;
     QString lastParsed = "1";
