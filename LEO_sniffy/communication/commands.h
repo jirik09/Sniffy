@@ -36,6 +36,7 @@ public:
     static const QByteArray PAUSE;
     static const QByteArray UNPAUSE;
     static const QByteArray NEXT;
+    static const QByteArray CONFIG;
 
     static const QByteArray GET_REAL_SMP_FREQ;
     static const QByteArray GET_SCOPE_INPUTS;
@@ -122,6 +123,34 @@ public:
     static const QByteArray CHANNELS_3;
     static const QByteArray CHANNELS_4;
 
+    /**************************** GENERATOR ****************************/
+    static const QByteArray CMD_GEN_MODE;
+    static const QByteArray CMD_MODE_PWM;
+    static const QByteArray CMD_MODE_DAC;
+    static const QByteArray CMD_GEN_DATA;
+    static const QByteArray CMD_GEN_OK;
+    static const QByteArray CMD_GEN_NEXT;
+    static const QByteArray CMD_GEN_SAMPLING_FREQ;
+    static const QByteArray CMD_GEN_OUTBUFF_ON;
+    static const QByteArray CMD_GEN_OUTBUFF_OFF ;
+    static const QByteArray CMD_GEN_DATA_LENGTH_CH1;
+    static const QByteArray CMD_GEN_DATA_LENGTH_CH2;
+    static const QByteArray CMD_GEN_CHANNELS;
+    static const QByteArray CMD_GEN_START;
+    static const QByteArray CMD_GEN_STOP;
+    static const QByteArray CMD_GEN_RESET;
+    static const QByteArray CMD_GET_PWM_CONFIG;
+    static const QByteArray CMD_GEN_PWM_DEINIT;
+    //static const QByteArray CMD_GEN_PWM_FREQ_PSC;
+    //static const QByteArray CMD_GEN_PWM_FREQ_ARR;
+    static const QByteArray CMD_GEN_PWM_FREQ_CH1;
+    static const QByteArray CMD_GEN_PWM_FREQ_CH2;
+    static const QByteArray CMD_GEN_DAC_VAL;
+    static const QByteArray CMD_GEN_PWM_REAL_FREQ_CH1;
+    static const QByteArray CMD_GEN_PWM_REAL_FREQ_CH2;
+    static const QByteArray CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH1;
+    static const QByteArray CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH2;
+
     /************************ COUNTER ***********************/
     // Counter complete deinit
     static const QByteArray COUNTER_DEINIT;
@@ -159,7 +188,7 @@ public:
     static const QByteArray LF_CH1_MULTIPLIER;
     static const QByteArray LF_CH2_MULTIPLIER;
 
-    // Counter LF multiplier    
+    // Counter LF multiplier
     static const QByteArray LF_MULTIPLIER_1X;
     static const QByteArray LF_MULTIPLIER_2X;
     static const QByteArray LF_MULTIPLIER_4X;

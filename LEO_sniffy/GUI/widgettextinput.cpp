@@ -65,9 +65,7 @@ void WidgetTextInput::processInput()
             number = flRead * mult;
             emit numberChanged(number);
             lastParsed = input;
-            qDebug () << number;
         }else{
-            qDebug () << "error";
             ui->lineEdit->setText(lastParsed);
         }
     }

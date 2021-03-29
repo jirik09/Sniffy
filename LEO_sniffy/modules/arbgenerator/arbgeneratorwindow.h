@@ -5,6 +5,8 @@
 #include <QScrollArea>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QFileDialog>
+#include <QtMath>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"
@@ -20,6 +22,9 @@
 
 #include "arbgeneratorconfig.h"
 #include "arbgenpanelsettings.h"
+#include "arbgeneratorspec.h"
+#include "signalcreator.h"
+#include "arbgeneratorfileloader.h"
 
 namespace Ui {
 class ArbGeneratorWindow;
@@ -34,17 +39,39 @@ public:
     ~ArbGeneratorWindow();
 
     void restoreGUIAfterStartup();
+    void setSpecification(ArbGeneratorSpec* spec);
+
+    QList<QList<int> > *getGeneratorDACData() const;
+    qreal getFrequency(int channel);
+    void setProgress(int percent);
+    void setGeneratorRuning();
+    void setGeneratorStopped();
+    void setFrequencyLabels(int channel, qreal freq);
 
 private:
+    void setGenerateButton (QString text, QString color);
 
     Ui::ArbGeneratorWindow *ui;
     ArbGeneratorConfig *config;
-
+    ArbGeneratorSpec *spec;
     ArbGenPanelSettings *setting;
+    ArbGeneratorFileLoader *fileLoader;
+
+    widgetChart *chart;
+    QVector<QVector<QPointF>> *generatorChartData;
+    QList<QList<int>> *generatorDACData;
+
+    bool isGenerating = false;
 
 private slots:
-    void generateSignalCallback();
+    void runGeneratorCallback();
+    void createSignalCallback();
+    void openFileCallback();
 
+signals:
+    void runGenerator();
+    void stopGenerator();
+    void updateFrequency();
 };
 
 #endif // ARBGENERATORWINDOW_H

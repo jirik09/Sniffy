@@ -40,9 +40,11 @@ public:
     int getStatus();
     void setDisabledButton(bool disabled, int index);
     void setEnabledButton(bool enabled, int index);
+    void setButtonHidden(bool hidden, int index);
     void disableAll();
     void enableAll(bool enable);
     void setChecked (bool checked, int index);    
+
 
 private:
     Ui::WidgetButtons *ui;

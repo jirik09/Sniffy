@@ -332,11 +332,11 @@ void Voltmeter::setNumberOfChannels(int num){
 
 void Voltmeter::setVDDSampling(){
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_VREF+";");
-    int lenght = 400 + +samplesToTakeTotal*100;
-    if(lenght>2000){
-        lenght = 2000;
+    int length = 400 + +samplesToTakeTotal*100;
+    if(length>2000){
+        length = 2000;
     }
-    comm->write(cmd->SCOPE,cmd->DATA_LENGTH,lenght);
+    comm->write(cmd->SCOPE,cmd->DATA_LENGTH,length);
     setNumberOfChannels(1);
     isReferenceMeasured = true;
 }

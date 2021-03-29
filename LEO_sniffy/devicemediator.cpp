@@ -133,6 +133,9 @@ void DeviceMediator::parseData(QByteArray data){
         }else{
             qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
         }
+        if (data.right(1)=="E"){
+            qDebug() << "DEVICE ERROR " << QString::number((data.right(2)).at(0));
+        }
 
     }
 }

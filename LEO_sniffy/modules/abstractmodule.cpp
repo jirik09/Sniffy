@@ -147,8 +147,8 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
         emit blockConflictingModules(moduleName, moduleSpecification->getResources());
         dockWidgetWindow->show();
         writeConfiguration();
-        startModule();
         moduleControlWidget->setStatus(ModuleStatus::PLAY);
+        startModule();
         break;
     case ModuleStatus::PLAY:
         dockWidgetWindow->hide();
