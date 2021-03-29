@@ -27,9 +27,8 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *pare
     chart->setRange(0, 1, 0, 1);
     verticalLayout_chart->addWidget(chart);
 
-    QVBoxLayout hovno;
-
     setting = new ArbGenPanelSettings(verticalLayout_settings,this);
+    fileLoader = new ArbGeneratorFileLoader();
 
     ui->widget_settings->setLayout(verticalLayout_settings);
     ui->widget_module->resize(600,300);
@@ -113,19 +112,20 @@ void ArbGeneratorWindow::runGeneratorCallback()
 
 void ArbGeneratorWindow::createSignalCallback()
 {
-    QList<qreal> *freq = new QList<qreal>;
-    QList<SignalShape> *shape = new QList<SignalShape>;
     int length;
     int numChannelsUsed;
     QList<int> DACData;
-    QList<qreal> signalData;
+    QVector<qreal> signalData;
     QVector<QPointF> chartSignal;
     qreal x(0);
     qreal y(0);
+    int tmpDAC;
     qreal maxX;
 
     // **************** build the data for calculation and get the signal lengths. ****************
     if(!isGenerating){
+        QList<qreal> *freq = new QList<qreal>;
+        QList<SignalShape> *shape = new QList<SignalShape>;
         for (int i = 0;i <MAX_ARB_CHANNELS_NUM ;i++ ) {
             if(setting->channelEnabled[i]){
                 freq->append(setting->dialFreqCh[i]->getRealValue());
@@ -140,9 +140,14 @@ void ArbGeneratorWindow::createSignalCallback()
 
         for(int i = 0;i<numChannelsUsed;i++){
             chartSignal.clear();
+            DACData.clear();
 
             // **************** generate signal based on inputs ****************
-            length = SignalCreator::calculateSignalLength(setting->memorySet,setting->customLength, spec->generatorBufferSize/numChannelsUsed,freq->at(i),spec->maxSamplingRate,spec->periphClockFrequency);
+            if(shape->at(i) == SignalShape::ARB){
+                length = fileLoader->getSignalLength(i);
+            }else{
+                length = SignalCreator::calculateSignalLength(setting->memorySet,setting->customLength, spec->generatorBufferSize/numChannelsUsed,freq->at(i),spec->maxSamplingRate,spec->periphClockFrequency);
+            }
 
             qreal div = (qreal)(spec->periphClockFrequency)/freq->at(i)/length;
             if(div<spec->periphClockFrequency/spec->maxSamplingRate){
@@ -150,32 +155,62 @@ void ArbGeneratorWindow::createSignalCallback()
             }
             qreal realfreq = spec->periphClockFrequency/(qreal)((int)(div))/length;
             setting->setLabels(LabelFormator::formatOutout(realfreq,"Hz",3),QString::number(length),i);
-            signalData = SignalCreator::createSignal(setting->signalShape[i], length, setting->dialAmplitudeCh[i]->getRealValue(), setting->dialOffsetCh[i]->getRealValue(), setting->dialDutyCh[i]->getRealValue(), setting->dialPhaseCh[i]->getRealValue(),spec->rangeMin,spec->rangeMax);
-            //If it is arb data then handle here and fix the datalength
 
-            // **************** calculate data for charts ****************
-            for (int j=0 ;j<length ;j++ ) {
-                y = signalData[j];
-                x = (qreal)(div)/spec->periphClockFrequency*j;// /1/realfreq*j;
-                chartSignal.append(QPointF(x,y));
-                x = (qreal)(div)/spec->periphClockFrequency*(j+1);// /1/realfreq*j;
-                chartSignal.append(QPointF(x,y));
-            }
-            x = (qreal)(div)/spec->periphClockFrequency*length;
-            chartSignal.append(QPointF(x,chartSignal[0].y()));
-            if(maxX<x){
-                maxX=x;
-            }
-            generatorChartData->append(chartSignal);
+            if(shape->at(i) == SignalShape::ARB){
+                signalData = fileLoader->getSignal(i);
+                if(setting->dialPhaseCh[i]->getRealValue()!=0){
+                    signalData = SignalCreator::shiftPhase(signalData,setting->dialPhaseCh[i]->getRealValue());
+                }
+                for (int j=0 ;j<length ;j++ ) {
+                    y = signalData[j];
+                    y = (y -fileLoader->getOffset(i)) *(setting->dialAmplitudeCh[i]->getRealValue()/fileLoader->getAmplitude(i))+fileLoader->getOffset(i); //gain
+                    y = y + (setting->dialOffsetCh[i]->getRealValue()-fileLoader->getOffset(i)); //offset
+                    y = fmax(fmin(y,spec->rangeMax),spec->rangeMin); //min max range
 
-            //**************** calculate data for MCU ****************
-            DACData.clear();
-            for (int j=0 ;j<length ;j++) {
-                int tmpDAC = ((pow(2,12)-1)*(qreal)(signalData[j]-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
-                DACData.append(tmpDAC);
+                    x = (qreal)(div)/spec->periphClockFrequency*j;// /1/realfreq*j;
+                    chartSignal.append(QPointF(x,y));
+                    x = (qreal)(div)/spec->periphClockFrequency*(j+1);// /1/realfreq*j;
+                    chartSignal.append(QPointF(x,y));
+
+                    tmpDAC = ((pow(2,12)-1)*(qreal)(y-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
+                    DACData.append(tmpDAC);
+                }
+                x = (qreal)(div)/spec->periphClockFrequency*length;
+                chartSignal.append(QPointF(x,chartSignal[0].y()));
+                if(maxX<x){
+                    maxX=x;
+                }
+                generatorChartData->append(chartSignal);
+                generatorDACData->append(DACData);
+
+            }else{ //Other signals except arbitrary
+                signalData = SignalCreator::createSignal(setting->signalShape[i], length, setting->dialAmplitudeCh[i]->getRealValue(), setting->dialOffsetCh[i]->getRealValue(), setting->dialDutyCh[i]->getRealValue(), setting->dialPhaseCh[i]->getRealValue(),spec->rangeMin,spec->rangeMax);
+                // **************** calculate data for charts ****************
+                for (int j=0 ;j<length ;j++ ) {
+                    y = signalData[j];
+                    x = (qreal)(div)/spec->periphClockFrequency*j;// /1/realfreq*j;
+                    chartSignal.append(QPointF(x,y));
+                    x = (qreal)(div)/spec->periphClockFrequency*(j+1);// /1/realfreq*j;
+                    chartSignal.append(QPointF(x,y));
+                }
+                x = (qreal)(div)/spec->periphClockFrequency*length;
+                chartSignal.append(QPointF(x,chartSignal[0].y()));
+                if(maxX<x){
+                    maxX=x;
+                }
+                generatorChartData->append(chartSignal);
+
+                //**************** calculate data for MCU ****************
+                DACData.clear();
+                for (int j=0 ;j<length ;j++) {
+                    tmpDAC = ((pow(2,12)-1)*(qreal)(signalData[j]-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
+                    DACData.append(tmpDAC);
+                }
+                generatorDACData->append(DACData);
             }
-            generatorDACData->append(DACData);
         }
+
+
 
         // **************** plot the data ****************
         chart->clearAll();
@@ -193,15 +228,18 @@ void ArbGeneratorWindow::createSignalCallback()
 void ArbGeneratorWindow::openFileCallback()
 {
     QString fileName;
-    fileName = QFileDialog::getSaveFileName(this,"Select output file","","Text files (*.csv *.txt)");
-    //config->datalogFileName = fileName;
-    qDebug() << fileName;
-    if(fileName.length()>=25){
-        fileName = fileName.left(8)+" ... "+fileName.right(12);
-    }
-    if(fileName.length()>3){
-     //   labelFile->setValue(fileName);
-      //  buttonStartLog->enableAll(true);
-    }
-}
+    int tmp = 0;
+    fileName = QFileDialog::getOpenFileName(this,"Select output file","","Text files (*.csv *.txt)");
+    tmp = fileLoader->openFile(fileName);
+    qDebug() << fileName << QString::number(tmp) <<fileLoader->getInfoString();
 
+    if(fileLoader->isSamplerateDefined()){
+        for (int i = 0;i<fileLoader->getNumChannels();i++){
+            setting->dialFreqCh[i]->setRealValue(fileLoader->getSamplerateFrequency()/fileLoader->getSignalLength(i));
+            setting->dialAmplitudeCh[i]->setRealValue(fileLoader->getAmplitude(i));
+            setting->dialOffsetCh[i]->setRealValue(fileLoader->getOffset(i));
+            setting->dialPhaseCh[i]->setRealValue(0,true);
+        }
+    }
+    createSignalCallback();
+}

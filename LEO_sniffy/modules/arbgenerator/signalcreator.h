@@ -15,8 +15,9 @@ class SignalCreator : public QObject
 public:
     explicit SignalCreator( QObject *parent = nullptr);
 
-    static QList<qreal> createSignal(SignalShape shape, int numSamples, qreal amplitude, qreal offset, qreal duty, qreal phase, qreal rangeMin, qreal rangeMax);
+    static QVector<qreal> createSignal(SignalShape shape, int numSamples, qreal amplitude, qreal offset, qreal duty, qreal phase, qreal rangeMin, qreal rangeMax);
     static int calculateSignalLength(MemoryLength memSet, int customLength, int generatorBufferSize, qreal signalFreq, int maxSamplingRate, int periphClockFrequency);
+    static QVector<qreal> shiftPhase(QVector<qreal> in, qreal phase);
 signals:
 
 };

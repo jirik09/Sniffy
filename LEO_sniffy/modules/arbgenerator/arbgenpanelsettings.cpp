@@ -11,15 +11,15 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
     buttonsGenerate->setObjectName("arbgenbtnen");
     buttonsGenerate->setText("Start");
 
-    buttonsEnable = new WidgetButtons(parent,4,ButtonTypes::CHECKABLE,"Enable");
+    buttonsEnable = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Number of channels");
     buttonsEnable->setObjectName("arbGenBtnEnableChannel");
-    buttonsEnable->setText("  CH 1  ",0);
+    buttonsEnable->setText("  One  ",0);
     buttonsEnable->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(0)),0);
-    buttonsEnable->setText("  CH 2  ",1);
+    buttonsEnable->setText("  Two  ",1);
     buttonsEnable->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(1)),1);
-    buttonsEnable->setText("  CH 3  ",2);
+    buttonsEnable->setText("  Three  ",2);
     buttonsEnable->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(2)),2);
-    buttonsEnable->setText("  CH 4  ",3);
+    buttonsEnable->setText("  Four  ",3);
     buttonsEnable->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(3)),3);
 
     buttonsMemory = new WidgetButtons(parent,3,ButtonTypes::RADIO,"Memory");
@@ -35,14 +35,13 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
     buttonSelectFile->setObjectName("buttonselectfileArbGen");
     buttonSelectFile->setText("   Select   ");
 
-
     QHBoxLayout *commonButtons = new QHBoxLayout();
     destination->addWidget(buttonsGenerate);
     commonButtons->addWidget(buttonsMemory);
     commonButtons->addWidget(customLengthInput);
-    commonButtons->addWidget(buttonSelectFile);
     destination->addLayout(commonButtons);
     destination->addWidget(buttonsEnable);
+    destination->addWidget(buttonSelectFile);
 
     QHBoxLayout *horBox = new QHBoxLayout();
     destination->addLayout(horBox);
@@ -160,12 +159,15 @@ void ArbGenPanelSettings::setChannelShown(int index, bool isShown)
 
 void ArbGenPanelSettings::restoreGUI()
 {
-    for(int i =0;i<MAX_ARB_CHANNELS_NUM;i++){
-        if(buttonsEnable->isChecked(i)){
-            setChannelShown(i,true);
-            channelEnabled[i] = true;
-        }
+    for(int i = 0;i<buttonsEnable->getSelectedIndex()+1;i++){
+        setChannelShown(i,true);
+        channelEnabled[i] = true;
     }
+    for(int i = buttonsEnable->getSelectedIndex()+1;i<MAX_ARB_CHANNELS_NUM;i++){
+        setChannelShown(i,false);
+        channelEnabled[i] = false;
+    }
+
     memoryCallback(buttonsMemory->getSelectedIndex());
     customLengthInput->processInput();
     customLenghtCallback(customLengthInput->getValue());
@@ -204,16 +206,13 @@ void ArbGenPanelSettings::setCopyFreq(int fromCh, int toCh)
 
 void ArbGenPanelSettings::buttonEnableChannelCallback(int index)
 {
-    //enable all channels below clicked button
-    for(int i = 0;i<=index;i++){
+    for(int i = 0;i<index+1;i++){
         setChannelShown(i,true);
         channelEnabled[i] = true;
-        buttonsEnable->setChecked(true,i);
     }
     for(int i = index+1;i<MAX_ARB_CHANNELS_NUM;i++){
         setChannelShown(i,false);
         channelEnabled[i] = false;
-        buttonsEnable->setChecked(false,i);
     }
     numChannelsEnabled = index+1;
     signalChangedCallback();
@@ -241,7 +240,7 @@ void ArbGenPanelSettings::buttonShapeCallback(int clicked, int channel)
     case 3:
         signalShape[channel] = SignalShape::ARB;
         arbChannelsEnabled++;
-        dialDutyCh[channel]->show();
+        dialDutyCh[channel]->hide();
 
         break;
     }

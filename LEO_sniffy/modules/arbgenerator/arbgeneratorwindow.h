@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QtMath>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"
@@ -23,6 +24,7 @@
 #include "arbgenpanelsettings.h"
 #include "arbgeneratorspec.h"
 #include "signalcreator.h"
+#include "arbgeneratorfileloader.h"
 
 namespace Ui {
 class ArbGeneratorWindow;
@@ -53,6 +55,7 @@ private:
     ArbGeneratorConfig *config;
     ArbGeneratorSpec *spec;
     ArbGenPanelSettings *setting;
+    ArbGeneratorFileLoader *fileLoader;
 
     widgetChart *chart;
     QVector<QVector<QPointF>> *generatorChartData;

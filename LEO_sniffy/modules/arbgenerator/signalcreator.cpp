@@ -4,9 +4,9 @@ SignalCreator::SignalCreator(QObject *parent) : QObject(parent)
 {
 }
 
-QList<qreal> SignalCreator::createSignal(SignalShape shape, int numSamples, qreal amplitude, qreal offset, qreal duty, qreal phase, qreal rangeMin, qreal rangeMax)
+QVector<qreal> SignalCreator::createSignal(SignalShape shape, int numSamples, qreal amplitude, qreal offset, qreal duty, qreal phase, qreal rangeMin, qreal rangeMax)
 {
-    QList<qreal> signal;
+    QVector<qreal> signal;
     qreal tmpPoint;
     int shift = (int)(phase / 360 * numSamples);
     switch (shape) {
@@ -148,5 +148,17 @@ int SignalCreator::calculateSignalLength(MemoryLength memSet, int customLength,i
     }
 
     return outputLeng;
+}
+
+QVector<qreal> SignalCreator::shiftPhase(QVector<qreal> in, qreal phase)
+{
+    int length = in.length();
+    int shift = (qreal)(length)*phase/360;
+    QVector<qreal> tmpData;
+
+    for(int i = 0;i<length;i++){
+        tmpData.append(in.at((i+shift)%length));
+    }
+    return tmpData;
 }
 
