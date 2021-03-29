@@ -42,6 +42,8 @@ public:
     WidgetButtons *buttonsEnable;
     WidgetButtons *buttonsMemory;
     WidgetTextInput *customLengthInput;
+    WidgetButtons *buttonSelectFile;
+    int arbChannelsEnabled = 0;
 
     int numChannelsEnabled = 0;
     MemoryLength memorySet = MemoryLength::BEST_FIT;
@@ -50,8 +52,7 @@ public:
     //for each channel
     QScrollArea *verChannArea[MAX_ARB_CHANNELS_NUM];
     WidgetButtons *buttonsShape[MAX_ARB_CHANNELS_NUM];
-    WidgetButtons *buttonSelectFile[MAX_ARB_CHANNELS_NUM];
-    WidgetLabel *labelFile[MAX_ARB_CHANNELS_NUM];
+
     WidgetDialRange *dialFreqCh[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialOffsetCh[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialAmplitudeCh[MAX_ARB_CHANNELS_NUM];

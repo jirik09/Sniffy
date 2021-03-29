@@ -5,6 +5,7 @@
 #include <QScrollArea>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QFileDialog>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"
@@ -62,6 +63,7 @@ private:
 private slots:
     void runGeneratorCallback();
     void createSignalCallback();
+    void openFileCallback();
 
 signals:
     void runGenerator();

@@ -31,11 +31,16 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
     customLengthInput = new WidgetTextInput(parent,"","200",InputTextType::NUMBER);
     customLengthInput->setObjectName("arbgenmemleng");
 
+    buttonSelectFile = new WidgetButtons(parent,1,ButtonTypes::NORMAL,"Arbitrary data");
+    buttonSelectFile->setObjectName("buttonselectfileArbGen");
+    buttonSelectFile->setText("   Select   ");
+
 
     QHBoxLayout *commonButtons = new QHBoxLayout();
     destination->addWidget(buttonsGenerate);
     commonButtons->addWidget(buttonsMemory);
     commonButtons->addWidget(customLengthInput);
+    commonButtons->addWidget(buttonSelectFile);
     destination->addLayout(commonButtons);
     destination->addWidget(buttonsEnable);
 
@@ -71,18 +76,6 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
         buttonsShape[i]->setText("Arb",3);
         verChanBox->addWidget(buttonsShape[i]);
         signalShape[i] = SignalShape::SINE;
-
-
-        buttonSelectFile[i] = new WidgetButtons(parent,1,ButtonTypes::NORMAL,"File");
-        buttonSelectFile[i]->setObjectName("buttonselectfile" + chNStr);
-        buttonSelectFile[i]->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(i)),3);
-
-        verChanBox->addWidget(buttonSelectFile[i]);
-        buttonSelectFile[i]->setText("   Select   ");
-
-        labelFile[i] = new WidgetLabel(parent,"","No File selected");
-        labelFile[i]->setObjectName("fileArbGen" + chNStr);
-        verChanBox->addWidget(labelFile[i]);
 
         dialFreqCh[i] = new WidgetDialRange(parent,"Frequency",i);
         dialFreqCh[i]->setObjectName("arbGenfreq"+chNStr);
@@ -228,8 +221,9 @@ void ArbGenPanelSettings::buttonEnableChannelCallback(int index)
 
 void ArbGenPanelSettings::buttonShapeCallback(int clicked, int channel)
 {
-    labelFile[channel]->hide();
-    buttonSelectFile[channel]->hide();
+    if(signalShape[channel] == SignalShape::ARB && clicked !=3){
+        arbChannelsEnabled--;
+    }
 
     switch (clicked) {
     case 0:
@@ -246,10 +240,16 @@ void ArbGenPanelSettings::buttonShapeCallback(int clicked, int channel)
         break;
     case 3:
         signalShape[channel] = SignalShape::ARB;
+        arbChannelsEnabled++;
         dialDutyCh[channel]->show();
-        labelFile[channel]->show();
-        buttonSelectFile[channel]->show();
+
         break;
+    }
+
+    if(arbChannelsEnabled>0){
+        buttonSelectFile->show();
+    }else{
+        buttonSelectFile->hide();
     }
     signalChangedCallback();
 }
