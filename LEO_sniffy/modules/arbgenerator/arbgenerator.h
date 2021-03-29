@@ -55,7 +55,7 @@ private:
     void setGeneratorDACMode();
     void setDataLength(int channel, int length);
     void setNumChannels(int numChannels);
-    void setSampleFrequency (int channel, int freq);
+    void setFrequency (int channel, qreal freq);
     void genAskForFreq();
     void setOutputBuffer (bool isEnabled);
     void sendNextData();

@@ -50,6 +50,8 @@ public:
     //for each channel
     QScrollArea *verChannArea[MAX_ARB_CHANNELS_NUM];
     WidgetButtons *buttonsShape[MAX_ARB_CHANNELS_NUM];
+    WidgetButtons *buttonSelectFile[MAX_ARB_CHANNELS_NUM];
+    WidgetLabel *labelFile[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialFreqCh[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialOffsetCh[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialAmplitudeCh[MAX_ARB_CHANNELS_NUM];
@@ -72,7 +74,7 @@ signals:
     void signalChanged();
 
 private slots:
-    void buttonEnableChannelCallback(int status);
+    void buttonEnableChannelCallback(int index);
     void buttonShapeCallback(int clicked, int channel);
     void syncWithCH1Callback(int clicked, int channel);
     void signalFrequencyCallback(qreal value, int channel);

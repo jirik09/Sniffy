@@ -81,6 +81,13 @@ void ArbGeneratorWindow::setGeneratorRuning()
     isGenerating = true;
 }
 
+void ArbGeneratorWindow::setGeneratorStopped()
+{
+    setGenerateButton("Start",COLOR_BLUE);
+    isGenerating = false;
+    createSignalCallback();
+}
+
 void ArbGeneratorWindow::setFrequencyLabels(int channel, qreal freq)
 {
     setting->setFreqLabel(LabelFormator::formatOutout(freq,"Hz",4),channel);
@@ -99,8 +106,7 @@ void ArbGeneratorWindow::runGeneratorCallback()
         setGenerateButton("Uploading",COLOR_ORANGE);
     }else{
         emit stopGenerator();
-        setGenerateButton("Start",COLOR_BLUE);
-        isGenerating = false;
+        setGeneratorStopped();
     }
 }
 
@@ -116,59 +122,62 @@ void ArbGeneratorWindow::createSignalCallback()
     qreal maxX;
 
     // **************** build the data for calculation and get the signal lengths. ****************
-    for (int i = 0;i <MAX_ARB_CHANNELS_NUM ;i++ ) {
-        if(setting->channelEnabled[i]){
-            freq->append(setting->dialFreqCh[i]->getRealValue());
+    if(!isGenerating){
+        for (int i = 0;i <MAX_ARB_CHANNELS_NUM ;i++ ) {
+            if(setting->channelEnabled[i]){
+                freq->append(setting->dialFreqCh[i]->getRealValue());
+            }
         }
+
+        lengths = SignalCreator::calculateSignalLengths(setting->memorySet,setting->customLength, spec->generatorBufferSize,*freq,spec->maxSamplingRate,spec->periphClockFrequency);
+        generatorChartData->clear();
+        generatorDACData->clear();
+        maxX = -10000;
+
+        for(int i = 0;i<lengths.length();i++){
+            chartSignal.clear();
+
+            // **************** generate signal based on inputs ****************
+            qreal div = (qreal)(spec->periphClockFrequency)/freq->at(i)/lengths.at(i);
+            if(div<spec->periphClockFrequency/spec->maxSamplingRate){
+                div = spec->periphClockFrequency/spec->maxSamplingRate;
+            }
+            qreal realfreq = spec->periphClockFrequency/(qreal)((int)(div))/lengths.at(i);
+            setting->setLabels(LabelFormator::formatOutout(realfreq,"Hz",3),QString::number(lengths.at(i)),i);
+            signalData = SignalCreator::createSignal(setting->signalShape[i], lengths[i], setting->dialAmplitudeCh[i]->getRealValue(), setting->dialOffsetCh[i]->getRealValue(), setting->dialDutyCh[i]->getRealValue(), setting->dialPhaseCh[i]->getRealValue(),spec->rangeMin,spec->rangeMax);
+            //If it is arb data then handle here and fix the datalength
+
+            // **************** calculate data for charts ****************
+            for (int j=0 ;j<lengths[i] ;j++ ) {
+                y = signalData[j];
+                x = (qreal)(div)/spec->periphClockFrequency*j;// /1/realfreq*j;
+                chartSignal.append(QPointF(x,y));
+                x = (qreal)(div)/spec->periphClockFrequency*(j+1);// /1/realfreq*j;
+                chartSignal.append(QPointF(x,y));
+            }
+            x = (qreal)(div)/spec->periphClockFrequency*lengths[i];
+            chartSignal.append(QPointF(x,chartSignal[0].y()));
+            if(maxX<x){
+                maxX=x;
+            }
+            generatorChartData->append(chartSignal);
+
+            //**************** calculate data for MCU ****************
+            DACData.clear();
+            for (int j=0 ;j<lengths[i] ;j++) {
+                int tmpDAC = ((pow(2,12)-1)*(qreal)(signalData[j]-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
+                DACData.append(tmpDAC);
+            }
+            generatorDACData->append(DACData);
+        }
+
+        // **************** plot the data ****************
+        chart->clearAll();
+        for(int i = 0;i<lengths.length();i++){
+            chart->updateTrace(&((*generatorChartData)[i]), i);
+        }
+        chart->setRange(0,maxX,spec->rangeMin,spec->rangeMax);
     }
-    lengths = SignalCreator::calculateSignalLengths(setting->memorySet,setting->customLength, spec->generatorBufferSize,*freq,spec->maxSamplingRate,spec->periphClockFrequency);
-    generatorChartData->clear();
-    generatorDACData->clear();
-    maxX = -10000;
-
-    for(int i = 0;i<lengths.length();i++){
-        chartSignal.clear();
-
-        // **************** generate signal based on inputs ****************
-        qreal div = (qreal)(spec->periphClockFrequency)/freq->at(i)/lengths.at(i);
-        if(div<spec->periphClockFrequency/spec->maxSamplingRate){
-            div = spec->periphClockFrequency/spec->maxSamplingRate;
-        }
-        qreal realfreq = spec->periphClockFrequency/(qreal)((int)(div))/lengths.at(i);
-        setting->setLabels(LabelFormator::formatOutout(realfreq,"Hz",3),QString::number(lengths.at(i)),i);
-        signalData = SignalCreator::createSignal(setting->signalShape[i], lengths[i], setting->dialAmplitudeCh[i]->getRealValue(), setting->dialOffsetCh[i]->getRealValue(), setting->dialDutyCh[i]->getRealValue(), setting->dialPhaseCh[i]->getRealValue(),spec->rangeMin,spec->rangeMax);
-   //If it is arb data then handle here and fix the datalength
-
-        // **************** calculate data for charts ****************
-        for (int j=0 ;j<lengths[i] ;j++ ) {
-            y = signalData[j];
-            x = (qreal)(div)/spec->periphClockFrequency*j;// /1/realfreq*j;
-            chartSignal.append(QPointF(x,y));
-            x = (qreal)(div)/spec->periphClockFrequency*(j+1);// /1/realfreq*j;
-            chartSignal.append(QPointF(x,y));
-        }
-        x = (qreal)(div)/spec->periphClockFrequency*lengths[i];
-        chartSignal.append(QPointF(x,chartSignal[0].y()));
-        if(maxX<x){
-            maxX=x;
-        }
-        generatorChartData->append(chartSignal);
-
-        //**************** calculate data for MCU ****************
-        DACData.clear();
-        for (int j=0 ;j<lengths[i] ;j++) {
-            int tmpDAC = ((pow(2,12)-1)*(qreal)(signalData[j]-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
-            DACData.append(tmpDAC);
-        }
-        generatorDACData->append(DACData);
-    }
-
-    // **************** plot the data ****************
-    chart->clearAll();
-    for(int i = 0;i<lengths.length();i++){
-        chart->updateTrace(&((*generatorChartData)[i]), i);
-    }
-    chart->setRange(0,maxX,spec->rangeMin,spec->rangeMax);
 
     if(isGenerating){
         emit updateFrequency();

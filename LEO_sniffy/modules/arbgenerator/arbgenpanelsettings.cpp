@@ -72,6 +72,18 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
         verChanBox->addWidget(buttonsShape[i]);
         signalShape[i] = SignalShape::SINE;
 
+
+        buttonSelectFile[i] = new WidgetButtons(parent,1,ButtonTypes::NORMAL,"File");
+        buttonSelectFile[i]->setObjectName("buttonselectfile" + chNStr);
+        buttonSelectFile[i]->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(i)),3);
+
+        verChanBox->addWidget(buttonSelectFile[i]);
+        buttonSelectFile[i]->setText("   Select   ");
+
+        labelFile[i] = new WidgetLabel(parent,"","No File selected");
+        labelFile[i]->setObjectName("fileArbGen" + chNStr);
+        verChanBox->addWidget(labelFile[i]);
+
         dialFreqCh[i] = new WidgetDialRange(parent,"Frequency",i);
         dialFreqCh[i]->setObjectName("arbGenfreq"+chNStr);
         dialFreqCh[i]->setRange(0.1,10000000,"Hz",10,0.01,1000,true);
@@ -112,6 +124,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
         dialPhaseCh[i] = new WidgetDialRange(parent ,"Phase",i);
         dialPhaseCh[i]->setObjectName("arbGenPhase" + chNStr);
         dialPhaseCh[i]->setRange(0,360,"°",5,1,0);
+        dialPhaseCh[i]->setRealValue(i*90,true);
         dialPhaseCh[i]->setColor(Colors::getChannelColorString(i));
         dialPhaseCh[i]->hideUnitSelection();
         verChanBox->addWidget(dialPhaseCh[i]);
@@ -134,7 +147,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
         connect(dialPhaseCh[i],&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::signalChangedCallback);
         setChannelShown(i,false);
     }
-    connect(buttonsEnable,&WidgetButtons::statusChanged,this,&ArbGenPanelSettings::buttonEnableChannelCallback);
+    connect(buttonsEnable,&WidgetButtons::clicked,this,&ArbGenPanelSettings::buttonEnableChannelCallback);
     connect(buttonsMemory,&WidgetButtons::clicked,this,&ArbGenPanelSettings::memoryCallback);
     connect(customLengthInput,&WidgetTextInput::numberChanged,this,&ArbGenPanelSettings::customLenghtCallback);
 
@@ -154,7 +167,12 @@ void ArbGenPanelSettings::setChannelShown(int index, bool isShown)
 
 void ArbGenPanelSettings::restoreGUI()
 {
-    buttonEnableChannelCallback(buttonsEnable->getStatus());
+    for(int i =0;i<MAX_ARB_CHANNELS_NUM;i++){
+        if(buttonsEnable->isChecked(i)){
+            setChannelShown(i,true);
+            channelEnabled[i] = true;
+        }
+    }
     memoryCallback(buttonsMemory->getSelectedIndex());
     customLengthInput->processInput();
     customLenghtCallback(customLengthInput->getValue());
@@ -191,25 +209,28 @@ void ArbGenPanelSettings::setCopyFreq(int fromCh, int toCh)
     dialFreqCh[toCh]->setRealValue(value,true);
 }
 
-void ArbGenPanelSettings::buttonEnableChannelCallback(int status)
+void ArbGenPanelSettings::buttonEnableChannelCallback(int index)
 {
-    int tmpchannelsEnabled = 0;
-    for(int i =0;i<MAX_ARB_CHANNELS_NUM;i++){
-        if((int)(pow(2,i))&(status)){
-            setChannelShown(i,true);
-            tmpchannelsEnabled++;
-            channelEnabled[i] = true;
-        }else{
-            setChannelShown(i,false);
-            channelEnabled[i] = false;
-        }
+    //enable all channels below clicked button
+    for(int i = 0;i<=index;i++){
+        setChannelShown(i,true);
+        channelEnabled[i] = true;
+        buttonsEnable->setChecked(true,i);
     }
-    numChannelsEnabled = tmpchannelsEnabled;
+    for(int i = index+1;i<MAX_ARB_CHANNELS_NUM;i++){
+        setChannelShown(i,false);
+        channelEnabled[i] = false;
+        buttonsEnable->setChecked(false,i);
+    }
+    numChannelsEnabled = index+1;
     signalChangedCallback();
 }
 
 void ArbGenPanelSettings::buttonShapeCallback(int clicked, int channel)
 {
+    labelFile[channel]->hide();
+    buttonSelectFile[channel]->hide();
+
     switch (clicked) {
     case 0:
         signalShape[channel] = SignalShape::SINE;
@@ -226,6 +247,8 @@ void ArbGenPanelSettings::buttonShapeCallback(int clicked, int channel)
     case 3:
         signalShape[channel] = SignalShape::ARB;
         dialDutyCh[channel]->show();
+        labelFile[channel]->show();
+        buttonSelectFile[channel]->show();
         break;
     }
     signalChangedCallback();

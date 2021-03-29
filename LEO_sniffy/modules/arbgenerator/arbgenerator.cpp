@@ -89,13 +89,14 @@ void ArbGenerator::startModule()
 void ArbGenerator::stopModule()
 {
     stopGenerator();
+    arbGenWindow->setGeneratorStopped();
 }
 
 void ArbGenerator::sendSignalCallback(){
     GeneratorData = *arbGenWindow->getGeneratorDACData();
     numChannelsUsed = GeneratorData.length();
     totalToSend = totalSent = 0;
-    lengthToSend = signalLengths[0];
+
     //Memory demand (#Chan * length) has to be reduced first
     if (numChannelsUsed > 1) {
         for(int i = 0;i<numChannelsUsed;i++){
@@ -108,13 +109,15 @@ void ArbGenerator::sendSignalCallback(){
         setNumChannels(numChannelsUsed);
         signalLengths[0] = GeneratorData[0].length();
         setDataLength(0,signalLengths[0]);
+        totalToSend =  signalLengths[0];
     }
 
 
     for(int i = 0;i<numChannelsUsed;i++){
-        setSampleFrequency(i,arbGenWindow->getFrequency(i));
+        setFrequency(i,arbGenWindow->getFrequency(i));
     }
 
+    lengthToSend = signalLengths[0];
     lengthSent = memoryIndex = actualSend = 0;
     sendingChannel = 1;
     sendNextData();
@@ -128,7 +131,7 @@ void ArbGenerator::stopCallback()
 void ArbGenerator::updateFrequencyCallback()
 {
     for (int i = 0;i<numChannelsUsed;i++){
-        setSampleFrequency(i,arbGenWindow->getFrequency(i));
+        setFrequency(i,arbGenWindow->getFrequency(i));
     }
     genAskForFreq();
 }
@@ -146,7 +149,6 @@ void ArbGenerator::sendNextData()
     QDataStream dataStreamHeader(&tmpHeader, QIODevice::WriteOnly);
     int tmp = ((memoryIndex / 256)*256*256*256 + (memoryIndex % 256) * 256*256 + (actualSend * 256) + (sendingChannel));
     dataStreamHeader << tmp;
-    qDebug ()<< QString::number(tmp,16) <<tmpHeader;
     comm->write(tmpHeader+":");
 
     QByteArray tmpData;
@@ -207,9 +209,12 @@ void ArbGenerator::setNumChannels(int numChannels)
     }
 }
 
-void ArbGenerator::setSampleFrequency(int channel, int freq)
+void ArbGenerator::setFrequency(int channel, qreal freq)
 {
-    int tmp = (freq*signalLengths[channel])*256 + (channel+1)%256;
+    int tmp = ((int)(round(freq*signalLengths[channel])))*256 + (channel+1)%256;
+    if(round(freq*signalLengths[channel])> static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate){
+        tmp = static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate*256 + (channel+1)%256;
+    }
     comm->write(cmd->GENERATOR,cmd->SAMPLING_FREQ,tmp);
 }
 

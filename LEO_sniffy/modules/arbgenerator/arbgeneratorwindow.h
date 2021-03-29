@@ -42,8 +42,8 @@ public:
     qreal getFrequency(int channel);
     void setProgress(int percent);
     void setGeneratorRuning();
+    void setGeneratorStopped();
     void setFrequencyLabels(int channel, qreal freq);
-
 
 private:
     void setGenerateButton (QString text, QString color);
