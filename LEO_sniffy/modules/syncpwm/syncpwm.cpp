@@ -158,13 +158,9 @@ void SyncPwm::dialFreqCallback(float val, int chanIndex){
     quint32 freq = (quint32)(val * FREQ_PRECISION);
     QByteArray data = intToSend(freq)+":"+intToSend(FREQ_PRECISION)+":"+intToSend(chanIndex);
     comm->write(cmd->SYNC_PWM_GEN+":"+cmd->SPWM_FREQ_CONFIG+":"+data+";");
-}
 
-void SyncPwm::dialDutyCallback(float val, int chanIndex){
-    config->chan[chanIndex].dutyCycle = val;
-    quint32 dutyCycle = (quint32)(val * DUTY_PRECISION);
-    quint32 phase = (quint32)(config->chan[chanIndex].phase * PHASE_PRECISION);
-    setDutyPhase(dutyCycle, phase, chanIndex);
+    if(config->common.equiMode && chanIndex == 0)
+        equiModeSetFreq(val);
 }
 
 void SyncPwm::dialPhaseCallback(float val, int chanIndex){
@@ -172,6 +168,19 @@ void SyncPwm::dialPhaseCallback(float val, int chanIndex){
     quint32 phase = (quint32)(val * PHASE_PRECISION);
     quint32 dutyCycle = (quint32)(config->chan[chanIndex].dutyCycle * DUTY_PRECISION);
     setDutyPhase(dutyCycle, phase, chanIndex);
+
+    if(config->common.equiMode && chanIndex == 0)
+        equiModeCalcAndSetPhase(val);
+}
+
+void SyncPwm::dialDutyCallback(float val, int chanIndex){
+    config->chan[chanIndex].dutyCycle = val;
+    quint32 dutyCycle = (quint32)(val * DUTY_PRECISION);
+    quint32 phase = (quint32)(config->chan[chanIndex].phase * PHASE_PRECISION);
+    setDutyPhase(dutyCycle, phase, chanIndex);
+
+    if(config->common.equiMode && chanIndex == 0)
+        equiModeCalcAndSetDuty(val);
 }
 
 void SyncPwm::setDutyPhase(quint32 dutyCycle, quint32 phase, quint32 chanIndex){
@@ -181,6 +190,24 @@ void SyncPwm::setDutyPhase(quint32 dutyCycle, quint32 phase, quint32 chanIndex){
                 +":"+intToSend(phase)
                 +":"+intToSend(PHASE_PRECISION)
                 +":"+intToSend(chanIndex)+";");
+}
+
+void SyncPwm::equiModeSetFreq(float val){
+    dialFreqCallback(val, 1);
+    dialFreqCallback(val, 2);
+    dialFreqCallback(val, 3);
+}
+
+void SyncPwm::equiModeCalcAndSetPhase(float val){
+    dialPhaseCallback(val*2, 1);
+    dialPhaseCallback(val*3, 2);
+    dialPhaseCallback(val*4, 3);
+}
+
+void SyncPwm::equiModeCalcAndSetDuty(float val){
+    dialDutyCallback(val, 1);
+    dialDutyCallback(val, 2);
+    dialDutyCallback(val, 3);
 }
 
 void SyncPwm::write(QByteArray feature, QByteArray param){

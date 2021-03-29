@@ -36,6 +36,10 @@ private:
 
     void stepGenEndNotif();
 
+    void equiModeSetFreq(float val);
+    void equiModeCalcAndSetPhase(float val);
+    void equiModeCalcAndSetDuty(float val);
+
 signals:
 
 private slots:

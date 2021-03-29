@@ -144,3 +144,17 @@ void SyncPwmSettings::greyOutComplementChanFreqDials(int chanIndex){
     dialFreqCh[chanIndex]->setDisabled(true);
     dialFreqCh[chanIndex]->setColor(colDisable);
 }
+
+void SyncPwmSettings::setFreqDial(float val, int chanIndex){
+    //dialFreqCh[chanIndex]->setRealValue(val, 1);
+}
+
+void SyncPwmSettings::setPhaseDial(float val, int chanIndex){
+
+}
+
+void SyncPwmSettings::setDutyDial(float val, int chanIndex){
+
+}
+
+

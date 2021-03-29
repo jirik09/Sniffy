@@ -36,6 +36,9 @@ public:
                                               COLOR_PURPLE};
 
     void greyOutComplementChanFreqDials(int chanIndex);
+    void setFreqDial(float val, int chanIndex);
+    void setPhaseDial(float val, int chanIndex);
+    void setDutyDial(float val, int chanIndex);
 
 private:
 
