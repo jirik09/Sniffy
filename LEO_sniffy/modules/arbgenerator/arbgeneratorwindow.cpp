@@ -58,6 +58,7 @@ void ArbGeneratorWindow::setSpecification(ArbGeneratorSpec* spec)
 {
     this->spec = spec;
     setting->setMaxNumChannels(spec->maxDACChannels);
+    fileLoader->setSignalRangeParameters(spec->DACResolution,spec->rangeMin,spec->rangeMax);
 }
 
 QList<QList<int>> *ArbGeneratorWindow::getGeneratorDACData() const
@@ -230,16 +231,35 @@ void ArbGeneratorWindow::openFileCallback()
     QString fileName;
     int tmp = 0;
     fileName = QFileDialog::getOpenFileName(this,"Select output file","","Text files (*.csv *.txt)");
-    tmp = fileLoader->openFile(fileName);
-    qDebug() << fileName << QString::number(tmp) <<fileLoader->getInfoString();
-
-    if(fileLoader->isSamplerateDefined()){
-        for (int i = 0;i<fileLoader->getNumChannels();i++){
+    tmp = fileLoader->parseFile(fileName);
+    for (int i = 0;i<fileLoader->getNumChannels();i++){
+        if(fileLoader->isSamplerateDefined()){
             setting->dialFreqCh[i]->setRealValue(fileLoader->getSamplerateFrequency()/fileLoader->getSignalLength(i));
-            setting->dialAmplitudeCh[i]->setRealValue(fileLoader->getAmplitude(i));
-            setting->dialOffsetCh[i]->setRealValue(fileLoader->getOffset(i));
-            setting->dialPhaseCh[i]->setRealValue(0,true);
         }
+        setting->dialAmplitudeCh[i]->setRealValue(fileLoader->getAmplitude(i));
+        setting->dialOffsetCh[i]->setRealValue(fileLoader->getOffset(i));
+        setting->dialPhaseCh[i]->setRealValue(0,true);
     }
+    if(tmp>0){
+        if(fileLoader->getParsingErrors()==0){
+            setting->labelArbFileInfo->setName("File parsed:");
+            setting->labelArbFileInfo->setValue(fileLoader->getInfoString());
+        }else{
+            setting->labelArbFileInfo->setName("File parsed with errors:");
+            setting->labelArbFileInfo->setValue(QString::number(fileLoader->getParsingErrors()));
+        }
+
+
+    }else if(tmp==-1){
+        setting->labelArbFileInfo->setValue("Could not open the file");
+        setting->labelArbFileInfo->setName("Error");
+    }else if(tmp==-2){
+        setting->labelArbFileInfo->setValue("No valid separator (, or ;)");
+        setting->labelArbFileInfo->setName("Error");
+    }else if(tmp==-4){
+        setting->labelArbFileInfo->setValue("File name is incorrect");
+        setting->labelArbFileInfo->setName("Error");
+    }
+
     createSignalCallback();
 }

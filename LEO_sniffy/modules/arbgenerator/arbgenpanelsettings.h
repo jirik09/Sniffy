@@ -43,7 +43,15 @@ public:
     WidgetButtons *buttonsMemory;
     WidgetTextInput *customLengthInput;
     WidgetButtons *buttonSelectFile;
+    WidgetButtons *buttonSWSweepEnable;
+    WidgetLabel *labelArbFileInfo;
     int arbChannelsEnabled = 0;
+
+    WidgetDialRange *dialFreqSweepMin;
+    WidgetDialRange *dialFreqSweepMax;
+    WidgetDialRange *dialFreqSweepTime;
+
+    QHBoxLayout *sweepControl;
 
     int numChannelsEnabled = 0;
     MemoryLength memorySet = MemoryLength::BEST_FIT;
@@ -82,6 +90,7 @@ private slots:
     void signalChangedCallback();
     void memoryCallback(int index);
     void customLenghtCallback(qreal value);
+    void buttonSweepCallback(int index);
 };
 
 #endif // ARBGENPANELSETTINGS_H
