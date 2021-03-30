@@ -230,7 +230,7 @@ void ArbGeneratorWindow::openFileCallback()
 {
     QString fileName;
     int tmp = 0;
-    fileName = QFileDialog::getOpenFileName(this,"Select output file","","Text files (*.csv *.txt)");
+    fileName = QFileDialog::getOpenFileName(this,"Select input file","","Text files (*.csv *.txt)");
     tmp = fileLoader->parseFile(fileName);
     for (int i = 0;i<fileLoader->getNumChannels();i++){
         if(fileLoader->isSamplerateDefined()){

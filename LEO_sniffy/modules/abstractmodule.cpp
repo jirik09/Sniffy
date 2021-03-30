@@ -267,6 +267,16 @@ int AbstractModule::getResources()
     return moduleSpecification->getResources();
 }
 
+bool AbstractModule::isModuleRestored() const
+{
+    return moduleRestored;
+}
+
+void AbstractModule::setModuleRestored(bool value)
+{
+    moduleRestored = value;
+}
+
 void AbstractModule::held(bool held){
     emit holdClicked(held);
 }

@@ -193,18 +193,21 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 
     foreach(module, modulesList){
         if(module->getModuleName()==moduleName){
-            status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
-            config = settings.value(module->getModuleName()+"config").toByteArray();
-            module->parseConfiguration(config);
+            if(!module->isModuleRestored()){
+                status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
+                config = settings.value(module->getModuleName()+"config").toByteArray();
+                module->parseConfiguration(config);
 
-            module->restoreGeometry(layout);
-            if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE){
-                if(status == ModuleStatus::PAUSE)
-                    status = ModuleStatus::PLAY;
-                module->writeConfiguration();
-                module->startModule();
+                module->restoreGeometry(layout);
+                if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE){
+                    if(status == ModuleStatus::PAUSE)
+                        status = ModuleStatus::PLAY;
+                    module->writeConfiguration();
+                    module->startModule();
+                }
+                module->setModuleStatus(status);
+                module->setModuleRestored(true);
             }
-            module->setModuleStatus(status);
         }
     }
 }
