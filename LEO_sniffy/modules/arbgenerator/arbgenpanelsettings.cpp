@@ -344,9 +344,10 @@ void ArbGenPanelSettings::syncWithCH1Callback(int clicked, int channel)
     }else{
         channelSyncWithCH1[channel] = true;
         setCopyFreq(0,channel);
-        emit syncRequest();
     }
     signalChangedCallback();
+
+    if(clicked != 0) emit syncRequest();
 }
 
 void ArbGenPanelSettings::signalFrequencyCallback(qreal value, int channel)

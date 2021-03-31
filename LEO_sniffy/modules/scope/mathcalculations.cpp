@@ -53,8 +53,6 @@ void MathCalculations::run()
 
         this->errorPosition=calcSymbolic(data,tmpTrace,expression);
 
-        if (restart)
-            break;
         if (abort)
             return;
 

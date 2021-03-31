@@ -57,6 +57,7 @@ public:
 
     void updateMeasurement(QList<Measurement*> m);
     void updateMath(QVector<QPointF> mathTrace);
+    void updateFFTchart(QVector<QPointF> fftTrace);
     void mathError(int errorPosition);
     void restoreGUIAfterStartup();
 
@@ -72,6 +73,7 @@ signals:
     void channelEnableChanged(int buttonStatus);
     void measurementChanged(Measurement *m);
     void mathExpressionChanged(QString exp);
+    void fftChanged(int length, FFTWindow window, FFTType type, int channelIndex);
     void measurementClearChanged();
     void verticalChanged();
     void resolutionChanged(int resolution);
@@ -94,6 +96,7 @@ private slots:
     void measurementAddedCallback(Measurement *m);
     void measurementClearCallback();
     void mathExpressionCallback(QString exp);
+    void fftChangedCallback(int length, FFTWindow window, FFTType type, int channelIndex);
     void sliderShiftCallback(int value);
 
     void chartLocalZoomCallback();
@@ -117,8 +120,11 @@ private:
     ScopeConfig *config;
     widgetChart *chart;
 
+    widgetChart *chartFFT;
+
     QVector<QVector<QPointF>> ChartData;
     QVector<QPointF> ChartMathData;
+    QVector<QPointF> ChartFFTData;
     int triggerChannelIndex =0;
 
     WidgetLabelArea *labelInfoPanel;

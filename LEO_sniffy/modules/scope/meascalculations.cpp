@@ -129,8 +129,6 @@ void MeasCalculations::run()
             }
         }
 
-        if (restart)
-            break;
         if (abort)
             return;
         if (!restart)

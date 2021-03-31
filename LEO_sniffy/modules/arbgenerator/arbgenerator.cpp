@@ -136,11 +136,9 @@ void ArbGenerator::updateFrequencyCallback() //this function counts only with tw
         for (int i = 0;i<numChannelsUsed;i++){
             setSamplingFrequency(i,arbGenWindow->getFrequency(i)*signalLengths[i]);
         }
-
     }else{
         //qDebug () << "updated both synced";
         setSamplingFrequency(99,arbGenWindow->getFrequency(0)*signalLengths[0]);
-
     }
     genAskForFreq();
 }

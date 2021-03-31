@@ -13,7 +13,6 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     mathType->setDisabledButton(true,1);
     mathType->setText("Symbolic",2);
     mathType->setText(" FFT ",3);
-    mathType->setDisabledButton(true,3);
 
     destination->addWidget(new WidgetSeparator(parent,""));
 
@@ -96,7 +95,6 @@ void PanelMath::typeChanged(int index)
 
     switch (index) {
     case 0:
-        emit expressionChanged("");
         break;
     case 1:
         btnChannelASel->show();
@@ -110,13 +108,30 @@ void PanelMath::typeChanged(int index)
         symbolicExample->show();
         symbolicExpressionCallback(symbolicExpression->getText());
         break;
+    case 3:
+        fftCallback();
+        break;
     }
+
+    if(previousMathType == 2){
+        emit expressionChanged("");
+    }else if(previousMathType == 3){
+        emit fftChanged(0, FFTWindow::rectangular, FFTType::periodogram, 0);
+    }
+
+    previousMathType = index;
 }
 
 void PanelMath::symbolicExpressionCallback(QString exp)
 {
     errorExp = symbolicExpression->getText();
     if(mathType->getSelectedIndex()==2) emit expressionChanged(exp);
+}
+
+void PanelMath::fftCallback()
+{
+    //TODO emit data from GUI
+    emit fftChanged(1024, FFTWindow::rectangular, FFTType::periodogram, 0);
 }
 
 void PanelMath::hideAll()
