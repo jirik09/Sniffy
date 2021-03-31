@@ -29,7 +29,10 @@ void ArbGenSweepController::setParameters(qreal minFreq, qreal maxFreq, qreal to
 
 void ArbGenSweepController::startTimer()
 {
-    if(!isRunning)timer->start();
+    if(!isRunning){
+        timerCallback();
+        timer->start();
+    }
     isRunning = true;
 }
 
