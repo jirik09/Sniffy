@@ -114,7 +114,7 @@ void ArbGenerator::sendSignalCallback(){
 
 
     for(int i = 0;i<numChannelsUsed;i++){
-        setFrequency(i,arbGenWindow->getFrequency(i));
+        setSamplingFrequency(i,arbGenWindow->getFrequency(i)*signalLengths[i]);
     }
 
     lengthToSend = signalLengths[0];
@@ -130,17 +130,28 @@ void ArbGenerator::stopCallback()
 
 void ArbGenerator::updateFrequencyCallback()
 {
-    for (int i = 0;i<numChannelsUsed;i++){
-        setFrequency(i,arbGenWindow->getFrequency(i));
+    if(arbGenWindow->getFrequency(1) != arbGenWindow->getFrequency(0)){
+        for (int i = 0;i<numChannelsUsed;i++){
+            setSamplingFrequency(i,arbGenWindow->getFrequency(i)*signalLengths[i]);
+        }
+        qDebug () << "synced independently";
+    }else{
+        setSamplingFrequency(99,arbGenWindow->getFrequency(0)*signalLengths[0]);
+        qDebug () << "synced both";
     }
     genAskForFreq();
+}
+
+void ArbGenerator::updateAllChannelsFreqCallback(qreal freq)
+{
+    setSamplingFrequency(100,freq);
 }
 
 void ArbGenerator::sendNextData()
 {
     comm->write(cmd->GENERATOR+":"+cmd->CMD_GEN_DATA + " ");
-    if (lengthToSend > DATA_BLOCK_SIZE){
-        actualSend = DATA_BLOCK_SIZE;
+    if (lengthToSend > SEND_BLOCK_SIZE){
+        actualSend = SEND_BLOCK_SIZE;
     }else{
         actualSend = lengthToSend;
     }
@@ -163,7 +174,6 @@ void ArbGenerator::sendNextData()
     memoryIndex += actualSend;
     totalSent += actualSend;
 }
-
 
 void ArbGenerator::startGenerator()
 {
@@ -209,11 +219,13 @@ void ArbGenerator::setNumChannels(int numChannels)
     }
 }
 
-void ArbGenerator::setFrequency(int channel, qreal freq)
+void ArbGenerator::setSamplingFrequency(int channel, qreal freq)
 {
-    int tmp = ((int)(round(freq*signalLengths[channel])))*256 + (channel+1)%256;
-    if(round(freq*signalLengths[channel])> static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate){
-        tmp = static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate*256 + (channel+1)%256;
+    int tmp = (int)(round(freq))*256 + (channel+1)%256;
+    int maxSamplingRate = static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate;
+
+    if(round(freq) > maxSamplingRate){
+        tmp = maxSamplingRate*256 + (channel+1)%256;
     }
     comm->write(cmd->GENERATOR,cmd->SAMPLING_FREQ,tmp);
 }

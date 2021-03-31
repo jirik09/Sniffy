@@ -74,6 +74,7 @@ public:
     SignalShape signalShape[MAX_ARB_CHANNELS_NUM];
     bool channelEnabled[MAX_ARB_CHANNELS_NUM];
     bool channelSyncWithCH1[MAX_ARB_CHANNELS_NUM];
+    bool isSweepEnabled = false;
 
 
 private:
@@ -91,6 +92,7 @@ private slots:
     void memoryCallback(int index);
     void customLenghtCallback(qreal value);
     void buttonSweepCallback(int index);
+    void sweepSettingsCallback();
 };
 
 #endif // ARBGENPANELSETTINGS_H

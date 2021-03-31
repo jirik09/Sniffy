@@ -37,9 +37,12 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *pare
     generatorChartData = new QVector<QVector<QPointF>>;
     generatorDACData = new QList<QList<int>>;
 
+    sweepController = new ArbGenSweepController();
+
     connect(setting,&ArbGenPanelSettings::signalChanged,this,&ArbGeneratorWindow::createSignalCallback);
     connect(setting->buttonsGenerate,&WidgetButtons::clicked,this,&ArbGeneratorWindow::runGeneratorCallback);
     connect(setting->buttonSelectFile,&WidgetButtons::clicked,this,&ArbGeneratorWindow::openFileCallback);
+    connect(sweepController, &ArbGenSweepController::updateSweepFrequency, this,&ArbGeneratorWindow::sweepTimerCallback);
 }
 
 ArbGeneratorWindow::~ArbGeneratorWindow()
@@ -80,6 +83,9 @@ void ArbGeneratorWindow::setGeneratorRuning()
 {
     setGenerateButton("Stop",COLOR_GREEN);
     isGenerating = true;
+    if(setting->isSweepEnabled){
+        sweepController->startTimer();
+    }
 }
 
 void ArbGeneratorWindow::setGeneratorStopped()
@@ -87,6 +93,9 @@ void ArbGeneratorWindow::setGeneratorStopped()
     setGenerateButton("Start",COLOR_BLUE);
     isGenerating = false;
     createSignalCallback();
+    if(setting->isSweepEnabled){
+        sweepController->stopTimer();
+    }
 }
 
 void ArbGeneratorWindow::setFrequencyLabels(int channel, qreal freq)
@@ -211,8 +220,6 @@ void ArbGeneratorWindow::createSignalCallback()
             }
         }
 
-
-
         // **************** plot the data ****************
         chart->clearAll();
         for(int i = 0;i<numChannelsUsed;i++){
@@ -221,7 +228,16 @@ void ArbGeneratorWindow::createSignalCallback()
         chart->setRange(0,maxX,spec->rangeMin,spec->rangeMax);
     }
 
+    if(setting->isSweepEnabled){
+        sweepController->setParameters(setting->dialFreqSweepMin->getRealValue(),setting->dialFreqSweepMax->getRealValue(),setting->dialFreqSweepTime->getRealValue());
+    }
+
     if(isGenerating){
+        if(setting->isSweepEnabled){
+            sweepController->startTimer();
+        }else{
+            sweepController->stopTimer();
+        }
         emit updateFrequency();
     }
 }
@@ -249,7 +265,6 @@ void ArbGeneratorWindow::openFileCallback()
             setting->labelArbFileInfo->setValue(QString::number(fileLoader->getParsingErrors()));
         }
 
-
     }else if(tmp==-1){
         setting->labelArbFileInfo->setValue("Could not open the file");
         setting->labelArbFileInfo->setName("Error");
@@ -262,4 +277,10 @@ void ArbGeneratorWindow::openFileCallback()
     }
 
     createSignalCallback();
+}
+
+void ArbGeneratorWindow::sweepTimerCallback(qreal frequency)
+{
+    setting->dialFreqCh[0]->setRealValue(frequency,true);
+    emit updateFrequency();  //todo Update only channels linked with CH1
 }

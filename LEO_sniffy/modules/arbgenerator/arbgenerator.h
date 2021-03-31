@@ -10,6 +10,7 @@
 #include "arbgeneratorwindow.h"
 #include "arbgeneratordefs.h"
 
+
 class ArbGenerator : public AbstractModule
 {
     Q_OBJECT
@@ -33,6 +34,7 @@ private slots:
     void sendSignalCallback();
     void stopCallback();
     void updateFrequencyCallback();
+    void updateAllChannelsFreqCallback(qreal freq);
 
 private:
     ArbGeneratorConfig *config;
@@ -55,7 +57,7 @@ private:
     void setGeneratorDACMode();
     void setDataLength(int channel, int length);
     void setNumChannels(int numChannels);
-    void setFrequency (int channel, qreal freq);
+    void setSamplingFrequency (int channel, qreal freq);
     void genAskForFreq();
     void setOutputBuffer (bool isEnabled);
     void sendNextData();
