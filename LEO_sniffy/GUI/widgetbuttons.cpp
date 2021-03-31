@@ -9,9 +9,10 @@ Class for buttons.
 #include "widgetbuttons.h"
 #include "ui_widgetbuttons.h"
 
-WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString name, int defaultSelectedIndex) :
+WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString name, int defaultSelectedIndex, int optionalEmitParam) :
     QWidget(parent),
-    ui(new Ui::WidgetButtons)
+    ui(new Ui::WidgetButtons),
+    optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
     setObjectName(name);
@@ -22,8 +23,6 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
     }else{
         ui->label->hide();
     }
-
-    //pushButtonsList = new QList<QPushButton*>();
 
     pushButtonsList.append(ui->pushButton_1);
     pushButtonsList.append(ui->pushButton_2);
@@ -51,28 +50,15 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
         ui->pushButton_8->hide();
 
     if(type==ButtonTypes::CHECKABLE || type==ButtonTypes::RADIO){
-        ui->pushButton_1->setCheckable(true);
-        ui->pushButton_2->setCheckable(true);
-        ui->pushButton_3->setCheckable(true);
-        ui->pushButton_4->setCheckable(true);
-        ui->pushButton_5->setCheckable(true);
-        ui->pushButton_6->setCheckable(true);
-        ui->pushButton_7->setCheckable(true);
-        ui->pushButton_8->setCheckable(true);
+        foreach(QPushButton *btn, pushButtonsList){
+            btn->setCheckable(true);
+        }
         setChecked(true,defaultSelectedIndex);
     }
 
-
-    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},0);
-    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},1);
-    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},2);
-    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},3);
-    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},4);
-    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},5);
-    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},6);
-    setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},7);
-
-
+    for(int i = 0; i < 8 ; i++){
+        setColor({"background-color:"+QString::fromUtf8(COLOR_BLUE)},i);
+    }
 
     connect(ui->pushButton_1,SIGNAL(clicked()),this,SLOT(button_1_Clicked()));
     connect(ui->pushButton_2,SIGNAL(clicked()),this,SLOT(button_2_Clicked()));
@@ -105,7 +91,6 @@ void WidgetButtons::restoreGeometry(QByteArray geom)
             index = geom.toInt()-1;
         }
         setChecked(true,index);
-        emit clicked(index);
     }else{
         int status = geom.toInt();
         if(status & 0x01){
@@ -132,7 +117,6 @@ void WidgetButtons::restoreGeometry(QByteArray geom)
         if(status & 0x80){
             setChecked(true,7);
         }
-        emit statusChanged(status);
     }
 }
 
@@ -142,7 +126,6 @@ void WidgetButtons::setText(QString text, int index){
 
 QString WidgetButtons::getText(int index){
     return pushButtonsList.at(index)->text();
-
 }
 
 void WidgetButtons::setColor(QString text, int index){
@@ -162,16 +145,15 @@ void WidgetButtons::clickedInternal (int index){
         uncheckAll();
         setChecked(true, index);
     }
-    emit clicked(index);
+    emit clicked(index,optionalEmitParam);
 
     int status = 0;
-
     for (int i=0;i<8;i++) {
         if(isChecked(i)){
             status += qPow(2,i);
         }
     }
-    emit statusChanged(status);
+    emit statusChanged(status, optionalEmitParam);
 }
 
 bool WidgetButtons::isChecked (int index){
@@ -241,14 +223,9 @@ void WidgetButtons::button_8_Clicked(){
 }
 
 void WidgetButtons::uncheckAll(){
-    ui->pushButton_1->setChecked(false);
-    ui->pushButton_2->setChecked(false);
-    ui->pushButton_3->setChecked(false);
-    ui->pushButton_4->setChecked(false);
-    ui->pushButton_5->setChecked(false);
-    ui->pushButton_6->setChecked(false);
-    ui->pushButton_7->setChecked(false);
-    ui->pushButton_8->setChecked(false);
+    foreach(QPushButton *btn, pushButtonsList){
+        btn->setChecked(false);
+    }
 }
 
 void WidgetButtons::setChecked (bool checked, int index){
@@ -256,4 +233,19 @@ void WidgetButtons::setChecked (bool checked, int index){
         uncheckAll();
     }
     pushButtonsList.at(index)->setChecked(checked);
+}
+
+void WidgetButtons::setButtonHidden(bool hidden, int index)
+{
+    int i = 0;
+    foreach(QPushButton *btn, pushButtonsList){
+        if(index==i){
+            if(hidden){
+                btn->hide();
+            }else{
+                btn->show();
+            }
+        }
+        i++;
+    }
 }

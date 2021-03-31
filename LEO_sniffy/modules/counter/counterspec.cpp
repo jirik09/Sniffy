@@ -1,10 +1,13 @@
 #include "counterspec.h"
 
-CounterSpec::CounterSpec(QByteArray data, QObject *parent) : QObject(parent)
+CounterSpec::CounterSpec(QObject *parent)
 {
-    QDataStream stream(data);
-    stream >> hf_max >> hf_min_Tg100ms >> hf_min_Tg500ms >> hf_min_Tg1s >> hf_min_Tg5s >> hf_min_Tg10s;
-    stream >> lf_max >> lf_min;
+    Q_UNUSED(parent);
+}
+void CounterSpec::parseSpecification(QByteArray spec){
+    QDataStream stream(spec);
+    stream >> resources >> hf_max >> hf_min_Tg100ms >> hf_min_Tg500ms >> hf_min_Tg1s;
+    stream >> hf_min_Tg5s >> hf_min_Tg10s >> lf_max >> lf_min;
     stream >> rat_max_ref >> rat_max_chan;
 
     char chars[4] = "";

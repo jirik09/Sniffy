@@ -35,6 +35,13 @@ void WidgetList::associateNumber(QString prefix, float num, QString affix){
     model->setStringList(list);
 }
 
+void WidgetList::associateString(QString prefix, QString num, QString affix){
+    QString newStr = list.first() + prefix + num + affix;
+    list.removeFirst();
+    list.prepend(newStr);
+    model->setStringList(list);
+}
+
 void WidgetList::appendAssociatedString(QString str){
     QString newStr = list.first() + str;
     list.removeFirst();

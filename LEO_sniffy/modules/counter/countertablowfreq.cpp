@@ -32,10 +32,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     dialSampleCountCh2->setRange(1, SAMPLE_COUNT, "Smpls", 1, 1, 1, false);
     dialSampleCountCh2->hideUnitSelection();
     destination->addWidget(dialSampleCountCh2);
-    QString colorStyleSheet = lfCh2BckgndColor;
-    dialSampleCountCh2->setDialButtonsColor(colorStyleSheet);
-    colorStyleSheet = lfCh2TextColor;
-    dialSampleCountCh2->setDialColor(colorStyleSheet);
+    dialSampleCountCh2->setColor(Colors::getChannelColorString(12));
     dialSampleCountCh2->hide();
 
     WidgetSeparator *separatorMultiplierSwitch = new WidgetSeparator(parent,"Sample Count multiplier");

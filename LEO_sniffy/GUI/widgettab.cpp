@@ -51,7 +51,7 @@ QByteArray widgetTab::saveGeometry()
 void widgetTab::restoreGeometry(QByteArray geom)
 {
     ui->tabWidget->setCurrentIndex(geom.toInt());
-    emit tabBarClicked(geom.toInt());
+    //emit tabBarClicked(geom.toInt());
 }
 
 void widgetTab::on_tabWidget_currentChanged(int index)

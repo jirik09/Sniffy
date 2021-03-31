@@ -26,23 +26,27 @@ void DeviceSpec::parseSpecification(QByteArray spec){
         streamUID>>UID2;
         streamUID>>UID3;
 
-        FW_Version = specParams[6];
-        FREE_RTOS_Version = specParams[8];
-        HAL_Version = specParams[10];
+        MCU_ID = "0x"+QString::number(UID2 + (UID3>>16),16);
 
-        QDataStream streamBuffLeng(specParams[12]);
+        Build_Date = specParams[5];
+
+        FW_Version = specParams[7];
+        FREE_RTOS_Version = specParams[9];
+        HAL_Version = specParams[11];
+
+        QDataStream streamBuffLeng(specParams[13]);
         streamBuffLeng>>bufferLength;
 
-        QDataStream streamUARTSpeed(specParams[13]);
+        QDataStream streamUARTSpeed(specParams[14]);
         streamUARTSpeed>>uartSpeed;
 
-        TX_pin = specParams[14];
-        RX_pin = specParams[15];
+        TX_pin = specParams[15];
+        RX_pin = specParams[16];
 
-        if(specParams.length()>=18){
+        if(specParams.length()>=19){
             useUsb = true;
-            DP_pin = specParams[17];
-            DM_pin = specParams[18];
+            DP_pin = specParams[18];
+            DM_pin = specParams[19];
         }
         isSpecificationLoaded = true;
     }

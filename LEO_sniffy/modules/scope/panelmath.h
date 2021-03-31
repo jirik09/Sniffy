@@ -35,8 +35,9 @@ public:
 
     WidgetButtons *btnChannelFFTSel;
 
-private slots:
+public slots:
     void typeChanged(int index);
+private slots:
     void symbolicExpressionCallback(QString exp);
 
 private:

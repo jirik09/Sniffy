@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QtMath>
 #include <QString>
+#include <QDebug>
 
 #include "../graphics/colors.h"
 #include "../graphics/styles.h"
@@ -26,7 +27,7 @@ class WidgetButtons : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetButtons(QWidget *parent = nullptr, int num = 1, ButtonTypes type = ButtonTypes::NORMAL, QString name = "", int defaultSelectedIndex = 0);
+    explicit WidgetButtons(QWidget *parent = nullptr, int num = 1, ButtonTypes type = ButtonTypes::NORMAL, QString name = "", int defaultSelectedIndex = 0, int optionalEmitParam = 0);
     ~WidgetButtons();
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
@@ -39,9 +40,11 @@ public:
     int getStatus();
     void setDisabledButton(bool disabled, int index);
     void setEnabledButton(bool enabled, int index);
+    void setButtonHidden(bool hidden, int index);
     void disableAll();
     void enableAll(bool enable);
     void setChecked (bool checked, int index);
+
 
 private:
     Ui::WidgetButtons *ui;
@@ -50,6 +53,7 @@ private:
     ButtonTypes type = ButtonTypes::NORMAL;
 
     QList<QPushButton*> pushButtonsList;
+    int optionalEmitParam = 0;
 
     void uncheckAll();
 
@@ -65,8 +69,8 @@ private slots:
 
 
 signals:
-    void clicked(int index);
-    void statusChanged(int status);
+    void clicked(int index, int optionalEmitParam = 0);
+    void statusChanged(int status, int optionalEmitParam = 0);
 };
 
 #endif // WIDGETBUTTONS_H

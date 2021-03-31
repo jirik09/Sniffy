@@ -6,17 +6,19 @@ Comment: similar to button widget set to 2 buttons, radio and on off text. Diffe
 #include "widgetswitch.h"
 #include "ui_widgetswitch.h"
 
-WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftName, QString rightName, QString name) :
+WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftName, QString rightName, QString name, int optionalEmitParam) :
     QWidget(parent),
-    ui(new Ui::WidgetSwitch)
+    ui(new Ui::WidgetSwitch),
+    optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
 
     ui->label_name->setText(name);
     setObjectName(name);
 
-    ui->pushButton_left->setStyleSheet(SELECTED_STYLE);
-    ui->pushButton_right->setStyleSheet(NOT_SELECTED_STYLE);
+    ui->pushButton_left->setCheckable(true);
+    ui->pushButton_right->setCheckable(true);
+    setLeft(true);
 
     ui->pushButton_left->setText(leftName);
     ui->pushButton_right->setText(rightName);
@@ -42,26 +44,41 @@ QByteArray WidgetSwitch::saveGeometry()
 void WidgetSwitch::restoreGeometry(QByteArray geom)
 {
     if (geom == "L"){
-        setLeft();
+        setLeft(true);
     }else{
-        setRight();
+        setRight(true);
     }
 }
 
-void WidgetSwitch::setLeft(){
-    ui->pushButton_left->setStyleSheet(SELECTED_STYLE);
-    ui->pushButton_right->setStyleSheet(NOT_SELECTED_STYLE);
-    emit clicked(0);
+void WidgetSwitch::setLeft(bool silent){
+    ui->pushButton_left->setStyleSheet(styleSelected);
+    ui->pushButton_right->setStyleSheet(styleNotSelected);
+    ui->pushButton_left->setChecked(true);
+    ui->pushButton_right->setChecked(false);
+    if (!silent)
+        emit clicked(0,optionalEmitParam);
 }
 
-void WidgetSwitch::setRight(){
-    ui->pushButton_right->setStyleSheet(SELECTED_STYLE);
-    ui->pushButton_left->setStyleSheet(NOT_SELECTED_STYLE);
-    emit clicked(1);
+void WidgetSwitch::setRight(bool silent){
+    ui->pushButton_right->setStyleSheet(styleSelected);
+    ui->pushButton_left->setStyleSheet(styleNotSelected);
+    ui->pushButton_right->setChecked(true);
+    ui->pushButton_left->setChecked(false);
+    if(!silent)
+        emit clicked(1,optionalEmitParam);
 }
 
 bool WidgetSwitch::isCheckedLeft(){
     return (ui->pushButton_left->isChecked());
+}
+
+void WidgetSwitch::setColor(QString color){
+    styleSelected = color;
+    if(ui->pushButton_right->isChecked()){
+        setRight(true);
+    }else {
+        setLeft(true);
+    }
 }
 
 bool WidgetSwitch::isCheckedRight(){

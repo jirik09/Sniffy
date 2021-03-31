@@ -8,9 +8,10 @@ Class for widget with dial and controls
 #include "ui_widgetdial.h"
 
 
-WidgetDial::WidgetDial(QWidget *parent, QString name) :
+WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     QWidget(parent),
-    ui(new Ui::WidgetDial)
+    ui(new Ui::WidgetDial),
+    optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
     ui->label_name->setText(name);
@@ -22,6 +23,11 @@ WidgetDial::WidgetDial(QWidget *parent, QString name) :
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
     options = new QList<params_dial>;
+
+    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+"} "
+                    "QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +"}";
+
+    ui->widget->setStyleSheet(style);
 }
 
 WidgetDial::~WidgetDial()
@@ -37,7 +43,9 @@ QByteArray WidgetDial::saveGeometry()
 
 void WidgetDial::restoreGeometry(QByteArray geom)
 {
-    setSelectedIndex(geom.toInt());
+    disconnect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
+    setSelectedIndex(geom.toInt(),true);
+    connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
 }
 
 void WidgetDial::addOption (QString shownValue, QString unit,float realValue){
@@ -62,21 +70,31 @@ int WidgetDial::getSelectedIndex() const
     return selectedIndex;
 }
 
-void WidgetDial::setSelectedIndex(int index){
+qreal WidgetDial::getRealValue() const
+{
+    return options->at(selectedIndex).realValue;
+}
+
+void WidgetDial::setSelectedIndex(int index, bool silent){
     ui->dial->setValue(index);
     ui->comboBox->setCurrentIndex(index);
 
     ui->label_unit->setText(options->at(index).unit);
     ui->label_value->setText(options->at(index).shownValue);
     selectedIndex = index;
-    emit valueChanged(options->at(index).realValue);
+    if(!silent){
+        emit valueChanged(options->at(index).realValue,optionalEmitParam);
+    }
 }
 
 void WidgetDial::setColor(QString color){
-    QString style = "color:"+color;
+    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_DARK_GREY)+"} "
+                    "QWidget{color:"+color +"}";
     ui->widget_dial->setStyleSheet(style);
 
-    style = "background-color:"+color;
+    style = "QPushButton:disabled{background-color: "+QString::fromUtf8(BACKGROUND_COLOR_BUTTON_DISABLED)+" color: "+QString::fromUtf8(COLOR_GREY)+"}"
+            "QPushButton:pressed{border: 2px solid "+QString::fromUtf8(BACKGROUND_COLOR_APP)+"}"
+            "QPushButton{border: none;background-color:"+color +"}";
     ui->pushButton_plus->setStyleSheet(style);
     ui->pushButton_minus->setStyleSheet(style);
 }

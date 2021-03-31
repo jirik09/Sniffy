@@ -28,8 +28,7 @@ public:
 private:
 
     CounterWindow *cntWindow;
-    CounterConfig *conf;
-    CounterSpec *spec;
+    CounterConfig *config;
 
     void startCounting();
     void stopCounting();
@@ -51,7 +50,7 @@ private:
     /* High Frequency Counter */
     MovingAverage *movAvg;
     QString strQerr, strTerr, avgQerr;
-    float avg;
+    float avg;    
 
     void parseHighFrequencyCounter(QByteArray data);
     void hfReloadState();

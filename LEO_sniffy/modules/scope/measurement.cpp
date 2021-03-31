@@ -19,14 +19,14 @@ void Measurement::setLabel(const QString &label)
     this->label = label;
 }
 
-QString Measurement::getValue() const
+QString Measurement::getValueString() const
 {
-    return value;
+    return valueString;
 }
 
-void Measurement::setValue(const QString &value)
+void Measurement::setValueString(const QString &value)
 {
-    this->value = value;
+    this->valueString = value;
 }
 
 MeasurementType Measurement::getType() const
@@ -37,5 +37,15 @@ MeasurementType Measurement::getType() const
 qint32 Measurement::getChannelIndex() const
 {
     return channelIndex;
+}
+
+qreal Measurement::getValue() const
+{
+    return value;
+}
+
+void Measurement::setValue(const qreal &value)
+{
+    this->value = value;
 }
 

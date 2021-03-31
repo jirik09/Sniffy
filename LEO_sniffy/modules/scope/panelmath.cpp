@@ -52,6 +52,7 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     symbolicTitle = new WidgetLabel(parent,"Type an expression");
     destination->addWidget(symbolicTitle);
     symbolicExpression = new WidgetTextInput(parent,"","a+b");
+    symbolicExpression->setObjectName("symbExpr");
     destination->addWidget(symbolicExpression);
     symbolicDesc = new WidgetLabel(parent,"Use:","t=time, a=CH1, b=CH2, ...");
     destination->addWidget(symbolicDesc);
@@ -84,7 +85,7 @@ void PanelMath::symbolicError(int errorPosition)
         symbolicExample->setStyleSheet("font: 10pt \"Courier New\";");
         symbolicExample->setName("here ");
         QString out;// = QString("^%*s").arg(symbolicExpression->getText().length()-errorPosition).arg("");
-        out.sprintf("^%*s", errorExp.length()-errorPosition, "");
+        out = QString::asprintf("^%*s", errorExp.length()-errorPosition, "");
         symbolicExample->setValue(out);
     }
 }

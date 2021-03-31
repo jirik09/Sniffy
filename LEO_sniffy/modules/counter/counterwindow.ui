@@ -43,7 +43,9 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">QWidget{
+background-color: rgb(58, 58, 58);
+}</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
    <property name="spacing">
@@ -85,10 +87,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QWidget{
-background-color: rgb(58, 58, 58);
-}
-</string>
+      <string notr="true"/>
      </property>
      <property name="lineWidth">
       <number>1</number>

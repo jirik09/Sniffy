@@ -19,17 +19,21 @@ public:
     QString getLabel() const;
     void setLabel(const QString &value);
 
-    QString getValue() const;
-    void setValue(const QString &value);
+    QString getValueString() const;
+    void setValueString(const QString &value);
 
     MeasurementType getType() const;
 
     qint32 getChannelIndex() const;
 
+    qreal getValue() const;
+    void setValue(const qreal &value);
+
 private:
     MeasurementType type;
     QString label;
-    QString value;
+    QString valueString;
+    qreal value;
     qint32 channelIndex;
 };
 

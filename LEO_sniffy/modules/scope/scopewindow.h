@@ -26,6 +26,7 @@
 #include "panelmeasurement.h"
 #include "panelcursors.h"
 #include "panelmath.h"
+#include "paneladvanced.h"
 #include "scopeconfig.h"
 
 #define CHART_MAX_Y 7
@@ -40,7 +41,7 @@ class ScopeWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit ScopeWindow(QWidget *parent = nullptr);
+    explicit ScopeWindow(ScopeConfig *config, QWidget *parent = nullptr);
     ~ScopeWindow();
     void paintEvent(QPaintEvent *event);
 
@@ -57,7 +58,7 @@ public:
     void updateMeasurement(QList<Measurement*> m);
     void updateMath(QVector<QPointF> mathTrace);
     void mathError(int errorPosition);
-    void passConfig(ScopeConfig &conf);
+    void restoreGUIAfterStartup();
 
 
 signals:
@@ -73,6 +74,7 @@ signals:
     void mathExpressionChanged(QString exp);
     void measurementClearChanged();
     void verticalChanged();
+    void resolutionChanged(int resolution);
 
 
 private slots:
@@ -80,6 +82,8 @@ private slots:
     void channelVerticalScaleCallback(float value);
     void channelVerticalShiftCallback(float value);
     void timeBaseCallback(float value);
+    void samplingFreqInputCallback (int freq);
+    void dataLengthInputCallback (int length);
     void channelEnableCallback(int buttonStatus);
     void longMemoryCallback(int index);
     void pretriggerCallback(float value);
@@ -100,6 +104,7 @@ private slots:
     void cursorValueHorBCallback(float value);
     void cursorValueVerACallback(float value);
     void cursorValueVerBCallback(float value);
+    void resolutionChangedCallback(int index);
 
     void updateCursorReadings();
 
@@ -120,6 +125,7 @@ private:
     PanelMeasurement *panelMeas;
     PanelCursors *panelCursors;
     PanelMath *panelMath;
+    PanelAdvanced *panelAdvanced;
 
     void updateChartTimeScale(float timeBase);
     void fillTimeBase();

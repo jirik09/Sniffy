@@ -21,7 +21,7 @@ const QByteArray Commands::RESET_DEVICE = "RES!";
 
 const QByteArray Commands::GENERATOR = "GEN_";
 const QByteArray Commands::PWM_GENERATOR = "GENP";
-const QByteArray Commands::SYNC_PWM_GEN = "SYNP";
+const QByteArray Commands::SYNC_PWM_GEN = "SPWM";
 const QByteArray Commands::LOG_ANLYS = "LOGA";
 const QByteArray Commands::COUNTER = "CNT_";
 const QByteArray Commands::SCOPE = "OSCP";
@@ -34,6 +34,7 @@ const QByteArray Commands::START = "STRT";
 const QByteArray Commands::PAUSE = "PAUS";
 const QByteArray Commands::UNPAUSE = "UPAU";
 const QByteArray Commands::NEXT = "NEXT";
+const QByteArray Commands::CONFIG = "CFG_";
 
 const QByteArray Commands::GET_REAL_SMP_FREQ = "FRQ?";
 const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";
@@ -115,6 +116,34 @@ const QByteArray Commands::CHANNELS_2 = "2CH_";
 const QByteArray Commands::CHANNELS_3 = "3CH_";
 const QByteArray Commands::CHANNELS_4 = "4CH_";
 
+/**************************** GENERATOR ****************************/
+const QByteArray Commands::CMD_GEN_MODE = "MODE";
+const QByteArray Commands::CMD_MODE_PWM = "PWM_";
+const QByteArray Commands::CMD_MODE_DAC = "DAC_";
+const QByteArray Commands::CMD_GEN_DATA = "DATA";
+const QByteArray Commands::CMD_GEN_OK = "G_OK";
+const QByteArray Commands::CMD_GEN_NEXT = "G_NX";
+const QByteArray Commands::CMD_GEN_SAMPLING_FREQ = "FREQ";
+const QByteArray Commands::CMD_GEN_OUTBUFF_ON =	"B_ON";
+const QByteArray Commands::CMD_GEN_OUTBUFF_OFF = "B_OF";
+const QByteArray Commands::CMD_GEN_DATA_LENGTH_CH1 = "LCH1";
+const QByteArray Commands::CMD_GEN_DATA_LENGTH_CH2 = "LCH2";
+const QByteArray Commands::CMD_GEN_CHANNELS = "CHAN";
+const QByteArray Commands::CMD_GEN_START = "STRT";
+const QByteArray Commands::CMD_GEN_STOP = "STOP";
+const QByteArray Commands::CMD_GEN_RESET = "RSET";
+const QByteArray Commands::CMD_GET_PWM_CONFIG = "PCF?";
+const QByteArray Commands::CMD_GEN_PWM_DEINIT =	"GPDI";
+//onst QByteArray Commands::CMD_GEN_PWM_FREQ_PSC = "FPWP";
+//const QByteArray Commands::CMD_GEN_PWM_FREQ_ARR =	"FPWA";
+const QByteArray Commands::CMD_GEN_PWM_FREQ_CH1 = "GFR1";
+const QByteArray Commands::CMD_GEN_PWM_FREQ_CH2	= "GFR2";
+const QByteArray Commands::CMD_GEN_DAC_VAL = "DAC_";
+const QByteArray Commands::CMD_GEN_PWM_REAL_FREQ_CH1 = "GPR1";
+const QByteArray Commands::CMD_GEN_PWM_REAL_FREQ_CH2 = "GPR2";
+const QByteArray Commands::CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH1 = "GSR1";
+const QByteArray Commands::CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH2 = "GSR2";
+
 /************************ COUNTER ***********************/
 // Counter complete deinit
 const QByteArray Commands::COUNTER_DEINIT = "DEIN";
@@ -180,3 +209,31 @@ const QByteArray Commands::INT_EVENT_FALL_CH1 = "FO1_";
 const QByteArray Commands::INT_EVENT_FALL_CH2 = "FO2_";
 const QByteArray Commands::INT_EVENT_SEQUENCE_AB = "SQAB";
 const QByteArray Commands::INT_EVENT_SEQUENCE_BA = "SQBA";
+
+/************************ SYNC PWM GENERATOR ***********************/
+//Syncronized PWM generator general commands
+const QByteArray Commands::SPWM_COMMAND = "SCOM";
+
+const QByteArray Commands::SPWM_INIT = "INIT";
+const QByteArray Commands::SPWM_DEINIT = "DINI";
+
+//Set frequency command
+const QByteArray Commands::SPWM_FREQ_CH12 = "SP12";
+const QByteArray Commands::SPWM_FREQ_CH34 = "SP34";
+const QByteArray Commands::SPWM_DUTYPHASE_CONFIG = "SPDP";
+
+//Individual channels run or not
+const QByteArray Commands::SPWM_CHANNEL_INVERT = "SPCI";
+const QByteArray Commands::SPWM_CHANNEL_STATE = "SSTA";
+const int Commands::SPWM_CHANNEL_ENABLE = 1;
+const int Commands::SPWM_CHANNEL_DISABLE = 0;
+const int Commands::SPWM_CHANNEL1 = 1;
+const int Commands::SPWM_CHANNEL2 = 2;
+const int Commands::SPWM_CHANNEL3 = 3;
+const int Commands::SPWM_CHANNEL4 = 4;
+
+// One pulse mode to let the timer disable after overflow
+const QByteArray Commands::SPWM_STEP_MODE = "STEP";
+const QByteArray Commands::SPWM_STEP_ENABLE = "STEE";
+const QByteArray Commands::SPWM_STEP_DISABLE = "STED";
+

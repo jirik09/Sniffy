@@ -6,6 +6,14 @@
 #include "modules/device/device.h"
 #include "modules/scope/scope.h"
 #include "modules/counter/counter.h"
+#include "modules/voltmeter/voltmeter.h"
+#include "modules/syncpwm/syncpwm.h"
+#include "modules/arbgenerator/arbgenerator.h"
+#include "modules/patterngenerator/patterngenerator.h"
+#include "modules/pwmgenerator/pwmgenerator.h"
+#include "modules/voltagesource/voltagesource.h"
+#include "modules/template/templatemodule.h"
+
 
 class DeviceMediator : public QObject
 {
@@ -18,6 +26,9 @@ public:
     bool getIsConnected() const;
     QString getDeviceName();
 
+    int getResourcesInUse() const;
+    void setResourcesInUse(int value);
+
 signals:
     void loadLayout(QString Devicename);
 
@@ -29,6 +40,7 @@ private:
     Comms *communication;
 
     bool isConnected = false;
+    int resourcesInUse = 0;
 
 private slots:
     void parseData(QByteArray data);
@@ -36,6 +48,8 @@ private slots:
     void handleError(QByteArray error);
     void ScanDevices();
     void open(int deviceIndex);
+    void blockConflictingModulesCallback(QString moduleName, int resources);
+    void releaseConflictingModulesCallback(QString moduleName, int resources);
 
 public slots:
     void close();

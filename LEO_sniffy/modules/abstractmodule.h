@@ -15,6 +15,10 @@
 #include "../GUI/widgetdialrange.h"
 #include "../GUI/widgetswitch.h"
 #include "../GUI/widgettab.h"
+#include "../GUI/widgetselection.h"
+#include "../GUI/widgettextinput.h"
+
+#include "abstractspecification.h"
 
 class AbstractModule : public QObject
 {
@@ -46,6 +50,7 @@ public:
     void showModuleWindow();
     void closeModule();
     void disableModule();
+    bool isActive();
 
     void setIcon (QString ImageURI);
 
@@ -54,6 +59,11 @@ public:
 
     void showModuleHoldButton();
 
+    int getResources();
+
+    bool isModuleRestored() const;
+    void setModuleRestored(bool value);
+
 protected:
     QString moduleName;
     QString moduleIconURI;
@@ -61,10 +71,13 @@ protected:
     Comms *comm;
     QByteArray moduleCommandPrefix;
 
+    AbstractSpecification* moduleSpecification;
+
 private:
     ModuleDockWidget *dockWidgetWindow;
     WidgetControlModule *moduleControlWidget;
     bool dockWinCreated = false;
+    bool moduleRestored = false;
 
 public slots:
     void widgetControlClicked(ModuleStatus status);
@@ -74,6 +87,8 @@ signals:
     void moduleCreated();
     void holdClicked(bool held);
     void loadModuleLayoutAndConfig(QString moduleName);
+    void blockConflictingModules(QString moduleName, int resources);
+    void releaseConflictingModules(QString moduleName, int resources);
 
 };
 

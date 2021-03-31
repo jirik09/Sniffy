@@ -38,7 +38,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorHorADial->hide();
 
     cursorHorBDial = new WidgetDialRange(parent ,"Cursor B");
-    cursorHorADial->setObjectName("horCurB");
+    cursorHorBDial->setObjectName("horCurB");
     cursorHorBDial->setRange(-0.0001,0.0001,"s",0.1,0.000000001,0);
     cursorHorBDial->setColor(Colors::getChannelColorString(0));
     cursorHorBDial->hideUnitSelection();
@@ -47,7 +47,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorHorBDial->hide();
 
     cursorVerADial = new WidgetDialRange(parent ,"Cursor A");
-    cursorHorADial->setObjectName("verCurA");
+    cursorVerADial->setObjectName("verCurA");
     cursorVerADial->setRange(-1,1,"V",10,0.01,0);
     cursorVerADial->setColor(Colors::getChannelColorString(0));
     cursorVerADial->hideUnitSelection();
@@ -56,7 +56,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorVerADial->hide();
 
     cursorVerBDial = new WidgetDialRange(parent ,"Cursor B");
-    cursorHorADial->setObjectName("verCurB");
+    cursorVerBDial->setObjectName("verCurB");
     cursorVerBDial->setRange(-1,1,"V",10,0.01,0);
     cursorVerBDial->setColor(Colors::getChannelColorString(0));
     cursorVerBDial->hideUnitSelection();

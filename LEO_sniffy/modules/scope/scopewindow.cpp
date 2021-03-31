@@ -10,9 +10,10 @@ But it can be easily coppied so we can keep some template file.
 #include "scopewindow.h"
 #include "ui_scopewindow.h"
 
-ScopeWindow::ScopeWindow(QWidget *parent) :
+ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ScopeWindow)
+    ui(new Ui::ScopeWindow),
+    config(config)
 {
     ui->setupUi(this);
 
@@ -26,12 +27,13 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************
-    widgetTab *tabs = new widgetTab(ui->widget_settings,4);
+    widgetTab *tabs = new widgetTab(ui->widget_settings,5);
     ui->verticalLayout_settings->addWidget(tabs);
     tabs->setText("Set",0);
     tabs->setText("Meas",1);
     tabs->setText("Cursors",2);
     tabs->setText("Math",3);
+    tabs->setText("Adv",4);
 
     // ************************* creating widget general settings *******************
     panelSet = new PanelSettings(tabs->getLayout(0),tabs);
@@ -65,8 +67,15 @@ ScopeWindow::ScopeWindow(QWidget *parent) :
     connect(panelCursors->cursorVerADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerACallback);
     connect(panelCursors->cursorVerBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerBCallback);
 
+    // ********************* create panel Math ****************
     panelMath = new PanelMath(tabs->getLayout(3),tabs);
     connect(panelMath,&PanelMath::expressionChanged,this,&ScopeWindow::mathExpressionCallback);
+
+    // ********************* create panel Advanced ****************
+    panelAdvanced = new PanelAdvanced(tabs->getLayout(4),tabs);
+    connect(panelAdvanced->resolutionButtons,&WidgetButtons::clicked,this,&ScopeWindow::resolutionChangedCallback);
+    connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::samplingFreqInputCallback);
+    connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::longMemoryCallback);
 
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
@@ -125,6 +134,11 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
                 chart-> setHorizontalMarker(i,zeroMarkerPosition,MarkerType::TICK);
             }
 
+            float triggerMarkerPosition = (config->channelOffset[i]+(qreal(config->triggerLevel)/65535*(config->rangeMax-config->rangeMin)/1000))/config->channelScale[i];
+            if(panelSet->buttonsTriggerChannel->getSelectedIndex()==i){
+                chart-> setHorizontalMarker(i,triggerMarkerPosition,MarkerType::TRIGGER);
+            }
+
             labelInfoPanel->setChannelLabelVisible(i,true);
             labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/div"));
 
@@ -134,7 +148,6 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
             panelCursors->cursorVerBDial->updateRange(config->rangeMin,(float)(config->rangeMax)/1000);
         }
     }
-
     chart->setVerticalMarker(triggerChannelIndex,0);
 }
 
@@ -192,6 +205,14 @@ void ScopeWindow::timeBaseCallback(float value){
     updateChartTimeScale(value);
     previousTimeBase = value;
 }
+void ScopeWindow::samplingFreqInputCallback(int freq){
+    timeBaseCallback(1.0/(qreal)(freq)*100);
+}
+
+void ScopeWindow::dataLengthInputCallback(int length)
+{
+    if (length>=100) emit memoryLengthChanged(length);
+}
 
 void ScopeWindow::longMemoryCallback(int index){
     emit memoryLengthChanged(index);
@@ -203,10 +224,17 @@ void ScopeWindow::pretriggerCallback(float value){
 
 void ScopeWindow::triggerValueCallback(float value){
     emit triggerValueChanged(value/3.3*100);
+    paintTraces(ChartData,ChartMathData);
 }
 
 void ScopeWindow::triggerChannelCallback(int index){
     emit triggerChannelChanged(index);
+    paintTraces(ChartData,ChartMathData);
+
+    panelSet->dialPretrigger->setColor(Colors::getChannelColorString(index));
+    panelSet->dialTriggerValue->setColor(Colors::getChannelColorString(index));
+    panelSet->buttonsTriggerEdge->setColor("background-color:"+Colors::getChannelColorString(index),0);
+    panelSet->buttonsTriggerEdge->setColor("background-color:"+Colors::getChannelColorString(index),1);
 }
 
 void ScopeWindow::triggerEdgeCallback(int index){
@@ -281,6 +309,7 @@ void ScopeWindow::mathExpressionCallback(QString exp)
 
 void ScopeWindow::sliderShiftCallback(int value){
     chart->setShift((float)value/10);
+    config->chartShift = (float)value/10;
 }
 
 void ScopeWindow::chartLocalZoomCallback()
@@ -371,6 +400,14 @@ void ScopeWindow::cursorValueVerBCallback(float value)
     }
 }
 
+void ScopeWindow::resolutionChangedCallback(int index){
+    if(index==0){
+        emit resolutionChanged(8);
+    }else{
+        emit resolutionChanged(12);
+    }
+}
+
 void ScopeWindow::updateCursorReadings()
 {
     if(config->cursorsActiveIndex == 2){
@@ -404,9 +441,26 @@ void ScopeWindow::mathError(int errorPosition)
     panelMath->symbolicError(errorPosition);
 }
 
-void ScopeWindow::passConfig(ScopeConfig &conf)
+void ScopeWindow::restoreGUIAfterStartup()
 {
-    this->config = &conf;
+    chart->setLocalZoom(config->chartLocalZoom);
+    chart->setShift(config->chartShift);
+    ui->sliderSignal->setValue((chart->getShift()*2000)-1000);
+
+    int vertical = panelSet->buttonsChannelVertical->getSelectedIndex();
+    panelSet->dialVerticalScale->setColor(Colors::getChannelColorString(vertical));
+    panelSet->dialVerticalShift->setColor(Colors::getChannelColorString(vertical));
+
+    channelEnableCallback(panelSet->buttonsChannelEnable->getStatus());
+    cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());
+    triggerChannelCallback(panelSet->buttonsTriggerChannel->getSelectedIndex());
+    resolutionChangedCallback(panelAdvanced->resolutionButtons->getSelectedIndex());
+
+    panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
+    panelMath->typeChanged(panelMath->mathType->getSelectedIndex());
+    if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
+        panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+    }
 }
 
 void ScopeWindow::singleSamplingDone(){
@@ -436,6 +490,7 @@ void ScopeWindow::updateChartTimeScale(float timeBase){
     }else{
         labelInfoPanel->setStyleSheet(QString::fromUtf8("color:")+COLOR_WHITE);
     }
+    config->chartLocalZoom = chart->getLocalZoom();
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/div"));
 }
 

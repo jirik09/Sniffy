@@ -4,12 +4,11 @@ Scope::Scope(QObject *parent)
 {
     Q_UNUSED(parent);
     config = new ScopeConfig();
-    specification = new ScopeSpec();
+    moduleSpecification = new ScopeSpec();
     measCalc = new MeasCalculations();
     mathCalc = new MathCalculations();
-    scpWindow = new ScopeWindow();
+    scpWindow = new ScopeWindow(config);
     scpWindow->setObjectName("scpWindow");
-    scpWindow->passConfig(*config);
 
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SCOPE;
@@ -28,6 +27,7 @@ Scope::Scope(QObject *parent)
     connect(scpWindow, &ScopeWindow::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
     connect(scpWindow, &ScopeWindow::triggerChannelChanged,this,&Scope::updateTriggerChannel);
     connect(scpWindow, &ScopeWindow::memoryLengthChanged,this,&Scope::updateMemoryLength);
+    connect(scpWindow, &ScopeWindow::resolutionChanged,this,&Scope::updateResolution);
 
     connect(scpWindow, &ScopeWindow::measurementChanged,this, &Scope::addMeasurement);
     connect(scpWindow, &ScopeWindow::measurementClearChanged, this, &Scope::clearMeasurement);
@@ -35,7 +35,6 @@ Scope::Scope(QObject *parent)
 
     connect(scpWindow, &ScopeWindow::mathExpressionChanged,this,&Scope::updateMathExpression);
     connect(mathCalc, &MathCalculations::mathCalculated, this, &Scope::updateMath);
-
 }
 
 void Scope::parseData(QByteArray data){
@@ -43,7 +42,7 @@ void Scope::parseData(QByteArray data){
 
     if(dataHeader=="CFG_"){
         data.remove(0,4);
-        specification->parseSpecification(data);
+        moduleSpecification->parseSpecification(data);
         showModuleControl();
 
     }else if(dataHeader=="SMPL"){
@@ -56,8 +55,8 @@ void Scope::parseData(QByteArray data){
     }else if(dataHeader=="OSC_"){
         quint8 tmpByte;
         quint16 tmpShort;
-        qreal minX;
-        qreal maxX;
+        qreal minX = 0;
+        qreal maxX = 0.1;
         qreal x(0);
         qreal y(0);
         int resolution;
@@ -104,8 +103,6 @@ void Scope::parseData(QByteArray data){
                     tmpShort = tmpByte;
                     streamBuffLeng>>tmpByte;
                     tmpShort += tmpByte*256;
-                    x = 0;
-                    y = 0;
                     x=j*1.0/samplingFreq + minX;
                     y=(tmpShort*(float)(config->rangeMax-config->rangeMin)/(pow(2,config->ADCresolution)-1)+config->rangeMin)/1000;
                     points.append(QPointF(x,y));
@@ -113,7 +110,17 @@ void Scope::parseData(QByteArray data){
                 maxX = x;
                 config->timeMax = maxX;
             }else{
-                qDebug() << "TODO <8bit data parser";
+                minX = float(config->dataLength)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
+                config->timeMin = minX;
+                for (int j(0); j < length; j++){
+                    streamBuffLeng>>tmpByte;
+                    tmpShort = tmpByte;
+                    x=j*1.0/samplingFreq + minX;
+                    y=(tmpShort*(float)(config->rangeMax-config->rangeMin)/(pow(2,config->ADCresolution)-1)+config->rangeMin)/1000;
+                    points.append(QPointF(x,y));
+                }
+                maxX = x;
+                config->timeMax = maxX;
             }
 
             while(numChannels<scopeData->length()){ //remove signals which will not be filled
@@ -128,7 +135,7 @@ void Scope::parseData(QByteArray data){
         }
 
         if(currentChannel==numChannels){
-            measCalc->calculate(*scopeData,scopeMeas,config->realSamplingRate);
+            measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
             mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
             scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
 
@@ -137,7 +144,6 @@ void Scope::parseData(QByteArray data){
             float zoomMultLength = config->signalMegazoom==true?1:(float)config->dataLength/1200;
             scpWindow->setDataMinMaxTimeAndZoom(minX,maxX,zoomMultSampling*zoomMultLength);
             scpWindow->setRealSamplingRate(samplingFreq);
-
 
             //handle single trigger
             if(config->triggerMode!=ScopeTriggerMode::TRIG_SINGLE){
@@ -153,9 +159,14 @@ void Scope::parseData(QByteArray data){
 }
 
 void Scope::writeConfiguration(){
+    if(isConfigurationWritten)return;
+
+    isConfigurationWritten = true;
+    scpWindow->restoreGUIAfterStartup();
+
+    comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
     updateTimebase(config->timeBase);
 
-    //this one will be done like others
     setDataLength(config->dataLength);
 
     updateTriggerLevel(config->triggerLevelPercent);
@@ -167,7 +178,6 @@ void Scope::writeConfiguration(){
 
     setNumberOfChannels(config->numberOfChannels);
     updateTriggerMode(config->triggerMode);
-
 }
 
 void Scope::parseConfiguration(QByteArray config){
@@ -178,11 +188,16 @@ QByteArray Scope::getConfiguration(){
 }
 
 void Scope::stopModule(){
+    isModuleStarted = false;
+    isConfigurationWritten = false;
     stopSampling();
     measCalc->exit();
     mathCalc->exit();
 }
 void Scope::startModule(){
+    if (isModuleStarted)return;
+
+    isModuleStarted = true;
     startSampling();
 }
 
@@ -239,18 +254,28 @@ void Scope::updateMemoryLength(int length){
         config->longestDataLength = false;
         config->signalMegazoom = false;
     }
-    if(length>0 && length<100){
+    if(length>0 && length<10){
         config->longestDataLength = true;
         config->signalMegazoom = length==2?true:false;
 
         if(config->ADCresolution>8){
-            config->dataLength = specification->memorySize/config->numberOfChannels/2;
+            config->dataLength = static_cast<ScopeSpec*>(moduleSpecification)->memorySize/config->numberOfChannels/2;
         }else{
-            config->dataLength = specification->memorySize/config->numberOfChannels;
+            config->dataLength = static_cast<ScopeSpec*>(moduleSpecification)->memorySize/config->numberOfChannels;
         }
+    }else if (length > 0 && length >=100){
+        config->dataLength = length;
+        config->longestDataLength = false;
+        config->signalMegazoom = false;
     }
     updateTimebase(config->timeBase);
     setDataLength(config->dataLength);
+}
+
+void Scope::updateResolution(int resolution)
+{
+    config->ADCresolution = resolution;
+    setResolution(resolution);
 }
 
 void Scope::updateChannelsEnable(int buttonStatus){
@@ -285,16 +310,18 @@ void Scope::updateChannelsEnable(int buttonStatus){
 }
 
 void Scope::addMeasurement(Measurement *m){
-    scopeMeas.append(m);
-    if(scopeMeas.length()>9){
-        scopeMeas.removeFirst();
+    config->scopeMeasList.append(m);
+    if(config->scopeMeasList.length()>9){
+        config->scopeMeasList.removeFirst();
     }
-    measCalc->calculate(*scopeData,scopeMeas,config->realSamplingRate);
+    config->measCount= config->scopeMeasList.length();
+    measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
 }
 
 void Scope::clearMeasurement(){
-    scopeMeas.clear();
-    updateMeasurement(scopeMeas);
+    config->scopeMeasList.clear();
+    config->measCount = 0;
+    updateMeasurement(config->scopeMeasList);
 }
 
 void Scope::updateMeasurement(QList<Measurement*> m){
@@ -342,6 +369,15 @@ void Scope::setNumberOfChannels(int num){
     case 4:
         comm->write(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_4+";");
         break;
+    }
+}
+
+void Scope::setResolution(int res)
+{
+    if(res==8){
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_DATA_DEPTH+":"+cmd->DATA_DEPTH_8B+";");
+    }else{
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_DATA_DEPTH+":"+cmd->DATA_DEPTH_12B+";");
     }
 }
 

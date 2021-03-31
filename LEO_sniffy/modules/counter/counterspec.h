@@ -3,12 +3,14 @@
 
 #include <QObject>
 #include <QDataStream>
+#include "../abstractspecification.h"
 
-class CounterSpec : public QObject
+class CounterSpec : public AbstractSpecification
 {
     Q_OBJECT
 public:
-    explicit CounterSpec(QByteArray data, QObject *parent = nullptr);
+    explicit CounterSpec(QObject *parent = nullptr);
+    void parseSpecification(QByteArray spec);
 
     int hf_max;
     int hf_min_Tg100ms;
@@ -33,7 +35,7 @@ public:
     QList<QString> pinsList = { pins.hf_ch1,
                                 pins.lf_ch1, pins.lf_ch2,
                                 pins.rat_ref, pins.rat_ch3,
-                                pins.int_ch1, pins.int_ch2,};
+                                pins.int_ch1, pins.int_ch2 };
 
 signals:
 

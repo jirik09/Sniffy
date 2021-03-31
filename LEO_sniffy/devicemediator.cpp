@@ -14,11 +14,24 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 }
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
-    QList<QSharedPointer<AbstractModule>> modules;
-    modules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
-    modules.append(QSharedPointer<AbstractModule> (new Scope(this)));
-    modules.append(QSharedPointer<AbstractModule> (new Counter(this)));
-    return modules;
+    QList<QSharedPointer<AbstractModule>> tmpModules;
+    tmpModules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Scope(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Counter(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Voltmeter(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new SyncPwm(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new PWMGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
+
+    foreach(QSharedPointer<AbstractModule> mod, tmpModules){
+        connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
+        connect(mod.data(), &AbstractModule::releaseConflictingModules, this, &DeviceMediator::releaseConflictingModulesCallback);
+    }
+
+    return tmpModules;
 }
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::getModulesList(){
@@ -62,6 +75,27 @@ void DeviceMediator::open(int deviceIndex){
     }
 }
 
+void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int resources)
+{
+    if(resourcesInUse & resources){
+        qDebug () << "FATAL ERROR - trying to open conflicting resources";
+    }
+    foreach(QSharedPointer<AbstractModule> mod, modules){
+        if(mod->getResources() & resources && mod->getModuleName()!=moduleName)
+            mod->setModuleStatus(ModuleStatus::LOCKED);
+    }
+    resourcesInUse = resourcesInUse | resources;
+}
+
+void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int resources)
+{
+    foreach(QSharedPointer<AbstractModule> mod, modules){
+        if(mod->getResources() & resources && mod->getModuleName()!=moduleName)
+            mod->setModuleStatus(ModuleStatus::STOP);
+    }
+    resourcesInUse = (resourcesInUse ^ resources) & resourcesInUse;
+}
+
 void DeviceMediator::close(){
     if(isConnected){
         foreach(QSharedPointer<AbstractModule> mod, modules){
@@ -88,20 +122,28 @@ void DeviceMediator::parseData(QByteArray data){
     //What if data belongs to voltmeter and scope???????????
     //Solution1: each module has to know if it is running or not and handle data correctly.
     foreach(QSharedPointer<AbstractModule> module, modules){
-        if(dataHeader == module->getCommandPrefix()){
+        if(dataHeader == module->getCommandPrefix() && (module->isActive() || dataToPass.left(4) == "CFG_" || dataToPass.left(4) == "ACK_")){
             module->parseData(dataToPass);
             isDataPassed=true;
         }
     }
     if(!isDataPassed){
-        qDebug() << "ERROR: this data was not passed to any module" << data;
+        if(data.length()<30){
+            qDebug() << "ERROR: this data was not passed to any module" << data;
+        }else{
+            qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
+        }
+        if (data.right(1)=="E"){
+            qDebug() << "DEVICE ERROR " << QString::number((uint8_t)((data.right(2)).at(0)));
+        }
+
     }
 }
 
 void DeviceMediator::ShowDeviceModule(){
     device->showModuleWindow();
     device->showModuleControl();
-    device->hideModuleStatus();    
+    device->hideModuleStatus();
 }
 
 bool DeviceMediator::getIsConnected() const
@@ -111,5 +153,15 @@ bool DeviceMediator::getIsConnected() const
 
 QString DeviceMediator::getDeviceName(){
     return device->getName();
+}
+
+int DeviceMediator::getResourcesInUse() const
+{
+    return resourcesInUse;
+}
+
+void DeviceMediator::setResourcesInUse(int value)
+{
+    resourcesInUse = value;
 }
 

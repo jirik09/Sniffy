@@ -28,6 +28,8 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
        after the object construction */
 
     setUnitsStyle(unitsStyleSheet);
+    QString color = COLOR_YELLOW;
+    setProgressBarColor(color);
     showBarDisplay(showPrgrssBar);
 
     displayString("");
@@ -165,11 +167,15 @@ void WidgetDisplay::setProgressBarRange(int min, int max){
     ui->progressBar->setRange(min, max);
 }
 
+void WidgetDisplay::setProgressBarColor(QString color){
+    ui->progressBar->setStyleSheet(QString::fromUtf8("QProgressBar {border: 1px solid #777; border-radius: 1px; background: rgb(38, 38, 38);}"
+                                                     "QProgressBar::chunk {background-color:") + color + "width: 20px;}");
+    ui->progressBar->repaint();
+}
+
 void WidgetDisplay::updateProgressBar(int value){
     ui->progressBar->setValue(value);
-    //  ui->progressBar->repaint();
-    //  if progress bar not left with its default style
-    //  the chunks are around 5% instead of at least 1%
+    ui->progressBar->repaint();
 }
 
 void WidgetDisplay::configLabel(int labelNumber, QString text, QString colorStyle, bool isVisible){
@@ -380,7 +386,7 @@ void WidgetDisplay::appendNewHistorySample(QString prefix, double sample, QStrin
         rememberMax = sample;
     }
 
-    if(historyData[0][0].length() > historySize){
+    if(historyData[0].at(0).length() > historySize){
         timeAxisMin += timeStep;
         clearExpiredData();
         clearExpiredPointsFromChart();
@@ -451,13 +457,13 @@ void WidgetDisplay::historyButtonClickedCallback(){
 
     if(historyView == DISABLED){
         sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
-        style = "QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
+                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
         historyView = ENABLED;
     }else {
         sizes = {0, cmpltWidth};
-        style = "QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
+                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
         historyView = DISABLED;
     }
     ui->splitter->setSizes(sizes);
@@ -467,14 +473,14 @@ void WidgetDisplay::historyButtonClickedCallback(){
 void WidgetDisplay::listChartSwitchClickedCallback(){
     QString style;
     if(listView == DISABLED){
-        style = "QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"
+                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
         chart->hide();
         list->show();
         listView = ENABLED;
     }else {
-        style = "QPushButton{image: url(:/graphics/graphics/icon_list.png);}"
-                "QPushButton:hover{background-color: rgb(71, 76, 94);}";
+        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_list.png);}"
+                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
         chart->show();
         list->hide();
         listView = DISABLED;

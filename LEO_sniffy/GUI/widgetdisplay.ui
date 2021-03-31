@@ -830,14 +830,14 @@ color: rgb(214, 214, 214);
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>10</width>
+                 <width>30</width>
                  <height>0</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>20</width>
-                 <height>22</height>
+                 <width>80</width>
+                 <height>35</height>
                 </size>
                </property>
               </widget>
@@ -877,14 +877,14 @@ color: rgb(214, 214, 214);
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>10</width>
+                 <width>30</width>
                  <height>0</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>20</width>
-                 <height>22</height>
+                 <width>80</width>
+                 <height>35</height>
                 </size>
                </property>
               </widget>
@@ -937,7 +937,7 @@ color: rgb(214, 214, 214);
                <property name="maximumSize">
                 <size>
                  <width>80</width>
-                 <height>40</height>
+                 <height>35</height>
                 </size>
                </property>
               </widget>
@@ -1034,17 +1034,11 @@ color: rgb(214, 214, 214);
                  <kerning>true</kerning>
                 </font>
                </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
                <property name="styleSheet">
-                <string notr="true">QProgressBar {
-	border: 1px solid #777;
-    border-radius: 1px;
-	background: rgb(38, 38, 38);
-}
-
-QProgressBar::chunk {
-    background-color: rgb(24, 154, 224);
-    width: 20px;
-}</string>
+                <string notr="true"/>
                </property>
                <property name="value">
                 <number>24</number>

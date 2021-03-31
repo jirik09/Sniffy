@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent):
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sep);
 
-
     createModulesWidgets();
     setupMainWindowComponents();
 
@@ -137,8 +136,8 @@ void MainWindow::saveLayout()
 {
     if(deviceMediator->getIsConnected()){
         QSharedPointer<AbstractModule> module;
-        layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
-        configFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".cfg";
+        layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
+        configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
 
         QSettings layout(layoutFile, QSettings::IniFormat);
         layout.setValue("geometry", saveGeometry());
@@ -153,27 +152,32 @@ void MainWindow::saveLayout()
             settings.setValue(module->getModuleName()+"config",module->getConfiguration());
             settings.setValue(module->getModuleName()+"status",(int)(module->getModuleStatus()));
         }
+        settings.setValue("resourcesInUse",deviceMediator->getResourcesInUse());
     }
 }
 
 void MainWindow::loadLayout(QString deviceName)
 {
-    layoutFile = QApplication::applicationDirPath() + "/"+deviceName+".lay";
+    layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".lay";
+    configFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".cfg";
     QFile file(layoutFile);
     if(!file.exists()){
         return;
     }
     QSettings layout(layoutFile, QSettings::IniFormat);
+    QSettings settings(configFile, QSettings::IniFormat);
     restoreGeometry(layout.value("geometry").toByteArray());
     restoreState(layout.value("windowState").toByteArray());
+
+    deviceMediator->setResourcesInUse(settings.value("resourcesInUse").toInt());
 }
 
 void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 {
     QString layoutFile;
     QString configFile;
-    layoutFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".lay";
-    configFile = QApplication::applicationDirPath() + "/"+deviceMediator->getDeviceName()+".cfg";
+    layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
+    configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
     QSharedPointer<AbstractModule> module;
 
     QFile file(layoutFile);
@@ -189,14 +193,21 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 
     foreach(module, modulesList){
         if(module->getModuleName()==moduleName){
-            status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
-            config = settings.value(module->getModuleName()+"config").toByteArray();
-            module->parseConfiguration(config);
-            module->writeConfiguration();
-            module->restoreGeometry(layout);
-            if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY)
-                module->startModule();
-            module->setModuleStatus(status);
+            if(!module->isModuleRestored()){
+                status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
+                config = settings.value(module->getModuleName()+"config").toByteArray();
+                module->parseConfiguration(config);
+
+                module->restoreGeometry(layout);
+                if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE){
+                    if(status == ModuleStatus::PAUSE)
+                        status = ModuleStatus::PLAY;
+                    module->writeConfiguration();
+                    module->startModule();
+                }
+                module->setModuleStatus(status);
+                module->setModuleRestored(true);
+            }
         }
     }
 }

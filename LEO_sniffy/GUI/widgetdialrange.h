@@ -25,15 +25,15 @@ class WidgetDialRange : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetDialRange(QWidget *parent = nullptr, QString name = "");
+    explicit WidgetDialRange(QWidget *parent = nullptr, QString name = "", int optionalEmitParam = 0);
     ~WidgetDialRange();
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
     void addOption (QString unitString,float mult);
     void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false);
-    void updateRange(float min, float max);
+    void updateRange(float min, float max, bool silent = false);
     void enableFineMousePrecision();
-    void setRealValue(float value);
+    void setRealValue(float value, bool silent = false);
     void hideUnitSelection(void);
     void setColor(QString color);
     void setDialColor(QString &styleSheet);
@@ -42,6 +42,7 @@ public:
     float getRealValue() const;
 
 private:
+    int optionalEmitParam;
     Ui::WidgetDialRange *ui;
     QList<params_unit> *units;
     int dialMaxValue = 500;
@@ -62,7 +63,7 @@ private:
     float logOffset = 0;
     float logGain = 0;
 
-    void updateControls(int except);
+    void updateControls(int except, bool silent = false);
     float getRealValueFromDial(int in);
     int getValueForDial(float real);
 
@@ -75,7 +76,7 @@ private slots:
     void textEditFinished();
 
 signals:
-    void valueChanged(float val);
+    void valueChanged(float val,int optionalEmitParam = 0);
 };
 
 #endif // WIDGETDIALRANGE_H

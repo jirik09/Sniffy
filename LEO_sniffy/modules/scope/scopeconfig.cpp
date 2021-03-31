@@ -1,7 +1,8 @@
 #include "scopeconfig.h"
 
-ScopeConfig::ScopeConfig(QObject *parent) : QObject(parent)
+ScopeConfig::ScopeConfig(QObject *parent)
 {
+    Q_UNUSED(parent);
 }
 
 void ScopeConfig::parse(QByteArray config)
@@ -52,6 +53,24 @@ void ScopeConfig::parse(QByteArray config)
     stream >> cursorsActiveIndex;
     stream >> timeMin;// = -0.01;
     stream >> timeMax;// = 0.01;
+    stream >> chartLocalZoom;
+    stream >> chartShift;
+    stream >> measCount;
+
+    MeasurementType type;
+    QString label;
+    qint32 channelIndex;
+
+    scopeMeasList.clear();
+    for(int i = 0; i<measCount;i++){
+        stream >> type;
+        stream >> label;
+        stream >> channelIndex;
+        Measurement *m = new Measurement(type,channelIndex);
+        m->setLabel(label);
+        scopeMeasList.append(m);
+    }
+    isConfigurationLoaded = true;
 
    // qDebug() << "Cofig from scope is being parsed "+config;
 }
@@ -107,6 +126,15 @@ QByteArray ScopeConfig::serialize()
     stream << cursorsActiveIndex;
     stream << timeMin;// = -0.01;
     stream << timeMax;// = 0.01;
+    stream << chartLocalZoom;
+    stream << chartShift;
+    stream << measCount;
+    for(int i = 0; i<measCount;i++){
+        stream << scopeMeasList[i]->getType();
+        stream << scopeMeasList[i]->getLabel();
+        stream << scopeMeasList[i]->getChannelIndex();
+    }
+
  //   qDebug() << "Cofig from scope is being serialized "+*data;
     return *data;
 
