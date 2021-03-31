@@ -15,6 +15,7 @@ ArbGenerator::ArbGenerator(QObject *parent)
     connect(arbGenWindow, &ArbGeneratorWindow::runGenerator, this,&ArbGenerator::sendSignalCallback);
     connect(arbGenWindow, &ArbGeneratorWindow::stopGenerator, this,&ArbGenerator::stopCallback);
     connect(arbGenWindow, &ArbGeneratorWindow::updateFrequency, this,&ArbGenerator::updateFrequencyCallback);
+    connect(arbGenWindow, &ArbGeneratorWindow::restartGenerating, this,&ArbGenerator::quickRestartCalback);
 }
 
 QWidget *ArbGenerator::getWidget()
@@ -128,23 +129,27 @@ void ArbGenerator::stopCallback()
     stopGenerator();
 }
 
-void ArbGenerator::updateFrequencyCallback()
+void ArbGenerator::updateFrequencyCallback() //this function counts only with two channels (logic for more channels as far more complex)
 {
-    if(arbGenWindow->getFrequency(1) != arbGenWindow->getFrequency(0)){
+    if(arbGenWindow->getFrequency(1) != arbGenWindow->getFrequency(0) || signalLengths[0] != signalLengths[1]){
+        //qDebug () << "updated independently";
         for (int i = 0;i<numChannelsUsed;i++){
             setSamplingFrequency(i,arbGenWindow->getFrequency(i)*signalLengths[i]);
         }
-        qDebug () << "synced independently";
+
     }else{
+        //qDebug () << "updated both synced";
         setSamplingFrequency(99,arbGenWindow->getFrequency(0)*signalLengths[0]);
-        qDebug () << "synced both";
+
     }
     genAskForFreq();
 }
 
-void ArbGenerator::updateAllChannelsFreqCallback(qreal freq)
+void ArbGenerator::quickRestartCalback()
 {
-    setSamplingFrequency(100,freq);
+    stopGenerator();
+    startGenerator();
+    qDebug () << "restarted";
 }
 
 void ArbGenerator::sendNextData()

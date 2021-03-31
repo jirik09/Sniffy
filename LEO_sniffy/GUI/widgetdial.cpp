@@ -23,6 +23,11 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
     options = new QList<params_dial>;
+
+    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+"} "
+                    "QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +"}";
+
+    ui->widget->setStyleSheet(style);
 }
 
 WidgetDial::~WidgetDial()
@@ -83,10 +88,13 @@ void WidgetDial::setSelectedIndex(int index, bool silent){
 }
 
 void WidgetDial::setColor(QString color){
-    QString style = "color:"+color;
+    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_DARK_GREY)+"} "
+                    "QWidget{color:"+color +"}";
     ui->widget_dial->setStyleSheet(style);
 
-    style = "background-color:"+color;
+    style = "QPushButton:disabled{background-color: "+QString::fromUtf8(BACKGROUND_COLOR_BUTTON_DISABLED)+" color: "+QString::fromUtf8(COLOR_GREY)+"}"
+            "QPushButton:pressed{border: 2px solid "+QString::fromUtf8(BACKGROUND_COLOR_APP)+"}"
+            "QPushButton{border: none;background-color:"+color +"}";
     ui->pushButton_plus->setStyleSheet(style);
     ui->pushButton_minus->setStyleSheet(style);
 }

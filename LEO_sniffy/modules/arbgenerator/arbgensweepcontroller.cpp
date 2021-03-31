@@ -42,8 +42,8 @@ void ArbGenSweepController::stopTimer()
 void ArbGenSweepController::timerCallback()
 {
     emit updateSweepFrequency(freqSamples.at(actualIndex));
-    QDateTime date = QDateTime::currentDateTime();
-    qDebug() <<date.time()<<freqSamples.at(actualIndex) << "Hz";
+    //QDateTime date = QDateTime::currentDateTime();
+    //qDebug() <<date.time()<<freqSamples.at(actualIndex) << "Hz";
     actualIndex = (actualIndex+1)%numSamples;
 
 }

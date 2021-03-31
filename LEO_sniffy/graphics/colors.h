@@ -20,8 +20,10 @@
 
 //Text colors
 #define COLOR_GREY   "rgb(124,124,124);"
+#define COLOR_DARK_GREY   "rgb(87,87,87);"
 #define COLOR_WHITE  "rgb(214,214,214);"
 #define QCOLOR_GREY   QColor(124,124,124)
+#define QCOLOR_DARK_GREY   QColor(87,87,87)
 #define QCOLOR_WHITE  QColor(214,214,214)
 
 // basic Channel colors

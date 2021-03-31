@@ -32,6 +32,8 @@ public:
     void setMaxNumChannels(int numChannels);
     void setLabels(QString freq, QString length, int index);
     void setFreqLabel(QString freq, int index);
+    void disableGUI();
+    void enableGUI();
 
 signals:
 
@@ -82,6 +84,7 @@ private:
 
 signals:
     void signalChanged();
+    void syncRequest();
 
 private slots:
     void buttonEnableChannelCallback(int index);
@@ -91,6 +94,8 @@ private slots:
     void signalChangedCallback();
     void memoryCallback(int index);
     void customLenghtCallback(qreal value);
+    void sweepMaxCallback(qreal value);
+    void sweepMinCallback(qreal value);
     void buttonSweepCallback(int index);
     void sweepSettingsCallback();
 };

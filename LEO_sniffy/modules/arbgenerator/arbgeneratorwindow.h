@@ -70,11 +70,13 @@ private slots:
     void createSignalCallback();
     void openFileCallback();
     void sweepTimerCallback(qreal frequency);
+    void syncRequestCallback();
 
 signals:
     void runGenerator();
     void stopGenerator();
     void updateFrequency();
+    void restartGenerating();
 };
 
 #endif // ARBGENERATORWINDOW_H

@@ -40,6 +40,7 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *pare
     sweepController = new ArbGenSweepController();
 
     connect(setting,&ArbGenPanelSettings::signalChanged,this,&ArbGeneratorWindow::createSignalCallback);
+    connect(setting,&ArbGenPanelSettings::syncRequest,this,&ArbGeneratorWindow::syncRequestCallback);
     connect(setting->buttonsGenerate,&WidgetButtons::clicked,this,&ArbGeneratorWindow::runGeneratorCallback);
     connect(setting->buttonSelectFile,&WidgetButtons::clicked,this,&ArbGeneratorWindow::openFileCallback);
     connect(sweepController, &ArbGenSweepController::updateSweepFrequency, this,&ArbGeneratorWindow::sweepTimerCallback);
@@ -114,9 +115,11 @@ void ArbGeneratorWindow::runGeneratorCallback()
     if(setting->buttonsGenerate->getText(0) == "Start"){
         emit runGenerator();
         setGenerateButton("Uploading",COLOR_ORANGE);
+        setting->disableGUI();
     }else{
         emit stopGenerator();
         setGeneratorStopped();
+        setting->enableGUI();
     }
 }
 
@@ -130,23 +133,23 @@ void ArbGeneratorWindow::createSignalCallback()
     qreal x(0);
     qreal y(0);
     int tmpDAC;
-    qreal maxX;
+    qreal maxX = -10000;
+
+    QList<qreal> *freq = new QList<qreal>;
+    QList<SignalShape> *shape = new QList<SignalShape>;
+    for (int i = 0;i <MAX_ARB_CHANNELS_NUM ;i++ ) {
+        if(setting->channelEnabled[i]){
+            freq->append(setting->dialFreqCh[i]->getRealValue());
+            shape->append(setting->signalShape[i]);
+        }
+    }
+    numChannelsUsed = freq->length();
 
     // **************** build the data for calculation and get the signal lengths. ****************
     if(!isGenerating){
-        QList<qreal> *freq = new QList<qreal>;
-        QList<SignalShape> *shape = new QList<SignalShape>;
-        for (int i = 0;i <MAX_ARB_CHANNELS_NUM ;i++ ) {
-            if(setting->channelEnabled[i]){
-                freq->append(setting->dialFreqCh[i]->getRealValue());
-                shape->append(setting->signalShape[i]);
-            }
-        }
-        numChannelsUsed = freq->length();
-
         generatorChartData->clear();
         generatorDACData->clear();
-        maxX = -10000;
+
 
         for(int i = 0;i<numChannelsUsed;i++){
             chartSignal.clear();
@@ -220,13 +223,38 @@ void ArbGeneratorWindow::createSignalCallback()
             }
         }
 
-        // **************** plot the data ****************
-        chart->clearAll();
-        for(int i = 0;i<numChannelsUsed;i++){
-            chart->updateTrace(&((*generatorChartData)[i]), i);
+
+    }else{ //generating but charts need to be updated anyway
+        QVector<QPointF> tmpVect;
+
+        for (int i = 0;i<generatorChartData->length() ;i++ ) {
+            tmpVect.clear();
+
+            qreal div = (qreal)(spec->periphClockFrequency) / freq->at(i) / generatorChartData->at(i).length();
+            if(div<spec->periphClockFrequency/spec->maxSamplingRate){
+                div = spec->periphClockFrequency/spec->maxSamplingRate;
+            }
+
+            for(int j = 0;j<generatorChartData->at(i).length();j=j+2){
+                y = generatorChartData->at(i).at(j).y();
+                x = (qreal)(div) / spec->periphClockFrequency*j/2;// /1/realfreq*j;
+                tmpVect.append(QPointF(x,y));
+                x = (qreal)(div) / spec->periphClockFrequency*(j/2+1);// /1/realfreq*j;
+                tmpVect.append(QPointF(x,y));
+            }
+            if(maxX<x){
+                maxX=x;
+            }
+            generatorChartData->replace(i,tmpVect);
         }
-        chart->setRange(0,maxX,spec->rangeMin,spec->rangeMax);
     }
+
+    // **************** plot the data ****************
+    chart->clearAll();
+    for(int i = 0;i<numChannelsUsed;i++){
+        chart->updateTrace(&((*generatorChartData)[i]), i);
+    }
+    chart->setRange(0,maxX,spec->rangeMin,spec->rangeMax);
 
     if(setting->isSweepEnabled){
         sweepController->setParameters(setting->dialFreqSweepMin->getRealValue(),setting->dialFreqSweepMax->getRealValue(),setting->dialFreqSweepTime->getRealValue());
@@ -282,5 +310,17 @@ void ArbGeneratorWindow::openFileCallback()
 void ArbGeneratorWindow::sweepTimerCallback(qreal frequency)
 {
     setting->dialFreqCh[0]->setRealValue(frequency,true);
-    emit updateFrequency();  //todo Update only channels linked with CH1
+    for (int i = 1;i<MAX_ARB_CHANNELS_NUM ; i++) {
+        if(setting->swSyncWithCH1[i]->isCheckedRight()){
+            setting->dialFreqCh[i]->setRealValue(frequency,true);
+        }
+    }
+    emit updateFrequency();
+}
+
+void ArbGeneratorWindow::syncRequestCallback()
+{
+    if(isGenerating){
+        emit restartGenerating();
+    }
 }

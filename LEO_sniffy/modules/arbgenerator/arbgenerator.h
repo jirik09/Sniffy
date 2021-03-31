@@ -34,7 +34,7 @@ private slots:
     void sendSignalCallback();
     void stopCallback();
     void updateFrequencyCallback();
-    void updateAllChannelsFreqCallback(qreal freq);
+    void quickRestartCalback();
 
 private:
     ArbGeneratorConfig *config;
