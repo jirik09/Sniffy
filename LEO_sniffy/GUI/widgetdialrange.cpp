@@ -155,22 +155,10 @@ void WidgetDialRange::textEditFinished(){
 
 void WidgetDialRange::textEditChanged(const QString & text){
     bool success = false ;
+    double value =  NumberParser::parse(text,success);
 
-    QString suffix = text.right(1);
-    QString parse;
-    qreal mult = 0;
-
-    if(suffix == "u"){mult = 0.000001;parse = text.left(text.length()-1);}
-    else if (suffix == "m"){mult = 0.001;parse = text.left(text.length()-1);}
-    else if (suffix == "k"){mult = 1000;parse = text.left(text.length()-1);}
-    else if (suffix == "M"){mult = 1000000;parse = text.left(text.length()-1);}
-
-    float flRead = QLocale().toFloat(parse,&success); //try local decimal separator
-    if(!success){  //try . as a separator
-        flRead = parse.toFloat(&success);
-    }
     if (success){
-        realValue = flRead * mult * unitMult;
+        realValue = value * unitMult;
         updateControls(2);
     }
 }

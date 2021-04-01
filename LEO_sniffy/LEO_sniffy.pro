@@ -75,6 +75,7 @@ SOURCES += \
     modules/device/device.cpp \
     modules/device/devicewindow.cpp \
     modules/device/devicespec.cpp \
+    modules/numberparser.cpp \
     modules/patterngenerator/patterngenerator.cpp \
     modules/patterngenerator/patterngeneratorconfig.cpp \
     modules/patterngenerator/patterngeneratorspec.cpp \
@@ -177,6 +178,7 @@ HEADERS += \
     modules/device/device.h \
     modules/device/devicewindow.h \
     modules/device/devicespec.h \
+    modules/numberparser.h \
     modules/patterngenerator/patterngenerator.h \
     modules/patterngenerator/patterngeneratorconfig.h \
     modules/patterngenerator/patterngeneratorspec.h \

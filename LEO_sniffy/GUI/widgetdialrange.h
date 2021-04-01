@@ -8,6 +8,7 @@
 
 #include "customdial.h"
 #include "../graphics/colors.h"
+#include "../modules/numberparser.h"
 
 
 namespace Ui {
