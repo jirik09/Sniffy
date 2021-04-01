@@ -3,9 +3,7 @@
 SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config, QWidget *parent) :
     QObject(parent),
     config(config)
-{
-    QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
+{        
     WidgetSeparator *separatorCommon = new WidgetSeparator(parent, "Common");
     destination->addWidget(separatorCommon);
 
@@ -22,70 +20,42 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
     buttonEquidist->setObjectName("syncPwmEquidistButton");
     buttonEquidist->setChecked(false, 0);
 
+    QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
     QHBoxLayout *commonButtons = new QHBoxLayout();
     destination->addLayout(commonButtons);
     commonButtons->addWidget(switchStepMode);
     commonButtons->addItem(spacer);
     commonButtons->addWidget(buttonStart);
+    spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
     commonButtons->addItem(spacer);
     commonButtons->addWidget(buttonEquidist);
 
     /* Channels ------------------------------------------------------------- */
     int phase = 0;
-
     if(config->layout == Layout::HORIZONTAL){
-
         for(int i = 0; i < CHANNELS_NUM; i++){
             QString chNStr = QString::number(i+1);
 
-            WidgetSeparator *separator = new WidgetSeparator(parent, "Channel " + chNStr);
-            destination->addWidget(separator);
-
+            separator[i] = new WidgetSeparator(parent, "Channel " + chNStr);
+            spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
+            destination->addWidget(separator[i]);
             QHBoxLayout *horBoxButtons = new QHBoxLayout();
             QHBoxLayout *horBoxDials = new QHBoxLayout();
             destination->addLayout(horBoxButtons);
             destination->addLayout(horBoxDials);
 
-            onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "", i);
-            onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);
-            onOffCh[i]->setColor("background-color:" + chanColor[i]);
+            configControlElements(parent, i, phase);
+
             horBoxButtons->addWidget(onOffCh[i]);
-
             horBoxButtons->addItem(spacer);
-
-            inverCh[i] = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0, i);
-            inverCh[i]->setText("Invert");
-            inverCh[i]->setObjectName("syncPwmInverCh" + chNStr);
-            inverCh[i]->setChecked(false, 0);
-            inverCh[i]->setColor("background-color:" + chanColor[i], 0);
             horBoxButtons->addWidget(inverCh[i]);
-
-            dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
-            dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
-            dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, true);
-            dialFreqCh[i]->setColor(chanColor[i]);
-            dialFreqCh[i]->hideUnitSelection();
             horBoxDials->addWidget(dialFreqCh[i]);
-
-            dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);
-            dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
-            dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, DEFAULT_DC, false);
-            dialDutyCh[i]->setColor(chanColor[i]);
-            dialDutyCh[i]->hideUnitSelection();
             horBoxDials->addWidget(dialDutyCh[i]);
-
-            dialPhaseCh[i] = new WidgetDialRange(parent, "Phase", i);
-            dialPhaseCh[i]->setObjectName("syncPwmPhaseCh" + chNStr);
-            dialPhaseCh[i]->setRange(0, 360, "°", 1, 1, phase, false);
-            dialPhaseCh[i]->setColor(chanColor[i]);
-            dialPhaseCh[i]->hideUnitSelection();
             horBoxDials->addWidget(dialPhaseCh[i]);
 
             phase += PI_HALF;
         }
-
     }else {
-
         QHBoxLayout *horBox = new QHBoxLayout();
         destination->addLayout(horBox);
 
@@ -93,42 +63,16 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
             QString chNStr = QString::number(i+1);
 
             QVBoxLayout *verChanBox = new QVBoxLayout();
+            separator[i] = new WidgetSeparator(parent, "Channel " + chNStr);
+
+            configControlElements(parent, i, phase);
+
             horBox->addLayout(verChanBox);
-
-            WidgetSeparator *separator = new WidgetSeparator(parent, "Channel " + chNStr);
-            verChanBox->addWidget(separator);
-
-            onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "", i);
-            onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);
-            onOffCh[i]->setColor("background-color:" + chanColor[i]);
+            verChanBox->addWidget(separator[i]);
             verChanBox->addWidget(onOffCh[i]);
-
-            inverCh[i] = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0, i);
-            inverCh[i]->setText("Invert");
-            inverCh[i]->setObjectName("syncPwmInverCh" + chNStr);
-            inverCh[i]->setChecked(false, 0);
-            inverCh[i]->setColor("background-color:" + chanColor[i], 0);
             verChanBox->addWidget(inverCh[i]);
-
-            dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
-            dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
-            dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, true);
-            dialFreqCh[i]->setColor(chanColor[i]);
-            dialFreqCh[i]->hideUnitSelection();
             verChanBox->addWidget(dialFreqCh[i]);
-
-            dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);
-            dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
-            dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, DEFAULT_DC, false);
-            dialDutyCh[i]->setColor(chanColor[i]);
-            dialDutyCh[i]->hideUnitSelection();
             verChanBox->addWidget(dialDutyCh[i]);
-
-            dialPhaseCh[i] = new WidgetDialRange(parent, "Phase", i);
-            dialPhaseCh[i]->setObjectName("syncPwmPhaseCh" + chNStr);
-            dialPhaseCh[i]->setRange(0, 360, "°", 1, 1, phase, false);
-            dialPhaseCh[i]->setColor(chanColor[i]);
-            dialPhaseCh[i]->hideUnitSelection();
             verChanBox->addWidget(dialPhaseCh[i]);
 
             phase += PI_HALF;
@@ -139,22 +83,43 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
     destination->addItem(verticalSpacer);
 }
 
+void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
+    QString chNStr = QString::number(i+1);
+
+    onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "", i);
+    onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);
+    onOffCh[i]->setColor("background-color:" + chanColor[i]);
+
+    inverCh[i] = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0, i);
+    inverCh[i]->setText("Invert");
+    inverCh[i]->setObjectName("syncPwmInverCh" + chNStr);
+    inverCh[i]->setChecked(false, 0);
+    inverCh[i]->setColor("background-color:" + chanColor[i], 0);
+
+    dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
+    dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
+    dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, true);
+    dialFreqCh[i]->setColor(chanColor[i]);    
+    dialFreqCh[i]->hideUnitSelection();
+
+    dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);
+    dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
+    dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, DEFAULT_DC, false);
+    dialDutyCh[i]->setColor(chanColor[i]);
+    dialDutyCh[i]->hideUnitSelection();
+
+    dialPhaseCh[i] = new WidgetDialRange(parent, "Phase", i);
+    dialPhaseCh[i]->setObjectName("syncPwmPhaseCh" + chNStr);
+    dialPhaseCh[i]->setRange(0, 360, "°", 1, 1, phase, false);
+    dialPhaseCh[i]->setColor(chanColor[i]);
+    dialPhaseCh[i]->hideUnitSelection();
+}
+
 void SyncPwmSettings::greyOutComplementChanFreqDials(int chanIndex){
     QString colDisable = BACKGROUND_COLOR_BUTTON_DISABLED;
+
     dialFreqCh[chanIndex]->setDisabled(true);
     dialFreqCh[chanIndex]->setColor(colDisable);
-}
-
-void SyncPwmSettings::setFreqDial(float val, int chanIndex){
-    //dialFreqCh[chanIndex]->setRealValue(val, 1);
-}
-
-void SyncPwmSettings::setPhaseDial(float val, int chanIndex){
-
-}
-
-void SyncPwmSettings::setDutyDial(float val, int chanIndex){
-
 }
 
 

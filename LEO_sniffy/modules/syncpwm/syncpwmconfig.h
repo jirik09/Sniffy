@@ -28,8 +28,8 @@ struct Common
 
 struct Channel
 {
-    double frequency;
-    float dutyCycle;
+    double freq;
+    float duty;
     float phase;
     bool enabled;
     bool inverted;

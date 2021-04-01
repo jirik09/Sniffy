@@ -25,6 +25,8 @@ private:
     SyncPwmWindow *spwmWindow;
     SyncPwmConfig *config;
 
+    bool skipRepaintLock = false;
+
     void setDutyPhase(quint32 dutyCycle, quint32 phase, quint32 chanIndex);
 
     void write(QByteArray feature, QByteArray param);
@@ -36,9 +38,17 @@ private:
 
     void stepGenEndNotif();
 
+    void setFreq(float val, int chanIndex);
+    void setDuty(float val, int chanIndex);
+    void setPhase(float val, int chanIndex);
+    void setOnOff(int index, int chanIndex);
+    void setInvert(int chanIndex);
+
     void equiModeSetFreq(float val);
-    void equiModeCalcAndSetPhase(float val);
-    void equiModeCalcAndSetDuty(float val);
+    void equiModeSetPhase(float val);
+    void equiModeSetDuty(float val);
+
+    void equiModeConfig();
 
 signals:
 

@@ -8,7 +8,7 @@
 #include "../../GUI/widgetseparator.h"
 #include "../../GUI/widgetdial.h"
 #include "../../GUI/widgetdialrange.h"
-#include "../../GUI/widgetdisplay.h"
+#include "../../GUI/widgetchart.h"
 #include "../../GUI/widgetswitch.h"
 #include "../../GUI/widgetbuttons.h"
 
@@ -27,10 +27,11 @@ class SyncPwmWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit SyncPwmWindow(SyncPwmConfig *conf, QWidget *parent = nullptr);
+    explicit SyncPwmWindow(SyncPwmConfig *config, QWidget *parent = nullptr);
     ~SyncPwmWindow();
 
     SyncPwmSettings *settings;
+    SyncPwmPainter *painter;
 
     void setSpecification(SyncPwmSpec *spec);
     void restoreGUIAfterStartup();
@@ -38,15 +39,20 @@ public:
     void setStopTxt();
     void uncheckStartButton();
 
+    void setFreqDial(float val, int chanIndex);
+    void setPhaseDial(float val, int chanIndex);
+    void setDutyDial(float val, int chanIndex);
+
+    void enableChannel(bool enable, int chanIndex);
+    void repaint();
+
 private slots:
     void dialFreqCallback(float val, int chanIndex);
 
 private:
     Ui::SyncPwmWindow *ui;
     SyncPwmConfig *config;
-    SyncPwmPainter *painter;
     SyncPwmSpec *spec;
-
 
     widgetChart *chart;
 

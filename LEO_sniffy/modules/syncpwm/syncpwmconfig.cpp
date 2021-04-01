@@ -13,8 +13,8 @@ SyncPwmConfig::SyncPwmConfig(QObject *parent)
     for(int i = 0; i < CHANNELS_NUM; i++){
         SyncPwmConfig::chan[i].enabled = true;
         SyncPwmConfig::chan[i].inverted = false;
-        SyncPwmConfig::chan[i].frequency = DEFAULT_FREQUENCY;
-        SyncPwmConfig::chan[i].dutyCycle = DEFAULT_DC;
+        SyncPwmConfig::chan[i].freq = DEFAULT_FREQUENCY;
+        SyncPwmConfig::chan[i].duty = DEFAULT_DC;
         SyncPwmConfig::chan[i].phase = phase;
         phase += PI_HALF;
     }
@@ -31,8 +31,8 @@ void SyncPwmConfig::parse(QByteArray config)
     for(int i = 0; i < CHANNELS_NUM; i++){
         stream >> SyncPwmConfig::chan[i].enabled;
         stream >> SyncPwmConfig::chan[i].inverted;
-        stream >> SyncPwmConfig::chan[i].frequency;
-        stream >> SyncPwmConfig::chan[i].dutyCycle;
+        stream >> SyncPwmConfig::chan[i].freq;
+        stream >> SyncPwmConfig::chan[i].duty;
         stream >> SyncPwmConfig::chan[i].phase;
     }
 }
@@ -49,8 +49,8 @@ QByteArray SyncPwmConfig::serialize()
     for(int i = 0; i < CHANNELS_NUM; i++){
         stream << SyncPwmConfig::chan[i].enabled;
         stream << SyncPwmConfig::chan[i].inverted;
-        stream << SyncPwmConfig::chan[i].frequency;
-        stream << SyncPwmConfig::chan[i].dutyCycle;
+        stream << SyncPwmConfig::chan[i].freq;
+        stream << SyncPwmConfig::chan[i].duty;
         stream << SyncPwmConfig::chan[i].phase;
     }
 
