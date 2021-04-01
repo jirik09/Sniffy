@@ -206,7 +206,8 @@ void Scope::startModule(){
     if (isModuleStarted)return;
 
     isModuleStarted = true;
-    startSampling();
+    if(config->triggerMode != ScopeTriggerMode::TRIG_STOP)
+        startSampling();
 }
 
 QWidget* Scope::getWidget(){
@@ -221,7 +222,7 @@ void Scope::updateTimebase(float div){
         config->requestedSamplingRate = round(float(100)/(div)+0.49);
     }
     setSamplingFrequency(config->requestedSamplingRate);
-    updateTriggerMode(config->triggerMode);
+    //updateTriggerMode(config->triggerMode);
 }
 
 void Scope::updatePretrigger(float percentage){
@@ -355,7 +356,7 @@ void Scope::updateFFTConfig(int length, FFTWindow window, FFTType type, int chan
     FFTtype = type;
     FFTChannelIndex = channelIndex;
     if(FFTlength !=0){
-      //  FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
+        //  FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
     }
 
 }

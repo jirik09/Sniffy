@@ -488,8 +488,9 @@ void ScopeWindow::restoreGUIAfterStartup()
 
     panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
     panelMath->typeChanged(panelMath->mathType->getSelectedIndex());
-    if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-        panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+    if(panelSet->buttonsTriggerMode->getSelectedIndex()==0){
+        panelSet->buttonsTriggerMode->setText("Single");
+        triggerModeCallback(0);
     }
 }
 
