@@ -64,7 +64,7 @@ void MainWindow::createModulesWidgets(){
         dockWidget[index]->setWidget(module->getWidget());
 
         addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget[index]);
-        connect(module.data(),SIGNAL(loadModuleLayoutAndConfig(QString)),this,SLOT(loadModuleLayoutAndConfigCallback(QString)));
+        connect(module.data(),&AbstractModule::loadModuleLayoutAndConfig,this,&MainWindow::loadModuleLayoutAndConfigCallback);
     }
 
     deviceMediator->ShowDeviceModule();

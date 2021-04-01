@@ -16,7 +16,6 @@ Scope::Scope(QObject *parent)
     moduleName = "Oscilloscope";
     moduleIconURI = ":/graphics/graphics/icon_scope.png";
 
-
     scopeData = new QVector<QVector<QPointF>>;
 
     //connect signals from GUI into scope
@@ -195,7 +194,6 @@ QByteArray Scope::getConfiguration(){
 }
 
 void Scope::stopModule(){
-    isModuleStarted = false;
     isConfigurationWritten = false;
     stopSampling();
     measCalc->exit();
@@ -203,9 +201,6 @@ void Scope::stopModule(){
     FFTCalc->exit();
 }
 void Scope::startModule(){
-    if (isModuleStarted)return;
-
-    isModuleStarted = true;
     if(config->triggerMode != ScopeTriggerMode::TRIG_STOP)
         startSampling();
 }

@@ -29,3 +29,8 @@ void ArbGeneratorSpec::parseSpecification(QByteArray spec)
         channelPins[i].remove('_');
     }
 }
+
+void ArbGeneratorSpec::parsePWMSpecification(QByteArray spec)
+{
+
+}

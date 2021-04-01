@@ -13,6 +13,7 @@ class ArbGeneratorSpec : public AbstractSpecification
 public:
     explicit ArbGeneratorSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);
+    void parsePWMSpecification(QByteArray spec);
 
     int maxSamplingRate;
     int periphClockFrequency;

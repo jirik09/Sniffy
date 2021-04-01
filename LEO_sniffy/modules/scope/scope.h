@@ -71,7 +71,6 @@ private:
     int FFTChannelIndex = 0;
 
     bool isConfigurationWritten = false;
-    bool isModuleStarted = false;
 
     //private functions - writing into device only - no logic
     void stopSampling();
