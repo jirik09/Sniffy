@@ -245,7 +245,6 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     return QObject::eventFilter(obj, event);
 }
 
-
 void widgetChart::clearAll(){
     for (int i = 0; i < maxTraces; i++){
         seriesList[i]->clear();
@@ -413,6 +412,10 @@ void widgetChart::setGraphColor(QColor qColor){
     axisY->setGridLineColor(qColor);
     axisX->setLinePenColor(qColor);
     axisY->setLinePenColor(qColor);
+}
+
+void widgetChart::setTraceColor(int index, QColor color){
+    seriesList.at(index)->setColor(color);    
 }
 
 void widgetChart::formatAxisLabelsForScope(){

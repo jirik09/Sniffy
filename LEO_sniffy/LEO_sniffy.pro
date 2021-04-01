@@ -96,6 +96,7 @@ SOURCES += \
     modules/scope/scopewindow.cpp \
     modules/syncpwm/syncpwm.cpp \
     modules/syncpwm/syncpwmconfig.cpp \
+    modules/syncpwm/syncpwmpainter.cpp \
     modules/syncpwm/syncpwmsettings.cpp \
     modules/syncpwm/syncpwmspec.cpp \
     modules/syncpwm/syncpwmwindow.cpp \
@@ -198,6 +199,7 @@ HEADERS += \
     modules/syncpwm/syncpwm.h \
     modules/syncpwm/syncpwmconfig.h \
     modules/syncpwm/syncpwmdefs.h \
+    modules/syncpwm/syncpwmpainter.h \
     modules/syncpwm/syncpwmsettings.h \
     modules/syncpwm/syncpwmspec.h \
     modules/syncpwm/syncpwmwindow.h \

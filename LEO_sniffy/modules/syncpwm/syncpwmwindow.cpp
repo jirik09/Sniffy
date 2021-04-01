@@ -17,36 +17,100 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
     widget_chart->setLayout(verticalLayout_chart);
     widget_settings->setLayout(verticalLayout_settings);
 
-    if(config->layout == SyncPwmLayout::HORIZONTAL){
+    QList<int> sizes;
+    if(config->layout == Layout::HORIZONTAL)
+    {
         splitter = new QSplitter(Qt::Horizontal, this);
         splitter->addWidget(widget_chart);
         splitter->addWidget(widget_settings);
+
+        sizes = splitter->sizes();
+        int wdth = splitter->width();
+        sizes = {wdth*2, wdth};
+
     }else {
         splitter = new QSplitter(Qt::Vertical, this);
         splitter->addWidget(widget_settings);
         splitter->addWidget(widget_chart);
+
+        sizes = splitter->sizes();
+        int hght = splitter->height();
+        sizes = {hght, hght*2};
     }
 
+    splitter->setSizes(sizes);
     ui->horizontalLayout->addWidget(splitter);
 
-    splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    splitter->setContentsMargins(0,0,0,0);
-
-    widget_chart->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
-    widget_chart->setContentsMargins(0,0,0,0);
     verticalLayout_chart->setContentsMargins(0,0,0,0);
     verticalLayout_chart->setSpacing(0);
-
-    widget_settings->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     verticalLayout_settings->setContentsMargins(4,4,4,4);
     verticalLayout_settings->setSpacing(2);
 
-    chart = new widgetChart(widget_chart, 4);
-    //chart->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    chart->setRange(0, 1, 0, RANGE_CHAN1_LOG1 + 1);
+    chart = new widgetChart(widget_chart, CHANNELS_NUM);
     verticalLayout_chart->addWidget(chart);
 
     settings = new SyncPwmSettings(verticalLayout_settings, config, this);
+    painter = new SyncPwmPainter(chart, config, this);
+}
+
+void SyncPwmWindow::setSpecification(SyncPwmSpec *spec){
+    this->spec = spec;
+
+    if(spec->chans_depend){
+        connect(settings->dialFreqCh[spec->drive_chx], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
+        connect(settings->dialFreqCh[spec->drive_chy], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
+        settings->greyOutComplementChanFreqDials(spec->driven_chx);
+        settings->greyOutComplementChanFreqDials(spec->driven_chy);
+    }
+
+    for(int i = 0; i < CHANNELS_NUM; i++){
+        settings->separator[i]->setText("Channel " + QString::number(i+1) + " | " + spec->pinsList[i]);
+    }
+}
+
+void SyncPwmWindow::restoreGUIAfterStartup(){
+    uncheckStartButton();
+    setStartTxt();
+}
+
+void SyncPwmWindow::setStartTxt(){
+    settings->buttonStart->setText("START");
+}
+
+void SyncPwmWindow::setStopTxt(){
+    settings->buttonStart->setText("STOP");
+}
+
+void SyncPwmWindow::uncheckStartButton(){
+    settings->buttonStart->setChecked(false, 0);
+}
+
+void SyncPwmWindow::dialFreqCallback(float val, int chanIndex){
+    if(chanIndex == spec->drive_chx){
+        settings->dialFreqCh[spec->driven_chx]->setRealValue(val);
+    }else {
+        settings->dialFreqCh[spec->driven_chy]->setRealValue(val);
+    }
+}
+
+void SyncPwmWindow::setFreqDial(float val, int chanIndex){
+    settings->dialFreqCh[chanIndex]->setRealValue(val, 1);
+}
+
+void SyncPwmWindow::setPhaseDial(float val, int chanIndex){
+    settings->dialPhaseCh[chanIndex]->setRealValue(val, 1);
+}
+
+void SyncPwmWindow::setDutyDial(float val, int chanIndex){
+    settings->dialDutyCh[chanIndex]->setRealValue(val, 1);
+}
+
+void SyncPwmWindow::enableChannel(bool enable,int chanIndex){
+    painter->enableChannel(enable, chanIndex);
+}
+
+void SyncPwmWindow::repaint(){
+    painter->repaint();
 }
 
 SyncPwmWindow::~SyncPwmWindow(){

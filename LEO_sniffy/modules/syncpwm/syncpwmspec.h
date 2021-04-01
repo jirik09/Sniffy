@@ -14,6 +14,9 @@ public:
 
     int max_freq;
     int chan_num;
+    int chans_depend;
+    int drive_chx, drive_chy;
+    int driven_chx, driven_chy;
 
     struct pins{
         QString chan1, chan2, chan3, chan4;

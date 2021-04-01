@@ -8,10 +8,31 @@
 
 #include "../abstractconfiguration.h"
 
-enum class SyncPwmLayout
+enum class Layout
 {
     HORIZONTAL = 0,
     VERTICAL = 1
+};
+
+enum class State
+{
+    STOPPED = 0,
+    RUNNING = 1
+};
+
+struct Common
+{
+    bool stepMode;
+    bool equiMode;
+};
+
+struct Channel
+{
+    double freq;
+    float duty;
+    float phase;
+    bool enabled;
+    bool inverted;
 };
 
 class SyncPwmConfig : public AbstractConfiguration
@@ -21,9 +42,12 @@ public:
     explicit SyncPwmConfig(QObject *parent = nullptr);
 
     void parse (QByteArray config);
-    QByteArray serialize ();
+    QByteArray serialize ();    
 
-    SyncPwmLayout layout;
+    Layout layout;
+    State state;
+    Common common;
+    Channel chan[CHANNELS_NUM];
 
 signals:
 

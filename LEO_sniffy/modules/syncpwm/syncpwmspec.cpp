@@ -7,6 +7,8 @@ SyncPwmSpec::SyncPwmSpec(QObject *parent)
 
 void SyncPwmSpec::parseSpecification(QByteArray spec){
     QDataStream stream(spec);
+    stream >> resources;
+    stream >> chans_depend >> drive_chx >> drive_chy >> driven_chx >> driven_chy;
     stream >> max_freq >> chan_num;
 
     char chars[4] = "";
