@@ -1,7 +1,8 @@
 #include "arbgenpanelsettings.h"
 
-ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *parent) :
-    QObject(parent)
+ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbased, QWidget *parent) :
+    QObject(parent),
+    isPWMbased(isPWMbased)
 {
 
     WidgetSeparator *separatorCommon = new WidgetSeparator(parent, "Common");
@@ -61,12 +62,12 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
     sweepControl = new QHBoxLayout();
     dialFreqSweepMin = new WidgetDialRange(parent,"Min frequency");
     dialFreqSweepMin->setObjectName("arbGenfreqSweepMin");
-    dialFreqSweepMin->setRange(0.1,10000000,"Hz",10,0.01,1000,true);
+    dialFreqSweepMin->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
     dialFreqSweepMin->setColor(COLOR_GREY);
 
     dialFreqSweepMax = new WidgetDialRange(parent,"Max frequency");
     dialFreqSweepMax->setObjectName("arbGenfreqSweepMax");
-    dialFreqSweepMax->setRange(0.1,10000000,"Hz",10,0.01,1000,true);
+    dialFreqSweepMax->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
     dialFreqSweepMax->setColor(COLOR_GREY);
 
     dialFreqSweepTime = new WidgetDialRange(parent,"Sweep time");
@@ -114,7 +115,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
 
         dialFreqCh[i] = new WidgetDialRange(parent,"Frequency",i);
         dialFreqCh[i]->setObjectName("arbGenfreq"+chNStr);
-        dialFreqCh[i]->setRange(0.1,10000000,"Hz",10,0.01,1000,true);
+        dialFreqCh[i]->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
         dialFreqCh[i]->setColor(Colors::getChannelColorString(i));
         verChanBox->addWidget(dialFreqCh[i]);
 
@@ -164,6 +165,20 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
 
         verChanBox->addWidget(labelDataLength[i]);
 
+        dialPWMFreqCh[i] = new WidgetDialRange(parent,"PWM Frequency",i);
+        dialPWMFreqCh[i]->setObjectName("arbGenpwmfreq"+chNStr);
+        dialPWMFreqCh[i]->setRange(1,10000000,"Hz",10,0.01,1000,true);
+        dialPWMFreqCh[i]->setColor(Colors::getChannelColorString(i));
+        verChanBox->addWidget(dialPWMFreqCh[i]);
+
+        labelRealPWMFreq[i] = new WidgetLabel(parent,"PWM Frequency","NA");
+        verChanBox->addWidget(labelRealPWMFreq[i]);
+
+        if(!isPWMbased){
+            dialPWMFreqCh[i]->hide();
+            labelRealPWMFreq[i]->hide();
+        }
+
         QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
         verChanBox->addItem(verticalSpacer);
 
@@ -173,6 +188,9 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
         connect(dialAmplitudeCh[i],&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::signalChangedCallback);
         connect(dialDutyCh[i],&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::signalChangedCallback);
         connect(dialPhaseCh[i],&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::signalChangedCallback);
+        if(isPWMbased){
+            connect(dialPWMFreqCh[i],&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::signalPWMFrequencyCallback);
+        }
         setChannelShown(i,false);
     }
     connect(buttonsEnable,&WidgetButtons::clicked,this,&ArbGenPanelSettings::buttonEnableChannelCallback);
@@ -181,8 +199,6 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, QWidget *pare
     connect(buttonSWSweepEnable,&WidgetButtons::clicked,this,&ArbGenPanelSettings::buttonSweepCallback);
     connect(dialFreqSweepMax,&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::sweepMaxCallback);
     connect(dialFreqSweepMin,&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::sweepMinCallback);
-    //connect(dialFreqSweepTime,&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::sweepSettingsCallback);
-
 
     QSpacerItem *verticalSpacerW = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     horBox->addItem(verticalSpacerW);
@@ -367,6 +383,10 @@ void ArbGenPanelSettings::signalFrequencyCallback(qreal value, int channel)
         signalChangedCallback();
 }
 
+void ArbGenPanelSettings::signalPWMFrequencyCallback(qreal value, int channel)
+{
+    signalChangedCallback();
+}
 
 void ArbGenPanelSettings::memoryCallback(int index)
 {

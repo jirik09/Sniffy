@@ -1,10 +1,11 @@
 #include "arbgeneratorwindow.h"
 #include "ui_arbgeneratorwindow.h"
 
-ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *parent) :
+ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbased, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ArbGeneratorWindow),
-    config(config)
+    config(config),
+    isPWMbased(isPWMbased)
 {
     ui->setupUi(this);
 
@@ -27,7 +28,7 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *pare
     chart->setRange(0, 1, 0, 1);
     verticalLayout_chart->addWidget(chart);
 
-    setting = new ArbGenPanelSettings(verticalLayout_settings,this);
+    setting = new ArbGenPanelSettings(verticalLayout_settings,isPWMbased,this);
     fileLoader = new ArbGeneratorFileLoader();
 
     ui->widget_settings->setLayout(verticalLayout_settings);
@@ -73,6 +74,11 @@ QList<QList<int>> *ArbGeneratorWindow::getGeneratorDACData() const
 qreal ArbGeneratorWindow::getFrequency(int channel)
 {
     return setting->dialFreqCh[channel]->getRealValue();
+}
+
+qreal ArbGeneratorWindow::getPWMFrequency(int channel)
+{
+    return setting->dialPWMFreqCh[channel]->getRealValue();
 }
 
 void ArbGeneratorWindow::setProgress(int percent)

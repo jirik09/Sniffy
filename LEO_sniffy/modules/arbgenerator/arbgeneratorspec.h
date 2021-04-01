@@ -20,8 +20,10 @@ public:
     int generatorBufferSize;
     int DACResolution;
     int maxDACChannels;
+    int maxPWMChannels;
 
     QString channelPins[MAX_ARB_CHANNELS_NUM];
+    QString channelPWMPins[MAX_ARB_CHANNELS_NUM];
 
     qreal rangeMin;
     qreal rangeMax;

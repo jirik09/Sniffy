@@ -36,7 +36,7 @@ class ArbGeneratorWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *parent = nullptr);
+    explicit ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbased = false,QWidget *parent = nullptr);
     ~ArbGeneratorWindow();
 
     void restoreGUIAfterStartup();
@@ -44,6 +44,7 @@ public:
 
     QList<QList<int> > *getGeneratorDACData() const;
     qreal getFrequency(int channel);
+    qreal getPWMFrequency(int channel);
     void setProgress(int percent);
     void setGeneratorRuning();
     void setGeneratorStopped();
@@ -64,6 +65,7 @@ private:
     QList<QList<int>> *generatorDACData;
 
     bool isGenerating = false;
+    bool isPWMbased = false;
 
 private slots:
     void runGeneratorCallback();

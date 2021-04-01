@@ -24,7 +24,7 @@ class ArbGenPanelSettings : public QObject
 {
     Q_OBJECT
 public:
-    explicit ArbGenPanelSettings(QVBoxLayout *destination, QWidget *parent = nullptr);
+    explicit ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbased = false, QWidget *parent = nullptr);
 
     void setChannelShown(int index, bool isShown);
     void setChannelShapeControl(int index, int shape);
@@ -73,10 +73,14 @@ public:
     WidgetLabel *labelDataLength[MAX_ARB_CHANNELS_NUM];
     WidgetSwitch *swSyncWithCH1[MAX_ARB_CHANNELS_NUM];
 
+    WidgetDialRange *dialPWMFreqCh[MAX_ARB_CHANNELS_NUM];
+    WidgetLabel *labelRealPWMFreq[MAX_ARB_CHANNELS_NUM];
+
     SignalShape signalShape[MAX_ARB_CHANNELS_NUM];
     bool channelEnabled[MAX_ARB_CHANNELS_NUM];
     bool channelSyncWithCH1[MAX_ARB_CHANNELS_NUM];
     bool isSweepEnabled = false;
+    bool isPWMbased = false;
 
 
 private:
@@ -91,6 +95,7 @@ private slots:
     void buttonShapeCallback(int clicked, int channel);
     void syncWithCH1Callback(int clicked, int channel);
     void signalFrequencyCallback(qreal value, int channel);
+    void signalPWMFrequencyCallback(qreal value, int channel);
     void signalChangedCallback();
     void memoryCallback(int index);
     void customLenghtCallback(qreal value);
