@@ -29,80 +29,62 @@
 //Special purpose color
 #define COLOR_HOVER "rgb(71,76,94);"
 
+#define COLOR_COMMON_DARK_GREYBLUE "rgb(76,82,89);"
+#define COLOR_COMMON_DARK_GREY "rgb(95,95,95);"
+#define QCOLOR_COMMON_DARK_GREYBLUE QColor(76,82,89)
+#define QCOLOR_COMMON_DARK_GREY QColor(95,95,95)
+
+#define COLOR_COMMON_LIGHT_GREY "rgb(180,180,180);"
+#define QCOLOR_COMMON_LIGHT_GREY QColor(180,180,180)
+
 //Common
 #define COLOR_BLACK "rgb(0,0,0);"
 #define COLOR_FULL_WHITE "rgb(255,255,255);"
 
-#define COLOR_BLUE   "rgb(98,177,208);"
-#define COLOR_RED "rgb(219,88,77);"
-#define COLOR_YELLOW "rgb(240,214,76);"
-#define COLOR_GREEN  "rgb(129,166,91);"
-#define COLOR_PURPLE "rgb(205,114,192);"
-#define COLOR_BROWN "rgb(185,136,93);"
-#define COLOR_ORANGE "rgb(239,161,57);"
-#define COLOR_GREEN_OIL "rgb(94,152,133);"
-#define COLOR_DARK_BLUE "rgb(99,122,172);"
+#define COLOR_BLUE   "rgb(44,150,195);"
+#define COLOR_ORANGE "rgb(203,119,48);"
+#define COLOR_GREEN "rgb(40,164,123);"
+#define COLOR_PURPLE "rgb(148,77,148);"
+#define COLOR_YELLOW "rgb(184,155,0);"
+#define COLOR_RED "rgb(189,66,54);"
+#define COLOR_DARK_BLUE "rgb(71,98,207);"
+#define COLOR_PINK  "rgb(205,114,191)"
 
 #define QCOLOR_BLACK QColor(0,0,0)
 #define QCOLOR_FULL_WHITE QColor(255,255,255)
 
-#define QCOLOR_BLUE   QColor(98,177,208)
-#define QCOLOR_RED    QColor(219,88,77)
-#define QCOLOR_YELLOW QColor(240,214,76)
-#define QCOLOR_GREEN  QColor(129,166,91)
-#define QCOLOR_PURPLE QColor(205,114,192)
-#define QCOLOR_BROWN QColor(185,136,93)
-#define QCOLOR_ORANGE QColor(239,161,57)
-#define QCOLOR_GREEN_OIL QColor(94,152,133)
-#define QCOLOR_DARK_BLUE QColor(99,122,172)
+#define QCOLOR_BLUE   QColor(44,150,195)
+#define QCOLOR_ORANGE QColor(203,119,48)
+#define QCOLOR_GREEN QColor(40,164,123)
+#define QCOLOR_PURPLE QColor(148,77,148)
+#define QCOLOR_YELLOW QColor(184,155,0)
+#define QCOLOR_RED    QColor(189,66,54)
+#define QCOLOR_DARK_BLUE QColor(71,98,207)
+#define QCOLOR_PINK  QColor(205,114,191)
 
 // Channel colors
 #define CHANNEL_1_COLOR COLOR_BLUE
-#define CHANNEL_2_COLOR COLOR_RED
-#define CHANNEL_3_COLOR COLOR_YELLOW
-#define CHANNEL_4_COLOR COLOR_GREEN
-#define CHANNEL_5_COLOR COLOR_PURPLE
-#define CHANNEL_6_COLOR COLOR_BROWN
-#define CHANNEL_7_COLOR COLOR_ORANGE
-#define CHANNEL_8_COLOR COLOR_GREEN_OIL
-#define CHANNEL_9_COLOR COLOR_DARK_BLUE
+#define CHANNEL_2_COLOR COLOR_PURPLE
+#define CHANNEL_3_COLOR COLOR_GREEN
+#define CHANNEL_4_COLOR COLOR_ORANGE
+#define CHANNEL_5_COLOR COLOR_YELLOW
+#define CHANNEL_6_COLOR COLOR_RED
+#define CHANNEL_7_COLOR COLOR_DARK_BLUE
+#define CHANNEL_8_COLOR COLOR_PINK
 
 #define CHANNEL_1_QCOLOR QCOLOR_BLUE
-#define CHANNEL_2_QCOLOR QCOLOR_RED
-#define CHANNEL_3_QCOLOR QCOLOR_YELLOW
-#define CHANNEL_4_QCOLOR QCOLOR_GREEN
-#define CHANNEL_5_QCOLOR QCOLOR_PURPLE
-#define CHANNEL_6_QCOLOR QCOLOR_BROWN
-#define CHANNEL_7_QCOLOR QCOLOR_ORANGE
-#define CHANNEL_8_QCOLOR QCOLOR_GREEN_OIL
-#define CHANNEL_9_QCOLOR QCOLOR_DARK_BLUE
+#define CHANNEL_2_QCOLOR QCOLOR_PURPLE
+#define CHANNEL_3_QCOLOR QCOLOR_GREEN
+#define CHANNEL_4_QCOLOR QCOLOR_ORANGE
+#define CHANNEL_5_QCOLOR QCOLOR_YELLOW
+#define CHANNEL_6_QCOLOR QCOLOR_RED
+#define CHANNEL_7_QCOLOR QCOLOR_DARK_BLUE
+#define CHANNEL_8_QCOLOR QCOLOR_PINK
 
-//extend colors
-//#define COLOR_RED "rgb(224,24,0);"
-//#define COLOR_BROWN "rgb(170,105,39);"
-//#define COLOR_DARK_BLUE "rgb(24,0,185);"
-//#define COLOR_YELLOW "rgb(255,217,15);"
-//#define COLOR_LIGHT_GREEN "rgb(24,224,0);"
-//#define COLOR_DARK_CYAN "rgb(30,170,100);"
-//#define COLOR_PINK "rgb(255,18,108);"
-
-//#define QCOLOR_RED QColor(224,24,0)
-//#define QCOLOR_BROWN QColor(170,105,39)
-//#define QCOLOR_DARK_BLUE QColor(24,0,185)
-//#define QCOLOR_YELLOW QColor(255,217,15)
-//#define QCOLOR_LIGHT_GREEN QColor(24,224,0)
-//#define QCOLOR_DARK_CYAN QColor(30,170,100)
-//#define QCOLOR_PINK QColor(255,18,108)
-
-// basic Channel colors
-//#define COLOR_BLUE   "rgb(24,154,224);"
-//#define COLOR_ORANGE "rgb(255,154,0);"
-//#define COLOR_GREEN  "rgb(54,154,24);"
-//#define COLOR_PURPLE "rgb(185,24,224);"
-//#define QCOLOR_BLUE   QColor(24,154,224)
-//#define QCOLOR_ORANGE QColor(255,154,0)
-//#define QCOLOR_GREEN  QColor(54,154,24)
-//#define QCOLOR_PURPLE QColor(185,24,224)
+enum colorTheme{
+    DARK = 0,
+    LIGHT
+};
 
 class Colors : public QObject
 {
@@ -111,6 +93,8 @@ public:
     explicit Colors(QObject *parent = nullptr);
     static QColor getChannelColor(int channelIndex);
     static QByteArray getChannelColorString(int channelIndex);
+    static QColor getCommonColor();
+    static QByteArray getCommonColorString();
 };
 
 #endif // COLORS_H
