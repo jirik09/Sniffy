@@ -74,6 +74,7 @@ public:
     WidgetLabel *labelRealFreq[MAX_ARB_CHANNELS_NUM];
     WidgetLabel *labelDataLength[MAX_ARB_CHANNELS_NUM];
     WidgetSwitch *swSyncWithCH1[MAX_ARB_CHANNELS_NUM];
+    WidgetSwitch *swSyncPWMWithCH1[MAX_ARB_CHANNELS_NUM];
 
     WidgetDialRange *dialPWMFreqCh[MAX_ARB_CHANNELS_NUM];
     WidgetLabel *labelRealPWMFreq[MAX_ARB_CHANNELS_NUM];
@@ -82,12 +83,16 @@ public:
     SignalShape signalShape[MAX_ARB_CHANNELS_NUM];
     bool channelEnabled[MAX_ARB_CHANNELS_NUM];
     bool channelSyncWithCH1[MAX_ARB_CHANNELS_NUM];
+    bool channelSyncPWMWithCH1[MAX_ARB_CHANNELS_NUM];
     bool isSweepEnabled = false;
     bool isPWMbased = false;
+    bool GUIEnabled = true;
+    bool isSilentGUIUpdate = false;
 
 
 private:
-    void setCopyFreq(int fromCh, int toCh);
+    void copyFreq(int fromCh, int toCh);
+    void copyPWMFreq(int fromCh, int toCh);
 
 signals:
     void signalChanged();
@@ -97,6 +102,7 @@ private slots:
     void buttonEnableChannelCallback(int index);
     void buttonShapeCallback(int clicked, int channel);
     void syncWithCH1Callback(int clicked, int channel);
+    void syncPWMWithCH1Callback(int clicked, int channel);
     void signalFrequencyCallback(qreal value, int channel);
     void signalPWMFrequencyCallback(qreal value, int channel);
     void signalChangedCallback();

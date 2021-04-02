@@ -120,7 +120,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         verChanBox->addWidget(dialFreqCh[i]);
 
         if(i!=0){
-            swSyncWithCH1[i] = new WidgetSwitch(parent,"Off","On","Sync with CH1",i);
+            swSyncWithCH1[i] = new WidgetSwitch(parent,"Off","On","CH1 Freq sync",i);
             swSyncWithCH1[i]->setObjectName("SwFreqSynch"+chNStr);
             swSyncWithCH1[i]->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(i)));
             verChanBox->addWidget(swSyncWithCH1[i]);
@@ -171,6 +171,20 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         dialPWMFreqCh[i]->setColor(Colors::getChannelColorString(i));
         verChanBox->addWidget(dialPWMFreqCh[i]);
 
+        if(i!=0){
+            swSyncPWMWithCH1[i] = new WidgetSwitch(parent,"Off","On","CH1 PWM sync",i);
+            swSyncPWMWithCH1[i]->setObjectName("SwPWMFreqSynch"+chNStr);
+            swSyncPWMWithCH1[i]->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(i)));
+            verChanBox->addWidget(swSyncPWMWithCH1[i]);
+
+            channelSyncPWMWithCH1[i] = false;
+            if(!isPWMbased){
+                swSyncPWMWithCH1[i]->hide();
+            }else{
+                connect(swSyncPWMWithCH1[i],&WidgetSwitch::clicked,this,&ArbGenPanelSettings::syncPWMWithCH1Callback);
+            }
+        }
+
         labelRealPWMFreq[i] = new WidgetLabel(parent,"PWM Frequency","NA");
         verChanBox->addWidget(labelRealPWMFreq[i]);
 
@@ -220,6 +234,7 @@ void ArbGenPanelSettings::setChannelShown(int index, bool isShown)
 
 void ArbGenPanelSettings::restoreGUI()
 {
+    isSilentGUIUpdate = true;
     for(int i = 0;i<buttonsEnable->getSelectedIndex()+1;i++){
         setChannelShown(i,true);
         channelEnabled[i] = true;
@@ -239,8 +254,14 @@ void ArbGenPanelSettings::restoreGUI()
         if(i>0 && swSyncWithCH1[i]->isCheckedRight()){
             syncWithCH1Callback(1,i);
         }
+        if(i>0 && swSyncPWMWithCH1[i]->isCheckedRight()){
+            syncPWMWithCH1Callback(1,i);
+        }
+        signalPWMFrequencyCallback(dialPWMFreqCh[i]->getRealValue(),i);
     }
     sweepMaxCallback(dialFreqSweepMax->getRealValue());
+    isSilentGUIUpdate = false;
+    signalChangedCallback();
 }
 
 void ArbGenPanelSettings::setMaxNumChannels(int numChannels)
@@ -273,6 +294,7 @@ void ArbGenPanelSettings::setPWMResolutionLabel(QString res, int index)
 
 void ArbGenPanelSettings::disableGUI()
 {
+    GUIEnabled = false;
     for(int i = 0; i < MAX_ARB_CHANNELS_NUM; i++){
         //swSyncWithCH1[i]->setEnabled(false);
         buttonsShape[i]->setEnabled(false);
@@ -293,6 +315,7 @@ void ArbGenPanelSettings::disableGUI()
 
 void ArbGenPanelSettings::enableGUI()
 {
+    GUIEnabled = true;
     for(int i = 0; i < MAX_ARB_CHANNELS_NUM; i++){
         //swSyncWithCH1[i]->setEnabled(true);
         buttonsShape[i]->setEnabled(true);
@@ -301,7 +324,8 @@ void ArbGenPanelSettings::enableGUI()
         dialAmplitudeCh[i]->setEnabled(true);
         dialDutyCh[i]->setEnabled(true);
         dialPhaseCh[i]->setEnabled(true);
-        dialPWMFreqCh[i]->setEnabled(true);
+        if(!channelSyncPWMWithCH1[i])
+            dialPWMFreqCh[i]->setEnabled(true);
     }
     buttonsEnable->setEnabled(true);
     buttonsMemory->setEnabled(true);
@@ -312,10 +336,16 @@ void ArbGenPanelSettings::enableGUI()
     sweepMaxCallback(dialFreqSweepMax->getRealValue());
 }
 
-void ArbGenPanelSettings::setCopyFreq(int fromCh, int toCh)
+void ArbGenPanelSettings::copyFreq(int fromCh, int toCh)
 {
     qreal value = dialFreqCh[fromCh]->getRealValue();
     dialFreqCh[toCh]->setRealValue(value,true);
+}
+
+void ArbGenPanelSettings::copyPWMFreq(int fromCh, int toCh)
+{
+    qreal value = dialPWMFreqCh[fromCh]->getRealValue();
+    dialPWMFreqCh[toCh]->setRealValue(value,true);
 }
 
 void ArbGenPanelSettings::buttonEnableChannelCallback(int index)
@@ -373,13 +403,30 @@ void ArbGenPanelSettings::syncWithCH1Callback(int clicked, int channel)
 {
     if(clicked==0){
         channelSyncWithCH1[channel] = false;
+        dialFreqCh[channel]->setEnabled(true);
     }else{
         channelSyncWithCH1[channel] = true;
-        setCopyFreq(0,channel);
+        copyFreq(0,channel);
+        dialFreqCh[channel]->setEnabled(false);
     }
     signalChangedCallback();
 
     if(clicked != 0) emit syncRequest();
+}
+
+void ArbGenPanelSettings::syncPWMWithCH1Callback(int clicked, int channel)
+{
+    if(clicked==0){
+        channelSyncPWMWithCH1[channel] = false;
+        if(GUIEnabled)
+            dialPWMFreqCh[channel]->setEnabled(true);
+    }else{
+        channelSyncPWMWithCH1[channel] = true;
+        copyPWMFreq(0,channel);
+        if (GUIEnabled)
+            dialPWMFreqCh[channel]->setEnabled(false);
+    }
+    signalChangedCallback();
 }
 
 void ArbGenPanelSettings::signalFrequencyCallback(qreal value, int channel)
@@ -387,7 +434,7 @@ void ArbGenPanelSettings::signalFrequencyCallback(qreal value, int channel)
     if(channel==0){
         for(int i = 1;i<MAX_ARB_CHANNELS_NUM;i++){
             if(channelSyncWithCH1[i])
-                setCopyFreq(0,i);
+                copyFreq(0,i);
         }
         dialFreqSweepMax->setRealValue(value,true);
     }else{
@@ -402,7 +449,18 @@ void ArbGenPanelSettings::signalFrequencyCallback(qreal value, int channel)
 void ArbGenPanelSettings::signalPWMFrequencyCallback(qreal value, int channel)
 {
     setPWMFreqLabel(LabelFormator::formatOutout(value,"Hz",3),channel);
-    signalChangedCallback();
+    if(channel==0){
+        for(int i = 1;i<MAX_ARB_CHANNELS_NUM;i++){
+            if(channelSyncPWMWithCH1[i])
+                copyPWMFreq(0,i);
+        }
+    }else{
+        if(channelSyncPWMWithCH1[channel])
+            dialPWMFreqCh[0]->setRealValue(value,false);
+    }
+
+    if (channel == 0 || !channelSyncPWMWithCH1[channel])
+        signalChangedCallback();
 }
 
 void ArbGenPanelSettings::memoryCallback(int index)
@@ -472,5 +530,6 @@ void ArbGenPanelSettings::sweepSettingsCallback()
 
 void ArbGenPanelSettings::signalChangedCallback()
 {
-    emit signalChanged();
+    if(!isSilentGUIUpdate)
+        emit signalChanged();
 }

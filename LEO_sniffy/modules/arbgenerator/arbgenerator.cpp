@@ -192,7 +192,6 @@ void ArbGenerator::quickRestartCalback()
 {
     stopGenerator();
     startGenerator();
-    qDebug () << "restarted";
 }
 
 void ArbGenerator::sendNextData()
