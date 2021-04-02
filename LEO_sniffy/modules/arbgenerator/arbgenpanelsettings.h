@@ -32,6 +32,8 @@ public:
     void setMaxNumChannels(int numChannels);
     void setLabels(QString freq, QString length, int index);
     void setFreqLabel(QString freq, int index);
+    void setPWMFreqLabel(QString freq, int index);
+    void setPWMResolutionLabel(QString res, int index);
     void disableGUI();
     void enableGUI();
 
@@ -75,6 +77,7 @@ public:
 
     WidgetDialRange *dialPWMFreqCh[MAX_ARB_CHANNELS_NUM];
     WidgetLabel *labelRealPWMFreq[MAX_ARB_CHANNELS_NUM];
+    WidgetLabel *labelPWMResolution[MAX_ARB_CHANNELS_NUM];
 
     SignalShape signalShape[MAX_ARB_CHANNELS_NUM];
     bool channelEnabled[MAX_ARB_CHANNELS_NUM];

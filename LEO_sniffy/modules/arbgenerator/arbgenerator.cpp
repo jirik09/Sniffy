@@ -85,9 +85,14 @@ void ArbGenerator::parseData(QByteArray data)
         arbGenWindow->setFrequencyLabels(1,(qreal)(freq)/signalLengths[1]);
 
     }else if(dataHeader==cmd->CMD_GEN_PWM_REAL_FREQ_CH1){
-        qDebug () << "todo parse frequency";
+        quint32 freq;
+        freq = qFromBigEndian<quint32>(data.right(4));
+        arbGenWindow->setPWMFrequencyLabels(0,(qreal)(freq));
+
     }else if(dataHeader==cmd->CMD_GEN_PWM_REAL_FREQ_CH2){
-        qDebug () << "todo parse frequency";
+        quint32 freq;
+        freq = qFromBigEndian<quint32>(data.right(4));
+        arbGenWindow->setPWMFrequencyLabels(1,(qreal)(freq));
 
     }else{
         qDebug()<<"UNHANDLED"<<data;

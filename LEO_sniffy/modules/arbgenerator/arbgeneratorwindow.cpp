@@ -28,6 +28,13 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
     chart->setRange(0, 1, 0, 1);
     verticalLayout_chart->addWidget(chart);
 
+    PWMchart = new widgetChart(widget_chart, 4);
+    PWMchart->setRange(0, 1, 0, 1);
+    verticalLayout_chart->addWidget(PWMchart);
+    if(!isPWMbased){
+        PWMchart->hide();
+    }
+
     setting = new ArbGenPanelSettings(verticalLayout_settings,isPWMbased,this);
     fileLoader = new ArbGeneratorFileLoader();
 
@@ -36,6 +43,7 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
     ui->widget_module->setLayout(verticalLayout_chart);
 
     generatorChartData = new QVector<QVector<QPointF>>;
+    generatorPWMChartData = new QVector<QVector<QPointF>>;
     generatorDACData = new QList<QList<int>>;
 
     sweepController = new ArbGenSweepController();
@@ -110,6 +118,11 @@ void ArbGeneratorWindow::setFrequencyLabels(int channel, qreal freq)
     setting->setFreqLabel(LabelFormator::formatOutout(freq,"Hz",4),channel);
 }
 
+void ArbGeneratorWindow::setPWMFrequencyLabels(int channel, qreal freq)
+{
+    setting->setPWMFreqLabel(LabelFormator::formatOutout(freq,"Hz",4),channel);
+}
+
 void ArbGeneratorWindow::setGenerateButton(QString text, QString color)
 {
     setting->buttonsGenerate->setText(text);
@@ -133,13 +146,15 @@ void ArbGeneratorWindow::createSignalCallback()
 {
     int length;
     int numChannelsUsed;
-    QList<int> DACData;
+    QList<int> MCUData;
     QVector<qreal> signalData;
     QVector<QPointF> chartSignal;
     qreal x(0);
     qreal y(0);
+    int PWMres;
     int tmpDAC;
     qreal maxX = -10000;
+    qreal maxRes = -10000;
 
     QList<qreal> *freq = new QList<qreal>;
     QList<SignalShape> *shape = new QList<SignalShape>;
@@ -155,11 +170,17 @@ void ArbGeneratorWindow::createSignalCallback()
     if(!isGenerating){
         generatorChartData->clear();
         generatorDACData->clear();
+        generatorPWMChartData->clear();
 
 
         for(int i = 0;i<numChannelsUsed;i++){
+            if(isPWMbased){
+                PWMres = spec->periphPWMClockFrequency/setting->dialPWMFreqCh[i]->getRealValue();
+                setting->setPWMResolutionLabel(LabelFormator::formatOutout(log2(PWMres),"Bits",1),i);
+            }
+
             chartSignal.clear();
-            DACData.clear();
+            MCUData.clear();
 
             // **************** generate signal based on inputs ****************
             if(shape->at(i) == SignalShape::ARB){
@@ -191,16 +212,21 @@ void ArbGeneratorWindow::createSignalCallback()
                     x = (qreal)(div)/spec->periphClockFrequency*(j+1);// /1/realfreq*j;
                     chartSignal.append(QPointF(x,y));
 
-                    tmpDAC = ((pow(2,12)-1)*(qreal)(y-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
-                    DACData.append(tmpDAC);
+                    if(isPWMbased){
+                        tmpDAC = PWMres-PWMres*((qreal)(y-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
+                    }else{
+                        tmpDAC = ((pow(2,spec->DACResolution)-1)*(qreal)(y-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
+                    }
+
+
+                    MCUData.append(tmpDAC);
                 }
                 x = (qreal)(div)/spec->periphClockFrequency*length;
                 chartSignal.append(QPointF(x,chartSignal[0].y()));
-                if(maxX<x){
-                    maxX=x;
-                }
+                if(maxX<x)maxX=x;
+
                 generatorChartData->append(chartSignal);
-                generatorDACData->append(DACData);
+                generatorDACData->append(MCUData);
 
             }else{ //Other signals except arbitrary
                 signalData = SignalCreator::createSignal(setting->signalShape[i], length, setting->dialAmplitudeCh[i]->getRealValue(), setting->dialOffsetCh[i]->getRealValue(), setting->dialDutyCh[i]->getRealValue(), setting->dialPhaseCh[i]->getRealValue(),spec->rangeMin,spec->rangeMax);
@@ -214,18 +240,48 @@ void ArbGeneratorWindow::createSignalCallback()
                 }
                 x = (qreal)(div)/spec->periphClockFrequency*length;
                 chartSignal.append(QPointF(x,chartSignal[0].y()));
-                if(maxX<x){
-                    maxX=x;
-                }
+                if(maxX<x) maxX=x;
+
                 generatorChartData->append(chartSignal);
 
                 //**************** calculate data for MCU ****************
-                DACData.clear();
+                MCUData.clear();
                 for (int j=0 ;j<length ;j++) {
-                    tmpDAC = ((pow(2,12)-1)*(qreal)(signalData[j]-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
-                    DACData.append(tmpDAC);
+                    if(isPWMbased){
+                        tmpDAC = PWMres-PWMres*(qreal)(signalData[j]-spec->rangeMin)/(spec->rangeMax-spec->rangeMin);
+                    }else{
+                        tmpDAC = ((pow(2,spec->DACResolution)-1)*(qreal)(signalData[j]-spec->rangeMin))/(spec->rangeMax-spec->rangeMin);
+                    }
+                    MCUData.append(tmpDAC);
                 }
-                generatorDACData->append(DACData);
+                generatorDACData->append(MCUData);
+            }
+
+            //*********** calculate signal for PWM chart *******
+            if(isPWMbased){
+                if(PWMres>maxRes)maxRes = PWMres;
+                chartSignal.clear();
+                int increment = ceil((qreal)(length)/ PWM_CHART_SAMPLES);
+                for (int j=0 ;j<length ;j+=increment) {
+                    x = 0;
+                    y = spec->Vcc+i;
+                    chartSignal.append(QPointF(x,y));
+                    x = PWMres-MCUData[j];
+                    chartSignal.append(QPointF(x,y));
+                    y = i;
+                    chartSignal.append(QPointF(x,y));
+                    x = PWMres;
+                    chartSignal.append(QPointF(x,y));
+                    j+=increment;
+                    if(j>=length)j = length-1;
+                    x = PWMres-MCUData[j];
+                    chartSignal.append(QPointF(x,y));
+                    y = spec->Vcc+i;
+                    chartSignal.append(QPointF(x,y));
+                    x = 0;
+                    chartSignal.append(QPointF(x,y));
+                }
+                generatorPWMChartData->append(chartSignal);
             }
         }
 
@@ -248,12 +304,11 @@ void ArbGeneratorWindow::createSignalCallback()
                 x = (qreal)(div) / spec->periphClockFrequency*(j/2+1);// /1/realfreq*j;
                 tmpVect.append(QPointF(x,y));
             }
-            if(maxX<x){
-                maxX=x;
-            }
+            if(maxX<x) maxX=x;
             generatorChartData->replace(i,tmpVect);
         }
     }
+
 
     // **************** plot the data ****************
     chart->clearAll();
@@ -261,6 +316,18 @@ void ArbGeneratorWindow::createSignalCallback()
         chart->updateTrace(&((*generatorChartData)[i]), i);
     }
     chart->setRange(0,maxX,spec->rangeMin,spec->rangeMax);
+
+
+    // **************** plot the PWM data ****************
+    if(isPWMbased){
+        PWMchart->clearAll();
+        for(int i = 0;i<numChannelsUsed;i++){
+            PWMchart->updateTrace(&((*generatorPWMChartData)[i]), i);
+            PWMchart->setHorizontalMarker(i,i);
+        }
+        PWMchart->setRange(0,maxRes,spec->Vcc*(-0.1),spec->Vcc*1.1+(numChannelsUsed-1));
+    }
+
 
     if(setting->isSweepEnabled){
         sweepController->setParameters(setting->dialFreqSweepMin->getRealValue(),setting->dialFreqSweepMax->getRealValue(),setting->dialFreqSweepTime->getRealValue());

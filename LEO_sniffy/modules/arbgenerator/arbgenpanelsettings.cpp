@@ -174,9 +174,13 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         labelRealPWMFreq[i] = new WidgetLabel(parent,"PWM Frequency","NA");
         verChanBox->addWidget(labelRealPWMFreq[i]);
 
+        labelPWMResolution[i] = new WidgetLabel(parent,"PWM Resolution","NA");
+        verChanBox->addWidget(labelPWMResolution[i]);
+
         if(!isPWMbased){
             dialPWMFreqCh[i]->hide();
             labelRealPWMFreq[i]->hide();
+            labelPWMResolution[i]->hide();
         }
 
         QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -257,6 +261,16 @@ void ArbGenPanelSettings::setFreqLabel(QString freq, int index)
     labelRealFreq[index]->setValue(freq);
 }
 
+void ArbGenPanelSettings::setPWMFreqLabel(QString freq, int index)
+{
+    labelRealPWMFreq[index]->setValue(freq);
+}
+
+void ArbGenPanelSettings::setPWMResolutionLabel(QString res, int index)
+{
+    labelPWMResolution[index]->setValue(res);
+}
+
 void ArbGenPanelSettings::disableGUI()
 {
     for(int i = 0; i < MAX_ARB_CHANNELS_NUM; i++){
@@ -267,6 +281,7 @@ void ArbGenPanelSettings::disableGUI()
         dialAmplitudeCh[i]->setEnabled(false);
         dialDutyCh[i]->setEnabled(false);
         dialPhaseCh[i]->setEnabled(false);
+        dialPWMFreqCh[i]->setEnabled(false);
     }
     buttonsEnable->setEnabled(false);
     buttonsMemory->setEnabled(false);
@@ -286,6 +301,7 @@ void ArbGenPanelSettings::enableGUI()
         dialAmplitudeCh[i]->setEnabled(true);
         dialDutyCh[i]->setEnabled(true);
         dialPhaseCh[i]->setEnabled(true);
+        dialPWMFreqCh[i]->setEnabled(true);
     }
     buttonsEnable->setEnabled(true);
     buttonsMemory->setEnabled(true);
@@ -385,6 +401,7 @@ void ArbGenPanelSettings::signalFrequencyCallback(qreal value, int channel)
 
 void ArbGenPanelSettings::signalPWMFrequencyCallback(qreal value, int channel)
 {
+    setPWMFreqLabel(LabelFormator::formatOutout(value,"Hz",3),channel);
     signalChangedCallback();
 }
 

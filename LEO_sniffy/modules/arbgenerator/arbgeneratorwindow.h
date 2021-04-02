@@ -49,6 +49,7 @@ public:
     void setGeneratorRuning();
     void setGeneratorStopped();
     void setFrequencyLabels(int channel, qreal freq);
+    void setPWMFrequencyLabels(int channel, qreal freq);
 
 private:
     void setGenerateButton (QString text, QString color);
@@ -61,7 +62,9 @@ private:
     ArbGenSweepController *sweepController; //this should be actually in module not in window (TODO in far future)
 
     widgetChart *chart;
+    widgetChart *PWMchart;
     QVector<QVector<QPointF>> *generatorChartData;
+    QVector<QVector<QPointF>> *generatorPWMChartData;
     QList<QList<int>> *generatorDACData;
 
     bool isGenerating = false;

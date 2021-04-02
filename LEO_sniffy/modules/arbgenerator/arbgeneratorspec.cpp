@@ -35,7 +35,7 @@ void ArbGeneratorSpec::parsePWMSpecification(QByteArray spec)
     QDataStream stream(spec);
     resources = 0;
 
-    stream >> resources >> maxPWMChannels;
+    stream >> resources >> periphPWMClockFrequency >> maxPWMChannels;
     char chars[4] = "";
     for(int i = 0; i < maxPWMChannels; i++){
         stream.readRawData(chars, 4);

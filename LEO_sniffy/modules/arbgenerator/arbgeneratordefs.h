@@ -22,6 +22,8 @@ const double SWEEP_TIME_STEP = 0.05;
 
 const int SEND_BLOCK_SIZE = 64;
 
+const int PWM_CHART_SAMPLES = 50;
+
 const double ARBITRARY_DEFAULT_SIGNAL_MAX = 2.5;
 const double ARBITRARY_DEFAULT_SIGNAL_MIN = 0.0;
 const int ARBITRARY_DEFAULT_SIGNAL_LENGTH = 468;

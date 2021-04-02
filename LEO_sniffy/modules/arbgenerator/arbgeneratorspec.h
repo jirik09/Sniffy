@@ -21,6 +21,7 @@ public:
     int DACResolution;
     int maxDACChannels;
     int maxPWMChannels;
+    int periphPWMClockFrequency;
 
     QString channelPins[MAX_ARB_CHANNELS_NUM];
     QString channelPWMPins[MAX_ARB_CHANNELS_NUM];
