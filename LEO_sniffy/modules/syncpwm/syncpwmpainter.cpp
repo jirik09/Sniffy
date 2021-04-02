@@ -84,26 +84,10 @@ void SyncPwmPainter::recalculate(){
 }
 
 void SyncPwmPainter::enableChannel(bool enable, int chanIndex){
-    if(enable){
-        switch(chanIndex){
-        case 0:
-            chart->setTraceColor(0, QCOLOR_CHAN1);
-            break;
-        case 1:
-            chart->setTraceColor(1, QCOLOR_CHAN2);
-            break;
-        case 2:
-            chart->setTraceColor(2, QCOLOR_CHAN3);
-            break;
-        case 3:
-            chart->setTraceColor(3, QCOLOR_CHAN4);
-            break;
-        default:
-            break;
-        }
-    }else {
+    if(enable)
+        chart->setTraceColor(chanIndex, Colors::getChannelColor(chanIndex));
+    else
         chart->setTraceColor(chanIndex, QCOLOR_GREY);
-    }
 
     repaint();
 }
@@ -125,9 +109,7 @@ void SyncPwmPainter::configDefaultChart(){
     chart->setMargins(-12, -5, -6, -10);
     chart->setLabelsVisible(true, false);
     chart->setRange(0, 1, 0, RANGE_CHAN1_LOG1 + 1);
-    chart->setTraceColor(0, QCOLOR_CHAN1);
-    chart->setTraceColor(1, QCOLOR_CHAN2);
-    chart->setTraceColor(2, QCOLOR_CHAN3);
-    chart->setTraceColor(3, QCOLOR_CHAN4);
+    for(int i = 0; i < CHANNELS_NUM; i++)
+        chart->setTraceColor(i, Colors::getChannelColor(i));
 }
 

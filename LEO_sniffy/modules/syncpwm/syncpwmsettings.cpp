@@ -9,16 +9,19 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
     switchStepMode = new WidgetSwitch(parent, " Continuous ", "     Step     ", "");
     switchStepMode->setObjectName("syncPwmStepButton");
+    switchStepMode->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)));
 
     buttonStart = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonStart->setText("Start", 0);
     buttonStart->setChecked(false, 0);
     buttonStart->setObjectName("syncPwmStartButton");
+    buttonStart->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
 
     buttonEquidist = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonEquidist->setText("Equidistant", 0);
     buttonEquidist->setObjectName("syncPwmEquidistButton");
     buttonEquidist->setChecked(false, 0);
+    buttonEquidist->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)), 0);
 
     QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
     QHBoxLayout *commonButtons = new QHBoxLayout();
@@ -85,33 +88,34 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
 void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
     QString chNStr = QString::number(i+1);
+    QByteArray color = Colors::getChannelColorString(i);
 
     onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "", i);
     onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);
-    onOffCh[i]->setColor("background-color:" + chanColor[i]);
+    onOffCh[i]->setColor("background-color:" + color);
 
     inverCh[i] = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0, i);
     inverCh[i]->setText("Invert");
     inverCh[i]->setObjectName("syncPwmInverCh" + chNStr);
     inverCh[i]->setChecked(false, 0);
-    inverCh[i]->setColor("background-color:" + chanColor[i], 0);
+    inverCh[i]->setColor("background-color:" + color, 0);
 
     dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
     dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
     dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, true);
-    dialFreqCh[i]->setColor(chanColor[i]);    
+    dialFreqCh[i]->setColor(color);
     dialFreqCh[i]->hideUnitSelection();
 
     dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);
     dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
     dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, DEFAULT_DC, false);
-    dialDutyCh[i]->setColor(chanColor[i]);
+    dialDutyCh[i]->setColor(color);
     dialDutyCh[i]->hideUnitSelection();
 
     dialPhaseCh[i] = new WidgetDialRange(parent, "Phase", i);
     dialPhaseCh[i]->setObjectName("syncPwmPhaseCh" + chNStr);
     dialPhaseCh[i]->setRange(0, 360, "°", 1, 1, phase, false);
-    dialPhaseCh[i]->setColor(chanColor[i]);
+    dialPhaseCh[i]->setColor(color);
     dialPhaseCh[i]->hideUnitSelection();
 }
 

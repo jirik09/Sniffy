@@ -32,11 +32,6 @@ public:
     WidgetDialRange *dialDutyCh[CHANNELS_NUM];
     WidgetDialRange *dialPhaseCh[CHANNELS_NUM];
 
-    const QString chanColor[CHANNELS_NUM] =  {COLOR_CHAN1,
-                                              COLOR_CHAN2,
-                                              COLOR_CHAN3,
-                                              COLOR_CHAN4};
-
     void configControlElements(QWidget *parent, int i, int phase);
     void greyOutComplementChanFreqDials(int chanIndex);
 
