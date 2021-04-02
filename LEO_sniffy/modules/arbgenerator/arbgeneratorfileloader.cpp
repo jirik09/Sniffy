@@ -14,19 +14,16 @@ ArbGeneratorFileLoader::ArbGeneratorFileLoader(QObject *parent) :
     }
 }
 
-int ArbGeneratorFileLoader::openFile(QString file)
+int ArbGeneratorFileLoader::parseFile(QString file)
 {
     if(file.length()<4){
-        return 0;
+        return -3; //file name is incorrect
     }
 
     QFile *loadData = new QFile(file);
 
-    if(!loadData->open(QFile::ReadOnly)){
-        return -1; //Could not open the file
-    }
+    if(!loadData->open(QFile::ReadOnly)) return -1; //Could not open the file
     QTextStream *fileStream = new QTextStream(loadData);
-
 
     QString tmpStr;
     QString tmpStr2;
@@ -52,14 +49,12 @@ int ArbGeneratorFileLoader::openFile(QString file)
     }
     bool run = true;
     isSampleRateDefined = false;
+    parsingErrors = 0;
     bool parsed;
     int channelIndex = 0;
 
-
     tmpStr = fileStream->readLine();
     tmpStr2 = fileStream->readLine();
-    qDebug() << tmpStr;
-
 
     if(parse(tmpStr,sample) || parse(tmpStr2,sample)){  //data can be directly passed (one channel)
         if(parse(tmpStr,sample)){
@@ -68,13 +63,11 @@ int ArbGeneratorFileLoader::openFile(QString file)
         }
         tmpStr = tmpStr2;
         while (run){
-            parse(tmpStr,sample);
+            if(!parse(tmpStr,sample)) parsingErrors++;
             parsedData[0].append(sample);
             updateMinMax(sample,0);
             tmpStr = fileStream->readLine();
-            if(tmpStr.isEmpty()){
-                run = false;
-            }
+            if(tmpStr.isEmpty()) run = false;
         }
 
     }else{  //more channels (or one with time)
@@ -85,9 +78,7 @@ int ArbGeneratorFileLoader::openFile(QString file)
             if(inList.length()==1){
                 splitter = ",";
                 inList = tmpStr2.split(splitter);
-                if(inList.length()==1){
-                    return -2; //File seems not to have valid data (No separator found)
-                }
+                if(inList.length()==1)return -2; //File seems not to have valid data (No separator found)
             }
         }
         inList = tmpStr.split(splitter);
@@ -96,9 +87,7 @@ int ArbGeneratorFileLoader::openFile(QString file)
         channelIndex = 0;
         foreach(QString str, inList){
             parsed = parse(str,sample);
-            if(!parsed && channelIndex==0){  //first line first column is not parsed  --> it is probably lable --> skip first line
-                break;
-            }
+            if(!parsed && channelIndex==0) break;  //first line first column is not parsed  --> it is probably lable --> skip first line
             if(parsed){
                 parsedData[channelIndex].append(sample);
                 updateMinMax(sample,channelIndex);
@@ -116,20 +105,20 @@ int ArbGeneratorFileLoader::openFile(QString file)
                 if(parsed){
                     parsedData[channelIndex].append(sample);
                     updateMinMax(sample,channelIndex);
+                }else{
+                    parsingErrors++;
                 }
                 channelIndex++;
             }
 
             tmpStr = fileStream->readLine();
-            if(tmpStr.isEmpty()){
-                run = false;
-            }
+            if(tmpStr.isEmpty())run = false;
         }
     }
-
+    loadData->close();
 
     //check if the first column is time (equidistant samples)
-    if(parsedData.at(1).length()>1){ //not if there is only one column
+    if(parsedData.at(1).length()>1){ //skip if there is only one column
         qreal diff = 0;
         qreal prevSmpl = 0;
         isSampleRateDefined = true;
@@ -140,18 +129,29 @@ int ArbGeneratorFileLoader::openFile(QString file)
                     break;
                 }
             }
-            if(prevSmpl!=0){
-                diff = sample - prevSmpl;
-            }
+            if(prevSmpl!=0) diff = sample - prevSmpl;
             prevSmpl = sample;
         }
-        if(isSampleRateDefined){
-            sampleRate = 1/diff;
+        if(isSampleRateDefined) sampleRate = 1/diff;
+    }
+
+    //chceck if data are above 127 --> data are probably represented in DAC values not in voltage
+    qreal maxTotal = -100000000;
+    for(int i=0;i<MAX_ARB_CHANNELS_NUM+1;i++){
+        maxTotal = fmax(max[i],maxTotal);
+    }
+    if(maxTotal>127){
+        for(int i = 0;i<parsedData.length();i++){
+            max[i] = -100000000;
+            min[i] = 100000000;
+            for(int j=0;j<parsedData.at(i).length();j++){
+                parsedData[i][j] = (parsedData[i][j] * (rangeMax-rangeMin)+rangeMin)/pow(2,resolution);
+                updateMinMax(parsedData[i][j],i);
+            }
         }
     }
 
-
-    loadData->close();
+    //copy data into private variable to be accesible by getter
     numOfChannels = 0;
     data->clear();
     for(int i=0;i<5;i++){
@@ -168,16 +168,17 @@ int ArbGeneratorFileLoader::openFile(QString file)
         }
     }
 
+
+    //append default data to channels which are not used
     int i = 0;
     while(data->length()<4){
         data->append(defaultData);
-        max[numOfChannels+i] = 2.5;
-        min[numOfChannels+i] = 0;
+        max[numOfChannels+i] = ARBITRARY_DEFAULT_SIGNAL_MAX;
+        min[numOfChannels+i] = ARBITRARY_DEFAULT_SIGNAL_MIN;
         i++;
     }
-    return 0;// data was prsed and ok
+    return numOfChannels;// data was prsed and ok
 }
-
 
 
 int ArbGeneratorFileLoader::getNumChannels()
@@ -216,14 +217,13 @@ QString ArbGeneratorFileLoader::getInfoString()
 {
     QString out;
     if(isSampleRateDefined){
-        out.append("time - "+ QString::number(round(sampleRate)) + "smps, ");
+        out.append("time - "+ QString::number(round(sampleRate)) + " smps");
     }
-
     if(numOfChannels==1){
-        out.append("CH1 - " + QString::number(data->at(0).length())+" ");
+        out.append(", CH1 - " + QString::number(data->at(0).length())+" smpls ");
     }else if(numOfChannels>1){
-        for (int i = 0;i<data->length();i++){
-            out.append("CH"+QString::number(i+1)+" - " + QString::number(data->at(i).length())+" ");
+        for (int i = 0;i<numOfChannels;i++){
+            out.append(", CH"+QString::number(i+1)+" - " + QString::number(data->at(i).length())+" smpls ");
         }
     }
     return out;
@@ -237,6 +237,11 @@ qreal ArbGeneratorFileLoader::getAmplitude(int channelIndex)
 qreal ArbGeneratorFileLoader::getOffset(int channelIndex)
 {
     return (max[channelIndex]+min[channelIndex])/2;
+}
+
+int ArbGeneratorFileLoader::getParsingErrors() const
+{
+    return parsingErrors;
 }
 
 bool ArbGeneratorFileLoader::parse(QString in, qreal &output)
@@ -254,12 +259,8 @@ bool ArbGeneratorFileLoader::parse(QString in, qreal &output)
 
 void ArbGeneratorFileLoader::updateMinMax(qreal sample, int channelIndex)
 {
-    if(sample<min[channelIndex]){
-        min[channelIndex] = sample;
-    }
-    if(sample>max[channelIndex]){
-        max[channelIndex] = sample;
-    }
+    min[channelIndex] = fmin(sample,min[channelIndex]);
+    max[channelIndex] = fmax(sample,max[channelIndex]);
 }
 
 

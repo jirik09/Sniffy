@@ -7,6 +7,8 @@
 
 #include "../graphics/colors.h"
 
+#include "../modules/numberparser.h"
+
 
 namespace Ui {
 class WidgetTextInput;

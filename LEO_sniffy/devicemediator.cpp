@@ -21,8 +21,8 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (new Voltmeter(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new SyncPwm(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this,true)));
     tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new PWMGenerator(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
@@ -134,7 +134,7 @@ void DeviceMediator::parseData(QByteArray data){
             qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
         }
         if (data.right(1)=="E"){
-            qDebug() << "DEVICE ERROR " << QString::number((data.right(2)).at(0));
+            qDebug() << "DEVICE ERROR " << QString::number((uint8_t)((data.right(2)).at(0)));
         }
 
     }

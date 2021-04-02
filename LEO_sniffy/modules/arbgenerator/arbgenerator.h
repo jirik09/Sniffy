@@ -10,11 +10,12 @@
 #include "arbgeneratorwindow.h"
 #include "arbgeneratordefs.h"
 
+
 class ArbGenerator : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit ArbGenerator(QObject *parent = nullptr);
+    explicit ArbGenerator(QObject *parent = nullptr, bool isPWMbased = false);
     QWidget* getWidget();
 
 signals:
@@ -33,10 +34,12 @@ private slots:
     void sendSignalCallback();
     void stopCallback();
     void updateFrequencyCallback();
+    void quickRestartCalback();
 
 private:
     ArbGeneratorConfig *config;
     ArbGeneratorWindow *arbGenWindow;
+    bool isPWMbased = false;
 
     int lengthToSend;
     int lengthSent;
@@ -53,9 +56,12 @@ private:
     void stopGenerator ();
     void restartGenerator();
     void setGeneratorDACMode();
+    void setGeneratorPWMMode();
+    void generatorDeinit();
     void setDataLength(int channel, int length);
     void setNumChannels(int numChannels);
-    void setFrequency (int channel, qreal freq);
+    void setSamplingFrequency (int channel, qreal freq);
+    void setPWMFrequency (int channel, qreal freq);
     void genAskForFreq();
     void setOutputBuffer (bool isEnabled);
     void sendNextData();

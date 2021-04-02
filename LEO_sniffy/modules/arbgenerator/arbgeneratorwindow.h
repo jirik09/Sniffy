@@ -25,6 +25,7 @@
 #include "arbgeneratorspec.h"
 #include "signalcreator.h"
 #include "arbgeneratorfileloader.h"
+#include "arbgensweepcontroller.h"
 
 namespace Ui {
 class ArbGeneratorWindow;
@@ -35,7 +36,7 @@ class ArbGeneratorWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *parent = nullptr);
+    explicit ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbased = false,QWidget *parent = nullptr);
     ~ArbGeneratorWindow();
 
     void restoreGUIAfterStartup();
@@ -43,10 +44,12 @@ public:
 
     QList<QList<int> > *getGeneratorDACData() const;
     qreal getFrequency(int channel);
+    qreal getPWMFrequency(int channel);
     void setProgress(int percent);
     void setGeneratorRuning();
     void setGeneratorStopped();
     void setFrequencyLabels(int channel, qreal freq);
+    void setPWMFrequencyLabels(int channel, qreal freq);
 
 private:
     void setGenerateButton (QString text, QString color);
@@ -55,23 +58,30 @@ private:
     ArbGeneratorConfig *config;
     ArbGeneratorSpec *spec;
     ArbGenPanelSettings *setting;
-    ArbGeneratorFileLoader *fileLoader;
+    ArbGeneratorFileLoader *fileLoader; //this should be actually in module not in window (TODO in far future)
+    ArbGenSweepController *sweepController; //this should be actually in module not in window (TODO in far future)
 
     widgetChart *chart;
+    widgetChart *PWMchart;
     QVector<QVector<QPointF>> *generatorChartData;
+    QVector<QVector<QPointF>> *generatorPWMChartData;
     QList<QList<int>> *generatorDACData;
 
     bool isGenerating = false;
+    bool isPWMbased = false;
 
 private slots:
     void runGeneratorCallback();
     void createSignalCallback();
     void openFileCallback();
+    void sweepTimerCallback(qreal frequency);
+    void syncRequestCallback();
 
 signals:
     void runGenerator();
     void stopGenerator();
     void updateFrequency();
+    void restartGenerating();
 };
 
 #endif // ARBGENERATORWINDOW_H

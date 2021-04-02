@@ -13,14 +13,18 @@ class ArbGeneratorSpec : public AbstractSpecification
 public:
     explicit ArbGeneratorSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);
+    void parsePWMSpecification(QByteArray spec);
 
     int maxSamplingRate;
     int periphClockFrequency;
     int generatorBufferSize;
     int DACResolution;
     int maxDACChannels;
+    int maxPWMChannels;
+    int periphPWMClockFrequency;
 
     QString channelPins[MAX_ARB_CHANNELS_NUM];
+    QString channelPWMPins[MAX_ARB_CHANNELS_NUM];
 
     qreal rangeMin;
     qreal rangeMax;

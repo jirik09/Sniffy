@@ -155,15 +155,11 @@ QByteArray Voltmeter::getConfiguration()
 
 void Voltmeter::startModule()
 {
-    if (isModuleStarted)return;
-
-    isModuleStarted = true;
     startSampling();
 }
 
 void Voltmeter::stopModule()
 {
-    isModuleStarted = false;
     isConfigurationWritten = false;
     voltWindow->stopDatalog();
     stopSampling();

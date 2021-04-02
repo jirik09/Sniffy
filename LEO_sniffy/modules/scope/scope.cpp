@@ -7,6 +7,7 @@ Scope::Scope(QObject *parent)
     moduleSpecification = new ScopeSpec();
     measCalc = new MeasCalculations();
     mathCalc = new MathCalculations();
+    FFTCalc = new FFTengine();
     scpWindow = new ScopeWindow(config);
     scpWindow->setObjectName("scpWindow");
 
@@ -14,7 +15,6 @@ Scope::Scope(QObject *parent)
     moduleCommandPrefix = cmd->SCOPE;
     moduleName = "Oscilloscope";
     moduleIconURI = ":/graphics/graphics/icon_scope.png";
-
 
     scopeData = new QVector<QVector<QPointF>>;
 
@@ -34,7 +34,9 @@ Scope::Scope(QObject *parent)
     connect(measCalc, &MeasCalculations::measCalculated, this, &Scope::updateMeasurement);
 
     connect(scpWindow, &ScopeWindow::mathExpressionChanged,this,&Scope::updateMathExpression);
+    connect(scpWindow, &ScopeWindow::fftChanged,this,&Scope::updateFFTConfig);
     connect(mathCalc, &MathCalculations::mathCalculated, this, &Scope::updateMath);
+    connect(FFTCalc, &FFTengine::fftCalculated, this, &Scope::updateFFT);
 }
 
 void Scope::parseData(QByteArray data){
@@ -137,6 +139,10 @@ void Scope::parseData(QByteArray data){
         if(currentChannel==numChannels){
             measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
             mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
+            if(FFTlength !=0){
+                FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,false,config->realSamplingRate);
+                qDebug() << "Caluclate fft";
+            }
             scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
 
             //signal sometimes need to be zoomed to show correct value V/div
@@ -188,17 +194,15 @@ QByteArray Scope::getConfiguration(){
 }
 
 void Scope::stopModule(){
-    isModuleStarted = false;
     isConfigurationWritten = false;
     stopSampling();
     measCalc->exit();
     mathCalc->exit();
+    FFTCalc->exit();
 }
 void Scope::startModule(){
-    if (isModuleStarted)return;
-
-    isModuleStarted = true;
-    startSampling();
+    if(config->triggerMode != ScopeTriggerMode::TRIG_STOP)
+        startSampling();
 }
 
 QWidget* Scope::getWidget(){
@@ -213,7 +217,7 @@ void Scope::updateTimebase(float div){
         config->requestedSamplingRate = round(float(100)/(div)+0.49);
     }
     setSamplingFrequency(config->requestedSamplingRate);
-    updateTriggerMode(config->triggerMode);
+    //updateTriggerMode(config->triggerMode);
 }
 
 void Scope::updatePretrigger(float percentage){
@@ -338,6 +342,23 @@ void Scope::updateMathExpression(QString exp)
 {
     mathExpression = exp;
     mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
+}
+
+void Scope::updateFFTConfig(int length, FFTWindow window, FFTType type, int channelIndex)
+{
+    FFTlength = length;
+    FFTwindow = window;
+    FFTtype = type;
+    FFTChannelIndex = channelIndex;
+    if(FFTlength !=0){
+        //  FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
+    }
+
+}
+
+void Scope::updateFFT()
+{
+    scpWindow->updateFFTchart(FFTCalc->getProcessedData());
 }
 
 void Scope::stopSampling(){

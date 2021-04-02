@@ -11,6 +11,7 @@
 #include "scopewindow.h"
 #include "scopeconfig.h"
 #include "scopespec.h"
+#include "fftengine.h"
 
 #include "communication/commands.h"
 #include "communication/comms.h"
@@ -27,10 +28,6 @@ public:
     explicit Scope(QObject *parent = nullptr);
 
     QWidget* getWidget();
-
-signals:
-    //module will probably emit signal to close other resources
-    //(must be done in abstract module and handled in device.cpp)
 
 public slots:
     void parseData(QByteArray data);
@@ -54,6 +51,8 @@ public slots:
     void updateMeasurement(QList<Measurement*> m);
     void updateMath(int errorPosition);
     void updateMathExpression(QString exp);
+    void updateFFTConfig(int length, FFTWindow window, FFTType type, int channelIndex);
+    void updateFFT();
     void clearMeasurement();
 
 private:
@@ -62,11 +61,16 @@ private:
    // ScopeSpec *specification;
     MeasCalculations *measCalc;
     MathCalculations *mathCalc;
+    FFTengine *FFTCalc;
     QVector<QVector<QPointF>> *scopeData;
     QString mathExpression;
 
+    int FFTlength = 0;
+    FFTWindow FFTwindow;
+    FFTType FFTtype;
+    int FFTChannelIndex = 0;
+
     bool isConfigurationWritten = false;
-    bool isModuleStarted = false;
 
     //private functions - writing into device only - no logic
     void stopSampling();

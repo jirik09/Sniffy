@@ -61,6 +61,9 @@ public:
 
     int getResources();
 
+    bool isModuleRestored() const;
+    void setModuleRestored(bool value);
+
 protected:
     QString moduleName;
     QString moduleIconURI;
@@ -74,6 +77,7 @@ private:
     ModuleDockWidget *dockWidgetWindow;
     WidgetControlModule *moduleControlWidget;
     bool dockWinCreated = false;
+    bool moduleRestored = false;
 
 public slots:
     void widgetControlClicked(ModuleStatus status);

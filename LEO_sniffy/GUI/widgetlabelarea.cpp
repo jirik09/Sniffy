@@ -98,14 +98,7 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
     foreach(Measurement* m, meas){
         measLabelList.at(fillIndex)->setText(m->getLabel()+" "+m->getValueString());
         measLabelList.at(fillIndex)->show();
-        if(m->getChannelIndex()==0)
-            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(0)));
-        if(m->getChannelIndex()==1)
-            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(1)));
-        if(m->getChannelIndex()==2)
-            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(2)));
-        if(m->getChannelIndex()==3)
-            measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(3)));
+        measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(m->getChannelIndex())));
         fillIndex++;
     }
 }

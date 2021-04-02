@@ -61,6 +61,7 @@ void ScopeConfig::parse(QByteArray config)
     QString label;
     qint32 channelIndex;
 
+    scopeMeasList.clear();
     for(int i = 0; i<measCount;i++){
         stream >> type;
         stream >> label;

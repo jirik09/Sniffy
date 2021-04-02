@@ -21,7 +21,14 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseZoom();
 
+    chartFFT = new widgetChart(ui->widget_chart, 5);
+    chartFFT->setRange(0, 50000, -100, 100);
+    chartFFT->setDataMinMax(0,50000);
+    chartFFT->enableLocalMouseZoom();
+
+    ui->verticalLayout_chart->addWidget(chartFFT);
     ui->verticalLayout_chart->addWidget(chart);
+    chartFFT->hide();
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
@@ -70,6 +77,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     // ********************* create panel Math ****************
     panelMath = new PanelMath(tabs->getLayout(3),tabs);
     connect(panelMath,&PanelMath::expressionChanged,this,&ScopeWindow::mathExpressionCallback);
+    connect(panelMath,&PanelMath::fftChanged,this,&ScopeWindow::fftChangedCallback);
 
     // ********************* create panel Advanced ****************
     panelAdvanced = new PanelAdvanced(tabs->getLayout(4),tabs);
@@ -307,6 +315,19 @@ void ScopeWindow::mathExpressionCallback(QString exp)
     paintTraces(ChartData,ChartMathData);
 }
 
+void ScopeWindow::fftChangedCallback(int length, FFTWindow window, FFTType type, int channelIndex)
+{
+    emit fftChanged(length,window,type,channelIndex);
+    ChartFFTData.clear();
+    if(length !=0){
+        chartFFT->show();
+        chartFFT->clearAll();
+        //paintTraces(ChartData,ChartMathData); TODO paint in a additional chart (clear)
+    }else{
+        chartFFT->hide();
+    }
+}
+
 void ScopeWindow::sliderShiftCallback(int value){
     chart->setShift((float)value/10);
     config->chartShift = (float)value/10;
@@ -436,6 +457,15 @@ void ScopeWindow::updateMath(QVector<QPointF> mathTrace)
     paintTraces(ChartData,ChartMathData);
 }
 
+void ScopeWindow::updateFFTchart(QVector<QPointF> fftTrace)
+{
+    ChartFFTData = fftTrace;
+    chartFFT->clearAll();
+    chartFFT->updateTrace(&ChartFFTData,0);
+    //TODO paint in a chart
+        qDebug () << "FFT was calculated and received by window" << fftTrace.length();
+}
+
 void ScopeWindow::mathError(int errorPosition)
 {
     panelMath->symbolicError(errorPosition);
@@ -458,8 +488,9 @@ void ScopeWindow::restoreGUIAfterStartup()
 
     panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
     panelMath->typeChanged(panelMath->mathType->getSelectedIndex());
-    if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-        panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+    if(panelSet->buttonsTriggerMode->getSelectedIndex()==0){
+        panelSet->buttonsTriggerMode->setText("Single");
+        triggerModeCallback(0);
     }
 }
 
