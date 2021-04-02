@@ -48,11 +48,13 @@ private slots:
     void handleError(QByteArray error);
     void ScanDevices();
     void open(int deviceIndex);
+    void disableModules();
     void blockConflictingModulesCallback(QString moduleName, int resources);
     void releaseConflictingModulesCallback(QString moduleName, int resources);
 
 public slots:
     void close();
+    void closeApp();
 };
 
 #endif // DEVICE_H

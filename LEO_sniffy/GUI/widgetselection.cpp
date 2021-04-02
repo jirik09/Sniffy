@@ -13,6 +13,8 @@ WidgetSelection::WidgetSelection(QWidget *parent, QString name) :
     ui->setupUi(this);
     ui->label->setText(name);
     options = new QList<params_sel>;
+    ui->comboBox->setStyleSheet(QString::fromUtf8("background-color:")+BACKGROUND_COLOR_DATA_AREA);
+    connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
 }
 
 WidgetSelection::~WidgetSelection()
@@ -22,7 +24,7 @@ WidgetSelection::~WidgetSelection()
 
 QByteArray WidgetSelection::saveGeometry()
 {
-    return  QByteArray::number(getSelected());
+    return  QByteArray::number(getSelectedIndex());
 }
 
 void WidgetSelection::restoreGeometry(QByteArray geom)
@@ -48,12 +50,17 @@ void WidgetSelection::setSelected(int index){
     selectedIndex = index;
 }
 
-int WidgetSelection::getSelected(){
+int WidgetSelection::getSelectedIndex(){
     return ui->comboBox->currentIndex();
 }
 
 int WidgetSelection::count(){
     return ui->comboBox->count();
+}
+
+void WidgetSelection::indexChanged(int index)
+{
+    emit selectedIndexChanged(index);
 }
 
 void WidgetSelection::clear(){

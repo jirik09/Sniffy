@@ -75,6 +75,17 @@ void DeviceMediator::open(int deviceIndex){
     }
 }
 
+void DeviceMediator::disableModules()
+{
+    if(isConnected){
+        foreach(QSharedPointer<AbstractModule> mod, modules){
+            mod->disableModule();
+        }
+        communication->close();
+        isConnected = false;
+    }
+}
+
 void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int resources)
 {
     if(resourcesInUse & resources){
@@ -97,18 +108,20 @@ void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int r
 }
 
 void DeviceMediator::close(){
-    if(isConnected){
-        foreach(QSharedPointer<AbstractModule> mod, modules){
-            mod->disableModule();
-        }
-        communication->close();
-        isConnected = false;
-    }
+    disableModules();
     ShowDeviceModule();
 
     disconnect(communication,&Comms::newData,this,&DeviceMediator::parseData);
     disconnect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
 }
+
+void DeviceMediator::closeApp()
+{
+    disableModules();
+    disconnect(communication,&Comms::newData,this,&DeviceMediator::parseData);
+    disconnect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
+}
+
 
 void DeviceMediator::handleError(QByteArray error){
     device->errorHandler(error);
