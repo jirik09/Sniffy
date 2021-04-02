@@ -1,13 +1,58 @@
 #include "arbgeneratorwindow.h"
 #include "ui_arbgeneratorwindow.h"
 
-ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, QWidget *parent) :
+ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbased, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ArbGeneratorWindow),
-    config(config)
+    config(config),
+    isPWMbased(isPWMbased)
 {
     ui->setupUi(this);
-    //TODO setup the GUI here
+
+    QWidget *widget_settings = new QWidget(this, Qt::Window);
+    QWidget *widget_chart = new QWidget(this, Qt::Window);
+    QVBoxLayout *verticalLayout_chart = new QVBoxLayout();
+    QVBoxLayout *verticalLayout_settings = new QVBoxLayout();
+    widget_settings->setLayout(verticalLayout_settings);
+    widget_chart->setLayout(verticalLayout_chart);
+
+
+    verticalLayout_settings->setContentsMargins(4,4,4,4);
+    verticalLayout_settings->setSpacing(2);
+
+    widget_chart->setContentsMargins(0,0,0,0);
+    verticalLayout_chart->setContentsMargins(0,0,0,0);
+    verticalLayout_chart->setSpacing(0);
+
+    chart = new widgetChart(widget_chart, 4);
+    chart->setRange(0, 1, 0, 1);
+    verticalLayout_chart->addWidget(chart);
+
+    PWMchart = new widgetChart(widget_chart, 4);
+    PWMchart->setRange(0, 1, 0, 1);
+    verticalLayout_chart->addWidget(PWMchart);
+    if(!isPWMbased){
+        PWMchart->hide();
+    }
+
+    setting = new ArbGenPanelSettings(verticalLayout_settings,isPWMbased,this);
+    fileLoader = new ArbGeneratorFileLoader();
+
+    ui->widget_settings->setLayout(verticalLayout_settings);
+    ui->widget_module->resize(600,300);
+    ui->widget_module->setLayout(verticalLayout_chart);
+
+    generatorChartData = new QVector<QVector<QPointF>>;
+    generatorPWMChartData = new QVector<QVector<QPointF>>;
+    generatorDACData = new QList<QList<int>>;
+
+    sweepController = new ArbGenSweepController();
+
+    connect(setting,&ArbGenPanelSettings::signalChanged,this,&ArbGeneratorWindow::createSignalCallback);
+    connect(setting,&ArbGenPanelSettings::syncRequest,this,&ArbGeneratorWindow::syncRequestCallback);
+    connect(setting->buttonsGenerate,&WidgetButtons::clicked,this,&ArbGeneratorWindow::runGeneratorCallback);
+    connect(setting->buttonSelectFile,&WidgetButtons::clicked,this,&ArbGeneratorWindow::openFileCallback);
+    connect(sweepController, &ArbGenSweepController::updateSweepFrequency, this,&ArbGeneratorWindow::sweepTimerCallback);
 }
 
 ArbGeneratorWindow::~ArbGeneratorWindow()

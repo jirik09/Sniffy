@@ -6,9 +6,10 @@ Comment: similar to button widget set to 2 buttons, radio and on off text. Diffe
 #include "widgetswitch.h"
 #include "ui_widgetswitch.h"
 
-WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftName, QString rightName, QString name) :
+WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftName, QString rightName, QString name, int optionalEmitParam) :
     QWidget(parent),
-    ui(new Ui::WidgetSwitch)
+    ui(new Ui::WidgetSwitch),
+    optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
 
@@ -55,7 +56,7 @@ void WidgetSwitch::setLeft(bool silent){
     ui->pushButton_left->setChecked(true);
     ui->pushButton_right->setChecked(false);
     if (!silent)
-        emit clicked(0);
+        emit clicked(0,optionalEmitParam);
 }
 
 void WidgetSwitch::setRight(bool silent){
@@ -64,11 +65,15 @@ void WidgetSwitch::setRight(bool silent){
     ui->pushButton_right->setChecked(true);
     ui->pushButton_left->setChecked(false);
     if(!silent)
-        emit clicked(1);
+        emit clicked(1,optionalEmitParam);
 }
 
 bool WidgetSwitch::isCheckedLeft(){
     return (ui->pushButton_left->isChecked());
+}
+
+bool WidgetSwitch::isCheckedRight(){
+    return (ui->pushButton_right->isChecked());
 }
 
 void WidgetSwitch::setColor(QString color){
@@ -80,9 +85,8 @@ void WidgetSwitch::setColor(QString color){
     }
 }
 
-bool WidgetSwitch::isCheckedRight(){
-    return (ui->pushButton_right->isChecked());
-}
+
+
 
 
 

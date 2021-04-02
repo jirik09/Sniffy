@@ -2,17 +2,20 @@
 #define ARBGENERATOR_H
 
 #include <QObject>
+#include <QtEndian>
 
 #include "../abstractmodule.h"
-#include "ArbGeneratorspec.h"
-#include "ArbGeneratorconfig.h"
-#include "ArbGeneratorwindow.h"
+#include "arbgeneratorspec.h"
+#include "arbgeneratorconfig.h"
+#include "arbgeneratorwindow.h"
+#include "arbgeneratordefs.h"
+
 
 class ArbGenerator : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit ArbGenerator(QObject *parent = nullptr);
+    explicit ArbGenerator(QObject *parent = nullptr, bool isPWMbased = false);
     QWidget* getWidget();
 
 signals:
@@ -26,17 +29,43 @@ public slots:
     void startModule();
     void stopModule();
 
+
 private slots:
-    //In case hold is needed
-
-    void showHoldButtonCallback();
-    void holdButtonCallback(bool held);
-
+    void sendSignalCallback();
+    void stopCallback();
+    void updateFrequencyCallback();
+    void quickRestartCalback();
 
 private:
     ArbGeneratorConfig *config;
-    ArbGeneratorWindow *tempWindow;
-   // scpWindow = new ScopeWindow();
+    ArbGeneratorWindow *arbGenWindow;
+    bool isPWMbased = false;
+
+    int lengthToSend;
+    int lengthSent;
+    int memoryIndex;
+    int actualSend;
+    int sendingChannel;
+    int numChannelsUsed;
+    int totalToSend;
+    int totalSent;
+    int signalLengths[MAX_ARB_CHANNELS_NUM] = {0};
+    QList<QList<int>> GeneratorData;
+
+    void startGenerator ();
+    void stopGenerator ();
+    void restartGenerator();
+    void setGeneratorDACMode();
+    void setGeneratorPWMMode();
+    void generatorDeinit();
+    void setDataLength(int channel, int length);
+    void setNumChannels(int numChannels);
+    void setSamplingFrequency (int channel, qreal freq);
+    void setPWMFrequency (int channel, qreal freq);
+    void genAskForFreq();
+    void setOutputBuffer (bool isEnabled);
+    void sendNextData();
+
 
 };
 

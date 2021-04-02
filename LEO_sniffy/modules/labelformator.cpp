@@ -4,6 +4,31 @@ LabelFormator::LabelFormator(QObject *parent) : QObject(parent)
 {
 }
 
+QString LabelFormator::formatOutout(qreal value, QString unit, int precision){
+    QString str;
+
+    if (value == std::numeric_limits<qreal>::infinity()){
+        str = "N/A " + unit;
+    }else if (abs(value)>=1000000000){
+        str=QString::number(value/1000000000,'f',precision) + " G"+unit;
+    }else if (abs(value)>=1000000){
+        str=QString::number(value/1000000,'f',precision) + " M"+unit;
+    }else if (abs(value)>=1000){
+        str=QString::number(value/1000,'f',precision) + " k"+unit;
+    }else if (abs(value)>=1){
+        str=QString::number(value,'f',precision) + " "+unit;
+    }else if (abs(value)>=0.001){
+        str=QString::number(value*1000,'f',precision) + " m"+unit;
+    }else if (abs(value)>=0.00000099){
+        str=QString::number(value*1000000,'f',precision) + " u"+unit;
+    }else if (abs(value)>=0.00000000099){
+        str=QString::number(value*1000000000,'f',precision) + " n"+unit;
+    }else {
+        str = "0.00 " + unit;
+    }
+    return str;
+}
+
 QString LabelFormator::formatOutout(qreal value, QString unit){
     QString str;
 

@@ -10,6 +10,8 @@
 #include "../../GUI/widgetlabel.h"
 #include "../../GUI/widgettextinput.h"
 
+#include "fftengine.h"
+
 class PanelMath : public QObject
 {
     Q_OBJECT
@@ -19,6 +21,7 @@ public:
 
 signals:
     void expressionChanged(QString exp);
+    void fftChanged(int length, FFTWindow window, FFTType type, int channelIndex);
 
 public:
     WidgetButtons *mathType;
@@ -35,10 +38,13 @@ public:
 
     WidgetButtons *btnChannelFFTSel;
 
+    int previousMathType = 0;
+
 public slots:
     void typeChanged(int index);
 private slots:
     void symbolicExpressionCallback(QString exp);
+    void fftCallback();
 
 private:
     void hideAll();

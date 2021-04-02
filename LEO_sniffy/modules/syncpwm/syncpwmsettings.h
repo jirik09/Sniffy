@@ -19,6 +19,8 @@ class SyncPwmSettings : public QObject
 public:
     explicit SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config, QWidget *parent = nullptr);
 
+    WidgetSeparator *separator[CHANNELS_NUM];
+
     WidgetButtons *buttonStart;
     WidgetButtons *buttonEquidist;
     WidgetSwitch *switchStepMode;
@@ -30,10 +32,8 @@ public:
     WidgetDialRange *dialDutyCh[CHANNELS_NUM];
     WidgetDialRange *dialPhaseCh[CHANNELS_NUM];
 
-    const QString chanColor[CHANNELS_NUM] =  {COLOR_BLUE,
-                                              COLOR_GREEN,
-                                              COLOR_ORANGE,
-                                              COLOR_PURPLE};    
+    void configControlElements(QWidget *parent, int i, int phase);
+    void greyOutComplementChanFreqDials(int chanIndex);
 
 private:
 

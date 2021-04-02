@@ -56,8 +56,12 @@ SOURCES += \
     modules/abstractspecification.cpp \
     modules/arbgenerator/arbgenerator.cpp \
     modules/arbgenerator/arbgeneratorconfig.cpp \
+    modules/arbgenerator/arbgeneratorfileloader.cpp \
     modules/arbgenerator/arbgeneratorspec.cpp \
     modules/arbgenerator/arbgeneratorwindow.cpp \
+    modules/arbgenerator/arbgenpanelsettings.cpp \
+    modules/arbgenerator/arbgensweepcontroller.cpp \
+    modules/arbgenerator/signalcreator.cpp \
     modules/counter/counter.cpp \
     modules/counter/counterconfig.cpp \
     modules/counter/counterspec.cpp \
@@ -71,6 +75,7 @@ SOURCES += \
     modules/device/device.cpp \
     modules/device/devicewindow.cpp \
     modules/device/devicespec.cpp \
+    modules/numberparser.cpp \
     modules/patterngenerator/patterngenerator.cpp \
     modules/patterngenerator/patterngeneratorconfig.cpp \
     modules/patterngenerator/patterngeneratorspec.cpp \
@@ -79,9 +84,11 @@ SOURCES += \
     modules/pwmgenerator/pwmgeneratorspec.cpp \
     modules/pwmgenerator/pwmgeneratorwindow.cpp \
     modules/pwmgenerator/pwngenerator.cpp \
+    modules/scope/fftengine.cpp \
     modules/scope/mathcalculations.cpp \
     modules/scope/meascalculations.cpp \
     modules/scope/measurement.cpp \
+    modules/scope/paneladvanced.cpp \
     modules/scope/panelcursors.cpp \
     modules/scope/panelmath.cpp \
     modules/scope/panelmeasurement.cpp \
@@ -92,6 +99,7 @@ SOURCES += \
     modules/scope/scopewindow.cpp \
     modules/syncpwm/syncpwm.cpp \
     modules/syncpwm/syncpwmconfig.cpp \
+    modules/syncpwm/syncpwmpainter.cpp \
     modules/syncpwm/syncpwmsettings.cpp \
     modules/syncpwm/syncpwmspec.cpp \
     modules/syncpwm/syncpwmwindow.cpp \
@@ -149,8 +157,13 @@ HEADERS += \
     modules/abstractspecification.h \
     modules/arbgenerator/arbgenerator.h \
     modules/arbgenerator/arbgeneratorconfig.h \
+    modules/arbgenerator/arbgeneratordefs.h \
+    modules/arbgenerator/arbgeneratorfileloader.h \
     modules/arbgenerator/arbgeneratorspec.h \
     modules/arbgenerator/arbgeneratorwindow.h \
+    modules/arbgenerator/arbgenpanelsettings.h \
+    modules/arbgenerator/arbgensweepcontroller.h \
+    modules/arbgenerator/signalcreator.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
     modules/counter/counterdefs.h \
@@ -166,6 +179,7 @@ HEADERS += \
     modules/device/device.h \
     modules/device/devicewindow.h \
     modules/device/devicespec.h \
+    modules/numberparser.h \
     modules/patterngenerator/patterngenerator.h \
     modules/patterngenerator/patterngeneratorconfig.h \
     modules/patterngenerator/patterngeneratorspec.h \
@@ -174,9 +188,31 @@ HEADERS += \
     modules/pwmgenerator/pwmgeneratorconfig.h \
     modules/pwmgenerator/pwmgeneratorspec.h \
     modules/pwmgenerator/pwmgeneratorwindow.h \
+    modules/scope/ffft/Array.h \
+    modules/scope/ffft/Array.hpp \
+    modules/scope/ffft/DynArray.h \
+    modules/scope/ffft/DynArray.hpp \
+    modules/scope/ffft/FFTReal.h \
+    modules/scope/ffft/FFTReal.hpp \
+    modules/scope/ffft/FFTRealFixLen.h \
+    modules/scope/ffft/FFTRealFixLen.hpp \
+    modules/scope/ffft/FFTRealFixLenParam.h \
+    modules/scope/ffft/FFTRealPassDirect.h \
+    modules/scope/ffft/FFTRealPassDirect.hpp \
+    modules/scope/ffft/FFTRealPassInverse.h \
+    modules/scope/ffft/FFTRealPassInverse.hpp \
+    modules/scope/ffft/FFTRealSelect.h \
+    modules/scope/ffft/FFTRealSelect.hpp \
+    modules/scope/ffft/FFTRealUseTrigo.h \
+    modules/scope/ffft/FFTRealUseTrigo.hpp \
+    modules/scope/ffft/OscSinCos.h \
+    modules/scope/ffft/OscSinCos.hpp \
+    modules/scope/ffft/def.h \
+    modules/scope/fftengine.h \
     modules/scope/mathcalculations.h \
     modules/scope/meascalculations.h \
     modules/scope/measurement.h \
+    modules/scope/paneladvanced.h \
     modules/scope/panelcursors.h \
     modules/scope/panelmath.h \
     modules/scope/panelmeasurement.h \
@@ -189,6 +225,7 @@ HEADERS += \
     modules/syncpwm/syncpwm.h \
     modules/syncpwm/syncpwmconfig.h \
     modules/syncpwm/syncpwmdefs.h \
+    modules/syncpwm/syncpwmpainter.h \
     modules/syncpwm/syncpwmsettings.h \
     modules/syncpwm/syncpwmspec.h \
     modules/syncpwm/syncpwmwindow.h \
@@ -246,7 +283,8 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES +=
+DISTFILES += \
+    modules/scope/ffft/readme.txt
 
 RESOURCES += \
     graphics.qrc

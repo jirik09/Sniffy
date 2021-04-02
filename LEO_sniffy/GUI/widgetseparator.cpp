@@ -16,6 +16,10 @@ void WidgetSeparator::hideLine(){
     ui->widget->hide();
 }
 
+void WidgetSeparator::setText(QString text){
+    ui->label_name->setText(text);
+}
+
 WidgetSeparator::~WidgetSeparator()
 {
     delete ui;

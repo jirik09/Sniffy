@@ -21,18 +21,26 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseZoom();
 
+    chartFFT = new widgetChart(ui->widget_chart, 5);
+    chartFFT->setRange(0, 50000, -100, 100);
+    chartFFT->setDataMinMax(0,50000);
+    chartFFT->enableLocalMouseZoom();
+
+    ui->verticalLayout_chart->addWidget(chartFFT);
     ui->verticalLayout_chart->addWidget(chart);
+    chartFFT->hide();
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************
-    widgetTab *tabs = new widgetTab(ui->widget_settings,4);
+    widgetTab *tabs = new widgetTab(ui->widget_settings,5);
     ui->verticalLayout_settings->addWidget(tabs);
     tabs->setText("Set",0);
     tabs->setText("Meas",1);
     tabs->setText("Cursors",2);
     tabs->setText("Math",3);
+    tabs->setText("Adv",4);
 
     // ************************* creating widget general settings *******************
     panelSet = new PanelSettings(tabs->getLayout(0),tabs);
@@ -66,8 +74,16 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     connect(panelCursors->cursorVerADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerACallback);
     connect(panelCursors->cursorVerBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerBCallback);
 
+    // ********************* create panel Math ****************
     panelMath = new PanelMath(tabs->getLayout(3),tabs);
     connect(panelMath,&PanelMath::expressionChanged,this,&ScopeWindow::mathExpressionCallback);
+    connect(panelMath,&PanelMath::fftChanged,this,&ScopeWindow::fftChangedCallback);
+
+    // ********************* create panel Advanced ****************
+    panelAdvanced = new PanelAdvanced(tabs->getLayout(4),tabs);
+    connect(panelAdvanced->resolutionButtons,&WidgetButtons::clicked,this,&ScopeWindow::resolutionChangedCallback);
+    connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::samplingFreqInputCallback);
+    connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::longMemoryCallback);
 
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
@@ -197,6 +213,14 @@ void ScopeWindow::timeBaseCallback(float value){
     updateChartTimeScale(value);
     previousTimeBase = value;
 }
+void ScopeWindow::samplingFreqInputCallback(int freq){
+    timeBaseCallback(1.0/(qreal)(freq)*100);
+}
+
+void ScopeWindow::dataLengthInputCallback(int length)
+{
+    if (length>=100) emit memoryLengthChanged(length);
+}
 
 void ScopeWindow::longMemoryCallback(int index){
     emit memoryLengthChanged(index);
@@ -289,6 +313,19 @@ void ScopeWindow::mathExpressionCallback(QString exp)
     emit mathExpressionChanged(exp);
     ChartMathData.clear();
     paintTraces(ChartData,ChartMathData);
+}
+
+void ScopeWindow::fftChangedCallback(int length, FFTWindow window, FFTType type, int channelIndex)
+{
+    emit fftChanged(length,window,type,channelIndex);
+    ChartFFTData.clear();
+    if(length !=0){
+        chartFFT->show();
+        chartFFT->clearAll();
+        //paintTraces(ChartData,ChartMathData); TODO paint in a additional chart (clear)
+    }else{
+        chartFFT->hide();
+    }
 }
 
 void ScopeWindow::sliderShiftCallback(int value){
@@ -384,6 +421,14 @@ void ScopeWindow::cursorValueVerBCallback(float value)
     }
 }
 
+void ScopeWindow::resolutionChangedCallback(int index){
+    if(index==0){
+        emit resolutionChanged(8);
+    }else{
+        emit resolutionChanged(12);
+    }
+}
+
 void ScopeWindow::updateCursorReadings()
 {
     if(config->cursorsActiveIndex == 2){
@@ -412,6 +457,15 @@ void ScopeWindow::updateMath(QVector<QPointF> mathTrace)
     paintTraces(ChartData,ChartMathData);
 }
 
+void ScopeWindow::updateFFTchart(QVector<QPointF> fftTrace)
+{
+    ChartFFTData = fftTrace;
+    chartFFT->clearAll();
+    chartFFT->updateTrace(&ChartFFTData,0);
+    //TODO paint in a chart
+        qDebug () << "FFT was calculated and received by window" << fftTrace.length();
+}
+
 void ScopeWindow::mathError(int errorPosition)
 {
     panelMath->symbolicError(errorPosition);
@@ -430,11 +484,13 @@ void ScopeWindow::restoreGUIAfterStartup()
     channelEnableCallback(panelSet->buttonsChannelEnable->getStatus());
     cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());
     triggerChannelCallback(panelSet->buttonsTriggerChannel->getSelectedIndex());
+    resolutionChangedCallback(panelAdvanced->resolutionButtons->getSelectedIndex());
 
     panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
     panelMath->typeChanged(panelMath->mathType->getSelectedIndex());
-    if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-        panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+    if(panelSet->buttonsTriggerMode->getSelectedIndex()==0){
+        panelSet->buttonsTriggerMode->setText("Single");
+        triggerModeCallback(0);
     }
 }
 

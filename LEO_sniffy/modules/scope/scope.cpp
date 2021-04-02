@@ -7,6 +7,7 @@ Scope::Scope(QObject *parent)
     moduleSpecification = new ScopeSpec();
     measCalc = new MeasCalculations();
     mathCalc = new MathCalculations();
+    FFTCalc = new FFTengine();
     scpWindow = new ScopeWindow(config);
     scpWindow->setObjectName("scpWindow");
 
@@ -14,7 +15,6 @@ Scope::Scope(QObject *parent)
     moduleCommandPrefix = cmd->SCOPE;
     moduleName = "Oscilloscope";
     moduleIconURI = ":/graphics/graphics/icon_scope.png";
-
 
     scopeData = new QVector<QVector<QPointF>>;
 
@@ -27,14 +27,16 @@ Scope::Scope(QObject *parent)
     connect(scpWindow, &ScopeWindow::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
     connect(scpWindow, &ScopeWindow::triggerChannelChanged,this,&Scope::updateTriggerChannel);
     connect(scpWindow, &ScopeWindow::memoryLengthChanged,this,&Scope::updateMemoryLength);
+    connect(scpWindow, &ScopeWindow::resolutionChanged,this,&Scope::updateResolution);
 
     connect(scpWindow, &ScopeWindow::measurementChanged,this, &Scope::addMeasurement);
     connect(scpWindow, &ScopeWindow::measurementClearChanged, this, &Scope::clearMeasurement);
     connect(measCalc, &MeasCalculations::measCalculated, this, &Scope::updateMeasurement);
 
     connect(scpWindow, &ScopeWindow::mathExpressionChanged,this,&Scope::updateMathExpression);
+    connect(scpWindow, &ScopeWindow::fftChanged,this,&Scope::updateFFTConfig);
     connect(mathCalc, &MathCalculations::mathCalculated, this, &Scope::updateMath);
-
+    connect(FFTCalc, &FFTengine::fftCalculated, this, &Scope::updateFFT);
 }
 
 void Scope::parseData(QByteArray data){
@@ -55,8 +57,8 @@ void Scope::parseData(QByteArray data){
     }else if(dataHeader=="OSC_"){
         quint8 tmpByte;
         quint16 tmpShort;
-        qreal minX;
-        qreal maxX;
+        qreal minX = 0;
+        qreal maxX = 0.1;
         qreal x(0);
         qreal y(0);
         int resolution;
@@ -110,7 +112,17 @@ void Scope::parseData(QByteArray data){
                 maxX = x;
                 config->timeMax = maxX;
             }else{
-                qDebug() << "TODO <8bit data parser";
+                minX = float(config->dataLength)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
+                config->timeMin = minX;
+                for (int j(0); j < length; j++){
+                    streamBuffLeng>>tmpByte;
+                    tmpShort = tmpByte;
+                    x=j*1.0/samplingFreq + minX;
+                    y=(tmpShort*(float)(config->rangeMax-config->rangeMin)/(pow(2,config->ADCresolution)-1)+config->rangeMin)/1000;
+                    points.append(QPointF(x,y));
+                }
+                maxX = x;
+                config->timeMax = maxX;
             }
 
             while(numChannels<scopeData->length()){ //remove signals which will not be filled
@@ -127,6 +139,10 @@ void Scope::parseData(QByteArray data){
         if(currentChannel==numChannels){
             measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
             mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
+            if(FFTlength !=0){
+                FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,false,config->realSamplingRate);
+                qDebug() << "Caluclate fft";
+            }
             scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
 
             //signal sometimes need to be zoomed to show correct value V/div
@@ -134,7 +150,6 @@ void Scope::parseData(QByteArray data){
             float zoomMultLength = config->signalMegazoom==true?1:(float)config->dataLength/1200;
             scpWindow->setDataMinMaxTimeAndZoom(minX,maxX,zoomMultSampling*zoomMultLength);
             scpWindow->setRealSamplingRate(samplingFreq);
-
 
             //handle single trigger
             if(config->triggerMode!=ScopeTriggerMode::TRIG_SINGLE){
@@ -179,17 +194,15 @@ QByteArray Scope::getConfiguration(){
 }
 
 void Scope::stopModule(){
-    isModuleStarted = false;
     isConfigurationWritten = false;
     stopSampling();
     measCalc->exit();
     mathCalc->exit();
+    FFTCalc->exit();
 }
 void Scope::startModule(){
-    if (isModuleStarted)return;
-
-    isModuleStarted = true;
-    startSampling();
+    if(config->triggerMode != ScopeTriggerMode::TRIG_STOP)
+        startSampling();
 }
 
 QWidget* Scope::getWidget(){
@@ -204,7 +217,7 @@ void Scope::updateTimebase(float div){
         config->requestedSamplingRate = round(float(100)/(div)+0.49);
     }
     setSamplingFrequency(config->requestedSamplingRate);
-    updateTriggerMode(config->triggerMode);
+    //updateTriggerMode(config->triggerMode);
 }
 
 void Scope::updatePretrigger(float percentage){
@@ -245,7 +258,7 @@ void Scope::updateMemoryLength(int length){
         config->longestDataLength = false;
         config->signalMegazoom = false;
     }
-    if(length>0 && length<100){
+    if(length>0 && length<10){
         config->longestDataLength = true;
         config->signalMegazoom = length==2?true:false;
 
@@ -254,9 +267,19 @@ void Scope::updateMemoryLength(int length){
         }else{
             config->dataLength = static_cast<ScopeSpec*>(moduleSpecification)->memorySize/config->numberOfChannels;
         }
+    }else if (length > 0 && length >=100){
+        config->dataLength = length;
+        config->longestDataLength = false;
+        config->signalMegazoom = false;
     }
     updateTimebase(config->timeBase);
     setDataLength(config->dataLength);
+}
+
+void Scope::updateResolution(int resolution)
+{
+    config->ADCresolution = resolution;
+    setResolution(resolution);
 }
 
 void Scope::updateChannelsEnable(int buttonStatus){
@@ -321,6 +344,23 @@ void Scope::updateMathExpression(QString exp)
     mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
 }
 
+void Scope::updateFFTConfig(int length, FFTWindow window, FFTType type, int channelIndex)
+{
+    FFTlength = length;
+    FFTwindow = window;
+    FFTtype = type;
+    FFTChannelIndex = channelIndex;
+    if(FFTlength !=0){
+        //  FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
+    }
+
+}
+
+void Scope::updateFFT()
+{
+    scpWindow->updateFFTchart(FFTCalc->getProcessedData());
+}
+
 void Scope::stopSampling(){
     comm->write(cmd->SCOPE+":"+cmd->STOP+";");
     setModuleStatus(ModuleStatus::PAUSE);
@@ -350,6 +390,15 @@ void Scope::setNumberOfChannels(int num){
     case 4:
         comm->write(cmd->SCOPE+":"+cmd->CHANNELS+":"+cmd->CHANNELS_4+";");
         break;
+    }
+}
+
+void Scope::setResolution(int res)
+{
+    if(res==8){
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_DATA_DEPTH+":"+cmd->DATA_DEPTH_8B+";");
+    }else{
+        comm->write(cmd->SCOPE+":"+cmd->SCOPE_DATA_DEPTH+":"+cmd->DATA_DEPTH_12B+";");
     }
 }
 

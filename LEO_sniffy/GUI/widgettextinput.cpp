@@ -1,7 +1,7 @@
 #include "widgettextinput.h"
 #include "ui_widgettextinput.h"
 
-WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value) :
+WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, InputTextType type) :
     QWidget(parent),
     ui(new Ui::WidgetTextInput)
 {
@@ -11,7 +11,13 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value) :
     ui->lineEdit->setText(value);
 
     ui->lineEdit->installEventFilter(this);
-    ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+BACKGROUND_COLOR_DATA_AREA+";}");
+    inputType = type;
+
+    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+"} QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +"}";
+    ui->label->setStyleSheet(style);
+
+    style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+"} QWidget{background-color:"+BACKGROUND_COLOR_DATA_AREA+";color:"+QString::fromUtf8(COLOR_WHITE) +"}";
+    ui->lineEdit->setStyleSheet(style);
 }
 
 WidgetTextInput::~WidgetTextInput()
@@ -34,6 +40,28 @@ QString WidgetTextInput::getText()
     return  ui->lineEdit->text();
 }
 
+qreal WidgetTextInput::getValue()
+{
+    return number;
+}
+
+void WidgetTextInput::processInput()
+{
+    if(inputType == InputTextType::STRING){
+        emit textChanged(ui->lineEdit->text());
+    }else if(inputType == InputTextType::NUMBER){
+        bool success = false ;
+        qreal value = NumberParser::parse(ui->lineEdit->text(),success);
+        if (success){
+            number = value;
+            emit numberChanged(number);
+            lastParsed = ui->lineEdit->text();
+        }else{
+            ui->lineEdit->setText(lastParsed);
+        }
+    }
+}
+
 bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
     bool processTextEdit = false;
     if(event->type() == QEvent::FocusOut) processTextEdit = true;
@@ -42,8 +70,13 @@ bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
         if( (ev->key() == Qt::Key_Enter) || (ev->key() == Qt::Key_Return)) processTextEdit = true;
     }
 
+    if(event->type() == QEvent::FocusIn){
+        ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+BACKGROUND_COLOR_FOCUS_IN+";}");
+    }
+
     if(processTextEdit){
-        emit textChanged(ui->lineEdit->text());
+        ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+BACKGROUND_COLOR_DATA_AREA+";}");
+        processInput();
     }
     return QObject::eventFilter(obj, event);
 }

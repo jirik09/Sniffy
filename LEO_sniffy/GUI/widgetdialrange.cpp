@@ -12,14 +12,20 @@ Class for widget with dial and controls with range
 #include "ui_widgetdialrange.h"
 
 
-WidgetDialRange::WidgetDialRange(QWidget *parent, QString name) :
+WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmitParam) :
     QWidget(parent),
+    optionalEmitParam(optionalEmitParam),
     ui(new Ui::WidgetDialRange)
 {
     ui->setupUi(this);
     ui->label_name->setText(name);
     setObjectName(name);
     units = new QList<params_unit>;
+
+    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+"} "
+                    "QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +"}";
+
+    ui->widget->setStyleSheet(style);
 }
 
 WidgetDialRange::~WidgetDialRange()
@@ -51,10 +57,13 @@ void WidgetDialRange::restoreGeometry(QByteArray geom)
 }
 
 void WidgetDialRange::setColor(QString color){
-    QString style = "color:"+color;
+    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_DARK_GREY)+"} "
+                    "QWidget{color:"+color +"}";
     ui->widget_dial->setStyleSheet(style);
 
-    style = "background-color:"+color;
+    style = "QPushButton:disabled{background-color: "+QString::fromUtf8(BACKGROUND_COLOR_BUTTON_DISABLED)+" color: "+QString::fromUtf8(COLOR_GREY)+"}"
+            "QPushButton:pressed{border: 2px solid "+QString::fromUtf8(BACKGROUND_COLOR_APP)+"}"
+            "QPushButton{border: none;background-color:"+color +"}";
     ui->pushButton_plus->setStyleSheet(style);
     ui->pushButton_minus->setStyleSheet(style);
 }
@@ -79,9 +88,9 @@ float WidgetDialRange::getRealValue() const
     return realValue;
 }
 
-void WidgetDialRange::setRealValue(float value){
+void WidgetDialRange::setRealValue(float value, bool silent){
     realValue = value;
-    updateControls(0);
+    updateControls(0,silent);
 }
 
 void WidgetDialRange::addOption (QString unit,float mult){
@@ -146,12 +155,10 @@ void WidgetDialRange::textEditFinished(){
 
 void WidgetDialRange::textEditChanged(const QString & text){
     bool success = false ;
-    float flRead = QLocale().toFloat(text,&success); //try local decimal separator
-    if(!success){  //try . as a separator
-        flRead = text.toFloat(&success);
-    }
+    double value =  NumberParser::parse(text,success);
+
     if (success){
-        realValue = flRead * unitMult;
+        realValue = value * unitMult;
         updateControls(2);
     }
 }
@@ -168,7 +175,7 @@ smalestUnitMult -   smallest unit to be shown in comboBox unit selection (1 by d
 defaultValue - selected by default (0 by default)
 log - bool type true=log scale, false=lin scale (false by default)
 */
-void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic ){
+void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic){
     rangeMax = max;
     rangeMin = min;
     rangePrecision = smalestUnitMult;
@@ -210,12 +217,12 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
         unitMult = units->last().mult;
     }
 
-    if(max>9 && max<1000){
-        addOption(baseUnit,1);
-        ui->comboBox->setCurrentIndex(units->length()-1);
-        // unitString = units->last().unit;
-        unitMult = units->last().mult;
-    }
+    //  if(max>9 && max<1000){
+    addOption(baseUnit,1);
+    ui->comboBox->setCurrentIndex(units->length()-1);
+    // unitString = units->last().unit;
+    unitMult = units->last().mult;
+    //  }
 
     if(max>=1000){
         addOption("k"+baseUnit,1000);
@@ -301,7 +308,7 @@ void WidgetDialRange::updateControls(int except, bool silent){
         connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
     }
     if(!silent)
-        emit valueChanged(realValue);
+        emit valueChanged(realValue,optionalEmitParam);
 }
 
 float WidgetDialRange::getRealValueFromDial(int in){

@@ -66,7 +66,7 @@ public:
     void setRangeY(qreal minY, qreal maxY);
     void setRange(qreal minX, qreal maxX, qreal minY, qreal maxY);
     qreal getSignalValue (int traceIndex, qreal time);
-    void setMargins(int left, int top, int right, int bottom);
+    void setMargins(int left, int top, int right, int bottom);    
 
     void setZoom(float invZoom);
     qreal getZoom();
@@ -82,6 +82,7 @@ public:
     void formatAxisLabelsForScope();
     void formatLabels(QString axisXLabelForm, QString axisYLabelForm);
     void setGraphColor(QColor qColor);
+    void setTraceColor(int index, QColor color);
     void setLabelsVisible(bool lableVisibleX, bool lableVisibleY);
     void setLabelsSize(int pointSize);
     void setHorizontalMarker(int channelIndex, qreal value, MarkerType type = MarkerType::TICK);
@@ -106,7 +107,7 @@ private:
     QMenu *menu;
     QAction *spline, *line, *scatter, *btnOpenGL;
     enum enable {DISABLED, ENABLED} openGL = DISABLED;
-    ChartMode chartMode = ChartMode::SPLINE;
+    ChartMode chartMode = ChartMode::LINE;
 
     int maxTraces;
 

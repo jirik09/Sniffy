@@ -26,6 +26,7 @@
 #include "panelmeasurement.h"
 #include "panelcursors.h"
 #include "panelmath.h"
+#include "paneladvanced.h"
 #include "scopeconfig.h"
 
 #define CHART_MAX_Y 7
@@ -56,6 +57,7 @@ public:
 
     void updateMeasurement(QList<Measurement*> m);
     void updateMath(QVector<QPointF> mathTrace);
+    void updateFFTchart(QVector<QPointF> fftTrace);
     void mathError(int errorPosition);
     void restoreGUIAfterStartup();
 
@@ -71,8 +73,10 @@ signals:
     void channelEnableChanged(int buttonStatus);
     void measurementChanged(Measurement *m);
     void mathExpressionChanged(QString exp);
+    void fftChanged(int length, FFTWindow window, FFTType type, int channelIndex);
     void measurementClearChanged();
     void verticalChanged();
+    void resolutionChanged(int resolution);
 
 
 private slots:
@@ -80,6 +84,8 @@ private slots:
     void channelVerticalScaleCallback(float value);
     void channelVerticalShiftCallback(float value);
     void timeBaseCallback(float value);
+    void samplingFreqInputCallback (int freq);
+    void dataLengthInputCallback (int length);
     void channelEnableCallback(int buttonStatus);
     void longMemoryCallback(int index);
     void pretriggerCallback(float value);
@@ -90,6 +96,7 @@ private slots:
     void measurementAddedCallback(Measurement *m);
     void measurementClearCallback();
     void mathExpressionCallback(QString exp);
+    void fftChangedCallback(int length, FFTWindow window, FFTType type, int channelIndex);
     void sliderShiftCallback(int value);
 
     void chartLocalZoomCallback();
@@ -100,6 +107,7 @@ private slots:
     void cursorValueHorBCallback(float value);
     void cursorValueVerACallback(float value);
     void cursorValueVerBCallback(float value);
+    void resolutionChangedCallback(int index);
 
     void updateCursorReadings();
 
@@ -112,14 +120,18 @@ private:
     ScopeConfig *config;
     widgetChart *chart;
 
+    widgetChart *chartFFT;
+
     QVector<QVector<QPointF>> ChartData;
     QVector<QPointF> ChartMathData;
+    QVector<QPointF> ChartFFTData;
     int triggerChannelIndex =0;
 
     WidgetLabelArea *labelInfoPanel;
     PanelMeasurement *panelMeas;
     PanelCursors *panelCursors;
     PanelMath *panelMath;
+    PanelAdvanced *panelAdvanced;
 
     void updateChartTimeScale(float timeBase);
     void fillTimeBase();

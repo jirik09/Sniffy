@@ -129,7 +129,6 @@ void Voltmeter::writeConfiguration()
     if(isConfigurationWritten)return;
 
     isConfigurationWritten = true;
-    qDebug() << "WRITE CONFIGURATION";
     //workaround first data was corrupted on channels > 1
     numChannelsEnabled = MAX_VOLTMETER_CHANNELS;
     setDefaultSampling();
@@ -156,16 +155,11 @@ QByteArray Voltmeter::getConfiguration()
 
 void Voltmeter::startModule()
 {
-    if (isModuleStarted)return;
-
-    isModuleStarted = true;
-    qDebug() << "START MODULE";
     startSampling();
 }
 
 void Voltmeter::stopModule()
 {
-    isModuleStarted = false;
     isConfigurationWritten = false;
     voltWindow->stopDatalog();
     stopSampling();
@@ -196,6 +190,7 @@ void Voltmeter::updateSamplingChannel(void){
             break;
         case VoltmeterMode::FAST:
             config->targetDataLength = 200;
+            setDefaultSampling();
             break;
         }
     }
@@ -279,6 +274,7 @@ void Voltmeter::resetMinMax()
 {
     for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
         data[i].max = -10000;
+        data[i].min = 10000;
     }
 }
 
@@ -295,7 +291,6 @@ void Voltmeter::setMode(int index)
         config->mode = VoltmeterMode::NORMAL;
         break;
     }
-    qDebug () << "mode set" << QString::number(index);
 }
 
 
@@ -333,11 +328,11 @@ void Voltmeter::setNumberOfChannels(int num){
 
 void Voltmeter::setVDDSampling(){
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_VREF+";");
-    int lenght = 400 + +samplesToTakeTotal*100;
-    if(lenght>2000){
-        lenght = 2000;
+    int length = 400 + +samplesToTakeTotal*100;
+    if(length>2000){
+        length = 2000;
     }
-    comm->write(cmd->SCOPE,cmd->DATA_LENGTH,lenght);
+    comm->write(cmd->SCOPE,cmd->DATA_LENGTH,length);
     setNumberOfChannels(1);
     isReferenceMeasured = true;
 }

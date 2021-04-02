@@ -81,7 +81,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     WidgetSeparator *separatorSet = new WidgetSeparator(this,"Display");
     tabs->getLayout(0)->addWidget(separatorSet);
 
-    buttonsCalc = new WidgetButtons(this,3,ButtonTypes::RADIO,"",0);
+    buttonsCalc = new WidgetButtons(this,3,ButtonTypes::RADIO,"",2);
     buttonsCalc->setObjectName("buttonscalc");
     tabs->getLayout(0)->addWidget(buttonsCalc);
     buttonsCalc->setText("Min/Max",0);

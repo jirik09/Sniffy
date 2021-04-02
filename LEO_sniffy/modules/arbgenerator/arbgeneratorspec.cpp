@@ -9,18 +9,37 @@ void ArbGeneratorSpec::parseSpecification(QByteArray spec)
 {
     QDataStream stream(spec);
 
-    stream >> specificationVariable;
+    stream >> resources >> maxSamplingRate >>periphClockFrequency >> generatorBufferSize;
+    stream >> DACResolution >> maxDACChannels;
 
-    //TODO parse spec into public variables
-    //example:
-    /*
-    stream >> resources >> maxSamplingRate12B ;
+    int tmp;
+    stream >> tmp;
+    rangeMin = (qreal)(tmp)/1000;
+    stream >> tmp;
+    rangeMax = (qreal)(tmp)/1000;
+    stream >> tmp;
+    Vcc = (qreal)(tmp)/1000;
+    stream >> tmp;
+    Vref = (qreal)(tmp)/1000;
+
     char chars[4] = "";
-    for(int i = 0; i < maxADCChannels; i++){
+    for(int i = 0; i < maxDACChannels; i++){
         stream.readRawData(chars, 4);
-        channelPins[i] = QString(chars);
+        channelPins[i] = QString::fromUtf8(chars,4);
         channelPins[i].remove('_');
     }
-    */
+}
 
+void ArbGeneratorSpec::parsePWMSpecification(QByteArray spec)
+{
+    QDataStream stream(spec);
+    resources = 0;
+
+    stream >> resources >> periphPWMClockFrequency >> maxPWMChannels;
+    char chars[4] = "";
+    for(int i = 0; i < maxPWMChannels; i++){
+        stream.readRawData(chars, 4);
+        channelPWMPins[i] = QString::fromUtf8(chars,4);
+        channelPWMPins[i].remove('_');
+    }
 }

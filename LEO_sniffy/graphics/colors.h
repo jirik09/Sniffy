@@ -15,12 +15,15 @@
 #define BACKGROUND_COLOR_BUTTON "rgb(38,38,38);"
 #define BACKGROUND_COLOR_CONTROL "rgb(58,58,58);"
 #define BACKGROUND_COLOR_APP "rgb(48,48,48);"
+#define BACKGROUND_COLOR_FOCUS_IN "rgb(48,48,48);"
 #define BACKGROUND_COLOR_BUTTON_DISABLED "rgb(48,48,48);"
 
 //Text colors
 #define COLOR_GREY   "rgb(124,124,124);"
+#define COLOR_DARK_GREY   "rgb(87,87,87);"
 #define COLOR_WHITE  "rgb(214,214,214);"
 #define QCOLOR_GREY   QColor(124,124,124)
+#define QCOLOR_DARK_GREY   QColor(87,87,87)
 #define QCOLOR_WHITE  QColor(214,214,214)
 
 // basic Channel colors

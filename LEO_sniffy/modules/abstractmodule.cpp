@@ -90,49 +90,49 @@ void AbstractModule::restoreGeometry(QSettings &layout)
     WidgetTextInput *text;
 
     foreach(tab, listTab){
-        if (!tab->objectName().isEmpty()){
+        if (!tab->objectName().isEmpty() && !layout.value(moduleName+tab->objectName()).isNull()){
             tab->restoreGeometry(layout.value(moduleName+tab->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: tab in "<<moduleName;
         }
     }
     foreach(btn, listBtn){
-        if (!btn->objectName().isEmpty()){
+        if (!btn->objectName().isEmpty() && !layout.value(moduleName+btn->objectName()).isNull()){
             btn->restoreGeometry(layout.value(moduleName+btn->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: button in "<<moduleName;
         }
     }
     foreach(sw, listSw){
-        if (!sw->objectName().isEmpty()){
+        if (!sw->objectName().isEmpty() && !layout.value(moduleName+sw->objectName()).isNull()){
             sw->restoreGeometry(layout.value(moduleName+sw->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: switch in "<<moduleName;
         }
     }
     foreach(dial, listDial){
-        if (!dial->objectName().isEmpty()){
+        if (!dial->objectName().isEmpty() && !layout.value(moduleName+dial->objectName()).isNull()){
             dial->restoreGeometry(layout.value(moduleName+dial->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: dial in "<<moduleName;
         }
     }
     foreach(dialRange, listDialRange){
-        if (!dialRange->objectName().isEmpty()){
+        if (!dialRange->objectName().isEmpty() && !layout.value(moduleName+dialRange->objectName()).isNull()){
              dialRange->restoreGeometry(layout.value(moduleName+dialRange->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: dialRange in "<<moduleName;
         }
     }
     foreach(sel, listSel){
-        if (!sel->objectName().isEmpty()){
+        if (!sel->objectName().isEmpty() && !layout.value(moduleName+sel->objectName()).isNull()){
              sel->restoreGeometry(layout.value(moduleName+sel->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: selection in "<<moduleName;
         }
     }
     foreach(text, listText){
-        if (!text->objectName().isEmpty()){
+        if (!text->objectName().isEmpty() && !layout.value(moduleName+text->objectName()).isNull()){
              text->restoreGeometry(layout.value(moduleName+text->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: textInput in "<<moduleName;
@@ -147,8 +147,8 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
         emit blockConflictingModules(moduleName, moduleSpecification->getResources());
         dockWidgetWindow->show();
         writeConfiguration();
-        startModule();
         moduleControlWidget->setStatus(ModuleStatus::PLAY);
+        startModule();
         break;
     case ModuleStatus::PLAY:
         dockWidgetWindow->hide();
@@ -269,6 +269,16 @@ int AbstractModule::getResources()
     if(moduleSpecification != nullptr)
         return moduleSpecification->getResources();
     return 0;
+}
+
+bool AbstractModule::isModuleRestored() const
+{
+    return moduleRestored;
+}
+
+void AbstractModule::setModuleRestored(bool value)
+{
+    moduleRestored = value;
 }
 
 void AbstractModule::held(bool held){

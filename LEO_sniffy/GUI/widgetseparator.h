@@ -16,6 +16,7 @@ public:
     ~WidgetSeparator();
 
     void hideLine();
+    void setText(QString text);
 
 private:
     Ui::WidgetSeparator *ui;

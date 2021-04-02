@@ -11,6 +11,7 @@
 #include "scopewindow.h"
 #include "scopeconfig.h"
 #include "scopespec.h"
+#include "fftengine.h"
 
 #include "communication/commands.h"
 #include "communication/comms.h"
@@ -28,10 +29,6 @@ public:
 
     QWidget* getWidget();
 
-signals:
-    //module will probably emit signal to close other resources
-    //(must be done in abstract module and handled in device.cpp)
-
 public slots:
     void parseData(QByteArray data);
     void writeConfiguration();
@@ -48,11 +45,14 @@ public slots:
     void updateTriggerEdge(ScopeTriggerEdge edge);
     void updateTriggerChannel(int index);
     void updateMemoryLength(int length);
+    void updateResolution(int resolution);
     void updateChannelsEnable(int buttonStatus);
     void addMeasurement(Measurement *m);
     void updateMeasurement(QList<Measurement*> m);
     void updateMath(int errorPosition);
     void updateMathExpression(QString exp);
+    void updateFFTConfig(int length, FFTWindow window, FFTType type, int channelIndex);
+    void updateFFT();
     void clearMeasurement();
 
 private:
@@ -61,17 +61,23 @@ private:
    // ScopeSpec *specification;
     MeasCalculations *measCalc;
     MathCalculations *mathCalc;
+    FFTengine *FFTCalc;
     QVector<QVector<QPointF>> *scopeData;
     QString mathExpression;
 
+    int FFTlength = 0;
+    FFTWindow FFTwindow;
+    FFTType FFTtype;
+    int FFTChannelIndex = 0;
+
     bool isConfigurationWritten = false;
-    bool isModuleStarted = false;
 
     //private functions - writing into device only - no logic
     void stopSampling();
     void startSampling();
     void restartSampling();
     void setNumberOfChannels(int num);
+    void setResolution(int res);
     void setTriggerChannel(int chan);
     void setTriggerMode(ScopeTriggerMode mode);
     void setTriggerEdge(ScopeTriggerEdge edge);
