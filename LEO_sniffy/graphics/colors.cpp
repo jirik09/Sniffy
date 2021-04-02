@@ -27,14 +27,6 @@ QColor Colors::getChannelColor(int channelIndex)
         return CHANNEL_8_QCOLOR;
     case 8:
         return CHANNEL_9_QCOLOR;
-    case 9:
-        return CHANNEL_10_QCOLOR;
-    case 10:
-        return CHANNEL_11_QCOLOR;
-    case 11:
-        return CHANNEL_12_QCOLOR;
-    case 12:
-        return CHANNEL_13_QCOLOR;
     default:
         return QCOLOR_BLACK;
     }
@@ -63,14 +55,6 @@ QByteArray Colors::getChannelColorString(int channelIndex)
         return CHANNEL_8_COLOR;
     case 8:
         return CHANNEL_9_COLOR;
-    case 9:
-        return CHANNEL_10_COLOR;
-    case 10:
-        return CHANNEL_11_COLOR;
-    case 11:
-        return CHANNEL_12_COLOR;
-    case 12:
-        return CHANNEL_13_COLOR;
     default:
         return COLOR_BLACK;
     }
