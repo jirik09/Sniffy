@@ -294,11 +294,11 @@ void CounterWindow::lfSwitchChannelCallback(int index){
     QString bckgndColor;
 
     if(index == 0){
-        bckgndColor = "background-color:"+QString::fromUtf8(COLOR_BLUE);
+        bckgndColor = "background-color:"+Colors::getChannelColorString(0);
         tabLowFreq->showDialInChannel(CHANNEL_1, true);
         tabLowFreq->showDialInChannel(CHANNEL_2, false);
     }else if (index == 1) {
-        bckgndColor = tabLowFreq->lfCh2BckgndColor;
+        bckgndColor = "background-color:"+Colors::getTextDarkColorString();
         tabLowFreq->showDialInChannel(CHANNEL_1, false);
         tabLowFreq->showDialInChannel(CHANNEL_2, true);
     }
@@ -315,7 +315,6 @@ void CounterWindow::lfSwitchQuantityCallback(int index){
 
 void CounterWindow::lfSwitchDutyCycleCallback(int index){
     WidgetDisplay *display, *unavailDisplay;
-    //QString unitsStyleSheet;
     QString pin;
 
     if(conf->lfState.activeChan == LFState::ActiveChan::CHAN1){

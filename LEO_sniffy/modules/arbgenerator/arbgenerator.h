@@ -15,7 +15,7 @@ class ArbGenerator : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit ArbGenerator(QObject *parent = nullptr, AbstractColors *theme = nullptr, bool isPWMbased = false);
+    explicit ArbGenerator(QObject *parent = nullptr, bool isPWMbased = false);
     QWidget* getWidget();
 
 signals:

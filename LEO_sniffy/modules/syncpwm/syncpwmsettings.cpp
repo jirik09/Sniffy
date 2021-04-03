@@ -9,19 +9,19 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
     switchStepMode = new WidgetSwitch(parent, " Continuous ", "     Step     ", "");
     switchStepMode->setObjectName("syncPwmStepButton");
-    switchStepMode->setColor("background-color:"+QString::fromUtf8(Colors::getCommonColorString()));
+    switchStepMode->setColor("background-color:"+Colors::getControlsColorString());
 
     buttonStart = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonStart->setText("Start", 0);
     buttonStart->setChecked(false, 0);
     buttonStart->setObjectName("syncPwmStartButton");
-    buttonStart->setColor("background-color:"+QString::fromUtf8(Colors::getCommonColorString()),0);
+    buttonStart->setColor("background-color:"+Colors::getControlsColorString(),0);
 
     buttonEquidist = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonEquidist->setText("Equidistant", 0);
     buttonEquidist->setObjectName("syncPwmEquidistButton");
     buttonEquidist->setChecked(false, 0);
-    buttonEquidist->setColor("background-color:"+QString::fromUtf8(Colors::getCommonColorString()), 0);
+    buttonEquidist->setColor("background-color:"+Colors::getControlsColorString(), 0);
 
     QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
     QHBoxLayout *commonButtons = new QHBoxLayout();
@@ -88,7 +88,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
 void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
     QString chNStr = QString::number(i+1);
-    QByteArray color = Colors::getChannelColorString(i);
+    QString color = Colors::getChannelColorString(i);
 
     onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "", i);
     onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);

@@ -21,7 +21,7 @@
 #define DARK_COLOR_HOVER QColor(71,76,94)
 
 /* CONTROLS */
-#define DARK_CONTROLS_GREY QColor(95,95,95)
+#define DARK_CONTROLS QColor(76,82,89)
 
 /* COLORS */
 #define DARK_FULL_BLACK QColor(0,0,0)

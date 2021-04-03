@@ -281,11 +281,6 @@ void AbstractModule::setModuleRestored(bool value)
     moduleRestored = value;
 }
 
-void AbstractModule::setTheme(AbstractColors *theme)
-{
-    this->theme = theme;
-}
-
 void AbstractModule::held(bool held){
     emit holdClicked(held);
 }

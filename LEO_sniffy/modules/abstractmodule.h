@@ -67,8 +67,6 @@ public:
     bool isModuleRestored() const;
     void setModuleRestored(bool value);
 
-    void setTheme(AbstractColors *theme);
-
 protected:
     QString moduleName;
     QString moduleIconURI;

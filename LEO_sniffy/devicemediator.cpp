@@ -6,26 +6,27 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 
     connect(communication,SIGNAL(devicesScaned(QList<DeviceDescriptor>)),this,SLOT(newDeviceList(QList<DeviceDescriptor>)),Qt::QueuedConnection);
 
-    AbstractColors *theme = new DarkTheme(this);
-    modules = createModulesList(theme);
+    Colors(this, new DarkTheme(this));
+
+    modules = createModulesList();
 
     connect(device,&Device::ScanDevices,this,&DeviceMediator::ScanDevices);
     connect(device,&Device::openDevice,this,&DeviceMediator::open);
     connect(device,&Device::closeDevice,this,&DeviceMediator::close);
 }
 
-QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(AbstractColors *theme){
+QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     QList<QSharedPointer<AbstractModule>> tmpModules;
     tmpModules.append(QSharedPointer<AbstractModule> (device = new Device(this)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new Scope(this,theme)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new Counter(this,theme)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new Voltmeter(this,theme)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new SyncPwm(this,theme)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this,theme)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this,theme,true)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this,theme)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this,theme)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this,theme)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Scope(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Counter(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new Voltmeter(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new SyncPwm(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this,true)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
     foreach(QSharedPointer<AbstractModule> mod, tmpModules){
         connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);

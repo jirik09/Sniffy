@@ -20,7 +20,7 @@ class Counter : public AbstractModule
     Q_OBJECT
 
 public:
-    explicit Counter(QObject *parent = nullptr, AbstractColors *theme = nullptr);
+    explicit Counter(QObject *parent = nullptr);
     ~Counter();
 
     QWidget* getWidget();

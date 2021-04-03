@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QColor>
 
+#include "graphics/abstractcolors.h"
+
 //backgrounds
 #define BACKGROUND_QCOLOR_DATA_AREA QColor(38,38,38)
 #define BACKGROUND_QCOLOR_BUTTON QColor(38,38,38)
@@ -86,15 +88,40 @@ enum colorTheme{
     LIGHT
 };
 
+#define TOP_CHANNEL_COLOR_INDEX  7
+
 class Colors : public QObject
 {
     Q_OBJECT
 public:
-    explicit Colors(QObject *parent = nullptr);
+    explicit Colors(QObject *parent = nullptr, AbstractColors *colorTheme = nullptr);
+
+    static QColor getAppBackgroundColor();
+    static QString getAppBackgroundColorString();
+
+    static QColor getDataAreaColor();
+    static QString getDataAreaColorString();
+
+    static QColor getControlBackgroundColor();
+    static QString getControlBackgroundColorString();
+
+    static QColor getButtonBackgroundColor();
+    static QString getButtonBackgroundColorString();
+
+    static QColor getButtonDisabledBackgroundColor();
+    static QString getButtonDisabledBackgroundColorString();
+
+    static QColor getTextDarkColor();
+    static QString getTextDarkColorString();
+
+    static QColor getTextLightColor();
+    static QString getTextLightColorString();
+
+    static QColor getControlsColor();
+    static QString getControlsColorString();
+
     static QColor getChannelColor(int channelIndex);
-    static QByteArray getChannelColorString(int channelIndex);
-    static QColor getCommonColor();
-    static QByteArray getCommonColorString();
+    static QString getChannelColorString(int channelIndex);
 };
 
 #endif // COLORS_H
