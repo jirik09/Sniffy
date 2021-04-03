@@ -10,6 +10,12 @@
     <height>375</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>0</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -43,7 +49,7 @@ background-color: rgb(58, 58, 58);
      <widget class="QWidget" name="widget_module" native="true">
       <property name="minimumSize">
        <size>
-        <width>150</width>
+        <width>180</width>
         <height>150</height>
        </size>
       </property>
@@ -81,7 +87,7 @@ background-color: rgb(58, 58, 58);
       </property>
       <property name="minimumSize">
        <size>
-        <width>200</width>
+        <width>220</width>
         <height>150</height>
        </size>
       </property>

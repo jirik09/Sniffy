@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>233</width>
-    <height>90</height>
+    <width>271</width>
+    <height>88</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>200</width>
-    <height>90</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>300</width>
+    <width>16777215</width>
     <height>16777215</height>
    </size>
   </property>
@@ -101,7 +101,7 @@ background-color: rgb(48, 48, 48);
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>60</height>
+          <height>40</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -126,7 +126,7 @@ background-color: rgb(48, 48, 48);
          <item>
           <widget class="QWidget" name="widget_5" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -139,7 +139,7 @@ background-color: rgb(48, 48, 48);
            </property>
            <property name="maximumSize">
             <size>
-             <width>32</width>
+             <width>40</width>
              <height>16777215</height>
             </size>
            </property>
@@ -150,9 +150,10 @@ background-color: rgb(48, 48, 48);
 } 
 
 QPushButton{border: none;
-	background-color: rgb(24, 154, 224);
+
 	color: rgb(214,214,214);
-	font: 99 14pt &quot;MS Shell Dlg 2&quot;;
+	font: 99 12pt &quot;MS Shell Dlg 2&quot;;
+	font-weight:bold;
 }
 </string>
            </property>
@@ -175,7 +176,7 @@ QPushButton{border: none;
             <item>
              <widget class="QPushButton" name="pushButton_plus">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -183,11 +184,35 @@ QPushButton{border: none;
               <property name="minimumSize">
                <size>
                 <width>25</width>
-                <height>25</height>
+                <height>20</height>
                </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>MS Shell Dlg 2</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
               </property>
               <property name="text">
                <string>+</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
               </property>
               <property name="autoRepeat">
                <bool>true</bool>
@@ -197,7 +222,7 @@ QPushButton{border: none;
             <item>
              <widget class="QPushButton" name="pushButton_minus">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -205,8 +230,26 @@ QPushButton{border: none;
               <property name="minimumSize">
                <size>
                 <width>25</width>
-                <height>25</height>
+                <height>20</height>
                </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <family>MS Shell Dlg 2</family>
+                <pointsize>12</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
+               </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true"/>
               </property>
               <property name="text">
                <string>–</string>
@@ -260,7 +303,7 @@ QPushButton{border: none;
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>20</height>
+                <height>15</height>
                </size>
               </property>
               <property name="text">
@@ -279,7 +322,7 @@ QPushButton{border: none;
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>20</height>
+                <height>15</height>
                </size>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -308,15 +351,18 @@ QPushButton{border: none;
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>80</width>
+                   <width>50</width>
                    <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>130</width>
+                   <width>150</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="layoutDirection">
+                  <enum>Qt::RightToLeft</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true"/>
@@ -325,7 +371,7 @@ QPushButton{border: none;
                   <number>50</number>
                  </property>
                  <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                  </property>
                 </widget>
                </item>
@@ -374,7 +420,7 @@ QPushButton{border: none;
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>22</height>
+          <height>20</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -410,7 +456,7 @@ QPushButton{border: none;
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>20</height>
+             <height>18</height>
             </size>
            </property>
           </widget>
@@ -424,21 +470,21 @@ QPushButton{border: none;
    <item>
     <widget class="QWidget" name="widget_dial" native="true">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
+      <sizepolicy hsizetype="Expanding" vsizetype="Ignored">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>70</width>
-       <height>70</height>
+       <width>50</width>
+       <height>50</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>100</width>
-       <height>100</height>
+       <width>120</width>
+       <height>120</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -464,7 +510,14 @@ width:5px;
        <number>0</number>
       </property>
       <item>
-       <widget class="CustomDial" name="dial"/>
+       <widget class="CustomDial" name="dial">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

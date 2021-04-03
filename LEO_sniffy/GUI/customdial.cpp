@@ -71,9 +71,9 @@ void CustomDial::mouseMoveEvent(QMouseEvent *me) {
 
     //qDebug() << "dist"<<distance <<"angle" <<angle<<"(X" << relativeX << " Y" << relativeY << ")";
     if (angle>225 || angle<45){
-        QDial::setValue(initialDialValue + distance/QDial::size().width()*QDial::maximum()*0.8);
+        QDial::setValue(initialDialValue + distance/QDial::size().width()*QDial::maximum()*MOUSE_DRAG_DISTANCE);
     }else {
-        QDial::setValue(initialDialValue - distance/QDial::size().width()*QDial::maximum()*0.8);
+        QDial::setValue(initialDialValue - distance/QDial::size().width()*QDial::maximum()*MOUSE_DRAG_DISTANCE);
     }
 }
 
@@ -96,7 +96,7 @@ void CustomDial::mouseReleaseEvent(QMouseEvent *me){
 
 void CustomDial::paintEvent(QPaintEvent*)
 {
-    static const int margin = 7;
+    int margin = 16;
 
     QPainter painter(this);
 
@@ -124,18 +124,20 @@ void CustomDial::paintEvent(QPaintEvent*)
     // Get ratio between current value and maximum to calculate angle
     double ratio = static_cast<double>(QDial::value()) / QDial::maximum();
 
-    int marginHalf = margin/2;
+
     int size = (QDial::width()<QDial::height())?QDial::width():QDial::height();
     int diffH = (QDial::width()>QDial::height())?QDial::width()-QDial::height():0;
     int diffV = (QDial::width()<QDial::height())?QDial::height()-QDial::width():0;
 
+    margin = margin * size / 100;
+    int marginHalf = margin/2;
     const QRectF rect(marginHalf+diffH/2,marginHalf+diffV/2,size-margin,size-margin);
 
     Qt::BrushStyle bs;
 
     //draw background arc
     if(drawMark){
-        bs = (Qt::BrushStyle)5;
+        bs = (Qt::BrushStyle)(size/30+3); //5 for static size
         painter.setPen(QPen(QBrush(QColor(48,48,48)),bs));
     }else {
         bs = (Qt::BrushStyle)2;
@@ -149,7 +151,7 @@ void CustomDial::paintEvent(QPaintEvent*)
 
     if(drawMark){
         //draw marker
-        painter.setPen(QPen(QBrush(QColor(214,214,214)),8));
+        painter.setPen(QPen(QBrush(QColor(214,214,214)),size/15+4)); //8 for static size
         painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
         //draw click pointer
         if(mousePressX!=0){

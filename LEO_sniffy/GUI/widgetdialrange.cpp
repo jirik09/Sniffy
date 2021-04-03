@@ -26,6 +26,8 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
                     "QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +"}";
 
     ui->widget->setStyleSheet(style);
+    this->setMinimumSize(170,85);
+    this->setMaximumSize(400,120);
 }
 
 WidgetDialRange::~WidgetDialRange()
@@ -105,7 +107,8 @@ void WidgetDialRange::addOption (QString unit,float mult){
 void WidgetDialRange::hideUnitSelection(void){
     ui->comboBox->close();
     ui->widget_4->close();
-    this->setMinimumSize(200,70);
+    this->setMinimumSize(170,60);
+    this->setMaximumSize(400,95);
 }
 
 void WidgetDialRange::plusClicked(){
