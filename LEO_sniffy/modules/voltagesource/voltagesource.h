@@ -12,7 +12,7 @@ class VoltageSource : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit VoltageSource(QObject *parent = nullptr);
+    explicit VoltageSource(QObject *parent = nullptr, AbstractColors *theme = nullptr);
     QWidget* getWidget();
 
 signals:

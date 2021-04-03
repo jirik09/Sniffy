@@ -1,8 +1,9 @@
 #include "templatemodule.h"
 
-TemplateModule::TemplateModule(QObject *parent)
+TemplateModule::TemplateModule(QObject *parent, AbstractColors *theme)
 {
     Q_UNUSED(parent);
+    setTheme(theme);
     moduleSpecification = new TemplateModuleSpec();
     config = new TemplateModuleConfig();
     tempWindow = new TemplateModuleWindow(config);

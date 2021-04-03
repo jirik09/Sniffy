@@ -21,7 +21,7 @@ class DeviceMediator : public QObject
     Q_OBJECT
 public:
     explicit DeviceMediator(QObject *parent = nullptr);
-    QList<QSharedPointer<AbstractModule>> createModulesList();
+    QList<QSharedPointer<AbstractModule>> createModulesList(AbstractColors *theme);
     QList<QSharedPointer<AbstractModule>> getModulesList();   
     void ShowDeviceModule();
     bool getIsConnected() const;

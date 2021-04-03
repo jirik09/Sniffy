@@ -1,8 +1,9 @@
 #include "syncpwm.h"
 
-SyncPwm::SyncPwm(QObject *parent)
+SyncPwm::SyncPwm(QObject *parent, AbstractColors *theme)
 {
     Q_UNUSED(parent);
+    setTheme(theme);
 
     config = new SyncPwmConfig(this);
     spwmWindow = new SyncPwmWindow(config);

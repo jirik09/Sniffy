@@ -12,7 +12,7 @@ class TemplateModule : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit TemplateModule(QObject *parent = nullptr);
+    explicit TemplateModule(QObject *parent = nullptr, AbstractColors *theme = nullptr);
     QWidget* getWidget();
 
 signals:
