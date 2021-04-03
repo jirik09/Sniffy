@@ -1,8 +1,9 @@
 #include "voltmeter.h"
 
-Voltmeter::Voltmeter(QObject *parent)
+Voltmeter::Voltmeter(QObject *parent, AbstractColors *theme)
 {
     Q_UNUSED(parent);
+    setTheme(theme);
     moduleSpecification = new VoltmeterSpec();
     config = new VoltmeterConfig();
     voltWindow = new VoltmeterWindow(config);

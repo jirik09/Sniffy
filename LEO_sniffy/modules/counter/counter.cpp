@@ -1,15 +1,16 @@
 #include "counter.h"
 
-Counter::Counter(QObject *parent)
+Counter::Counter(QObject *parent, AbstractColors *theme)
 {
     Q_UNUSED(parent);
 
+    setTheme(theme);
     config = new CounterConfig(this);
-    cntWindow = new CounterWindow(config);
+    cntWindow = new CounterWindow(config);    
 
     moduleCommandPrefix = cmd->COUNTER;
     moduleName = "Counter";
-    moduleIconURI = ":/graphics/graphics/icon_counter.png";
+    moduleIconURI = ":/graphics/graphics/icon_counter.png";   
 
     movAvg = new MovingAverage(2, cntWindow->tabHighFreq);
 
@@ -308,7 +309,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val1 >> val2 >> qerr >> terr;
 
-    WidgetDisplay *display;
+    WidgetDisplay *display = cntWindow->displayLFCh1;
     if(channel == "IC1D"){
         display = cntWindow->displayLFCh1;
     }else if(channel == "IC2D"){

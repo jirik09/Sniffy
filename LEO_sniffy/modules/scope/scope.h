@@ -25,7 +25,7 @@ class Scope : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit Scope(QObject *parent = nullptr);
+    explicit Scope(QObject *parent = nullptr, AbstractColors *theme = nullptr);
 
     QWidget* getWidget();
 

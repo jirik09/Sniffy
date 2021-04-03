@@ -1,8 +1,9 @@
 #include "voltagesource.h"
 
-VoltageSource::VoltageSource(QObject *parent)
+VoltageSource::VoltageSource(QObject *parent, AbstractColors *theme)
 {
     Q_UNUSED(parent);
+    setTheme(theme);
     moduleSpecification = new VoltageSourceSpec();
     config = new VoltageSourceConfig();
     tempWindow = new VoltageSourceWindow(config);

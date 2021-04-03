@@ -1,9 +1,10 @@
 #include "arbgenerator.h"
 
-ArbGenerator::ArbGenerator(QObject *parent, bool isPWMbased):
+ArbGenerator::ArbGenerator(QObject *parent, AbstractColors *theme, bool isPWMbased):
     isPWMbased(isPWMbased)
 {
     Q_UNUSED(parent);
+    setTheme(theme);
     moduleSpecification = new ArbGeneratorSpec();
     config = new ArbGeneratorConfig();
     arbGenWindow = new ArbGeneratorWindow(config, isPWMbased);
