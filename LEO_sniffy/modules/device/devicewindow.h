@@ -27,6 +27,9 @@ public:
     void showSpecification(DeviceSpec *spec);
     void hideSpecification();
 
+    void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);
+    void clearModuleDescriptions();
+
     WidgetSelection *deviceSelection;
     WidgetButtons *deviceConnectButton;
 
@@ -35,16 +38,11 @@ private:
     QVBoxLayout *verticalLayoutSpecification;
     QSpacerItem *verticalSpacer;
     QScrollArea *scrollAreaSpecification;
-   // WidgetSeparator *deviceParameters;
 
+    QVBoxLayout *descriptorsLayout;
     QList<WidgetDesciptionExpand*> *modulesDescriptions;
     WidgetDesciptionExpand *devDesc;
-   /*WidgetLabel *labelMCU;
-    WidgetLabel *labelCoreFreq;
-    WidgetLabel *labelFWVer;
-    WidgetLabel *labelRTOSVer;
-    WidgetLabel *labelHALVer;
-    WidgetLabel *labelMCU_ID;*/
+
     Ui::DeviceWindow *ui;
 };
 

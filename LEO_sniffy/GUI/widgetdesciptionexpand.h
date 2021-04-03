@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QDebug>
 
 #include "widgetlabel.h"
 
@@ -25,6 +26,10 @@ private:
 
     QList<WidgetLabel*> *labels;
     QVBoxLayout *labelsLayout;
+    bool isHidden = false;
+
+private slots:
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 };
 

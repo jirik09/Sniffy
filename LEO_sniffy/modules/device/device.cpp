@@ -57,6 +57,11 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
     }
 }
 
+void Device::addModuleDescription(QString name, QList<QString> labels, QList<QString> values)
+{
+    deviceWindow->addModuleDescription(name,labels,values);
+}
+
 void Device::connectDevice(int index){
     emit openDevice(index);
     deviceWindow->deviceConnectButton->setText("Disconnect",0);
@@ -64,11 +69,28 @@ void Device::connectDevice(int index){
 }
 
 void Device::disconnectDevice(){
+    deviceWindow->clearModuleDescriptions();
     emit closeDevice();
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
     setIcon(":/graphics/graphics/icon_not_connected.png");
     setModuleName("Device");
+}
+
+void Device::passSystemSpecificationToGUI()
+{
+    QList<QString> labels, values;;
+    labels.append("MCU");
+    values.append(deviceSpec->MCU);
+    labels.append("Core frequency");
+    values.append(QString::number(deviceSpec->CoreClock/1000000) + "MHz");
+    labels.append("FW");
+    values.append(deviceSpec->FW_Version + " ("+deviceSpec->Build_Date+")");
+    labels.append("Free RTOS");
+    values.append(deviceSpec->FREE_RTOS_Version);
+    labels.append("HAL");
+    values.append(deviceSpec->HAL_Version);
+    deviceWindow->addModuleDescription("System Info",labels,values);
 }
 
 void Device::errorHandler(QByteArray error){
@@ -87,8 +109,10 @@ void Device::parseData(QByteArray data){
     data.remove(0,4);
 
     if(feature=="CFG_"){
-        static_cast<DeviceSpec*>(moduleSpecification)->parseSpecification(data);
-        deviceWindow->showSpecification(static_cast<DeviceSpec*>(moduleSpecification));
+        deviceSpec = static_cast<DeviceSpec*>(moduleSpecification);
+        deviceSpec->parseSpecification(data);
+        passSystemSpecificationToGUI();
+        deviceWindow->showSpecification(deviceSpec);
         setIcon(":/graphics/graphics/icon_connected.png");
         setModuleName(static_cast<DeviceSpec*>(moduleSpecification)->device);
     }else if(feature=="ACK_"){

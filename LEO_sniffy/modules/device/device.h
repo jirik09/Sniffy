@@ -21,13 +21,15 @@ public:
     QString getName();
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
+    void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);
     void errorHandler(QByteArray error);
 
 private:
     void connectDevice(int index);
     void disconnectDevice();
+    void passSystemSpecificationToGUI();
 
-  //  DeviceSpec *deviceSpec;
+    DeviceSpec *deviceSpec;
     DeviceWindow *deviceWindow;
 
 signals:

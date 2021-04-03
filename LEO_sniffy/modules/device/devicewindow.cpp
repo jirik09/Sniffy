@@ -40,11 +40,10 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
 
     verticalLayoutSpecification->addWidget(deviceConnectButton);
 
-    modulesDescriptions = new QList<WidgetDesciptionExpand *>();
+    modulesDescriptions = new QList<WidgetDesciptionExpand *>;
 
-    devDesc = new WidgetDesciptionExpand(WidgetSpecification,"System");
-    modulesDescriptions->append(devDesc);
-    verticalLayoutSpecification->addWidget(devDesc);
+    descriptorsLayout = new QVBoxLayout();
+    verticalLayoutSpecification->addLayout(descriptorsLayout);
 
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     verticalLayoutSpecification->addItem(verticalSpacer);
@@ -60,7 +59,7 @@ DeviceWindow::~DeviceWindow()
 }
 
 void DeviceWindow::showSpecification(DeviceSpec *spec){
-    qDebug() << "update specification got to GUI";
+    //qDebug() << "update specification got to GUI";
     QString devicePreviewImage =":/graphics/graphics/"+spec->device+".png";
 
     if(QFileInfo::exists(devicePreviewImage)){
@@ -71,17 +70,6 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
 
     QList<WidgetDesciptionExpand *>::iterator it;
     for (it = modulesDescriptions->begin(); it != modulesDescriptions->end(); ++it){
-        (*it)->clearLabels();
-    }
-
-    devDesc->addLabel("MCU",spec->MCU);
-    devDesc->addLabel("Core Frequency",QString::number(spec->CoreClock/1000000) + "MHz");
-    devDesc->addLabel("FW",spec->FW_Version + " ("+spec->Build_Date+")");
-    devDesc->addLabel("Free RTOS",spec->FREE_RTOS_Version);
-    devDesc->addLabel("HAL",spec->HAL_Version);
-
-
-    for (it = modulesDescriptions->begin(); it != modulesDescriptions->end(); ++it){
         (*it)->show();
     }
 }
@@ -89,10 +77,41 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
 void DeviceWindow::hideSpecification(){
     QList<WidgetDesciptionExpand *>::iterator it;
     for (it = modulesDescriptions->begin(); it != modulesDescriptions->end(); ++it){
-        (*it)->clearLabels();
         (*it)->hide();
     }
     ui->widget_device->setStyleSheet("image: none;");
     ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/no_device.png);");
 }
+
+void DeviceWindow::addModuleDescription(QString name, QList<QString> labels, QList<QString> values)
+{
+    WidgetDesciptionExpand *newDesc = new WidgetDesciptionExpand(WidgetSpecification,name);
+
+    for (int i = 0;i<labels.length() && i<values.length() ; i++) {
+        newDesc->addLabel(labels.at(i),values.at(i));
+    }
+    modulesDescriptions->append(newDesc);
+    descriptorsLayout->addWidget(newDesc);
+}
+
+void DeviceWindow::clearModuleDescriptions()
+{
+    QList<WidgetDesciptionExpand *>::iterator it;
+    for (it = modulesDescriptions->begin(); it != modulesDescriptions->end(); ++it){
+      //  (*it)->clearLabels();
+        (*it)->deleteLater();
+    }
+    verticalLayoutSpecification->removeItem(descriptorsLayout);
+    verticalLayoutSpecification->removeItem(verticalSpacer);
+
+    descriptorsLayout->deleteLater();
+    descriptorsLayout = new QVBoxLayout();
+
+    verticalLayoutSpecification->addLayout(descriptorsLayout);
+    verticalLayoutSpecification->addItem(verticalSpacer);
+
+    modulesDescriptions->clear();
+}
+
+
 
