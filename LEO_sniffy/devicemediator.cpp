@@ -114,11 +114,11 @@ void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int res
 
 void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int resources)
 {
+    resourcesInUse = (resourcesInUse ^ resources) & resourcesInUse;
     foreach(QSharedPointer<AbstractModule> mod, modules){
-        if(mod->getResources() & resources && mod->getModuleName()!=moduleName)
+        if(((mod->getResources() ^ resources)& resourcesInUse)==0 && mod->getModuleName()!=moduleName)
             mod->setModuleStatus(ModuleStatus::STOP);
     }
-    resourcesInUse = (resourcesInUse ^ resources) & resourcesInUse;
 }
 
 void DeviceMediator::close(){
