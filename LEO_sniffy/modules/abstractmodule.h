@@ -71,7 +71,7 @@ protected:
     Comms *comm;
     QByteArray moduleCommandPrefix;
 
-    AbstractSpecification* moduleSpecification;
+    AbstractSpecification* moduleSpecification = nullptr;
 
 private:
     ModuleDockWidget *dockWidgetWindow;

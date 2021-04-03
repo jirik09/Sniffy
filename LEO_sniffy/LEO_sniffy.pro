@@ -115,7 +115,8 @@ SOURCES += \
     modules/voltmeter/voltmeter.cpp \
     modules/voltmeter/voltmeterconfig.cpp \
     modules/voltmeter/voltmeterspec.cpp \
-    modules/voltmeter/voltmeterwindow.cpp
+    modules/voltmeter/voltmeterwindow.cpp \
+    settingsdialog.cpp
 
 
 HEADERS += \
@@ -242,7 +243,8 @@ HEADERS += \
     modules/voltmeter/voltmeterconfig.h \
     modules/voltmeter/voltmeterdefs.h \
     modules/voltmeter/voltmeterspec.h \
-    modules/voltmeter/voltmeterwindow.h
+    modules/voltmeter/voltmeterwindow.h \
+    settingsdialog.h
 
 
 
@@ -272,7 +274,8 @@ FORMS += \
     modules/syncpwm/syncpwmwindow.ui \
     modules/template/templatemodulewindow.ui \
     modules/voltagesource/voltagesourcewindow.ui \
-    modules/voltmeter/voltmeterwindow.ui
+    modules/voltmeter/voltmeterwindow.ui \
+    settingsdialog.ui
 
 
 TRANSLATIONS += \

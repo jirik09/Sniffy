@@ -68,10 +68,35 @@ void DeviceMediator::open(int deviceIndex){
         connect(communication,&Comms::newData,this,&DeviceMediator::parseData);
         connect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
 
+        QString layoutFile;
+        QString configFile;
+        layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceList.at(deviceIndex).deviceName+".lay";
+        configFile = QApplication::applicationDirPath() + "/sessions/"+deviceList.at(deviceIndex).deviceName+".cfg";
+        QSharedPointer<AbstractModule> module;
+
+        QFile file(layoutFile);
+        QFile fileMod(configFile);
+
+        if(file.exists() && fileMod.exists()){
+            sett->askForSessionRestore(deviceList.at(deviceIndex).deviceName);
+        }else{
+            sett->setNoSessionFound();
+        }
         foreach(QSharedPointer<AbstractModule> mod, modules){
             mod->setComms(communication);
         }
         emit loadLayout(deviceList.at(deviceIndex).deviceName);
+    }
+}
+
+void DeviceMediator::disableModules()
+{
+    if(isConnected){
+        foreach(QSharedPointer<AbstractModule> mod, modules){
+            mod->disableModule();
+        }
+        communication->close();
+        isConnected = false;
     }
 }
 
@@ -97,18 +122,20 @@ void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int r
 }
 
 void DeviceMediator::close(){
-    if(isConnected){
-        foreach(QSharedPointer<AbstractModule> mod, modules){
-            mod->disableModule();
-        }
-        communication->close();
-        isConnected = false;
-    }
+    disableModules();
     ShowDeviceModule();
 
     disconnect(communication,&Comms::newData,this,&DeviceMediator::parseData);
     disconnect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
 }
+
+void DeviceMediator::closeApp()
+{
+    disableModules();
+    disconnect(communication,&Comms::newData,this,&DeviceMediator::parseData);
+    disconnect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
+}
+
 
 void DeviceMediator::handleError(QByteArray error){
     device->errorHandler(error);
@@ -163,5 +190,10 @@ int DeviceMediator::getResourcesInUse() const
 void DeviceMediator::setResourcesInUse(int value)
 {
     resourcesInUse = value;
+}
+
+void DeviceMediator::passSettings(SettingsDialog *sett)
+{
+    this->sett = sett;
 }
 

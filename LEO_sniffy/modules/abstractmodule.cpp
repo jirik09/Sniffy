@@ -223,9 +223,11 @@ void AbstractModule::showModuleWindow(){
 
 void AbstractModule::closeModule(){
     dockWidgetWindow->hide();
-    stopModule();
+    if(moduleControlWidget->getStatus()!=ModuleStatus::STOP)
+        stopModule();
     moduleControlWidget->setStatus(ModuleStatus::STOP);
-    emit releaseConflictingModules(moduleName, moduleSpecification->getResources());
+    if(moduleSpecification != nullptr)
+        emit releaseConflictingModules(moduleName, moduleSpecification->getResources());
 }
 
 void AbstractModule::disableModule(){
@@ -264,7 +266,9 @@ void AbstractModule::showModuleHoldButton(){
 
 int AbstractModule::getResources()
 {
-    return moduleSpecification->getResources();
+    if(moduleSpecification != nullptr)
+        return moduleSpecification->getResources();
+    return 0;
 }
 
 bool AbstractModule::isModuleRestored() const

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "../graphics/colors.h"
+
 namespace Ui {
 class WidgetSelection;
 }
@@ -31,9 +33,14 @@ private:
 public:
     void addOption (QString shownValue, float realValue);
     void clear();
-    void setSelected(int index);
-    int getSelected();
+    void setSelected(int index, bool silent = false);
+    int getSelectedIndex();
     int count();
+
+private slots:
+    void indexChanged(int index);
+signals:
+    void selectedIndexChanged(int index);
 };
 
 #endif // WIDGETSELECTION_H
