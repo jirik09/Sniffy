@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent):
     ui->setupUi(this);
 
     setWindowTitle("LEO sniffy");
+    sett = new SettingsDialog(this);
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sep);
@@ -32,11 +33,12 @@ MainWindow::MainWindow(QWidget *parent):
     createModulesWidgets();
     setupMainWindowComponents();
 
-    connect(deviceMediator,&DeviceMediator::loadLayout,this,&MainWindow::loadLayout);
+    connect(deviceMediator,&DeviceMediator::loadLayout,this,&MainWindow::loadLayout,Qt::DirectConnection);
 }
 
 void MainWindow::createModulesWidgets(){
     deviceMediator = new DeviceMediator(this);
+    deviceMediator->passSettings(sett);
 
     modulesList = deviceMediator->getModulesList();
     QSharedPointer<AbstractModule> module;
@@ -81,6 +83,7 @@ void MainWindow::setupMainWindowComponents(){
     ui->verticalLayout_modules->addWidget(footer);
 
     connect(footer,&WidgetFooter::sizeClicked,this,&MainWindow::setMenuSize);
+    connect(footer,&WidgetFooter::settingsClicked,this,&MainWindow::openSettingDialog);
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
@@ -98,6 +101,13 @@ void MainWindow::setMenuSize(bool isWide){
     }else{
         setMenuNarrow();
     }
+}
+
+void MainWindow::openSettingDialog()
+{
+    sett->open();
+    //   sett->show();
+    //   sett->activateWindow();
 }
 
 void MainWindow::setMenuWide(){
@@ -128,13 +138,14 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent (QCloseEvent *event)
 {
     saveLayout();
-    deviceMediator->close();
+    deviceMediator->closeApp();
     event->accept();
 }
 
 void MainWindow::saveLayout()
 {
     if(deviceMediator->getIsConnected()){
+        if(!sett->askToSaveSession())return;
         QSharedPointer<AbstractModule> module;
         layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
         configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
@@ -158,12 +169,14 @@ void MainWindow::saveLayout()
 
 void MainWindow::loadLayout(QString deviceName)
 {
+    if(!sett->IsSessionRestoreRequest()) return;
+
     layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".lay";
     configFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".cfg";
     QFile file(layoutFile);
-    if(!file.exists()){
-        return;
-    }
+
+    if(!file.exists()) return;
+
     QSettings layout(layoutFile, QSettings::IniFormat);
     QSettings settings(configFile, QSettings::IniFormat);
     restoreGeometry(layout.value("geometry").toByteArray());
@@ -174,6 +187,8 @@ void MainWindow::loadLayout(QString deviceName)
 
 void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 {
+    if(!sett->IsSessionRestoreRequest()) return;
+
     QString layoutFile;
     QString configFile;
     layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
@@ -183,8 +198,7 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
     QFile file(layoutFile);
     QFile fileMod(configFile);
 
-    if(!file.exists() || !fileMod.exists())
-        return;
+    if(!file.exists() || !fileMod.exists()) return;
 
     QSettings settings(configFile, QSettings::IniFormat);
     QSettings layout(layoutFile, QSettings::IniFormat);

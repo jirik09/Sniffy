@@ -175,7 +175,9 @@ void ArbGeneratorWindow::createSignalCallback()
 
         for(int i = 0;i<numChannelsUsed;i++){
             if(isPWMbased){
-                PWMres = spec->periphPWMClockFrequency/setting->dialPWMFreqCh[i]->getRealValue();
+                PWMres = spec->periphPWMClockFrequency/(int)(setting->dialPWMFreqCh[i]->getRealValue());
+                while(PWMres>65535)
+                    PWMres = (PWMres+1)/2-1;
                 setting->setPWMResolutionLabel(LabelFormator::formatOutout(log2(PWMres),"Bits",1),i);
             }
 

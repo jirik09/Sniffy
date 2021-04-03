@@ -26,7 +26,7 @@ void Device::deviceConnection(int buttonIndex){
         QString btnText = deviceWindow->deviceConnectButton->getText(buttonIndex);
 
         if(btnText.compare("Connect")==0){
-            connectDevice(deviceWindow->deviceSelection->getSelected());
+            connectDevice(deviceWindow->deviceSelection->getSelectedIndex());
         }else if (btnText.compare("Disconnect")==0){
             disconnectDevice();
             deviceWindow->hideSpecification();

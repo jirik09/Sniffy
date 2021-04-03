@@ -11,6 +11,7 @@
 #include <QSettings>
 
 #include "devicemediator.h"
+#include "settingsdialog.h"
 #include "GUI/widgetfooter.h"
 
 QT_BEGIN_NAMESPACE
@@ -35,6 +36,8 @@ private:
     QString configFile;
     QString setingsFile;
 
+    SettingsDialog *sett;
+
     void setMenuNarrow();
     void setMenuWide();
 
@@ -47,5 +50,6 @@ private slots:
     void loadLayout(QString deviceName);
     void loadModuleLayoutAndConfigCallback(QString moduleName);
     void setMenuSize(bool isWide);
+    void openSettingDialog();
 };
 #endif // MAINWINDOW_H
