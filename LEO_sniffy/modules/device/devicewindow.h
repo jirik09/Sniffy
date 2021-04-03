@@ -9,6 +9,7 @@
 #include "../../GUI/widgetbuttons.h"
 #include "../../GUI/widgetlabel.h"
 #include "../../GUI/widgetseparator.h"
+#include "../../GUI/widgetdesciptionexpand.h"
 
 #include "devicespec.h"
 
@@ -34,13 +35,16 @@ private:
     QVBoxLayout *verticalLayoutSpecification;
     QSpacerItem *verticalSpacer;
     QScrollArea *scrollAreaSpecification;
-    WidgetSeparator *deviceParameters;
-    WidgetLabel *labelMCU;
+   // WidgetSeparator *deviceParameters;
+
+    QList<WidgetDesciptionExpand*> *modulesDescriptions;
+    WidgetDesciptionExpand *devDesc;
+   /*WidgetLabel *labelMCU;
     WidgetLabel *labelCoreFreq;
     WidgetLabel *labelFWVer;
     WidgetLabel *labelRTOSVer;
     WidgetLabel *labelHALVer;
-    WidgetLabel *labelMCU_ID;
+    WidgetLabel *labelMCU_ID;*/
     Ui::DeviceWindow *ui;
 };
 
