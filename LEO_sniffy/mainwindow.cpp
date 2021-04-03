@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent):
 
 void MainWindow::createModulesWidgets(){
     deviceMediator = new DeviceMediator(this);
+    deviceMediator->passSettings(sett);
 
     modulesList = deviceMediator->getModulesList();
     QSharedPointer<AbstractModule> module;
@@ -144,6 +145,7 @@ void MainWindow::closeEvent (QCloseEvent *event)
 void MainWindow::saveLayout()
 {
     if(deviceMediator->getIsConnected()){
+        if(!sett->askToSaveSession())return;
         QSharedPointer<AbstractModule> module;
         layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
         configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
@@ -167,7 +169,7 @@ void MainWindow::saveLayout()
 
 void MainWindow::loadLayout(QString deviceName)
 {
-    if(sett->getRestoreSession() == 0) return;
+    if(!sett->IsSessionRestoreRequest()) return;
 
     layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".lay";
     configFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".cfg";
@@ -185,7 +187,7 @@ void MainWindow::loadLayout(QString deviceName)
 
 void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 {
-    if(sett->getRestoreSession() == 0) return;
+    if(!sett->IsSessionRestoreRequest()) return;
 
     QString layoutFile;
     QString configFile;

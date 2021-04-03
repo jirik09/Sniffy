@@ -45,9 +45,13 @@ void WidgetSelection::addOption (QString shownValue,float realValue){
     }
 
 }
-void WidgetSelection::setSelected(int index){
+void WidgetSelection::setSelected(int index, bool silent){
+    if(silent)
+        disconnect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
     ui->comboBox->setCurrentIndex(index);
     selectedIndex = index;
+    if(silent)
+        connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
 }
 
 int WidgetSelection::getSelectedIndex(){

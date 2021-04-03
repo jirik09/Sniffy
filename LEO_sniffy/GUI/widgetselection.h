@@ -33,7 +33,7 @@ private:
 public:
     void addOption (QString shownValue, float realValue);
     void clear();
-    void setSelected(int index);
+    void setSelected(int index, bool silent = false);
     int getSelectedIndex();
     int count();
 

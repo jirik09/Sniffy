@@ -68,6 +68,20 @@ void DeviceMediator::open(int deviceIndex){
         connect(communication,&Comms::newData,this,&DeviceMediator::parseData);
         connect(communication,&Comms::communicationError,this,&DeviceMediator::handleError);
 
+        QString layoutFile;
+        QString configFile;
+        layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceList.at(deviceIndex).deviceName+".lay";
+        configFile = QApplication::applicationDirPath() + "/sessions/"+deviceList.at(deviceIndex).deviceName+".cfg";
+        QSharedPointer<AbstractModule> module;
+
+        QFile file(layoutFile);
+        QFile fileMod(configFile);
+
+        if(file.exists() && fileMod.exists()){
+            sett->askForSessionRestore(deviceList.at(deviceIndex).deviceName);
+        }else{
+            sett->setNoSessionFound();
+        }
         foreach(QSharedPointer<AbstractModule> mod, modules){
             mod->setComms(communication);
         }
@@ -176,5 +190,10 @@ int DeviceMediator::getResourcesInUse() const
 void DeviceMediator::setResourcesInUse(int value)
 {
     resourcesInUse = value;
+}
+
+void DeviceMediator::passSettings(SettingsDialog *sett)
+{
+    this->sett = sett;
 }
 

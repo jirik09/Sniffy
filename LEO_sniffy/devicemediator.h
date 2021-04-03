@@ -3,6 +3,7 @@
 
 #include "communication/comms.h"
 #include "communication/commands.h"
+#include "settingsdialog.h"
 #include "modules/device/device.h"
 #include "modules/scope/scope.h"
 #include "modules/counter/counter.h"
@@ -28,6 +29,7 @@ public:
 
     int getResourcesInUse() const;
     void setResourcesInUse(int value);
+    void passSettings(SettingsDialog *sett);
 
 signals:
     void loadLayout(QString Devicename);
@@ -36,6 +38,7 @@ private:
     QList<DeviceDescriptor> deviceList;
     QList<QSharedPointer<AbstractModule>> modules;
     Device *device;
+    SettingsDialog *sett;
 
     Comms *communication;
 

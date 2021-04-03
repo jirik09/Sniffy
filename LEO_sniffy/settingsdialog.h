@@ -26,7 +26,10 @@ public:
     void open();
 
     int getThemeIndex() const;
-    int getRestoreSession() const;
+    bool IsSessionRestoreRequest() const;
+    void askForSessionRestore (QString device);
+    bool askToSaveSession ();
+    void setNoSessionFound();
 
 private:
     Ui::SettingsDialog *ui;
@@ -37,7 +40,8 @@ private:
 
     QString settingFile;
 
-    int restoreSession = 0; //0 no, 1 ask, 2 yes
+    int restoreSession = 1; //0 no, 1 ask, 2 yes
+    int sessionRestoreAnswer = -1; //-1 not answered
     int themeIndex;
 
     void saveSettings();
