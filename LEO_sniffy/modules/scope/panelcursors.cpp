@@ -19,13 +19,13 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     channelButtons->setObjectName("cursorChannSelection");
     destination->addWidget(channelButtons);
     channelButtons->setText("CH1",0);
-    channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(0)),0);
+    channelButtons->setColor("background-color:"+Colors::getChannelColorString(0),0);
     channelButtons->setText("CH2",1);
-    channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(1)),1);
+    channelButtons->setColor("background-color:"+Colors::getChannelColorString(1),1);
     channelButtons->setText("CH3",2);
-    channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(2)),2);
+    channelButtons->setColor("background-color:"+Colors::getChannelColorString(2),2);
     channelButtons->setText("CH4",3);
-    channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(3)),3);
+    channelButtons->setColor("background-color:"+Colors::getChannelColorString(3),3);
     channelButtons->setEnabled(false);
 
     cursorHorADial = new WidgetDialRange(parent ,"Cursor A");

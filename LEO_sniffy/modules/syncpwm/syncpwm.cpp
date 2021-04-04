@@ -3,7 +3,6 @@
 SyncPwm::SyncPwm(QObject *parent)
 {
     Q_UNUSED(parent);
-
     config = new SyncPwmConfig(this);
     spwmWindow = new SyncPwmWindow(config);
 

@@ -9,6 +9,9 @@
 #include "../GUI/widgetcontrolmodule.h"
 #include "../communication/comms.h"
 #include "../communication/commands.h"
+#include "../graphics/abstractcolors.h"
+#include "../graphics/themes/darktheme.h"
+#include "../graphics/themes/lighttheme.h"
 
 #include "../GUI/widgetbuttons.h"
 #include "../GUI/widgetdial.h"
@@ -68,10 +71,11 @@ protected:
     QString moduleName;
     QString moduleIconURI;
     Commands *cmd;
-    Comms *comm;
+    Comms *comm;    
     QByteArray moduleCommandPrefix;
 
     AbstractSpecification* moduleSpecification = nullptr;
+    AbstractColors *theme;
 
 private:
     ModuleDockWidget *dockWidgetWindow;

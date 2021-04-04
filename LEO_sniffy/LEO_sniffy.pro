@@ -46,7 +46,10 @@ SOURCES += \
     communication/serialportwriter.cpp \
     devicedescriptor.cpp \
     devicemediator.cpp \
+    graphics/abstractcolors.cpp \
     graphics/colors.cpp \
+    graphics/themes/darktheme.cpp \
+    graphics/themes/lighttheme.cpp \    
     main.cpp \
     mainwindow.cpp \
     math/movingaverage.cpp \
@@ -150,8 +153,11 @@ HEADERS += \
     communication/serialportwriter.h \
     devicedescriptor.h \
     devicemediator.h \
+    graphics/abstractcolors.h \
     graphics/colors.h \
     graphics/styles.h \
+    graphics/themes/darktheme.h \
+    graphics/themes/lighttheme.h \    
     mainwindow.h \
     math/movingaverage.h \
     math/timing.h \

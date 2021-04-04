@@ -38,7 +38,7 @@ private:
     QList<DeviceDescriptor> deviceList;
     QList<QSharedPointer<AbstractModule>> modules;
     Device *device;
-    SettingsDialog *sett;
+    SettingsDialog *sett;    
 
     Comms *communication;
 

@@ -9,7 +9,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     buttonsChannelSwitch->setObjectName("cntBtnChannelSwitch");
     buttonsChannelSwitch->setText("CH1", 0);
     buttonsChannelSwitch->setText("CH2", 1);
-    buttonsChannelSwitch->setColor(lfCh2BckgndColor, 1);
+    buttonsChannelSwitch->setColor(Colors::getTextDarkColorString(), 1);
     destination->addWidget(buttonsChannelSwitch);
 
     WidgetSeparator *separatorQuantitySwitch = new WidgetSeparator(parent,"Quantity switch");
@@ -32,7 +32,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     dialSampleCountCh2->setRange(1, SAMPLE_COUNT, "Smpls", 1, 1, 1, false);
     dialSampleCountCh2->hideUnitSelection();
     destination->addWidget(dialSampleCountCh2);
-    dialSampleCountCh2->setColor(Colors::getChannelColorString(12));
+    dialSampleCountCh2->setColor(Colors::getChannelColorString(7));
     dialSampleCountCh2->hide();
 
     WidgetSeparator *separatorMultiplierSwitch = new WidgetSeparator(parent,"Sample Count multiplier");

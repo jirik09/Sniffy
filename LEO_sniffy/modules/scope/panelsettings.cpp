@@ -10,13 +10,13 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsChannelEnable->setObjectName("ChannelEnable");
     destination->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
-    buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
+    buttonsChannelEnable->setColor("background-color:"+Colors::getChannelColorString(0),0);
     buttonsChannelEnable->setText("CH2",1);
-    buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),1);
+    buttonsChannelEnable->setColor("background-color:"+Colors::getChannelColorString(1),1);
     buttonsChannelEnable->setText("CH3",2);
-    buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
+    buttonsChannelEnable->setColor("background-color:"+Colors::getChannelColorString(2),2);
     buttonsChannelEnable->setText("CH4",3);
-    buttonsChannelEnable->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);
+    buttonsChannelEnable->setColor("background-color:"+Colors::getChannelColorString(3),3);
 
     WidgetSeparator *separatorTrig = new WidgetSeparator(parent,"Trigger");
     destination->addWidget(separatorTrig);
@@ -36,10 +36,10 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsTriggerChannel->setText("CH2",1);
     buttonsTriggerChannel->setText("CH3",2);
     buttonsTriggerChannel->setText("CH4",3);
-    buttonsTriggerChannel->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
-    buttonsTriggerChannel->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),1);
-    buttonsTriggerChannel->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
-    buttonsTriggerChannel->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);
+    buttonsTriggerChannel->setColor("background-color:"+Colors::getChannelColorString(0),0);
+    buttonsTriggerChannel->setColor("background-color:"+Colors::getChannelColorString(1),1);
+    buttonsTriggerChannel->setColor("background-color:"+Colors::getChannelColorString(2),2);
+    buttonsTriggerChannel->setColor("background-color:"+Colors::getChannelColorString(3),3);
 
     buttonsTriggerChannel->disableAll();
     buttonsTriggerChannel->setDisabledButton(false,0);
@@ -90,11 +90,11 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsChannelVertical->setText("CH3",2);
     buttonsChannelVertical->setText("CH4",3);
     buttonsChannelVertical->setText("Math",4);
-    buttonsChannelVertical->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
-    buttonsChannelVertical->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),1);
-    buttonsChannelVertical->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
-    buttonsChannelVertical->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);
-    buttonsChannelVertical->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(4)),4);
+    buttonsChannelVertical->setColor("background-color:"+Colors::getChannelColorString(0),0);
+    buttonsChannelVertical->setColor("background-color:"+Colors::getChannelColorString(1),1);
+    buttonsChannelVertical->setColor("background-color:"+Colors::getChannelColorString(2),2);
+    buttonsChannelVertical->setColor("background-color:"+Colors::getChannelColorString(3),3);
+    buttonsChannelVertical->setColor("background-color:"+Colors::getChannelColorString(4),4);
 
 
     dialVerticalScale = new WidgetDial(parent ,"Scale");

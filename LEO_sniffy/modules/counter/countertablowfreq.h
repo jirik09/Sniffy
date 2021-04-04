@@ -25,9 +25,6 @@ public:
     WidgetButtons *buttonsMultiplierSwitch;
     WidgetButtons *buttonsDutyCycleSwitch;
 
-    const QString lfCh2BckgndColor = "background-color:"+QString::fromUtf8(COLOR_GREY);
-    const QString lfCh2TextColor =  "color:"+QString::fromUtf8(COLOR_GREY);
-
     void enableAllComponents(bool enable);
     void changeAllComponentsColor(QString bckgndColor);
     void changeAllComponentsCheck(int quantBtnIndex, int dcBtnIndex, int multipIndex);

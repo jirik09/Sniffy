@@ -6,6 +6,8 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 
     connect(communication,SIGNAL(devicesScaned(QList<DeviceDescriptor>)),this,SLOT(newDeviceList(QList<DeviceDescriptor>)),Qt::QueuedConnection);
 
+    Colors(this, new DarkTheme(this));
+
     modules = createModulesList();
 
     connect(device,&Device::ScanDevices,this,&DeviceMediator::ScanDevices);
@@ -28,7 +30,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
 
     foreach(QSharedPointer<AbstractModule> mod, tmpModules){
         connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
-        connect(mod.data(), &AbstractModule::releaseConflictingModules, this, &DeviceMediator::releaseConflictingModulesCallback);
+        connect(mod.data(), &AbstractModule::releaseConflictingModules, this, &DeviceMediator::releaseConflictingModulesCallback);      
     }
 
     return tmpModules;
