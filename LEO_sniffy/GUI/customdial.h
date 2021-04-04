@@ -4,7 +4,7 @@
 #include <QDial>
 #include "math.h"
 
-#define MOUSE_DRAG_DISTANCE 0.4 //highe number more sensitive
+#define MOUSE_DRAG_DISTANCE 0.6 //higher number more sensitive (short distance big change)
 
 class CustomDial : public QDial
 {   

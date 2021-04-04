@@ -40,3 +40,39 @@ qreal NumberParser::parse(QString text)
     bool success;
     return parse(text, success);
 }
+
+qreal NumberParser::getNiceNumber(qreal number, int validDigits)
+{
+    if(abs(number) <0.0000001){
+        return 0;
+    }
+    bool isNegative = false;
+    if(number <0){
+        isNegative = true; number = - number;
+    }
+    qreal exponent = log10(number);
+    int exp = round(-exponent+0.2)+validDigits;
+    qreal multiplier = pow(10,exp);
+    int validValue = roundToFive(number * multiplier);
+
+    if(isinf(qreal(validValue)/multiplier)){
+        qDebug () << "chyba";
+        return number;
+    }
+    if(isNegative){
+        return qreal(-validValue)/multiplier;
+    }else{
+
+        return qreal(validValue)/multiplier;
+    }
+}
+
+qreal NumberParser::roundToFive(qreal number)
+{
+    int tmp = (int)round(number)%5;
+    if(tmp>2.5){
+        tmp = tmp-5;
+    }
+    return round(number-tmp);
+
+}

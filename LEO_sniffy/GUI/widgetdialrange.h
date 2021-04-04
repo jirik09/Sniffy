@@ -4,12 +4,13 @@
 #include <QWidget>
 #include <QList>
 #include <QString>
-#include "math.h"
+#include <QtMath>
 
 #include "customdial.h"
 #include "../graphics/colors.h"
 #include "../modules/numberparser.h"
 
+#define DIAL_DEFAULT_RANGE 700
 
 namespace Ui {
 class WidgetDialRange;
@@ -25,13 +26,14 @@ class WidgetDialRange : public QWidget
 {
     Q_OBJECT
 
+
 public:
     explicit WidgetDialRange(QWidget *parent = nullptr, QString name = "", int optionalEmitParam = 0);
     ~WidgetDialRange();
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
     void addOption (QString unitString,float mult);
-    void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false);
+    void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false, int numOfDecimals = 2);
     void updateRange(float min, float max, bool silent = false);
     void enableFineMousePrecision();
     void setRealValue(float value, bool silent = false);
@@ -48,7 +50,7 @@ private:
     int optionalEmitParam;
     Ui::WidgetDialRange *ui;
     QList<params_unit> *units;
-    int dialMaxValue = 500;
+    int dialMaxValue = DIAL_DEFAULT_RANGE;
     float realValue;
     float defaultRealValue = 0;
     float labelValue;
