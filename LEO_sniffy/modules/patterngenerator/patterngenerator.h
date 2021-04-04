@@ -12,7 +12,7 @@ class PatternGenerator : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit PatternGenerator(QObject *parent = nullptr, AbstractColors *theme = nullptr);
+    explicit PatternGenerator(QObject *parent = nullptr);
     QWidget* getWidget();
 
 signals:

@@ -1,99 +1,80 @@
 #include "colors.h"
 
-colorTheme theme = DARK;
+static AbstractColors *theme = nullptr;
 
-Colors::Colors(QObject *parent) : QObject(parent)
+Colors::Colors(QObject *parent, AbstractColors *colorTheme) : QObject(parent)
 {
+    theme = colorTheme;
 }
 
-QColor Colors::getChannelColor(int channelIndex)
-{
-    int index = channelIndex;
-
-    if(theme==DARK) {
-        switch (index) {
-        case 0:
-            return CHANNEL_1_QCOLOR;
-        case 1:
-            return CHANNEL_2_QCOLOR;
-        case 2:
-            return CHANNEL_3_QCOLOR;
-        case 3:
-            return CHANNEL_4_QCOLOR;
-        case 4:
-            return CHANNEL_5_QCOLOR;
-        case 5:
-            return CHANNEL_6_QCOLOR;
-        case 6:
-            return CHANNEL_7_QCOLOR;
-        case 7:
-            return CHANNEL_8_QCOLOR;
-        default:
-            return QCOLOR_BLACK;
-        }
-    }else if(theme==LIGHT){
-
-    }else {
-
-    }
-
-    return QCOLOR_BLACK;
+QColor Colors::getAppBackgroundColor(){
+    return theme->getAppBackgroundColor();
 }
 
-QByteArray Colors::getChannelColorString(int channelIndex)
-{
-    int index = channelIndex;
-
-    if(theme==DARK) {
-        switch (index) {
-        case 0:
-            return CHANNEL_1_COLOR;
-        case 1:
-            return CHANNEL_2_COLOR;
-        case 2:
-            return CHANNEL_3_COLOR;
-        case 3:
-            return CHANNEL_4_COLOR;
-        case 4:
-            return CHANNEL_5_COLOR;
-        case 5:
-            return CHANNEL_6_COLOR;
-        case 6:
-            return CHANNEL_7_COLOR;
-        case 7:
-            return CHANNEL_8_COLOR;
-        default:
-            return COLOR_BLACK;
-        }
-    }else if(theme==LIGHT){
-
-    }else {
-
-    }
-
-    return COLOR_BLACK;
+QString Colors::getAppBackgroundColorString(){
+    return theme->getAppBackgroundColorString();
 }
 
-QColor Colors::getCommonColor()
-{
-    switch (theme) {
-    case DARK:
-        return QCOLOR_COMMON_DARK_GREY;
-    case LIGHT:
-        return QCOLOR_COMMON_LIGHT_GREY;
-    default:
-        return QCOLOR_BLACK;
-    }
+QColor Colors::getDataAreaColor(){
+    return theme->getDataAreaColor();
 }
 
-QByteArray Colors::getCommonColorString()
-{
-    switch (theme) {
-    case DARK:
-        return COLOR_COMMON_DARK_GREY;
-    case LIGHT:
-        return COLOR_COMMON_LIGHT_GREY;
-    default:
-        return COLOR_BLACK;
-    }
+QString Colors::getDataAreaColorString(){
+    return theme->getDataAreaColorString();
 }
+
+QColor Colors::getButtonBackgroundColor(){
+    return theme->getButtonBackgroundColor();
+}
+
+QString Colors::getButtonBackgroundColorString(){
+    return theme->getButtonBackgroundColorString();
+}
+
+QColor Colors::getButtonDisabledBackgroundColor(){
+    return theme->getButtonDisabledBackgroundColor();
+}
+
+QString Colors::getButtonDisabledBackgroundColorString(){
+    return theme->getButtonDisabledBackgroundColorString();
+}
+
+QColor Colors::getTextDarkColor(){
+    return theme->getTextDarkColor();
+}
+
+QString Colors::getTextDarkColorString(){
+    return theme->getTextDarkColorString();
+}
+
+QColor Colors::getTextLightColor(){
+    return theme->getTextLightColor();
+}
+
+QString Colors::getTextLightColorString(){
+    return theme->getTextLightColorString();
+}
+
+QColor Colors::getControlsColor(){
+    return theme->getControlsColor();
+}
+
+QString Colors::getControlsColorString(){
+    return theme->getControlsColorString();
+}
+
+QColor Colors::getChannelColor(int channelIndex){
+    if(channelIndex > TOP_CHANNEL_COLOR_INDEX)
+        return theme->getChannelColor(TOP_CHANNEL_COLOR_INDEX);
+    else
+       return theme->getChannelColor(channelIndex);
+}
+
+QString Colors::getChannelColorString(int channelIndex){
+    if(channelIndex > TOP_CHANNEL_COLOR_INDEX)
+        return theme->getChannelColorString(TOP_CHANNEL_COLOR_INDEX);
+    else
+       return theme->getChannelColorString(channelIndex);
+}
+
+

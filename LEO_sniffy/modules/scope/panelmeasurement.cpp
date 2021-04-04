@@ -8,13 +8,13 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
     channelButtons->setObjectName("measChannSelection");
     destination->addWidget(channelButtons);
     channelButtons->setText("CH1",0);
-    channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(0)),0);
+    channelButtons->setColor("background-color:"+Colors::getChannelColorString(0),0);
     channelButtons->setText("CH2",1);
-    channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(1)),1);
+    channelButtons->setColor("background-color:"+Colors::getChannelColorString(1),1);
     channelButtons->setText("CH3",2);
-    channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(2)),2);
+    channelButtons->setColor("background-color:"+Colors::getChannelColorString(2),2);
     channelButtons->setText("CH4",3);
-    channelButtons->setColor(QString::fromUtf8("background-color:"+Colors::getChannelColorString(3)),3);
+    channelButtons->setColor("background-color:"+Colors::getChannelColorString(3),3);
 
     destination->addWidget(new WidgetSeparator(parent,"Voltage measurement"));
 
@@ -76,24 +76,24 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
     channelButtonPhaseA = new WidgetButtons(parent,4,ButtonTypes::RADIO,"1st channel");
     destination->addWidget(channelButtonPhaseA);
     channelButtonPhaseA->setText("CH1",0);
-    channelButtonPhaseA->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
+    channelButtonPhaseA->setColor("background-color:"+Colors::getChannelColorString(0),0);
     channelButtonPhaseA->setText("CH2",1);
-    channelButtonPhaseA->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),1);
+    channelButtonPhaseA->setColor("background-color:"+Colors::getChannelColorString(1),1);
     channelButtonPhaseA->setText("CH3",2);
-    channelButtonPhaseA->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
+    channelButtonPhaseA->setColor("background-color:"+Colors::getChannelColorString(2),2);
     channelButtonPhaseA->setText("CH4",3);
-    channelButtonPhaseA->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);
+    channelButtonPhaseA->setColor("background-color:"+Colors::getChannelColorString(3),3);
 
     channelButtonPhaseB = new WidgetButtons(parent,4,ButtonTypes::RADIO,"2nd channel");
     destination->addWidget(channelButtonPhaseB);
     channelButtonPhaseB->setText("CH1",0);
-    channelButtonPhaseB->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
+    channelButtonPhaseB->setColor("background-color:"+Colors::getChannelColorString(0),0);
     channelButtonPhaseB->setText("CH2",1);
-    channelButtonPhaseB->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),1);
+    channelButtonPhaseB->setColor("background-color:"+Colors::getChannelColorString(1),1);
     channelButtonPhaseB->setText("CH3",2);
-    channelButtonPhaseB->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),2);
+    channelButtonPhaseB->setColor("background-color:"+Colors::getChannelColorString(2),2);
     channelButtonPhaseB->setText("CH4",3);
-    channelButtonPhaseB->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),3);
+    channelButtonPhaseB->setColor("background-color:"+Colors::getChannelColorString(3),3);
     channelButtonPhaseB->setChecked(true,1);
 
 
@@ -198,13 +198,13 @@ void PanelMeasurement::clearClicked(){
 void PanelMeasurement::setMeasButtonsColor(int index){
     foreach(WidgetButtons* but, measButtons){
         if(index==0)
-            but->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(0)),0);
+            but->setColor("background-color:"+Colors::getChannelColorString(0),0);
         if(index==1)
-            but->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(1)),0);
+            but->setColor("background-color:"+Colors::getChannelColorString(1),0);
         if(index==2)
-            but->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(2)),0);
+            but->setColor("background-color:"+Colors::getChannelColorString(2),0);
         if(index==3)
-            but->setColor("background-color:"+QString::fromUtf8(Colors::getChannelColorString(3)),0);
+            but->setColor("background-color:"+Colors::getChannelColorString(3),0);
     }
 
 }

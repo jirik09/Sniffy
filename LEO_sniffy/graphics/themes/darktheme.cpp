@@ -77,12 +77,12 @@ QString DarkTheme::getTextLightColorString()
 
 QColor DarkTheme::getControlsColor()
 {
-    return DARK_CONTROLS_GREY;
+    return DARK_CONTROLS;
 }
 
 QString DarkTheme::getControlsColorString()
 {
-    return DARK_CONTROLS_GREY.name();
+    return DARK_CONTROLS.name();
 }
 
 QColor DarkTheme::getChannelColor(int channelIndex)

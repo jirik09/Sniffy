@@ -31,12 +31,12 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     channLabelList.append(ui->label_math1);
     channLabelList.append(ui->label_math2);
 
-    ui->label_ch1->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(0)));
-    ui->label_ch2->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(1)));
-    ui->label_ch3->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(2)));
-    ui->label_ch4->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(3)));
-    ui->label_math1->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(4)));
-    ui->label_math2->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(5)));
+    ui->label_ch1->setStyleSheet("color:"+Colors::getChannelColorString(0));
+    ui->label_ch2->setStyleSheet("color:"+Colors::getChannelColorString(1));
+    ui->label_ch3->setStyleSheet("color:"+Colors::getChannelColorString(2));
+    ui->label_ch4->setStyleSheet("color:"+Colors::getChannelColorString(3));
+    ui->label_math1->setStyleSheet("color:"+Colors::getChannelColorString(4));
+    ui->label_math2->setStyleSheet("color:"+Colors::getChannelColorString(5));
 
     foreach(QLabel *label, channLabelList){
         label->hide();
@@ -98,7 +98,7 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
     foreach(Measurement* m, meas){
         measLabelList.at(fillIndex)->setText(m->getLabel()+" "+m->getValueString());
         measLabelList.at(fillIndex)->show();
-        measLabelList.at(fillIndex)->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(m->getChannelIndex())));
+        measLabelList.at(fillIndex)->setStyleSheet("color:"+Colors::getChannelColorString(m->getChannelIndex()));
         fillIndex++;
     }
 }
@@ -125,8 +125,8 @@ void WidgetLabelArea::setCursorTimeReadings(qreal curA, qreal curB)
 
 void WidgetLabelArea::setCursorReadingsColor(int channelIndex)
 {
-    ui->widget_Hcursors->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(channelIndex)));
-    ui->widget_Vcursors->setStyleSheet(QString::fromUtf8("color:"+Colors::getChannelColorString(channelIndex)));
+    ui->widget_Hcursors->setStyleSheet("color:"+Colors::getChannelColorString(channelIndex));
+    ui->widget_Vcursors->setStyleSheet("color:"+Colors::getChannelColorString(channelIndex));
 }
 
 void WidgetLabelArea::hideCursorReadings()

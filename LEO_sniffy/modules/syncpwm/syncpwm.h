@@ -16,7 +16,7 @@ class SyncPwm : public AbstractModule
     Q_OBJECT
 
 public:
-    explicit SyncPwm(QObject *parent = nullptr, AbstractColors *theme = nullptr);
+    explicit SyncPwm(QObject *parent = nullptr);
     ~SyncPwm();
 
     QWidget* getWidget();

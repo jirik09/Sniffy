@@ -1,9 +1,8 @@
 #include "patterngenerator.h"
 
-PatternGenerator::PatternGenerator(QObject *parent, AbstractColors *theme)
+PatternGenerator::PatternGenerator(QObject *parent)
 {
     Q_UNUSED(parent);
-    setTheme(theme);
     moduleSpecification = new PatternGeneratorSpec();
     config = new PatternGeneratorConfig();
     tempWindow = new PatternGeneratorWindow(config);

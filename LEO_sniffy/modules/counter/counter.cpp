@@ -1,10 +1,8 @@
 #include "counter.h"
 
-Counter::Counter(QObject *parent, AbstractColors *theme)
+Counter::Counter(QObject *parent)
 {
     Q_UNUSED(parent);
-
-    setTheme(theme);
     config = new CounterConfig(this);
     cntWindow = new CounterWindow(config);    
 

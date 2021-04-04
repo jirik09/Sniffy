@@ -1,9 +1,8 @@
 #include "scope.h"
 
-Scope::Scope(QObject *parent, AbstractColors *theme)
+Scope::Scope(QObject *parent)
 {
     Q_UNUSED(parent);
-    setTheme(theme);
     config = new ScopeConfig();
     moduleSpecification = new ScopeSpec();
     measCalc = new MeasCalculations();

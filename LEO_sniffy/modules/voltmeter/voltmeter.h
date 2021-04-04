@@ -17,7 +17,7 @@ class Voltmeter : public AbstractModule
 {
     Q_OBJECT
 public:
-    explicit Voltmeter(QObject *parent = nullptr, AbstractColors *theme = nullptr);
+    explicit Voltmeter(QObject *parent = nullptr);
     QWidget* getWidget();
 
 
