@@ -31,6 +31,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
 
     customLengthInput = new WidgetTextInput(parent,"","200",InputTextType::NUMBER);
     customLengthInput->setObjectName("arbgenmemleng");
+    customLengthInput->setMaximumSize(120,50);
 
     buttonSelectFile = new WidgetButtons(parent,1,ButtonTypes::NORMAL,"     Arbitrary data");
     buttonSelectFile->setObjectName("buttonselectfileArbGen");

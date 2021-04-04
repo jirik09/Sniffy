@@ -67,7 +67,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
 
     dialTimeBase = new WidgetDial(parent ,"Time base");
     dialTimeBase->setObjectName("TimeBase");
-    dialTimeBase->setColor(Colors::getChannelColorString(1));
+    dialTimeBase->setColor(Colors::getControlsColorString());
     destination->addWidget(dialTimeBase);
     fillTimeBase();
     dialTimeBase->setDefaultIndex(10);
