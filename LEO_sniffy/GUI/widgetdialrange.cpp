@@ -90,6 +90,11 @@ float WidgetDialRange::getRealValue() const
     return realValue;
 }
 
+void WidgetDialRange::setNumOfDecimals(int value)
+{
+    numOfDecimals = value;
+}
+
 void WidgetDialRange::setRealValue(float value, bool silent){
     realValue = value;
     updateControls(0,silent);
@@ -302,7 +307,7 @@ void WidgetDialRange::updateControls(int except, bool silent){
             }
         }
         ui->label_unit->setText(unitString);
-        ui->lineEdit->setText(QString::number(labelValue,'f',2));
+        ui->lineEdit->setText(QString::number(labelValue,'f',numOfDecimals));
     }
 
     if(except!=1){

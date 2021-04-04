@@ -42,6 +42,8 @@ public:
     float getDefaultRealValue() const;
     float getRealValue() const;
 
+    void setNumOfDecimals(int value);
+
 private:
     int optionalEmitParam;
     Ui::WidgetDialRange *ui;
@@ -61,6 +63,7 @@ private:
     QString unitString;
 
     bool logaritmic;
+    int numOfDecimals = 2;
     float logOffset = 0;
     float logGain = 0;
 

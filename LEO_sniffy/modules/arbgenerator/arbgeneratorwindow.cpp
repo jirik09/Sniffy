@@ -117,7 +117,7 @@ void ArbGeneratorWindow::setGeneratorStopped()
 
 void ArbGeneratorWindow::setFrequencyLabels(int channel, qreal freq)
 {
-    setting->setFreqLabel(LabelFormator::formatOutout(freq,"Hz",4),channel);
+    setting->setFreqLabel(LabelFormator::formatOutout(freq,"Hz",5),channel);
 }
 
 void ArbGeneratorWindow::setPWMFrequencyLabels(int channel, qreal freq)
@@ -198,7 +198,7 @@ void ArbGeneratorWindow::createSignalCallback()
                 div = spec->periphClockFrequency/spec->maxSamplingRate;
             }
             qreal realfreq = spec->periphClockFrequency/(qreal)((int)(div))/length;
-            setting->setLabels(LabelFormator::formatOutout(realfreq,"Hz",3),QString::number(length),i);
+            setting->setLabels(LabelFormator::formatOutout(realfreq,"Hz",4),QString::number(length),i);
 
             if(shape->at(i) == SignalShape::ARB){
                 signalData = fileLoader->getSignal(i);
