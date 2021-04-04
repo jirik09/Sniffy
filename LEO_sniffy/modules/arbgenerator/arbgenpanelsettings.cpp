@@ -115,6 +115,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
 
         dialFreqCh[i] = new WidgetDialRange(parent,"Frequency",i);
         dialFreqCh[i]->setObjectName("arbGenfreq"+chNStr);
+        dialFreqCh[i]->setNumOfDecimals(3);
         dialFreqCh[i]->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
         dialFreqCh[i]->setColor(Colors::getChannelColorString(i));
         verChanBox->addWidget(dialFreqCh[i]);

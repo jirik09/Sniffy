@@ -56,6 +56,8 @@
         <file>graphics/icon_pattern_generator.png</file>
         <file>graphics/icon_pwm_gen.png</file>
         <file>graphics/icon_voltage_source.png</file>
+        <file>graphics/arrow_down.png</file>
+        <file>graphics/arrow_up.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

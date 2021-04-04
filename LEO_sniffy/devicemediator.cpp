@@ -24,9 +24,9 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (new SyncPwm(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this,true)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
+  //  tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
+ //   tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
+ //   tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
     foreach(QSharedPointer<AbstractModule> mod, tmpModules){
         connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
@@ -116,11 +116,11 @@ void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int res
 
 void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int resources)
 {
+    resourcesInUse = (resourcesInUse ^ resources) & resourcesInUse;
     foreach(QSharedPointer<AbstractModule> mod, modules){
-        if(mod->getResources() & resources && mod->getModuleName()!=moduleName)
+        if(((mod->getResources() ^ resources)& resourcesInUse)==0 && mod->getModuleName()!=moduleName)
             mod->setModuleStatus(ModuleStatus::STOP);
     }
-    resourcesInUse = (resourcesInUse ^ resources) & resourcesInUse;
 }
 
 void DeviceMediator::close(){

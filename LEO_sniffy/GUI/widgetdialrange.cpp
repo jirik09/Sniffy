@@ -26,6 +26,8 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
                     "QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +"}";
 
     ui->widget->setStyleSheet(style);
+    this->setMinimumSize(170,85);
+    this->setMaximumSize(400,120);
 }
 
 WidgetDialRange::~WidgetDialRange()
@@ -88,6 +90,11 @@ float WidgetDialRange::getRealValue() const
     return realValue;
 }
 
+void WidgetDialRange::setNumOfDecimals(int value)
+{
+    numOfDecimals = value;
+}
+
 void WidgetDialRange::setRealValue(float value, bool silent){
     realValue = value;
     updateControls(0,silent);
@@ -105,42 +112,66 @@ void WidgetDialRange::addOption (QString unit,float mult){
 void WidgetDialRange::hideUnitSelection(void){
     ui->comboBox->close();
     ui->widget_4->close();
-    this->setMinimumSize(200,70);
+    this->setMinimumSize(170,60);
+    this->setMaximumSize(400,95);
 }
 
 void WidgetDialRange::plusClicked(){
-    float tmpValue = labelValue + buttonStep;
-    if(abs(labelValue)>1000){
+    float tmpValue = labelValue + buttonStep ;
+    labelValue = labelValue + 0.000001;
+    if(abs(labelValue)>=1000){
         tmpValue = labelValue + buttonStep*10;
-    }else if(abs(labelValue)>500){
+    }else if(abs(labelValue)>=500){
         tmpValue = labelValue + buttonStep*5;
-    }else if(abs(labelValue)>200){
+    }else if(abs(labelValue)>=200){
         tmpValue = labelValue + buttonStep*2;
+    }else if(abs(labelValue)<2 && numOfDecimals>1){
+        tmpValue = labelValue + buttonStep*0.05;
+    }else if(abs(labelValue)<5 && numOfDecimals>1){
+        tmpValue = labelValue + buttonStep*0.1;
+    }else if(abs(labelValue)<10 && numOfDecimals>1){
+        tmpValue = labelValue + buttonStep*0.2;
+    }else if(abs(labelValue)<50&& numOfDecimals>=1){
+        tmpValue = labelValue + buttonStep*0.5;
     }
+
     realValue = tmpValue * unitMult;
     updateControls(0);
 }
 
 void WidgetDialRange::minusClicked(){
+
     float tmpValue = labelValue - buttonStep;
-    if(abs(labelValue)>1000){
+    labelValue = labelValue - 0.000001;
+    if(abs(labelValue)>=1000){
+        tmpValue = labelValue - buttonStep*20;
+    }else if(abs(labelValue)>=500){
         tmpValue = labelValue - buttonStep*10;
-    }else if(abs(labelValue)>500){
-        tmpValue = labelValue - buttonStep*5;
-    }else if(abs(labelValue)>200){
+    }else if(abs(labelValue)>=200){
         tmpValue = labelValue - buttonStep*2;
+    }else if(abs(labelValue)<2 && numOfDecimals>1){
+        tmpValue = labelValue - buttonStep*0.05;
+    }else if(abs(labelValue)<5 && numOfDecimals>1){
+        tmpValue = labelValue - buttonStep*0.1;
+    }else if(abs(labelValue)<10 && numOfDecimals>1){
+        tmpValue = labelValue - buttonStep*0.2;
+    }else if(abs(labelValue)<50 && numOfDecimals>=1){
+        tmpValue = labelValue - buttonStep*0.5;
     }
+
     realValue = tmpValue * unitMult;
     updateControls(0);
 }
 
 void WidgetDialRange::dialValueChanged(int in){
+
     //dial change is marginal so do the action
-    if(abs(realValue)>getRealValueFromDial(in+1.5) || abs(realValue)<getRealValueFromDial(in-1.5) ){
-        realValue = getRealValueFromDial(in);
+    //if(abs(realValue)>getRealValueFromDial(in+1.5) || abs(realValue)<getRealValueFromDial(in-1.5) ){
+        realValue = NumberParser::getNiceNumber(getRealValueFromDial(in),3);
+        //realValue = getRealValueFromDial(in);
         realValue = (rangePrecision)*round(realValue/(rangePrecision));
-        updateControls(0);
-    }
+        updateControls(1);
+   // }
 }
 
 void WidgetDialRange::unitChanged(int in){
@@ -175,10 +206,16 @@ smalestUnitMult -   smallest unit to be shown in comboBox unit selection (1 by d
 defaultValue - selected by default (0 by default)
 log - bool type true=log scale, false=lin scale (false by default)
 */
-void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic){
+void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic, int numOfDecimals){
     rangeMax = max;
     rangeMin = min;
     rangePrecision = smalestUnitMult;
+    this->numOfDecimals = numOfDecimals;
+
+    if(numOfDecimals ==0 && (max - min) <dialMaxValue){
+        dialMaxValue = (max - min)*5;
+    }
+
     dialStep = (max-min)/dialMaxValue;
     this->buttonStep = buttonStep;
     logaritmic = isLogaritmic;
@@ -273,6 +310,8 @@ void WidgetDialRange::enableFineMousePrecision()
 }
 
 void WidgetDialRange::updateControls(int except, bool silent){
+   // qDebug () << realValue << NumberParser::getNiceNumber(realValue/1000,numOfDecimals+1) << NumberParser::getNiceNumber(realValue,numOfDecimals+1);
+       //qDebug () << "pico" << qPow(10,-1)<<qPow(10,0)<<qPow(10,1)<<qPow(10,2);
     if(realValue>rangeMax){
         realValue = rangeMax;
     }
@@ -280,7 +319,7 @@ void WidgetDialRange::updateControls(int except, bool silent){
         realValue = rangeMin;
     }
     if(except!=2){
-        //calculate the unit mult ans label value from real value and available ranges in units selection
+        //calculate the unit mult and label value from real value and available ranges in units selection
         int i = 0;
         float tempLabelVal = 0;
         for(i = units->length()-1;i>=0;i--){
@@ -294,12 +333,12 @@ void WidgetDialRange::updateControls(int except, bool silent){
             ui->comboBox->setCurrentIndex(i);
             connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
 
-            if(abs(tempLabelVal)>=1 && abs(tempLabelVal)<1000){
+            if(abs(tempLabelVal)>=1 && abs(tempLabelVal)<=1000){
                 break;
             }
         }
         ui->label_unit->setText(unitString);
-        ui->lineEdit->setText(QString::number(labelValue,'f',2));
+        ui->lineEdit->setText(QString::number(labelValue,'f',numOfDecimals));
     }
 
     if(except!=1){

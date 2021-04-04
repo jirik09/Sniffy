@@ -67,6 +67,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
 
     dialTimeBase = new WidgetDial(parent ,"Time base");
     dialTimeBase->setObjectName("TimeBase");
+    dialTimeBase->setColor(Colors::getChannelColorString(1));
     destination->addWidget(dialTimeBase);
     fillTimeBase();
     dialTimeBase->setDefaultIndex(10);
@@ -126,29 +127,28 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
 }
 
 
-
 void PanelSettings::fillTimeBase(){
-    dialTimeBase->addOption("500","ns",5e-7);
-    dialTimeBase->addOption("1","us",1e-6);
-    dialTimeBase->addOption("2","us",2e-6);
-    dialTimeBase->addOption("5","us",5e-6);
-    dialTimeBase->addOption("10","us",1e-5);
-    dialTimeBase->addOption("20","us",2e-5);
-    dialTimeBase->addOption("50","us",5e-5);
-    dialTimeBase->addOption("100","us",1e-4);
-    dialTimeBase->addOption("200","us",2e-4);
-    dialTimeBase->addOption("500","us",5e-4);
-    dialTimeBase->addOption("1","ms",1e-3);
-    dialTimeBase->addOption("2","ms",2e-3);
-    dialTimeBase->addOption("5","ms",5e-3);
-    dialTimeBase->addOption("10","ms",1e-2);
-    dialTimeBase->addOption("20","ms",2e-2);
-    dialTimeBase->addOption("50","ms",5e-2);
-    dialTimeBase->addOption("100","ms",1e-1);
-    dialTimeBase->addOption("200","ms",2e-1);
-    dialTimeBase->addOption("500","ms",5e-1);
-    dialTimeBase->addOption("1","s",1);
-    dialTimeBase->addOption("2","s",2);
-    dialTimeBase->addOption("5","s",5);
     dialTimeBase->addOption("10","s",10);
+    dialTimeBase->addOption("5","s",5);
+    dialTimeBase->addOption("2","s",2);
+    dialTimeBase->addOption("1","s",1);
+    dialTimeBase->addOption("500","ms",5e-1);
+    dialTimeBase->addOption("200","ms",2e-1);
+    dialTimeBase->addOption("100","ms",1e-1);
+    dialTimeBase->addOption("50","ms",5e-2);
+    dialTimeBase->addOption("20","ms",2e-2);
+    dialTimeBase->addOption("10","ms",1e-2);
+    dialTimeBase->addOption("5","ms",5e-3);
+    dialTimeBase->addOption("2","ms",2e-3);
+    dialTimeBase->addOption("1","ms",1e-3);
+    dialTimeBase->addOption("500","us",5e-4);
+    dialTimeBase->addOption("200","us",2e-4);
+    dialTimeBase->addOption("100","us",1e-4);
+    dialTimeBase->addOption("50","us",5e-5);
+    dialTimeBase->addOption("20","us",2e-5);
+    dialTimeBase->addOption("10","us",1e-5);
+    dialTimeBase->addOption("5","us",5e-6);
+    dialTimeBase->addOption("2","us",2e-6);
+    dialTimeBase->addOption("1","us",1e-6);
+    dialTimeBase->addOption("500","ns",5e-7);
 }

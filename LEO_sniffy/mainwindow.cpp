@@ -213,13 +213,14 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
                 module->parseConfiguration(config);
 
                 module->restoreGeometry(layout);
+                module->setModuleStatus(status);
                 if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE){
-                    if(status == ModuleStatus::PAUSE)
-                        status = ModuleStatus::PLAY;
+                    /*if(status == ModuleStatus::PAUSE)
+                        status = ModuleStatus::PLAY;*/
                     module->writeConfiguration();
                     module->startModule();
                 }
-                module->setModuleStatus(status);
+
                 module->setModuleRestored(true);
             }
         }

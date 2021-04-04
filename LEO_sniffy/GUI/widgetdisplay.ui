@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>566</width>
-    <height>123</height>
+    <width>341</width>
+    <height>120</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,7 +22,7 @@
   <property name="minimumSize">
    <size>
     <width>0</width>
-    <height>40</height>
+    <height>120</height>
    </size>
   </property>
   <property name="font">
@@ -485,7 +485,7 @@ background-color: rgb(38, 38, 38);
                 <string notr="true"/>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TextLabel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>tt</string>
                </property>
               </widget>
              </item>
@@ -501,7 +501,7 @@ background-color: rgb(38, 38, 38);
                 <font/>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>tt</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -526,7 +526,7 @@ background-color: rgb(38, 38, 38);
                 <font/>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>tt</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -545,7 +545,7 @@ background-color: rgb(38, 38, 38);
                 <font/>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>tt</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -570,7 +570,7 @@ background-color: rgb(38, 38, 38);
                 <font/>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string>tt</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

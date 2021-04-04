@@ -4,8 +4,10 @@
 #include <QDial>
 #include "math.h"
 
+#define MOUSE_DRAG_DISTANCE 0.6 //higher number more sensitive (short distance big change)
+
 class CustomDial : public QDial
-{
+{   
     Q_OBJECT
 
     Q_PROPERTY(double knobRadius READ getKnobRadius WRITE setKnobRadius)
