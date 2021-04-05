@@ -39,6 +39,14 @@ QString Colors::getButtonDisabledBackgroundColorString(){
     return theme->getButtonDisabledBackgroundColorString();
 }
 
+QColor Colors::getTextColor(){
+    return theme->getTextColor();
+}
+
+QColor Colors::getTextColorString(){
+    return theme->getTextColor();
+}
+
 QColor Colors::getTextDarkColor(){
     return theme->getTextDarkColor();
 }

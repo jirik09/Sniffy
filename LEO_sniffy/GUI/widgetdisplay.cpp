@@ -180,7 +180,7 @@ void WidgetDisplay::updateProgressBar(int value){
 
 void WidgetDisplay::configLabel(int labelNumber, QString text, QString colorStyle, bool isVisible){
     labelList.at(labelNumber)->setText(text);
-    labelList.at(labelNumber)->setStyleSheet(colorStyle);
+    labelList.at(labelNumber)->setStyleSheet("color:" + colorStyle);
     isVisible ? labelList.at(labelNumber)->show() : labelList.at(labelNumber)->hide();
 }
 

@@ -8,6 +8,7 @@ CounterTabRatio::CounterTabRatio(QVBoxLayout *destination, QWidget *parent) : QO
     dialSampleCount = new WidgetDialRange(parent, "Sample Count");
     dialSampleCount->setObjectName("dialRatSampleCount");
     dialSampleCount->setRange(2, REFERENCE_COUNT_MAX, "Smpls", 1, 1, REFERENCE_COUNT_DEFAULT, true);
+    dialSampleCount->setColor(Colors::getControlsColorString());
     dialSampleCount->hideUnitSelection();
     destination->addWidget(dialSampleCount);
 
