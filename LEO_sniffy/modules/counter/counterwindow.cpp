@@ -294,11 +294,11 @@ void CounterWindow::lfSwitchChannelCallback(int index){
     QString bckgndColor;
 
     if(index == 0){
-        bckgndColor = "background-color:"+Colors::getChannelColorString(0);
+        bckgndColor = Colors::getChannelColorString(0);
         tabLowFreq->showDialInChannel(CHANNEL_1, true);
         tabLowFreq->showDialInChannel(CHANNEL_2, false);
     }else if (index == 1) {
-        bckgndColor = "background-color:"+Colors::getTextDarkColorString();
+        bckgndColor = Colors::getTextDarkColorString();
         tabLowFreq->showDialInChannel(CHANNEL_1, false);
         tabLowFreq->showDialInChannel(CHANNEL_2, true);
     }

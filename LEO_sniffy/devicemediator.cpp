@@ -5,9 +5,6 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
     communication = new Comms();
 
     connect(communication,SIGNAL(devicesScaned(QList<DeviceDescriptor>)),this,SLOT(newDeviceList(QList<DeviceDescriptor>)),Qt::QueuedConnection);
-
-    Colors(this, new DarkTheme(this));
-
     modules = createModulesList();
 
     connect(device,&Device::ScanDevices,this,&DeviceMediator::ScanDevices);
@@ -80,9 +77,9 @@ void DeviceMediator::open(int deviceIndex){
         QFile fileMod(configFile);
 
         if(file.exists() && fileMod.exists()){
-            sett->askForSessionRestore(deviceList.at(deviceIndex).deviceName);
+            CustomSettings::askForSessionRestore(deviceList.at(deviceIndex).deviceName);
         }else{
-            sett->setNoSessionFound();
+            CustomSettings::setNoSessionfound();
         }
         foreach(QSharedPointer<AbstractModule> mod, modules){
             mod->setComms(communication);
@@ -194,8 +191,4 @@ void DeviceMediator::setResourcesInUse(int value)
     resourcesInUse = value;
 }
 
-void DeviceMediator::passSettings(SettingsDialog *sett)
-{
-    this->sett = sett;
-}
 

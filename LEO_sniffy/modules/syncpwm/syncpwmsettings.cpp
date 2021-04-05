@@ -9,19 +9,19 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
     switchStepMode = new WidgetSwitch(parent, " Continuous ", "     Step     ", "");
     switchStepMode->setObjectName("syncPwmStepButton");
-    switchStepMode->setColor("background-color:"+Colors::getControlsColorString());
+    switchStepMode->setColor(Colors::getControlsColorString());
 
     buttonStart = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonStart->setText("Start", 0);
     buttonStart->setChecked(false, 0);
     buttonStart->setObjectName("syncPwmStartButton");
-    buttonStart->setColor("background-color:"+Colors::getControlsColorString(),0);
+    buttonStart->setColor(Colors::getControlsColorString(),0);
 
     buttonEquidist = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonEquidist->setText("Equidistant", 0);
     buttonEquidist->setObjectName("syncPwmEquidistButton");
     buttonEquidist->setChecked(false, 0);
-    buttonEquidist->setColor("background-color:"+Colors::getControlsColorString(), 0);
+    buttonEquidist->setColor(Colors::getControlsColorString(), 0);
 
     QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
     QHBoxLayout *commonButtons = new QHBoxLayout();
@@ -92,13 +92,13 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
 
     onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "", i);
     onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);
-    onOffCh[i]->setColor("background-color:" + color);
+    onOffCh[i]->setColor(color);
 
     inverCh[i] = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0, i);
     inverCh[i]->setText("Invert");
     inverCh[i]->setObjectName("syncPwmInverCh" + chNStr);
     inverCh[i]->setChecked(false, 0);
-    inverCh[i]->setColor("background-color:" + color, 0);
+    inverCh[i]->setColor(color, 0);
 
     dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
     dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);

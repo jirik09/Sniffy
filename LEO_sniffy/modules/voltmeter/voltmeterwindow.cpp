@@ -49,13 +49,13 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonsChannelEnable->setObjectName("ChannelvoltmeterEnable");
     tabs->getLayout(0)->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
-    buttonsChannelEnable->setColor("background-color:"+Colors::getChannelColorString(0),0);
+    buttonsChannelEnable->setColor(Colors::getChannelColorString(0),0);
     buttonsChannelEnable->setText("CH2",1);
-    buttonsChannelEnable->setColor("background-color:"+Colors::getChannelColorString(1),1);
+    buttonsChannelEnable->setColor(Colors::getChannelColorString(1),1);
     buttonsChannelEnable->setText("CH3",2);
-    buttonsChannelEnable->setColor("background-color:"+Colors::getChannelColorString(2),2);
+    buttonsChannelEnable->setColor(Colors::getChannelColorString(2),2);
     buttonsChannelEnable->setText("CH4",3);
-    buttonsChannelEnable->setColor("background-color:"+Colors::getChannelColorString(3),3);
+    buttonsChannelEnable->setColor(Colors::getChannelColorString(3),3);
 
     buttonsMode = new WidgetButtons(this,2,ButtonTypes::RADIO,"Speed");
     buttonsMode->setObjectName("ChannelVoltmode");
@@ -89,7 +89,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonsCalc->setText("Min/Max",0);
     buttonsCalc->setText("Ripple",1);
     buttonsCalc->setText("None",2);
-    buttonsCalc->setColor("background-color:"+Colors::getChannelColorString(12),2);
+    buttonsCalc->setColor(COLOR_GREY,2);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
     QSpacerItem *verticalSpacer;
@@ -112,7 +112,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonStartLog->setObjectName("buttonlogcontrol");
     tabs->getLayout(1)->addWidget(buttonStartLog);
     buttonStartLog->setText("Start",0);
-    buttonStartLog->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+    buttonStartLog->setColor(QString::fromUtf8(COLOR_GREEN),0);
     buttonStartLog->enableAll(false);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
@@ -251,7 +251,7 @@ void VoltmeterWindow::stopDatalog()
         logFile->close();
         isDataLogRunning = false;
         buttonStartLog->setText("Start",0);
-        buttonStartLog->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+        buttonStartLog->setColor(QString::fromUtf8(COLOR_GREEN),0);
         buttonSelectFile->enableAll(true);
         labelFile->setValue("Log stopped (" + QString::number(logSampleIndex) + " smpl)");
     }
@@ -279,7 +279,7 @@ void VoltmeterWindow::startDatalog()
             *logStream << "\n";
             isDataLogRunning = true;
             buttonStartLog->setText("Stop",0);
-            buttonStartLog->setColor("background-color:"+QString::fromUtf8(COLOR_RED),0);
+            buttonStartLog->setColor(QString::fromUtf8(COLOR_RED),0);
             buttonSelectFile->enableAll(false);
         }else{
             labelFile->setValue("Error opening file");

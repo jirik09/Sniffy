@@ -5,6 +5,11 @@ LightTheme::LightTheme(QObject *parent)
     Q_UNUSED(parent);
 }
 
+QString LightTheme::getThemeName()
+{
+    return "Light";
+}
+
 QColor LightTheme::getAppBackgroundColor()
 {
     return LIGHT_BACKGROUND_APP;
