@@ -31,6 +31,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
 
     customLengthInput = new WidgetTextInput(parent,"","200",InputTextType::NUMBER);
     customLengthInput->setObjectName("arbgenmemleng");
+    customLengthInput->setMaximumSize(120,50);
 
     buttonSelectFile = new WidgetButtons(parent,1,ButtonTypes::NORMAL,"     Arbitrary data");
     buttonSelectFile->setObjectName("buttonselectfileArbGen");
@@ -168,7 +169,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
 
         dialPWMFreqCh[i] = new WidgetDialRange(parent,"PWM Frequency",i);
         dialPWMFreqCh[i]->setObjectName("arbGenpwmfreq"+chNStr);
-        dialPWMFreqCh[i]->setRange(1,10000000,"Hz",10,0.01,1000,true);
+        dialPWMFreqCh[i]->setRange(1,10000000,"Hz",10,0.01,10000,true);
         dialPWMFreqCh[i]->setColor(Colors::getChannelColorString(i));
         verChanBox->addWidget(dialPWMFreqCh[i]);
 
