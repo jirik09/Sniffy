@@ -8,7 +8,7 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     mathType->setObjectName("MathTypeBtnSelection");
     destination->addWidget(mathType);
     mathType->setText("None",0);
-    mathType->setColor(QString::fromUtf8("background-color:")+COLOR_GREY,0);
+    mathType->setColor(COLOR_GREY,0);
     mathType->setText("Basic",1);
     mathType->setDisabledButton(true,1);
     mathType->setText("Symbolic",2);
@@ -20,13 +20,13 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     btnChannelASel->setObjectName("MathbtnChannelASel");
     destination->addWidget(btnChannelASel);
     btnChannelASel->setText("CH1",0);
-    btnChannelASel->setColor("background-color:"+Colors::getChannelColorString(0),0);
+    btnChannelASel->setColor(Colors::getChannelColorString(0),0);
     btnChannelASel->setText("CH2",1);
-    btnChannelASel->setColor("background-color:"+Colors::getChannelColorString(1),1);
+    btnChannelASel->setColor(Colors::getChannelColorString(1),1);
     btnChannelASel->setText("CH3",2);
-    btnChannelASel->setColor("background-color:"+Colors::getChannelColorString(2),2);
+    btnChannelASel->setColor(Colors::getChannelColorString(2),2);
     btnChannelASel->setText("CH4",3);
-    btnChannelASel->setColor("background-color:"+Colors::getChannelColorString(3),3);
+    btnChannelASel->setColor(Colors::getChannelColorString(3),3);
 
     operatorSel = new WidgetSelection(parent,"");
     destination->addWidget(operatorSel);
@@ -40,13 +40,13 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     btnChannelBSel->setObjectName("MathbtnChannelBSel");
     destination->addWidget(btnChannelBSel);
     btnChannelBSel->setText("CH1",0);
-    btnChannelBSel->setColor("background-color:"+Colors::getChannelColorString(0),0);
+    btnChannelBSel->setColor(Colors::getChannelColorString(0),0);
     btnChannelBSel->setText("CH2",1);
-    btnChannelBSel->setColor("background-color:"+Colors::getChannelColorString(1),1);
+    btnChannelBSel->setColor(Colors::getChannelColorString(1),1);
     btnChannelBSel->setText("CH3",2);
-    btnChannelBSel->setColor("background-color:"+Colors::getChannelColorString(2),2);
+    btnChannelBSel->setColor(Colors::getChannelColorString(2),2);
     btnChannelBSel->setText("CH4",3);
-    btnChannelBSel->setColor("background-color:"+Colors::getChannelColorString(3),3);
+    btnChannelBSel->setColor(Colors::getChannelColorString(3),3);
 
     symbolicTitle = new WidgetLabel(parent,"Type an expression");
     destination->addWidget(symbolicTitle);

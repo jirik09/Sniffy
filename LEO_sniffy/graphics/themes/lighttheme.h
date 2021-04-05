@@ -7,11 +7,11 @@
 #include "../abstractcolors.h"
 
 /* BACKGROUNDS */
-#define LIGHT_BACKGROUND_APP QColor(48,48,48)
-#define LIGHT_BACKGROUND_DATA_AREA QColor(38,38,38)
-#define LIGHT_BACKGROUND_CONTROL QColor(58,58,58)
-#define LIGHT_BACKGROUND_BUTTON QColor(38,38,38)
-#define LIGHT_BACKGROUND_BUTTON_DISABLED QColor(48,48,48)
+#define LIGHT_BACKGROUND_APP QColor(148,148,148)
+#define LIGHT_BACKGROUND_DATA_AREA QColor(138,138,138)
+#define LIGHT_BACKGROUND_CONTROL QColor(158,158,158)
+#define LIGHT_BACKGROUND_BUTTON QColor(138,138,138)
+#define LIGHT_BACKGROUND_BUTTON_DISABLED QColor(148,148,148)
 
 /* TEXT */
 #define LIGHT_TEXT_DARK QColor(124,124,124)
@@ -50,6 +50,8 @@ class LightTheme : public AbstractColors
     Q_OBJECT
 public:
     explicit LightTheme(QObject *parent = nullptr);
+
+    QString getThemeName();
 
     QColor getAppBackgroundColor();
     QString getAppBackgroundColorString();

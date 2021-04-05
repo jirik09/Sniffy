@@ -29,7 +29,6 @@ public:
 
     int getResourcesInUse() const;
     void setResourcesInUse(int value);
-    void passSettings(SettingsDialog *sett);
 
 signals:
     void loadLayout(QString Devicename);
@@ -37,8 +36,7 @@ signals:
 private:
     QList<DeviceDescriptor> deviceList;
     QList<QSharedPointer<AbstractModule>> modules;
-    Device *device;
-    SettingsDialog *sett;    
+    Device *device;  
 
     Comms *communication;
 

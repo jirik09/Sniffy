@@ -29,7 +29,7 @@
 #define DARK_BLUE QColor(47,160,208)
 #define DARK_ORANGE QColor(210,128,60)
 #define DARK_GREEN QColor(44,182,137)
-#define DARK_PURPLE QColor(142,84,161)
+#define DARK_PURPLE QColor(180,84,100)
 #define DARK_YELLOW QColor(184,155,0)
 #define DARK_RED QColor(189,66,54)
 #define DARK_BLUE_DARK QColor(71,98,207)
@@ -51,6 +51,8 @@ class DarkTheme : public AbstractColors
     Q_OBJECT
 public:
     explicit DarkTheme(QObject *parent = nullptr);
+
+    QString getThemeName();
 
     QColor getAppBackgroundColor();
     QString getAppBackgroundColorString();

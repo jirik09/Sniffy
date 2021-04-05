@@ -11,6 +11,7 @@
 #include "GUI/widgetselection.h"
 #include "GUI/widgetseparator.h"
 #include "GUI/widgetlabel.h"
+#include "customsettings.h"
 
 namespace Ui {
 class SettingsDialog;
@@ -25,12 +26,6 @@ public:
     ~SettingsDialog();
     void open();
 
-    int getThemeIndex() const;
-    bool IsSessionRestoreRequest() const;
-    void askForSessionRestore (QString device);
-    bool askToSaveSession ();
-    void setNoSessionFound();
-
 private:
     Ui::SettingsDialog *ui;
 
@@ -38,14 +33,7 @@ private:
     WidgetSelection * selTheme;
     WidgetButtons *buttonsDone;
 
-    QString settingFile;
-
-    int restoreSession = 1; //0 no, 1 ask, 2 yes
-    int sessionRestoreAnswer = -1; //-1 not answered
-    int themeIndex;
-
-    void saveSettings();
-    void loadSettings();
+    bool restartNeededWarning = false;
 
 private slots:
     void closeDialog(int isCanceled);

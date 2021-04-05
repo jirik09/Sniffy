@@ -128,7 +128,7 @@ void ArbGeneratorWindow::setPWMFrequencyLabels(int channel, qreal freq)
 void ArbGeneratorWindow::setGenerateButton(QString text, QString color)
 {
     setting->buttonsGenerate->setText(text);
-    setting->buttonsGenerate->setColor(QString::fromUtf8("background-color:")+color,0);
+    setting->buttonsGenerate->setColor(color,0);
 }
 
 void ArbGeneratorWindow::runGeneratorCallback()

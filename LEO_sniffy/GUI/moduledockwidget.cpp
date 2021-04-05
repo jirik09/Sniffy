@@ -28,7 +28,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     btnHold->setText("HOLD");
     btnHold->setStyleSheet(QString::fromUtf8("QPushButton{padding-top: 0px; padding-bottom: 1px; padding-left: 0px; padding-right: 0px; font-size: 10px;}"
                            "QPushButton{background-color: ")+BACKGROUND_COLOR_CONTROL+" color: "+COLOR_GREY+
-                           "border-style: solid; border-color: "+COLOR_GREY+" border-width: 1px; border-radius: 1px;}"
+                           "border-style: solid; border-color: "+COLOR_GREY+"; border-width: 1px; border-radius: 1px;}"
                            "QPushButton:checked{background-color: "+BACKGROUND_COLOR_CONTROL+" color: "+COLOR_ORANGE+
                            "border-style: solid; border-color: "+COLOR_ORANGE+"; border-width: 1px; border-radius: 1px;}"
                            "QPushButton:hover{border-width: 2px;}");

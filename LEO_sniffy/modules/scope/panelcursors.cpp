@@ -8,7 +8,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorTypeButtons->setObjectName("cursortypeSel");
     destination->addWidget(cursorTypeButtons);
     cursorTypeButtons->setText("None",0);
-    cursorTypeButtons->setColor(QString::fromUtf8("background-color:")+COLOR_GREY,0);
+    cursorTypeButtons->setColor(COLOR_GREY,0);
     cursorTypeButtons->setText("Horizontal",1);
     cursorTypeButtons->setText("Vertical",2);
 
@@ -19,13 +19,13 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     channelButtons->setObjectName("cursorChannSelection");
     destination->addWidget(channelButtons);
     channelButtons->setText("CH1",0);
-    channelButtons->setColor("background-color:"+Colors::getChannelColorString(0),0);
+    channelButtons->setColor(Colors::getChannelColorString(0),0);
     channelButtons->setText("CH2",1);
-    channelButtons->setColor("background-color:"+Colors::getChannelColorString(1),1);
+    channelButtons->setColor(Colors::getChannelColorString(1),1);
     channelButtons->setText("CH3",2);
-    channelButtons->setColor("background-color:"+Colors::getChannelColorString(2),2);
+    channelButtons->setColor(Colors::getChannelColorString(2),2);
     channelButtons->setText("CH4",3);
-    channelButtons->setColor("background-color:"+Colors::getChannelColorString(3),3);
+    channelButtons->setColor(Colors::getChannelColorString(3),3);
     channelButtons->setEnabled(false);
 
     cursorHorADial = new WidgetDialRange(parent ,"Cursor A");

@@ -20,11 +20,13 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseZoom();
+    chart->setGraphColor(QCOLOR_GREY);
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
     chartFFT->setRange(0, 50000, -100, 100);
     chartFFT->setDataMinMax(0,50000);
     chartFFT->enableLocalMouseZoom();
+    chartFFT->setGraphColor(QCOLOR_GREY);
 
     ui->verticalLayout_chart->addWidget(chartFFT);
     ui->verticalLayout_chart->addWidget(chart);
@@ -97,9 +99,8 @@ ScopeWindow::~ScopeWindow()
 
 void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
-    ui->sliderSignal->setStyleSheet(QString::fromUtf8(
-                                        "QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
-                                        "background-color: ")+BACKGROUND_COLOR_DATA_AREA+"border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
+    ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
+                                        "background-color: "+Colors::getDataAreaColorString()+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
                                                                                          "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
                                                                                          "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+QString::fromUtf8("px;}"));
     event->accept();
@@ -241,8 +242,8 @@ void ScopeWindow::triggerChannelCallback(int index){
 
     panelSet->dialPretrigger->setColor(Colors::getChannelColorString(index));
     panelSet->dialTriggerValue->setColor(Colors::getChannelColorString(index));
-    panelSet->buttonsTriggerEdge->setColor("background-color:"+Colors::getChannelColorString(index),0);
-    panelSet->buttonsTriggerEdge->setColor("background-color:"+Colors::getChannelColorString(index),1);
+    panelSet->buttonsTriggerEdge->setColor(Colors::getChannelColorString(index),0);
+    panelSet->buttonsTriggerEdge->setColor(Colors::getChannelColorString(index),1);
 }
 
 void ScopeWindow::triggerEdgeCallback(int index){
@@ -256,14 +257,14 @@ void ScopeWindow::triggerEdgeCallback(int index){
 void ScopeWindow::triggerModeCallback(int index){
     if(index==0){
         if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-            panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_ORANGE),0);
+            panelSet->buttonsTriggerMode->setColor(QString::fromUtf8(COLOR_ORANGE),0);
             emit triggerModeChanged(ScopeTriggerMode::TRIG_STOP);
             panelSet->buttonsTriggerMode->setText("Single",0);
             labelInfoPanel->setTriggerLabelText("");
 
         }else if(panelSet->buttonsTriggerMode->getText(0)=="Single"){
             emit triggerModeChanged(ScopeTriggerMode::TRIG_SINGLE);
-            panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_GREEN),0);
+            panelSet->buttonsTriggerMode->setColor(QString::fromUtf8(COLOR_GREEN),0);
             panelSet->buttonsTriggerMode->setText("Stop",0);
         }
     }else if(index==1){
@@ -463,7 +464,7 @@ void ScopeWindow::updateFFTchart(QVector<QPointF> fftTrace)
     chartFFT->clearAll();
     chartFFT->updateTrace(&ChartFFTData,0);
     //TODO paint in a chart
-        qDebug () << "FFT was calculated and received by window" << fftTrace.length();
+    qDebug () << "FFT was calculated and received by window" << fftTrace.length();
 }
 
 void ScopeWindow::mathError(int errorPosition)
@@ -496,7 +497,7 @@ void ScopeWindow::restoreGUIAfterStartup()
 
 void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
-    panelSet->buttonsTriggerMode->setColor("background-color:"+QString::fromUtf8(COLOR_ORANGE),0);
+    panelSet->buttonsTriggerMode->setColor(COLOR_ORANGE,0);
     labelInfoPanel->setTriggerLabelText("");
 }
 

@@ -77,7 +77,7 @@ bool WidgetSwitch::isCheckedRight(){
 }
 
 void WidgetSwitch::setColor(QString color){
-    styleSelected = color;
+    styleSelected = "background-color:"+color;
     if(ui->pushButton_right->isChecked()){
         setRight(true);
     }else {

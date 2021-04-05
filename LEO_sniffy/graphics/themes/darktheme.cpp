@@ -5,6 +5,11 @@ DarkTheme::DarkTheme(QObject *parent)
     Q_UNUSED(parent);
 }
 
+QString DarkTheme::getThemeName()
+{
+    return "Dark";
+}
+
 QColor DarkTheme::getAppBackgroundColor()
 {
     return DARK_BACKGROUND_APP;

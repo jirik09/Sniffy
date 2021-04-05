@@ -44,12 +44,13 @@ SOURCES += \
     communication/serialline.cpp \
     communication/serialportreader.cpp \
     communication/serialportwriter.cpp \
+    customsettings.cpp \
     devicedescriptor.cpp \
     devicemediator.cpp \
     graphics/abstractcolors.cpp \
     graphics/colors.cpp \
     graphics/themes/darktheme.cpp \
-    graphics/themes/lighttheme.cpp \    
+    graphics/themes/lighttheme.cpp \
     main.cpp \
     mainwindow.cpp \
     math/movingaverage.cpp \
@@ -151,13 +152,14 @@ HEADERS += \
     communication/serialline.h \
     communication/serialportreader.h \
     communication/serialportwriter.h \
+    customsettings.h \
     devicedescriptor.h \
     devicemediator.h \
     graphics/abstractcolors.h \
     graphics/colors.h \
     graphics/styles.h \
     graphics/themes/darktheme.h \
-    graphics/themes/lighttheme.h \    
+    graphics/themes/lighttheme.h \
     mainwindow.h \
     math/movingaverage.h \
     math/timing.h \
@@ -197,26 +199,6 @@ HEADERS += \
     modules/pwmgenerator/pwmgeneratorconfig.h \
     modules/pwmgenerator/pwmgeneratorspec.h \
     modules/pwmgenerator/pwmgeneratorwindow.h \
-    modules/scope/ffft/Array.h \
-    modules/scope/ffft/Array.hpp \
-    modules/scope/ffft/DynArray.h \
-    modules/scope/ffft/DynArray.hpp \
-    modules/scope/ffft/FFTReal.h \
-    modules/scope/ffft/FFTReal.hpp \
-    modules/scope/ffft/FFTRealFixLen.h \
-    modules/scope/ffft/FFTRealFixLen.hpp \
-    modules/scope/ffft/FFTRealFixLenParam.h \
-    modules/scope/ffft/FFTRealPassDirect.h \
-    modules/scope/ffft/FFTRealPassDirect.hpp \
-    modules/scope/ffft/FFTRealPassInverse.h \
-    modules/scope/ffft/FFTRealPassInverse.hpp \
-    modules/scope/ffft/FFTRealSelect.h \
-    modules/scope/ffft/FFTRealSelect.hpp \
-    modules/scope/ffft/FFTRealUseTrigo.h \
-    modules/scope/ffft/FFTRealUseTrigo.hpp \
-    modules/scope/ffft/OscSinCos.h \
-    modules/scope/ffft/OscSinCos.hpp \
-    modules/scope/ffft/def.h \
     modules/scope/fftengine.h \
     modules/scope/mathcalculations.h \
     modules/scope/meascalculations.h \
@@ -295,8 +277,6 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-DISTFILES += \
-    modules/scope/ffft/readme.txt
 
 RESOURCES += \
     graphics.qrc

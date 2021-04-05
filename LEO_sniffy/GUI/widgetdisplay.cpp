@@ -169,7 +169,7 @@ void WidgetDisplay::setProgressBarRange(int min, int max){
 
 void WidgetDisplay::setProgressBarColor(QString color){
     ui->progressBar->setStyleSheet(QString::fromUtf8("QProgressBar {border: 1px solid #777; border-radius: 1px; background: rgb(38, 38, 38);}"
-                                                     "QProgressBar::chunk {background-color:") + color + "width: 20px;}");
+                                                     "QProgressBar::chunk {background-color:") + color + ";width: 20px;}");
     ui->progressBar->repaint();
 }
 

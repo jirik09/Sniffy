@@ -9,6 +9,8 @@ class AbstractColors : public QObject
 public:
     explicit AbstractColors(QObject *parent = nullptr);
 
+    virtual QString getThemeName() = 0;
+
     virtual QColor getAppBackgroundColor() = 0;
     virtual QString getAppBackgroundColorString() = 0;
 
