@@ -180,7 +180,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
 
     if(isAvgBuffFull){
         config->hfState.hold = HFState::HoldOnState::OFF;
-        cntWindow->hfSetColorRemainSec(QCOLOR_WHITE);
+        cntWindow->hfSetColorRemainSec(false);
         avg = (isFrequency) ? movAvg->getAverage() : 1 / movAvg->getAverage();
         if (config->hfState.error == HFState::ErrorType::AVERAGE){
             qerr = (isFrequency) ? qerr / movAvg->getBufferSize() : 1 / (1 / avg - movAvg->getBufferSize()) - avg;
@@ -230,7 +230,7 @@ QString Counter::hfFormatRemainSec(uint countToGo, uint additionTime){
         formatTime = QString::number(timeInSec, 'f', 1);
     else
         formatTime = QString::number(timeInSec, 'd', 0);
-    cntWindow->hfSetColorRemainSec(QCOLOR_GREY);
+    cntWindow->hfSetColorRemainSec(true);
     config->hfState.hold = HFState::HoldOnState::ON;
     return (formatTime + " Sec ");
 }

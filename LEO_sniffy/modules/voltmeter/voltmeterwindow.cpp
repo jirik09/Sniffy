@@ -13,26 +13,26 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     WidgetDisplay *display;
 
     display  = new WidgetDisplay("Voltmeter_CH1", "Channel 1", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH1","color:"+Colors::getChannelColorString(0),true);
+    display->configLabel(0,"CH1",Colors::getChannelColorString(0),true);
     display->setProgressBarColor(Colors::getChannelColorString(0));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH2", "Channel 2", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH2","color:"+Colors::getChannelColorString(1),true);
+    display->configLabel(0,"CH2",Colors::getChannelColorString(1),true);
     display->setProgressBarColor(Colors::getChannelColorString(1));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH3", "Channel 3", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH3","color:"+Colors::getChannelColorString(2),true);
+    display->configLabel(0,"CH3",Colors::getChannelColorString(2),true);
     display->setProgressBarColor(Colors::getChannelColorString(2));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH4", "Channel 4", styleSheet, true, 1, HISTORY_SIZE, this);
     displays.append(display);
-    display->configLabel(0,"CH4","color:"+Colors::getChannelColorString(3),true);
+    display->configLabel(0,"CH4",Colors::getChannelColorString(3),true);
     display->setProgressBarColor(Colors::getChannelColorString(3));
 
     foreach(WidgetDisplay * dis, displays){
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
-        dis->configLabel(2,"VOLTAGE","color:"+QString::fromUtf8(COLOR_GREY),true);
+        dis->configLabel(2,"VOLTAGE",QString::fromUtf8(COLOR_GREY),true);
         ui->verticalLayout_display->addWidget(dis);
     }
 

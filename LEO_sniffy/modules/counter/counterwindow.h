@@ -58,7 +58,7 @@ public:
     void clearDisplay(WidgetDisplay *display, bool uponSwitch);
     void msleep(int msec);
 
-    void hfSetColorRemainSec(QColor color);
+    void hfSetColorRemainSec(bool waiting);
 
     void appendNewHistorySample(WidgetDisplay *display, QString prefix, float sample, QString affix = "", float timeStep = 1);
     void associateToHistorySample(WidgetDisplay *display, int traceIndex, QString prefix = "", float sample = 0, QString affix = "");
@@ -82,7 +82,7 @@ private:
     void configureAllDisplays(void);
     void configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor);
     void configureDisplaysDynamicAttr();
-    void configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin);
+    void configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin, int chan);
     void configureErrorStyles(WidgetDisplay *display);
     void resetPreviousCounterMode();
     void setNextCounterMode(int index);

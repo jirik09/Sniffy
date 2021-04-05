@@ -23,6 +23,7 @@ CounterTabHighFreq::CounterTabHighFreq(QVBoxLayout *destination, QWidget *parent
     dialAveraging = new WidgetDialRange(parent ,"Averaging");
     dialAveraging->setObjectName("dialHfAveraging");
     dialAveraging->setRange(2, AVERAGE_RANGE, "Smpls", 1, 1, 2, false);
+    dialAveraging->setColor(Colors::getControlsColorString());
     dialAveraging->hideUnitSelection();
     destination->addWidget(dialAveraging);
 
