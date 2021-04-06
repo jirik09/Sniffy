@@ -9,6 +9,9 @@
 #include "../../GUI/widgetseparator.h"
 #include "../../GUI/widgetlabel.h"
 #include "../../GUI/widgettextinput.h"
+#include "../../GUI/widgetswitch.h"
+
+#include "../labelformator.h"
 
 #include "fftengine.h"
 
@@ -37,6 +40,10 @@ public:
     WidgetTextInput *symbolicExpression;
 
     WidgetButtons *btnChannelFFTSel;
+    WidgetSelection *selFFTWindow;
+    WidgetButtons *swFFTType;
+    WidgetSelection *selFFTLength;
+
 
     int previousMathType = 0;
 

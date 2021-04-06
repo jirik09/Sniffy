@@ -89,6 +89,7 @@ void Scope::parseData(QByteArray data){
             streamBuffLeng>>tmpByte;
             numChannels = tmpByte;
             config->numberOfChannels = numChannels;
+            config->numberOfChannelsReceived = numChannels;
 
             QVector<QPointF> points;
             if(length<500000){
@@ -139,9 +140,8 @@ void Scope::parseData(QByteArray data){
         if(currentChannel==numChannels){
             measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
             mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
-            if(FFTlength !=0){
-                FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,false,config->realSamplingRate);
-                qDebug() << "Caluclate fft";
+            if(FFTlength !=0 && numChannels>FFTChannelIndex){
+                FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
             }
             scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
 
@@ -350,10 +350,10 @@ void Scope::updateFFTConfig(int length, FFTWindow window, FFTType type, int chan
     FFTwindow = window;
     FFTtype = type;
     FFTChannelIndex = channelIndex;
-    if(FFTlength !=0){
-        //  FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
-    }
 
+    if(FFTlength !=0 && config->numberOfChannelsReceived>FFTChannelIndex){
+        FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
+    }
 }
 
 void Scope::updateFFT()

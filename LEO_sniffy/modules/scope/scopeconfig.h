@@ -32,6 +32,7 @@ public:
     int rangeMax; //mv
 
     int numberOfChannels = 1;
+    int numberOfChannelsReceived = 0;
     int triggerLevel = 32767; //16bit number
     int pretrigger = 32767; //16bit number
 

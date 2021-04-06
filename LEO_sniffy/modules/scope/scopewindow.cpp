@@ -319,6 +319,7 @@ void ScopeWindow::mathExpressionCallback(QString exp)
 void ScopeWindow::fftChangedCallback(int length, FFTWindow window, FFTType type, int channelIndex)
 {
     emit fftChanged(length,window,type,channelIndex);
+    fftChannelIndex = channelIndex;
     ChartFFTData.clear();
     if(length !=0){
         chartFFT->show();
@@ -463,8 +464,8 @@ void ScopeWindow::updateFFTchart(QVector<QPointF> fftTrace)
     ChartFFTData = fftTrace;
     chartFFT->clearAll();
     chartFFT->updateTrace(&ChartFFTData,0);
-    //TODO paint in a chart
-    qDebug () << "FFT was calculated and received by window" << fftTrace.length();
+    chartFFT->setTraceColor(0,Colors::getChannelColor(fftChannelIndex));
+   // qDebug () << "FFT was calculated and received by window" << fftTrace.length();
 }
 
 void ScopeWindow::mathError(int errorPosition)

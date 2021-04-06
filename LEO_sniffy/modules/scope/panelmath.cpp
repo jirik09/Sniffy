@@ -34,7 +34,6 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     operatorSel->addOption("Subtract (-)",2);
     operatorSel->addOption("Multiply (*)",3);
     operatorSel->addOption("Divide (/)",4);
-    operatorSel->setSelected(0);
 
     btnChannelBSel = new WidgetButtons(parent,4,ButtonTypes::RADIO,"");
     btnChannelBSel->setObjectName("MathbtnChannelBSel");
@@ -57,6 +56,49 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     destination->addWidget(symbolicDesc);
     symbolicExample= new WidgetLabel(parent,"Example:","2.1*a+ln(b)+sin(pi*100*t)");
     destination->addWidget(symbolicExample);
+
+
+    btnChannelFFTSel = new WidgetButtons(parent,4,ButtonTypes::RADIO,"");
+    btnChannelFFTSel->setObjectName("FFTbtnChannelBSel");
+    destination->addWidget(btnChannelFFTSel);
+    btnChannelFFTSel->setText("CH1",0);
+    btnChannelFFTSel->setColor(Colors::getChannelColorString(0),0);
+    btnChannelFFTSel->setText("CH2",1);
+    btnChannelFFTSel->setColor(Colors::getChannelColorString(1),1);
+    btnChannelFFTSel->setText("CH3",2);
+    btnChannelFFTSel->setColor(Colors::getChannelColorString(2),2);
+    btnChannelFFTSel->setText("CH4",3);
+    btnChannelFFTSel->setColor(Colors::getChannelColorString(3),3);
+    destination->addWidget(btnChannelFFTSel);
+
+    selFFTWindow = new WidgetSelection(parent,"Window");
+    selFFTWindow->setObjectName("FFTWindowSel");
+    selFFTWindow->addOption("Rectangular",FFTWindow::rectangular);
+    selFFTWindow->addOption("Hamming",FFTWindow::hamming);
+    selFFTWindow->addOption("Hann",FFTWindow::hann);
+    selFFTWindow->addOption("Blackman",FFTWindow::blackman);
+    destination->addWidget(selFFTWindow);
+
+    selFFTLength = new WidgetSelection(parent,"Length");
+    selFFTLength->setObjectName("selFFTLength");
+    selFFTLength->addOption("1024",1025);
+    selFFTLength->addOption("2048",2049);
+    selFFTLength->addOption("4096",4097);
+    selFFTLength->addOption("8192",8193);
+    selFFTLength->addOption("16384",16385);
+    destination->addWidget(selFFTLength);
+
+    swFFTType = new WidgetButtons(parent,2,ButtonTypes::RADIO,"Type");
+    swFFTType->setObjectName("FFTTypeSelection");
+    swFFTType->setText("Spectra",0);
+    swFFTType->setText("Period",1);
+    destination->addWidget(swFFTType);
+
+    connect(btnChannelFFTSel,&WidgetButtons::clicked,this,&PanelMath::fftCallback);
+    connect(swFFTType,&WidgetButtons::clicked,this,&PanelMath::fftCallback);
+    connect(selFFTWindow,&WidgetSelection::selectedIndexChanged,this,&PanelMath::fftCallback);
+    connect(selFFTLength,&WidgetSelection::selectedIndexChanged,this,&PanelMath::fftCallback);
+
 
     QSpacerItem *verticalSpacer;
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -109,6 +151,10 @@ void PanelMath::typeChanged(int index)
         symbolicExpressionCallback(symbolicExpression->getText());
         break;
     case 3:
+        btnChannelFFTSel->show();
+        selFFTWindow->show();
+        swFFTType->show();
+        selFFTLength->show();
         fftCallback();
         break;
     }
@@ -131,7 +177,7 @@ void PanelMath::symbolicExpressionCallback(QString exp)
 void PanelMath::fftCallback()
 {
     //TODO emit data from GUI
-    emit fftChanged(1024, FFTWindow::rectangular, FFTType::periodogram, 0);
+    emit fftChanged(selFFTLength->getSelectedValue(), (FFTWindow)selFFTWindow->getSelectedValue(), FFTType(swFFTType->getSelectedIndex()),btnChannelFFTSel->getSelectedIndex());
 }
 
 void PanelMath::hideAll()
@@ -143,5 +189,9 @@ void PanelMath::hideAll()
     symbolicTitle->hide();
     symbolicExpression->hide();
     symbolicExample->hide();
+    btnChannelFFTSel->hide();
+    selFFTWindow->hide();
+    swFFTType->hide();
+    selFFTLength->hide();
 }
 
