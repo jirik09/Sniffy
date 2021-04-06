@@ -223,7 +223,7 @@ void VoltmeterWindow::showProgress(int current, int max){
 void VoltmeterWindow::setPins(QString pins[], int numOfCh)
 {
     for(int i = 0;i<numOfCh;i++){
-        displays.at(i)->configLabel(1,"pin "+pins[i],"color:"+QString::fromUtf8(COLOR_GREY),true);
+        displays.at(i)->configLabel(1,"pin "+pins[i],QString::fromUtf8(COLOR_GREY),true);
     }
 }
 

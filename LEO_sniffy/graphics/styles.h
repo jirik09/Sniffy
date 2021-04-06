@@ -27,13 +27,13 @@
 #define PATH_IMG_EVENT_BA_FR    ":/graphics/graphics/cnt_ba_fr.png"
 #define PATH_IMG_EVENT_BA_FF    ":/graphics/graphics/cnt_ba_ff.png"
 
-#define CONTEXT_MENU_HOVER      QString::fromUtf8("QMenu::item{background-color: rgb(38, 38, 38);} QMenu::item:selected{background-color: rgb(71, 76, 94);}")
+#define CONTEXT_MENU_HOVER      QString::fromUtf8("QMenu::item{background-color: " BACKGROUND_COLOR_BUTTON "} QMenu::item:selected{background-color: " COLOR_HOVER "}")
 
 /* GLOBAL APP STYLESHEET */
 #define STYLESH_GLOBAL               STYLESH_OBJECT+STYLESH_SPLITTER+STYLESH_BUTTON+STYLESH_SCROLL_GLOBAL
 
-#define STYLESH_OBJECT               QString::fromUtf8("QObject{background-color: rgb(48, 48, 48);font: 10pt 'MS Shell Dlg 2';color: rgb(228, 228, 228);border:none;}")
-#define STYLESH_SPLITTER             QString::fromUtf8("QSplitter::handle{background-color: rgb(38, 38, 38);}")
+#define STYLESH_OBJECT               QString::fromUtf8("QObject{background-color:" BACKGROUND_COLOR_APP "font: 10pt 'MS Shell Dlg 2';color: rgb(228, 228, 228);border:none;}")
+#define STYLESH_SPLITTER             QString::fromUtf8("QSplitter::handle{background-color:" BACKGROUND_COLOR_BUTTON "}")
 #define STYLESH_BUTTON               QString::fromUtf8("QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}")
 
 #define STYLESH_SCROLL_GLOBAL        STYLESH_SCROLLAREA+STYLESH_SCROLLBAR_VER+STYLESH_SCROLLBAR_HOR+STYLESH_SCROLLBAR_HVER+STYLESH_SCROLLBAR_HHOR+STYLESH_SCROLLBAR_ADD_LINE+STYLESH_SCROLLBAR_SUB_LINE+STYLESH_SCROLLBAR_UP_ARROW+STYLESH_SCROLLBAR_ADD_PG
