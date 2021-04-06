@@ -111,9 +111,6 @@ public:
     static QColor getButtonDisabledBackgroundColor();
     static QString getButtonDisabledBackgroundColorString();
 
-    static QColor getTextColor();
-    static QColor getTextColorString();
-
     static QColor getTextDarkColor();
     static QString getTextDarkColorString();
 

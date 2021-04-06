@@ -60,16 +60,6 @@ QString LightTheme::getButtonDisabledBackgroundColorString()
     return LIGHT_BACKGROUND_BUTTON_DISABLED.name();
 }
 
-QColor LightTheme::getTextColor()
-{
-    return LIGHT_TEXT;
-}
-
-QColor LightTheme::getTextColorString()
-{
-    return LIGHT_TEXT.name();
-}
-
 QColor LightTheme::getTextDarkColor()
 {
     return LIGHT_TEXT_DARK;

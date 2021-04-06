@@ -14,70 +14,7 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QObject{
-background-color: rgb(48, 48, 48);
-font: 10pt &quot;MS Shell Dlg 2&quot;;
-color: rgb(228, 228, 228);
-border:none;
-}
-
-QSplitter::handle{
-background-color: rgb(38, 38, 38);
-}
-
-QPushButton{
-	padding-top: 1px;
-	padding-bottom: 1px;
-	padding-left: 3px;
-	padding-right: 3px;
-}
-
-QScrollArea {
-border:none
-}
-
- QScrollBar:vertical {
-     border: none;
-     background: rgb(58,58,58);
-     width: 10px;
-     margin: 0 0 0 0;
- }
-
- QScrollBar:horizontal {
-     border: none;
-     background: rgb(58,58,58);
-     height: 10px;
-     margin: 0 0 0 0;
- }
- QScrollBar::handle:vertical {
-     background: rgb(24,154,224);
-     border-radius: 5px;
-     min-height: 40px;
- }
-
- QScrollBar::handle:horizontal {
-     background: rgb(24,154,224);
-     border-radius: 5px;
-     min-width: 40px;
- }
- QScrollBar::add-line {
-height: 0px;
- }
-
- QScrollBar::sub-line {
-     height: 0px;
- }
- QScrollBar::up-arrow, QScrollBar::down-arrow {
-
-     background: none;
- }
-
- QScrollBar::add-page, QScrollBar::sub-page {
-     background: none;
- }
-
-
-</string>
+   <string notr="true"/>
   </property>
   <property name="dockOptions">
    <set>QMainWindow::AllowNestedDocks|QMainWindow::AnimatedDocks</set>
@@ -181,7 +118,7 @@ border: none</string>
      <x>0</x>
      <y>0</y>
      <width>1156</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

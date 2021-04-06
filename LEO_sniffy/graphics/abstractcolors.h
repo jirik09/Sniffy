@@ -26,9 +26,6 @@ public:
     virtual QColor getButtonDisabledBackgroundColor() = 0;
     virtual QString getButtonDisabledBackgroundColorString() = 0;
 
-    virtual QColor getTextColor() = 0;
-    virtual QColor getTextColorString() = 0;
-
     virtual QColor getTextDarkColor() = 0;
     virtual QString getTextDarkColorString() = 0;
 

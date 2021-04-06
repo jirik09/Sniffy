@@ -1,6 +1,8 @@
 #ifndef STYLES_H
 #define STYLES_H
 
+#include "../graphics/colors.h"
+
 #define IMAGE_UNITS_HZ    "image: url(:/graphics/graphics/units_hz.png); border: none;"
 #define IMAGE_UNITS_SEC   "image: url(:/graphics/graphics/units_sec.png); border: none;"
 #define IMAGE_UNITS_VOLT   "image: url(:/graphics/graphics/units_v.png); border: none;"
@@ -26,5 +28,24 @@
 #define PATH_IMG_EVENT_BA_FF    ":/graphics/graphics/cnt_ba_ff.png"
 
 #define CONTEXT_MENU_HOVER      QString::fromUtf8("QMenu::item{background-color: rgb(38, 38, 38);} QMenu::item:selected{background-color: rgb(71, 76, 94);}")
+
+/* GLOBAL APP STYLESHEET */
+#define STYLESH_GLOBAL               STYLESH_OBJECT+STYLESH_SPLITTER+STYLESH_BUTTON+STYLESH_SCROLL_GLOBAL
+
+#define STYLESH_OBJECT               QString::fromUtf8("QObject{background-color: rgb(48, 48, 48);font: 10pt 'MS Shell Dlg 2';color: rgb(228, 228, 228);border:none;}")
+#define STYLESH_SPLITTER             QString::fromUtf8("QSplitter::handle{background-color: rgb(38, 38, 38);}")
+#define STYLESH_BUTTON               QString::fromUtf8("QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}")
+
+#define STYLESH_SCROLL_GLOBAL        STYLESH_SCROLLAREA+STYLESH_SCROLLBAR_VER+STYLESH_SCROLLBAR_HOR+STYLESH_SCROLLBAR_HVER+STYLESH_SCROLLBAR_HHOR+STYLESH_SCROLLBAR_ADD_LINE+STYLESH_SCROLLBAR_SUB_LINE+STYLESH_SCROLLBAR_UP_ARROW+STYLESH_SCROLLBAR_ADD_PG
+#define STYLESH_SCROLLAREA           QString::fromUtf8("QScrollArea {border:none}")
+#define STYLESH_SCROLLBAR_VER        QString::fromUtf8("QScrollBar:vertical {border: none;background:" BACKGROUND_COLOR_FOCUS_IN "width: 10px;margin: 0 0 0 0;}")
+#define STYLESH_SCROLLBAR_HOR        QString::fromUtf8("QScrollBar:horizontal {border: none;background:" BACKGROUND_COLOR_FOCUS_IN "height: 10px;margin: 0 0 0 0;}")
+#define STYLESH_SCROLLBAR_HVER       QString::fromUtf8("QScrollBar::handle:vertical {border: none;background:" COLOR_COMMON_DARK_GREYBLUE "min-height: 38px;}")
+#define STYLESH_SCROLLBAR_HHOR       QString::fromUtf8("QScrollBar::handle:horizontal {border: none;background:" COLOR_COMMON_DARK_GREYBLUE "min-width: 38px;}")
+#define STYLESH_SCROLLBAR_ADD_LINE   QString::fromUtf8("QScrollBar::add-line {height: 0px;}")
+#define STYLESH_SCROLLBAR_SUB_LINE   QString::fromUtf8("QScrollBar::sub-line {height: 0px;}")
+#define STYLESH_SCROLLBAR_UP_ARROW   QString::fromUtf8("QScrollBar::up-arrow, QScrollBar::down-arrow {background: none;}")
+#define STYLESH_SCROLLBAR_ADD_PG     QString::fromUtf8("QScrollBar::add-page, QScrollBar::sub-page {background: none;}")
+
 
 #endif // STYLES_H

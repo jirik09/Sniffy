@@ -14,7 +14,6 @@
 #define LIGHT_BACKGROUND_BUTTON_DISABLED QColor(148,148,148)
 
 /* TEXT */
-#define LIGHT_TEXT LIGHT_FULL_WHITE
 #define LIGHT_TEXT_DARK QColor(124,124,124)
 #define LIGHT_TEXT_LIGHT QColor(214,214,214)
 
@@ -68,9 +67,6 @@ public:
 
     QColor getButtonDisabledBackgroundColor();
     QString getButtonDisabledBackgroundColorString();
-
-    QColor getTextColor();
-    QColor getTextColorString();
 
     QColor getTextDarkColor();
     QString getTextDarkColorString();

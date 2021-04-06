@@ -12,6 +12,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<QList<DeviceDescriptor>>();
     qRegisterMetaType<QSerialPort::SerialPortError>();
 
+    QString styleSheet = STYLESH_GLOBAL;
+    a.setStyleSheet(styleSheet);
 
     CustomSettings::loadSettings(QApplication::applicationDirPath() + "/settings.ini");
 
@@ -25,7 +27,6 @@ int main(int argc, char *argv[])
     }
 
     Colors(nullptr, themes->at(CustomSettings::getThemeIndex()));
-
 
     MainWindow w;
     w.show();

@@ -283,7 +283,7 @@ void CounterWindow::hfSwitchErrorAvgCallback(int index){
 }
 
 void CounterWindow::hfSetColorRemainSec(bool waiting){
-    QColor color = (waiting) ? Colors::getTextDarkColor() : Colors::getTextColor();
+    QColor color = (waiting) ? Colors::getTextDarkColor() : Colors::getTextLightColor();
     displayHF->changeAvgColor(color);
 }
 
