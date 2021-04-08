@@ -157,7 +157,6 @@ HEADERS += \
     devicemediator.h \
     graphics/abstractcolors.h \
     graphics/colors.h \
-    graphics/styles.h \
     graphics/themes/darktheme.h \
     graphics/themes/lighttheme.h \
     mainwindow.h \

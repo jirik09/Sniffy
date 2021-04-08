@@ -7,6 +7,8 @@
 
 #include "widgetlabel.h"
 
+#include "../graphics/colors.h"
+
 namespace Ui {
 class WidgetDesciptionExpand;
 }

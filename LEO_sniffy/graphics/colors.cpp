@@ -7,74 +7,55 @@ Colors::Colors(QObject *parent, AbstractColors *colorTheme) : QObject(parent)
     theme = colorTheme;
 }
 
-QColor Colors::getAppBackgroundColor(){
+QString Colors::getAppGlobalStyle(){
+    return theme->getAppGlobalStyle();
+}
+
+QString Colors::getGraphicsPath(){
+    return theme->getGraphicsPath();
+}
+
+QString Colors::getAppBackgroundColor(){
     return theme->getAppBackgroundColor();
 }
 
-QString Colors::getAppBackgroundColorString(){
-    return theme->getAppBackgroundColorString();
-}
-
-QColor Colors::getDataAreaColor(){
+QString Colors::getDataAreaColor(){
     return theme->getDataAreaColor();
 }
 
-QString Colors::getDataAreaColorString(){
-    return theme->getDataAreaColorString();
+QString Colors::getControlBackgroundColor(){
+    return theme->getControlBackgroundColor();
 }
 
-QColor Colors::getButtonBackgroundColor(){
+QString Colors::getButtonBackgroundColor(){
     return theme->getButtonBackgroundColor();
 }
 
-QString Colors::getButtonBackgroundColorString(){
-    return theme->getButtonBackgroundColorString();
-}
-
-QColor Colors::getButtonDisabledBackgroundColor(){
+QString Colors::getButtonDisabledBackgroundColor(){
     return theme->getButtonDisabledBackgroundColor();
 }
 
-QString Colors::getButtonDisabledBackgroundColorString(){
-    return theme->getButtonDisabledBackgroundColorString();
-}
-
-QColor Colors::getTextDarkColor(){
+QString Colors::getTextDarkColor(){
     return theme->getTextDarkColor();
 }
 
-QString Colors::getTextDarkColorString(){
-    return theme->getTextDarkColorString();
-}
-
-QColor Colors::getTextLightColor(){
+QString Colors::getTextLightColor(){
     return theme->getTextLightColor();
 }
 
-QString Colors::getTextLightColorString(){
-    return theme->getTextLightColorString();
-}
-
-QColor Colors::getControlsColor(){
+QString Colors::getControlsColor(){
     return theme->getControlsColor();
 }
 
-QString Colors::getControlsColorString(){
-    return theme->getControlsColorString();
-}
-
-QColor Colors::getChannelColor(int channelIndex){
+QString Colors::getChannelColor(int channelIndex){
     if(channelIndex > TOP_CHANNEL_COLOR_INDEX)
         return theme->getChannelColor(TOP_CHANNEL_COLOR_INDEX);
     else
-       return theme->getChannelColor(channelIndex);
+        return theme->getChannelColor(channelIndex);
 }
 
-QString Colors::getChannelColorString(int channelIndex){
-    if(channelIndex > TOP_CHANNEL_COLOR_INDEX)
-        return theme->getChannelColorString(TOP_CHANNEL_COLOR_INDEX);
-    else
-       return theme->getChannelColorString(channelIndex);
+QString Colors::getHoverColor()
+{
+    return theme->getHoverColor();
 }
-
 

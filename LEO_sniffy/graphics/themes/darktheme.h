@@ -7,33 +7,34 @@
 #include "../abstractcolors.h"
 
 /* BACKGROUNDS */
-#define DARK_BACKGROUND_APP QColor(48,48,48)
-#define DARK_BACKGROUND_DATA_AREA QColor(38,38,38)
-#define DARK_BACKGROUND_CONTROL QColor(58,58,58)
-#define DARK_BACKGROUND_BUTTON QColor(38,38,38)
-#define DARK_BACKGROUND_BUTTON_DISABLED QColor(48,48,48)
+#define DARK_BACKGROUND_APP "#303030"
+#define DARK_BACKGROUND_DATA_AREA "#262626"
+#define DARK_BACKGROUND_CONTROL "#3a3a3a"
+#define DARK_BACKGROUND_BUTTON "#262626"
+#define DARK_BACKGROUND_BUTTON_DISABLED "#303030"
+#define DARK_BACKGROUND_FOCUS_IN "#303030"
 
 /* TEXT */
-#define DARK_TEXT_DARK  QColor(124,124,124)
-#define DARK_TEXT_LIGHT QColor(214,214,214)
+#define DARK_TEXT_DARK "#7c7c7c"
+#define DARK_TEXT_LIGHT "#d6d6d6"
 
 /* SPECIAL PURPOSE */
-#define DARK_COLOR_HOVER QColor(71,76,94)
+#define DARK_HOVER "#474c5e"
 
 /* CONTROLS */
-#define DARK_CONTROLS QColor(76,82,89)
+#define DARK_CONTROLS "#4c5259"
 
 /* COLORS */
-#define DARK_FULL_BLACK QColor(0,0,0)
-#define DARK_FULL_WHITE QColor(255,255,255)
-#define DARK_BLUE QColor(47,160,208)
-#define DARK_ORANGE QColor(210,128,60)
-#define DARK_GREEN QColor(44,182,137)
-#define DARK_PURPLE QColor(180,84,100)
-#define DARK_YELLOW QColor(184,155,0)
-#define DARK_RED QColor(189,66,54)
-#define DARK_BLUE_DARK QColor(71,98,207)
-#define DARK_PINK QColor(205,114,191)
+#define DARK_FULL_BLACK "#000000"
+#define DARK_FULL_WHITE "#ffffff"
+#define DARK_BLUE "#2fa0d0"
+#define DARK_ORANGE "#d2803c"
+#define DARK_GREEN "#2cb689"
+#define DARK_PURPLE "#b45464"
+#define DARK_YELLOW "#b89b00"
+#define DARK_RED "#bd4236"
+#define DARK_BLUE_DARK "#4762cf"
+#define DARK_PINK "#cd72bf"
 
 /* CHANNELS */
 #define DARK_CHANNEL_1 DARK_BLUE
@@ -45,7 +46,6 @@
 #define DARK_CHANNEL_7 DARK_BLUE_DARK
 #define DARK_CHANNEL_8 DARK_PINK
 
-
 class DarkTheme : public AbstractColors
 {
     Q_OBJECT
@@ -53,33 +53,19 @@ public:
     explicit DarkTheme(QObject *parent = nullptr);
 
     QString getThemeName();
+    QString getAppGlobalStyle();
+    QString getGraphicsPath();
 
-    QColor getAppBackgroundColor();
-    QString getAppBackgroundColorString();
-
-    QColor getDataAreaColor();
-    QString getDataAreaColorString();
-
-    QColor getControlBackgroundColor();
-    QString getControlBackgroundColorString();
-
-    QColor getButtonBackgroundColor();
-    QString getButtonBackgroundColorString();
-
-    QColor getButtonDisabledBackgroundColor();
-    QString getButtonDisabledBackgroundColorString();
-
-    QColor getTextDarkColor();
-    QString getTextDarkColorString();
-
-    QColor getTextLightColor();
-    QString getTextLightColorString();
-
-    QColor getControlsColor();
-    QString getControlsColorString();
-
-    QColor getChannelColor(int channelIndex);
-    QString getChannelColorString(int channelIndex);
+    QString getAppBackgroundColor();
+    QString getDataAreaColor();
+    QString getControlBackgroundColor();
+    QString getButtonBackgroundColor();
+    QString getButtonDisabledBackgroundColor();
+    QString getTextDarkColor();
+    QString getTextLightColor();
+    QString getControlsColor();
+    QString getChannelColor(int channelIndex);
+    QString getHoverColor();
 
 private:
 
@@ -90,9 +76,34 @@ private:
         DARK_CHANNEL_5, DARK_CHANNEL_6,
         DARK_CHANNEL_7, DARK_CHANNEL_8
     };
-
-signals:
-
 };
+
+#define DARK_GRAPHICS_PATH              ":/graphics/graphics/"
+
+/* GLOBAL APP STYLESHEET */
+#define DARK_STYLE_GLOBAL               DARK_STYLE_OBJECT DARK_STYLE_SPLITTER \
+                                        DARK_STYLE_BUTTON DARK_STYLE_SCROLL_GLOBAL \
+                                        DARK_STYLE_HOVER
+
+#define DARK_STYLE_OBJECT               "QObject{background-color: " DARK_BACKGROUND_APP ";font: 10pt 'MS Shell Dlg 2';color: rgb(228, 228, 228);border:none;}"
+#define DARK_STYLE_SPLITTER             "QSplitter::handle{background-color:" DARK_BACKGROUND_BUTTON ";}"
+#define DARK_STYLE_BUTTON               "QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}"
+
+#define DARK_STYLE_SCROLL_GLOBAL        DARK_STYLE_SCROLLAREA DARK_STYLE_SCROLLBAR_VER DARK_STYLE_SCROLLBAR_HOR \
+                                        DARK_STYLE_SCROLLBAR_HVER DARK_STYLE_SCROLLBAR_HHOR DARK_STYLE_SCROLLBAR_ADD_LINE \
+                                        DARK_STYLE_SCROLLBAR_SUB_LINE DARK_STYLE_SCROLLBAR_UP_ARROW DARK_STYLE_SCROLLBAR_ADD_PAGE
+
+#define DARK_STYLE_SCROLLAREA           "QScrollArea {border:none}"
+#define DARK_STYLE_SCROLLBAR_VER        "QScrollBar:vertical {border: none;background:" DARK_BACKGROUND_FOCUS_IN ";width: 10px;margin: 0 0 0 0;}"
+#define DARK_STYLE_SCROLLBAR_HOR        "QScrollBar:horizontal {border: none;background:" DARK_BACKGROUND_FOCUS_IN ";height: 10px;margin: 0 0 0 0;}"
+#define DARK_STYLE_SCROLLBAR_HVER       "QScrollBar::handle:vertical {border: none;background:" DARK_CONTROLS ";min-height: 38px;}"
+#define DARK_STYLE_SCROLLBAR_HHOR       "QScrollBar::handle:horizontal {border: none;background:" DARK_CONTROLS ";min-width: 38px;}"
+#define DARK_STYLE_SCROLLBAR_ADD_LINE   "QScrollBar::add-line {height: 0px;}"
+#define DARK_STYLE_SCROLLBAR_SUB_LINE   "QScrollBar::sub-line {height: 0px;}"
+#define DARK_STYLE_SCROLLBAR_UP_ARROW   "QScrollBar::up-arrow, QScrollBar::down-arrow {background: none;}"
+#define DARK_STYLE_SCROLLBAR_ADD_PAGE   "QScrollBar::add-page, QScrollBar::sub-page {background: none;}"
+
+#define DARK_STYLE_HOVER                "QMenu::item{background-color: " DARK_BACKGROUND_BUTTON ";}\
+                                         QMenu::item:selected{background-color: " DARK_HOVER ";}"
 
 #endif // DARKTHEME_H

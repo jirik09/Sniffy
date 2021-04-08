@@ -13,7 +13,7 @@ WidgetSelection::WidgetSelection(QWidget *parent, QString name) :
     ui->setupUi(this);
     ui->label->setText(name);
     options = new QList<params_sel>;
-    ui->comboBox->setStyleSheet(QString::fromUtf8("background-color:")+Colors::getDataAreaColorString());
+    ui->comboBox->setStyleSheet(QString::fromUtf8("background-color:")+Colors::getDataAreaColor()+";");
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
 }
 

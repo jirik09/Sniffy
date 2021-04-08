@@ -7,7 +7,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     setObjectName(title);
     hide();
 
-    setStyleSheet(QString::fromUtf8("QDockWidget{border: 3px solid gray; background-color: ")+QString::fromUtf8(COLOR_GREY)+";}");
+    setStyleSheet("QDockWidget{border: 3px solid gray; background-color: "+QString::fromUtf8(COLOR_GREY)+";}");
 
     // ***************** create title bar and window contorl icons *************
     QWidget *titleBar = new QWidget();
@@ -26,11 +26,11 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     btnHold->resize(38, 12);
     btnHold->setMaximumSize(36, 13);
     btnHold->setText("HOLD");
-    btnHold->setStyleSheet(QString::fromUtf8("QPushButton{padding-top: 0px; padding-bottom: 1px; padding-left: 0px; padding-right: 0px; font-size: 10px;}"
-                           "QPushButton{background-color: ")+BACKGROUND_COLOR_CONTROL+" color: "+COLOR_GREY+
-                           "border-style: solid; border-color: "+COLOR_GREY+"; border-width: 1px; border-radius: 1px;}"
-                           "QPushButton:checked{background-color: "+BACKGROUND_COLOR_CONTROL+" color: "+COLOR_ORANGE+
-                           "border-style: solid; border-color: "+COLOR_ORANGE+"; border-width: 1px; border-radius: 1px;}"
+    btnHold->setStyleSheet("QPushButton{padding-top: 0px; padding-bottom: 1px; padding-left: 0px; padding-right: 0px; font-size: 10px;}"
+                           "QPushButton{background-color: "+Colors::getControlBackgroundColor()+"; color: "+COLOR_GREY+
+                           "; border-style: solid; border-color: "+COLOR_GREY+"; border-width: 1px; border-radius: 1px;}"
+                           "QPushButton:checked{background-color: "+Colors::getControlBackgroundColor()+"; color: "+COLOR_ORANGE+
+                           "; border-style: solid; border-color: "+COLOR_ORANGE+"; border-width: 1px; border-radius: 1px;}"
                            "QPushButton:hover{border-width: 2px;}");
     btnHold->hide();
     titleBarLayout->addWidget(btnHold);
@@ -40,20 +40,20 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
 
     QPushButton *down = new QPushButton();
     down->resize(10,10);
-    down->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/dock.png);}"
-                                          "QPushButton:hover{background-color: ")+COLOR_HOVER+"}");
+    down->setStyleSheet("QPushButton{image: url("+Colors::getGraphicsPath()+"dock.png);}"
+                        "QPushButton:hover{background-color: "+Colors::getHoverColor()+";}");
     titleBarLayout->addWidget(down);
 
     QPushButton *up = new QPushButton();
     up->resize(10,10);
-    up->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/unDock.png);}"
-                                        "QPushButton:hover{background-color: ")+COLOR_HOVER+"}");
+    up->setStyleSheet("QPushButton{image: url("+Colors::getGraphicsPath()+"unDock.png);}"
+                      "QPushButton:hover{background-color: "+Colors::getHoverColor()+";}");
     titleBarLayout->addWidget(up);
 
     QPushButton *exit = new QPushButton();
     exit->resize(10,10);
-    exit->setStyleSheet(QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/exit.png);}"
-                                          "QPushButton:hover{background-color: rgb(120, 50, 50);}"));
+    exit->setStyleSheet("QPushButton{image: url("+Colors::getGraphicsPath()+"exit.png);}"
+                        "QPushButton:hover{background-color: rgb(120, 50, 50);}");
     titleBarLayout->addWidget(exit);
 
     connect(up,SIGNAL(clicked()),this,SLOT(unDockOrMaximize()));

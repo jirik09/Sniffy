@@ -13,21 +13,21 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     WidgetDisplay *display;
 
     display  = new WidgetDisplay("Voltmeter_CH1", "Channel 1", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH1",Colors::getChannelColorString(0),true);
-    display->setProgressBarColor(Colors::getChannelColorString(0));
+    display->configLabel(0,"CH1",Colors::getChannelColor(0),true);
+    display->setProgressBarColor(Colors::getChannelColor(0));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH2", "Channel 2", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH2",Colors::getChannelColorString(1),true);
-    display->setProgressBarColor(Colors::getChannelColorString(1));
+    display->configLabel(0,"CH2",Colors::getChannelColor(1),true);
+    display->setProgressBarColor(Colors::getChannelColor(1));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH3", "Channel 3", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH3",Colors::getChannelColorString(2),true);
-    display->setProgressBarColor(Colors::getChannelColorString(2));
+    display->configLabel(0,"CH3",Colors::getChannelColor(2),true);
+    display->setProgressBarColor(Colors::getChannelColor(2));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH4", "Channel 4", styleSheet, true, 1, HISTORY_SIZE, this);
     displays.append(display);
-    display->configLabel(0,"CH4",Colors::getChannelColorString(3),true);
-    display->setProgressBarColor(Colors::getChannelColorString(3));
+    display->configLabel(0,"CH4",Colors::getChannelColor(3),true);
+    display->setProgressBarColor(Colors::getChannelColor(3));
 
     foreach(WidgetDisplay * dis, displays){
         dis->setContentsMargins(5, 5, 5, 5);
@@ -49,13 +49,13 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonsChannelEnable->setObjectName("ChannelvoltmeterEnable");
     tabs->getLayout(0)->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
-    buttonsChannelEnable->setColor(Colors::getChannelColorString(0),0);
+    buttonsChannelEnable->setColor(Colors::getChannelColor(0),0);
     buttonsChannelEnable->setText("CH2",1);
-    buttonsChannelEnable->setColor(Colors::getChannelColorString(1),1);
+    buttonsChannelEnable->setColor(Colors::getChannelColor(1),1);
     buttonsChannelEnable->setText("CH3",2);
-    buttonsChannelEnable->setColor(Colors::getChannelColorString(2),2);
+    buttonsChannelEnable->setColor(Colors::getChannelColor(2),2);
     buttonsChannelEnable->setText("CH4",3);
-    buttonsChannelEnable->setColor(Colors::getChannelColorString(3),3);
+    buttonsChannelEnable->setColor(Colors::getChannelColor(3),3);
 
     buttonsMode = new WidgetButtons(this,2,ButtonTypes::RADIO,"Speed");
     buttonsMode->setObjectName("ChannelVoltmode");
@@ -73,7 +73,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     dialAveraging->setObjectName("voltAvgSamples");
     dialAveraging->setRange(1,64,"x",1,1,4,false);
     dialAveraging->hideUnitSelection();
-    dialAveraging->setColor(Colors::getChannelColorString(1));
+    dialAveraging->setColor(Colors::getChannelColor(1));
     dialAveraging->setNumOfDecimals(0);
     tabs->getLayout(0)->addWidget(dialAveraging);
 

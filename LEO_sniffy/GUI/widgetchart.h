@@ -19,7 +19,6 @@
 #include <QDebug>
 
 #include "../graphics/colors.h"
-#include "../graphics/styles.h"
 #include "../math/timing.h"
 
 QT_CHARTS_USE_NAMESPACE

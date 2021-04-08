@@ -10,92 +10,62 @@ QString LightTheme::getThemeName()
     return "Light";
 }
 
-QColor LightTheme::getAppBackgroundColor()
+QString LightTheme::getAppGlobalStyle()
+{
+    return 0;
+}
+
+QString LightTheme::getGraphicsPath()
+{
+    return 0;
+}
+
+QString LightTheme::getAppBackgroundColor()
 {
     return LIGHT_BACKGROUND_APP;
 }
 
-QString LightTheme::getAppBackgroundColorString()
-{
-    return LIGHT_BACKGROUND_APP.name();
-}
-
-QColor LightTheme::getDataAreaColor()
+QString LightTheme::getDataAreaColor()
 {
     return LIGHT_BACKGROUND_DATA_AREA;
 }
 
-QString LightTheme::getDataAreaColorString()
-{
-    return LIGHT_BACKGROUND_DATA_AREA.name();
-}
-
-QColor LightTheme::getControlBackgroundColor()
+QString LightTheme::getControlBackgroundColor()
 {
     return LIGHT_BACKGROUND_CONTROL;
 }
 
-QString LightTheme::getControlBackgroundColorString()
-{
-    return LIGHT_BACKGROUND_CONTROL.name();
-}
-
-QColor LightTheme::getButtonBackgroundColor()
+QString LightTheme::getButtonBackgroundColor()
 {
     return LIGHT_BACKGROUND_BUTTON;
 }
 
-QString LightTheme::getButtonBackgroundColorString()
-{
-    return LIGHT_BACKGROUND_BUTTON.name();
-}
-
-QColor LightTheme::getButtonDisabledBackgroundColor()
+QString LightTheme::getButtonDisabledBackgroundColor()
 {
     return LIGHT_BACKGROUND_BUTTON_DISABLED;
 }
 
-QString LightTheme::getButtonDisabledBackgroundColorString()
-{
-    return LIGHT_BACKGROUND_BUTTON_DISABLED.name();
-}
-
-QColor LightTheme::getTextDarkColor()
+QString LightTheme::getTextDarkColor()
 {
     return LIGHT_TEXT_DARK;
 }
 
-QString LightTheme::getTextDarkColorString()
-{
-    return LIGHT_TEXT_DARK.name();
-}
-
-QColor LightTheme::getTextLightColor()
+QString LightTheme::getTextLightColor()
 {
     return LIGHT_TEXT_LIGHT;
 }
 
-QString LightTheme::getTextLightColorString()
+QString LightTheme::getControlsColor()
 {
-    return LIGHT_TEXT_LIGHT.name();
+    return LIGHT_CONTROLS;
 }
 
-QColor LightTheme::getControlsColor()
-{
-    return LIGHT_CONTROLS_GREY;
-}
-
-QString LightTheme::getControlsColorString()
-{
-    return LIGHT_CONTROLS_GREY.name();
-}
-
-QColor LightTheme::getChannelColor(int channelIndex)
-{
-    return chanColor.at(channelIndex);
-}
-
-QString LightTheme::getChannelColorString(int channelIndex)
+QString LightTheme::getChannelColor(int channelIndex)
 {
     return chanColor.at(channelIndex).name();
+}
+
+QString LightTheme::getHoverColor()
+{
+    return 0;
 }

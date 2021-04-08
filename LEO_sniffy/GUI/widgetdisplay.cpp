@@ -168,8 +168,8 @@ void WidgetDisplay::setProgressBarRange(int min, int max){
 }
 
 void WidgetDisplay::setProgressBarColor(QString color){
-    ui->progressBar->setStyleSheet(QString::fromUtf8("QProgressBar {border: 1px solid #777; border-radius: 1px; background: rgb(38, 38, 38);}"
-                                                     "QProgressBar::chunk {background-color:") + color + ";width: 20px;}");
+    ui->progressBar->setStyleSheet("QProgressBar {border: 1px solid #777; border-radius: 1px; background:"+Colors::getDataAreaColor()+";}"
+                                   "QProgressBar::chunk {background-color:"+color+"; width: 20px;}");
     ui->progressBar->repaint();
 }
 
@@ -320,7 +320,7 @@ void WidgetDisplay::configureFloatingHistoryNumber(){
     ui->dial->setToolTip(QString::number(historySize));
     labelFloatHistNum = new QLabel(this);
     labelFloatHistNum->setGeometry(ui->dial->x()+10, ui->dial->y()+64, 30, 20);
-    labelFloatHistNum->setStyleSheet(QString::fromUtf8("QLabel{background-color: rgb(48, 48, 48);}"));
+    labelFloatHistNum->setStyleSheet("QLabel{background-color:"+Colors::getAppBackgroundColor()+";}");
     labelFloatHistNum->hide();
     labelFloatHistNum->setNum(100);
 }
@@ -332,7 +332,7 @@ void WidgetDisplay::createHistoryChart(int historyTracesNum){
    // chart->setGridLinesVisible(true, true);
     chart->setGridDensity(5, 5);
     chart->setLabelsVisible(true, true);
-    chart->setGraphColor(QCOLOR_GREY);
+    chart->setGraphColor(QColor(COLOR_GREY));
     chart->setMargins(-12, -5, -6, -10);
     chart->setRangeY(0, 3.3);
     chart->setDataMinMax(0, 10);
@@ -457,34 +457,36 @@ void WidgetDisplay::historyButtonClickedCallback(){
 
     if(historyView == DISABLED){
         sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
-        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_history_on.png);}"
-                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
+        style = "QPushButton{image: url("+Colors::getGraphicsPath()+"icon_history_on.png);}"
+                "QPushButton:hover{background-color:"+Colors::getHoverColor()+";}";
         historyView = ENABLED;
     }else {
         sizes = {0, cmpltWidth};
-        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}"
-                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
+        style = "QPushButton{image: url("+Colors::getGraphicsPath()+"icon_history_off.png);}"
+                "QPushButton:hover{background-color:"+Colors::getHoverColor()+";}";
         historyView = DISABLED;
     }
+
     ui->splitter->setSizes(sizes);
-    ui->pushButton_history->setStyleSheet(style);
+    ui->pushButton_history->setStyleSheet(style);    
 }
 
 void WidgetDisplay::listChartSwitchClickedCallback(){
     QString style;
     if(listView == DISABLED){
-        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_chart.png);}"
-                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
+        style = "QPushButton{image: url("+Colors::getGraphicsPath()+"icon_chart.png);}"
+                "QPushButton:hover{background-color: "+Colors::getHoverColor()+";}";
         chart->hide();
         list->show();
         listView = ENABLED;
     }else {
-        style = QString::fromUtf8("QPushButton{image: url(:/graphics/graphics/icon_list.png);}"
-                "QPushButton:hover{background-color: ")+COLOR_HOVER+"}";
+        style = "QPushButton{image: url("+Colors::getGraphicsPath()+"icon_list.png);}"
+                "QPushButton:hover{background-color: "+Colors::getHoverColor()+";}";
         chart->show();
         list->hide();
         listView = DISABLED;
     }
+
     ui->pushButton_list->setStyleSheet(style);
 }
 
@@ -506,7 +508,6 @@ void WidgetDisplay::dialHistoryValueChangedCallback(int val){
 
 void WidgetDisplay::dialShowMenuOnRightClickCallback(const QPoint &mousePos){
     QMenu menu(tr("Context menu"), this);
-    menu.setStyleSheet(CONTEXT_MENU_HOVER);
 
     QAction s100("100", this);
     QAction s300("300", this);

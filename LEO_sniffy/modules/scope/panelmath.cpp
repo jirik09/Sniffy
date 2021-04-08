@@ -20,13 +20,13 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     btnChannelASel->setObjectName("MathbtnChannelASel");
     destination->addWidget(btnChannelASel);
     btnChannelASel->setText("CH1",0);
-    btnChannelASel->setColor(Colors::getChannelColorString(0),0);
+    btnChannelASel->setColor(Colors::getChannelColor(0),0);
     btnChannelASel->setText("CH2",1);
-    btnChannelASel->setColor(Colors::getChannelColorString(1),1);
+    btnChannelASel->setColor(Colors::getChannelColor(1),1);
     btnChannelASel->setText("CH3",2);
-    btnChannelASel->setColor(Colors::getChannelColorString(2),2);
+    btnChannelASel->setColor(Colors::getChannelColor(2),2);
     btnChannelASel->setText("CH4",3);
-    btnChannelASel->setColor(Colors::getChannelColorString(3),3);
+    btnChannelASel->setColor(Colors::getChannelColor(3),3);
 
     operatorSel = new WidgetSelection(parent,"");
     destination->addWidget(operatorSel);
@@ -40,13 +40,13 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     btnChannelBSel->setObjectName("MathbtnChannelBSel");
     destination->addWidget(btnChannelBSel);
     btnChannelBSel->setText("CH1",0);
-    btnChannelBSel->setColor(Colors::getChannelColorString(0),0);
+    btnChannelBSel->setColor(Colors::getChannelColor(0),0);
     btnChannelBSel->setText("CH2",1);
-    btnChannelBSel->setColor(Colors::getChannelColorString(1),1);
+    btnChannelBSel->setColor(Colors::getChannelColor(1),1);
     btnChannelBSel->setText("CH3",2);
-    btnChannelBSel->setColor(Colors::getChannelColorString(2),2);
+    btnChannelBSel->setColor(Colors::getChannelColor(2),2);
     btnChannelBSel->setText("CH4",3);
-    btnChannelBSel->setColor(Colors::getChannelColorString(3),3);
+    btnChannelBSel->setColor(Colors::getChannelColor(3),3);
 
     symbolicTitle = new WidgetLabel(parent,"Type an expression");
     destination->addWidget(symbolicTitle);

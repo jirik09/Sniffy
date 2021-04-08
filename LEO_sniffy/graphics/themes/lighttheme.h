@@ -7,33 +7,34 @@
 #include "../abstractcolors.h"
 
 /* BACKGROUNDS */
-#define LIGHT_BACKGROUND_APP QColor(148,148,148)
-#define LIGHT_BACKGROUND_DATA_AREA QColor(138,138,138)
-#define LIGHT_BACKGROUND_CONTROL QColor(158,158,158)
-#define LIGHT_BACKGROUND_BUTTON QColor(138,138,138)
-#define LIGHT_BACKGROUND_BUTTON_DISABLED QColor(148,148,148)
+#define LIGHT_BACKGROUND_APP "#303030"
+#define LIGHT_BACKGROUND_DATA_AREA "#262626"
+#define LIGHT_BACKGROUND_CONTROL "#3a3a3a"
+#define LIGHT_BACKGROUND_BUTTON "#262626"
+#define LIGHT_BACKGROUND_BUTTON_DISABLED "#303030"
+#define LIGHT_BACKGROUND_FOCUS_IN "#303030"
 
 /* TEXT */
-#define LIGHT_TEXT_DARK QColor(124,124,124)
-#define LIGHT_TEXT_LIGHT QColor(214,214,214)
+#define LIGHT_TEXT_DARK "#7c7c7c"
+#define LIGHT_TEXT_LIGHT "#d6d6d6"
 
 /* SPECIAL PURPOSE */
-#define LIGHT_COLOR_HOVER QColor(71,76,94)
+#define LIGHT_HOVER "#474c5e"
 
 /* CONTROLS */
-#define LIGHT_CONTROLS_GREY QColor(95,95,95)
+#define LIGHT_CONTROLS "#4c5259"
 
 /* COLORS */
-#define LIGHT_FULL_BLACK QColor(0,0,0)
-#define LIGHT_FULL_WHITE QColor(255,255,255)
-#define LIGHT_BLUE QColor(47,160,208)
-#define LIGHT_ORANGE QColor(210,128,60)
-#define LIGHT_GREEN QColor(44,182,137)
-#define LIGHT_PURPLE QColor(142,84,161)
-#define LIGHT_YELLOW QColor(184,155,0)
-#define LIGHT_RED QColor(189,66,54)
-#define LIGHT_BLUE_DARK QColor(71,98,207)
-#define LIGHT_PINK QColor(205,114,191)
+#define LIGHT_FULL_BLACK "#000000"
+#define LIGHT_FULL_WHITE "#ffffff"
+#define LIGHT_BLUE "#2fa0d0"
+#define LIGHT_ORANGE "#d2803c"
+#define LIGHT_GREEN "#2cb689"
+#define LIGHT_PURPLE "#b45464"
+#define LIGHT_YELLOW "#b89b00"
+#define LIGHT_RED "#bd4236"
+#define LIGHT_BLUE_DARK "#4762cf"
+#define LIGHT_PINK "#cd72bf"
 
 /* CHANNELS */
 #define LIGHT_CHANNEL_1 LIGHT_BLUE
@@ -52,33 +53,19 @@ public:
     explicit LightTheme(QObject *parent = nullptr);
 
     QString getThemeName();
+    QString getAppGlobalStyle();
+    QString getGraphicsPath();
 
-    QColor getAppBackgroundColor();
-    QString getAppBackgroundColorString();
-
-    QColor getDataAreaColor();
-    QString getDataAreaColorString();
-
-    QColor getControlBackgroundColor();
-    QString getControlBackgroundColorString();
-
-    QColor getButtonBackgroundColor();
-    QString getButtonBackgroundColorString();
-
-    QColor getButtonDisabledBackgroundColor();
-    QString getButtonDisabledBackgroundColorString();
-
-    QColor getTextDarkColor();
-    QString getTextDarkColorString();
-
-    QColor getTextLightColor();
-    QString getTextLightColorString();
-
-    QColor getControlsColor();
-    QString getControlsColorString();
-
-    QColor getChannelColor(int channelIndex);
-    QString getChannelColorString(int channelIndex);
+    QString getAppBackgroundColor();
+    QString getDataAreaColor();
+    QString getControlBackgroundColor();
+    QString getButtonBackgroundColor();
+    QString getButtonDisabledBackgroundColor();
+    QString getTextDarkColor();
+    QString getTextLightColor();
+    QString getControlsColor();
+    QString getChannelColor(int channelIndex);
+    QString getHoverColor();
 
 private:
 

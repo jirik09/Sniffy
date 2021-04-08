@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 
+#include <QTextCodec>
+
 #include <QApplication>
 #include "devicedescriptor.h"
 #include "modules/scope/measurement.h"
@@ -7,11 +9,12 @@
 
 int main(int argc, char *argv[])
 {
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+
     QApplication a(argc, argv);
     qRegisterMetaType<QList<Measurement *>>();
     qRegisterMetaType<QList<DeviceDescriptor>>();
     qRegisterMetaType<QSerialPort::SerialPortError>();
-
 
     CustomSettings::loadSettings(QApplication::applicationDirPath() + "/settings.ini");
 
@@ -24,10 +27,9 @@ int main(int argc, char *argv[])
         CustomSettings::addTheme(themes->at(i)->getThemeName());
     }
 
-    Colors(nullptr, themes->at(CustomSettings::getThemeIndex()));
-
-    QString styleSheet = STYLESH_GLOBAL;
-    a.setStyleSheet(styleSheet);
+    int themeIndex = CustomSettings::getThemeIndex();
+    Colors(nullptr, themes->at(themeIndex));
+    a.setStyleSheet(themes->at(themeIndex)->getAppGlobalStyle());
 
     MainWindow w;
     w.show();

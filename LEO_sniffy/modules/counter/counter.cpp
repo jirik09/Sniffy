@@ -101,7 +101,7 @@ void Counter::parseData(QByteArray data){
 /************************************** COMMON FUNCTIONS ****************************************/
 QString Counter::formatNumber(WidgetDisplay *display, double valToFormat, double error){
     QString str = "0.000";
-    if(valToFormat != 0){
+    if(valToFormat > 0){
         const int places = 4;
         int abs = qFabs(error);
         int leftDigitNum = (abs < 1) ? 0 : (int)(log10(abs) + 1);
@@ -119,7 +119,7 @@ QString Counter::formatNumber(WidgetDisplay *display, double valToFormat, double
 }
 
 QString Counter::formatErrNumber(WidgetDisplay *display, double errToFormat){
-    if(errToFormat != 0)
+    if(errToFormat > 0)
         return display->formatNumber(errToFormat, 'g', 4);
     else
         return "0.0000";
@@ -167,11 +167,15 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val >> qerr >> terr;
 
+//    if(val<0) val = 0;
+//    if(qerr<0) qerr = 0;
+//    if(terr<0) terr = 0;
+
     WidgetDisplay *display = cntWindow->displayHF;
 
     bool isFrequency = (freqPer == "QFRE") ? true : false;
 
-    uint countToGo = (isFrequency) ? movAvg->prepend(val) : movAvg->prepend(1/val);
+    uint countToGo = (isFrequency || val==0) ? movAvg->prepend(val) : movAvg->prepend(1/val);
     this->strQerr = strQerr = formatErrNumber(display, qerr);
     this->strTerr = strTerr = formatErrNumber(display, terr);
     cntWindow->showPMErrorSigns(display, true);
@@ -181,9 +185,9 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     if(isAvgBuffFull){
         config->hfState.hold = HFState::HoldOnState::OFF;
         cntWindow->hfSetColorRemainSec(false);
-        avg = (isFrequency) ? movAvg->getAverage() : 1 / movAvg->getAverage();
+        avg = (isFrequency || movAvg->getAverage()==0) ? movAvg->getAverage() : 1 / movAvg->getAverage();
         if (config->hfState.error == HFState::ErrorType::AVERAGE){
-            qerr = (isFrequency) ? qerr / movAvg->getBufferSize() : 1 / (1 / avg - movAvg->getBufferSize()) - avg;
+            qerr = (isFrequency || avg<=0) ? qerr / movAvg->getBufferSize() : 1 / (1 / avg - movAvg->getBufferSize()) - avg;
             avgQerr = strQerr = formatErrNumber(display, qerr);
         }
         strAvg = formatNumber(display, avg, qerr+terr);
@@ -211,7 +215,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     else
         cntWindow->associateToHistorySample(display, 3, ", avg unavailable ", -1);
 
-    if(!isFrequency)
+    if(!isFrequency && val>0)
         val = 1 / val;
 
     display->updateProgressBar(val);

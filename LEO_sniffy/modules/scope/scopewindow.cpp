@@ -20,13 +20,13 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseZoom();
-    chart->setGraphColor(QCOLOR_GREY);
+    chart->setGraphColor(QColor(COLOR_GREY));
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
     chartFFT->setRange(0, 50000, -100, 100);
     chartFFT->setDataMinMax(0,50000);
     chartFFT->enableLocalMouseZoom();
-    chartFFT->setGraphColor(QCOLOR_GREY);
+    chartFFT->setGraphColor(QColor(COLOR_GREY));
 
     ui->verticalLayout_chart->addWidget(chartFFT);
     ui->verticalLayout_chart->addWidget(chart);
@@ -99,8 +99,8 @@ ScopeWindow::~ScopeWindow()
 
 void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
-    ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
-                                        "background-color: "+Colors::getDataAreaColorString()+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
+    ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url("+Colors::getGraphicsPath()+"signalBackground.png) center;"
+                                        "background-color: "+Colors::getDataAreaColor()+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
                                                                                          "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
                                                                                          "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+QString::fromUtf8("px;}"));
     event->accept();
@@ -188,14 +188,14 @@ void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
 
 void ScopeWindow::channelVerticalCallback(int index){
     config->selectedChannelIndexVertical = index;
-    panelSet->dialVerticalScale->setColor(Colors::getChannelColorString(index));
+    panelSet->dialVerticalScale->setColor(Colors::getChannelColor(index));
     if(config->channelScaleIndex[index]==-1){
         config->channelScaleIndex[index] = panelSet->dialVerticalScale->getDefaultIndex();
         config->channelOffsetIndex[index] = panelSet->dialVerticalShift->getDefaultRealValue();
     }
     panelSet->dialVerticalScale->setSelectedIndex(config->channelScaleIndex[index]);
 
-    panelSet->dialVerticalShift->setColor(Colors::getChannelColorString(index));
+    panelSet->dialVerticalShift->setColor(Colors::getChannelColor(index));
     panelSet->dialVerticalShift->setRealValue(config->channelOffset[index]);
 }
 
@@ -240,10 +240,10 @@ void ScopeWindow::triggerChannelCallback(int index){
     emit triggerChannelChanged(index);
     paintTraces(ChartData,ChartMathData);
 
-    panelSet->dialPretrigger->setColor(Colors::getChannelColorString(index));
-    panelSet->dialTriggerValue->setColor(Colors::getChannelColorString(index));
-    panelSet->buttonsTriggerEdge->setColor(Colors::getChannelColorString(index),0);
-    panelSet->buttonsTriggerEdge->setColor(Colors::getChannelColorString(index),1);
+    panelSet->dialPretrigger->setColor(Colors::getChannelColor(index));
+    panelSet->dialTriggerValue->setColor(Colors::getChannelColor(index));
+    panelSet->buttonsTriggerEdge->setColor(Colors::getChannelColor(index),0);
+    panelSet->buttonsTriggerEdge->setColor(Colors::getChannelColor(index),1);
 }
 
 void ScopeWindow::triggerEdgeCallback(int index){
@@ -375,10 +375,10 @@ void ScopeWindow::cursorTypeCallback(int index)
 void ScopeWindow::cursorChannelCallback(int index)
 {
     config->cursorChannelIndex = index;
-    panelCursors->cursorHorADial->setColor(Colors::getChannelColorString(index));
-    panelCursors->cursorHorBDial->setColor(Colors::getChannelColorString(index));
-    panelCursors->cursorVerADial->setColor(Colors::getChannelColorString(index));
-    panelCursors->cursorVerBDial->setColor(Colors::getChannelColorString(index));
+    panelCursors->cursorHorADial->setColor(Colors::getChannelColor(index));
+    panelCursors->cursorHorBDial->setColor(Colors::getChannelColor(index));
+    panelCursors->cursorVerADial->setColor(Colors::getChannelColor(index));
+    panelCursors->cursorVerBDial->setColor(Colors::getChannelColor(index));
     if(config->cursorsActiveIndex == 2){
         chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
         chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
@@ -479,8 +479,8 @@ void ScopeWindow::restoreGUIAfterStartup()
     ui->sliderSignal->setValue((chart->getShift()*2000)-1000);
 
     int vertical = panelSet->buttonsChannelVertical->getSelectedIndex();
-    panelSet->dialVerticalScale->setColor(Colors::getChannelColorString(vertical));
-    panelSet->dialVerticalShift->setColor(Colors::getChannelColorString(vertical));
+    panelSet->dialVerticalScale->setColor(Colors::getChannelColor(vertical));
+    panelSet->dialVerticalShift->setColor(Colors::getChannelColor(vertical));
 
     channelEnableCallback(panelSet->buttonsChannelEnable->getStatus());
     cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());

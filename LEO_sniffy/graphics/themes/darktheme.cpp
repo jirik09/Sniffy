@@ -10,92 +10,62 @@ QString DarkTheme::getThemeName()
     return "Dark";
 }
 
-QColor DarkTheme::getAppBackgroundColor()
+QString DarkTheme::getAppGlobalStyle()
+{
+    return DARK_STYLE_GLOBAL;
+}
+
+QString DarkTheme::getGraphicsPath()
+{
+    return DARK_GRAPHICS_PATH;
+}
+
+QString DarkTheme::getAppBackgroundColor()
 {
     return DARK_BACKGROUND_APP;
 }
 
-QString DarkTheme::getAppBackgroundColorString()
-{
-    return DARK_BACKGROUND_APP.name();
-}
-
-QColor DarkTheme::getDataAreaColor()
+QString DarkTheme::getDataAreaColor()
 {
     return DARK_BACKGROUND_DATA_AREA;
 }
 
-QString DarkTheme::getDataAreaColorString()
-{
-    return DARK_BACKGROUND_DATA_AREA.name();
-}
-
-QColor DarkTheme::getControlBackgroundColor()
+QString DarkTheme::getControlBackgroundColor()
 {
     return DARK_BACKGROUND_CONTROL;
 }
 
-QString DarkTheme::getControlBackgroundColorString()
-{
-    return DARK_BACKGROUND_CONTROL.name();
-}
-
-QColor DarkTheme::getButtonBackgroundColor()
+QString DarkTheme::getButtonBackgroundColor()
 {
     return DARK_BACKGROUND_BUTTON;
 }
 
-QString DarkTheme::getButtonBackgroundColorString()
-{
-    return DARK_BACKGROUND_BUTTON.name();
-}
-
-QColor DarkTheme::getButtonDisabledBackgroundColor()
+QString DarkTheme::getButtonDisabledBackgroundColor()
 {
     return DARK_BACKGROUND_BUTTON_DISABLED;
 }
 
-QString DarkTheme::getButtonDisabledBackgroundColorString()
-{
-    return DARK_BACKGROUND_BUTTON_DISABLED.name();
-}
-
-QColor DarkTheme::getTextDarkColor()
+QString DarkTheme::getTextDarkColor()
 {
     return DARK_TEXT_DARK;
 }
 
-QString DarkTheme::getTextDarkColorString()
-{
-    return DARK_TEXT_DARK.name();
-}
-
-QColor DarkTheme::getTextLightColor()
+QString DarkTheme::getTextLightColor()
 {
     return DARK_TEXT_LIGHT;
 }
 
-QString DarkTheme::getTextLightColorString()
-{
-    return DARK_TEXT_LIGHT.name();
-}
-
-QColor DarkTheme::getControlsColor()
+QString DarkTheme::getControlsColor()
 {
     return DARK_CONTROLS;
 }
 
-QString DarkTheme::getControlsColorString()
-{
-    return DARK_CONTROLS.name();
-}
-
-QColor DarkTheme::getChannelColor(int channelIndex)
-{
-    return chanColor.at(channelIndex);
-}
-
-QString DarkTheme::getChannelColorString(int channelIndex)
+QString DarkTheme::getChannelColor(int channelIndex)
 {
     return chanColor.at(channelIndex).name();
+}
+
+QString DarkTheme::getHoverColor()
+{
+    return DARK_HOVER;
 }

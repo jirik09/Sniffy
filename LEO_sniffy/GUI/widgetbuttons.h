@@ -9,7 +9,6 @@
 #include <QDebug>
 
 #include "../graphics/colors.h"
-#include "../graphics/styles.h"
 
 namespace Ui {
 class WidgetButtons;

@@ -53,17 +53,17 @@ void CounterWindow::configureCounterTabs(void){
 void CounterWindow::createAllDisplays(void){
     displayHF = createHighFreqDisplay();
     displayHF->setContentsMargins(5, 5, 5, 5);
-    displayHF->setProgressBarColor(Colors::getChannelColorString(CHANNEL_1));
+    displayHF->setProgressBarColor(Colors::getChannelColor(CHANNEL_1));
     ui->verticalLayout_display->addWidget(displayHF);
 
     displayLFCh1 = createLowFreqDisplays("LowFreqCh1Counter");
     displayLFCh1->setContentsMargins(5, 5, 5, 5);
-    displayLFCh1->setProgressBarColor(Colors::getChannelColorString(CHANNEL_1));
+    displayLFCh1->setProgressBarColor(Colors::getChannelColor(CHANNEL_1));
     ui->verticalLayout_display->addWidget(displayLFCh1);
 
     displayLFCh2 = createLowFreqDisplays("LowFreqCh2Counter");
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
-    displayLFCh2->setProgressBarColor(Colors::getChannelColorString(CHANNEL_2));
+    displayLFCh2->setProgressBarColor(Colors::getChannelColor(CHANNEL_2));
     ui->verticalLayout_display->addWidget(displayLFCh2);
 
     displayRat = createRatioDisplay();
@@ -123,11 +123,11 @@ void CounterWindow::configureErrorStyles(WidgetDisplay *display){
 }
 
 void CounterWindow::configureAllDisplays(void){
-    configureDisplaysStaticAttr(displayHF, "CH1", LITERAL_FREQUENCY, Colors::getChannelColorString(CHANNEL_1));
-    configureDisplaysStaticAttr(displayLFCh1, "CH1", LITERAL_FREQUENCY, Colors::getChannelColorString(CHANNEL_1));
-    configureDisplaysStaticAttr(displayLFCh2, "CH2", LITERAL_FREQUENCY, Colors::getChannelColorString(CHANNEL_2));
-    configureDisplaysStaticAttr(displayRat, "CH3/CH1", LITERAL_RATIO, Colors::getChannelColorString(CHANNEL_1));
-    configureDisplaysStaticAttr(displayInt, "CH1 - CH2", LITERAL_INTERVAL, Colors::getChannelColorString(CHANNEL_1));
+    configureDisplaysStaticAttr(displayHF, "CH1", LITERAL_FREQUENCY, Colors::getChannelColor(CHANNEL_1));
+    configureDisplaysStaticAttr(displayLFCh1, "CH1", LITERAL_FREQUENCY, Colors::getChannelColor(CHANNEL_1));
+    configureDisplaysStaticAttr(displayLFCh2, "CH2", LITERAL_FREQUENCY, Colors::getChannelColor(CHANNEL_2));
+    configureDisplaysStaticAttr(displayRat, "CH3/CH1", LITERAL_RATIO, Colors::getChannelColor(CHANNEL_1));
+    configureDisplaysStaticAttr(displayInt, "CH1 - CH2", LITERAL_INTERVAL, Colors::getChannelColor(CHANNEL_1));
     displayRat->hide();
     displayInt->hide();
     displayLFCh1->hide();
@@ -135,7 +135,7 @@ void CounterWindow::configureAllDisplays(void){
 }
 
 void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor){
-    display->configLabel(LABELNUM_QUAN, quantity, Colors::getTextDarkColorString(), true);
+    display->configLabel(LABELNUM_QUAN, quantity, Colors::getTextDarkColor(), true);
     display->configLabel(LABELNUM_CHAN, channel, sideLabelsColor, true);
     display->configLabel(LABELNUM_INDIC, "    ", sideLabelsColor, true);
 }
@@ -160,8 +160,8 @@ void CounterWindow::configureDisplaysDynamicAttr(){
 }
 
 void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin, int chan){
-    display->configLabel(LABELNUM_PINS, pin, Colors::getChannelColorString(chan), true);
-    display->configLabel(LABELNUM_FLAG, "", Colors::getChannelColorString(3), true);
+    display->configLabel(LABELNUM_PINS, pin, Colors::getChannelColor(chan), true);
+    display->configLabel(LABELNUM_FLAG, "", Colors::getChannelColor(3), true);
 }
 
 void CounterWindow::switchCounterModeCallback(int index){
@@ -293,11 +293,11 @@ void CounterWindow::lfSwitchChannelCallback(int index){
     QString bckgndColor;
 
     if(index == CHANNEL_1){
-        bckgndColor = Colors::getChannelColorString(CHANNEL_1);
+        bckgndColor = Colors::getChannelColor(CHANNEL_1);
         tabLowFreq->showDialInChannel(CHANNEL_1, true);
         tabLowFreq->showDialInChannel(CHANNEL_2, false);
     }else if (index == CHANNEL_2) {
-        bckgndColor = Colors::getChannelColorString(CHANNEL_2);
+        bckgndColor = Colors::getChannelColor(CHANNEL_2);
         tabLowFreq->showDialInChannel(CHANNEL_1, false);
         tabLowFreq->showDialInChannel(CHANNEL_2, true);
     }
