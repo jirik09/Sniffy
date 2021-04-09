@@ -14,7 +14,7 @@ WidgetDesciptionExpand::WidgetDesciptionExpand(QWidget *parent, QString name) :
     labelsLayout->setSpacing(0);
     labelsLayout->setContentsMargins(0,0,0,0);
 
-    ui->widget_arrow->setStyleSheet("image: url("+Colors::getGraphicsPath()+"arrow_up.png);");
+    ui->widget_arrow->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"arrow_up.png);");
     ui->widget_sep->installEventFilter(this);
     ui->widget_arrow->installEventFilter(this);
 }
@@ -45,11 +45,11 @@ bool WidgetDesciptionExpand::eventFilter(QObject *obj, QEvent *event)
         if(isHidden){
             isHidden = false;
             ui->widget_info->show();
-            ui->widget_arrow->setStyleSheet("image: url("+Colors::getGraphicsPath()+"arrow_up.png);");
+            ui->widget_arrow->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"arrow_up.png);");
         }else{
             isHidden = true;
             ui->widget_info->hide();
-            ui->widget_arrow->setStyleSheet("image: url("+Colors::getGraphicsPath()+"arrow_down.png);");
+            ui->widget_arrow->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"arrow_down.png);");
         }
     }
     return QObject::eventFilter(obj, event);

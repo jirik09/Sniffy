@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QColor>
 
-#include "../abstractcolors.h"
+#include "../abstractgraphics.h"
 
 /* BACKGROUNDS */
 #define DARK_BACKGROUND_APP "#303030"
@@ -46,7 +46,8 @@
 #define DARK_CHANNEL_7 DARK_BLUE_DARK
 #define DARK_CHANNEL_8 DARK_PINK
 
-class DarkTheme : public AbstractColors
+
+class DarkTheme : public AbstractGraphics
 {
     Q_OBJECT
 public:
@@ -77,6 +78,7 @@ private:
         DARK_CHANNEL_7, DARK_CHANNEL_8
     };
 };
+
 
 #define DARK_GRAPHICS_PATH              ":/graphics/graphics/"
 

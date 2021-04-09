@@ -9,25 +9,25 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     ui->setupUi(this);
 
     //setup displays
-    QString styleSheet = IMAGE_UNITS_VOLT;
+    QString styleSheet = Graphics::IMAGE_UNITS_VOLT;
     WidgetDisplay *display;
 
     display  = new WidgetDisplay("Voltmeter_CH1", "Channel 1", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH1",Colors::getChannelColor(0),true);
-    display->setProgressBarColor(Colors::getChannelColor(0));
+    display->configLabel(0,"CH1",Graphics::getChannelColor(0),true);
+    display->setProgressBarColor(Graphics::getChannelColor(0));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH2", "Channel 2", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH2",Colors::getChannelColor(1),true);
-    display->setProgressBarColor(Colors::getChannelColor(1));
+    display->configLabel(0,"CH2",Graphics::getChannelColor(1),true);
+    display->setProgressBarColor(Graphics::getChannelColor(1));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH3", "Channel 3", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH3",Colors::getChannelColor(2),true);
-    display->setProgressBarColor(Colors::getChannelColor(2));
+    display->configLabel(0,"CH3",Graphics::getChannelColor(2),true);
+    display->setProgressBarColor(Graphics::getChannelColor(2));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH4", "Channel 4", styleSheet, true, 1, HISTORY_SIZE, this);
     displays.append(display);
-    display->configLabel(0,"CH4",Colors::getChannelColor(3),true);
-    display->setProgressBarColor(Colors::getChannelColor(3));
+    display->configLabel(0,"CH4",Graphics::getChannelColor(3),true);
+    display->setProgressBarColor(Graphics::getChannelColor(3));
 
     foreach(WidgetDisplay * dis, displays){
         dis->setContentsMargins(5, 5, 5, 5);
@@ -49,13 +49,13 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonsChannelEnable->setObjectName("ChannelvoltmeterEnable");
     tabs->getLayout(0)->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
-    buttonsChannelEnable->setColor(Colors::getChannelColor(0),0);
+    buttonsChannelEnable->setColor(Graphics::getChannelColor(0),0);
     buttonsChannelEnable->setText("CH2",1);
-    buttonsChannelEnable->setColor(Colors::getChannelColor(1),1);
+    buttonsChannelEnable->setColor(Graphics::getChannelColor(1),1);
     buttonsChannelEnable->setText("CH3",2);
-    buttonsChannelEnable->setColor(Colors::getChannelColor(2),2);
+    buttonsChannelEnable->setColor(Graphics::getChannelColor(2),2);
     buttonsChannelEnable->setText("CH4",3);
-    buttonsChannelEnable->setColor(Colors::getChannelColor(3),3);
+    buttonsChannelEnable->setColor(Graphics::getChannelColor(3),3);
 
     buttonsMode = new WidgetButtons(this,2,ButtonTypes::RADIO,"Speed");
     buttonsMode->setObjectName("ChannelVoltmode");
@@ -73,7 +73,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     dialAveraging->setObjectName("voltAvgSamples");
     dialAveraging->setRange(1,64,"x",1,1,4,false);
     dialAveraging->hideUnitSelection();
-    dialAveraging->setColor(Colors::getChannelColor(1));
+    dialAveraging->setColor(Graphics::getChannelColor(1));
     dialAveraging->setNumOfDecimals(0);
     tabs->getLayout(0)->addWidget(dialAveraging);
 
@@ -155,18 +155,18 @@ void VoltmeterWindow::showData(ChannelData data[], int numChannels){
         if(buttonsCalc->getSelectedIndex()==0){
             displays.at(i)->displayQerrString(displays.at(i)->formatNumber(data[i].min,'f',4));
             displays.at(i)->displayTerrString(displays.at(i)->formatNumber(data[i].max,'f',4));
-            QString styleSheet = IMAGE_UNITS_VMAX;
+            QString styleSheet = Graphics::IMAGE_UNITS_VMAX;
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = IMAGE_UNITS_VMIN;
+            styleSheet = Graphics::IMAGE_UNITS_VMIN;
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
         }else if(buttonsCalc->getSelectedIndex()==1){
             displays.at(i)->displayQerrString(displays.at(i)->formatNumber(data[i].frequency,'f',4));
             displays.at(i)->displayTerrString(displays.at(i)->formatNumber(data[i].ripple,'f',4));
-            QString styleSheet = IMAGE_UNITS_VRIPPLE;
+            QString styleSheet = Graphics::IMAGE_UNITS_VRIPPLE;
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = IMAGE_UNITS_HZ;
+            styleSheet = Graphics::IMAGE_UNITS_HZ;
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
@@ -187,18 +187,18 @@ void VoltmeterWindow::showEmptyCalcs(){
         if(buttonsCalc->getSelectedIndex()==0){
             displays.at(i)->displayQerrString("--");
             displays.at(i)->displayTerrString("--");
-            QString styleSheet = IMAGE_UNITS_VMAX;
+            QString styleSheet = Graphics::IMAGE_UNITS_VMAX;
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = IMAGE_UNITS_VMIN;
+            styleSheet = Graphics::IMAGE_UNITS_VMIN;
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
         }else if(buttonsCalc->getSelectedIndex()==1){
             displays.at(i)->displayQerrString("--");
             displays.at(i)->displayTerrString("--");
-            QString styleSheet = IMAGE_UNITS_VRIPPLE;
+            QString styleSheet = Graphics::IMAGE_UNITS_VRIPPLE;
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = IMAGE_UNITS_HZ;
+            styleSheet = Graphics::IMAGE_UNITS_HZ;
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);

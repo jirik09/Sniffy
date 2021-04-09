@@ -18,8 +18,8 @@ int main(int argc, char *argv[])
 
     CustomSettings::loadSettings(QApplication::applicationDirPath() + "/settings.ini");
 
-    QList<AbstractColors*> *themes;
-    themes = new QList<AbstractColors*>;
+    QList<AbstractGraphics*> *themes;
+    themes = new QList<AbstractGraphics*>;
     themes->append(new DarkTheme());
     themes->append(new LightTheme());
 
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     }
 
     int themeIndex = CustomSettings::getThemeIndex();
-    Colors(nullptr, themes->at(themeIndex));
+    Graphics(nullptr, themes->at(themeIndex));
     a.setStyleSheet(themes->at(themeIndex)->getAppGlobalStyle());
 
     MainWindow w;

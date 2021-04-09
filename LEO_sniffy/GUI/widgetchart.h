@@ -18,7 +18,7 @@
 #include <QDateTimeAxis>
 #include <QDebug>
 
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 #include "../math/timing.h"
 
 QT_CHARTS_USE_NAMESPACE

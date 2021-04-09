@@ -28,8 +28,6 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
        after the object construction */
 
     setUnitsStyle(unitsStyleSheet);
-    QString color = COLOR_YELLOW;
-    setProgressBarColor(color);
     showBarDisplay(showPrgrssBar);
 
     displayString("");
@@ -168,7 +166,7 @@ void WidgetDisplay::setProgressBarRange(int min, int max){
 }
 
 void WidgetDisplay::setProgressBarColor(QString color){
-    ui->progressBar->setStyleSheet("QProgressBar {border: 1px solid #777; border-radius: 1px; background:"+Colors::getDataAreaColor()+";}"
+    ui->progressBar->setStyleSheet("QProgressBar {border: 1px solid #777; border-radius: 1px; background:"+Graphics::getDataAreaColor()+";}"
                                    "QProgressBar::chunk {background-color:"+color+"; width: 20px;}");
     ui->progressBar->repaint();
 }
@@ -320,7 +318,7 @@ void WidgetDisplay::configureFloatingHistoryNumber(){
     ui->dial->setToolTip(QString::number(historySize));
     labelFloatHistNum = new QLabel(this);
     labelFloatHistNum->setGeometry(ui->dial->x()+10, ui->dial->y()+64, 30, 20);
-    labelFloatHistNum->setStyleSheet("QLabel{background-color:"+Colors::getAppBackgroundColor()+";}");
+    labelFloatHistNum->setStyleSheet("QLabel{background-color:"+Graphics::getAppBackgroundColor()+";}");
     labelFloatHistNum->hide();
     labelFloatHistNum->setNum(100);
 }
@@ -457,13 +455,13 @@ void WidgetDisplay::historyButtonClickedCallback(){
 
     if(historyView == DISABLED){
         sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
-        style = "QPushButton{image: url("+Colors::getGraphicsPath()+"icon_history_on.png);}"
-                "QPushButton:hover{background-color:"+Colors::getHoverColor()+";}";
+        style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_history_on.png);}"
+                "QPushButton:hover{background-color:"+Graphics::getHoverColor()+";}";
         historyView = ENABLED;
     }else {
         sizes = {0, cmpltWidth};
-        style = "QPushButton{image: url("+Colors::getGraphicsPath()+"icon_history_off.png);}"
-                "QPushButton:hover{background-color:"+Colors::getHoverColor()+";}";
+        style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
+                "QPushButton:hover{background-color:"+Graphics::getHoverColor()+";}";
         historyView = DISABLED;
     }
 
@@ -474,14 +472,14 @@ void WidgetDisplay::historyButtonClickedCallback(){
 void WidgetDisplay::listChartSwitchClickedCallback(){
     QString style;
     if(listView == DISABLED){
-        style = "QPushButton{image: url("+Colors::getGraphicsPath()+"icon_chart.png);}"
-                "QPushButton:hover{background-color: "+Colors::getHoverColor()+";}";
+        style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_chart.png);}"
+                "QPushButton:hover{background-color: "+Graphics::getHoverColor()+";}";
         chart->hide();
         list->show();
         listView = ENABLED;
     }else {
-        style = "QPushButton{image: url("+Colors::getGraphicsPath()+"icon_list.png);}"
-                "QPushButton:hover{background-color: "+Colors::getHoverColor()+";}";
+        style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
+                "QPushButton:hover{background-color: "+Graphics::getHoverColor()+";}";
         chart->show();
         list->hide();
         listView = DISABLED;

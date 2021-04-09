@@ -47,8 +47,8 @@ SOURCES += \
     customsettings.cpp \
     devicedescriptor.cpp \
     devicemediator.cpp \
-    graphics/abstractcolors.cpp \
-    graphics/colors.cpp \
+    graphics/abstractgraphics.cpp \
+    graphics/graphics.cpp \
     graphics/themes/darktheme.cpp \
     graphics/themes/lighttheme.cpp \
     main.cpp \
@@ -155,8 +155,8 @@ HEADERS += \
     customsettings.h \
     devicedescriptor.h \
     devicemediator.h \
-    graphics/abstractcolors.h \
-    graphics/colors.h \
+    graphics/abstractgraphics.h \
+    graphics/graphics.h \
     graphics/themes/darktheme.h \
     graphics/themes/lighttheme.h \
     mainwindow.h \

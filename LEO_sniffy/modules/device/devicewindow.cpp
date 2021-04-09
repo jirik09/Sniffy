@@ -60,12 +60,12 @@ DeviceWindow::~DeviceWindow()
 
 void DeviceWindow::showSpecification(DeviceSpec *spec){
     //qDebug() << "update specification got to GUI";
-    QString devicePreviewImage = Colors::getGraphicsPath()+spec->device+".png";
+    QString devicePreviewImage = Graphics::getGraphicsPath()+spec->device+".png";
 
     if(QFileInfo::exists(devicePreviewImage)){
-        ui->widget_device->setStyleSheet("image: url("+Colors::getGraphicsPath()+spec->device+".png);");
+        ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+spec->device+".png);");
     }else{
-        ui->widget_device->setStyleSheet("image: url("+Colors::getGraphicsPath()+"unknown_device.png);");
+        ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"unknown_device.png);");
     }
 
     QList<WidgetDesciptionExpand *>::iterator it;
@@ -80,7 +80,7 @@ void DeviceWindow::hideSpecification(){
         (*it)->hide();
     }
     ui->widget_device->setStyleSheet("image: none;");
-    ui->widget_device->setStyleSheet("image: url("+Colors::getGraphicsPath()+"no_device.png);");
+    ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"no_device.png);");
 }
 
 void DeviceWindow::addModuleDescription(QString name, QList<QString> labels, QList<QString> values)

@@ -15,13 +15,13 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
     buttonsEnable = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Number of channels");
     buttonsEnable->setObjectName("arbGenBtnEnableChannel");
     buttonsEnable->setText("  One  ",0);
-    buttonsEnable->setColor(Colors::getChannelColor(0),0);
+    buttonsEnable->setColor(Graphics::getChannelColor(0),0);
     buttonsEnable->setText("  Two  ",1);
-    buttonsEnable->setColor(Colors::getChannelColor(1),1);
+    buttonsEnable->setColor(Graphics::getChannelColor(1),1);
     buttonsEnable->setText("  Three  ",2);
-    buttonsEnable->setColor(Colors::getChannelColor(2),2);
+    buttonsEnable->setColor(Graphics::getChannelColor(2),2);
     buttonsEnable->setText("  Four  ",3);
-    buttonsEnable->setColor(Colors::getChannelColor(3),3);
+    buttonsEnable->setColor(Graphics::getChannelColor(3),3);
 
     buttonsMemory = new WidgetButtons(parent,3,ButtonTypes::RADIO,"Memory");
     buttonsMemory->setObjectName("arbgenbtnmem");
@@ -43,8 +43,8 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
     buttonSWSweepEnable = new WidgetButtons (parent,2,ButtonTypes::RADIO,"SW sweep CH1",0);
     buttonSWSweepEnable->setText("   Off   ",0);
     buttonSWSweepEnable->setText("   On   ",1);
-    buttonSWSweepEnable->setColor(Colors::getControlsColor(),0);
-    buttonSWSweepEnable->setColor(Colors::getControlsColor(),1);
+    buttonSWSweepEnable->setColor(Graphics::getControlsColor(),0);
+    buttonSWSweepEnable->setColor(Graphics::getControlsColor(),1);
     buttonSWSweepEnable->setObjectName("arbGenSweepbtn");
 
     QHBoxLayout *commonButtons = new QHBoxLayout();
@@ -103,13 +103,13 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         buttonsShape[i] = new WidgetButtons(parent,4,ButtonTypes::RADIO,"",0,i);
         buttonsShape[i]->setObjectName("arbGenBtnshape"+chNStr);
 
-        buttonsShape[i]->setColor(Colors::getChannelColor(i),0);
+        buttonsShape[i]->setColor(Graphics::getChannelColor(i),0);
         buttonsShape[i]->setText("Sine",0);
-        buttonsShape[i]->setColor(Colors::getChannelColor(i),1);
+        buttonsShape[i]->setColor(Graphics::getChannelColor(i),1);
         buttonsShape[i]->setText("Saw",1);
-        buttonsShape[i]->setColor(Colors::getChannelColor(i),2);
+        buttonsShape[i]->setColor(Graphics::getChannelColor(i),2);
         buttonsShape[i]->setText("Rect",2);
-        buttonsShape[i]->setColor(Colors::getChannelColor(i),3);
+        buttonsShape[i]->setColor(Graphics::getChannelColor(i),3);
         buttonsShape[i]->setText("Arb",3);
         verChanBox->addWidget(buttonsShape[i]);
         signalShape[i] = SignalShape::SINE;
@@ -118,13 +118,13 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         dialFreqCh[i]->setObjectName("arbGenfreq"+chNStr);
         dialFreqCh[i]->setNumOfDecimals(3);
         dialFreqCh[i]->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
-        dialFreqCh[i]->setColor(Colors::getChannelColor(i));
+        dialFreqCh[i]->setColor(Graphics::getChannelColor(i));
         verChanBox->addWidget(dialFreqCh[i]);
 
         if(i!=0){
             swSyncWithCH1[i] = new WidgetSwitch(parent,"Off","On","CH1 Freq sync",i);
             swSyncWithCH1[i]->setObjectName("SwFreqSynch"+chNStr);
-            swSyncWithCH1[i]->setColor(Colors::getChannelColor(i));
+            swSyncWithCH1[i]->setColor(Graphics::getChannelColor(i));
             verChanBox->addWidget(swSyncWithCH1[i]);
             connect(swSyncWithCH1[i],&WidgetSwitch::clicked,this,&ArbGenPanelSettings::syncWithCH1Callback);
             channelSyncWithCH1[i] = false;
@@ -134,21 +134,21 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         dialOffsetCh[i] = new WidgetDialRange(parent ,"Offset",i);
         dialOffsetCh[i]->setObjectName("arbGenOffset" + chNStr);
         dialOffsetCh[i]->setRange(-3.3,6.6,"V",0.05,0.01,1.65);
-        dialOffsetCh[i]->setColor(Colors::getChannelColor(i));
+        dialOffsetCh[i]->setColor(Graphics::getChannelColor(i));
         dialOffsetCh[i]->hideUnitSelection();
         verChanBox->addWidget(dialOffsetCh[i]);
 
         dialAmplitudeCh[i] = new WidgetDialRange(parent ,"Amplitude",i);
         dialAmplitudeCh[i]->setObjectName("arbGenAmpl" + chNStr);
         dialAmplitudeCh[i]->setRange(-3.3,6.6,"V",0.05,0.01,1.65);
-        dialAmplitudeCh[i]->setColor(Colors::getChannelColor(i));
+        dialAmplitudeCh[i]->setColor(Graphics::getChannelColor(i));
         dialAmplitudeCh[i]->hideUnitSelection();
         verChanBox->addWidget(dialAmplitudeCh[i]);
 
         dialDutyCh[i] = new WidgetDialRange(parent ,"Duty",i);
         dialDutyCh[i]->setObjectName("arbGenDuty" + chNStr);
         dialDutyCh[i]->setRange(0,100,"%",5,1,50);
-        dialDutyCh[i]->setColor(Colors::getChannelColor(i));
+        dialDutyCh[i]->setColor(Graphics::getChannelColor(i));
         dialDutyCh[i]->hideUnitSelection();
         verChanBox->addWidget(dialDutyCh[i]);
 
@@ -156,7 +156,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         dialPhaseCh[i]->setObjectName("arbGenPhase" + chNStr);
         dialPhaseCh[i]->setRange(0,360,"°",5,1,0);
         dialPhaseCh[i]->setRealValue(i*90,true);
-        dialPhaseCh[i]->setColor(Colors::getChannelColor(i));
+        dialPhaseCh[i]->setColor(Graphics::getChannelColor(i));
         dialPhaseCh[i]->hideUnitSelection();
         verChanBox->addWidget(dialPhaseCh[i]);
 
@@ -170,13 +170,13 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         dialPWMFreqCh[i] = new WidgetDialRange(parent,"PWM Frequency",i);
         dialPWMFreqCh[i]->setObjectName("arbGenpwmfreq"+chNStr);
         dialPWMFreqCh[i]->setRange(1,10000000,"Hz",10,0.01,10000,true);
-        dialPWMFreqCh[i]->setColor(Colors::getChannelColor(i));
+        dialPWMFreqCh[i]->setColor(Graphics::getChannelColor(i));
         verChanBox->addWidget(dialPWMFreqCh[i]);
 
         if(i!=0){
             swSyncPWMWithCH1[i] = new WidgetSwitch(parent,"Off","On","CH1 PWM sync",i);
             swSyncPWMWithCH1[i]->setObjectName("SwPWMFreqSynch"+chNStr);
-            swSyncPWMWithCH1[i]->setColor(Colors::getChannelColor(i));
+            swSyncPWMWithCH1[i]->setColor(Graphics::getChannelColor(i));
             verChanBox->addWidget(swSyncPWMWithCH1[i]);
 
             channelSyncPWMWithCH1[i] = false;

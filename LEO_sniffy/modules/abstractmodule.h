@@ -9,7 +9,7 @@
 #include "../GUI/widgetcontrolmodule.h"
 #include "../communication/comms.h"
 #include "../communication/commands.h"
-#include "../graphics/abstractcolors.h"
+#include "../graphics/abstractgraphics.h"
 #include "../graphics/themes/darktheme.h"
 #include "../graphics/themes/lighttheme.h"
 
@@ -75,7 +75,7 @@ protected:
     QByteArray moduleCommandPrefix;
 
     AbstractSpecification* moduleSpecification = nullptr;
-    AbstractColors *theme;
+    AbstractGraphics *theme;
 
 private:
     ModuleDockWidget *dockWidgetWindow;

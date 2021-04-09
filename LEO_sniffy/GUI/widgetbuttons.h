@@ -8,7 +8,7 @@
 #include <QString>
 #include <QDebug>
 
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetButtons;

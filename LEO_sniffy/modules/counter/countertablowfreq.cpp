@@ -24,7 +24,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     dialSampleCountCh1->setObjectName("dialLfCh1SampleCount");
     dialSampleCountCh1->setRange(1, SAMPLE_COUNT, "Smpls", 1, 1, 1, false, 0);
     dialSampleCountCh1->hideUnitSelection();
-    dialSampleCountCh1->setColor(Colors::getChannelColor(0));
+    dialSampleCountCh1->setColor(Graphics::getChannelColor(0));
     destination->addWidget(dialSampleCountCh1);
 
     dialSampleCountCh2 = new WidgetDialRange(parent ,"Sample Count");
@@ -32,7 +32,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     dialSampleCountCh2->setRange(1, SAMPLE_COUNT, "Smpls", 1, 1, 1, false, 0);
     dialSampleCountCh2->hideUnitSelection();
     destination->addWidget(dialSampleCountCh2);
-    dialSampleCountCh2->setColor(Colors::getChannelColor(1));
+    dialSampleCountCh2->setColor(Graphics::getChannelColor(1));
     dialSampleCountCh2->hide();
 
     WidgetSeparator *separatorMultiplierSwitch = new WidgetSeparator(parent,"Sample Count multiplier");
@@ -46,7 +46,7 @@ CounterTabLowFreq::CounterTabLowFreq(QVBoxLayout *destination, QWidget *parent) 
     buttonsMultiplierSwitch->setText("8x", 3);
     destination->addWidget(buttonsMultiplierSwitch);
 
-    WidgetSeparator *separatorDutyCycleSwitch = new WidgetSeparator(parent,"Switch to Duty cycle");
+    WidgetSeparator *separatorDutyCycleSwitch = new WidgetSeparator(parent,"Duty cycle switch");
     destination->addWidget(separatorDutyCycleSwitch);
 
     buttonsDutyCycleSwitch = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);

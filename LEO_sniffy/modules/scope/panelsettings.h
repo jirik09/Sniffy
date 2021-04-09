@@ -37,8 +37,8 @@ public:
 private:
     void fillTimeBase();
 
-    const QString verticalControlColor = "color:"+Colors::getChannelColor(0);
-    const QString verticalControlBcgrColor = "background-color:"+Colors::getChannelColor(0);
+    const QString verticalControlColor = "color:"+Graphics::getChannelColor(0);
+    const QString verticalControlBcgrColor = "background-color:"+Graphics::getChannelColor(0);
 
 };
 

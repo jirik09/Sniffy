@@ -1,13 +1,13 @@
-#ifndef ABSTRACTCOLORS_H
-#define ABSTRACTCOLORS_H
+#ifndef ABSTRACTGRAPHICS_H
+#define ABSTRACTGRAPHICS_H
 
 #include <QObject>
 
-class AbstractColors : public QObject
+class AbstractGraphics : public QObject
 {
     Q_OBJECT
 public:
-    explicit AbstractColors(QObject *parent = nullptr);
+    explicit AbstractGraphics(QObject *parent = nullptr);
 
     virtual QString getThemeName() = 0;
     virtual QString getAppGlobalStyle() = 0;
@@ -32,4 +32,4 @@ signals:
 
 };
 
-#endif // ABSTRACTCOLORS_H
+#endif // ABSTRACTGRAPHICS_H

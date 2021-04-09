@@ -10,13 +10,13 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsChannelEnable->setObjectName("ChannelEnable");
     destination->addWidget(buttonsChannelEnable);
     buttonsChannelEnable->setText("CH1",0);
-    buttonsChannelEnable->setColor(Colors::getChannelColor(0),0);
+    buttonsChannelEnable->setColor(Graphics::getChannelColor(0),0);
     buttonsChannelEnable->setText("CH2",1);
-    buttonsChannelEnable->setColor(Colors::getChannelColor(1),1);
+    buttonsChannelEnable->setColor(Graphics::getChannelColor(1),1);
     buttonsChannelEnable->setText("CH3",2);
-    buttonsChannelEnable->setColor(Colors::getChannelColor(2),2);
+    buttonsChannelEnable->setColor(Graphics::getChannelColor(2),2);
     buttonsChannelEnable->setText("CH4",3);
-    buttonsChannelEnable->setColor(Colors::getChannelColor(3),3);
+    buttonsChannelEnable->setColor(Graphics::getChannelColor(3),3);
 
     WidgetSeparator *separatorTrig = new WidgetSeparator(parent,"Trigger");
     destination->addWidget(separatorTrig);
@@ -35,10 +35,10 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsTriggerChannel->setText("CH2",1);
     buttonsTriggerChannel->setText("CH3",2);
     buttonsTriggerChannel->setText("CH4",3);
-    buttonsTriggerChannel->setColor(Colors::getChannelColor(0),0);
-    buttonsTriggerChannel->setColor(Colors::getChannelColor(1),1);
-    buttonsTriggerChannel->setColor(Colors::getChannelColor(2),2);
-    buttonsTriggerChannel->setColor(Colors::getChannelColor(3),3);
+    buttonsTriggerChannel->setColor(Graphics::getChannelColor(0),0);
+    buttonsTriggerChannel->setColor(Graphics::getChannelColor(1),1);
+    buttonsTriggerChannel->setColor(Graphics::getChannelColor(2),2);
+    buttonsTriggerChannel->setColor(Graphics::getChannelColor(3),3);
 
     buttonsTriggerChannel->disableAll();
     buttonsTriggerChannel->setDisabledButton(false,0);
@@ -66,7 +66,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
 
     dialTimeBase = new WidgetDial(parent ,"Time base");
     dialTimeBase->setObjectName("TimeBase");
-    dialTimeBase->setColor(Colors::getControlsColor());
+    dialTimeBase->setColor(Graphics::getControlsColor());
     destination->addWidget(dialTimeBase);
     fillTimeBase();
     dialTimeBase->setDefaultIndex(10);
@@ -89,17 +89,17 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsChannelVertical->setText("CH3",2);
     buttonsChannelVertical->setText("CH4",3);
     buttonsChannelVertical->setText("Math",4);
-    buttonsChannelVertical->setColor(Colors::getChannelColor(0),0);
-    buttonsChannelVertical->setColor(Colors::getChannelColor(1),1);
-    buttonsChannelVertical->setColor(Colors::getChannelColor(2),2);
-    buttonsChannelVertical->setColor(Colors::getChannelColor(3),3);
-    buttonsChannelVertical->setColor(Colors::getChannelColor(4),4);
+    buttonsChannelVertical->setColor(Graphics::getChannelColor(0),0);
+    buttonsChannelVertical->setColor(Graphics::getChannelColor(1),1);
+    buttonsChannelVertical->setColor(Graphics::getChannelColor(2),2);
+    buttonsChannelVertical->setColor(Graphics::getChannelColor(3),3);
+    buttonsChannelVertical->setColor(Graphics::getChannelColor(4),4);
 
 
     dialVerticalScale = new WidgetDial(parent ,"Scale");
     dialVerticalScale->setObjectName("VerticalScale");
     destination->addWidget(dialVerticalScale);
-    dialVerticalScale->setColor(Colors::getChannelColor(0));
+    dialVerticalScale->setColor(Graphics::getChannelColor(0));
     dialVerticalScale->addOption("10","mV/div",0.01);
     dialVerticalScale->addOption("20","mV/div",0.02);
     dialVerticalScale->addOption("50","mV/div",0.05);
@@ -115,7 +115,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     dialVerticalShift = new WidgetDialRange(parent ,"Shift");
     dialVerticalShift->setObjectName("VerticalShift");
     dialVerticalShift->setRange(-3.3,6.6,"V",10,0.01,0);
-    dialVerticalShift->setColor(Colors::getChannelColor(0));
+    dialVerticalShift->setColor(Graphics::getChannelColor(0));
     dialVerticalShift->hideUnitSelection();
     destination->addWidget(dialVerticalShift);
 

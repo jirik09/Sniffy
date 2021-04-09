@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetSwitch;
@@ -30,8 +30,8 @@ private:
     Ui::WidgetSwitch *ui;
     int optionalEmitParam;
 
-    QString styleSelected = "background-color:" + Colors::getChannelColor(0) + "; border: none;";
-    QString styleNotSelected = "background-color:" + Colors::getButtonBackgroundColor() + "; border: none;";
+    QString styleSelected = "background-color:" + Graphics::getChannelColor(0) + "; border: none;";
+    QString styleNotSelected = "background-color:" + Graphics::getButtonBackgroundColor() + "; border: none;";
 
 signals:
     void clicked(int index, int optionalEmitParam = 0);

@@ -85,7 +85,7 @@ void SyncPwmPainter::recalculate(){
 
 void SyncPwmPainter::enableChannel(bool enable, int chanIndex){
     if(enable)
-        chart->setTraceColor(chanIndex, Colors::getChannelColor(chanIndex));
+        chart->setTraceColor(chanIndex, Graphics::getChannelColor(chanIndex));
     else
         chart->setTraceColor(chanIndex, QColor(COLOR_GREY));
 
@@ -110,6 +110,6 @@ void SyncPwmPainter::configDefaultChart(){
     chart->setLabelsVisible(true, false);
     chart->setRange(0, 1, 0, RANGE_CHAN1_LOG1 + 1);
     for(int i = 0; i < CHANNELS_NUM; i++)
-        chart->setTraceColor(i, Colors::getChannelColor(i));
+        chart->setTraceColor(i, Graphics::getChannelColor(i));
 }
 

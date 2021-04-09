@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QtWidgets/QPushButton>
 
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetFeature;

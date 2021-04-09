@@ -16,7 +16,7 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, I
     QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+";} QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +";}";
     ui->label->setStyleSheet(style);
 
-    style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+";} QWidget{background-color:"+Colors::getDataAreaColor()+";color:"+QString::fromUtf8(COLOR_WHITE) +";}";
+    style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+";} QWidget{background-color:"+Graphics::getDataAreaColor()+";color:"+QString::fromUtf8(COLOR_WHITE) +";}";
     ui->lineEdit->setStyleSheet(style);
 }
 
@@ -75,7 +75,7 @@ bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
     }
 
     if(processTextEdit){
-        ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+Colors::getDataAreaColor()+";}");
+        ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+Graphics::getDataAreaColor()+";}");
         processInput();
     }
     return QObject::eventFilter(obj, event);

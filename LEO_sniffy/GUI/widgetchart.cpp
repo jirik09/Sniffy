@@ -12,7 +12,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->legend()->hide();
     chart->setObjectName("chart");
 
-    chart->setBackgroundBrush(QColor(Colors::getDataAreaColor()));
+    chart->setBackgroundBrush(QColor(Graphics::getDataAreaColor()));
     chart->setAcceptHoverEvents(true);
     this->setMouseTracking(true);
     //chart->setToolTip("¯\\_(ツ)_/¯");
@@ -30,7 +30,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     for (int i = 0; i < maxTraces; i++) {
         QLineSeries *series = new QLineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(Colors::getChannelColor(i))), 2.0));
+        series->setPen(QPen(QBrush(QColor(Graphics::getChannelColor(i))), 2.0));
         seriesList.append(series);
         createSeries(series);
     }
@@ -105,7 +105,7 @@ void widgetChart::switchToSplineSeriesCallback(){
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(Colors::getChannelColor(i))), 2.0));
+        series->setPen(QPen(QBrush(QColor(Graphics::getChannelColor(i))), 2.0));
         series->append(seriesList[i]->points());
         chart->removeSeries(seriesList[i]);
         seriesList[i]->clear();
@@ -128,7 +128,7 @@ void widgetChart::switchToLineSeriesSeamless()
     for (int i = 0; i < maxTraces; i++) {
         QLineSeries *series = new QLineSeries;
         //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(Colors::getChannelColor(i))), 2.0));
+        series->setPen(QPen(QBrush(QColor(Graphics::getChannelColor(i))), 2.0));
         series->append(seriesList[i]->points());
         chart->removeSeries(seriesList[i]);
         seriesList[i]->clear();
@@ -521,7 +521,7 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
 
     QPainter painter(&marker);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(QPen(QBrush(QColor(Colors::getChannelColor(channelIndex))), 1.0));
+    painter.setPen(QPen(QBrush(QColor(Graphics::getChannelColor(channelIndex))), 1.0));
     painter.setBrush(painter.pen().color());
     switch (type) {
     case MarkerType::ARROW_DOWN_BIG:
@@ -537,7 +537,7 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
         painter.drawPath(*MarkerPath_Tick);
         break;
     case MarkerType::CROSS:
-        painter.setPen(QPen(QBrush(QColor(Colors::getChannelColor(channelIndex))), 2.0));
+        painter.setPen(QPen(QBrush(QColor(Graphics::getChannelColor(channelIndex))), 2.0));
         painter.drawPath(*MarkerPath_Cross);
         break;
     case MarkerType::CIRCLE:
@@ -578,7 +578,7 @@ void widgetChart::setHorizontalCursor(int channelIndex, qreal value, Cursor type
     lst->append(end);
 
     QPen *pen = new QPen();
-    pen->setColor(Colors::getChannelColor(channelIndex));
+    pen->setColor(Graphics::getChannelColor(channelIndex));
     pen->setWidth(2);
     if(type == Cursor::CURSOR_A){
         pen->setStyle(Qt::DashLine);
@@ -600,7 +600,7 @@ void widgetChart::setVerticalCursor(int channelIndex, qreal value, Cursor type)
     lst->append(end);
 
     QPen *pen = new QPen();
-    pen->setColor(Colors::getChannelColor(channelIndex));
+    pen->setColor(Graphics::getChannelColor(channelIndex));
     pen->setWidth(2);
 
     if(type == Cursor::CURSOR_A){

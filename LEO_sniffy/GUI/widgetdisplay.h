@@ -22,8 +22,7 @@
 #include "GUI/widgetdialrange.h"
 
 #include "math/timing.h"
-
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetDisplay;

@@ -63,8 +63,8 @@ void WidgetDialRange::setColor(QString color){
                     "QWidget{color:"+color +"}";
     ui->widget_dial->setStyleSheet(style);
 
-    style = "QPushButton:disabled{background-color: "+Colors::getButtonDisabledBackgroundColor()+"; color: "+QString::fromUtf8(COLOR_GREY)+";}"
-            "QPushButton:pressed{border: 2px solid "+Colors::getAppBackgroundColor()+";}"
+    style = "QPushButton:disabled{background-color: "+Graphics::getButtonDisabledBackgroundColor()+"; color: "+QString::fromUtf8(COLOR_GREY)+";}"
+            "QPushButton:pressed{border: 2px solid "+Graphics::getAppBackgroundColor()+";}"
             "QPushButton{border: none;background-color:"+color +";}";
     ui->pushButton_plus->setStyleSheet(style);
     ui->pushButton_minus->setStyleSheet(style);
