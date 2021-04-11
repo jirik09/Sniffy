@@ -18,12 +18,22 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
     ui(new Ui::WidgetDialRange)
 {
     ui->setupUi(this);
+
+    QString style =  "QLineEdit{border:none;background-color: rgb(48, 48, 48);"
+                     "font: 12pt 'MS Shell Dlg 2';padding:0px;margin:0px;}";
+    this->WidgetDialRange::setStyleSheet(style);
+
+//    QString style = "QPushButton:pressed{border: 2px solid rgb(48,48,48);}"
+//                    "QPushButton{border: none;color: rgb(214,214,214);"
+//                    "font: 99 12pt 'MS Shell Dlg 2';font-weight:bold;}";
+//    ui->widget_5->setStyleSheet(style);
+
+    style = "QWidget:disabled{color:"+Graphics::COLOR_COMPONENT_DISABLED+";}"
+                    "QWidget{color:"+Graphics::COLOR_TEXT_COMPONENT+";}";
+
     ui->label_name->setText(name);
     setObjectName(name);
     units = new QList<params_unit>;
-
-    QString style = "QWidget:disabled{color:"+Graphics::COLOR_COMPONENT_DISABLED+";}"
-                    "QWidget{color:"+Graphics::COLOR_TEXT_COMPONENT+";}";
 
     ui->widget->setStyleSheet(style);
     this->setMinimumSize(170,85);

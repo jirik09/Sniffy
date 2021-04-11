@@ -12,7 +12,7 @@ Voltmeter::Voltmeter(QObject *parent)
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SCOPE;
     moduleName = "Voltmeter";
-    moduleIconURI = ":/graphics/graphics/icon_voltmeter.png";
+    moduleIconURI = Graphics::getGraphicsPath()+"icon_voltmeter.png";
 
     measCalc = new MeasCalculations();
     voltmeterData = new QVector<QVector<QPointF>>;

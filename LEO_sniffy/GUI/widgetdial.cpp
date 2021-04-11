@@ -14,6 +14,16 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
+
+//    QString style = "QPushButton:pressed{border: 2px solid rgb(48,48,48);}"
+//                    "QPushButton{border: none;color: rgb(214,214,214);"
+//                    "font: 99 12pt 'MS Shell Dlg 2';font-weight:bold;}";
+//    ui->widget_5->setStyleSheet(style);
+
+    QString style = "QWidget:disabled{color:"+Graphics::COLOR_COMPONENT_DISABLED+";}"
+            "QWidget{color:"+Graphics::COLOR_TEXT_COMPONENT+";}";
+    ui->widget->setStyleSheet(style);
+
     ui->label_name->setText(name);
     ui->dial->setPageStep(1);
     setObjectName(name);
@@ -23,11 +33,6 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
     options = new QList<params_dial>;
-
-    QString style = "QWidget:disabled{color:"+Graphics::COLOR_COMPONENT_DISABLED+";}"
-                    "QWidget{color:"+Graphics::COLOR_TEXT_COMPONENT+";}";
-
-    ui->widget->setStyleSheet(style);
 }
 
 WidgetDial::~WidgetDial()

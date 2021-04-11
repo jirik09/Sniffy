@@ -33,9 +33,7 @@
     </size>
    </property>
    <property name="styleSheet">
-    <string notr="true">QWidget#centralwidget{
-	border-right: 1px solid gray;
-}</string>
+    <string notr="true"/>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <property name="spacing">
@@ -100,8 +98,7 @@
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">image: url(:/graphics/graphics/logo_sniffy.png);
-border: none</string>
+            <string notr="true"/>
            </property>
           </widget>
          </item>

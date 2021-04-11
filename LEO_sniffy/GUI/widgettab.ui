@@ -14,36 +14,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-
-QTabWidget::pane { /* The tab widget frame */
-border-top: 3px solid rgb(38,38,38);
-
-top:-3px;
-  
-    
-}
-
-QTabWidget::tab-bar {	
-
-}
-
-/* Style the tab using the tab sub-control. Note that
-    it reads QTabBar _not_ QTabWidget */
-QTabBar::tab {
-    background:rgb(38, 38, 38);
-    border-bottom: 3px solid rgb(128, 128, 128); /* same as the pane color */
-    padding: 7px;
-}
-
-QTabBar::tab:selected, QTabBar::tab:hover {
-    background: rgb(58, 58, 58);
-}
-
-QTabBar::tab:selected {
-    border-bottom-color: orange; /* same as pane color */
-}
-</string>
+   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -96,8 +67,8 @@ QTabBar::tab:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>740</width>
-            <height>263</height>
+            <width>734</width>
+            <height>267</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_1">
@@ -152,8 +123,8 @@ QTabBar::tab:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>740</width>
-            <height>263</height>
+            <width>734</width>
+            <height>267</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -208,8 +179,8 @@ QTabBar::tab:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>740</width>
-            <height>263</height>
+            <width>734</width>
+            <height>267</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -264,8 +235,8 @@ QTabBar::tab:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>740</width>
-            <height>263</height>
+            <width>734</width>
+            <height>267</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -320,8 +291,8 @@ QTabBar::tab:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>740</width>
-            <height>263</height>
+            <width>734</width>
+            <height>267</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -376,8 +347,8 @@ QTabBar::tab:selected {
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>740</width>
-            <height>263</height>
+            <width>734</width>
+            <height>267</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">

@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+#include "../graphics/graphics.h"
+
 namespace Ui {
 class WidgetSeparator;
 }

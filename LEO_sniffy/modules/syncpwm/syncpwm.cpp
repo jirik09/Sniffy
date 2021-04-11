@@ -8,7 +8,7 @@ SyncPwm::SyncPwm(QObject *parent)
 
     moduleCommandPrefix = cmd->SYNC_PWM_GEN;
     moduleName = "Sync PWM";
-    moduleIconURI = ":/graphics/graphics/icon_syncpwm.png";
+    moduleIconURI = Graphics::getGraphicsPath()+"icon_syncpwm.png";
 
     connect(spwmWindow->settings->buttonStart, &WidgetButtons::clicked, this, &SyncPwm::buttonStartCallback);
     connect(spwmWindow->settings->switchStepMode, &WidgetSwitch::clicked, this, &SyncPwm::switchStepModeCallback);

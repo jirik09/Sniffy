@@ -52,30 +52,35 @@ void CounterWindow::configureCounterTabs(void){
 }
 
 void CounterWindow::createAllDisplays(void){
+    QString chan1 = Graphics::getChannelColor(CHANNEL_1);
+    QString chan2 = Graphics::getChannelColor(CHANNEL_2);
+
     displayHF = createHighFreqDisplay();
     displayHF->setContentsMargins(5, 5, 5, 5);
-    displayHF->setIndicationFlagColor(Graphics::getChannelColor(CHANNEL_1));
-    displayHF->setProgressBarColor(Graphics::getChannelColor(CHANNEL_1));
+    displayHF->setIndicationFlagColor(chan1);
+    displayHF->setProgressBarColor(chan1);
     ui->verticalLayout_display->addWidget(displayHF);
 
     displayLFCh1 = createLowFreqDisplays("LowFreqCh1Counter");
     displayLFCh1->setContentsMargins(5, 5, 5, 5);
-    displayLFCh1->setIndicationFlagColor(Graphics::getChannelColor(CHANNEL_1));
-    displayLFCh1->setProgressBarColor(Graphics::getChannelColor(CHANNEL_1));
+    displayLFCh1->setIndicationFlagColor(chan1);
+    displayLFCh1->setProgressBarColor(chan1);
     ui->verticalLayout_display->addWidget(displayLFCh1);
 
     displayLFCh2 = createLowFreqDisplays("LowFreqCh2Counter");
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
-    displayLFCh2->setIndicationFlagColor(Graphics::getChannelColor(CHANNEL_2));
-    displayLFCh2->setProgressBarColor(Graphics::getChannelColor(CHANNEL_2));
+    displayLFCh2->setIndicationFlagColor(chan2);
+    displayLFCh2->setProgressBarColor(chan2);
     ui->verticalLayout_display->addWidget(displayLFCh2);
 
     displayRat = createRatioDisplay();
     displayRat->setContentsMargins(5, 5, 5, 5);
+    displayRat->setIndicationFlagColor(chan1);
     ui->verticalLayout_display->addWidget(displayRat);
 
     displayInt = createIntervalsDisplay();
     displayInt->setContentsMargins(5, 5, 5, 5);
+    displayInt->setIndicationFlagColor(chan1);
     ui->verticalLayout_display->addWidget(displayInt);
 }
 

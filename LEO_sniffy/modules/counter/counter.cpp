@@ -8,7 +8,7 @@ Counter::Counter(QObject *parent)
 
     moduleCommandPrefix = cmd->COUNTER;
     moduleName = "Counter";
-    moduleIconURI = ":/graphics/graphics/icon_counter.png";
+    moduleIconURI = Graphics::getGraphicsPath()+"icon_counter.png";
 
     movAvg = new MovingAverage(2, cntWindow->tabHighFreq);
 

@@ -23,25 +23,43 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
 
     ui->label_0->setText(firstLabelText);
     ui->label_0->show();
+
     setIndicationFlagColor(Graphics::COLOR_UNINITIALIZED);
-
-    /* One must hide the unnecessary displays
-       after the object construction */
-
     setUnitsStyle(unitsStyleSheet);
     showBarDisplay(showPrgrssBar);
-
     displayString("");
     displayAvgString("");
-
     hideHistoryChartArea();
     historyData = new QVector<QVector<QPointF>>(historyTracesNum);
     createHistoryChart(historyTracesNum);
     createHistoryList();
     setHistorySize(historySize);
-
     configureCustomDial();
     configureFloatingHistoryNumber();
+
+    QString style;
+
+    style = "QObject{background-color:"+Graphics::COLOR_DISPLAY+";}";
+    this->WidgetDisplay::setStyleSheet(style);
+
+    style = "QObject{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}";
+    ui->line->setStyleSheet(style);
+
+    style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
+            "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}";
+    ui->pushButton_history->setStyleSheet(style);
+
+    style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
+            "QPushButton:hover{background-color: "+Graphics::COLOR_HOVER+";}";
+    ui->pushButton_list->setStyleSheet(style);
+
+    style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_clear_history.png);}"
+            "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}";
+    ui->pushButton_clear->setStyleSheet(style);
+
+    style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_save.png);}"
+            "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}";
+    ui->pushButton_save->setStyleSheet(style);
 
     connect(ui->pushButton_history, SIGNAL(clicked()),
             this, SLOT(historyButtonClickedCallback()));

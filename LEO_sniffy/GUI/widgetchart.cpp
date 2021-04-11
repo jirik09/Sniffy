@@ -6,7 +6,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     ui(new Ui::widgetChart),
     maxTraces(maxTraces)
 {
-    ui->setupUi(this);
+    ui->setupUi(this);    
 
     chart = new QChart();
     chart->legend()->hide();

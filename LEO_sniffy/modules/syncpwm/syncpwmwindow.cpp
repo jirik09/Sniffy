@@ -42,10 +42,10 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
     splitter->setSizes(sizes);
     ui->horizontalLayout->addWidget(splitter);
 
-    verticalLayout_chart->setContentsMargins(0,0,0,0);
+    verticalLayout_chart->setContentsMargins(0,0,0,4);
     verticalLayout_chart->setSpacing(0);
-    verticalLayout_settings->setContentsMargins(4,4,4,4);
-    verticalLayout_settings->setSpacing(2);
+    verticalLayout_settings->setContentsMargins(4,1,4,2);
+    verticalLayout_settings->setSpacing(1);
 
     chart = new widgetChart(widget_chart, CHANNELS_NUM);
     verticalLayout_chart->addWidget(chart);
