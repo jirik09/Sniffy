@@ -13,10 +13,10 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, I
     ui->lineEdit->installEventFilter(this);
     inputType = type;
 
-    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+";} QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +";}";
+    QString style = "QWidget:disabled{color: "+Graphics::COLOR_UNINITIALIZED+";} QWidget{color:"+Graphics::COLOR_UNINITIALIZED+";}";
     ui->label->setStyleSheet(style);
 
-    style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+";} QWidget{background-color:"+Graphics::getDataAreaColor()+";color:"+QString::fromUtf8(COLOR_WHITE) +";}";
+    style = "QWidget:disabled{color: "+Graphics::COLOR_UNINITIALIZED+";} QWidget{background-color:"+Graphics::COLOR_DATA_AREA+";color:"+Graphics::COLOR_UNINITIALIZED+";}";
     ui->lineEdit->setStyleSheet(style);
 }
 
@@ -71,11 +71,11 @@ bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
     }
 
     if(event->type() == QEvent::FocusIn){
-        ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+BACKGROUND_COLOR_FOCUS_IN+";}");
+        ui->lineEdit->setStyleSheet("QLineEdit{ background-color:"+Graphics::COLOR_BACKGROUND_FOCUS_IN+";}");
     }
 
     if(processTextEdit){
-        ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+Graphics::getDataAreaColor()+";}");
+        ui->lineEdit->setStyleSheet("QLineEdit{ background-color:"+Graphics::COLOR_DATA_AREA+";}");
         processInput();
     }
     return QObject::eventFilter(obj, event);

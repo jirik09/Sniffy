@@ -21,9 +21,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     buttons->addWidget(buttonsRestoreSession);
 
     selTheme = new WidgetSelection(this,"Color scheme");
-    QList<QString> themesList = CustomSettings::getThemesList();
-    for (int i =0; i<themesList.length(); i++) {
-        selTheme->addOption(themesList.at(i),i);
+    QList<QString> *themesList = CustomSettings::getThemesList();
+    for (int i =0; i<themesList->length(); i++) {
+        selTheme->addOption(themesList->at(i),i);
     }
     selTheme->setSelected(0);
     buttons->addWidget(selTheme);

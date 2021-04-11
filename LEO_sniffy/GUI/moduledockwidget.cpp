@@ -5,9 +5,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     setMinimumSize(QSize(250, 150));
     setAllowedAreas(Qt::RightDockWidgetArea);
     setObjectName(title);
-    hide();
-
-    setStyleSheet("QDockWidget{border: 3px solid gray; background-color: "+QString::fromUtf8(COLOR_GREY)+";}");
+    hide();   
 
     // ***************** create title bar and window contorl icons *************
     QWidget *titleBar = new QWidget();
@@ -27,10 +25,10 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     btnHold->setMaximumSize(36, 13);
     btnHold->setText("HOLD");
     btnHold->setStyleSheet("QPushButton{padding-top: 0px; padding-bottom: 1px; padding-left: 0px; padding-right: 0px; font-size: 10px;}"
-                           "QPushButton{background-color: "+Graphics::getControlBackgroundColor()+"; color: "+COLOR_GREY+
-                           "; border-style: solid; border-color: "+COLOR_GREY+"; border-width: 1px; border-radius: 1px;}"
-                           "QPushButton:checked{background-color: "+Graphics::getControlBackgroundColor()+"; color: "+COLOR_ORANGE+
-                           "; border-style: solid; border-color: "+COLOR_ORANGE+"; border-width: 1px; border-radius: 1px;}"
+                           "QPushButton{background-color: "+Graphics::COLOR_WINDOW_WIDGET+"; color: "+Graphics::COLOR_TEXT_LABEL+
+                           "; border-style: solid; border-color: "+Graphics::COLOR_TEXT_LABEL+"; border-width: 1px; border-radius: 1px;}"
+                           "QPushButton:checked{background-color: "+Graphics::COLOR_WINDOW_WIDGET+"; color: "+Graphics::COLOR_WARNING+
+                           "; border-style: solid; border-color: "+Graphics::COLOR_WARNING+"; border-width: 1px; border-radius: 1px;}"
                            "QPushButton:hover{border-width: 2px;}");
     btnHold->hide();
     titleBarLayout->addWidget(btnHold);
@@ -41,19 +39,19 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     QPushButton *down = new QPushButton();
     down->resize(10,10);
     down->setStyleSheet("QPushButton{image: url("+Graphics::getGraphicsPath()+"dock.png);}"
-                        "QPushButton:hover{background-color: "+Graphics::getHoverColor()+";}");
+                        "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}");
     titleBarLayout->addWidget(down);
 
     QPushButton *up = new QPushButton();
     up->resize(10,10);
     up->setStyleSheet("QPushButton{image: url("+Graphics::getGraphicsPath()+"unDock.png);}"
-                      "QPushButton:hover{background-color: "+Graphics::getHoverColor()+";}");
+                      "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}");
     titleBarLayout->addWidget(up);
 
     QPushButton *exit = new QPushButton();
     exit->resize(10,10);
     exit->setStyleSheet("QPushButton{image: url("+Graphics::getGraphicsPath()+"exit.png);}"
-                        "QPushButton:hover{background-color: rgb(120, 50, 50);}");
+                        "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER_EXIT+";}");
     titleBarLayout->addWidget(exit);
 
     connect(up,SIGNAL(clicked()),this,SLOT(unDockOrMaximize()));

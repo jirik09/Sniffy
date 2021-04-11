@@ -1,35 +1,16 @@
 #include "graphics.h"
 
-static AbstractGraphics *theme = nullptr;
+QSharedPointer<AbstractTheme> Graphics::theme = nullptr;
+QList<QString> *Graphics::themeList = nullptr;
 
-QString Graphics::IMAGE_UNITS_HZ;
-QString Graphics::IMAGE_UNITS_SEC;
-QString Graphics::IMAGE_UNITS_VOLT;
-QString Graphics::IMAGE_UNITS_VRIPPLE;
-QString Graphics::IMAGE_UNITS_VMAX;
-QString Graphics::IMAGE_UNITS_VMIN;
-QString Graphics::IMAGE_SIGN_PERCENT;
-QString Graphics::IMAGE_SIGN_ERR;
-QString Graphics::IMAGE_SIGN_ERRAVG;
-QString Graphics::IMAGE_SIGN_AVG;
-QString Graphics::IMAGE_SIGN_PLSMNS;
+QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {  
+    [] { return QSharedPointer<AbstractTheme>(new Dark); },
+    [] { return QSharedPointer<AbstractTheme>(new Light); },
+};
 
-Graphics::Graphics(QObject *parent, AbstractGraphics *colorTheme) : QObject(parent)
+Graphics::Graphics(QObject *parent, int themeIndex) : QObject(parent)
 {
-    theme = colorTheme;
-
-    QString path = theme->getGraphicsPath();
-    IMAGE_UNITS_HZ = "image: url("+path+"units_hz.png); border: none;";
-    IMAGE_UNITS_SEC = "image: url("+path+"units_sec.png); border: none;";
-    IMAGE_UNITS_VOLT = "image: url("+path+"units_v.png); border: none;";
-    IMAGE_UNITS_VRIPPLE = "image: url("+path+"units_Vripple.png); border: none;";
-    IMAGE_UNITS_VMAX = "image: url("+path+"units_Vmax.png); border: none;";
-    IMAGE_UNITS_VMIN = "image: url("+path+"units_Vmin.png); border: none;";
-    IMAGE_SIGN_PERCENT = "image: url("+path+"units_perc.png); border: none;";
-    IMAGE_SIGN_ERR = "image: url("+path+"units_err.png); border: none;";
-    IMAGE_SIGN_ERRAVG = "image: url("+path+"units_erravg.png); border: none;";
-    IMAGE_SIGN_AVG = "image: url("+path+"units_avg.png); border: none;";
-    IMAGE_SIGN_PLSMNS = "image: url("+path+"sign_pm.png); border: none;";
+    theme = createTheme[themeIndex]();
 }
 
 QString Graphics::getAppGlobalStyle(){
@@ -40,38 +21,6 @@ QString Graphics::getGraphicsPath(){
     return theme->getGraphicsPath();
 }
 
-QString Graphics::getAppBackgroundColor(){
-    return theme->getAppBackgroundColor();
-}
-
-QString Graphics::getDataAreaColor(){
-    return theme->getDataAreaColor();
-}
-
-QString Graphics::getControlBackgroundColor(){
-    return theme->getControlBackgroundColor();
-}
-
-QString Graphics::getButtonBackgroundColor(){
-    return theme->getButtonBackgroundColor();
-}
-
-QString Graphics::getButtonDisabledBackgroundColor(){
-    return theme->getButtonDisabledBackgroundColor();
-}
-
-QString Graphics::getTextDarkColor(){
-    return theme->getTextDarkColor();
-}
-
-QString Graphics::getTextLightColor(){
-    return theme->getTextLightColor();
-}
-
-QString Graphics::getControlsColor(){
-    return theme->getControlsColor();
-}
-
 QString Graphics::getChannelColor(int channelIndex){
     if(channelIndex > TOP_CHANNEL_COLOR_INDEX)
         return theme->getChannelColor(TOP_CHANNEL_COLOR_INDEX);
@@ -79,8 +28,35 @@ QString Graphics::getChannelColor(int channelIndex){
         return theme->getChannelColor(channelIndex);
 }
 
-QString Graphics::getHoverColor()
-{
-    return theme->getHoverColor();
+QList<QString> *Graphics::initThemesList(){
+    themeList = new QList<QString>;
+    themeList->append("Dark");
+    themeList->append("Light");
+
+    return themeList;
 }
 
+QSharedPointer<AbstractTheme> Graphics::getThemeInstance(){
+    return theme;
+}
+
+QString Graphics::COLOR_WINDOW_APP;
+QString Graphics::COLOR_WINDOW_WIDGET;
+QString Graphics::COLOR_BACKGROUND_BUTTON;
+QString Graphics::COLOR_BACKGROUND_BUTTON_DISABLED;
+QString Graphics::COLOR_BACKGROUND_FOCUS_IN;
+QString Graphics::COLOR_COMPONENT_DISABLED;
+QString Graphics::COLOR_DATA_AREA;
+QString Graphics::COLOR_CONTROLS;
+QString Graphics::COLOR_DISPLAY;
+QString Graphics::COLOR_CHART;
+QString Graphics::COLOR_CHART_GRIDLEG_DEFAULT;
+QString Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST;
+QString Graphics::COLOR_TEXT_ALL;
+QString Graphics::COLOR_TEXT_LABEL;
+QString Graphics::COLOR_TEXT_COMPONENT;
+QString Graphics::COLOR_HOVER;
+QString Graphics::COLOR_HOVER_EXIT;
+QString Graphics::COLOR_WARNING;
+QString Graphics::COLOR_ERROR;
+QString Graphics::COLOR_UNINITIALIZED;

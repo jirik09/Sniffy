@@ -87,7 +87,7 @@ void SyncPwmPainter::enableChannel(bool enable, int chanIndex){
     if(enable)
         chart->setTraceColor(chanIndex, Graphics::getChannelColor(chanIndex));
     else
-        chart->setTraceColor(chanIndex, QColor(COLOR_GREY));
+        chart->setTraceColor(chanIndex, QColor(Graphics::COLOR_COMPONENT_DISABLED));
 
     repaint();
 }
@@ -105,7 +105,7 @@ qreal SyncPwmPainter::setTimeScale(){
 }
 
 void SyncPwmPainter::configDefaultChart(){
-    chart->setGraphColor(QColor(COLOR_GREY));
+    chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
     chart->setMargins(-12, -5, -6, -10);
     chart->setLabelsVisible(true, false);
     chart->setRange(0, 1, 0, RANGE_CHAN1_LOG1 + 1);

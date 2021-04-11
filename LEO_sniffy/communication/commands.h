@@ -160,13 +160,11 @@ public:
     static const QByteArray MODE_HIGH_FREQ;
     static const QByteArray MODE_LOW_FREQ;
     static const QByteArray MODE_RATIO;
-    static const QByteArray MODE_INTERVAL;
-    QList<QByteArray> pCOUNTER_MODE;
+    static const QByteArray MODE_INTERVAL;    
 
     // Counter common
     static const QByteArray QUANT_FREQUENCY;
     static const QByteArray QUANT_PERIOD;
-    QList<QByteArray> pQUANTITIY;
 
     // Counter HF quantity
     static const QByteArray HF_QUANTITY;
@@ -178,7 +176,6 @@ public:
     static const QByteArray HF_TIME_1S;
     static const QByteArray HF_TIME_5S;
     static const QByteArray HF_TIME_10S;
-    QList<QByteArray> pHF_GATE_TIME;
 
     // Counter LF quantity
     static const QByteArray LF_CH1_QUANTITY;
@@ -193,7 +190,6 @@ public:
     static const QByteArray LF_MULTIPLIER_2X;
     static const QByteArray LF_MULTIPLIER_4X;
     static const QByteArray LF_MULTIPLIER_8X;
-    QList<QByteArray> pLF_MULTIPLIER;
 
     // Counter LF Sample Count buffer
     static const QByteArray LF_CH1_SAMPLE_COUNT;

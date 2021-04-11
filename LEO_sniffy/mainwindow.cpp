@@ -23,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->centralwidget->setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_APP+";}");
 
     setWindowTitle("LEO sniffy");
     sett = new SettingsDialog(this);
@@ -54,7 +55,7 @@ void MainWindow::createModulesWidgets(){
 
         WidgetModule[index] = new WidgetControlModule(ui->centralwidget, moduleName);
         ui->verticalLayout_modules->addWidget(WidgetModule[index]);
-        WidgetModule[index]->setStatus(ModuleStatus::STOP);
+        WidgetModule[index]->setStatus(ModuleStatus::STOP);        
         WidgetModule[index]->hide();
 
         dockWidget[index] = new ModuleDockWidget(this, moduleName);
@@ -86,7 +87,7 @@ void MainWindow::setupMainWindowComponents(){
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
-    horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+    horizontalLayout->setObjectName("horizontalLayout");
 
     //    animation = new QPropertyAnimation(ui->centralwidget, "size", this);
     //    animation->setDuration(355);

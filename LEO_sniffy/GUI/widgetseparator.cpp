@@ -9,7 +9,7 @@ WidgetSeparator::WidgetSeparator(QWidget *parent, QString name) :
     ui(new Ui::WidgetSeparator)
 {
     ui->setupUi(this);
-    ui->label_name->setText(name);
+    ui->label_name->setText(name);           
 }
 
 void WidgetSeparator::hideLine(){

@@ -7,9 +7,10 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     config(config)
 {
     ui->setupUi(this);
+    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
 
     //setup displays
-    QString styleSheet = Graphics::IMAGE_UNITS_VOLT;
+    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_v.png); border: none;";
     WidgetDisplay *display;
 
     display  = new WidgetDisplay("Voltmeter_CH1", "Channel 1", styleSheet, true, 1, HISTORY_SIZE, this);
@@ -32,7 +33,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     foreach(WidgetDisplay * dis, displays){
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
-        dis->configLabel(2,"VOLTAGE",QString::fromUtf8(COLOR_GREY),true);
+        dis->configLabel(2,"VOLTAGE",Graphics::COLOR_UNINITIALIZED,true);
         ui->verticalLayout_display->addWidget(dis);
     }
 
@@ -89,7 +90,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonsCalc->setText("Min/Max",0);
     buttonsCalc->setText("Ripple",1);
     buttonsCalc->setText("None",2);
-    buttonsCalc->setColor(COLOR_GREY,2);
+    buttonsCalc->setColor(Graphics::COLOR_UNINITIALIZED,2);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
     QSpacerItem *verticalSpacer;
@@ -112,7 +113,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonStartLog->setObjectName("buttonlogcontrol");
     tabs->getLayout(1)->addWidget(buttonStartLog);
     buttonStartLog->setText("Start",0);
-    buttonStartLog->setColor(QString::fromUtf8(COLOR_GREEN),0);
+    buttonStartLog->setColor(Graphics::COLOR_UNINITIALIZED,0);
     buttonStartLog->enableAll(false);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
@@ -155,18 +156,18 @@ void VoltmeterWindow::showData(ChannelData data[], int numChannels){
         if(buttonsCalc->getSelectedIndex()==0){
             displays.at(i)->displayQerrString(displays.at(i)->formatNumber(data[i].min,'f',4));
             displays.at(i)->displayTerrString(displays.at(i)->formatNumber(data[i].max,'f',4));
-            QString styleSheet = Graphics::IMAGE_UNITS_VMAX;
+            QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vmax.png); border: none;";
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = Graphics::IMAGE_UNITS_VMIN;
+            styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vmin.png); border: none;";
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
         }else if(buttonsCalc->getSelectedIndex()==1){
             displays.at(i)->displayQerrString(displays.at(i)->formatNumber(data[i].frequency,'f',4));
             displays.at(i)->displayTerrString(displays.at(i)->formatNumber(data[i].ripple,'f',4));
-            QString styleSheet = Graphics::IMAGE_UNITS_VRIPPLE;
+            QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vripple.png); border: none;";
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = Graphics::IMAGE_UNITS_HZ;
+            styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
@@ -187,18 +188,18 @@ void VoltmeterWindow::showEmptyCalcs(){
         if(buttonsCalc->getSelectedIndex()==0){
             displays.at(i)->displayQerrString("--");
             displays.at(i)->displayTerrString("--");
-            QString styleSheet = Graphics::IMAGE_UNITS_VMAX;
+            QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vmax.png); border: none;";
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = Graphics::IMAGE_UNITS_VMIN;
+            styleSheet =  "image: url("+Graphics::getGraphicsPath()+"units_Vmin.png); border: none;";
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
         }else if(buttonsCalc->getSelectedIndex()==1){
             displays.at(i)->displayQerrString("--");
             displays.at(i)->displayTerrString("--");
-            QString styleSheet = Graphics::IMAGE_UNITS_VRIPPLE;
+            QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vripple.png); border: none;";
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = Graphics::IMAGE_UNITS_HZ;
+            styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
@@ -223,7 +224,7 @@ void VoltmeterWindow::showProgress(int current, int max){
 void VoltmeterWindow::setPins(QString pins[], int numOfCh)
 {
     for(int i = 0;i<numOfCh;i++){
-        displays.at(i)->configLabel(1,"pin "+pins[i],QString::fromUtf8(COLOR_GREY),true);
+        displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::COLOR_UNINITIALIZED,true);
     }
 }
 
@@ -251,7 +252,7 @@ void VoltmeterWindow::stopDatalog()
         logFile->close();
         isDataLogRunning = false;
         buttonStartLog->setText("Start",0);
-        buttonStartLog->setColor(QString::fromUtf8(COLOR_GREEN),0);
+        buttonStartLog->setColor(Graphics::COLOR_UNINITIALIZED,0);
         buttonSelectFile->enableAll(true);
         labelFile->setValue("Log stopped (" + QString::number(logSampleIndex) + " smpl)");
     }
@@ -279,7 +280,7 @@ void VoltmeterWindow::startDatalog()
             *logStream << "\n";
             isDataLogRunning = true;
             buttonStartLog->setText("Stop",0);
-            buttonStartLog->setColor(QString::fromUtf8(COLOR_RED),0);
+            buttonStartLog->setColor(Graphics::COLOR_UNINITIALIZED,0);
             buttonSelectFile->enableAll(false);
         }else{
             labelFile->setValue("Error opening file");

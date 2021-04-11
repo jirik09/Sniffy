@@ -43,8 +43,8 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
     buttonSWSweepEnable = new WidgetButtons (parent,2,ButtonTypes::RADIO,"SW sweep CH1",0);
     buttonSWSweepEnable->setText("   Off   ",0);
     buttonSWSweepEnable->setText("   On   ",1);
-    buttonSWSweepEnable->setColor(Graphics::getControlsColor(),0);
-    buttonSWSweepEnable->setColor(Graphics::getControlsColor(),1);
+    buttonSWSweepEnable->setColor(Graphics::COLOR_CONTROLS,0);
+    buttonSWSweepEnable->setColor(Graphics::COLOR_CONTROLS,1);
     buttonSWSweepEnable->setObjectName("arbGenSweepbtn");
 
     QHBoxLayout *commonButtons = new QHBoxLayout();
@@ -64,17 +64,17 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
     dialFreqSweepMin = new WidgetDialRange(parent,"Min frequency");
     dialFreqSweepMin->setObjectName("arbGenfreqSweepMin");
     dialFreqSweepMin->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
-    dialFreqSweepMin->setColor(COLOR_GREY);
+    dialFreqSweepMin->setColor(Graphics::COLOR_UNINITIALIZED);
 
     dialFreqSweepMax = new WidgetDialRange(parent,"Max frequency");
     dialFreqSweepMax->setObjectName("arbGenfreqSweepMax");
     dialFreqSweepMax->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
-    dialFreqSweepMax->setColor(COLOR_GREY);
+    dialFreqSweepMax->setColor(Graphics::COLOR_UNINITIALIZED);
 
     dialFreqSweepTime = new WidgetDialRange(parent,"Sweep time");
     dialFreqSweepTime->setObjectName("arbGenfreqSweeptime");
     dialFreqSweepTime->setRange(0.1,60,"s",10,0.1,1,true);
-    dialFreqSweepTime->setColor(COLOR_GREY);
+    dialFreqSweepTime->setColor(Graphics::COLOR_UNINITIALIZED);
 
     sweepControl->addWidget(dialFreqSweepMin);
     sweepControl->addWidget(dialFreqSweepMax);

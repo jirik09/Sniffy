@@ -7,6 +7,7 @@ CounterWindow::CounterWindow(CounterConfig *conf, QWidget *parent) :
     conf(conf)
 {
     ui->setupUi(this);
+    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
 
     /* Left panel for data display */
     createAllDisplays();
@@ -53,17 +54,20 @@ void CounterWindow::configureCounterTabs(void){
 void CounterWindow::createAllDisplays(void){
     displayHF = createHighFreqDisplay();
     displayHF->setContentsMargins(5, 5, 5, 5);
-    //displayHF->setProgressBarColor(Graphics::getChannelColor(CHANNEL_1));
+    displayHF->setIndicationFlagColor(Graphics::getChannelColor(CHANNEL_1));
+    displayHF->setProgressBarColor(Graphics::getChannelColor(CHANNEL_1));
     ui->verticalLayout_display->addWidget(displayHF);
 
     displayLFCh1 = createLowFreqDisplays("LowFreqCh1Counter");
     displayLFCh1->setContentsMargins(5, 5, 5, 5);
-    //displayLFCh1->setProgressBarColor(Graphics::getChannelColor(CHANNEL_1));
+    displayLFCh1->setIndicationFlagColor(Graphics::getChannelColor(CHANNEL_1));
+    displayLFCh1->setProgressBarColor(Graphics::getChannelColor(CHANNEL_1));
     ui->verticalLayout_display->addWidget(displayLFCh1);
 
     displayLFCh2 = createLowFreqDisplays("LowFreqCh2Counter");
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
-    //displayLFCh2->setProgressBarColor(Graphics::getChannelColor(CHANNEL_2));
+    displayLFCh2->setIndicationFlagColor(Graphics::getChannelColor(CHANNEL_2));
+    displayLFCh2->setProgressBarColor(Graphics::getChannelColor(CHANNEL_2));
     ui->verticalLayout_display->addWidget(displayLFCh2);
 
     displayRat = createRatioDisplay();
@@ -76,16 +80,16 @@ void CounterWindow::createAllDisplays(void){
 }
 
 WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
-    QString styleSheet = Graphics::IMAGE_UNITS_HZ;
+    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
     WidgetDisplay *display  = new WidgetDisplay("HighFreqCounter", LITERAL_FREQUENCY, styleSheet, true, 4, HISTORY_SIZE, this);
-    styleSheet = Graphics::IMAGE_SIGN_AVG;
+    styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_avg.png); border: none;";
     display->setAvgStyle(styleSheet);
     configureErrorStyles(display);
     return display;
 }
 
 WidgetDisplay *CounterWindow::createLowFreqDisplays(QString name){
-    QString styleSheet = Graphics::IMAGE_UNITS_HZ;
+    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
     WidgetDisplay *display = new WidgetDisplay(name, LITERAL_FREQUENCY, styleSheet, true, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
@@ -95,9 +99,9 @@ WidgetDisplay *CounterWindow::createLowFreqDisplays(QString name){
 WidgetDisplay *CounterWindow::createRatioDisplay(void){
     QString styleSheet = "";
     WidgetDisplay *display  = new WidgetDisplay("RatioCounter", LITERAL_RATIO, styleSheet, false, 1, HISTORY_SIZE, this);
-    styleSheet = Graphics::IMAGE_SIGN_ERR;
+    styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
     display->setErrStyle(styleSheet);
-    styleSheet = Graphics::IMAGE_SIGN_PLSMNS;
+    styleSheet = "image: url("+Graphics::getGraphicsPath()+"sign_pm.png); border: none;";
     display->setTerrStyle(styleSheet);
     display->showAvgDisplay(false);
     display->showTerrStyle(false);
@@ -105,7 +109,7 @@ WidgetDisplay *CounterWindow::createRatioDisplay(void){
 }
 
 WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
-    QString styleSheet = Graphics::IMAGE_UNITS_SEC;
+    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_sec.png); border: none;";
     WidgetDisplay *display  = new WidgetDisplay("IntervalsCounter", LITERAL_INTERVAL, styleSheet, false, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
@@ -114,10 +118,10 @@ WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
 }
 
 void CounterWindow::configureErrorStyles(WidgetDisplay *display){
-    QString styleSheet = Graphics::IMAGE_SIGN_ERR;
-    styleSheet = Graphics::IMAGE_SIGN_ERR;
+    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
+    styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
     display->setErrStyle(styleSheet);
-    styleSheet = Graphics::IMAGE_SIGN_PLSMNS;
+    styleSheet = "image: url("+Graphics::getGraphicsPath()+"sign_pm.png); border: none;";
     display->setQerrStyle(styleSheet);
     display->setTerrStyle(styleSheet);
 }
@@ -135,7 +139,7 @@ void CounterWindow::configureAllDisplays(void){
 }
 
 void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor){
-    display->configLabel(LABELNUM_QUAN, quantity, Graphics::getTextDarkColor(), true);
+    display->configLabel(LABELNUM_QUAN, quantity, Graphics::COLOR_TEXT_LABEL, true);
     display->configLabel(LABELNUM_CHAN, channel, sideLabelsColor, true);
     display->configLabel(LABELNUM_INDIC, "    ", sideLabelsColor, true);
 }
@@ -252,10 +256,10 @@ void CounterWindow::switchQuantity(int index, WidgetDisplay *display){
     QString unitsStyleSheet;
     if(index == 0){
         display->setLabelText(LABELNUM_QUAN, LITERAL_FREQUENCY);
-        unitsStyleSheet = Graphics::IMAGE_UNITS_HZ;
+        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
     }else if (index == 1) {
         display->setLabelText(LABELNUM_QUAN, LITERAL_PERIOD);
-        unitsStyleSheet = Graphics::IMAGE_UNITS_SEC;
+        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_sec.png); border: none;";
     }
     display->setUnitsStyle(unitsStyleSheet);
 }
@@ -279,12 +283,17 @@ void CounterWindow::hfSwitchQuantityCallback(int index){
 }
 
 void CounterWindow::hfSwitchErrorAvgCallback(int index){
-    QString unitsStyleSheet = (index == 0) ? Graphics::IMAGE_SIGN_ERR : Graphics::IMAGE_SIGN_ERRAVG;
+    QString unitsStyleSheet;
+    if(index == 0)
+        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
+    else
+        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_erravg.png); border: none;";
+
     displayHF->setErrStyle(unitsStyleSheet);
 }
 
 void CounterWindow::hfSetColorRemainSec(bool waiting){
-    QColor color = (waiting) ? Graphics::getTextDarkColor() : Graphics::getTextLightColor();
+    QColor color = (waiting) ? Graphics::COLOR_TEXT_LABEL : Graphics::COLOR_TEXT_ALL;
     displayHF->changeAvgColor(color);
 }
 
@@ -343,9 +352,9 @@ void CounterWindow::lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavai
     display->setLabelText(LABELNUM_QUAN, "PULSE WIDTH  |  DUTY CYCLE");
     display->setLabelText(LABELNUM_PINS, pin);
 
-    QString unitsStyleSheet = Graphics::IMAGE_UNITS_SEC;
+    QString unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_sec.png); border: none;";
     display->setAvgStyle(unitsStyleSheet);
-    unitsStyleSheet = Graphics::IMAGE_SIGN_PERCENT;
+    unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_perc.png); border: none;";
     display->setUnitsStyle(unitsStyleSheet);
     unitsStyleSheet = "";
     unavailDisplay->setUnitsStyle(unitsStyleSheet);
@@ -358,7 +367,7 @@ void CounterWindow::lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavai
     unavailDisplay->showBarDisplay(false);
     unavailDisplay->setLabelText(LABELNUM_FLAG, LITERAL_NO_DATA);
 
-    unavailDisplay->drawIndicationFlag(LABELNUM_INDIC, "clear");
+    unavailDisplay->clearIndicationFlag(LABELNUM_INDIC);
     clearDisplay(unavailDisplay, false);
     clearDisplay(display, true);
 }
@@ -387,7 +396,11 @@ void CounterWindow::lfShowDutyCycleDisplays(WidgetDisplay *display, bool dutyEna
 
 void CounterWindow::lfShowErrorStyle(WidgetDisplay *display, bool show){
     QString unitsStyleSheet;
-    unitsStyleSheet = (show) ? Graphics::IMAGE_SIGN_ERR: "";
+    if(show)
+        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
+    else
+        unitsStyleSheet = "";
+
     display->setErrStyle(unitsStyleSheet);
 }
 

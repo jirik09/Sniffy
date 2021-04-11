@@ -33,7 +33,7 @@ public:
 
     QLabel *labelPicEventsSeq;
 
-    QPixmap *pixmapEventsSeq;
+    QPixmap *pixmapEventsSeq = nullptr;
 
     void loadGraphics();
 

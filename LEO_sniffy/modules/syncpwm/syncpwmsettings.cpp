@@ -9,19 +9,19 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
     switchStepMode = new WidgetSwitch(parent, " Continuous ", "     Step     ", "");
     switchStepMode->setObjectName("syncPwmStepButton");
-    switchStepMode->setColor(Graphics::getControlsColor());
+    switchStepMode->setColor(Graphics::COLOR_CONTROLS);
 
     buttonStart = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonStart->setText("Start", 0);
     buttonStart->setChecked(false, 0);
     buttonStart->setObjectName("syncPwmStartButton");
-    buttonStart->setColor(Graphics::getControlsColor(),0);
+    buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
 
     buttonEquidist = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonEquidist->setText("Equidistant", 0);
     buttonEquidist->setObjectName("syncPwmEquidistButton");
     buttonEquidist->setChecked(false, 0);
-    buttonEquidist->setColor(Graphics::getControlsColor(), 0);
+    buttonEquidist->setColor(Graphics::COLOR_CONTROLS, 0);
 
     QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
     QHBoxLayout *commonButtons = new QHBoxLayout();
@@ -120,10 +120,8 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
 }
 
 void SyncPwmSettings::greyOutComplementChanFreqDials(int chanIndex){
-    QString colDisable = Graphics::getButtonDisabledBackgroundColor();
-
     dialFreqCh[chanIndex]->setDisabled(true);
-    dialFreqCh[chanIndex]->setColor(colDisable);
+    //dialFreqCh[chanIndex]->setColor(Graphics::COLOR_COMPONENT_DISABLED);
 }
 
 

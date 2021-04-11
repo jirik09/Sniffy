@@ -57,7 +57,7 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
     }
 
     for(int i = 0; i < 8 ; i++){
-        setColor(Graphics::getControlsColor(),i);
+        setColor(Graphics::COLOR_CONTROLS,i);
     }
 
     connect(ui->pushButton_1,SIGNAL(clicked()),this,SLOT(button_1_Clicked()));
@@ -132,12 +132,13 @@ void WidgetButtons::setColor(QString text, int index){
     QString tempStyleSheet = "";
     if (index>=0 && index<8){
         if(type == ButtonTypes::CHECKABLE || type == ButtonTypes::RADIO){
-            tempStyleSheet = "QPushButton:disabled{background-color:"+Graphics::getButtonDisabledBackgroundColor()+"; color:"+COLOR_GREY+";}"
-                             "QPushButton{border: none;background-color:"+Graphics::getButtonBackgroundColor()+";}"
+            tempStyleSheet = "QPushButton:disabled{background-color:"+Graphics::COLOR_BACKGROUND_BUTTON_DISABLED+"; color:"+Graphics::COLOR_WINDOW_WIDGET+";}"
+                             "QPushButton{border: none;background-color:"+Graphics::COLOR_BACKGROUND_BUTTON+";}"
                              "QPushButton:checked{border: none;background-color:"+text+";}";
-        }else{
-            tempStyleSheet = "QPushButton:disabled{background-color:"+Graphics::getButtonDisabledBackgroundColor()+"; color:"+COLOR_GREY+";}"
-                             "QPushButton:pressed{border: 2px solid"+Graphics::getAppBackgroundColor()+";}"
+
+        }else{            
+            tempStyleSheet = "QPushButton:disabled{background-color:"+Graphics::COLOR_BACKGROUND_BUTTON_DISABLED+"; color:"+Graphics::COLOR_WINDOW_WIDGET+";}"
+                             "QPushButton:pressed{border: 2px solid"+Graphics::COLOR_WINDOW_APP+";}"
                              "QPushButton{border: none;background-color:"+text+";}";
         }
         pushButtonsList.at(index)->setStyleSheet(tempStyleSheet);

@@ -8,7 +8,7 @@ QString CustomSettings::settingFile;
 int CustomSettings::restoreSession;
 int CustomSettings::sessionRestoreAnswer;
 int CustomSettings::themeIndex;
-QList<QString> CustomSettings::themesList;
+QList<QString> *CustomSettings::themesList = nullptr;
 
 void CustomSettings::loadSettings(QString fileName)
 {
@@ -88,10 +88,15 @@ int CustomSettings::getThemeIndex()
 
 void CustomSettings::addTheme(QString name)
 {
-    themesList.append(name);
+    themesList->append(name);
 }
 
-QList<QString> CustomSettings::getThemesList()
+void CustomSettings::setThemesList(QList<QString> *list)
+{
+    themesList = list;
+}
+
+QList<QString>* CustomSettings::getThemesList()
 {
     return themesList;
 }

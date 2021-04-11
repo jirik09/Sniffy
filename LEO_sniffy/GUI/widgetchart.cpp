@@ -12,7 +12,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->legend()->hide();
     chart->setObjectName("chart");
 
-    chart->setBackgroundBrush(QColor(Graphics::getDataAreaColor()));
+    chart->setBackgroundBrush(QColor(Graphics::COLOR_DATA_AREA));
     chart->setAcceptHoverEvents(true);
     this->setMouseTracking(true);
     //chart->setToolTip("¯\\_(ツ)_/¯");

@@ -1,13 +1,15 @@
-#ifndef LIGHTTHEME_H
-#define LIGHTTHEME_H
+#ifndef LIGHT_H
+#define LIGHT_H
 
 #include <QObject>
 #include <QColor>
 
-#include "../abstractgraphics.h"
+#include "../abstracttheme.h"
+#include "../graphics.h"
 
 /* BACKGROUNDS */
 #define LIGHT_BACKGROUND_APP "#303030"
+#define LIGHT_BACKGROUND_WIDGET "#d6d6d6"
 #define LIGHT_BACKGROUND_DATA_AREA "#262626"
 #define LIGHT_BACKGROUND_CONTROL "#3a3a3a"
 #define LIGHT_BACKGROUND_BUTTON "#262626"
@@ -20,13 +22,18 @@
 
 /* SPECIAL PURPOSE */
 #define LIGHT_HOVER "#474c5e"
+#define LIGHT_COMPONENT_DISABLED "#b7b7b7"
+#define LIGHT_ERROR "#bd4236"
+#define LIGHT_WARNING "#d2803c"
+
+/* CHART GRID & LEGEND */
+#define LIGHT_CHART_DARK "#333333"
+#define LIGHT_CHART_LIGHT "#878787"
 
 /* CONTROLS */
 #define LIGHT_CONTROLS "#4c5259"
 
 /* COLORS */
-#define LIGHT_FULL_BLACK "#000000"
-#define LIGHT_FULL_WHITE "#ffffff"
 #define LIGHT_BLUE "#2fa0d0"
 #define LIGHT_ORANGE "#d2803c"
 #define LIGHT_GREEN "#2cb689"
@@ -46,26 +53,17 @@
 #define LIGHT_CHANNEL_7 LIGHT_BLUE_DARK
 #define LIGHT_CHANNEL_8 LIGHT_PINK
 
-class LightTheme : public AbstractGraphics
+class Light : public AbstractTheme
 {
     Q_OBJECT
 public:
-    explicit LightTheme(QObject *parent = nullptr);
+    explicit Light(QObject *parent = nullptr);
 
     QString getThemeName();
     QString getAppGlobalStyle();
     QString getGraphicsPath();
 
-    QString getAppBackgroundColor();
-    QString getDataAreaColor();
-    QString getControlBackgroundColor();
-    QString getButtonBackgroundColor();
-    QString getButtonDisabledBackgroundColor();
-    QString getTextDarkColor();
-    QString getTextLightColor();
-    QString getControlsColor();
     QString getChannelColor(int channelIndex);
-    QString getHoverColor();
 
 private:
 
@@ -81,4 +79,4 @@ signals:
 
 };
 
-#endif // LIGHTTHEME_H
+#endif // LIGHT_H

@@ -4,11 +4,11 @@ Counter::Counter(QObject *parent)
 {
     Q_UNUSED(parent);
     config = new CounterConfig(this);
-    cntWindow = new CounterWindow(config);    
+    cntWindow = new CounterWindow(config);
 
     moduleCommandPrefix = cmd->COUNTER;
     moduleName = "Counter";
-    moduleIconURI = ":/graphics/graphics/icon_counter.png";   
+    moduleIconURI = ":/graphics/graphics/icon_counter.png";
 
     movAvg = new MovingAverage(2, cntWindow->tabHighFreq);
 
@@ -130,22 +130,28 @@ void Counter::displayValues(WidgetDisplay *display, QString val, QString avg, QS
     display->displayString(val);
     display->displayQerrString(qerr);
     display->displayTerrString(terr);
-    QString color = (display == cntWindow->displayLFCh2) ? "grey" : "blue";
-    display->drawIndicationFlag(LABELNUM_INDIC, color);
+
+    QString color = Graphics::getChannelColor(0);
+    if(display == cntWindow->displayLFCh2)
+        color = Graphics::getChannelColor(1);
+
+    display->drawIndicationFlag(LABELNUM_INDIC);
     cntWindow->displayFlagHoldOn(display, false);
 }
 
 void Counter::switchCounterModeCallback(int index){
     config->mode = (CounterMode)index;
-    write(cmd->COUNTER_MODE, cmd->pCOUNTER_MODE.at(index));
-    //reloadModeState[index];
     if(index == 0){
+        write(cmd->COUNTER_MODE, cmd->MODE_HIGH_FREQ);
         hfReloadState();
     }else if (index == 1) {
+        write(cmd->COUNTER_MODE, cmd->MODE_LOW_FREQ);
         lfReloadState();
     }else if (index == 2) {
+        write(cmd->COUNTER_MODE, cmd->MODE_RATIO);
         ratReloadState();
     }else if (index == 3) {
+        write(cmd->COUNTER_MODE, cmd->MODE_INTERVAL);
         intReloadState();
     }
 }
@@ -166,10 +172,6 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     QString strAvg, strQerr, strTerr; // strVal
     QDataStream streamBuffLeng(data);
     streamBuffLeng >> val >> qerr >> terr;
-
-//    if(val<0) val = 0;
-//    if(qerr<0) qerr = 0;
-//    if(terr<0) terr = 0;
 
     WidgetDisplay *display = cntWindow->displayHF;
 
@@ -261,24 +263,33 @@ void Counter::hfDisplayErrors(){
 void Counter::hfSwitchQuantityCallback(int index){
     config->hfState.quantState = HFState::QuantitySwitched::YES;
     config->hfState.quantity = (HFState::Quantity)index;
-    write(cmd->HF_QUANTITY, cmd->pQUANTITIY.at(index));
+
+    if(config->hfState.quantity == HFState::Quantity::FREQUENCY)
+        write(cmd->HF_QUANTITY, cmd->QUANT_FREQUENCY);
+    else
+        write(cmd->HF_QUANTITY, cmd->QUANT_PERIOD);
+
     cntWindow->clearDisplay(cntWindow->displayHF, true);
     cntWindow->displayHF->displayAvgString("");
 }
 
 void Counter::hfSwitchGateTimeCallback(int index){
     config->hfState.gateTimeIndexBackup = index;
-    write(cmd->HF_GATE_TIME, cmd->pHF_GATE_TIME.at(index));
 
     if(index == 0){
+        write(cmd->HF_GATE_TIME, cmd->HF_TIME_100M);
         config->hfState.gateTime = HFState::GateTime::GATE_TIME_100M;
     }else if(index == 1){
+        write(cmd->HF_GATE_TIME, cmd->HF_TIME_500M);
         config->hfState.gateTime = HFState::GateTime::GATE_TIME_500M;
     }else if(index == 2){
+        write(cmd->HF_GATE_TIME, cmd->HF_TIME_1S);
         config->hfState.gateTime = HFState::GateTime::GATE_TIME_1S;
     }else if(index == 3){
+        write(cmd->HF_GATE_TIME, cmd->HF_TIME_5S);
         config->hfState.gateTime = HFState::GateTime::GATE_TIME_5S;
     }else if(index == 4){
+        write(cmd->HF_GATE_TIME, cmd->HF_TIME_10S);
         config->hfState.gateTime = HFState::GateTime::GATE_TIME_10S;
     }
     movAvg->clear();
@@ -397,6 +408,7 @@ void Counter::lfSwitchChannelCallback(int index){
 void Counter::lfSwitchQuantityCallback(int index){
     QByteArray chanQuant;
     WidgetDisplay *display = cntWindow->displayLFCh1;
+
     if(config->lfState.activeChan == LFState::ActiveChan::CHAN1){
         config->lfState.chan1.quantity = (LFState::Channel::Quantity)index;
         display = cntWindow->displayLFCh1;
@@ -406,12 +418,16 @@ void Counter::lfSwitchQuantityCallback(int index){
         display = cntWindow->displayLFCh2;
         chanQuant = cmd->LF_CH2_QUANTITY;
     }
+
     lfSwitchQuantity(index, chanQuant);
     cntWindow->clearDisplay(display, true);
 }
 
 void Counter::lfSwitchQuantity(int index, QByteArray channelQuantitiy){
-    write(channelQuantitiy, cmd->pQUANTITIY.at(index));
+    if(index == 0)
+        write(channelQuantitiy, cmd->QUANT_FREQUENCY);
+    else
+        write(channelQuantitiy, cmd->QUANT_PERIOD);
 }
 
 void Counter::lfSwitchMultiplierCallback(int index){
@@ -427,7 +443,23 @@ void Counter::lfSwitchMultiplierCallback(int index){
 }
 
 void Counter::lfSwitchMultiplier(int index, QByteArray channelMultiplier){
-    write(channelMultiplier, cmd->pLF_MULTIPLIER.at(index));
+    switch(index){
+    case 0:
+        write(channelMultiplier, cmd->LF_MULTIPLIER_1X);
+        break;
+    case 1:
+        write(channelMultiplier, cmd->LF_MULTIPLIER_2X);
+        break;
+    case 2:
+        write(channelMultiplier, cmd->LF_MULTIPLIER_4X);
+        break;
+    case 3:
+        write(channelMultiplier, cmd->LF_MULTIPLIER_8X);
+        break;
+    default:
+        break;
+    }
+
     if(config->lfState.activeChan == LFState::ActiveChan::CHAN1){
         cntWindow->clearDisplay(cntWindow->displayLFCh1, true);
     }else {
@@ -483,7 +515,7 @@ void Counter::parseRatioCounter(QByteArray data){
 
         cntWindow->displayFlagHoldOn(display, false);
         cntWindow->showPMErrorSigns(display, true);
-        display->drawIndicationFlag(LABELNUM_INDIC, "blue");
+        display->drawIndicationFlag(LABELNUM_INDIC);
 
         /* History section */
         cntWindow->appendNewHistorySample(display, "Ratio: ", val, "");
@@ -583,7 +615,7 @@ void Counter::intDialTimeoutChangedCallback(float val){
 
 void Counter::writeConfiguration(){ //tahle funkce se vola vzdy pri otevreni modulu
     cntWindow->restoreGUIAfterStartup();
-    switchCounterModeCallback((int)config->mode);    
+    switchCounterModeCallback((int)config->mode);
 }
 
 void Counter::parseConfiguration(QByteArray config){    
