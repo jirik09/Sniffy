@@ -20,6 +20,7 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
 //                    "font: 99 12pt 'MS Shell Dlg 2';font-weight:bold;}";
 //    ui->widget_5->setStyleSheet(style);
 
+    // TODO: put in global style
     QString style = "QWidget:disabled{color:"+Graphics::COLOR_COMPONENT_DISABLED+";}"
             "QWidget{color:"+Graphics::COLOR_TEXT_COMPONENT+";}";
     ui->widget->setStyleSheet(style);

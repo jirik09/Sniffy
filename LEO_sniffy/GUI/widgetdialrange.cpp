@@ -19,6 +19,7 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
 {
     ui->setupUi(this);
 
+    // TODO: put in global style
     QString style =  "QLineEdit{border:none;background-color: rgb(48, 48, 48);"
                      "font: 12pt 'MS Shell Dlg 2';padding:0px;margin:0px;}";
     this->WidgetDialRange::setStyleSheet(style);
@@ -28,6 +29,7 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
 //                    "font: 99 12pt 'MS Shell Dlg 2';font-weight:bold;}";
 //    ui->widget_5->setStyleSheet(style);
 
+    // TODO: put in global style
     style = "QWidget:disabled{color:"+Graphics::COLOR_COMPONENT_DISABLED+";}"
                     "QWidget{color:"+Graphics::COLOR_TEXT_COMPONENT+";}";
 

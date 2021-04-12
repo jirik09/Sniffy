@@ -6,6 +6,8 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     ui(new Ui::widgetLabelArea)
 {
     ui->setupUi(this);
+    ui->label_scale->setStyleSheet("QLabel{text-align:center}");
+
     ui->widget_Hcursors->hide();
     ui->widget_Vcursors->hide();
     ui->widget_meas->hide();

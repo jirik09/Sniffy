@@ -23,7 +23,9 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->widget->setStyleSheet("border:none");
     ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_sniffy.png);");
+    // TODO: put in global style
     ui->centralwidget->setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_APP+";}"
                                      "QWidget#centralwidget{border-right: 1px solid"+Graphics::COLOR_TEXT_LABEL+";}");
 

@@ -13,11 +13,16 @@ WidgetControlModule::WidgetControlModule(QWidget *parent, QString name) :
 {
     ui->setupUi(this);
 
-        ui->pushButton_name->setText(name);
-        ui->widget_status->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"status_stop.png)");
-        connect(ui->pushButton_name,SIGNAL(clicked()),this,SLOT(clickedInternal()));
+    // TODO: put in global style
+    QString style = "QPushButton {text-align:left;}"
+                    "QPushButton:hover{background-color: rgb(38, 38, 38);text-align:left;border-radius: 5px;}";
+    ui->pushButton_name->setStyleSheet(style);
 
-        status = ModuleStatus::STOP;
+    ui->pushButton_name->setText(name);
+    ui->widget_status->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"status_stop.png)");
+    connect(ui->pushButton_name,SIGNAL(clicked()),this,SLOT(clickedInternal()));
+
+    status = ModuleStatus::STOP;
 }
 
 WidgetControlModule::~WidgetControlModule()

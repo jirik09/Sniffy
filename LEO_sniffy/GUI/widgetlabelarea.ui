@@ -115,7 +115,7 @@
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLabel{text-align:center}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>scale</string>
