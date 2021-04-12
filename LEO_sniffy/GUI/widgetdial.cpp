@@ -14,16 +14,13 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
+    setStyleSheet(Graphics::STYLE_DIAL);
+    ui->comboBox->setStyleSheet(Graphics::STYLE_COMBO_BOX);
 
 //    QString style = "QPushButton:pressed{border: 2px solid rgb(48,48,48);}"
 //                    "QPushButton{border: none;color: rgb(214,214,214);"
 //                    "font: 99 12pt 'MS Shell Dlg 2';font-weight:bold;}";
 //    ui->widget_5->setStyleSheet(style);
-
-    // TODO: put in global style
-    QString style = "QWidget:disabled{color:"+Graphics::COLOR_COMPONENT_DISABLED+";}"
-            "QWidget{color:"+Graphics::COLOR_TEXT_COMPONENT+";}";
-    ui->widget->setStyleSheet(style);
 
     ui->label_name->setText(name);
     ui->dial->setPageStep(1);
@@ -94,13 +91,10 @@ void WidgetDial::setSelectedIndex(int index, bool silent){
 }
 
 void WidgetDial::setColor(QString color){
-    QString style = "QWidget:disabled{color:"+Graphics::COLOR_COMPONENT_DISABLED+";}"
-                    "QWidget{color:"+color+";}";
+    QString style = Graphics::STYLE_DIAL+"QWidget{color:"+color+";}";
     ui->widget_dial->setStyleSheet(style);
 
-    style = "QPushButton:disabled{background-color:"+Graphics::COLOR_BACKGROUND_BUTTON_DISABLED+"; color:"+Graphics::COLOR_WINDOW_WIDGET+";}"
-            "QPushButton:pressed{border: 2px solid"+Graphics::COLOR_WINDOW_APP+";}"
-            "QPushButton{border: none;background-color:"+color+";}";
+    style = Graphics::STYLE_PUSH_BUTTON+"QPushButton{background-color:"+color+";}";
     ui->pushButton_plus->setStyleSheet(style);
     ui->pushButton_minus->setStyleSheet(style);
 }

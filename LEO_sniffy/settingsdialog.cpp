@@ -8,6 +8,8 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Settings");
 
+    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
+
     QVBoxLayout *buttons = new QVBoxLayout();
     buttons->setSpacing(2);
     buttons->setContentsMargins(5,5,5,5);

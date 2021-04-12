@@ -13,10 +13,12 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, I
     ui->lineEdit->installEventFilter(this);
     inputType = type;
 
-    QString style = "QWidget:disabled{color: "+Graphics::COLOR_UNINITIALIZED+";} QWidget{color:"+Graphics::COLOR_UNINITIALIZED+";}";
+    QString style = "QWidget:disabled{color: "+Graphics::COLOR_UNINITIALIZED+";}"
+                    "QWidget{color:"+Graphics::COLOR_UNINITIALIZED+";}";
     ui->label->setStyleSheet(style);
 
-    style = "QWidget:disabled{color: "+Graphics::COLOR_UNINITIALIZED+";} QWidget{background-color:"+Graphics::COLOR_DATA_AREA+";color:"+Graphics::COLOR_UNINITIALIZED+";}";
+    style = "QWidget:disabled{color: "+Graphics::COLOR_UNINITIALIZED+";}"
+            "QWidget{background-color:"+Graphics::COLOR_DATA_AREA+";color:"+Graphics::COLOR_UNINITIALIZED+";}";
     ui->lineEdit->setStyleSheet(style);
 }
 

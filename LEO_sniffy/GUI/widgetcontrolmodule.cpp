@@ -12,11 +12,7 @@ WidgetControlModule::WidgetControlModule(QWidget *parent, QString name) :
     ui(new Ui::WidgetFeature)
 {
     ui->setupUi(this);
-
-    // TODO: put in global style
-    QString style = "QPushButton {text-align:left;}"
-                    "QPushButton:hover{background-color: rgb(38, 38, 38);text-align:left;border-radius: 5px;}";
-    ui->pushButton_name->setStyleSheet(style);
+    ui->pushButton_name->setStyleSheet(Graphics::STYLE_MODULE_BUTTON);
 
     ui->pushButton_name->setText(name);
     ui->widget_status->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"status_stop.png)");

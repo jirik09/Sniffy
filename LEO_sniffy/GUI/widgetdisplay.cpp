@@ -40,7 +40,7 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     QString style;
 
     style = "QObject{background-color:"+Graphics::COLOR_DISPLAY+";}";
-    this->WidgetDisplay::setStyleSheet(style);
+    setStyleSheet(style);
 
     style = "QObject{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}";
     ui->line->setStyleSheet(style);
@@ -185,8 +185,7 @@ void WidgetDisplay::setProgressBarRange(int min, int max){
 }
 
 void WidgetDisplay::setProgressBarColor(QString color){
-    ui->progressBar->setStyleSheet("QProgressBar {border: 1px solid #777; border-radius: 1px; background:"+Graphics::COLOR_DATA_AREA+";}"
-                                   "QProgressBar::chunk {background-color:"+color+"; width: 20px;}");
+    ui->progressBar->setStyleSheet(Graphics::STYLE_PROGRESS_BAR+"QProgressBar::chunk{background-color:"+color+";}");
     ui->progressBar->repaint();
 }
 

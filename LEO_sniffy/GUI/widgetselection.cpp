@@ -12,8 +12,8 @@ WidgetSelection::WidgetSelection(QWidget *parent, QString name) :
 {
     ui->setupUi(this);
     ui->label->setText(name);
-    options = new QList<params_sel>;
-    ui->comboBox->setStyleSheet("background-color:"+Graphics::COLOR_DATA_AREA+";");
+    setStyleSheet(Graphics::STYLE_COMBO_BOX);
+    options = new QList<params_sel>;    
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
 }
 

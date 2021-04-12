@@ -71,6 +71,7 @@ void SyncPwmWindow::setSpecification(SyncPwmSpec *spec){
 
 void SyncPwmWindow::restoreGUIAfterStartup(){
     uncheckStartButton();
+    uncheckEquidistantButton();
     setStartTxt();
 }
 
@@ -84,6 +85,10 @@ void SyncPwmWindow::setStopTxt(){
 
 void SyncPwmWindow::uncheckStartButton(){
     settings->buttonStart->setChecked(false, 0);
+}
+
+void SyncPwmWindow::uncheckEquidistantButton(){
+    settings->buttonEquidist->setChecked(false, 0);
 }
 
 void SyncPwmWindow::dialFreqCallback(float val, int chanIndex){

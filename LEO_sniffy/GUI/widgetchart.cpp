@@ -12,10 +12,9 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->legend()->hide();
     chart->setObjectName("chart");
 
-    chart->setBackgroundBrush(QColor(Graphics::COLOR_DATA_AREA));
+    chart->setBackgroundBrush(QColor(Graphics::COLOR_CHART));
     chart->setAcceptHoverEvents(true);
     this->setMouseTracking(true);
-    //chart->setToolTip("¯\\_(ツ)_/¯");
 
     QMargins *chrtMargin = new QMargins(0,5,0,0);
     chart->setMargins(*chrtMargin);

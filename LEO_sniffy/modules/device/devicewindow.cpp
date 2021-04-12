@@ -29,9 +29,9 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
     WidgetSeparator *availableDevices = new WidgetSeparator(WidgetSpecification,"Available devices");
     verticalLayoutSpecification->addWidget(availableDevices);
 
-    deviceSelection  = new WidgetSelection(WidgetSpecification);
+    deviceSelection = new WidgetSelection(WidgetSpecification);
     verticalLayoutSpecification->addWidget(deviceSelection);
-    deviceSelection->addOption("Scanning for available devices",-1);
+    deviceSelection->addOption("Scanning for available devices",-1);    
 
     deviceConnectButton = new WidgetButtons(WidgetSpecification,2);
     deviceConnectButton->setObjectName("connectbutton");
@@ -80,7 +80,7 @@ void DeviceWindow::hideSpecification(){
     for (it = modulesDescriptions->begin(); it != modulesDescriptions->end(); ++it){
         (*it)->hide();
     }
-    ui->widget_device->setStyleSheet("image: none;");
+    //ui->widget_device->setStyleSheet("image: none;");
     ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"no_device.png);");
 }
 

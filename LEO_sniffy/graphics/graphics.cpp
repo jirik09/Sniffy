@@ -42,8 +42,6 @@ QSharedPointer<AbstractTheme> Graphics::getThemeInstance(){
 
 QString Graphics::COLOR_WINDOW_APP;
 QString Graphics::COLOR_WINDOW_WIDGET;
-QString Graphics::COLOR_BACKGROUND_BUTTON;
-QString Graphics::COLOR_BACKGROUND_BUTTON_DISABLED;
 QString Graphics::COLOR_BACKGROUND_FOCUS_IN;
 QString Graphics::COLOR_COMPONENT_DISABLED;
 QString Graphics::COLOR_DATA_AREA;
@@ -60,3 +58,13 @@ QString Graphics::COLOR_HOVER_EXIT;
 QString Graphics::COLOR_WARNING;
 QString Graphics::COLOR_ERROR;
 QString Graphics::COLOR_UNINITIALIZED;
+
+QString Graphics::STYLE_PUSH_BUTTON;
+QString Graphics::STYLE_CHECK_BUTTON;
+QString Graphics::STYLE_PROGRESS_BAR;
+QString Graphics::STYLE_COMBO_BOX;
+
+QString Graphics::STYLE_CONTROL_BUTTON;
+QString Graphics::STYLE_MODULE_BUTTON;
+QString Graphics::STYLE_HOLD_BUTTON;
+QString Graphics::STYLE_DIAL;

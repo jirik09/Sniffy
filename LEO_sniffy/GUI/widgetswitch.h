@@ -30,8 +30,8 @@ private:
     Ui::WidgetSwitch *ui;
     int optionalEmitParam;
 
-    QString styleSelected = "background-color:" + Graphics::getChannelColor(0) + "; border: none;";
-    QString styleNotSelected = "background-color:" + Graphics::COLOR_BACKGROUND_BUTTON + "; border: none;";
+    QString styleSelected;
+    QString styleNotSelected;
 
 signals:
     void clicked(int index, int optionalEmitParam = 0);

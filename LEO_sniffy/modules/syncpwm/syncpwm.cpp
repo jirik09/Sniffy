@@ -74,6 +74,7 @@ void SyncPwm::parseData(QByteArray data){
 
 void SyncPwm::writeConfiguration(){
     spwmWindow->restoreGUIAfterStartup();
+    config->common.equiMode = false;
 
     write(cmd->SPWM_COMMAND, cmd->SPWM_INIT);
 

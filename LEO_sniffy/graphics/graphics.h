@@ -26,8 +26,6 @@ public:
 
     static QString COLOR_WINDOW_APP;
     static QString COLOR_WINDOW_WIDGET;
-    static QString COLOR_BACKGROUND_BUTTON;
-    static QString COLOR_BACKGROUND_BUTTON_DISABLED;
     static QString COLOR_BACKGROUND_FOCUS_IN;
     static QString COLOR_COMPONENT_DISABLED;
     static QString COLOR_DATA_AREA;
@@ -44,6 +42,16 @@ public:
     static QString COLOR_WARNING;
     static QString COLOR_ERROR;
     static QString COLOR_UNINITIALIZED;
+
+    static QString STYLE_PUSH_BUTTON;
+    static QString STYLE_CHECK_BUTTON;
+    static QString STYLE_PROGRESS_BAR;
+    static QString STYLE_COMBO_BOX;
+
+    static QString STYLE_CONTROL_BUTTON;
+    static QString STYLE_MODULE_BUTTON;
+    static QString STYLE_HOLD_BUTTON;
+    static QString STYLE_DIAL;    
 
 private:
     static QSharedPointer<AbstractTheme> theme;
