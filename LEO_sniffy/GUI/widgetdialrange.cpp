@@ -33,6 +33,7 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
 
     this->setMinimumSize(170,85);
     this->setMaximumSize(400,120);
+    setColor(Graphics::COLOR_CONTROLS);
 }
 
 WidgetDialRange::~WidgetDialRange()

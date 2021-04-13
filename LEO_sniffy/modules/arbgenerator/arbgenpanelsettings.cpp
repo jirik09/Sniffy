@@ -64,17 +64,14 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
     dialFreqSweepMin = new WidgetDialRange(parent,"Min frequency");
     dialFreqSweepMin->setObjectName("arbGenfreqSweepMin");
     dialFreqSweepMin->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
-    dialFreqSweepMin->setColor(Graphics::COLOR_UNINITIALIZED);
 
     dialFreqSweepMax = new WidgetDialRange(parent,"Max frequency");
     dialFreqSweepMax->setObjectName("arbGenfreqSweepMax");
     dialFreqSweepMax->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
-    dialFreqSweepMax->setColor(Graphics::COLOR_UNINITIALIZED);
 
     dialFreqSweepTime = new WidgetDialRange(parent,"Sweep time");
     dialFreqSweepTime->setObjectName("arbGenfreqSweeptime");
     dialFreqSweepTime->setRange(0.1,60,"s",10,0.1,1,true);
-    dialFreqSweepTime->setColor(Graphics::COLOR_UNINITIALIZED);
 
     sweepControl->addWidget(dialFreqSweepMin);
     sweepControl->addWidget(dialFreqSweepMax);

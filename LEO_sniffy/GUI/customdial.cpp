@@ -117,9 +117,13 @@ void CustomDial::paintEvent(QPaintEvent* evt)
     Qt::BrushStyle bs;
 
     //draw background arc
-
-    bs = (Qt::BrushStyle)(size/30+3); //5 for static size
-    painter.setPen(QPen(QBrush(QColor(48,48,48)),bs));
+    if(drawMark){
+        bs = (Qt::BrushStyle)(size/30+3); //5 for static size
+        painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_DATA_INPUT_AREA)),bs));
+    }else {
+        bs = (Qt::BrushStyle)2;
+        painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_TEXT_LABEL)),bs));
+    }
 
     painter.drawArc(rect,0,360*16);
 
@@ -127,13 +131,15 @@ void CustomDial::paintEvent(QPaintEvent* evt)
     painter.setPen(QPen(QBrush(pointColor),bs));
     painter.drawArc(rect,225*16,-ratio*16*270-5*16);
 
-    //draw marker
-    painter.setPen(QPen(QBrush(QColor(214,214,214)),size/15+4)); //8 for static size
-    painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
-    //draw click pointer
-    if(mousePressX!=0){
-        painter.setPen(QPen(QBrush(QColor(128,128,128)),4));
-        painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
+    if(drawMark){
+        //draw marker
+        painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_TEXT_ALL)),size/15+4)); //8 for static size
+        painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
+        //draw click pointer
+        if(mousePressX!=0){
+            painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_TEXT_LABEL)),4));
+            painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
+        }
     }
 }
 

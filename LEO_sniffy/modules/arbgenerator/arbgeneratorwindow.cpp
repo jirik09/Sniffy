@@ -27,12 +27,12 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
 
     chart = new widgetChart(widget_chart, 4);
     chart->setRange(0, 1, 0, 1);
-    chart->setGraphColor(QColor(Graphics::COLOR_UNINITIALIZED));
+    chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_DEFAULT));
     verticalLayout_chart->addWidget(chart);
 
     PWMchart = new widgetChart(widget_chart, 4);
     PWMchart->setRange(0, 1, 0, 1);
-    PWMchart->setGraphColor(QColor(Graphics::COLOR_UNINITIALIZED));
+    PWMchart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_DEFAULT));
     verticalLayout_chart->addWidget(PWMchart);
     if(!isPWMbased){
         PWMchart->hide();
@@ -94,12 +94,12 @@ qreal ArbGeneratorWindow::getPWMFrequency(int channel)
 
 void ArbGeneratorWindow::setProgress(int percent)
 {
-    setGenerateButton("Uploading "+ QString::number(percent)+ "%",Graphics::COLOR_UNINITIALIZED);
+    setGenerateButton("Uploading "+ QString::number(percent)+ "%",Graphics::COLOR_WARNING);
 }
 
 void ArbGeneratorWindow::setGeneratorRuning()
 {
-    setGenerateButton("Stop",Graphics::COLOR_UNINITIALIZED);
+    setGenerateButton("Stop",Graphics::COLOR_RUNNING);
     isGenerating = true;
     if(setting->isSweepEnabled){
         sweepController->startTimer();
@@ -108,7 +108,7 @@ void ArbGeneratorWindow::setGeneratorRuning()
 
 void ArbGeneratorWindow::setGeneratorStopped()
 {
-    setGenerateButton("Start",Graphics::COLOR_UNINITIALIZED);
+    setGenerateButton("Start",Graphics::COLOR_CONTROLS);
     isGenerating = false;
     createSignalCallback();
     if(setting->isSweepEnabled){
@@ -136,7 +136,7 @@ void ArbGeneratorWindow::runGeneratorCallback()
 {
     if(setting->buttonsGenerate->getText(0) == "Start"){
         emit runGenerator();
-        setGenerateButton("Uploading",Graphics::COLOR_UNINITIALIZED);
+        setGenerateButton("Uploading",Graphics::COLOR_WARNING);
         setting->disableGUI();
     }else{
         emit stopGenerator();

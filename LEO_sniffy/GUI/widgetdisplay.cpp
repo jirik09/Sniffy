@@ -24,7 +24,6 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     ui->label_0->setText(firstLabelText);
     ui->label_0->show();
 
-    setIndicationFlagColor(Graphics::COLOR_UNINITIALIZED);
     setUnitsStyle(unitsStyleSheet);
     showBarDisplay(showPrgrssBar);
     displayString("");
@@ -276,6 +275,7 @@ void WidgetDisplay::configureCustomDial(){
     ui->dial->setRange(100, 1000);
     ui->dial->setPageStep(100);
     ui->dial->setSingleStep(20);
+    ui->dial->setCustomGraphics(Graphics::STYLE_CUSTOM_DIALS_USED);
 }
 
 void WidgetDisplay::configureFloatingHistoryNumber(){

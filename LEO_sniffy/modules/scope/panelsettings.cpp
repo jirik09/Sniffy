@@ -66,7 +66,6 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
 
     dialTimeBase = new WidgetDial(parent ,"Time base");
     dialTimeBase->setObjectName("TimeBase");
-    dialTimeBase->setColor(Graphics::COLOR_CONTROLS);
     destination->addWidget(dialTimeBase);
     fillTimeBase();
     dialTimeBase->setDefaultIndex(10);
@@ -94,7 +93,6 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsChannelVertical->setColor(Graphics::getChannelColor(2),2);
     buttonsChannelVertical->setColor(Graphics::getChannelColor(3),3);
     buttonsChannelVertical->setColor(Graphics::getChannelColor(4),4);
-
 
     dialVerticalScale = new WidgetDial(parent ,"Scale");
     dialVerticalScale->setObjectName("VerticalScale");

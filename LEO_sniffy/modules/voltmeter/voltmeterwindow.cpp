@@ -15,26 +15,27 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
 
     display  = new WidgetDisplay("Voltmeter_CH1", "Channel 1", styleSheet, true, 1, HISTORY_SIZE, this);
     display->configLabel(0,"CH1",Graphics::getChannelColor(0),true);
-    display->setProgressBarColor(Graphics::getChannelColor(0));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH2", "Channel 2", styleSheet, true, 1, HISTORY_SIZE, this);
     display->configLabel(0,"CH2",Graphics::getChannelColor(1),true);
-    display->setProgressBarColor(Graphics::getChannelColor(1));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH3", "Channel 3", styleSheet, true, 1, HISTORY_SIZE, this);
     display->configLabel(0,"CH3",Graphics::getChannelColor(2),true);
-    display->setProgressBarColor(Graphics::getChannelColor(2));
     displays.append(display);
     display  = new WidgetDisplay("Voltmeter_CH4", "Channel 4", styleSheet, true, 1, HISTORY_SIZE, this);
     displays.append(display);
     display->configLabel(0,"CH4",Graphics::getChannelColor(3),true);
-    display->setProgressBarColor(Graphics::getChannelColor(3));
 
+    int index = 0;
     foreach(WidgetDisplay * dis, displays){
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
-        dis->configLabel(2,"VOLTAGE",Graphics::COLOR_UNINITIALIZED,true);
+        dis->configLabel(2,"VOLTAGE",Graphics::COLOR_TEXT_LABEL,true);
         ui->verticalLayout_display->addWidget(dis);
+        dis->setIndicationFlagColor(Graphics::getChannelColor(index));
+        dis->setProgressBarColor(Graphics::getChannelColor(index));
+        dis->showLabel(4);
+        index++;
     }
 
     //setup control
@@ -90,7 +91,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonsCalc->setText("Min/Max",0);
     buttonsCalc->setText("Ripple",1);
     buttonsCalc->setText("None",2);
-    buttonsCalc->setColor(Graphics::COLOR_UNINITIALIZED,2);
+    buttonsCalc->setColor(Graphics::COLOR_UNUSED,2);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
     QSpacerItem *verticalSpacer;
@@ -113,7 +114,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonStartLog->setObjectName("buttonlogcontrol");
     tabs->getLayout(1)->addWidget(buttonStartLog);
     buttonStartLog->setText("Start",0);
-    buttonStartLog->setColor(Graphics::COLOR_UNINITIALIZED,0);
+    buttonStartLog->setColor(Graphics::COLOR_WARNING,0);
     buttonStartLog->enableAll(false);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
@@ -152,6 +153,9 @@ void VoltmeterWindow::showData(ChannelData data[], int numChannels){
         displays.at(i)->displayString(displays.at(i)->formatNumber(data[i].voltage,'f',4));
         displays.at(i)->updateProgressBar(data[i].percent);
         displays.at(i)->appendNewHistorySample("",data[i].voltage , "V", 1);
+
+
+        displays.at(i)->drawIndicationFlag(4);
 
         if(buttonsCalc->getSelectedIndex()==0){
             displays.at(i)->displayQerrString(displays.at(i)->formatNumber(data[i].min,'f',4));
@@ -224,7 +228,7 @@ void VoltmeterWindow::showProgress(int current, int max){
 void VoltmeterWindow::setPins(QString pins[], int numOfCh)
 {
     for(int i = 0;i<numOfCh;i++){
-        displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::COLOR_UNINITIALIZED,true);
+        displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::COLOR_TEXT_ALL,true);
     }
 }
 
@@ -252,7 +256,7 @@ void VoltmeterWindow::stopDatalog()
         logFile->close();
         isDataLogRunning = false;
         buttonStartLog->setText("Start",0);
-        buttonStartLog->setColor(Graphics::COLOR_UNINITIALIZED,0);
+        buttonStartLog->setColor(Graphics::COLOR_WARNING,0);
         buttonSelectFile->enableAll(true);
         labelFile->setValue("Log stopped (" + QString::number(logSampleIndex) + " smpl)");
     }
@@ -280,7 +284,7 @@ void VoltmeterWindow::startDatalog()
             *logStream << "\n";
             isDataLogRunning = true;
             buttonStartLog->setText("Stop",0);
-            buttonStartLog->setColor(Graphics::COLOR_UNINITIALIZED,0);
+            buttonStartLog->setColor(Graphics::COLOR_RUNNING,0);
             buttonSelectFile->enableAll(false);
         }else{
             labelFile->setValue("Error opening file");

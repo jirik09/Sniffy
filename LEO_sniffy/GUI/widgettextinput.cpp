@@ -16,7 +16,7 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, I
     QString style = Graphics::STYLE_TEXTINPUT;
     ui->label->setStyleSheet(style);
 
-    style = Graphics::STYLE_TEXTINPUT+"QWidget{background-color:"+Graphics::COLOR_DATA_AREA+"} QWidget::focus{ background-color:"+Graphics::COLOR_BACKGROUND_FOCUS_IN+";}";
+    style = Graphics::STYLE_TEXTINPUT+"QWidget{background-color:"+Graphics::COLOR_DATA_INPUT_AREA+"} QWidget::focus{ background-color:"+Graphics::COLOR_BACKGROUND_FOCUS_IN+";}";
     ui->lineEdit->setStyleSheet(style);
 }
 

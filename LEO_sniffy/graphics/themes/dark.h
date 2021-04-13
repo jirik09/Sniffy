@@ -19,29 +19,28 @@
 #define DARK_WINDOW_WIDGET "#3a3a3a"        // background of all widgets
 
 /* COMPONENTS */
-#define DARK_CONTROLS "#8b9299"
-#define DARK_COMBOBOX "#303030"
-#define DARK_BACKGROUND_BUTTON "#262626"
-#define DARK_BACKGROUND_BUTTON_DISABLED "#303030"
+#define DARK_CONTROLS "#8b9299"             //default color of controls
+#define DARK_BACKGROUND_BUTTON "#262626"    //background of buttons which can be cliked including tabs and combo box
+#define DARK_BACKGROUND_BUTTON_DISABLED "#303030" //background of disabled controls
 
 /* TEXT */
 #define DARK_TEXT_ALL "#e4e4e4"
 #define DARK_TEXT_LABEL "#7c7c7c"
-#define DARK_TEXT_COMPONENT "#e4e4e4"
 
 /* SPECIAL PURPOSE */
-#define DARK_COMPONENT_DISABLED "#575757"
-#define DARK_WINDOW_CONTROL_HOVER "#474c5e"
-#define DARK_WINDOW_EXIT_HOVER "#783232"
-#define DARK_ERROR "#bd4236"
-#define DARK_WARNING "#d2803c"
-#define DARK_BACKGROUND_FOCUS_IN "#303030"
-#define DARK_DATA_AREA "#262626"
-#define DARK_UNINITIALIZED "#ffffff"
+#define DARK_COMPONENT_DISABLED "#575757"       //background color of diabled components
+#define DARK_WINDOW_CONTROL_HOVER "#474c5e"     //Control color of window when hovered dock/undock/scroll
+#define DARK_WINDOW_EXIT_HOVER "#783232"        //window exit hover color
+#define DARK_ERROR "#bd4236"                    //error color
+#define DARK_WARNING "#d2803c"                  //Warning or working color button
+#define DARK_RUNNING "#1a9c25"                  //color of button when running
+#define DARK_UNUSED "#7a7a7a"                   //color of button when its function is none or disable
+#define DARK_BACKGROUND_FOCUS_IN "#303030"      //background area of data inputs when focused in by mouse
+#define DARK_DATA_INPUT_AREA "#282828"          //backgrounf of user text / number inputs
 
 /* DISPLAY & CHART & GRID & LEGEND */
-#define DARK_CHART "#262626"
-#define DARK_CHART_GRIDLEG_DEFAULT "#ffffff"
+#define DARK_CHART "#262626"                    //chart background colors
+#define DARK_CHART_GRIDLEG_DEFAULT "#e4e4e4"
 #define DARK_CHART_GRIDLEG_LOW_CONTRAST "#7c7c7c"
 #define DARK_DISPLAY DARK_CHART
 
@@ -94,7 +93,7 @@
                                     QScrollBar::add-page,QScrollBar::sub-page{background: none;}\
                                     QScrollBar:handle:hover{background:" DARK_WINDOW_CONTROL_HOVER ";}"
 
-#define DARK_STYLE_LINEEDIT         "QLineEdit{border:none;background-color:" DARK_BACKGROUND_FOCUS_IN ";font:12pt " DARK_FONT ";padding:0px;margin:0px;}"
+#define DARK_STYLE_LINEEDIT         "QLineEdit::focus{border:none;background-color:" DARK_BACKGROUND_FOCUS_IN "}QLineEdit{border:none;background-color:" DARK_DATA_INPUT_AREA ";font:12pt " DARK_FONT ";padding:0px;margin:0px;}"
 
 #define DARK_STYLE_PUSH_BUTTON      "QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
                                     QPushButton{border:none;background-color:" DARK_CONTROLS ";color:" DARK_TEXT_ALL ";}\
@@ -106,11 +105,11 @@
                                     QPushButton{border: none;background-color:" DARK_BACKGROUND_BUTTON ";}\
                                     QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED "; color:" DARK_COMPONENT_DISABLED ";}"
 
-#define DARK_STYLE_MENU             "QMenu::item{background-color:" DARK_DATA_AREA ";}\
+#define DARK_STYLE_MENU             "QMenu::item{background-color:" DARK_DATA_INPUT_AREA ";}\
                                     QMenu::item:selected{background-color:" DARK_WINDOW_CONTROL_HOVER ";}"
 
-#define DARK_STYLE_TAB              "QTabWidget::pane {border-top: 3px solid " DARK_DATA_AREA ";top:-3px;} QTabWidget::tab-bar {}\
-                                    QTabBar::tab {background:" DARK_DATA_AREA ";border-bottom: 3px solid rgb(128, 128, 128);padding: 7px;}\
+#define DARK_STYLE_TAB              "QTabWidget::pane {border-top: 3px solid " DARK_BACKGROUND_BUTTON ";top:-3px;} QTabWidget::tab-bar {}\
+                                    QTabBar::tab {background:" DARK_BACKGROUND_BUTTON ";border-bottom: 3px solid rgb(128, 128, 128);padding: 7px;}\
                                     QTabBar::tab:selected,QTabBar::tab:hover{background:" DARK_WINDOW_WIDGET ";}\
                                     QTabBar::tab:selected{border-bottom-color:orange;}"
 
@@ -121,8 +120,8 @@
 #define DARK_STYLE_PROGRESS_BAR     "QProgressBar{border:1px solid " DARK_TEXT_LABEL ";border-radius:1px;background:" DARK_DISPLAY ";}\
                                     QProgressBar::chunk{width: 20px;background-color:" DARK_CHANNEL_1 ";}"
 
-#define DARK_STYLE_COMBO_BOX        "QComboBox{background-color:" DARK_COMBOBOX ";}\
-                                    QComboBox QAbstractItemView{selection-background-color:" DARK_WINDOW_CONTROL_HOVER ";background-color:" DARK_COMBOBOX ";}"
+#define DARK_STYLE_COMBO_BOX        "QComboBox{background-color:" DARK_DATA_INPUT_AREA ";}\
+                                    QComboBox QAbstractItemView{selection-background-color:" DARK_WINDOW_CONTROL_HOVER ";background-color:" DARK_DATA_INPUT_AREA ";}"
 
 
 /***************** CONCRETE STYLE SHEETS *****************/
@@ -141,7 +140,7 @@
 
 #define DARK_STYLE_DIAL             DARK_STYLE_LINEEDIT \
                                     "QWidget:disabled{color:" DARK_COMPONENT_DISABLED ";}\
-                                    QWidget{color:" DARK_TEXT_COMPONENT ";}"
+                                    QWidget{color:" DARK_TEXT_ALL ";}"
 #define DARK_STYLE_USE_CUSTOM_DIALS true
 
 #define DARK_STYLE_TEXTINPUT        "QWidget:disabled{ color:" DARK_COMPONENT_DISABLED ";}QWidget{font: 10pt" DARK_FONT "; color:" DARK_TEXT_ALL ";}"

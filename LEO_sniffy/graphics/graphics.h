@@ -27,7 +27,7 @@ public:
     static QString COLOR_WINDOW_WIDGET;
     static QString COLOR_BACKGROUND_FOCUS_IN;
     static QString COLOR_COMPONENT_DISABLED;
-    static QString COLOR_DATA_AREA;
+    static QString COLOR_DATA_INPUT_AREA;
     static QString COLOR_CONTROLS;
     static QString COLOR_DISPLAY;
     static QString COLOR_CHART;
@@ -35,12 +35,12 @@ public:
     static QString COLOR_CHART_GRIDLEG_LOW_CONTRAST;
     static QString COLOR_TEXT_ALL;
     static QString COLOR_TEXT_LABEL;
-    static QString COLOR_TEXT_COMPONENT;
     static QString COLOR_WINDOW_CONTROL_HOVER;
     static QString COLOR_WINDOW_EXIT_HOVER;
     static QString COLOR_WARNING;
     static QString COLOR_ERROR;
-    static QString COLOR_UNINITIALIZED;
+    static QString COLOR_RUNNING;
+    static QString COLOR_UNUSED;
 
     static QString STYLE_PUSH_BUTTON;
     static QString STYLE_CHECK_BUTTON;

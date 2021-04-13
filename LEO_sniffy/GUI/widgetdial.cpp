@@ -27,6 +27,7 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
     options = new QList<params_dial>;
+    setColor(Graphics::COLOR_CONTROLS);
 }
 
 WidgetDial::~WidgetDial()
