@@ -207,6 +207,14 @@ defaultValue - selected by default (0 by default)
 log - bool type true=log scale, false=lin scale (false by default)
 */
 void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic, int numOfDecimals){
+
+    if(units->length()>0){
+        disconnect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
+        units->clear();
+        ui->comboBox->clear();
+        connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
+    }
+
     rangeMax = max;
     rangeMin = min;
     rangePrecision = smalestUnitMult;
