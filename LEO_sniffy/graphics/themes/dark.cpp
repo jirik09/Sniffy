@@ -36,7 +36,7 @@ Dark::Dark(QObject *parent)
 }
 
 QString Dark::getThemeName(){
-    return "Dark";    
+    return DARK_THEME_NAME;
 }
 
 QString Dark::getAppGlobalStyle(){

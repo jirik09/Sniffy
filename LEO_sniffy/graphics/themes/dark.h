@@ -9,6 +9,7 @@
 
 #define DARK_GRAPHICS_PATH  ":/graphics/graphics/themes/dark/"
 #define DARK_FONT           "'MS Shell Dlg 2'"
+#define DARK_THEME_NAME     "Dark"
 
 /***************** COLORS *****************/
 

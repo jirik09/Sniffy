@@ -4,17 +4,13 @@ QSharedPointer<AbstractTheme> Graphics::theme = nullptr;
 QList<QString> *Graphics::themeList = nullptr;
 
 QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {  
-    [] { return QSharedPointer<AbstractTheme>(new Dark); },
-    [] { return QSharedPointer<AbstractTheme>(new Light); },
+        [] { return QSharedPointer<AbstractTheme>(new Dark); },
+[] { return QSharedPointer<AbstractTheme>(new Light); },
 };
 
 Graphics::Graphics(QObject *parent, int themeIndex) : QObject(parent)
 {
     theme = createTheme[themeIndex]();
-}
-
-QString Graphics::getAppGlobalStyle(){
-    return theme->getAppGlobalStyle();
 }
 
 QString Graphics::getGraphicsPath(){
@@ -30,9 +26,9 @@ QString Graphics::getChannelColor(int channelIndex){
 
 QList<QString> *Graphics::initThemesList(){
     themeList = new QList<QString>;
-    themeList->append("Dark");
-    themeList->append("Light");
 
+    for(int i = 0;i<createTheme.length();i++)
+        themeList->append(createTheme[i]()->getThemeName());
     return themeList;
 }
 

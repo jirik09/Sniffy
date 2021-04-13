@@ -17,7 +17,6 @@ class Graphics : public QObject
 public:
     explicit Graphics(QObject *parent = nullptr, int themeIndex = 0);
 
-    static QString getAppGlobalStyle();
     static QString getGraphicsPath();
     static QString getChannelColor(int channelIndex);
 
