@@ -8,7 +8,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorTypeButtons->setObjectName("cursortypeSel");
     destination->addWidget(cursorTypeButtons);
     cursorTypeButtons->setText("None",0);
-    cursorTypeButtons->setColor(COLOR_GREY,0);
+    cursorTypeButtons->setColor(Graphics::COLOR_UNINITIALIZED,0);
     cursorTypeButtons->setText("Horizontal",1);
     cursorTypeButtons->setText("Vertical",2);
 
@@ -19,19 +19,19 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     channelButtons->setObjectName("cursorChannSelection");
     destination->addWidget(channelButtons);
     channelButtons->setText("CH1",0);
-    channelButtons->setColor(Colors::getChannelColorString(0),0);
+    channelButtons->setColor(Graphics::getChannelColor(0),0);
     channelButtons->setText("CH2",1);
-    channelButtons->setColor(Colors::getChannelColorString(1),1);
+    channelButtons->setColor(Graphics::getChannelColor(1),1);
     channelButtons->setText("CH3",2);
-    channelButtons->setColor(Colors::getChannelColorString(2),2);
+    channelButtons->setColor(Graphics::getChannelColor(2),2);
     channelButtons->setText("CH4",3);
-    channelButtons->setColor(Colors::getChannelColorString(3),3);
+    channelButtons->setColor(Graphics::getChannelColor(3),3);
     channelButtons->setEnabled(false);
 
     cursorHorADial = new WidgetDialRange(parent ,"Cursor A");
     cursorHorADial->setObjectName("horCurA");
     cursorHorADial->setRange(-0.0001,0.0001,"s",0.1,0.000000001,0);
-    cursorHorADial->setColor(Colors::getChannelColorString(0));
+    cursorHorADial->setColor(Graphics::getChannelColor(0));
     cursorHorADial->hideUnitSelection();
     cursorHorADial->enableFineMousePrecision();
     destination->addWidget(cursorHorADial);
@@ -40,7 +40,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorHorBDial = new WidgetDialRange(parent ,"Cursor B");
     cursorHorBDial->setObjectName("horCurB");
     cursorHorBDial->setRange(-0.0001,0.0001,"s",0.1,0.000000001,0);
-    cursorHorBDial->setColor(Colors::getChannelColorString(0));
+    cursorHorBDial->setColor(Graphics::getChannelColor(0));
     cursorHorBDial->hideUnitSelection();
     cursorHorBDial->enableFineMousePrecision();
     destination->addWidget(cursorHorBDial);
@@ -49,7 +49,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorVerADial = new WidgetDialRange(parent ,"Cursor A");
     cursorVerADial->setObjectName("verCurA");
     cursorVerADial->setRange(-1,1,"V",10,0.01,0);
-    cursorVerADial->setColor(Colors::getChannelColorString(0));
+    cursorVerADial->setColor(Graphics::getChannelColor(0));
     cursorVerADial->hideUnitSelection();
     cursorVerADial->enableFineMousePrecision();
     destination->addWidget(cursorVerADial);
@@ -58,7 +58,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorVerBDial = new WidgetDialRange(parent ,"Cursor B");
     cursorVerBDial->setObjectName("verCurB");
     cursorVerBDial->setRange(-1,1,"V",10,0.01,0);
-    cursorVerBDial->setColor(Colors::getChannelColorString(0));
+    cursorVerBDial->setColor(Graphics::getChannelColor(0));
     cursorVerBDial->hideUnitSelection();
     cursorVerBDial->enableFineMousePrecision();
     destination->addWidget(cursorVerBDial);

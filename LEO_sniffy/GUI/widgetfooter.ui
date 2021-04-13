@@ -53,20 +53,20 @@
       <item>
        <widget class="QPushButton" name="pushButton_settingsA">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>27</width>
+          <width>35</width>
           <height>35</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>27</width>
+          <width>35</width>
           <height>35</height>
          </size>
         </property>

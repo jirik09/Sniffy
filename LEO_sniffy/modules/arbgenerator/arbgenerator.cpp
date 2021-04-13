@@ -12,11 +12,11 @@ ArbGenerator::ArbGenerator(QObject *parent, bool isPWMbased):
     if(isPWMbased){
         arbGenWindow->setObjectName("pwmGenWindow");
         moduleName = "PWM genarator";
-        moduleIconURI = ":/graphics/graphics/icon_pwm_gen.png";
+        moduleIconURI = Graphics::getGraphicsPath()+"icon_pwm_gen.png";
     }else{
         arbGenWindow->setObjectName("arbGenWindow");
         moduleName = "Arbitrary generator";
-        moduleIconURI = ":/graphics/graphics/icon_signal_generator.png";
+        moduleIconURI = Graphics::getGraphicsPath()+"icon_signal_generator.png";
     }
 
     connect(arbGenWindow, &ArbGeneratorWindow::runGenerator, this,&ArbGenerator::sendSignalCallback);

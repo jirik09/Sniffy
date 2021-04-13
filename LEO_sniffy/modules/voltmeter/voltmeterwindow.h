@@ -20,11 +20,11 @@
 #include "../../GUI/widgetlabelarea.h"
 #include "../../GUI/widgetdisplay.h"
 #include "../../GUI/widgetswitch.h"
+#include "../../graphics/graphics.h"
 
 #include "voltmeterconfig.h"
 #include "voltmeterdefs.h"
 #include "channeldata.h"
-#include "./graphics/colors.h"
 #include "../labelformator.h"
 
 namespace Ui {

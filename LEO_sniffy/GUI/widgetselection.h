@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetSelection;
@@ -35,7 +35,7 @@ public:
     void clear();
     void setSelected(int index, bool silent = false);
     int getSelectedIndex();
-    int count();
+    int count();    
 
 private slots:
     void indexChanged(int index);

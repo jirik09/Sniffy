@@ -15,11 +15,11 @@ WidgetFooter::WidgetFooter(QWidget *parent) :
     connect(ui->pushButton_settingsA,&QPushButton::clicked,this, &WidgetFooter::settingsCallback);
     connect(ui->pushButton_settingsB,&QPushButton::clicked,this, &WidgetFooter::settingsCallback);
 
-    ui->pushButton_settingsA->setIcon(QIcon(":/graphics/graphics/settings_gear.png"));
-    ui->pushButton_settingsB->setIcon(QIcon(":/graphics/graphics/settings_gear.png"));
+    ui->pushButton_settingsA->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_gear.png"));
+    ui->pushButton_settingsB->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_gear.png"));
 
-    animationForward = new QMovie(":/graphics/graphics/menu_burger_button.gif");
-    animationBackward = new QMovie(":/graphics/graphics/menu_burger_button_backw.gif");
+    animationForward = new QMovie(Graphics::getGraphicsPath()+"menu_burger_button.gif");
+    animationBackward = new QMovie(Graphics::getGraphicsPath()+"menu_burger_button_backw.gif");
 
     QSize *size = new QSize(30, 30);
     animationForward->setScaledSize(*size);
@@ -52,15 +52,15 @@ void WidgetFooter::setAppearance(bool isWide){
         ui->pushButton_settingsA->show();
         ui->pushButton_settingsB->hide();
         ui->label_settings->setText("");
-        //ui->pushButton_setSize->setIcon(QIcon(":/graphics/graphics/settings_horizontal.png"));
+        //ui->pushButton_setSize->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_horizontal.png"));
 
         ui->label_burgerAnim->setMovie(animationBackward);
         animationBackward->start();
     }else{
         ui->pushButton_settingsB->show();
         ui->pushButton_settingsA->hide();
-        ui->label_settings->setText("Settings");
-        //ui->pushButton_setSize->setIcon(QIcon(":/graphics/graphics/settings_vertical.png"));
+        ui->label_settings->setText("");
+        //ui->pushButton_setSize->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_vertical.png"));
 
         ui->label_burgerAnim->setMovie(animationForward);
         animationForward->start();

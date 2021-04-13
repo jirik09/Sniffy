@@ -9,7 +9,9 @@ WidgetSeparator::WidgetSeparator(QWidget *parent, QString name) :
     ui(new Ui::WidgetSeparator)
 {
     ui->setupUi(this);
-    ui->label_name->setText(name);
+    ui->widget->setStyleSheet("background-image: url("+Graphics::getGraphicsPath()+"separator.png);");
+    ui->label_name->setStyleSheet("QLabel{color:"+Graphics::COLOR_TEXT_LABEL+";}");
+    ui->label_name->setText(name);           
 }
 
 void WidgetSeparator::hideLine(){

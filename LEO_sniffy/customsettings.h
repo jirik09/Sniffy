@@ -26,7 +26,8 @@ public:
     static int getThemeIndex();
 
     static void addTheme(QString name);
-    static QList<QString> getThemesList();
+    static void setThemesList(QList<QString> *list);
+    static QList<QString> *getThemesList();
 
 
 
@@ -36,9 +37,8 @@ private:
 
     static int restoreSession; //0 no, 1 ask, 2 yes
     static int sessionRestoreAnswer; //-1 not answered
-    static int themeIndex;
-    static QList<QString> themesList;
-
+    static int themeIndex;    
+    static QList<QString> *themesList;
 
 signals:
 

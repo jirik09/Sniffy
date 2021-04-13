@@ -12,7 +12,7 @@ PatternGenerator::PatternGenerator(QObject *parent)
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = "SYST";//cmd->SCOPE;
     moduleName = "Pattern generator";
-    moduleIconURI = ":/graphics/graphics/icon_pattern_generator.png";
+    moduleIconURI = Graphics::getGraphicsPath()+"icon_pattern_generator.png";
 
 //In case hold button should be shown insert this and connect callback to handle hold/pause
     connect(this, &AbstractModule::moduleCreated, this, &PatternGenerator::showHoldButtonCallback);

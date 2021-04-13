@@ -22,9 +22,7 @@
 #include "GUI/widgetdialrange.h"
 
 #include "math/timing.h"
-
-#include "../graphics/colors.h"
-#include "../graphics/styles.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetDisplay;
@@ -76,7 +74,9 @@ public:
     QString getLabelText(int labelNumber);
     void hideLabel(int labelNumber);
     void showLabel(int labelNumber);
-    void drawIndicationFlag(int labelNumber, QString color);
+    void drawIndicationFlag(int labelNumber);
+    void clearIndicationFlag(int labelNumber);
+    void setIndicationFlagColor(QString color);
 
     /* Progress bar */
     void showProgressBar(bool visible);
@@ -115,6 +115,9 @@ private:
          historyView = DISABLED,
          listView = DISABLED,
          control = ENABLED;
+
+    /* indication colors */
+    QString cFull, cTran1, cTran2, cBlank;
 
     void hideHistoryChartArea();    
 

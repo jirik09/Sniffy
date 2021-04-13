@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetSwitch;
@@ -30,10 +30,8 @@ private:
     Ui::WidgetSwitch *ui;
     int optionalEmitParam;
 
-    QString styleSelected =
-            QString::fromUtf8("background-color:") + COLOR_BLUE + QString::fromUtf8("border: none;");
-    QString styleNotSelected =
-            QString::fromUtf8("background-color:") + BACKGROUND_COLOR_BUTTON + QString::fromUtf8("border: none;");
+    QString styleSelected;
+    QString styleNotSelected;
 
 signals:
     void clicked(int index, int optionalEmitParam = 0);

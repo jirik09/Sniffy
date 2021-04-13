@@ -47,10 +47,10 @@ SOURCES += \
     customsettings.cpp \
     devicedescriptor.cpp \
     devicemediator.cpp \
-    graphics/abstractcolors.cpp \
-    graphics/colors.cpp \
-    graphics/themes/darktheme.cpp \
-    graphics/themes/lighttheme.cpp \
+    graphics/abstracttheme.cpp \
+    graphics/graphics.cpp \
+    graphics/themes/dark.cpp \
+    graphics/themes/light.cpp \
     main.cpp \
     mainwindow.cpp \
     math/movingaverage.cpp \
@@ -155,11 +155,10 @@ HEADERS += \
     customsettings.h \
     devicedescriptor.h \
     devicemediator.h \
-    graphics/abstractcolors.h \
-    graphics/colors.h \
-    graphics/styles.h \
-    graphics/themes/darktheme.h \
-    graphics/themes/lighttheme.h \
+    graphics/abstracttheme.h \
+    graphics/graphics.h \
+    graphics/themes/dark.h \
+    graphics/themes/light.h \
     mainwindow.h \
     math/movingaverage.h \
     math/timing.h \

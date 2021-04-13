@@ -8,6 +8,7 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
     isPWMbased(isPWMbased)
 {
     ui->setupUi(this);
+    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
 
     QWidget *widget_settings = new QWidget(this, Qt::Window);
     QWidget *widget_chart = new QWidget(this, Qt::Window);
@@ -26,12 +27,12 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
 
     chart = new widgetChart(widget_chart, 4);
     chart->setRange(0, 1, 0, 1);
-    chart->setGraphColor(QCOLOR_GREY);
+    chart->setGraphColor(QColor(Graphics::COLOR_UNINITIALIZED));
     verticalLayout_chart->addWidget(chart);
 
     PWMchart = new widgetChart(widget_chart, 4);
     PWMchart->setRange(0, 1, 0, 1);
-    PWMchart->setGraphColor(QCOLOR_GREY);
+    PWMchart->setGraphColor(QColor(Graphics::COLOR_UNINITIALIZED));
     verticalLayout_chart->addWidget(PWMchart);
     if(!isPWMbased){
         PWMchart->hide();
@@ -93,12 +94,12 @@ qreal ArbGeneratorWindow::getPWMFrequency(int channel)
 
 void ArbGeneratorWindow::setProgress(int percent)
 {
-    setGenerateButton("Uploading "+ QString::number(percent)+ "%",COLOR_ORANGE);
+    setGenerateButton("Uploading "+ QString::number(percent)+ "%",Graphics::COLOR_UNINITIALIZED);
 }
 
 void ArbGeneratorWindow::setGeneratorRuning()
 {
-    setGenerateButton("Stop",COLOR_GREEN);
+    setGenerateButton("Stop",Graphics::COLOR_UNINITIALIZED);
     isGenerating = true;
     if(setting->isSweepEnabled){
         sweepController->startTimer();
@@ -107,7 +108,7 @@ void ArbGeneratorWindow::setGeneratorRuning()
 
 void ArbGeneratorWindow::setGeneratorStopped()
 {
-    setGenerateButton("Start",COLOR_BLUE);
+    setGenerateButton("Start",Graphics::COLOR_UNINITIALIZED);
     isGenerating = false;
     createSignalCallback();
     if(setting->isSweepEnabled){
@@ -135,7 +136,7 @@ void ArbGeneratorWindow::runGeneratorCallback()
 {
     if(setting->buttonsGenerate->getText(0) == "Start"){
         emit runGenerator();
-        setGenerateButton("Uploading",COLOR_ORANGE);
+        setGenerateButton("Uploading",Graphics::COLOR_UNINITIALIZED);
         setting->disableGUI();
     }else{
         emit stopGenerator();

@@ -53,7 +53,7 @@
    <item>
     <widget class="QLabel" name="label_name">
      <property name="styleSheet">
-      <string notr="true">color: rgb(124, 124, 124);</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>TextLabel_pPxxxxxxxx</string>
@@ -87,7 +87,7 @@
       <enum>Qt::LeftToRight</enum>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-image: url(:/graphics/graphics/separator.png);</string>
+      <string notr="true"/>
      </property>
     </widget>
    </item>

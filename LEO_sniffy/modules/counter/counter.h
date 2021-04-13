@@ -10,7 +10,6 @@
 #include "communication/comms.h"
 #include "math/movingaverage.h"
 
-//#include "../../GUI/moduledockwidget.h"
 #include "../../GUI/widgetcontrolmodule.h"
 
 #include "../abstractmodule.h"

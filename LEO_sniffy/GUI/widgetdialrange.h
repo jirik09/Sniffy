@@ -7,7 +7,7 @@
 #include <QtMath>
 
 #include "customdial.h"
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 #include "../modules/numberparser.h"
 
 #define DIAL_DEFAULT_RANGE 700

@@ -16,6 +16,7 @@
 #include "../../GUI/widgetdisplay.h"
 #include "../../GUI/widgetswitch.h"
 #include "../../GUI/widgetbuttons.h"
+#include "../../graphics/graphics.h"
 
 #include "counterspec.h"
 #include "counterconfig.h"

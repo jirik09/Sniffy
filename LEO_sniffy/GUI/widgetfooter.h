@@ -8,6 +8,7 @@
 #include <QSize>
 
 #include "GUI/clickablelabel.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetFooter;
