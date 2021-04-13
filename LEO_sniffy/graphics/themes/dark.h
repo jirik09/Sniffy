@@ -14,12 +14,12 @@
 /***************** COLORS *****************/
 
 /* WINDOWS */
-#define DARK_WINDOW_APP "#303030"
-#define DARK_WINDOW_DOCK_WIDGET "#6c6c6c"
-#define DARK_WINDOW_WIDGET "#3a3a3a"
+#define DARK_WINDOW_APP "#303030"           //laft panel and dock widget window top
+#define DARK_WINDOW_DOCK_WIDGET "#6c6c6c"   //actualy only undocked border color
+#define DARK_WINDOW_WIDGET "#3a3a3a"        // background of all widgets
 
 /* COMPONENTS */
-#define DARK_CONTROLS "#4c5259"
+#define DARK_CONTROLS "#8b9299"
 #define DARK_COMBOBOX "#303030"
 #define DARK_BACKGROUND_BUTTON "#262626"
 #define DARK_BACKGROUND_BUTTON_DISABLED "#303030"
@@ -31,8 +31,8 @@
 
 /* SPECIAL PURPOSE */
 #define DARK_COMPONENT_DISABLED "#575757"
-#define DARK_HOVER "#474c5e"
-#define DARK_HOVER_EXIT "#783232"
+#define DARK_WINDOW_CONTROL_HOVER "#474c5e"
+#define DARK_WINDOW_EXIT_HOVER "#783232"
 #define DARK_ERROR "#bd4236"
 #define DARK_WARNING "#d2803c"
 #define DARK_BACKGROUND_FOCUS_IN "#303030"
@@ -92,7 +92,7 @@
                                     QScrollBar::sub-line{height: 0px;}\
                                     QScrollBar::up-arrow,QScrollBar::down-arrow{background: none;}\
                                     QScrollBar::add-page,QScrollBar::sub-page{background: none;}\
-                                    QScrollBar:handle:hover{background:" DARK_HOVER ";}"
+                                    QScrollBar:handle:hover{background:" DARK_WINDOW_CONTROL_HOVER ";}"
 
 #define DARK_STYLE_LINEEDIT         "QLineEdit{border:none;background-color:" DARK_BACKGROUND_FOCUS_IN ";font:12pt " DARK_FONT ";padding:0px;margin:0px;}"
 
@@ -107,7 +107,7 @@
                                     QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED "; color:" DARK_COMPONENT_DISABLED ";}"
 
 #define DARK_STYLE_MENU             "QMenu::item{background-color:" DARK_DATA_AREA ";}\
-                                    QMenu::item:selected{background-color:" DARK_HOVER ";}"
+                                    QMenu::item:selected{background-color:" DARK_WINDOW_CONTROL_HOVER ";}"
 
 #define DARK_STYLE_TAB              "QTabWidget::pane {border-top: 3px solid " DARK_DATA_AREA ";top:-3px;} QTabWidget::tab-bar {}\
                                     QTabBar::tab {background:" DARK_DATA_AREA ";border-bottom: 3px solid rgb(128, 128, 128);padding: 7px;}\
@@ -122,7 +122,7 @@
                                     QProgressBar::chunk{width: 20px;background-color:" DARK_CHANNEL_1 ";}"
 
 #define DARK_STYLE_COMBO_BOX        "QComboBox{background-color:" DARK_COMBOBOX ";}\
-                                    QComboBox QAbstractItemView{selection-background-color:" DARK_HOVER ";background-color:" DARK_COMBOBOX ";}"
+                                    QComboBox QAbstractItemView{selection-background-color:" DARK_WINDOW_CONTROL_HOVER ";background-color:" DARK_COMBOBOX ";}"
 
 
 /***************** CONCRETE STYLE SHEETS *****************/
@@ -142,7 +142,9 @@
 #define DARK_STYLE_DIAL             DARK_STYLE_LINEEDIT \
                                     "QWidget:disabled{color:" DARK_COMPONENT_DISABLED ";}\
                                     QWidget{color:" DARK_TEXT_COMPONENT ";}"
+#define DARK_STYLE_USE_CUSTOM_DIALS true
 
+#define DARK_STYLE_TEXTINPUT        "QWidget:disabled{ color:" DARK_COMPONENT_DISABLED ";}QWidget{font: 10pt" DARK_FONT "; color:" DARK_TEXT_ALL ";}"
 
 class Dark : public AbstractTheme
 {

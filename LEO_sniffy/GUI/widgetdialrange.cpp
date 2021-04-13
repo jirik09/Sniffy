@@ -29,6 +29,7 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
     ui->label_name->setText(name);
     setObjectName(name);
     units = new QList<params_unit>;
+    ui->dial->setCustomGraphics(Graphics::STYLE_CUSTOM_DIALS_USED);
 
     this->setMinimumSize(170,85);
     this->setMaximumSize(400,120);

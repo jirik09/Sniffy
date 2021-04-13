@@ -46,19 +46,19 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     ui->line->setStyleSheet(style);
 
     style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
-            "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}";
+            "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
     ui->pushButton_history->setStyleSheet(style);
 
     style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
-            "QPushButton:hover{background-color: "+Graphics::COLOR_HOVER+";}";
+            "QPushButton:hover{background-color: "+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
     ui->pushButton_list->setStyleSheet(style);
 
     style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_clear_history.png);}"
-            "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}";
+            "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
     ui->pushButton_clear->setStyleSheet(style);
 
     style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_save.png);}"
-            "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}";
+            "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
     ui->pushButton_save->setStyleSheet(style);
 
     connect(ui->pushButton_history, SIGNAL(clicked()),
@@ -421,12 +421,12 @@ void WidgetDisplay::historyButtonClickedCallback(){
     if(historyView == DISABLED){
         sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
         style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_history_on.png);}"
-                "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}";
+                "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         historyView = ENABLED;
     }else {
         sizes = {0, cmpltWidth};
         style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
-                "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}";
+                "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         historyView = DISABLED;
     }
 
@@ -438,13 +438,13 @@ void WidgetDisplay::listChartSwitchClickedCallback(){
     QString style;
     if(listView == DISABLED){
         style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_chart.png);}"
-                "QPushButton:hover{background-color: "+Graphics::COLOR_HOVER+";}";
+                "QPushButton:hover{background-color: "+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         chart->hide();
         list->show();
         listView = ENABLED;
     }else {
         style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
-                "QPushButton:hover{background-color: "+Graphics::COLOR_HOVER+";}";
+                "QPushButton:hover{background-color: "+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         chart->show();
         list->hide();
         listView = DISABLED;

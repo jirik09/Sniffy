@@ -32,19 +32,19 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     QPushButton *down = new QPushButton();
     down->resize(10,10);
     down->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton{image: url("+Graphics::getGraphicsPath()+"dock.png);}"
-                                                       "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}");
+                                                       "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
     titleBarLayout->addWidget(down);
 
     QPushButton *up = new QPushButton();
     up->resize(10,10);
     up->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton{image: url("+Graphics::getGraphicsPath()+"unDock.png);}"
-                                                     "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}");
+                                                     "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
     titleBarLayout->addWidget(up);
 
     QPushButton *exit = new QPushButton();
     exit->resize(10,10);
     exit->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton{image: url("+Graphics::getGraphicsPath()+"exit.png);}"
-                                                       "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER_EXIT+";}");
+                                                       "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_EXIT_HOVER+";}");
     titleBarLayout->addWidget(exit);
 
     connect(up,SIGNAL(clicked()),this,SLOT(unDockOrMaximize()));

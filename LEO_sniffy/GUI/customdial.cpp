@@ -12,40 +12,18 @@ Extends standard dial and just override the paint function
 
 #include <cmath>
 
-CustomDial::CustomDial(QWidget* parent,
-                       double knobRadius,
-                       double knobMargin)
-    : QDial(parent),
-      knobRadius_(knobRadius),
-      knobMargin_(knobMargin)
+CustomDial::CustomDial(QWidget* parent)
+    : QDial(parent)
 {
     // Default range
     QDial::setRange(0,100);
     QDial::setPageStep(5);
     QDial::setSingleStep(2);
-    //   int size = parent->size().height();
-    // QDial::setMinimumSize(size,size);
-    //  QDial::setMaximumSize(size,size);
 }
 
-void CustomDial::setKnobRadius(double radius)
+void CustomDial::setCustomGraphics(bool enable)
 {
-    knobRadius_ = radius;
-}
-
-double CustomDial::getKnobRadius() const
-{
-    return knobRadius_;
-}
-
-void CustomDial::setKnobMargin(double margin)
-{
-    knobMargin_ = margin;
-}
-
-double CustomDial::getKnobMargin() const
-{
-    return knobMargin_;
+    customGraphics = enable;
 }
 
 void CustomDial::drawMarker(bool draw)
@@ -94,8 +72,12 @@ void CustomDial::mouseReleaseEvent(QMouseEvent *me){
     QDial::update();
 }
 
-void CustomDial::paintEvent(QPaintEvent*)
+void CustomDial::paintEvent(QPaintEvent* evt)
 {
+    if(!customGraphics){
+        QDial::paintEvent(evt);
+        return;
+    }
     int margin = 16;
 
     QPainter painter(this);
@@ -124,7 +106,6 @@ void CustomDial::paintEvent(QPaintEvent*)
     // Get ratio between current value and maximum to calculate angle
     double ratio = static_cast<double>(QDial::value()) / QDial::maximum();
 
-
     int size = (QDial::width()<QDial::height())?QDial::width():QDial::height();
     int diffH = (QDial::width()>QDial::height())?QDial::width()-QDial::height():0;
     int diffV = (QDial::width()<QDial::height())?QDial::height()-QDial::width():0;
@@ -136,28 +117,23 @@ void CustomDial::paintEvent(QPaintEvent*)
     Qt::BrushStyle bs;
 
     //draw background arc
-    if(drawMark){
-        bs = (Qt::BrushStyle)(size/30+3); //5 for static size
-        painter.setPen(QPen(QBrush(QColor(48,48,48)),bs));
-    }else {
-        bs = (Qt::BrushStyle)2;
-        painter.setPen(QPen(QBrush(QColor(68,68,68)),bs));
-    }
+
+    bs = (Qt::BrushStyle)(size/30+3); //5 for static size
+    painter.setPen(QPen(QBrush(QColor(48,48,48)),bs));
+
     painter.drawArc(rect,0,360*16);
 
     //draw actual value
     painter.setPen(QPen(QBrush(pointColor),bs));
     painter.drawArc(rect,225*16,-ratio*16*270-5*16);
 
-    if(drawMark){
-        //draw marker
-        painter.setPen(QPen(QBrush(QColor(214,214,214)),size/15+4)); //8 for static size
-        painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
-        //draw click pointer
-        if(mousePressX!=0){
-            painter.setPen(QPen(QBrush(QColor(128,128,128)),4));
-            painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
-        }
+    //draw marker
+    painter.setPen(QPen(QBrush(QColor(214,214,214)),size/15+4)); //8 for static size
+    painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
+    //draw click pointer
+    if(mousePressX!=0){
+        painter.setPen(QPen(QBrush(QColor(128,128,128)),4));
+        painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
     }
 }
 

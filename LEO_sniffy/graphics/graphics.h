@@ -36,8 +36,8 @@ public:
     static QString COLOR_TEXT_ALL;
     static QString COLOR_TEXT_LABEL;
     static QString COLOR_TEXT_COMPONENT;
-    static QString COLOR_HOVER;
-    static QString COLOR_HOVER_EXIT;
+    static QString COLOR_WINDOW_CONTROL_HOVER;
+    static QString COLOR_WINDOW_EXIT_HOVER;
     static QString COLOR_WARNING;
     static QString COLOR_ERROR;
     static QString COLOR_UNINITIALIZED;
@@ -50,7 +50,9 @@ public:
     static QString STYLE_CONTROL_BUTTON;
     static QString STYLE_MODULE_BUTTON;
     static QString STYLE_HOLD_BUTTON;
-    static QString STYLE_DIAL;    
+    static QString STYLE_DIAL;
+    static bool STYLE_CUSTOM_DIALS_USED;
+    static QString STYLE_TEXTINPUT;
 
 private:
     static QSharedPointer<AbstractTheme> theme;
