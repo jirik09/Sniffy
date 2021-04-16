@@ -6,12 +6,14 @@ QList<QString> *Graphics::themeList = nullptr;
 QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {  
         [] { return QSharedPointer<AbstractTheme>(new Dark); },
         [] { return QSharedPointer<AbstractTheme>(new Light); },
+        [] { return QSharedPointer<AbstractTheme>(new Dawn); },
 };
 
 QList<QString> *Graphics::initThemesList(){
     themeList = new QList<QString>;
     themeList->append(((QString)(typeid(Dark).name())).remove(0,1));
     themeList->append(((QString)(typeid(Light).name())).remove(0,1));
+    themeList->append(((QString)(typeid(Dawn).name())).remove(0,1));
     return themeList;
 }
 

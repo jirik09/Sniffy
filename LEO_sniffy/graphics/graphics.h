@@ -9,6 +9,7 @@
 
 #include "graphics/themes/dark.h"
 #include "graphics/themes/light.h"
+#include "graphics/themes/dawn.h"
 #include "graphics/abstracttheme.h"
 
 class Graphics : public QObject

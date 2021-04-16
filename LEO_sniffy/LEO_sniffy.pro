@@ -50,6 +50,7 @@ SOURCES += \
     graphics/abstracttheme.cpp \
     graphics/graphics.cpp \
     graphics/themes/dark.cpp \
+    graphics/themes/dawn.cpp \
     graphics/themes/light.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -158,6 +159,7 @@ HEADERS += \
     graphics/abstracttheme.h \
     graphics/graphics.h \
     graphics/themes/dark.h \
+    graphics/themes/dawn.h \
     graphics/themes/light.h \
     mainwindow.h \
     math/movingaverage.h \

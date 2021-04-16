@@ -24,6 +24,7 @@ WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftName, QString rightName,
     ui->pushButton_right->setText(rightName);
 
     styleSelected = Graphics::STYLE_CHECK_BUTTON+"QPushButton:checked{background-color:"+Graphics::getChannelColor(0)+";}";
+    //styleSelected = QString(Graphics::STYLE_CHECK_BUTTON).arg(Graphics::getChannelColor(0));
     styleNotSelected = Graphics::STYLE_CHECK_BUTTON;
 
     connect(ui->pushButton_left,SIGNAL(clicked()),this,SLOT(setLeft()));
@@ -81,6 +82,7 @@ bool WidgetSwitch::isCheckedRight(){
 
 void WidgetSwitch::setColor(QString color){
     styleSelected = Graphics::STYLE_CHECK_BUTTON+"QPushButton:checked{background-color:"+color+";}";
+    //styleSelected = QString(Graphics::STYLE_CHECK_BUTTON).arg(color);
     if(ui->pushButton_right->isChecked()){
         setRight(true);
     }else {
