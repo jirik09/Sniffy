@@ -14,7 +14,7 @@
 
 /* WINDOWS */
 #define DARK_WINDOW_APP "#303030"           //laft panel and dock widget window top
-#define DARK_WINDOW_DOCK_WIDGET "#6c6c6c"   //actualy only undocked border color
+#define DARK_WINDOW_DOCK_WIDGET "#7c7c7c"   //actualy only undocked border color
 #define DARK_WINDOW_WIDGET "#3a3a3a"        // background of all widgets
 
 /* COMPONENTS */
@@ -67,7 +67,7 @@
 
 /***************** GENERAL GLOBAL QT STYLE SHEETS *****************/
 
-#define DARK_STYLE_GLOBAL           DARK_STYLE_OBJECT DARK_STYLE_WIDGET DARK_STYLE_DOCK_WIDGET \
+#define DARK_STYLE_GLOBAL           DARK_STYLE_OBJECT \
                                     DARK_STYLE_SPLITTER DARK_STYLE_SCROLLAREA DARK_STYLE_PUSH_BUTTON \
                                     DARK_STYLE_CHECK_BUTTON DARK_STYLE_SCROLLBAR DARK_STYLE_MENU \
                                     DARK_STYLE_TAB DARK_STYLE_TOOLTIP DARK_STYLE_COMBO_BOX DARK_STYLE_LINEEDIT \
@@ -83,14 +83,13 @@
 
 #define DARK_STYLE_SCROLLAREA       "QScrollArea{border:none}"
 
-#define DARK_STYLE_SCROLLBAR        "QScrollBar:vertical{border: none;background:" DARK_BACKGROUND_FOCUS_IN ";width: 10px;margin: 0 0 0 0;}\
-                                    QScrollBar:horizontal{border: none;background:" DARK_BACKGROUND_FOCUS_IN ";height: 10px;margin: 0 0 0 0;}\
+#define DARK_STYLE_SCROLLBAR        "QScrollBar:vertical{border: none;width: 10px;margin: 0 0 0 0;}\
+                                    QScrollBar:horizontal{border: none;height: 10px;margin: 0 0 0 0;}\
                                     QScrollBar::handle:vertical{border: none;background:" DARK_CONTROLS ";min-height: 38px;}\
                                     QScrollBar::handle:horizontal {border: none;background:" DARK_CONTROLS ";min-width: 38px;}\
-                                    QScrollBar::add-line{height: 0px;}\
-                                    QScrollBar::sub-line{height: 0px;}\
-                                    QScrollBar::up-arrow,QScrollBar::down-arrow{background: none;}\
-                                    QScrollBar::add-page,QScrollBar::sub-page{background: none;}\
+                                    QScrollBar::add-line{height: 0px;border: none;background:" DARK_CONTROLS ";}\
+                                    QScrollBar::sub-line{height: 0px;border: none;background:" DARK_CONTROLS ";}\
+                                    QScrollBar::add-page,QScrollBar::sub-page{background:" DARK_WINDOW_APP";}\
                                     QScrollBar:handle:hover{background:" DARK_WINDOW_CONTROL_HOVER ";}"
 
 #define DARK_STYLE_LINEEDIT         "QLineEdit::focus{border:none;background-color:" DARK_BACKGROUND_FOCUS_IN "}\
