@@ -9,7 +9,6 @@ class AbstractTheme : public QObject
 public:
     explicit AbstractTheme(QObject *parent = nullptr);
 
-    virtual QString getThemeName() = 0;
     virtual QString getAppGlobalStyle() = 0;
     virtual QString getGraphicsPath() = 0;
     virtual QString getChannelColor(int channelIndex) = 0;

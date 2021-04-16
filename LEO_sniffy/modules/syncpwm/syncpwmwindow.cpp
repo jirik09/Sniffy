@@ -7,7 +7,6 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
     config(config)
 {
     ui->setupUi(this);
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
 
     QSplitter *splitter = nullptr;
     QWidget *widget_chart = new QWidget(this, Qt::Window);

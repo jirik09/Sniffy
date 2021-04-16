@@ -14,14 +14,13 @@
 class Graphics : public QObject
 {
     Q_OBJECT
-public:
-    explicit Graphics(QObject *parent = nullptr, int themeIndex = 0);
 
+public:
     static QString getGraphicsPath();
     static QString getChannelColor(int channelIndex);
 
     static QList<QString> *initThemesList();
-    static QSharedPointer<AbstractTheme> getThemeInstance();
+    static QSharedPointer<AbstractTheme> getThemeInstance(int themeIndex);
 
     static QString COLOR_WINDOW_APP;
     static QString COLOR_WINDOW_WIDGET;
@@ -35,6 +34,7 @@ public:
     static QString COLOR_CHART_GRIDLEG_LOW_CONTRAST;
     static QString COLOR_TEXT_ALL;
     static QString COLOR_TEXT_LABEL;
+    static QString COLOR_TEXT_COMPONENT;
     static QString COLOR_WINDOW_CONTROL_HOVER;
     static QString COLOR_WINDOW_EXIT_HOVER;
     static QString COLOR_WARNING;

@@ -7,7 +7,6 @@ PWMGeneratorWindow::PWMGeneratorWindow(PWMGeneratorConfig *config, QWidget *pare
     config(config)
 {
     ui->setupUi(this);
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
     //TODO setup the GUI here
 }
 

@@ -9,7 +9,6 @@
 
 #define DARK_GRAPHICS_PATH  ":/graphics/graphics/themes/dark/"
 #define DARK_FONT           "'MS Shell Dlg 2'"
-#define DARK_THEME_NAME     "Dark"
 
 /***************** COLORS *****************/
 
@@ -26,6 +25,7 @@
 /* TEXT */
 #define DARK_TEXT_ALL "#e4e4e4"
 #define DARK_TEXT_LABEL "#7c7c7c"
+#define DARK_TEXT_COMPONENT "#e4e4e4"
 
 /* SPECIAL PURPOSE */
 #define DARK_COMPONENT_DISABLED "#575757"       //background color of diabled components
@@ -77,7 +77,7 @@
 
 #define DARK_STYLE_DOCK_WIDGET      "QDockWidget{border: 3px solid; background-color:" DARK_WINDOW_DOCK_WIDGET ";}"
 
-#define DARK_STYLE_WIDGET           "QWidget{background-color:" DARK_WINDOW_APP ";}"
+#define DARK_STYLE_WIDGET           "QWidget{background-color:" DARK_WINDOW_WIDGET ";}"
 
 #define DARK_STYLE_SPLITTER         "QSplitter::handle{background-color:" DARK_CHART ";}"
 
@@ -93,15 +93,16 @@
                                     QScrollBar::add-page,QScrollBar::sub-page{background: none;}\
                                     QScrollBar:handle:hover{background:" DARK_WINDOW_CONTROL_HOVER ";}"
 
-#define DARK_STYLE_LINEEDIT         "QLineEdit::focus{border:none;background-color:" DARK_BACKGROUND_FOCUS_IN "}QLineEdit{border:none;background-color:" DARK_DATA_INPUT_AREA ";font:12pt " DARK_FONT ";padding:0px;margin:0px;}"
+#define DARK_STYLE_LINEEDIT         "QLineEdit::focus{border:none;background-color:" DARK_BACKGROUND_FOCUS_IN "}\
+                                    QLineEdit{border:none;background-color:" DARK_DATA_INPUT_AREA ";font:12pt " DARK_FONT ";padding:0px;margin:0px;}"
 
 #define DARK_STYLE_PUSH_BUTTON      "QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
-                                    QPushButton{border:none;background-color:" DARK_CONTROLS ";color:" DARK_TEXT_ALL ";}\
+                                    QPushButton{border:none;background-color:" DARK_CONTROLS ";color:" DARK_TEXT_COMPONENT ";}\
                                     QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED ";color:" DARK_COMPONENT_DISABLED ";}\
                                     QPushButton:pressed{border: 2px solid " DARK_WINDOW_WIDGET ";}"
 
 #define DARK_STYLE_CHECK_BUTTON     "QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
-                                    QPushButton:checked{border: none;background-color:" DARK_CONTROLS ";color:" DARK_TEXT_ALL ";}\
+                                    QPushButton:checked{border: none;background-color:" DARK_CONTROLS ";color:" DARK_TEXT_COMPONENT ";}\
                                     QPushButton{border: none;background-color:" DARK_BACKGROUND_BUTTON ";}\
                                     QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED "; color:" DARK_COMPONENT_DISABLED ";}"
 
@@ -109,9 +110,9 @@
                                     QMenu::item:selected{background-color:" DARK_WINDOW_CONTROL_HOVER ";}"
 
 #define DARK_STYLE_TAB              "QTabWidget::pane {border-top: 3px solid " DARK_BACKGROUND_BUTTON ";top:-3px;} QTabWidget::tab-bar {}\
-                                    QTabBar::tab {background:" DARK_BACKGROUND_BUTTON ";border-bottom: 3px solid rgb(128, 128, 128);padding: 7px;}\
+                                    QTabBar::tab {background:" DARK_BACKGROUND_BUTTON ";border-bottom: 3px solid rgb(128, 128, 128);padding: 7px;color: " DARK_TEXT_COMPONENT ";}\
                                     QTabBar::tab:selected,QTabBar::tab:hover{background:" DARK_WINDOW_WIDGET ";}\
-                                    QTabBar::tab:selected{border-bottom-color:orange;}"
+                                    QTabBar::tab:selected{border-bottom-color:" DARK_WARNING ";}"
 
 #define DARK_STYLE_TOOLTIP          "QToolTip{border: 0px;color:" DARK_TEXT_ALL ";background-color:" DARK_WINDOW_APP ";}"
 
@@ -140,10 +141,11 @@
 
 #define DARK_STYLE_DIAL             DARK_STYLE_LINEEDIT \
                                     "QWidget:disabled{color:" DARK_COMPONENT_DISABLED ";}\
-                                    QWidget{color:" DARK_TEXT_ALL ";}"
+                                    QWidget{color:" DARK_TEXT_COMPONENT ";}\
+                                    QPushButton{font: 12pt" DARK_FONT ";}"
 #define DARK_STYLE_USE_CUSTOM_DIALS true
 
-#define DARK_STYLE_TEXTINPUT        "QWidget:disabled{ color:" DARK_COMPONENT_DISABLED ";}QWidget{font: 10pt" DARK_FONT "; color:" DARK_TEXT_ALL ";}"
+#define DARK_STYLE_TEXTINPUT        "QWidget:disabled{ color:" DARK_COMPONENT_DISABLED ";}QWidget{font: 10pt" DARK_FONT "; color:" DARK_TEXT_COMPONENT ";}"
 
 class Dark : public AbstractTheme
 {
@@ -151,7 +153,6 @@ class Dark : public AbstractTheme
 public:
     explicit Dark(QObject *parent = nullptr);
 
-    QString getThemeName();
     QString getAppGlobalStyle();
     QString getGraphicsPath();
 

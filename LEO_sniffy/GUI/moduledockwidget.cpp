@@ -13,6 +13,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     QHBoxLayout* titleBarLayout = new QHBoxLayout();
     titleBarLayout->setContentsMargins(5, 5, 5, 5);
     titleBar->setLayout(titleBarLayout);
+    titleBar->setStyleSheet("QObject{background-color:" + Graphics::COLOR_WINDOW_APP + ";}");
     titleBarLayout->addWidget(new QLabel(title));
 
     titleBarLayout->addItem(new QSpacerItem(6, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -28,6 +29,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     btnHold->hide();
     titleBarLayout->addWidget(btnHold);
     titleBarLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
+
 
     QPushButton *down = new QPushButton();
     down->resize(10,10);

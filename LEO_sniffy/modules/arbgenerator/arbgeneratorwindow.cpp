@@ -8,7 +8,6 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
     isPWMbased(isPWMbased)
 {
     ui->setupUi(this);
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
 
     QWidget *widget_settings = new QWidget(this, Qt::Window);
     QWidget *widget_chart = new QWidget(this, Qt::Window);

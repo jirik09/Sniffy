@@ -5,12 +5,14 @@ QList<QString> *Graphics::themeList = nullptr;
 
 QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {  
         [] { return QSharedPointer<AbstractTheme>(new Dark); },
-[] { return QSharedPointer<AbstractTheme>(new Light); },
+        [] { return QSharedPointer<AbstractTheme>(new Light); },
 };
 
-Graphics::Graphics(QObject *parent, int themeIndex) : QObject(parent)
-{
-    theme = createTheme[themeIndex]();
+QList<QString> *Graphics::initThemesList(){
+    themeList = new QList<QString>;
+    themeList->append(((QString)(typeid(Dark).name())).remove(0,1));
+    themeList->append(((QString)(typeid(Light).name())).remove(0,1));
+    return themeList;
 }
 
 QString Graphics::getGraphicsPath(){
@@ -24,15 +26,8 @@ QString Graphics::getChannelColor(int channelIndex){
         return theme->getChannelColor(channelIndex);
 }
 
-QList<QString> *Graphics::initThemesList(){
-    themeList = new QList<QString>;
-
-    for(int i = 0;i<createTheme.length();i++)
-        themeList->append(createTheme[i]()->getThemeName());
-    return themeList;
-}
-
-QSharedPointer<AbstractTheme> Graphics::getThemeInstance(){
+QSharedPointer<AbstractTheme> Graphics::getThemeInstance(int themeIndex){
+    theme = createTheme[themeIndex]();
     return theme;
 }
 
@@ -48,6 +43,7 @@ QString Graphics::COLOR_CHART_GRIDLEG_DEFAULT;
 QString Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST;
 QString Graphics::COLOR_TEXT_ALL;
 QString Graphics::COLOR_TEXT_LABEL;
+QString Graphics::COLOR_TEXT_COMPONENT;
 QString Graphics::COLOR_WINDOW_CONTROL_HOVER;
 QString Graphics::COLOR_WINDOW_EXIT_HOVER;
 QString Graphics::COLOR_WARNING;

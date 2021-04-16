@@ -16,7 +16,6 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     config(config)
 {
     ui->setupUi(this);
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
 
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);

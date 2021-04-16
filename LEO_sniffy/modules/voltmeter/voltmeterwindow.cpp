@@ -7,8 +7,6 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     config(config)
 {
     ui->setupUi(this);
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
-
     //setup displays
     QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_v.png); border: none;";
     WidgetDisplay *display;

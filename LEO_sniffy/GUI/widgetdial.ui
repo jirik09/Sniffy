@@ -157,6 +157,11 @@
                 <height>30</height>
                </size>
               </property>
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+               </font>
+              </property>
               <property name="text">
                <string>+</string>
               </property>
@@ -184,6 +189,11 @@
                 <width>30</width>
                 <height>30</height>
                </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>12</pointsize>
+               </font>
               </property>
               <property name="text">
                <string>–</string>
