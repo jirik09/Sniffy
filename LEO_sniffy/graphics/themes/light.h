@@ -7,8 +7,10 @@
 #include "../abstracttheme.h"
 #include "../graphics.h"
 
+#define LIGHT_GRAPHICS_PATH  ":/graphics/graphics/themes/light/"
+
 /* BACKGROUNDS */
-#define LIGHT_BACKGROUND_APP "#adadad"
+#define LIGHT_BACKGROUND_APP "#f0f0f0"
 #define LIGHT_BACKGROUND_WIDGET "#f0f0f0"
 #define LIGHT_BACKGROUND_DATA_AREA "#ffffff"
 #define LIGHT_BACKGROUND_CONTROL "#adadad"
@@ -25,8 +27,10 @@
 #define LIGHT_COMPONENT_DISABLED "#b7b7b7"
 #define LIGHT_ERROR "#bd4236"
 #define LIGHT_WARNING "#d2803c"
+#define LIGHT_DATA_INPUT_AREA "#f0f0f0"
 
 /* CHART GRID & LEGEND */
+#define LIGHT_CHART "#f0f0f0"
 #define LIGHT_CHART_DARK "#333333"
 #define LIGHT_CHART_LIGHT "#878787"
 

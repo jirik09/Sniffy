@@ -6,6 +6,8 @@ Light::Light(QObject *parent)
 
     Graphics::COLOR_WINDOW_APP = LIGHT_BACKGROUND_APP;
     Graphics::COLOR_WINDOW_WIDGET = LIGHT_BACKGROUND_WIDGET;
+    Graphics::COLOR_DATA_INPUT_AREA = LIGHT_DATA_INPUT_AREA;
+    Graphics::COLOR_CHART = LIGHT_CHART;
 }
 
 QString Light::getThemeName(){
@@ -17,7 +19,7 @@ QString Light::getAppGlobalStyle(){
 }
 
 QString Light::getGraphicsPath(){
-    return 0;
+    return LIGHT_GRAPHICS_PATH;
 }
 
 QString Light::getChannelColor(int channelIndex){
