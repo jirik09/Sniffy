@@ -36,6 +36,8 @@ Dark::Dark(QObject *parent)
     Graphics::STYLE_DIAL = DARK_STYLE_DIAL;
     Graphics::STYLE_CUSTOM_DIALS_USED = DARK_STYLE_USE_CUSTOM_DIALS;
     Graphics::STYLE_TEXTINPUT = DARK_STYLE_TEXTINPUT;
+    Graphics::STYLE_DOCK_WIDGET = DARK_STYLE_MODULE_DOCK_WIDGET;
+    Graphics::STYLE_DOCK_WINDOW = DARK_STYLE_OBJECT;
 }
 
 QString Dark::getAppGlobalStyle(){

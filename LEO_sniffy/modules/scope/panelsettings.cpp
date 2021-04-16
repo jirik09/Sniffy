@@ -31,10 +31,10 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsTriggerChannel = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Channel");
     buttonsTriggerChannel->setObjectName("TriggerChannel");
     destination->addWidget(buttonsTriggerChannel);
-    buttonsTriggerChannel->setText("CH1",0);
-    buttonsTriggerChannel->setText("CH2",1);
-    buttonsTriggerChannel->setText("CH3",2);
-    buttonsTriggerChannel->setText("CH4",3);
+    buttonsTriggerChannel->setText(" CH1 ",0);
+    buttonsTriggerChannel->setText(" CH2 ",1);
+    buttonsTriggerChannel->setText(" CH3 ",2);
+    buttonsTriggerChannel->setText(" CH4 ",3);
     buttonsTriggerChannel->setColor(Graphics::getChannelColor(0),0);
     buttonsTriggerChannel->setColor(Graphics::getChannelColor(1),1);
     buttonsTriggerChannel->setColor(Graphics::getChannelColor(2),2);

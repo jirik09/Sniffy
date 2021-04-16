@@ -53,6 +53,8 @@ public:
     static QString STYLE_DIAL;
     static bool STYLE_CUSTOM_DIALS_USED;
     static QString STYLE_TEXTINPUT;
+    static QString STYLE_DOCK_WIDGET;
+    static QString STYLE_DOCK_WINDOW;
 
 private:
     static QSharedPointer<AbstractTheme> theme;

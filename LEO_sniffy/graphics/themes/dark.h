@@ -146,6 +146,8 @@
 
 #define DARK_STYLE_TEXTINPUT        "QWidget:disabled{ color:" DARK_COMPONENT_DISABLED ";}QWidget{font: 10pt" DARK_FONT "; color:" DARK_TEXT_COMPONENT ";}"
 
+#define DARK_STYLE_MODULE_DOCK_WIDGET        DARK_STYLE_WIDGET DARK_STYLE_DOCK_WIDGET
+
 class Dark : public AbstractTheme
 {
     Q_OBJECT

@@ -6,7 +6,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     setAllowedAreas(Qt::RightDockWidgetArea);
     setObjectName(title);
     hide();
-    setStyleSheet(DARK_STYLE_WIDGET DARK_STYLE_DOCK_WIDGET);
+    setStyleSheet(Graphics::STYLE_DOCK_WIDGET);
 
     // ***************** create title bar and window contorl icons *************
     QWidget *titleBar = new QWidget();
@@ -15,7 +15,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     titleBarLayout->setContentsMargins(5,2,5,2);
     titleBar->setLayout(titleBarLayout);
 
-    titleBar->setStyleSheet(DARK_STYLE_OBJECT);
+    titleBar->setStyleSheet(Graphics::STYLE_DOCK_WINDOW);
     titleBarLayout->addWidget(new QLabel(title));
 
     titleBarLayout->addItem(new QSpacerItem(6, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));

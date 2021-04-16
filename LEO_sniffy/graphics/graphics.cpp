@@ -62,3 +62,5 @@ QString Graphics::STYLE_HOLD_BUTTON;
 QString Graphics::STYLE_DIAL;
 bool    Graphics::STYLE_CUSTOM_DIALS_USED = false;
 QString Graphics::STYLE_TEXTINPUT;
+QString Graphics::STYLE_DOCK_WIDGET;
+QString Graphics::STYLE_DOCK_WINDOW;
