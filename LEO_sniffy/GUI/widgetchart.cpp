@@ -6,7 +6,8 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     ui(new Ui::widgetChart),
     maxTraces(maxTraces)
 {
-    ui->setupUi(this);    
+    ui->setupUi(this);
+    setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
 
     chart = new QChart();
     chart->legend()->hide();

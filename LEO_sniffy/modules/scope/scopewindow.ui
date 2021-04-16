@@ -50,7 +50,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="handleWidth">
-      <number>3</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="widget_left" native="true">
       <property name="styleSheet">
@@ -74,6 +74,12 @@
        </property>
        <item>
         <widget class="QWidget" name="widget_top" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -87,22 +93,20 @@
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QWidget{
-background-color: rgb(38, 38, 38);
-}</string>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="spacing">
            <number>0</number>
           </property>
           <property name="leftMargin">
-           <number>40</number>
+           <number>30</number>
           </property>
           <property name="topMargin">
-           <number>5</number>
+           <number>10</number>
           </property>
           <property name="rightMargin">
-           <number>40</number>
+           <number>30</number>
           </property>
           <property name="bottomMargin">
            <number>0</number>
@@ -110,7 +114,7 @@ background-color: rgb(38, 38, 38);
           <item>
            <widget class="QSlider" name="sliderSignal">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -156,9 +160,7 @@ background-color: rgb(38, 38, 38);
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QWidget{
-background-color: rgb(38, 38, 38);
-}</string>
+          <string notr="true"/>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
@@ -183,6 +185,9 @@ background-color: rgb(38, 38, 38);
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <property name="spacing">
@@ -234,9 +239,7 @@ background-color: rgb(38, 38, 38);
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QWidget{
-background-color: rgb(38, 38, 38);
-}</string>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <property name="spacing">
@@ -258,6 +261,12 @@ background-color: rgb(38, 38, 38);
            <layout class="QVBoxLayout" name="verticalLayout_info">
             <property name="spacing">
              <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>15</number>
+            </property>
+            <property name="rightMargin">
+             <number>15</number>
             </property>
            </layout>
           </item>

@@ -16,24 +16,26 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     config(config)
 {
     ui->setupUi(this);
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
+
+    ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
 
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseZoom();
-    chart->setGraphColor(QColor(Graphics::COLOR_UNINITIALIZED));
+    chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
     chartFFT->setRange(0, 50000, -100, 100);
     chartFFT->setDataMinMax(0,50000);
     chartFFT->enableLocalMouseZoom();
-    chartFFT->setGraphColor(QColor(Graphics::COLOR_UNINITIALIZED));
+    chartFFT->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
 
     ui->verticalLayout_chart->addWidget(chartFFT);
     ui->verticalLayout_chart->addWidget(chart);
     chartFFT->hide();
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
+    ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************
@@ -101,7 +103,7 @@ ScopeWindow::~ScopeWindow()
 void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
     ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url("+Graphics::getGraphicsPath()+"signalBackground.png) center;"
-                                        "background-color: "+Graphics::COLOR_DATA_AREA+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
+                                        "background-color: "+Graphics::COLOR_DATA_INPUT_AREA+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
                                                                                          "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
                                                                                          "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+"px;}");
     event->accept();
@@ -258,14 +260,14 @@ void ScopeWindow::triggerEdgeCallback(int index){
 void ScopeWindow::triggerModeCallback(int index){
     if(index==0){
         if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-            panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_UNINITIALIZED,0);
+            panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
             emit triggerModeChanged(ScopeTriggerMode::TRIG_STOP);
             panelSet->buttonsTriggerMode->setText("Single",0);
             labelInfoPanel->setTriggerLabelText("");
 
         }else if(panelSet->buttonsTriggerMode->getText(0)=="Single"){
             emit triggerModeChanged(ScopeTriggerMode::TRIG_SINGLE);
-            panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_UNINITIALIZED,0);
+            panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_RUNNING,0);
             panelSet->buttonsTriggerMode->setText("Stop",0);
         }
     }else if(index==1){
@@ -498,7 +500,7 @@ void ScopeWindow::restoreGUIAfterStartup()
 
 void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
-    panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_UNINITIALIZED,0);
+    panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
     labelInfoPanel->setTriggerLabelText("");
 }
 
@@ -519,9 +521,9 @@ void ScopeWindow::updateChartTimeScale(float timeBase){
         chart->setZoom(chart->getZoom()*previousTimeBase/timeBase);
     }
     if(chart->getLocalZoom()!=1.0){
-        labelInfoPanel->setStyleSheet("QLabel#label_scale {color:"+Graphics::COLOR_UNINITIALIZED+";}");
+        labelInfoPanel->setStyleSheet("QLabel#label_scale {color:"+Graphics::COLOR_WARNING+";}");
     }else{
-        labelInfoPanel->setStyleSheet("color:"+Graphics::COLOR_UNINITIALIZED+";");
+        labelInfoPanel->setStyleSheet("color:"+Graphics::COLOR_TEXT_ALL+";");
     }
     config->chartLocalZoom = chart->getLocalZoom();
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/div"));

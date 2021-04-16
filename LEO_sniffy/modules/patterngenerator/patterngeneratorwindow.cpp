@@ -7,7 +7,6 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     config(config)
 {
     ui->setupUi(this);
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
     //TODO setup the GUI here
 }
 

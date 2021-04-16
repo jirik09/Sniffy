@@ -6,13 +6,16 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     setAllowedAreas(Qt::RightDockWidgetArea);
     setObjectName(title);
     hide();
+    setStyleSheet(Graphics::STYLE_DOCK_WIDGET);
 
     // ***************** create title bar and window contorl icons *************
     QWidget *titleBar = new QWidget();
 
     QHBoxLayout* titleBarLayout = new QHBoxLayout();
-    titleBarLayout->setContentsMargins(5, 5, 5, 5);
+    titleBarLayout->setContentsMargins(5,2,5,2);
     titleBar->setLayout(titleBarLayout);
+
+    titleBar->setStyleSheet(Graphics::STYLE_DOCK_WINDOW);
     titleBarLayout->addWidget(new QLabel(title));
 
     titleBarLayout->addItem(new QSpacerItem(6, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -29,22 +32,23 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     titleBarLayout->addWidget(btnHold);
     titleBarLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
+
     QPushButton *down = new QPushButton();
     down->resize(10,10);
     down->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton{image: url("+Graphics::getGraphicsPath()+"dock.png);}"
-                                                       "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}");
+                                                       "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
     titleBarLayout->addWidget(down);
 
     QPushButton *up = new QPushButton();
     up->resize(10,10);
     up->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton{image: url("+Graphics::getGraphicsPath()+"unDock.png);}"
-                                                     "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER+";}");
+                                                     "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
     titleBarLayout->addWidget(up);
 
     QPushButton *exit = new QPushButton();
     exit->resize(10,10);
     exit->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton{image: url("+Graphics::getGraphicsPath()+"exit.png);}"
-                                                       "QPushButton:hover{background-color:"+Graphics::COLOR_HOVER_EXIT+";}");
+                                                       "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_EXIT_HOVER+";}");
     titleBarLayout->addWidget(exit);
 
     connect(up,SIGNAL(clicked()),this,SLOT(unDockOrMaximize()));

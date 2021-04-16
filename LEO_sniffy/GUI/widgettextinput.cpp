@@ -13,12 +13,10 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, I
     ui->lineEdit->installEventFilter(this);
     inputType = type;
 
-    QString style = "QWidget:disabled{color: "+Graphics::COLOR_UNINITIALIZED+";}"
-                    "QWidget{color:"+Graphics::COLOR_UNINITIALIZED+";}";
+    QString style = Graphics::STYLE_TEXTINPUT;
     ui->label->setStyleSheet(style);
 
-    style = "QWidget:disabled{color: "+Graphics::COLOR_UNINITIALIZED+";}"
-            "QWidget{background-color:"+Graphics::COLOR_DATA_AREA+";color:"+Graphics::COLOR_UNINITIALIZED+";}";
+    style = Graphics::STYLE_TEXTINPUT+"QWidget{background-color:"+Graphics::COLOR_DATA_INPUT_AREA+"} QWidget::focus{ background-color:"+Graphics::COLOR_BACKGROUND_FOCUS_IN+";}";
     ui->lineEdit->setStyleSheet(style);
 }
 
@@ -72,12 +70,7 @@ bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
         if( (ev->key() == Qt::Key_Enter) || (ev->key() == Qt::Key_Return)) processTextEdit = true;
     }
 
-    if(event->type() == QEvent::FocusIn){
-        ui->lineEdit->setStyleSheet("QLineEdit{ background-color:"+Graphics::COLOR_BACKGROUND_FOCUS_IN+";}");
-    }
-
     if(processTextEdit){
-        ui->lineEdit->setStyleSheet("QLineEdit{ background-color:"+Graphics::COLOR_DATA_AREA+";}");
         processInput();
     }
     return QObject::eventFilter(obj, event);

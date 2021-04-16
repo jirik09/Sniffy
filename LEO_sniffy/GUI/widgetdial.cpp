@@ -17,13 +17,9 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     setStyleSheet(Graphics::STYLE_DIAL);
     ui->comboBox->setStyleSheet(Graphics::STYLE_COMBO_BOX);
 
-//    QString style = "QPushButton:pressed{border: 2px solid rgb(48,48,48);}"
-//                    "QPushButton{border: none;color: rgb(214,214,214);"
-//                    "font: 99 12pt 'MS Shell Dlg 2';font-weight:bold;}";
-//    ui->widget_5->setStyleSheet(style);
-
     ui->label_name->setText(name);
     ui->dial->setPageStep(1);
+    ui->dial->setCustomGraphics(Graphics::STYLE_CUSTOM_DIALS_USED);
     setObjectName(name);
 
     connect(ui->pushButton_plus,SIGNAL(clicked()),this,SLOT(plusClicked()));
@@ -31,6 +27,7 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
     options = new QList<params_dial>;
+    setColor(Graphics::COLOR_CONTROLS);
 }
 
 WidgetDial::~WidgetDial()
@@ -40,7 +37,6 @@ WidgetDial::~WidgetDial()
 
 QByteArray WidgetDial::saveGeometry()
 {
-    //TO DO pass all the data including the min max range color etc
     return QByteArray::number(selectedIndex);
 }
 

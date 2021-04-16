@@ -97,7 +97,7 @@
       <bool>true</bool>
      </property>
      <property name="handleWidth">
-      <number>3</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="widget_display" native="true">
       <property name="sizePolicy">

@@ -7,7 +7,6 @@ CounterWindow::CounterWindow(CounterConfig *conf, QWidget *parent) :
     conf(conf)
 {
     ui->setupUi(this);
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
 
     /* Left panel for data display */
     createAllDisplays();

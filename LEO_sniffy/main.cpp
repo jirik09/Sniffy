@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
     CustomSettings::loadSettings(QApplication::applicationDirPath() + "/settings.ini");
     CustomSettings::setThemesList(Graphics::initThemesList());
 
-    Graphics(nullptr, CustomSettings::getThemeIndex());
-    app.setStyleSheet(Graphics::getThemeInstance()->getAppGlobalStyle());
+    //Graphics(nullptr, CustomSettings::getThemeIndex());
+    app.setStyleSheet(Graphics::getThemeInstance(CustomSettings::getThemeIndex())->getAppGlobalStyle());
 
     MainWindow w;
     w.show();

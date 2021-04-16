@@ -14,21 +14,19 @@
 class Graphics : public QObject
 {
     Q_OBJECT
-public:
-    explicit Graphics(QObject *parent = nullptr, int themeIndex = 0);
 
-    static QString getAppGlobalStyle();
+public:
     static QString getGraphicsPath();
     static QString getChannelColor(int channelIndex);
 
     static QList<QString> *initThemesList();
-    static QSharedPointer<AbstractTheme> getThemeInstance();
+    static QSharedPointer<AbstractTheme> getThemeInstance(int themeIndex);
 
     static QString COLOR_WINDOW_APP;
     static QString COLOR_WINDOW_WIDGET;
     static QString COLOR_BACKGROUND_FOCUS_IN;
     static QString COLOR_COMPONENT_DISABLED;
-    static QString COLOR_DATA_AREA;
+    static QString COLOR_DATA_INPUT_AREA;
     static QString COLOR_CONTROLS;
     static QString COLOR_DISPLAY;
     static QString COLOR_CHART;
@@ -37,11 +35,12 @@ public:
     static QString COLOR_TEXT_ALL;
     static QString COLOR_TEXT_LABEL;
     static QString COLOR_TEXT_COMPONENT;
-    static QString COLOR_HOVER;
-    static QString COLOR_HOVER_EXIT;
+    static QString COLOR_WINDOW_CONTROL_HOVER;
+    static QString COLOR_WINDOW_EXIT_HOVER;
     static QString COLOR_WARNING;
     static QString COLOR_ERROR;
-    static QString COLOR_UNINITIALIZED;
+    static QString COLOR_RUNNING;
+    static QString COLOR_UNUSED;
 
     static QString STYLE_PUSH_BUTTON;
     static QString STYLE_CHECK_BUTTON;
@@ -51,7 +50,11 @@ public:
     static QString STYLE_CONTROL_BUTTON;
     static QString STYLE_MODULE_BUTTON;
     static QString STYLE_HOLD_BUTTON;
-    static QString STYLE_DIAL;    
+    static QString STYLE_DIAL;
+    static bool STYLE_CUSTOM_DIALS_USED;
+    static QString STYLE_TEXTINPUT;
+    static QString STYLE_DOCK_WIDGET;
+    static QString STYLE_DOCK_WINDOW;
 
 private:
     static QSharedPointer<AbstractTheme> theme;

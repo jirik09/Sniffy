@@ -7,26 +7,30 @@
 #include "../abstracttheme.h"
 #include "../graphics.h"
 
+#define LIGHT_GRAPHICS_PATH  ":/graphics/graphics/themes/light/"
+
 /* BACKGROUNDS */
-#define LIGHT_BACKGROUND_APP "#303030"
-#define LIGHT_BACKGROUND_WIDGET "#d6d6d6"
-#define LIGHT_BACKGROUND_DATA_AREA "#262626"
-#define LIGHT_BACKGROUND_CONTROL "#3a3a3a"
-#define LIGHT_BACKGROUND_BUTTON "#262626"
-#define LIGHT_BACKGROUND_BUTTON_DISABLED "#303030"
-#define LIGHT_BACKGROUND_FOCUS_IN "#303030"
+#define LIGHT_BACKGROUND_APP "#f0f0f0"
+#define LIGHT_BACKGROUND_WIDGET "#f0f0f0"
+#define LIGHT_BACKGROUND_DATA_AREA "#ffffff"
+#define LIGHT_BACKGROUND_CONTROL "#adadad"
+#define LIGHT_BACKGROUND_BUTTON "#adadad"
+#define LIGHT_BACKGROUND_BUTTON_DISABLED "#adadad"
+#define LIGHT_BACKGROUND_FOCUS_IN "#ffffff"
 
 /* TEXT */
 #define LIGHT_TEXT_DARK "#7c7c7c"
 #define LIGHT_TEXT_LIGHT "#d6d6d6"
 
 /* SPECIAL PURPOSE */
-#define LIGHT_HOVER "#474c5e"
+#define LIGHT_HOVER "#e5f3ff"
 #define LIGHT_COMPONENT_DISABLED "#b7b7b7"
 #define LIGHT_ERROR "#bd4236"
 #define LIGHT_WARNING "#d2803c"
+#define LIGHT_DATA_INPUT_AREA "#f0f0f0"
 
 /* CHART GRID & LEGEND */
+#define LIGHT_CHART "#f0f0f0"
 #define LIGHT_CHART_DARK "#333333"
 #define LIGHT_CHART_LIGHT "#878787"
 

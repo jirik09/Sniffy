@@ -43,6 +43,9 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
+     <property name="handleWidth">
+      <number>5</number>
+     </property>
      <widget class="QWidget" name="widget_module" native="true">
       <property name="minimumSize">
        <size>
