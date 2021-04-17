@@ -62,7 +62,11 @@ QString Graphics::STYLE_CONTROL_BUTTON;
 QString Graphics::STYLE_MODULE_BUTTON;
 QString Graphics::STYLE_HOLD_BUTTON;
 QString Graphics::STYLE_DIAL;
-bool    Graphics::STYLE_CUSTOM_DIALS_USED = false;
 QString Graphics::STYLE_TEXTINPUT;
 QString Graphics::STYLE_DOCK_WIDGET;
 QString Graphics::STYLE_DOCK_WINDOW;
+
+bool    Graphics::STYLE_CUSTOM_DIALS_USED = false;
+bool    Graphics::STYLE_TRANSPARENCY_USED = false;
+
+QString Graphics::STYLE_GLOBAL;

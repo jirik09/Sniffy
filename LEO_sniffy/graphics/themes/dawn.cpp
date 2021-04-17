@@ -25,23 +25,33 @@ Dawn::Dawn(QObject *parent)
     Graphics::COLOR_RUNNING = DAWN_RUNNING;
     Graphics::COLOR_UNUSED = DAWN_UNUSED;
 
+    /* These called with QString().arg() from code (must have %1) */
     Graphics::STYLE_PUSH_BUTTON = DAWN_STYLE_PUSH_BUTTON;
     Graphics::STYLE_CHECK_BUTTON = DAWN_STYLE_CHECK_BUTTON;
     Graphics::STYLE_PROGRESS_BAR = DAWN_STYLE_PROGRESS_BAR;
-    Graphics::STYLE_COMBO_BOX = DAWN_STYLE_COMBO_BOX;
 
+    Graphics::STYLE_COMBO_BOX = DAWN_STYLE_COMBO_BOX;
     Graphics::STYLE_CONTROL_BUTTON = DAWN_STYLE_CONTROL_BUTTON;
     Graphics::STYLE_MODULE_BUTTON = DAWN_STYLE_MODULE_BUTTON;
     Graphics::STYLE_HOLD_BUTTON = DAWN_STYLE_HOLD_BUTTON;
     Graphics::STYLE_DIAL = DAWN_STYLE_DIAL;
-    Graphics::STYLE_CUSTOM_DIALS_USED = DAWN_STYLE_USE_CUSTOM_DIALS;
     Graphics::STYLE_TEXTINPUT = DAWN_STYLE_TEXTINPUT;
     Graphics::STYLE_DOCK_WIDGET = DAWN_STYLE_MODULE_DOCK_WIDGET;
     Graphics::STYLE_DOCK_WINDOW = DAWN_STYLE_OBJECT;
+
+    Graphics::STYLE_CUSTOM_DIALS_USED = DAWN_STYLE_USE_CUSTOM_DIALS;
+    Graphics::STYLE_TRANSPARENCY_USED = DAWN_STYLE_USE_TRANSPARENCY;
+
+    if(DAWN_STYLE_USE_TRANSPARENCY){
+        QString color = QString(DAWN_CONTROLS).remove("#");
+        Graphics::STYLE_GLOBAL = QString(DAWN_STYLE_GLOBAL).arg(color);
+    }else{
+        Graphics::STYLE_GLOBAL = QString(DAWN_STYLE_GLOBAL).arg(DAWN_CONTROLS);
+    }
 }
 
 QString Dawn::getAppGlobalStyle(){
-    return DAWN_STYLE_GLOBAL;
+    return Graphics::STYLE_GLOBAL;
 }
 
 QString Dawn::getGraphicsPath(){

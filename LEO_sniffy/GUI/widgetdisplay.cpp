@@ -49,7 +49,7 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     ui->pushButton_history->setStyleSheet(style);
 
     style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
-            "QPushButton:hover{background-color: "+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+            "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
     ui->pushButton_list->setStyleSheet(style);
 
     style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_clear_history.png);}"
@@ -184,7 +184,9 @@ void WidgetDisplay::setProgressBarRange(int min, int max){
 }
 
 void WidgetDisplay::setProgressBarColor(QString color){
-    ui->progressBar->setStyleSheet(Graphics::STYLE_PROGRESS_BAR+"QProgressBar::chunk{background-color:"+color+";}");
+    if(Graphics::STYLE_TRANSPARENCY_USED)
+        color = color.remove("#");
+    ui->progressBar->setStyleSheet(QString(Graphics::STYLE_PROGRESS_BAR).arg(color));
     ui->progressBar->repaint();
 }
 
@@ -256,10 +258,10 @@ void WidgetDisplay::clearIndicationFlag(int labelNumber)
 
 void WidgetDisplay::setIndicationFlagColor(QString color)
 {
-    QString cFull = "#FF"+color.remove('#');
-    QString cTran1 = "#AA"+color.remove('#');
-    QString cTran2 = "#55"+color.remove('#');
-    QString cBlank = "#00"+color.remove('#');
+    QString cFull = "#FF"+color.remove("#");
+    QString cTran1 = "#AA"+color.remove("#");
+    QString cTran2 = "#55"+color.remove("#");
+    QString cBlank = "#00"+color.remove("#");
     this->cFull = QString("<span style=background-color:"+cFull+";color:"+cBlank+";>--</span>");
     this->cTran1 = QString("<span style=background-color:"+cTran1+";color:"+cBlank+";>--</span>");
     this->cTran2 = QString("<span style=background-color:"+cTran2+";color:"+cBlank+";>--</span>");
@@ -438,13 +440,13 @@ void WidgetDisplay::listChartSwitchClickedCallback(){
     QString style;
     if(listView == DISABLED){
         style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_chart.png);}"
-                "QPushButton:hover{background-color: "+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+                "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         chart->hide();
         list->show();
         listView = ENABLED;
     }else {
         style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
-                "QPushButton:hover{background-color: "+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+                "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         chart->show();
         list->hide();
         listView = DISABLED;
