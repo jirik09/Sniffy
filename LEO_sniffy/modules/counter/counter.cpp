@@ -33,10 +33,10 @@ Counter::Counter(QObject *parent)
 
     /* Ratio Counter Signals/Slots */
     connect(cntWindow->tabRatio->dialSampleCount, &WidgetDialRange::valueChanged, this, &Counter::ratDialSampleCountChangedCallback);
-    connect(cntWindow->tabRatio->buttonRetrigger, &WidgetButtons::clicked, this, &Counter::ratRetriggerCallback);
+    connect(cntWindow->tabRatio->buttonStart, &WidgetButtons::clicked, this, &Counter::ratStartCallback);
 
     /* Intervals Counter Signals/Slots */
-    connect(cntWindow->tabInter->buttonsStart, &WidgetButtons::clicked, this, &Counter::intButtonsStartCallback);
+    connect(cntWindow->tabInter->buttonStart, &WidgetButtons::clicked, this, &Counter::intButtonsStartCallback);
     connect(cntWindow->tabInter->dialTimeout, &WidgetDialRange::valueChanged, this, &Counter::intDialTimeoutChangedCallback);
     connect(cntWindow->tabInter->buttonsEventsSeq, &WidgetButtons::clicked, this, &Counter::intSwitchEventSequenceChangedCallback);
     connect(cntWindow->tabInter->switchEdgeEventA, &WidgetSwitch::clicked, this, &Counter::intEventAChangedCallback);
@@ -136,7 +136,7 @@ void Counter::displayValues(WidgetDisplay *display, QString val, QString avg, QS
         color = Graphics::getChannelColor(1);
 
     display->drawIndicationFlag(LABELNUM_INDIC);
-    cntWindow->displayFlagHoldOn(display, false);
+    cntWindow->displayFlagAcquiring(display, false);
 }
 
 void Counter::switchCounterModeCallback(int index){
@@ -243,7 +243,7 @@ QString Counter::hfFormatRemainSec(uint countToGo, uint additionTime){
 
 void Counter::hfDisplayErrors(){
     if(config->hfState.error == HFState::ErrorType::SIMPLE){
-        cntWindow->displayFlagHoldOn(cntWindow->displayHF, true);
+        cntWindow->displayFlagAcquiring(cntWindow->displayHF, true);
         cntWindow->displayHF->displayQerrString(" ");
         cntWindow->displayHF->displayTerrString(" ");
         cntWindow->showPMErrorSigns(cntWindow->displayHF, false);
@@ -349,7 +349,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         }else {
             displayValues(display, strVal, "", strQerr, strTerr);
             cntWindow->showPMErrorSigns(display, true);
-            cntWindow->displayFlagHoldOn(display, false);
+            cntWindow->displayFlagAcquiring(display, false);
             display->updateProgressBar(val1);
 
             QString quant;
@@ -369,7 +369,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         strVal = display->formatNumber(val1, 'f', 3);
         strVal2 = display->formatNumber(val2, 'e', 5);
         cntWindow->showPMErrorSigns(display, true);
-        cntWindow->displayFlagHoldOn(display, false);
+        cntWindow->displayFlagAcquiring(display, false);
         displayValues(display, strVal, strVal2, "", "");
 
         /* History section */
@@ -503,6 +503,8 @@ void Counter::parseRatioCounter(QByteArray data){
     if(inputString == "WARN"){
         cntWindow->ratDisplayFlagWarning(display, true);
     }else {
+        cntWindow->tabRatio->setStartButton(false);
+
         double val; QString strVal;
         QDataStream streamBuffLeng(data);
         streamBuffLeng >> val;
@@ -513,7 +515,7 @@ void Counter::parseRatioCounter(QByteArray data){
         strVal = display->formatNumber(error, 'g', 6);
         display->displayTerrString(strVal);
 
-        cntWindow->displayFlagHoldOn(display, false);
+        cntWindow->displayFlagAcquiring(display, false);
         cntWindow->showPMErrorSigns(display, true);
         display->drawIndicationFlag(LABELNUM_INDIC);
 
@@ -527,21 +529,25 @@ void Counter::ratReloadState(){
 }
 
 void Counter::ratDialSampleCountChangedCallback(float val){
-    cntWindow->clearDisplay(cntWindow->displayRat, true);
+    //cntWindow->clearDisplay(cntWindow->displayRat, false);
     config->ratState.sampleCount = val;
     write(cmd->RAT_CH3_SAMPLE_COUNT, val);
 }
 
-void Counter::ratRetriggerCallback(int index){
+void Counter::ratStartCallback(int index){
     Q_UNUSED(index);
+    comm->write(moduleCommandPrefix+":"+cmd->START+";");
+    cntWindow->tabRatio->setStartButton(true);
+    cntWindow->displayFlagAcquiring(cntWindow->displayRat, true);
     cntWindow->clearDisplay(cntWindow->displayRat, true);
-    write(cmd->RAT_CH3_SAMPLE_COUNT, config->ratState.sampleCount);
 }
 
 /************************************** INTERVALS FUNCTIONS ****************************************/
 void Counter::parseIntervalsCounter(QByteArray data){
     QByteArray inputString = data.left(4); data.remove(0, 4);
     WidgetDisplay *display = cntWindow->displayInt;
+
+    cntWindow->tabInter->setStartButton(false);
 
     if(inputString == "TMOT"){
         cntWindow->intDisplayFlagTimeout(display, true);
@@ -558,7 +564,7 @@ void Counter::parseIntervalsCounter(QByteArray data){
         displayValues(display, strVal, "", strQerr, strTerr);
 
         cntWindow->showPMErrorSigns(display, true);
-        cntWindow->displayFlagHoldOn(display, false);
+        cntWindow->displayFlagAcquiring(display, false);
 
         /* History section */
         QString pm(0x00B1);
@@ -577,7 +583,8 @@ void Counter::intReloadState(){
 
 void Counter::intButtonsStartCallback(){
     comm->write(moduleCommandPrefix+":"+cmd->START+";");
-    cntWindow->displayFlagHoldOn(cntWindow->displayInt, true);
+    cntWindow->tabInter->setStartButton(true);
+    cntWindow->displayFlagAcquiring(cntWindow->displayInt, true);
     cntWindow->clearDisplay(cntWindow->displayInt, true);
 }
 

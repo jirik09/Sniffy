@@ -7,10 +7,10 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, CounterConfig
     WidgetSeparator *separatorStart = new WidgetSeparator(parent,"Let's roll");
     destination->addWidget(separatorStart);
 
-    buttonsStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
-    buttonsStart->setObjectName("btnStart");
-    buttonsStart->setText("Start", 0);
-    destination->addWidget(buttonsStart);
+    buttonStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
+    buttonStart->setObjectName("btnStart");
+    buttonStart->setText("Start", 0);
+    destination->addWidget(buttonStart);
 
     dialTimeout = new WidgetDialRange(parent ,"Timeout");
     dialTimeout->setObjectName("dialIntTimeout");
@@ -115,3 +115,12 @@ void CounterTabIntervals::setSeqPicture(){
     labelPicEventsSeq->setPixmap(pixmapEventsSeq->scaled(width, height, Qt::KeepAspectRatio));
 }
 
+void CounterTabIntervals::setStartButton(bool start){
+    if(start){
+        buttonStart->setColor(Graphics::COLOR_WARNING,0);
+        buttonStart->setText("Acquiring",0);
+    }else{
+        buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
+        buttonStart->setText("Start",0);
+    }
+}

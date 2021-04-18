@@ -51,12 +51,14 @@ public:
     CounterTabIntervals *tabInter;
 
     void setSpecification(CounterSpec *spec);
-    void displayFlagHoldOn(WidgetDisplay *display, bool visible);
+    void displayFlagAcquiring(WidgetDisplay *display, bool visible);
     void displayFlagSwitchMode(WidgetDisplay *display, bool visible);
     void ratDisplayFlagWarning(WidgetDisplay *display, bool visible);
-    void intDisplayFlagTimeout(WidgetDisplay *display, bool visible);    
+    void intDisplayFlagTimeout(WidgetDisplay *display, bool visible);
     void showPMErrorSigns(WidgetDisplay *display, bool visible);    
     void clearDisplay(WidgetDisplay *display, bool uponSwitch);
+    void setStartButton(bool start);
+
     void msleep(int msec);
 
     void hfSetColorRemainSec(bool waiting);

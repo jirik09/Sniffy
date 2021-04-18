@@ -185,8 +185,10 @@ void CounterWindow::resetPreviousCounterMode(){
         displayLFCh2->hide();
     }else if(conf->modePrevIndex == CounterMode::RATIO) {
         displayRat->hide();
+        tabRatio->setStartButton(false);
     }else if(conf->modePrevIndex == CounterMode::INTERVAL) {
         displayInt->hide();
+        tabInter->setStartButton(false);
     }
 }
 
@@ -225,7 +227,7 @@ void CounterWindow::setNextCounterMode(int index){
 
     }else if(index == (int)CounterMode::RATIO) {
         displayRat->show();
-        clearDisplay(displayRat, true);
+        clearDisplay(displayRat, false);
 
     }else if(index == (int)CounterMode::INTERVAL) {
         tabInter->loadGraphics();
@@ -238,17 +240,17 @@ void CounterWindow::clearDisplay(WidgetDisplay *display, bool uponSwitch){
     display->displayString("");
     display->displayQerrString("");
     display->displayTerrString("");
-    displayFlagHoldOn(display, uponSwitch);
+    displayFlagAcquiring(display, uponSwitch);
     showPMErrorSigns(display, false);
 }
 
-void CounterWindow::displayFlagHoldOn(WidgetDisplay *display, bool visible){
-    QString string = (visible) ? "HOLD ON" : "";
+void CounterWindow::displayFlagAcquiring(WidgetDisplay *display, bool visible){
+    QString string = (visible) ? "Acquiring" : "";
     display->setLabelText(LABELNUM_FLAG, string);
 }
 
 void CounterWindow::displayFlagSwitchMode(WidgetDisplay *display, bool visible){
-    QString string = (visible) ? "FREQ 2 HI !!!" : "";
+    QString string = (visible) ? "Freq 2 hi !!!" : "";
     display->setLabelText(LABELNUM_FLAG, string);
 }
 
@@ -410,7 +412,7 @@ void CounterWindow::lfShowErrorStyle(WidgetDisplay *display, bool show){
 
 /************************************** RATIO MEAS. FUNCTIONS ****************************************/
 void CounterWindow::ratDisplayFlagWarning(WidgetDisplay *display, bool visible){
-    QString string = (visible) ? "SC 2 LOW !!!" : "";
+    QString string = (visible) ? "SC 2 low !!!" : "";
     display->setLabelText(LABELNUM_FLAG, string);
 }
 
