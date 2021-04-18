@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent):
     sett = new SettingsDialog(this);
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
-    ui->widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    //ui->widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     ui->verticalLayout_modules->addWidget(sep);
 
     createModulesWidgets();

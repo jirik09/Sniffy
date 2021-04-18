@@ -111,7 +111,7 @@ QByteArray SyncPwm::getConfiguration(){
 
 void SyncPwm::stepGenEndNotif(){
     spwmWindow->setStartTxt();
-    spwmWindow->uncheckStartButton();
+    //spwmWindow->uncheckStartButton();
     config->state = State::STOPPED;
     setModuleStatus(ModuleStatus::PAUSE);
 }

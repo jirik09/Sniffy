@@ -77,7 +77,6 @@ void SyncPwmWindow::restoreGUIAfterStartup(){
 void SyncPwmWindow::setStartTxt(){
     settings->buttonStart->setText("Start");
     settings->buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
-
 }
 
 void SyncPwmWindow::setStopTxt(){

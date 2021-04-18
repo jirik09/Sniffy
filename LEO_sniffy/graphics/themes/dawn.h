@@ -47,7 +47,7 @@
 /* COLORS */
 #define DAWN_BLUE "#3193e4"
 #define DAWN_ORANGE "#fa961b"
-#define DAWN_GREEN "#3aa79f"
+#define DAWN_GREEN "#259789"
 #define DAWN_PURPLE "#a844b9"
 #define DAWN_YELLOW "#f7c034"
 #define DAWN_RED "#de5359"
@@ -68,6 +68,7 @@
 /***************** GENERAL GLOBAL QT STYLE SHEETS *****************/
 
 #define DAWN_STYLE_USE_TRANSPARENCY true // arguments must define transparency ('#' removed in code)
+#define DAWN_STYLE_USE_CUSTOM_DIALS true
 
 #define DAWN_STYLE_GLOBAL           DAWN_STYLE_OBJECT \
                                     DAWN_STYLE_SPLITTER DAWN_STYLE_SCROLLAREA DAWN_STYLE_PUSH_BUTTON \
@@ -93,10 +94,10 @@
 #define DAWN_STYLE_SCROLLBAR \
 "QScrollBar:vertical{border: none;width: 10px;margin: 0 0 0 0;}\
 QScrollBar:horizontal{border: none;height: 10px;margin: 0 0 0 0;}\
-QScrollBar::handle:vertical{border-radius: 2px;border: none;background-color:" DAWN_CONTROLS ";min-height: 38px;}\
-QScrollBar::handle:horizontal{border-radius: 2px;border: none;background-color:" DAWN_CONTROLS ";min-width: 38px;}\
-QScrollBar::add-line{height: 0px;border: none;background-color:" DAWN_CONTROLS ";}\
-QScrollBar::sub-line{height: 0px;border: none;background-color:" DAWN_CONTROLS ";}\
+QScrollBar::handle:vertical{border-radius: 2px;border: none;background-color:" DAWN_TEXT_LABEL ";min-height: 38px;}\
+QScrollBar::handle:horizontal{border-radius: 2px;border: none;background-color:" DAWN_TEXT_LABEL ";min-width: 38px;}\
+QScrollBar::add-line{height: 0px;border: none;background-color:" DAWN_TEXT_LABEL ";}\
+QScrollBar::sub-line{height: 0px;border: none;background-color:" DAWN_TEXT_LABEL ";}\
 QScrollBar::add-page,QScrollBar::sub-page{background-color: #44a1a4ab;}\
 QScrollBar:handle:hover{background-color: #bba1a4ab;}"
 
@@ -169,8 +170,6 @@ QPushButton:hover{background-color:#3Cfa961b;border-color:" DAWN_WARNING ";color
 "QWidget:disabled{color:" DAWN_COMPONENT_DISABLED ";}\
 QWidget{color:" DAWN_TEXT_COMPONENT ";}\
 QPushButton{font: 12pt" DAWN_FONT ";}"
-
-#define DAWN_STYLE_USE_CUSTOM_DIALS true
 
 #define DAWN_STYLE_TEXTINPUT \
 "QWidget:disabled{ color:" DAWN_COMPONENT_DISABLED ";}\

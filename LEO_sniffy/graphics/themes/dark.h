@@ -68,6 +68,7 @@
 /***************** GENERAL GLOBAL QT STYLE SHEETS *****************/
 
 #define DARK_STYLE_USE_TRANSPARENCY false  // if true, arguments must define transparency (# removed in code)
+#define DARK_STYLE_USE_CUSTOM_DIALS true
 
 #define DARK_STYLE_GLOBAL           DARK_STYLE_OBJECT \
                                     DARK_STYLE_SPLITTER DARK_STYLE_SCROLLAREA DARK_STYLE_CHECK_BUTTON \
@@ -161,8 +162,6 @@ QPushButton:hover{border-width:2px;}"
 "QWidget:disabled{color:" DARK_COMPONENT_DISABLED ";}\
 QWidget{color:" DARK_TEXT_COMPONENT ";}\
 QPushButton{font: 12pt" DARK_FONT ";}"
-
-#define DARK_STYLE_USE_CUSTOM_DIALS true
 
 #define DARK_STYLE_TEXTINPUT \
 "QWidget:disabled{ color:" DARK_COMPONENT_DISABLED ";}\
