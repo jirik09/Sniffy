@@ -49,6 +49,7 @@ struct LFState
 struct RatState
 {
     int sampleCount;
+    bool running;
 };
 
 struct IntState
@@ -56,6 +57,7 @@ struct IntState
     enum class Sequence { AB = 0, BA = 1 } seqAB;
     enum class Event { RISING = 0, FALLING = 1 } eventA, eventB;
     int timeout;
+    bool running;
 };
 
 

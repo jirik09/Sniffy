@@ -62,8 +62,8 @@ ModuleDockWidget::~ModuleDockWidget()
 {
 }
 
-void ModuleDockWidget::showHoldButton(){
-    btnHold->show();
+void ModuleDockWidget::showHoldButton(bool show){
+    (show) ? btnHold->show() : btnHold->hide();
 }
 
 void ModuleDockWidget::unDockOrMaximize(){

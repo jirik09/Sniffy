@@ -69,7 +69,7 @@ void PWMGenerator::stopModule()
 //In case hold is needed
 
 void PWMGenerator::showHoldButtonCallback(){
-    this->showModuleHoldButton();
+    this->showModuleHoldButton(true);
 }
 
 void PWMGenerator::holdButtonCallback(bool held){

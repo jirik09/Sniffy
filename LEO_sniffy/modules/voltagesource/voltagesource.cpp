@@ -69,7 +69,7 @@ void VoltageSource::stopModule()
 //In case hold is needed
 
 void VoltageSource::showHoldButtonCallback(){
-    this->showModuleHoldButton();
+    this->showModuleHoldButton(true);
 }
 
 void VoltageSource::holdButtonCallback(bool held){

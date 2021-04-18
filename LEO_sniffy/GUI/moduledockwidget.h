@@ -16,7 +16,7 @@ public:
     explicit ModuleDockWidget(QWidget *parent = nullptr, QString title = nullptr);
     ~ModuleDockWidget();
 
-    void showHoldButton();
+    void showHoldButton(bool show);
 
 signals:
     void moduleWindowClosing();

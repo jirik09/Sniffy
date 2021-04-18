@@ -43,16 +43,14 @@ Counter::Counter(QObject *parent)
     connect(cntWindow->tabInter->switchEdgeEventB, &WidgetSwitch::clicked, this, &Counter::intEventBChangedCallback);
 }
 
-void Counter::startModule(){    
-    startCounting();
-}
+void Counter::startModule(){}
 
 void Counter::stopModule(){
     stopCounting();
 }
 
 void Counter::showHoldButtonCallback(){
-    this->showModuleHoldButton();
+    this->showModuleHoldButton(true);
 }
 
 void Counter::holdCounter(bool held){
@@ -225,6 +223,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
 }
 
 void Counter::hfReloadState(){
+    this->showModuleHoldButton(true);
     hfSwitchQuantityCallback((int)config->hfState.quantity);
     hfSwitchGateTimeCallback(config->hfState.gateTimeIndexBackup);
 }
@@ -380,6 +379,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
 }
 
 void Counter::lfReloadState(){
+    this->showModuleHoldButton(true);
     LFState::Channel chan = (config->lfState.activeChan == LFState::ActiveChan::CHAN1) ? config->lfState.chan1 : config->lfState.chan2;
     if (chan.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
         lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
@@ -501,10 +501,11 @@ void Counter::parseRatioCounter(QByteArray data){
     WidgetDisplay *display = cntWindow->displayRat;
 
     if(inputString == "WARN"){
+        cntWindow->clearDisplay(cntWindow->displayRat, false);
         cntWindow->ratDisplayFlagWarning(display, true);
-    }else {
         cntWindow->tabRatio->setStartButton(false);
-
+        config->ratState.running = false;
+    }else {        
         double val; QString strVal;
         QDataStream streamBuffLeng(data);
         streamBuffLeng >> val;
@@ -525,21 +526,31 @@ void Counter::parseRatioCounter(QByteArray data){
 }
 
 void Counter::ratReloadState(){
+    config->ratState.running = false;
+    this->showModuleHoldButton(false);
     ratDialSampleCountChangedCallback(config->ratState.sampleCount);
 }
 
-void Counter::ratDialSampleCountChangedCallback(float val){
-    //cntWindow->clearDisplay(cntWindow->displayRat, false);
+void Counter::ratDialSampleCountChangedCallback(float val){    
     config->ratState.sampleCount = val;
     write(cmd->RAT_CH3_SAMPLE_COUNT, val);
+    cntWindow->clearDisplay(cntWindow->displayRat, config->ratState.running);
 }
 
 void Counter::ratStartCallback(int index){
-    Q_UNUSED(index);
-    comm->write(moduleCommandPrefix+":"+cmd->START+";");
-    cntWindow->tabRatio->setStartButton(true);
-    cntWindow->displayFlagAcquiring(cntWindow->displayRat, true);
-    cntWindow->clearDisplay(cntWindow->displayRat, true);
+    Q_UNUSED(index);   
+    if(config->ratState.running){
+        stopCounting();
+        cntWindow->tabRatio->setStartButton(!config->ratState.running);
+        cntWindow->displayFlagAcquiring(cntWindow->displayRat, false);
+        config->ratState.running = false;
+    }else {
+        startCounting();
+        cntWindow->tabRatio->setStartButton(!config->ratState.running);
+        cntWindow->clearDisplay(cntWindow->displayRat, true);
+        //cntWindow->displayFlagAcquiring(cntWindow->displayRat, true);
+        config->ratState.running = true;
+    }
 }
 
 /************************************** INTERVALS FUNCTIONS ****************************************/
@@ -575,6 +586,8 @@ void Counter::parseIntervalsCounter(QByteArray data){
 }
 
 void Counter::intReloadState(){
+    config->intState.running = false;
+    this->showModuleHoldButton(false);
     intSwitchEventSequenceChangedCallback((int)config->intState.seqAB);
     intDialTimeoutChangedCallback(config->intState.timeout);
     intEventAChangedCallback((int)config->intState.eventA);
@@ -623,6 +636,8 @@ void Counter::intDialTimeoutChangedCallback(float val){
 void Counter::writeConfiguration(){ //tahle funkce se vola vzdy pri otevreni modulu
     cntWindow->restoreGUIAfterStartup();
     switchCounterModeCallback((int)config->mode);
+    if(config->mode == CounterMode::HIGH_FREQUENCY || config->mode == CounterMode::LOW_FREQUENCY)
+        startCounting();
 }
 
 void Counter::parseConfiguration(QByteArray config){    

@@ -27,8 +27,8 @@ CounterTabRatio::CounterTabRatio(QVBoxLayout *destination, QWidget *parent) : QO
 
 void CounterTabRatio::setStartButton(bool start){
     if(start){
-        buttonStart->setColor(Graphics::COLOR_WARNING,0);
-        buttonStart->setText("Acquiring",0);
+        buttonStart->setColor(Graphics::COLOR_RUNNING,0);
+        buttonStart->setText("Stop",0);
     }else{
         buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
         buttonStart->setText("Start",0);

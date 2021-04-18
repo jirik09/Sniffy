@@ -60,7 +60,7 @@ public:
     QString getModuleName();
     void setModuleName(QString value);
 
-    void showModuleHoldButton();
+    void showModuleHoldButton(bool show);
 
     int getResources();
 
