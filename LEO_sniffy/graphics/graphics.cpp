@@ -6,12 +6,14 @@ QList<QString> *Graphics::themeList = nullptr;
 QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {  
         [] { return QSharedPointer<AbstractTheme>(new Dark); },
         [] { return QSharedPointer<AbstractTheme>(new Light); },
+        [] { return QSharedPointer<AbstractTheme>(new Dawn); },
 };
 
 QList<QString> *Graphics::initThemesList(){
     themeList = new QList<QString>;
     themeList->append(((QString)(typeid(Dark).name())).remove(0,1));
     themeList->append(((QString)(typeid(Light).name())).remove(0,1));
+    themeList->append(((QString)(typeid(Dawn).name())).remove(0,1));
     return themeList;
 }
 
@@ -60,7 +62,11 @@ QString Graphics::STYLE_CONTROL_BUTTON;
 QString Graphics::STYLE_MODULE_BUTTON;
 QString Graphics::STYLE_HOLD_BUTTON;
 QString Graphics::STYLE_DIAL;
-bool    Graphics::STYLE_CUSTOM_DIALS_USED = false;
 QString Graphics::STYLE_TEXTINPUT;
 QString Graphics::STYLE_DOCK_WIDGET;
 QString Graphics::STYLE_DOCK_WINDOW;
+
+bool    Graphics::STYLE_CUSTOM_DIALS_USED = false;
+bool    Graphics::STYLE_TRANSPARENCY_USED = false;
+
+QString Graphics::STYLE_GLOBAL;

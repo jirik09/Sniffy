@@ -68,7 +68,9 @@ void WidgetDialRange::setColor(QString color){
     QString style = Graphics::STYLE_DIAL+"QWidget{color:"+color+";}";
     ui->widget_dial->setStyleSheet(style);
 
-    style = Graphics::STYLE_PUSH_BUTTON+"QPushButton{background-color:"+color+";}";
+    if(Graphics::STYLE_TRANSPARENCY_USED)
+        color = color.remove("#");
+    style = QString(Graphics::STYLE_PUSH_BUTTON).arg(color);
     ui->pushButton_plus->setStyleSheet(style);
     ui->pushButton_minus->setStyleSheet(style);
 }

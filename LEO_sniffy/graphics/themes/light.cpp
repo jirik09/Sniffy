@@ -15,7 +15,7 @@ QString Light::getThemeName(){
 }
 
 QString Light::getAppGlobalStyle(){
-    return 0;
+    return "";
 }
 
 QString Light::getGraphicsPath(){

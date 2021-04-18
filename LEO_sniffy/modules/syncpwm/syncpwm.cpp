@@ -40,7 +40,9 @@ SyncPwm::SyncPwm(QObject *parent)
     connect(spwmWindow->settings->dialPhaseCh[3], &WidgetDialRange::valueChanged, this, &SyncPwm::dialPhaseCallback);
 }
 
-void SyncPwm::startModule(){}
+void SyncPwm::startModule(){
+    setModuleStatus(ModuleStatus::PAUSE);
+}
 
 void SyncPwm::stopModule(){
     write(cmd->SPWM_COMMAND, cmd->SPWM_DEINIT);
@@ -48,10 +50,12 @@ void SyncPwm::stopModule(){
 
 void SyncPwm::start(){
     write(cmd->SPWM_COMMAND, cmd->START);
+    setModuleStatus(ModuleStatus::PLAY);
 }
 
 void SyncPwm::stop(){
     write(cmd->SPWM_COMMAND, cmd->STOP);
+    setModuleStatus(ModuleStatus::PAUSE);
 }
 
 void SyncPwm::parseData(QByteArray data){
@@ -107,8 +111,9 @@ QByteArray SyncPwm::getConfiguration(){
 
 void SyncPwm::stepGenEndNotif(){
     spwmWindow->setStartTxt();
-    spwmWindow->uncheckStartButton();
+    //spwmWindow->uncheckStartButton();
     config->state = State::STOPPED;
+    setModuleStatus(ModuleStatus::PAUSE);
 }
 
 void SyncPwm::setFreq(float val, int chanIndex){

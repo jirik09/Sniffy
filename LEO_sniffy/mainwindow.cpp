@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent):
 {
     ui->setupUi(this);
 
-    ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_sniffy.png);");
+    ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_sniffy.png);");    
     ui->centralwidget->setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_APP+";}"
                                      "QWidget#centralwidget{border-right: 1px solid"+Graphics::COLOR_TEXT_LABEL+";}");
 
@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent):
     sett = new SettingsDialog(this);
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
+    //ui->widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     ui->verticalLayout_modules->addWidget(sep);
 
     createModulesWidgets();

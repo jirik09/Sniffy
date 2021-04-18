@@ -2,6 +2,14 @@
 
 CounterTabRatio::CounterTabRatio(QVBoxLayout *destination, QWidget *parent) : QObject(parent)
 {
+    WidgetSeparator *separatorRetrigButton = new WidgetSeparator(parent,"Sampling retrigger");
+    destination->addWidget(separatorRetrigButton);
+
+    buttonRetrigger = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, 0);
+    buttonRetrigger->setObjectName("retrigger");
+    buttonRetrigger->setText("Start", 0);
+    destination->addWidget(buttonRetrigger);
+
     WidgetSeparator *separatorSampleCounte = new WidgetSeparator(parent,"Sampling of the reference input");
     destination->addWidget(separatorSampleCounte);
 
@@ -11,14 +19,6 @@ CounterTabRatio::CounterTabRatio(QVBoxLayout *destination, QWidget *parent) : QO
     dialSampleCount->setColor(Graphics::COLOR_CONTROLS);
     dialSampleCount->hideUnitSelection();
     destination->addWidget(dialSampleCount);
-
-    WidgetSeparator *separatorRetrigButton = new WidgetSeparator(parent,"Sampling retrigger");
-    destination->addWidget(separatorRetrigButton);
-
-    buttonRetrigger = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, 0);
-    buttonRetrigger->setObjectName("retrigger");
-    buttonRetrigger->setText("Retrigger", 0);
-    destination->addWidget(buttonRetrigger);
 
     QSpacerItem *verticalSpacer;
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);

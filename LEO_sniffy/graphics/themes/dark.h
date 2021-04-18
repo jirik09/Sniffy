@@ -67,86 +67,107 @@
 
 /***************** GENERAL GLOBAL QT STYLE SHEETS *****************/
 
+#define DARK_STYLE_USE_TRANSPARENCY false  // if true, arguments must define transparency (# removed in code)
+#define DARK_STYLE_USE_CUSTOM_DIALS true
+
 #define DARK_STYLE_GLOBAL           DARK_STYLE_OBJECT \
-                                    DARK_STYLE_SPLITTER DARK_STYLE_SCROLLAREA DARK_STYLE_PUSH_BUTTON \
-                                    DARK_STYLE_CHECK_BUTTON DARK_STYLE_SCROLLBAR DARK_STYLE_MENU \
-                                    DARK_STYLE_TAB DARK_STYLE_TOOLTIP DARK_STYLE_COMBO_BOX DARK_STYLE_LINEEDIT \
+                                    DARK_STYLE_SPLITTER DARK_STYLE_SCROLLAREA DARK_STYLE_CHECK_BUTTON \
+                                    DARK_STYLE_SCROLLBAR DARK_STYLE_MENU DARK_STYLE_TAB \
+                                    DARK_STYLE_TOOLTIP DARK_STYLE_COMBO_BOX DARK_STYLE_LINEEDIT \
                                     DARK_STYLE_LIST_VIEW DARK_STYLE_PROGRESS_BAR
 
-#define DARK_STYLE_OBJECT           "QObject{background-color:" DARK_WINDOW_APP ";font: 10pt" DARK_FONT ";color:" DARK_TEXT_ALL ";border:none;}"
+#define DARK_STYLE_OBJECT \
+"QObject{background-color:" DARK_WINDOW_APP ";font: 10pt" DARK_FONT ";color:" DARK_TEXT_ALL ";border:none;}"
 
-#define DARK_STYLE_DOCK_WIDGET      "QDockWidget{border: 3px solid; background-color:" DARK_WINDOW_DOCK_WIDGET ";}"
+#define DARK_STYLE_DOCK_WIDGET \
+"QDockWidget{border: 3px solid; background-color:" DARK_WINDOW_DOCK_WIDGET ";}"
 
-#define DARK_STYLE_WIDGET           "QWidget{background-color:" DARK_WINDOW_WIDGET ";}"
+#define DARK_STYLE_WIDGET \
+"QWidget{background-color:" DARK_WINDOW_WIDGET ";}"
 
-#define DARK_STYLE_SPLITTER         "QSplitter::handle{background-color:" DARK_CHART ";}"
+#define DARK_STYLE_SPLITTER \
+"QSplitter::handle{background-color:" DARK_CHART ";}"
 
-#define DARK_STYLE_SCROLLAREA       "QScrollArea{border:none}"
+#define DARK_STYLE_SCROLLAREA \
+"QScrollArea{border:none}"
 
-#define DARK_STYLE_SCROLLBAR        "QScrollBar:vertical{border: none;width: 10px;margin: 0 0 0 0;}\
-                                    QScrollBar:horizontal{border: none;height: 10px;margin: 0 0 0 0;}\
-                                    QScrollBar::handle:vertical{border: none;background:" DARK_CONTROLS ";min-height: 38px;}\
-                                    QScrollBar::handle:horizontal {border: none;background:" DARK_CONTROLS ";min-width: 38px;}\
-                                    QScrollBar::add-line{height: 0px;border: none;background:" DARK_CONTROLS ";}\
-                                    QScrollBar::sub-line{height: 0px;border: none;background:" DARK_CONTROLS ";}\
-                                    QScrollBar::add-page,QScrollBar::sub-page{background:" DARK_WINDOW_APP";}\
-                                    QScrollBar:handle:hover{background:" DARK_WINDOW_CONTROL_HOVER ";}"
+#define DARK_STYLE_SCROLLBAR \
+"QScrollBar:vertical{border: none;width: 10px;margin: 0 0 0 0;}\
+QScrollBar:horizontal{border: none;height: 10px;margin: 0 0 0 0;}\
+QScrollBar::handle:vertical{border: none;background-color:" DARK_CONTROLS ";min-height: 38px;}\
+QScrollBar::handle:horizontal {border: none;background-color:" DARK_CONTROLS ";min-width: 38px;}\
+QScrollBar::add-line{height: 0px;border: none;background-color:" DARK_CONTROLS ";}\
+QScrollBar::sub-line{height: 0px;border: none;background-color:" DARK_CONTROLS ";}\
+QScrollBar::add-page,QScrollBar::sub-page{background-color:" DARK_WINDOW_APP";}\
+QScrollBar:handle:hover{background-color:" DARK_WINDOW_CONTROL_HOVER ";}"
 
-#define DARK_STYLE_LINEEDIT         "QLineEdit::focus{border:none;background-color:" DARK_BACKGROUND_FOCUS_IN "}\
-                                    QLineEdit{border:none;background-color:" DARK_DATA_INPUT_AREA ";font:12pt " DARK_FONT ";padding:0px;margin:0px;}"
+#define DARK_STYLE_LINEEDIT \
+"QLineEdit::focus{border:none;background-color:" DARK_BACKGROUND_FOCUS_IN "}\
+QLineEdit{border:none;background-color:" DARK_DATA_INPUT_AREA ";font:12pt " DARK_FONT ";padding:0px;margin:0px;}"
 
-#define DARK_STYLE_PUSH_BUTTON      "QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
-                                    QPushButton{border:none;background-color:" DARK_CONTROLS ";color:" DARK_TEXT_COMPONENT ";}\
-                                    QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED ";color:" DARK_COMPONENT_DISABLED ";}\
-                                    QPushButton:pressed{border: 2px solid " DARK_WINDOW_WIDGET ";}"
+#define DARK_STYLE_MENU \
+"QMenu::item{background-color:" DARK_DATA_INPUT_AREA ";}\
+QMenu::item:selected{background-color:" DARK_WINDOW_CONTROL_HOVER ";}"
 
-#define DARK_STYLE_CHECK_BUTTON     "QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
-                                    QPushButton:checked{border: none;background-color:" DARK_CONTROLS ";color:" DARK_TEXT_COMPONENT ";}\
-                                    QPushButton{border: none;background-color:" DARK_BACKGROUND_BUTTON ";}\
-                                    QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED "; color:" DARK_COMPONENT_DISABLED ";}"
+#define DARK_STYLE_TAB \
+"QTabWidget::pane {border-top: 3px solid " DARK_BACKGROUND_BUTTON ";top:-3px;} QTabWidget::tab-bar {}\
+QTabBar::tab {background-color:" DARK_BACKGROUND_BUTTON ";border-bottom: 3px solid rgb(128, 128, 128);padding: 7px;color: " DARK_TEXT_COMPONENT ";}\
+QTabBar::tab:selected,QTabBar::tab:hover{background-color:" DARK_WINDOW_WIDGET ";}\
+QTabBar::tab:selected{border-bottom-color:" DARK_WARNING ";}"
 
-#define DARK_STYLE_MENU             "QMenu::item{background-color:" DARK_DATA_INPUT_AREA ";}\
-                                    QMenu::item:selected{background-color:" DARK_WINDOW_CONTROL_HOVER ";}"
+#define DARK_STYLE_TOOLTIP \
+"QToolTip{border: 0px;color:" DARK_TEXT_ALL ";background-color:" DARK_WINDOW_APP ";}"
 
-#define DARK_STYLE_TAB              "QTabWidget::pane {border-top: 3px solid " DARK_BACKGROUND_BUTTON ";top:-3px;} QTabWidget::tab-bar {}\
-                                    QTabBar::tab {background:" DARK_BACKGROUND_BUTTON ";border-bottom: 3px solid rgb(128, 128, 128);padding: 7px;color: " DARK_TEXT_COMPONENT ";}\
-                                    QTabBar::tab:selected,QTabBar::tab:hover{background:" DARK_WINDOW_WIDGET ";}\
-                                    QTabBar::tab:selected{border-bottom-color:" DARK_WARNING ";}"
+#define DARK_STYLE_LIST_VIEW \
+"QListView{alternate-background-color:" DARK_WINDOW_WIDGET ";}"
 
-#define DARK_STYLE_TOOLTIP          "QToolTip{border: 0px;color:" DARK_TEXT_ALL ";background-color:" DARK_WINDOW_APP ";}"
+#define DARK_STYLE_COMBO_BOX \
+"QComboBox{background-color:" DARK_DATA_INPUT_AREA ";}\
+QComboBox QAbstractItemView{selection-background-color:" DARK_WINDOW_CONTROL_HOVER ";background-color:" DARK_DATA_INPUT_AREA ";}"
 
-#define DARK_STYLE_LIST_VIEW        "QListView{alternate-background-color:" DARK_WINDOW_WIDGET ";}"
+#define DARK_STYLE_PUSH_BUTTON \
+"QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
+QPushButton{border:none;background-color: %1;color:" DARK_TEXT_COMPONENT ";}\
+QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED ";color:" DARK_COMPONENT_DISABLED ";}\
+QPushButton:pressed{border: 2px solid " DARK_WINDOW_WIDGET ";}"
 
-#define DARK_STYLE_PROGRESS_BAR     "QProgressBar{border:1px solid " DARK_TEXT_LABEL ";border-radius:1px;background:" DARK_DISPLAY ";}\
-                                    QProgressBar::chunk{width: 20px;background-color:" DARK_CHANNEL_1 ";}"
+#define DARK_STYLE_CHECK_BUTTON \
+"QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
+QPushButton:checked{border: none;background-color:%1; color:" DARK_TEXT_COMPONENT ";}\
+QPushButton{border: none;background-color:" DARK_BACKGROUND_BUTTON ";}\
+QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED "; color:" DARK_COMPONENT_DISABLED ";}"
 
-#define DARK_STYLE_COMBO_BOX        "QComboBox{background-color:" DARK_DATA_INPUT_AREA ";}\
-                                    QComboBox QAbstractItemView{selection-background-color:" DARK_WINDOW_CONTROL_HOVER ";background-color:" DARK_DATA_INPUT_AREA ";}"
-
+#define DARK_STYLE_PROGRESS_BAR \
+"QProgressBar{border:1px solid " DARK_TEXT_LABEL ";border-radius:1px;background-color:" DARK_DISPLAY ";}\
+QProgressBar::chunk{width: 20px;background-color:%1;}"
 
 /***************** CONCRETE STYLE SHEETS *****************/
 
-#define DARK_STYLE_CONTROL_BUTTON   "QPushButton{background-color:" DARK_WINDOW_APP ";}"
+#define DARK_STYLE_CONTROL_BUTTON \
+"QPushButton{background-color:" DARK_WINDOW_APP ";}"
 
-#define DARK_STYLE_MODULE_BUTTON    "QPushButton {text-align:left;}\
-                                    QPushButton:hover{background-color:" DARK_BACKGROUND_BUTTON ";text-align:left;border-radius:5px;}"
+#define DARK_STYLE_MODULE_BUTTON \
+"QPushButton {text-align:left;}\
+QPushButton:hover{background-color:" DARK_BACKGROUND_BUTTON ";text-align:left;border-radius:5px;}"
 
-#define DARK_STYLE_HOLD_BUTTON      "QPushButton{padding-top: 0px;padding-bottom:1px;padding-left:0px;padding-right:0px;font-size:10px;}\
-                                    QPushButton{background-color:" DARK_WINDOW_WIDGET ";color:" DARK_TEXT_LABEL ";}\
-                                    QPushButton{border-style:solid; border-color:" DARK_TEXT_LABEL ";border-width:1px;border-radius:1px;}\
-                                    QPushButton:checked{background-color:" DARK_WINDOW_WIDGET "; color: " DARK_WARNING ";}\
-                                    QPushButton:checked{border-style:solid;border-color:" DARK_WARNING ";border-width:1px;border-radius:1px;}\
-                                    QPushButton:hover{border-width:2px;}"
+#define DARK_STYLE_HOLD_BUTTON \
+"QPushButton{padding-top: 0px;padding-bottom:1px;padding-left:0px;padding-right:0px;font-size:10px;}\
+QPushButton{background-color:" DARK_WINDOW_WIDGET ";color:" DARK_TEXT_LABEL ";}\
+QPushButton{border-style:solid; border-color:" DARK_TEXT_LABEL ";border-width:1px;border-radius:1px;}\
+QPushButton:checked{background-color:" DARK_WINDOW_WIDGET "; color: " DARK_WARNING ";}\
+QPushButton:checked{border-style:solid;border-color:" DARK_WARNING ";border-width:1px;border-radius:1px;}\
+QPushButton:hover{border-width:2px;}"
 
-#define DARK_STYLE_DIAL             DARK_STYLE_LINEEDIT \
-                                    "QWidget:disabled{color:" DARK_COMPONENT_DISABLED ";}\
-                                    QWidget{color:" DARK_TEXT_COMPONENT ";}\
-                                    QPushButton{font: 12pt" DARK_FONT ";}"
-#define DARK_STYLE_USE_CUSTOM_DIALS true
+#define DARK_STYLE_DIAL DARK_STYLE_LINEEDIT \
+"QWidget:disabled{color:" DARK_COMPONENT_DISABLED ";}\
+QWidget{color:" DARK_TEXT_COMPONENT ";}\
+QPushButton{font: 12pt" DARK_FONT ";}"
 
-#define DARK_STYLE_TEXTINPUT        "QWidget:disabled{ color:" DARK_COMPONENT_DISABLED ";}QWidget{font: 10pt" DARK_FONT "; color:" DARK_TEXT_COMPONENT ";}"
+#define DARK_STYLE_TEXTINPUT \
+"QWidget:disabled{ color:" DARK_COMPONENT_DISABLED ";}\
+QWidget{font: 10pt" DARK_FONT "; color:" DARK_TEXT_COMPONENT ";}"
 
-#define DARK_STYLE_MODULE_DOCK_WIDGET        DARK_STYLE_WIDGET DARK_STYLE_DOCK_WIDGET
+#define DARK_STYLE_MODULE_DOCK_WIDGET DARK_STYLE_WIDGET DARK_STYLE_DOCK_WIDGET
 
 class Dark : public AbstractTheme
 {

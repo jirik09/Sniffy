@@ -131,10 +131,12 @@ QString WidgetButtons::getText(int index){
 void WidgetButtons::setColor(QString text, int index){
     QString tempStyleSheet = "";
     if (index>=0 && index<8){
-        if(type == ButtonTypes::CHECKABLE || type == ButtonTypes::RADIO){            
-            tempStyleSheet = Graphics::STYLE_CHECK_BUTTON+"QPushButton:checked{background-color:"+text+";}";
-        }else{            
-            tempStyleSheet = Graphics::STYLE_PUSH_BUTTON+"QPushButton{background-color:"+text+";}";
+        if(Graphics::STYLE_TRANSPARENCY_USED)
+            text = text.remove("#");
+        if(type == ButtonTypes::CHECKABLE || type == ButtonTypes::RADIO){
+            tempStyleSheet = QString(Graphics::STYLE_CHECK_BUTTON).arg(text);
+        }else{
+            tempStyleSheet = QString(Graphics::STYLE_PUSH_BUTTON).arg(text);
         }
         pushButtonsList.at(index)->setStyleSheet(tempStyleSheet);
     }

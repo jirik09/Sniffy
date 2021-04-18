@@ -169,7 +169,7 @@ void CounterWindow::configureDisplaysDynamicAttr(){
 
 void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin, int chan){
     display->configLabel(LABELNUM_PINS, pin, Graphics::getChannelColor(chan), true);
-    display->configLabel(LABELNUM_FLAG, "", Graphics::getChannelColor(3), true);
+    display->configLabel(LABELNUM_FLAG, "", Graphics::COLOR_WARNING, true);
 }
 
 void CounterWindow::switchCounterModeCallback(int index){

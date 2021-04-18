@@ -57,6 +57,7 @@
 #define LIGHT_CHANNEL_7 LIGHT_BLUE_DARK
 #define LIGHT_CHANNEL_8 LIGHT_PINK
 
+
 class Light : public AbstractTheme
 {
     Q_OBJECT

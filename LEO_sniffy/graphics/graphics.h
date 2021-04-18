@@ -9,6 +9,7 @@
 
 #include "graphics/themes/dark.h"
 #include "graphics/themes/light.h"
+#include "graphics/themes/dawn.h"
 #include "graphics/abstracttheme.h"
 
 class Graphics : public QObject
@@ -51,10 +52,14 @@ public:
     static QString STYLE_MODULE_BUTTON;
     static QString STYLE_HOLD_BUTTON;
     static QString STYLE_DIAL;
-    static bool STYLE_CUSTOM_DIALS_USED;
     static QString STYLE_TEXTINPUT;
     static QString STYLE_DOCK_WIDGET;
     static QString STYLE_DOCK_WINDOW;
+
+    static bool STYLE_CUSTOM_DIALS_USED;
+    static bool STYLE_TRANSPARENCY_USED;
+
+    static QString STYLE_GLOBAL;
 
 private:
     static QSharedPointer<AbstractTheme> theme;

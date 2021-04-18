@@ -11,7 +11,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
     switchStepMode->setObjectName("syncPwmStepButton");
     switchStepMode->setColor(Graphics::COLOR_CONTROLS);
 
-    buttonStart = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
+    buttonStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
     buttonStart->setText("Start", 0);
     buttonStart->setChecked(false, 0);
     buttonStart->setObjectName("syncPwmStartButton");
