@@ -69,7 +69,7 @@ void TemplateModule::stopModule()
 //In case hold is needed
 
 void TemplateModule::showHoldButtonCallback(){
-    this->showModuleHoldButton();
+    this->showModuleHoldButton(true);
 }
 
 void TemplateModule::holdButtonCallback(bool held){

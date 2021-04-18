@@ -69,7 +69,7 @@ void PatternGenerator::stopModule()
 //In case hold is needed
 
 void PatternGenerator::showHoldButtonCallback(){
-    this->showModuleHoldButton();
+    this->showModuleHoldButton(true);
 }
 
 void PatternGenerator::holdButtonCallback(bool held){
