@@ -21,7 +21,7 @@ class CounterTabIntervals : public QObject
 public:
     explicit CounterTabIntervals(QVBoxLayout *destination, CounterConfig *conf, QWidget *parent = nullptr);
 
-    WidgetButtons *buttonsStart;
+    WidgetButtons *buttonStart;
     WidgetButtons *buttonsEventsSeq;
     WidgetSwitch *switchEdgeEventA;
     WidgetSwitch *switchEdgeEventB;
@@ -31,6 +31,7 @@ public:
     QPixmap *pixmapEventsSeq = nullptr;
 
     void loadGraphics();
+    void setStartButton(bool start);
 
 private:
     CounterConfig *conf;

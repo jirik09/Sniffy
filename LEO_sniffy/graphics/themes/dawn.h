@@ -159,7 +159,7 @@ QPushButton:checked{text-align:left; border: 3px solid " DAWN_WINDOW_APP ";backg
 QPushButton:checked:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP "; background:" DAWN_WINDOW_CONTROL_HOVER ";}"
 
 #define DAWN_STYLE_HOLD_BUTTON \
-"QPushButton{padding-top: 0px;padding-bottom:1px;padding-left:0px;padding-right:0px;font-size:10px;}\
+"QPushButton{font-weight:bold;padding-top: 0px;padding-bottom:1px;padding-left:0px;padding-right:0px;font-size:10px;}\
 QPushButton{border: 1px solid #EEfa961b; background-color:" DAWN_WINDOW_APP ";color:" DAWN_TEXT_LABEL ";}\
 QPushButton{border-color:" DAWN_TEXT_LABEL ";border-radius:1px;}\
 QPushButton:checked{border:none;background-color:" DAWN_WARNING ";color:" DAWN_WINDOW_WIDGET ";}\

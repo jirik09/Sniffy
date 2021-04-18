@@ -104,7 +104,7 @@ private slots:
 
     /* Ratio Counter */
     void ratDialSampleCountChangedCallback(float val);
-    void ratRetriggerCallback(int actualLength);
+    void ratStartCallback(int actualLength);
 
     /* Intervals meas. Counter */
     void intButtonsStartCallback();

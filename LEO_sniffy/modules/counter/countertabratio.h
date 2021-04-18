@@ -18,7 +18,9 @@ public:
     explicit CounterTabRatio(QVBoxLayout *destination, QWidget *parent = nullptr);
 
     WidgetDialRange *dialSampleCount;
-    WidgetButtons *buttonRetrigger;
+    WidgetButtons *buttonStart;
+
+    void setStartButton(bool start);
 
 signals:
 
