@@ -10,7 +10,6 @@
 #include "communication/comms.h"
 #include "math/movingaverage.h"
 
-//#include "../../GUI/moduledockwidget.h"
 #include "../../GUI/widgetcontrolmodule.h"
 
 #include "../abstractmodule.h"
@@ -105,7 +104,7 @@ private slots:
 
     /* Ratio Counter */
     void ratDialSampleCountChangedCallback(float val);
-    void ratRetriggerCallback(int actualLength);
+    void ratStartCallback(int actualLength);
 
     /* Intervals meas. Counter */
     void intButtonsStartCallback();

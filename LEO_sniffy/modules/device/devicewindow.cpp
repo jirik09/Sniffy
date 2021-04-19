@@ -28,9 +28,9 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
     WidgetSeparator *availableDevices = new WidgetSeparator(WidgetSpecification,"Available devices");
     verticalLayoutSpecification->addWidget(availableDevices);
 
-    deviceSelection  = new WidgetSelection(WidgetSpecification);
+    deviceSelection = new WidgetSelection(WidgetSpecification);
     verticalLayoutSpecification->addWidget(deviceSelection);
-    deviceSelection->addOption("Scanning for available devices",-1);
+    deviceSelection->addOption("Scanning for available devices",-1);    
 
     deviceConnectButton = new WidgetButtons(WidgetSpecification,2);
     deviceConnectButton->setObjectName("connectbutton");
@@ -60,12 +60,12 @@ DeviceWindow::~DeviceWindow()
 
 void DeviceWindow::showSpecification(DeviceSpec *spec){
     //qDebug() << "update specification got to GUI";
-    QString devicePreviewImage =":/graphics/graphics/"+spec->device+".png";
+    QString devicePreviewImage = Graphics::getGraphicsPath()+spec->device+".png";
 
     if(QFileInfo::exists(devicePreviewImage)){
-        ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/"+spec->device+".png);");
+        ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+spec->device+".png);");
     }else{
-        ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/unknown_device.png);");
+        ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"unknown_device.png);");
     }
 
     QList<WidgetDesciptionExpand *>::iterator it;
@@ -79,8 +79,8 @@ void DeviceWindow::hideSpecification(){
     for (it = modulesDescriptions->begin(); it != modulesDescriptions->end(); ++it){
         (*it)->hide();
     }
-    ui->widget_device->setStyleSheet("image: none;");
-    ui->widget_device->setStyleSheet("image: url(:/graphics/graphics/no_device.png);");
+    //ui->widget_device->setStyleSheet("image: none;");
+    ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"no_device.png);");
 }
 
 void DeviceWindow::addModuleDescription(QString name, QList<QString> labels, QList<QString> values)

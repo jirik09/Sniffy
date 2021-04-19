@@ -20,10 +20,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget{
-background-color: rgb(58, 58, 58);
-}
-</string>
+   <string notr="true"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
@@ -50,7 +47,7 @@ background-color: rgb(58, 58, 58);
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="handleWidth">
-      <number>3</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="widget_device" native="true">
       <property name="minimumSize">

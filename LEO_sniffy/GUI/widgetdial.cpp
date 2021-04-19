@@ -14,8 +14,12 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
+    setStyleSheet(Graphics::STYLE_DIAL);
+    ui->comboBox->setStyleSheet(Graphics::STYLE_COMBO_BOX);
+
     ui->label_name->setText(name);
     ui->dial->setPageStep(1);
+    ui->dial->setCustomGraphics(Graphics::STYLE_CUSTOM_DIALS_USED);
     setObjectName(name);
 
     connect(ui->pushButton_plus,SIGNAL(clicked()),this,SLOT(plusClicked()));
@@ -23,11 +27,7 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
     options = new QList<params_dial>;
-
-    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+"} "
-                    "QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +"}";
-
-    ui->widget->setStyleSheet(style);
+    setColor(Graphics::COLOR_CONTROLS);
 }
 
 WidgetDial::~WidgetDial()
@@ -37,7 +37,6 @@ WidgetDial::~WidgetDial()
 
 QByteArray WidgetDial::saveGeometry()
 {
-    //TO DO pass all the data including the min max range color etc
     return QByteArray::number(selectedIndex);
 }
 
@@ -94,13 +93,12 @@ void WidgetDial::setSelectedIndex(int index, bool silent){
 }
 
 void WidgetDial::setColor(QString color){
-    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_DARK_GREY)+"} "
-                    "QWidget{color:"+color +"}";
+    QString style = Graphics::STYLE_DIAL+"QWidget{color:"+color+";}";
     ui->widget_dial->setStyleSheet(style);
 
-    style = "QPushButton:disabled{background-color: "+QString::fromUtf8(BACKGROUND_COLOR_BUTTON_DISABLED)+" color: "+QString::fromUtf8(COLOR_GREY)+"}"
-            "QPushButton:pressed{border: 2px solid "+QString::fromUtf8(BACKGROUND_COLOR_APP)+"}"
-            "QPushButton{border: none;background-color:"+color +"}";
+    if(Graphics::STYLE_TRANSPARENCY_USED)
+        color = color.remove("#");
+    style = QString(Graphics::STYLE_PUSH_BUTTON).arg(color);
     ui->pushButton_plus->setStyleSheet(style);
     ui->pushButton_minus->setStyleSheet(style);
 }

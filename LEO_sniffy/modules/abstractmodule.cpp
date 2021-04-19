@@ -259,9 +259,9 @@ void AbstractModule::setModuleName(QString value){
 
 /* This function must be called after dockWidget is created.
    Connect signal moduleCreated() in the module... */
-void AbstractModule::showModuleHoldButton(){
+void AbstractModule::showModuleHoldButton(bool show){
     if(dockWinCreated)
-        dockWidgetWindow->showHoldButton();
+        dockWidgetWindow->showHoldButton(show);
 }
 
 int AbstractModule::getResources()

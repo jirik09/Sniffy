@@ -6,7 +6,7 @@
 #include <QTextStream>
 #include <QFile>
 
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetList;

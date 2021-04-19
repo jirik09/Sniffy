@@ -41,10 +41,10 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
     splitter->setSizes(sizes);
     ui->horizontalLayout->addWidget(splitter);
 
-    verticalLayout_chart->setContentsMargins(0,0,0,0);
+    verticalLayout_chart->setContentsMargins(0,0,0,4);
     verticalLayout_chart->setSpacing(0);
-    verticalLayout_settings->setContentsMargins(4,4,4,4);
-    verticalLayout_settings->setSpacing(2);
+    verticalLayout_settings->setContentsMargins(4,1,4,2);
+    verticalLayout_settings->setSpacing(1);
 
     chart = new widgetChart(widget_chart, CHANNELS_NUM);
     verticalLayout_chart->addWidget(chart);
@@ -70,19 +70,26 @@ void SyncPwmWindow::setSpecification(SyncPwmSpec *spec){
 
 void SyncPwmWindow::restoreGUIAfterStartup(){
     uncheckStartButton();
+    uncheckEquidistantButton();
     setStartTxt();
 }
 
 void SyncPwmWindow::setStartTxt(){
-    settings->buttonStart->setText("START");
+    settings->buttonStart->setText("Start");
+    settings->buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
 }
 
 void SyncPwmWindow::setStopTxt(){
-    settings->buttonStart->setText("STOP");
+    settings->buttonStart->setText("Stop");
+    settings->buttonStart->setColor(Graphics::COLOR_RUNNING,0);
 }
 
 void SyncPwmWindow::uncheckStartButton(){
     settings->buttonStart->setChecked(false, 0);
+}
+
+void SyncPwmWindow::uncheckEquidistantButton(){
+    settings->buttonEquidist->setChecked(false, 0);
 }
 
 void SyncPwmWindow::dialFreqCallback(float val, int chanIndex){

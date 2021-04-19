@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 
 namespace Ui {
 class WidgetSelection;

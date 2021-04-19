@@ -6,16 +6,6 @@
 #endif // SYNCPWMDEFS_H
 
 #define CHANNELS_NUM 4
-/* Chart preview signals */
-//#define QCOLOR_CHAN1  QCOLOR_ORANGE
-//#define QCOLOR_CHAN2  QCOLOR_BLUE
-//#define QCOLOR_CHAN3  QCOLOR_GREEN
-//#define QCOLOR_CHAN4  QCOLOR_PURPLE
-/* Components */
-#define COLOR_CHAN1  COLOR_ORANGE
-#define COLOR_CHAN2  COLOR_BLUE
-#define COLOR_CHAN3  COLOR_GREEN
-#define COLOR_CHAN4  COLOR_PURPLE
 
 #define PI_HALF 90
 #define DEFAULT_FREQUENCY 1000

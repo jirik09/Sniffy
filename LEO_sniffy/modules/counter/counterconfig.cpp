@@ -25,11 +25,13 @@ CounterConfig::CounterConfig(QObject *parent)
     lfState.chan2.sampleCount = 1;
 
     ratState.sampleCount = REFERENCE_COUNT_DEFAULT;
+    ratState.running = false;
 
     intState.seqAB = IntState::Sequence::AB;
     intState.eventA = IntState::Event::RISING;
     intState.eventB = IntState::Event::RISING;
     intState.timeout = INTERVAL_TIMEOUT_DEFAULT;
+    intState.running = false;
 }
 
 void CounterConfig::parse(QByteArray config)

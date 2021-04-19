@@ -13,10 +13,10 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, I
     ui->lineEdit->installEventFilter(this);
     inputType = type;
 
-    QString style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+"} QWidget{color:"+QString::fromUtf8(COLOR_WHITE) +"}";
+    QString style = Graphics::STYLE_TEXTINPUT;
     ui->label->setStyleSheet(style);
 
-    style = "QWidget:disabled{color: "+QString::fromUtf8(COLOR_GREY)+"} QWidget{background-color:"+Colors::getDataAreaColorString()+";color:"+QString::fromUtf8(COLOR_WHITE) +"}";
+    style = Graphics::STYLE_TEXTINPUT+"QWidget{background-color:"+Graphics::COLOR_DATA_INPUT_AREA+"} QWidget::focus{background-color:"+Graphics::COLOR_BACKGROUND_FOCUS_IN+";}";
     ui->lineEdit->setStyleSheet(style);
 }
 
@@ -70,12 +70,7 @@ bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
         if( (ev->key() == Qt::Key_Enter) || (ev->key() == Qt::Key_Return)) processTextEdit = true;
     }
 
-    if(event->type() == QEvent::FocusIn){
-        ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+BACKGROUND_COLOR_FOCUS_IN+";}");
-    }
-
     if(processTextEdit){
-        ui->lineEdit->setStyleSheet(QString::fromUtf8(" QLineEdit{ background-color:")+Colors::getDataAreaColorString()+";}");
         processInput();
     }
     return QObject::eventFilter(obj, event);

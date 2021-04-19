@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>584</width>
-    <height>97</height>
+    <height>78</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,13 +21,13 @@
     <number>0</number>
    </property>
    <property name="leftMargin">
-    <number>10</number>
+    <number>0</number>
    </property>
    <property name="topMargin">
     <number>0</number>
    </property>
    <property name="rightMargin">
-    <number>10</number>
+    <number>0</number>
    </property>
    <property name="bottomMargin">
     <number>0</number>
@@ -115,7 +115,7 @@
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLabel{text-align:center}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>scale</string>
@@ -234,7 +234,7 @@
          <item>
           <layout class="QGridLayout" name="gridLayout">
            <property name="spacing">
-            <number>5</number>
+            <number>2</number>
            </property>
            <item row="2" column="2">
             <widget class="QLabel" name="label_meas9">

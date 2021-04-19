@@ -6,6 +6,8 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     ui(new Ui::widgetLabelArea)
 {
     ui->setupUi(this);
+    ui->label_scale->setStyleSheet("QLabel{text-align:center}");
+
     ui->widget_Hcursors->hide();
     ui->widget_Vcursors->hide();
     ui->widget_meas->hide();
@@ -31,16 +33,18 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     channLabelList.append(ui->label_math1);
     channLabelList.append(ui->label_math2);
 
-    ui->label_ch1->setStyleSheet("color:"+Colors::getChannelColorString(0));
-    ui->label_ch2->setStyleSheet("color:"+Colors::getChannelColorString(1));
-    ui->label_ch3->setStyleSheet("color:"+Colors::getChannelColorString(2));
-    ui->label_ch4->setStyleSheet("color:"+Colors::getChannelColorString(3));
-    ui->label_math1->setStyleSheet("color:"+Colors::getChannelColorString(4));
-    ui->label_math2->setStyleSheet("color:"+Colors::getChannelColorString(5));
+    ui->label_ch1->setStyleSheet("color:"+Graphics::getChannelColor(0));
+    ui->label_ch2->setStyleSheet("color:"+Graphics::getChannelColor(1));
+    ui->label_ch3->setStyleSheet("color:"+Graphics::getChannelColor(2));
+    ui->label_ch4->setStyleSheet("color:"+Graphics::getChannelColor(3));
+    ui->label_math1->setStyleSheet("color:"+Graphics::getChannelColor(4));
+    ui->label_math2->setStyleSheet("color:"+Graphics::getChannelColor(5));
 
     foreach(QLabel *label, channLabelList){
         label->hide();
     }
+    this->setStyleSheet("QWidget{background-color:" + Graphics::COLOR_DATA_INPUT_AREA + ";}");
+
 }
 
 WidgetLabelArea::~WidgetLabelArea()
@@ -98,7 +102,7 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
     foreach(Measurement* m, meas){
         measLabelList.at(fillIndex)->setText(m->getLabel()+" "+m->getValueString());
         measLabelList.at(fillIndex)->show();
-        measLabelList.at(fillIndex)->setStyleSheet("color:"+Colors::getChannelColorString(m->getChannelIndex()));
+        measLabelList.at(fillIndex)->setStyleSheet("color:"+Graphics::getChannelColor(m->getChannelIndex()));
         fillIndex++;
     }
 }
@@ -125,8 +129,8 @@ void WidgetLabelArea::setCursorTimeReadings(qreal curA, qreal curB)
 
 void WidgetLabelArea::setCursorReadingsColor(int channelIndex)
 {
-    ui->widget_Hcursors->setStyleSheet("color:"+Colors::getChannelColorString(channelIndex));
-    ui->widget_Vcursors->setStyleSheet("color:"+Colors::getChannelColorString(channelIndex));
+    ui->widget_Hcursors->setStyleSheet("color:"+Graphics::getChannelColor(channelIndex));
+    ui->widget_Vcursors->setStyleSheet("color:"+Graphics::getChannelColor(channelIndex));
 }
 
 void WidgetLabelArea::hideCursorReadings()

@@ -53,15 +53,7 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">QPushButton {text-align:left; }
-
-QPushButton:hover {
-background-color: rgb(38, 38, 38);
-text-align:left;
-border-radius: 5px;
-}
-
-</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>PushButton</string>

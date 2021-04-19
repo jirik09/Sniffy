@@ -1,19 +1,21 @@
 #include "countertabintervals.h"
 
-CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *parent) : QObject(parent)
+CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, CounterConfig *conf, QWidget *parent) :
+    QObject(parent),
+    conf(conf)
 {
     WidgetSeparator *separatorStart = new WidgetSeparator(parent,"Let's roll");
     destination->addWidget(separatorStart);
 
-    buttonsStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
-    buttonsStart->setObjectName("btnStart");
-    buttonsStart->setText("Start", 0);
-    destination->addWidget(buttonsStart);
+    buttonStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
+    buttonStart->setObjectName("btnStart");
+    buttonStart->setText("Start", 0);
+    destination->addWidget(buttonStart);
 
     dialTimeout = new WidgetDialRange(parent ,"Timeout");
     dialTimeout->setObjectName("dialIntTimeout");
-    dialTimeout->setRange(1, INTERVAL_TIMEOUT_MAX, "Sec", 1, 1, INTERVAL_TIMEOUT_DEFAULT, false);
-    dialTimeout->setColor(Colors::getControlsColorString());
+    dialTimeout->setRange(1, INTERVAL_TIMEOUT_MAX, "Sec", 1, 1, INTERVAL_TIMEOUT_DEFAULT, false, 0);
+    dialTimeout->setColor(Graphics::COLOR_CONTROLS);
     dialTimeout->hideUnitSelection();    
     destination->addWidget(dialTimeout);
 
@@ -32,13 +34,13 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     switchEdgeEventA = new WidgetSwitch(parent, "Rising", "Falling", "");
     switchEdgeEventA->setObjectName("edgeEventA");
     switchEdgeEventA->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-    switchEdgeEventA->setColor(Colors::getControlsColorString());
+    switchEdgeEventA->setColor(Graphics::COLOR_CONTROLS);
     horizontalLayout_switchArea->addWidget(switchEdgeEventA);
 
     switchEdgeEventB = new WidgetSwitch(parent, "Rising", "Falling", "");
     switchEdgeEventB->setObjectName("edgeEventB");
     switchEdgeEventB->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-    switchEdgeEventB->setColor(Colors::getControlsColorString());
+    switchEdgeEventB->setColor(Graphics::COLOR_CONTROLS);
     horizontalLayout_switchArea->addWidget(switchEdgeEventB);
 
     labelPicEventsSeq = new QLabel(parent);
@@ -60,6 +62,13 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, QWidget *pare
     connect(buttonsEventsSeq, &WidgetButtons::clicked, this, &CounterTabIntervals::eventsSequenceChangedCallback);
     connect(switchEdgeEventA, &WidgetSwitch::clicked, this, &CounterTabIntervals::eventAEdgeChangedCallback);
     connect(switchEdgeEventB, &WidgetSwitch::clicked, this, &CounterTabIntervals::eventBEdgeChangedCallback);
+}
+
+void CounterTabIntervals::loadGraphics(){
+    seqAB = (conf->intState.seqAB == IntState::Sequence::AB) ? false : true;
+    eventA = (conf->intState.eventA == IntState::Event::RISING) ? false : true;
+    eventB = (conf->intState.eventB == IntState::Event::RISING) ? false : true;
+    setSeqPicture();
 }
 
 void CounterTabIntervals::eventsSequenceChangedCallback(int index){
@@ -106,3 +115,12 @@ void CounterTabIntervals::setSeqPicture(){
     labelPicEventsSeq->setPixmap(pixmapEventsSeq->scaled(width, height, Qt::KeepAspectRatio));
 }
 
+void CounterTabIntervals::setStartButton(bool start){
+    if(start){
+        buttonStart->setColor(Graphics::COLOR_RUNNING,0);
+        buttonStart->setText("Stop",0);
+    }else{
+        buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
+        buttonStart->setText("Start",0);
+    }
+}

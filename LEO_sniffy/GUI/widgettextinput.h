@@ -5,8 +5,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 
-#include "../graphics/colors.h"
-
+#include "../graphics/graphics.h"
 #include "../modules/numberparser.h"
 
 

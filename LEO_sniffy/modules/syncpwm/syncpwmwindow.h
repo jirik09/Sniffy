@@ -38,6 +38,7 @@ public:
     void setStartTxt();
     void setStopTxt();
     void uncheckStartButton();
+    void uncheckEquidistantButton();
 
     void setFreqDial(float val, int chanIndex);
     void setPhaseDial(float val, int chanIndex);

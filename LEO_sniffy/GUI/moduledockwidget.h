@@ -7,7 +7,7 @@
 #include <QPushButton>
 #include <QLabel>
 
-#include "../graphics/colors.h"
+#include "../graphics/graphics.h"
 
 class ModuleDockWidget : public QDockWidget
 {
@@ -16,7 +16,7 @@ public:
     explicit ModuleDockWidget(QWidget *parent = nullptr, QString title = nullptr);
     ~ModuleDockWidget();
 
-    void showHoldButton();
+    void showHoldButton(bool show);
 
 signals:
     void moduleWindowClosing();

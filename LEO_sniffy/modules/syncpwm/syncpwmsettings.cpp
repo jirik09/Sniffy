@@ -9,19 +9,19 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
     switchStepMode = new WidgetSwitch(parent, " Continuous ", "     Step     ", "");
     switchStepMode->setObjectName("syncPwmStepButton");
-    switchStepMode->setColor(Colors::getControlsColorString());
+    switchStepMode->setColor(Graphics::COLOR_CONTROLS);
 
-    buttonStart = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
+    buttonStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
     buttonStart->setText("Start", 0);
     buttonStart->setChecked(false, 0);
     buttonStart->setObjectName("syncPwmStartButton");
-    buttonStart->setColor(Colors::getControlsColorString(),0);
+    buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
 
     buttonEquidist = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonEquidist->setText("Equidistant", 0);
     buttonEquidist->setObjectName("syncPwmEquidistButton");
     buttonEquidist->setChecked(false, 0);
-    buttonEquidist->setColor(Colors::getControlsColorString(), 0);
+    buttonEquidist->setColor(Graphics::COLOR_CONTROLS, 0);
 
     QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
     QHBoxLayout *commonButtons = new QHBoxLayout();
@@ -88,7 +88,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
 void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
     QString chNStr = QString::number(i+1);
-    QString color = Colors::getChannelColorString(i);
+    QString color = Graphics::getChannelColor(i);
 
     onOffCh[i] = new WidgetSwitch(parent, "On", "Off", "", i);
     onOffCh[i]->setObjectName("syncPwmOnOffCh" + chNStr);
@@ -120,10 +120,8 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
 }
 
 void SyncPwmSettings::greyOutComplementChanFreqDials(int chanIndex){
-    QString colDisable = BACKGROUND_COLOR_BUTTON_DISABLED;
-
     dialFreqCh[chanIndex]->setDisabled(true);
-    dialFreqCh[chanIndex]->setColor(colDisable);
+    //dialFreqCh[chanIndex]->setColor(Graphics::COLOR_COMPONENT_DISABLED);
 }
 
 

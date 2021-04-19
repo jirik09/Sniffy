@@ -17,22 +17,25 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseZoom();
-    chart->setGraphColor(QCOLOR_GREY);
+    chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
     chartFFT->setRange(0, 50000, -100, 100);
     chartFFT->setDataMinMax(0,50000);
     chartFFT->enableLocalMouseZoom();
-    chartFFT->setGraphColor(QCOLOR_GREY);
+    chartFFT->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
 
     ui->verticalLayout_chart->addWidget(chartFFT);
     ui->verticalLayout_chart->addWidget(chart);
     chartFFT->hide();
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
+    ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************
@@ -99,10 +102,10 @@ ScopeWindow::~ScopeWindow()
 
 void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
-    ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url(:/graphics/graphics/signalBackground.png) center;"
-                                        "background-color: "+Colors::getDataAreaColorString()+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
+    ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url("+Graphics::getGraphicsPath()+"signalBackground.png) center;"
+                                        "background-color: "+Graphics::COLOR_DATA_INPUT_AREA+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
                                                                                          "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
-                                                                                         "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+QString::fromUtf8("px;}"));
+                                                                                         "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+"px;}");
     event->accept();
 }
 
@@ -188,14 +191,14 @@ void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
 
 void ScopeWindow::channelVerticalCallback(int index){
     config->selectedChannelIndexVertical = index;
-    panelSet->dialVerticalScale->setColor(Colors::getChannelColorString(index));
+    panelSet->dialVerticalScale->setColor(Graphics::getChannelColor(index));
     if(config->channelScaleIndex[index]==-1){
         config->channelScaleIndex[index] = panelSet->dialVerticalScale->getDefaultIndex();
         config->channelOffsetIndex[index] = panelSet->dialVerticalShift->getDefaultRealValue();
     }
     panelSet->dialVerticalScale->setSelectedIndex(config->channelScaleIndex[index]);
 
-    panelSet->dialVerticalShift->setColor(Colors::getChannelColorString(index));
+    panelSet->dialVerticalShift->setColor(Graphics::getChannelColor(index));
     panelSet->dialVerticalShift->setRealValue(config->channelOffset[index]);
 }
 
@@ -240,10 +243,10 @@ void ScopeWindow::triggerChannelCallback(int index){
     emit triggerChannelChanged(index);
     paintTraces(ChartData,ChartMathData);
 
-    panelSet->dialPretrigger->setColor(Colors::getChannelColorString(index));
-    panelSet->dialTriggerValue->setColor(Colors::getChannelColorString(index));
-    panelSet->buttonsTriggerEdge->setColor(Colors::getChannelColorString(index),0);
-    panelSet->buttonsTriggerEdge->setColor(Colors::getChannelColorString(index),1);
+    panelSet->dialPretrigger->setColor(Graphics::getChannelColor(index));
+    panelSet->dialTriggerValue->setColor(Graphics::getChannelColor(index));
+    panelSet->buttonsTriggerEdge->setColor(Graphics::getChannelColor(index),0);
+    panelSet->buttonsTriggerEdge->setColor(Graphics::getChannelColor(index),1);
 }
 
 void ScopeWindow::triggerEdgeCallback(int index){
@@ -257,14 +260,14 @@ void ScopeWindow::triggerEdgeCallback(int index){
 void ScopeWindow::triggerModeCallback(int index){
     if(index==0){
         if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-            panelSet->buttonsTriggerMode->setColor(QString::fromUtf8(COLOR_ORANGE),0);
+            panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
             emit triggerModeChanged(ScopeTriggerMode::TRIG_STOP);
             panelSet->buttonsTriggerMode->setText("Single",0);
             labelInfoPanel->setTriggerLabelText("");
 
         }else if(panelSet->buttonsTriggerMode->getText(0)=="Single"){
             emit triggerModeChanged(ScopeTriggerMode::TRIG_SINGLE);
-            panelSet->buttonsTriggerMode->setColor(QString::fromUtf8(COLOR_GREEN),0);
+            panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_RUNNING,0);
             panelSet->buttonsTriggerMode->setText("Stop",0);
         }
     }else if(index==1){
@@ -376,10 +379,10 @@ void ScopeWindow::cursorTypeCallback(int index)
 void ScopeWindow::cursorChannelCallback(int index)
 {
     config->cursorChannelIndex = index;
-    panelCursors->cursorHorADial->setColor(Colors::getChannelColorString(index));
-    panelCursors->cursorHorBDial->setColor(Colors::getChannelColorString(index));
-    panelCursors->cursorVerADial->setColor(Colors::getChannelColorString(index));
-    panelCursors->cursorVerBDial->setColor(Colors::getChannelColorString(index));
+    panelCursors->cursorHorADial->setColor(Graphics::getChannelColor(index));
+    panelCursors->cursorHorBDial->setColor(Graphics::getChannelColor(index));
+    panelCursors->cursorVerADial->setColor(Graphics::getChannelColor(index));
+    panelCursors->cursorVerBDial->setColor(Graphics::getChannelColor(index));
     if(config->cursorsActiveIndex == 2){
         chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
         chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
@@ -480,8 +483,8 @@ void ScopeWindow::restoreGUIAfterStartup()
     ui->sliderSignal->setValue((chart->getShift()*2000)-1000);
 
     int vertical = panelSet->buttonsChannelVertical->getSelectedIndex();
-    panelSet->dialVerticalScale->setColor(Colors::getChannelColorString(vertical));
-    panelSet->dialVerticalShift->setColor(Colors::getChannelColorString(vertical));
+    panelSet->dialVerticalScale->setColor(Graphics::getChannelColor(vertical));
+    panelSet->dialVerticalShift->setColor(Graphics::getChannelColor(vertical));
 
     channelEnableCallback(panelSet->buttonsChannelEnable->getStatus());
     cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());
@@ -498,7 +501,7 @@ void ScopeWindow::restoreGUIAfterStartup()
 
 void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
-    panelSet->buttonsTriggerMode->setColor(COLOR_ORANGE,0);
+    panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
     labelInfoPanel->setTriggerLabelText("");
 }
 
@@ -519,9 +522,9 @@ void ScopeWindow::updateChartTimeScale(float timeBase){
         chart->setZoom(chart->getZoom()*previousTimeBase/timeBase);
     }
     if(chart->getLocalZoom()!=1.0){
-        labelInfoPanel->setStyleSheet(QString::fromUtf8("QLabel#label_scale {color:")+COLOR_RED+"}");
+        labelInfoPanel->setStyleSheet("QLabel#label_scale {color:"+Graphics::COLOR_WARNING+";}");
     }else{
-        labelInfoPanel->setStyleSheet(QString::fromUtf8("color:")+COLOR_WHITE);
+        labelInfoPanel->setStyleSheet("color:"+Graphics::COLOR_TEXT_ALL+";");
     }
     config->chartLocalZoom = chart->getLocalZoom();
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/div"));

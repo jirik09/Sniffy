@@ -13,6 +13,7 @@
 #include "GUI/widgetlabel.h"
 #include "customsettings.h"
 
+
 namespace Ui {
 class SettingsDialog;
 }

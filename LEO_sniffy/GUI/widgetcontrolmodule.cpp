@@ -12,12 +12,14 @@ WidgetControlModule::WidgetControlModule(QWidget *parent, QString name) :
     ui(new Ui::WidgetFeature)
 {
     ui->setupUi(this);
+    ui->pushButton_name->setStyleSheet(Graphics::STYLE_MODULE_BUTTON);
+    ui->pushButton_name->setCheckable(true);
 
-        ui->pushButton_name->setText(name);
-        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_stop.png)"));
-        connect(ui->pushButton_name,SIGNAL(clicked()),this,SLOT(clickedInternal()));
+    ui->pushButton_name->setText(name);
+    ui->widget_status->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"status_stop.png)");
+    connect(ui->pushButton_name,SIGNAL(clicked()),this,SLOT(clickedInternal()));
 
-        status = ModuleStatus::STOP;
+    status = ModuleStatus::STOP;
 }
 
 WidgetControlModule::~WidgetControlModule()
@@ -26,21 +28,27 @@ WidgetControlModule::~WidgetControlModule()
 }
 
 void WidgetControlModule::setStatus(ModuleStatus stat){
-    if(stat==ModuleStatus::PLAY)
-        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_play.png)"));
-
-    if(stat==ModuleStatus::STOP)
-        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_stop.png)"));
-
-    if(stat==ModuleStatus::HIDDEN_PLAY)
-        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_play_hidden.png)"));
-
-    if(stat==ModuleStatus::PAUSE || stat==ModuleStatus::HIDDEN_PAUSE)
-        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_pause.png)"));
-
-    if(stat==ModuleStatus::LOCKED)
-        ui->widget_status->setStyleSheet(QString::fromUtf8("image: url(:/graphics/graphics/status_locked.png)"));
-
+    if(stat==ModuleStatus::PLAY){
+        ui->widget_status->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"status_play.png)");
+        ui->pushButton_name->setChecked(true);
+    }
+    if(stat==ModuleStatus::STOP){
+        ui->widget_status->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"status_stop.png)");
+        ui->pushButton_name->setEnabled(true);
+        ui->pushButton_name->setChecked(false);
+    }
+    if(stat==ModuleStatus::HIDDEN_PLAY){
+        ui->widget_status->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"status_play_hidden.png)");
+        ui->pushButton_name->setChecked(true);
+    }
+    if(stat==ModuleStatus::PAUSE || stat==ModuleStatus::HIDDEN_PAUSE){
+        ui->widget_status->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"status_pause.png)");
+        ui->pushButton_name->setChecked(true);
+    }
+    if(stat==ModuleStatus::LOCKED){
+        ui->widget_status->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"status_locked.png)");
+        ui->pushButton_name->setEnabled(false);
+    }
     status = stat;
 }
 

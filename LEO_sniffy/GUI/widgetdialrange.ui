@@ -32,17 +32,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QLineEdit{
-border:none;
-background-color: rgb(48, 48, 48);
-font: 12pt &quot;MS Shell Dlg 2&quot;;
-padding:0px;
-margin:0px;
-}
-
-QComboBox{
-background-color: rgb(48, 48, 48);
-}</string>
+   <string notr="true"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
@@ -144,18 +134,7 @@ background-color: rgb(48, 48, 48);
             </size>
            </property>
            <property name="styleSheet">
-            <string notr="true">QPushButton:pressed{
-	border: 2px solid rgb(48,48,48);
-
-} 
-
-QPushButton{border: none;
-
-	color: rgb(214,214,214);
-	font: 99 12pt &quot;MS Shell Dlg 2&quot;;
-	font-weight:bold;
-}
-</string>
+            <string notr="true"/>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <property name="spacing">
@@ -197,9 +176,9 @@ QPushButton{border: none;
                <font>
                 <family>MS Shell Dlg 2</family>
                 <pointsize>12</pointsize>
-                <weight>75</weight>
+                <weight>50</weight>
                 <italic>false</italic>
-                <bold>true</bold>
+                <bold>false</bold>
                </font>
               </property>
               <property name="styleSheet">
@@ -243,9 +222,9 @@ QPushButton{border: none;
                <font>
                 <family>MS Shell Dlg 2</family>
                 <pointsize>12</pointsize>
-                <weight>75</weight>
+                <weight>50</weight>
                 <italic>false</italic>
-                <bold>true</bold>
+                <bold>false</bold>
                </font>
               </property>
               <property name="styleSheet">
@@ -488,10 +467,7 @@ QPushButton{border: none;
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgb(24, 154, 224);
-background-color: none;
-width:5px;
-</string>
+      <string notr="true"/>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="spacing">

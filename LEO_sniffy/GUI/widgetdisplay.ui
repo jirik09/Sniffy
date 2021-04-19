@@ -38,10 +38,7 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">QObject{
-background-color: rgb(58, 58, 58);
-color: rgb(214, 214, 214)
-}</string>
+   <string notr="true"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_3">
    <property name="spacing">
@@ -68,9 +65,7 @@ color: rgb(214, 214, 214)
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">QObject{
-background-color: rgb(38, 38, 38);
-}</string>
+      <string notr="true"/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_menu">
       <property name="spacing">
@@ -109,7 +104,7 @@ background-color: rgb(38, 38, 38);
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton{image: url(:/graphics/graphics/icon_history_off.png);}QPushButton:hover{background-color: rgb(71, 76, 94);}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -137,7 +132,7 @@ background-color: rgb(38, 38, 38);
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton{image: url(:/graphics/graphics/icon_list.png);}QPushButton:hover{background-color: rgb(71, 76, 94);}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -165,7 +160,7 @@ background-color: rgb(38, 38, 38);
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton{image: url(:/graphics/graphics/icon_clear_history.png);}QPushButton:hover{background-color: rgb(71, 76, 94);}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -202,11 +197,7 @@ background-color: rgb(38, 38, 38);
          <number>-1</number>
         </property>
         <property name="styleSheet">
-         <string notr="true">QToolTip {
-color: rgb(214, 214, 214);
-background-color: rgb(48, 48, 48);
-border: 0px;
-}</string>
+         <string notr="true"/>
         </property>
         <property name="minimum">
          <number>20</number>
@@ -253,7 +244,7 @@ border: 0px;
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton{image: url(:/graphics/graphics/icon_save.png);}QPushButton:hover{background-color: rgb(71, 76, 94);}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -271,8 +262,14 @@ border: 0px;
    </item>
    <item>
     <widget class="QSplitter" name="splitter">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="opaqueResize">
+      <bool>true</bool>
      </property>
      <property name="handleWidth">
       <number>0</number>
@@ -294,9 +291,7 @@ border: 0px;
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="styleSheet">
-       <string notr="true">QObject{
-background-color: rgb(38, 38, 38);
-}</string>
+       <string notr="true"/>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="spacing">
@@ -384,9 +379,7 @@ background-color: rgb(38, 38, 38);
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QObject{
-background-color: rgb(58, 58, 58);
-}</string>
+          <string notr="true"/>
          </property>
          <property name="frameShadow">
           <enum>QFrame::Plain</enum>
@@ -411,9 +404,7 @@ background-color: rgb(58, 58, 58);
           </sizepolicy>
          </property>
          <property name="styleSheet">
-          <string notr="true">QObject{
-background-color: rgb(38, 38, 38);
-}</string>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
@@ -723,9 +714,7 @@ background-color: rgb(38, 38, 38);
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">QLCDNumber{
-color: rgb(214, 214, 214);
-}</string>
+                <string notr="true"/>
                </property>
                <property name="frameShape">
                 <enum>QFrame::NoFrame</enum>
@@ -830,7 +819,7 @@ color: rgb(214, 214, 214);
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>30</width>
+                 <width>20</width>
                  <height>0</height>
                 </size>
                </property>
@@ -877,7 +866,7 @@ color: rgb(214, 214, 214);
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>30</width>
+                 <width>20</width>
                  <height>0</height>
                 </size>
                </property>

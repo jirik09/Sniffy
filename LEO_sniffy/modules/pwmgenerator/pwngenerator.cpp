@@ -12,7 +12,7 @@ PWMGenerator::PWMGenerator(QObject *parent)
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = "SYST";//cmd->SCOPE;
     moduleName = "PWM genarator";
-    moduleIconURI = ":/graphics/graphics/icon_pwm_gen.png";
+    moduleIconURI = Graphics::getGraphicsPath()+"icon_pwm_gen.png";
 
 //In case hold button should be shown insert this and connect callback to handle hold/pause
     connect(this, &AbstractModule::moduleCreated, this, &PWMGenerator::showHoldButtonCallback);
@@ -69,7 +69,7 @@ void PWMGenerator::stopModule()
 //In case hold is needed
 
 void PWMGenerator::showHoldButtonCallback(){
-    this->showModuleHoldButton();
+    this->showModuleHoldButton(true);
 }
 
 void PWMGenerator::holdButtonCallback(bool held){
