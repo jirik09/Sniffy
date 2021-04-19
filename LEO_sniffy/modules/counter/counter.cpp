@@ -166,6 +166,7 @@ void Counter::switchCounterModeCallback(int index){
 
     if(config->isHeld){
         comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
+        enableModuleHoldButton(false);
         config->isHeld = false;
     }
 }

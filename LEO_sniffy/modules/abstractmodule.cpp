@@ -264,6 +264,10 @@ void AbstractModule::showModuleHoldButton(bool show){
         dockWidgetWindow->showHoldButton(show);
 }
 
+void AbstractModule::enableModuleHoldButton(bool enable){
+    dockWidgetWindow->enableHoldButton(enable);
+}
+
 int AbstractModule::getResources()
 {
     if(moduleSpecification != nullptr)
