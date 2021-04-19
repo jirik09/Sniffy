@@ -5,7 +5,7 @@ CounterConfig::CounterConfig(QObject *parent)
     Q_UNUSED(parent);
 
     mode = CounterMode::HIGH_FREQUENCY;
-    modePrevIndex = CounterMode::HIGH_FREQUENCY;
+    modePrevIndex = CounterMode::HIGH_FREQUENCY;    
 
     hfState.quantity = HFState::Quantity::FREQUENCY;
     hfState.quantState = HFState::QuantitySwitched::NO;

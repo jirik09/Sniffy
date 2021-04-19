@@ -86,9 +86,11 @@ void CounterTabIntervals::eventBEdgeChangedCallback(int index){
     setSeqPicture();
 }
 
-void CounterTabIntervals::setSeqPicture(){
-    QString picPath;
+void CounterTabIntervals::setSeqPicture()
+{
+    setStartButton(false);
 
+    QString picPath;
     if(!seqAB){
         if(eventA && eventB){
             picPath = PATH_IMG_EVENT_AB_FF;

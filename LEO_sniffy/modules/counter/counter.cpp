@@ -57,9 +57,11 @@ void Counter::holdCounter(bool held){
     if(held){
         comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
         setModuleStatus(ModuleStatus::PAUSE);
+        config->isHeld = true;
     }else{
         comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
         setModuleStatus(ModuleStatus::PLAY);
+        config->isHeld = false;
     }
 }
 
@@ -139,18 +141,32 @@ void Counter::displayValues(WidgetDisplay *display, QString val, QString avg, QS
 
 void Counter::switchCounterModeCallback(int index){
     config->mode = (CounterMode)index;
+
     if(index == 0){
         write(cmd->COUNTER_MODE, cmd->MODE_HIGH_FREQ);
+        setModuleStatus(ModuleStatus::PLAY);
+        this->showModuleHoldButton(true);
         hfReloadState();
     }else if (index == 1) {
         write(cmd->COUNTER_MODE, cmd->MODE_LOW_FREQ);
+        setModuleStatus(ModuleStatus::PLAY);
+        this->showModuleHoldButton(true);
         lfReloadState();
     }else if (index == 2) {
         write(cmd->COUNTER_MODE, cmd->MODE_RATIO);
+        setModuleStatus(ModuleStatus::PAUSE);
+        this->showModuleHoldButton(false);
         ratReloadState();
     }else if (index == 3) {
         write(cmd->COUNTER_MODE, cmd->MODE_INTERVAL);
+        setModuleStatus(ModuleStatus::PAUSE);
+        this->showModuleHoldButton(false);
         intReloadState();
+    }
+
+    if(config->isHeld){
+        comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
+        config->isHeld = false;
     }
 }
 
@@ -222,8 +238,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     config->hfState.quantState = HFState::QuantitySwitched::NO;
 }
 
-void Counter::hfReloadState(){
-    this->showModuleHoldButton(true);
+void Counter::hfReloadState(){    
     hfSwitchQuantityCallback((int)config->hfState.quantity);
     hfSwitchGateTimeCallback(config->hfState.gateTimeIndexBackup);
 }
@@ -378,8 +393,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
     }
 }
 
-void Counter::lfReloadState(){
-    this->showModuleHoldButton(true);
+void Counter::lfReloadState(){    
     LFState::Channel chan = (config->lfState.activeChan == LFState::ActiveChan::CHAN1) ? config->lfState.chan1 : config->lfState.chan2;
     if (chan.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
         lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
@@ -504,8 +518,9 @@ void Counter::parseRatioCounter(QByteArray data){
         cntWindow->clearDisplay(cntWindow->displayRat, false);
         cntWindow->ratDisplayFlagWarning(display, true);
         cntWindow->tabRatio->setStartButton(false);
+        setModuleStatus(ModuleStatus::PAUSE);
         config->ratState.running = false;
-    }else {        
+    }else {
         double val; QString strVal;
         QDataStream streamBuffLeng(data);
         streamBuffLeng >> val;
@@ -527,7 +542,6 @@ void Counter::parseRatioCounter(QByteArray data){
 
 void Counter::ratReloadState(){
     config->ratState.running = false;
-    this->showModuleHoldButton(false);
     ratDialSampleCountChangedCallback(config->ratState.sampleCount);
 }
 
@@ -538,7 +552,7 @@ void Counter::ratDialSampleCountChangedCallback(float val){
 }
 
 void Counter::ratStartCallback(int index){
-    Q_UNUSED(index);   
+    Q_UNUSED(index);
     if(config->ratState.running){
         stopCounting();
         cntWindow->tabRatio->setStartButton(!config->ratState.running);
@@ -559,6 +573,8 @@ void Counter::parseIntervalsCounter(QByteArray data){
     WidgetDisplay *display = cntWindow->displayInt;
 
     cntWindow->tabInter->setStartButton(false);
+    config->intState.running = false;
+    setModuleStatus(ModuleStatus::PAUSE);
 
     if(inputString == "TMOT"){
         cntWindow->intDisplayFlagTimeout(display, true);
@@ -587,21 +603,31 @@ void Counter::parseIntervalsCounter(QByteArray data){
 
 void Counter::intReloadState(){
     config->intState.running = false;
-    this->showModuleHoldButton(false);
     intSwitchEventSequenceChangedCallback((int)config->intState.seqAB);
     intDialTimeoutChangedCallback(config->intState.timeout);
     intEventAChangedCallback((int)config->intState.eventA);
     intEventBChangedCallback((int)config->intState.eventB);
 }
 
-void Counter::intButtonsStartCallback(){
-    comm->write(moduleCommandPrefix+":"+cmd->START+";");
-    cntWindow->tabInter->setStartButton(true);
-    cntWindow->displayFlagAcquiring(cntWindow->displayInt, true);
-    cntWindow->clearDisplay(cntWindow->displayInt, true);
+void Counter::intButtonsStartCallback(){ 
+    if(config->intState.running){
+        stopCounting();
+        cntWindow->tabInter->setStartButton(!config->intState.running);
+        cntWindow->displayFlagAcquiring(cntWindow->displayInt, false);
+        config->intState.running = false;
+    }else {
+        startCounting();
+        cntWindow->tabInter->setStartButton(!config->intState.running);
+        cntWindow->clearDisplay(cntWindow->displayInt, true);
+        //cntWindow->displayFlagAcquiring(cntWindow->displayRat, true);
+        config->intState.running = true;
+    }
 }
 
-void Counter::intSwitchEventSequenceChangedCallback(int index){
+void Counter::intSwitchEventSequenceChangedCallback(int index){    
+    stopCounting();
+    config->intState.running = false;
+
     if(index){
         write(cmd->INT_EVENT, cmd->INT_EVENT_SEQUENCE_BA);
     }else {
@@ -611,6 +637,9 @@ void Counter::intSwitchEventSequenceChangedCallback(int index){
 }
 
 void Counter::intEventAChangedCallback(int index){
+    stopCounting();
+    config->intState.running = false;
+
     if(index){
         write(cmd->INT_EVENT, cmd->INT_EVENT_FALL_CH1);
     }else {
@@ -620,6 +649,9 @@ void Counter::intEventAChangedCallback(int index){
 }
 
 void Counter::intEventBChangedCallback(int index){
+    stopCounting();
+    config->intState.running = false;
+
     if(index){
         write(cmd->INT_EVENT, cmd->INT_EVENT_FALL_CH2);
     }else {

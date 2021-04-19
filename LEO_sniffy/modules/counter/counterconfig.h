@@ -78,6 +78,8 @@ public:
     RatState ratState;
     IntState intState;
 
+    bool isHeld = false;
+
 signals:
 
 };
