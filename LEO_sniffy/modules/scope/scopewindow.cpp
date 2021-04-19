@@ -156,8 +156,11 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
 
             panelCursors->cursorHorADial->updateRange(config->timeMin,config->timeMax);
             panelCursors->cursorHorBDial->updateRange(config->timeMin,config->timeMax);
-            panelCursors->cursorVerADial->updateRange(config->rangeMin,(float)(config->rangeMax)/1000);
-            panelCursors->cursorVerBDial->updateRange(config->rangeMin,(float)(config->rangeMax)/1000);
+            panelCursors->cursorVerADial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
+            panelCursors->cursorVerBDial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
+            chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
+            chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
+
         }
     }
     chart->setVerticalMarker(triggerChannelIndex,0);
@@ -322,6 +325,7 @@ void ScopeWindow::mathExpressionCallback(QString exp)
 void ScopeWindow::fftChangedCallback(int length, FFTWindow window, FFTType type, int channelIndex)
 {
     emit fftChanged(length,window,type,channelIndex);
+    fftChannelIndex = channelIndex;
     ChartFFTData.clear();
     if(length !=0){
         chartFFT->show();
@@ -466,8 +470,8 @@ void ScopeWindow::updateFFTchart(QVector<QPointF> fftTrace)
     ChartFFTData = fftTrace;
     chartFFT->clearAll();
     chartFFT->updateTrace(&ChartFFTData,0);
-    //TODO paint in a chart
-    qDebug () << "FFT was calculated and received by window" << fftTrace.length();
+    chartFFT->setTraceColor(0,Graphics::getChannelColor(fftChannelIndex));
+   // qDebug () << "FFT was calculated and received by window" << fftTrace.length();
 }
 
 void ScopeWindow::mathError(int errorPosition)

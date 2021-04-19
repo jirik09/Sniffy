@@ -35,7 +35,8 @@ public:
     void clear();
     void setSelected(int index, bool silent = false);
     int getSelectedIndex();
-    int count();    
+    qreal getSelectedValue();
+    int count();
 
 private slots:
     void indexChanged(int index);

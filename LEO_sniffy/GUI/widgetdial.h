@@ -30,6 +30,7 @@ public:
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
     void addOption (QString shownValue, QString unit,float realValue);
+    void clearOptions();
     int getSelectedIndex() const;
     qreal getRealValue() const;
     void setSelectedIndex(int index, bool silent = false);

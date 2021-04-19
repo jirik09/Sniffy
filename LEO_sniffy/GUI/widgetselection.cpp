@@ -29,7 +29,8 @@ QByteArray WidgetSelection::saveGeometry()
 
 void WidgetSelection::restoreGeometry(QByteArray geom)
 {
-    setSelected(geom.toInt());
+   if(options->length()>geom.toInt())
+        setSelected(geom.toInt());
 }
 
 void WidgetSelection::addOption (QString shownValue,float realValue){
@@ -40,11 +41,10 @@ void WidgetSelection::addOption (QString shownValue,float realValue){
 
     ui->comboBox->addItem(shownValue);
 
-    if(options->length()==1){
+    if(options->length()>1)
         setSelected(0);
-    }
-
 }
+
 void WidgetSelection::setSelected(int index, bool silent){
     if(silent)
         disconnect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
@@ -56,6 +56,11 @@ void WidgetSelection::setSelected(int index, bool silent){
 
 int WidgetSelection::getSelectedIndex(){
     return ui->comboBox->currentIndex();
+}
+
+qreal WidgetSelection::getSelectedValue()
+{
+    return options->at(getSelectedIndex()).realValue;
 }
 
 int WidgetSelection::count(){

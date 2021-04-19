@@ -64,6 +64,12 @@ void WidgetDial::addOption (QString shownValue, QString unit,float realValue){
     }
 }
 
+void WidgetDial::clearOptions()
+{
+    ui->comboBox->clear();
+    options->clear();
+}
+
 int WidgetDial::getSelectedIndex() const
 {
     return selectedIndex;

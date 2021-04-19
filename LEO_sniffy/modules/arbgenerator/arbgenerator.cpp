@@ -54,6 +54,8 @@ void ArbGenerator::parseData(QByteArray data)
             }
         }
     }else if(dataHeader==cmd->CMD_GEN_NEXT){
+        if(!dataBeingUploaded)return;
+
         if (lengthToSend == 0){
             if (sendingChannel == 1 && numChannelsUsed == 2) {
                 lengthToSend = GeneratorData[1].length();
@@ -72,8 +74,10 @@ void ArbGenerator::parseData(QByteArray data)
         arbGenWindow->setProgress(totalSent*100/totalToSend);
 
     }else if(dataHeader==cmd->CMD_GEN_OK){
-        arbGenWindow->setGeneratorRuning();
-
+        if(dataBeingUploaded){
+            dataBeingUploaded = false;
+            arbGenWindow->setGeneratorRuning();
+        }
     }else if(dataHeader==cmd->CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH1){
         quint32 freq;
         freq = qFromBigEndian<quint32>(data.right(4));
@@ -133,6 +137,7 @@ void ArbGenerator::stopModule()
 }
 
 void ArbGenerator::sendSignalCallback(){
+    dataBeingUploaded = true;
     GeneratorData = *arbGenWindow->getGeneratorDACData();
     numChannelsUsed = GeneratorData.length();
     totalToSend = totalSent = 0;
@@ -172,17 +177,16 @@ void ArbGenerator::sendSignalCallback(){
 void ArbGenerator::stopCallback()
 {
     stopGenerator();
+    dataBeingUploaded = false;
 }
 
 void ArbGenerator::updateFrequencyCallback() //this function counts only with two channels (logic for more channels as far more complex)
 {
     if(arbGenWindow->getFrequency(1) != arbGenWindow->getFrequency(0) || signalLengths[0] != signalLengths[1]){
-        //qDebug () << "updated independently";
         for (int i = 0;i<numChannelsUsed;i++){
             setSamplingFrequency(i,arbGenWindow->getFrequency(i)*signalLengths[i]);
         }
     }else{
-        //qDebug () << "updated both synced";
         setSamplingFrequency(99,arbGenWindow->getFrequency(0)*signalLengths[0]);
     }
     genAskForFreq();
@@ -195,7 +199,7 @@ void ArbGenerator::quickRestartCalback()
 }
 
 void ArbGenerator::sendNextData()
-{
+{  
     comm->write(cmd->GENERATOR+":"+cmd->CMD_GEN_DATA + " ");
     if (lengthToSend > SEND_BLOCK_SIZE){
         actualSend = SEND_BLOCK_SIZE;

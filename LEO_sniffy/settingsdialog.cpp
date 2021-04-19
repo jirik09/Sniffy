@@ -27,7 +27,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     for (int i =0; i<themesList->length(); i++) {
         selTheme->addOption(themesList->at(i),i);
     }
-    selTheme->setSelected(0);
     buttons->addWidget(selTheme);
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);

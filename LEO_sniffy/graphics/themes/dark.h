@@ -144,11 +144,11 @@ QProgressBar::chunk{width: 20px;background-color:%1;}"
 /***************** CONCRETE STYLE SHEETS *****************/
 
 #define DARK_STYLE_CONTROL_BUTTON \
-"QPushButton{background-color:" DARK_WINDOW_APP ";}"
+"QPushButton{background-color:" DARK_WINDOW_APP ";qproperty-iconSize: 15px;padding: 5px}"
 
 #define DARK_STYLE_MODULE_BUTTON \
-"QPushButton {text-align:left;}\
-QPushButton:hover{background-color:" DARK_BACKGROUND_BUTTON ";text-align:left;border-radius:5px;}"
+"QPushButton {text-align:left;qproperty-iconSize: 35px;}\
+QPushButton:hover{background-color:" DARK_BACKGROUND_BUTTON ";border-radius:5px;}"
 
 #define DARK_STYLE_HOLD_BUTTON \
 "QPushButton{padding-top: 0px;padding-bottom:1px;padding-left:0px;padding-right:0px;font-size:10px;}\

@@ -113,6 +113,7 @@ void ArbGeneratorWindow::setGeneratorStopped()
     if(setting->isSweepEnabled){
         sweepController->stopTimer();
     }
+    setting->enableGUI();
 }
 
 void ArbGeneratorWindow::setFrequencyLabels(int channel, qreal freq)
@@ -140,7 +141,6 @@ void ArbGeneratorWindow::runGeneratorCallback()
     }else{
         emit stopGenerator();
         setGeneratorStopped();
-        setting->enableGUI();
     }
 }
 

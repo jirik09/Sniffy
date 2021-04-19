@@ -125,7 +125,8 @@ private:
     QVector<QVector<QPointF>> ChartData;
     QVector<QPointF> ChartMathData;
     QVector<QPointF> ChartFFTData;
-    int triggerChannelIndex =0;
+    int fftChannelIndex = 0;
+    int triggerChannelIndex = 0;
 
     WidgetLabelArea *labelInfoPanel;
     PanelMeasurement *panelMeas;

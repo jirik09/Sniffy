@@ -71,15 +71,14 @@ void FFTengine::run()
 
         tmpOutput = calculateSpectrum(tmpData,window,minNFFT);
         outputData = processOutput(tmpOutput,type);
-        qDebug() << "FFT done";
 
         if (abort)
             return;
 
-        if (!restart){
-            outputSpectrum = tmpOutput;
-            emit fftCalculated();
-        }
+        //if (!restart){
+        outputSpectrum = tmpOutput;
+        emit fftCalculated();
+        // }
         mutex.lock();
         if (!restart)
             condition.wait(&mutex);
@@ -157,27 +156,27 @@ QVector<std::complex<float>> FFTengine::fft(QVector<std::complex<float>> x) {
 }
 
 void FFTengine::resizeHamming(int length) {
-  if (hamming.size() != length) {
-    hamming.resize(length);
-    for (int n = 0; n < length; n++)
-      hamming[n] = 0.54 - 0.46 * cos(2 * M_PI * n / length);
-  }
+    if (hamming.size() != length) {
+        hamming.resize(length);
+        for (int n = 0; n < length; n++)
+            hamming[n] = 0.54 - 0.46 * cos(2 * M_PI * n / length);
+    }
 }
 
 void FFTengine::resizeHann(int length) {
-  if (hann.size() != length) {
-    hann.resize(length);
-    for (int n = 0; n < length; n++)
-      hann[n] = 0.5 * (1 - cos(2 * M_PI * n / length));
-  }
+    if (hann.size() != length) {
+        hann.resize(length);
+        for (int n = 0; n < length; n++)
+            hann[n] = 0.5 * (1 - cos(2 * M_PI * n / length));
+    }
 }
 
 void FFTengine::resizeBlackman(int length) {
-  if (blackman.size() != length) {
-    blackman.resize(length);
-    for (int n = 0; n < length; n++)
-      blackman[n] = 0.42 - 0.5 * cos(2 * M_PI * n / (length - 1)) + 0.08 * cos(4 * M_PI * n / (length - 1));
-  }
+    if (blackman.size() != length) {
+        blackman.resize(length);
+        for (int n = 0; n < length; n++)
+            blackman[n] = 0.42 - 0.5 * cos(2 * M_PI * n / (length - 1)) + 0.08 * cos(4 * M_PI * n / (length - 1));
+    }
 }
 
 int FFTengine::nextPow2(int number) {
