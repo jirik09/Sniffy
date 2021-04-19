@@ -56,12 +56,13 @@ QByteArray WidgetDialRange::saveGeometry()
 
 void WidgetDialRange::restoreGeometry(QByteArray geom)
 {
+    qreal max, min;
     QDataStream stream(geom);
     stream >> realValue;
     stream >> dialMaxValue;
-    stream >> rangeMin;
-    stream >> rangeMax;
-    updateRange(rangeMin,rangeMax,true);
+    stream >> min;
+    stream >> max;
+    updateRange(min,max,true);
 }
 
 void WidgetDialRange::setColor(QString color){
@@ -284,13 +285,18 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     connect(ui->pushButton_minus,SIGNAL(clicked()),this,SLOT(minusClicked()));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
-    connect(ui->lineEdit,SIGNAL(textEdited(const QString &)),this,SLOT(textEditChanged(const QString &)));
+    connect(ui->lineEdit,SIGNAL(textEdited(QString)),this,SLOT(textEditChanged(QString)));
     connect(ui->lineEdit,SIGNAL(editingFinished()),this,SLOT(textEditFinished()));
     updateControls(0);
 }
 
 void WidgetDialRange::updateRange(float min, float max, bool silent)
 {
+    if(rangeMax == max && rangeMin == min){
+       // updateControls(2,silent);
+        return;
+    }
+
     rangeMax = max;
     rangeMin = min;
     dialStep = (max-min)/dialMaxValue;
@@ -331,7 +337,7 @@ void WidgetDialRange::updateControls(int except, bool silent){
     if(realValue<rangeMin){
         realValue = rangeMin;
     }
-    if(except!=2){
+    if(except!=2){ //do not update line edit and unit
         //calculate the unit mult and label value from real value and available ranges in units selection
         int i = 0;
         float tempLabelVal = 0;
@@ -354,7 +360,7 @@ void WidgetDialRange::updateControls(int except, bool silent){
         ui->lineEdit->setText(QString::number(labelValue,'f',numOfDecimals));
     }
 
-    if(except!=1){
+    if(except!=1){ //do not update dial
         disconnect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
         ui->dial->setValue(getValueForDial(realValue));
         connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));

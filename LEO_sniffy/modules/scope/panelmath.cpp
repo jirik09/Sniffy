@@ -62,13 +62,13 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     btnChannelFFTSel->setObjectName("FFTbtnChannelBSel");
     destination->addWidget(btnChannelFFTSel);
     btnChannelFFTSel->setText("CH1",0);
-    btnChannelFFTSel->setColor(Colors::getChannelColorString(0),0);
+    btnChannelFFTSel->setColor(Graphics::getChannelColor(0),0);
     btnChannelFFTSel->setText("CH2",1);
-    btnChannelFFTSel->setColor(Colors::getChannelColorString(1),1);
+    btnChannelFFTSel->setColor(Graphics::getChannelColor(1),1);
     btnChannelFFTSel->setText("CH3",2);
-    btnChannelFFTSel->setColor(Colors::getChannelColorString(2),2);
+    btnChannelFFTSel->setColor(Graphics::getChannelColor(2),2);
     btnChannelFFTSel->setText("CH4",3);
-    btnChannelFFTSel->setColor(Colors::getChannelColorString(3),3);
+    btnChannelFFTSel->setColor(Graphics::getChannelColor(3),3);
     destination->addWidget(btnChannelFFTSel);
 
     selFFTWindow = new WidgetSelection(parent,"Window");

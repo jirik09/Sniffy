@@ -51,6 +51,7 @@ private:
     int totalSent;
     int signalLengths[MAX_ARB_CHANNELS_NUM] = {0};
     QList<QList<int>> GeneratorData;
+    bool dataBeingUploaded = false;
 
     void startGenerator ();
     void stopGenerator ();
