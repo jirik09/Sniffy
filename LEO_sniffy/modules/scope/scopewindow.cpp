@@ -158,9 +158,10 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
             panelCursors->cursorHorBDial->updateRange(config->timeMin,config->timeMax);
             panelCursors->cursorVerADial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
             panelCursors->cursorVerBDial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
-            chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
-            chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
-
+            if(config->cursorsActiveIndex == 2){
+                chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
+                chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
+            }
         }
     }
     chart->setVerticalMarker(triggerChannelIndex,0);
