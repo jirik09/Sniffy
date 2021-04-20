@@ -5,7 +5,7 @@ CounterConfig::CounterConfig(QObject *parent)
     Q_UNUSED(parent);
 
     mode = CounterMode::HIGH_FREQUENCY;
-    modePrevIndex = CounterMode::HIGH_FREQUENCY;
+    modePrevIndex = CounterMode::HIGH_FREQUENCY;    
 
     hfState.quantity = HFState::Quantity::FREQUENCY;
     hfState.quantState = HFState::QuantitySwitched::NO;
@@ -24,8 +24,7 @@ CounterConfig::CounterConfig(QObject *parent)
     lfState.chan2.dutyCycle = LFState::Channel::DutyCycle::DISABLED;
     lfState.chan2.sampleCount = 1;
 
-    ratState.sampleCount = REFERENCE_COUNT_DEFAULT;
-    ratState.running = false;
+    ratState.sampleCount = REFERENCE_COUNT_DEFAULT;    
 
     intState.seqAB = IntState::Sequence::AB;
     intState.eventA = IntState::Event::RISING;

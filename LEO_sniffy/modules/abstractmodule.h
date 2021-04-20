@@ -61,6 +61,7 @@ public:
     void setModuleName(QString value);
 
     void showModuleHoldButton(bool show);
+    void enableModuleHoldButton(bool enable);
 
     int getResources();
 
