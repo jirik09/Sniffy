@@ -227,6 +227,7 @@ HEADERS += \
     modules/template/templatemodulewindow.h \
     modules/voltagesource/voltagesource.h \
     modules/voltagesource/voltagesourceconfig.h \
+    modules/voltagesource/voltagesourcedefs.h \
     modules/voltagesource/voltagesourcespec.h \
     modules/voltagesource/voltagesourcewindow.h \
     modules/voltmeter/channeldata.h \

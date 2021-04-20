@@ -268,7 +268,7 @@ void ArbGeneratorWindow::createSignalCallback()
                 int increment = ceil((qreal)(length)/ PWM_CHART_SAMPLES);
                 for (int j=0 ;j<length ;j+=increment) {
                     x = 0;
-                    y = spec->Vcc+i;
+                    y = spec->rangeMax+i;
                     chartSignal.append(QPointF(x,y));
                     x = PWMres-MCUData[j];
                     chartSignal.append(QPointF(x,y));
@@ -280,7 +280,7 @@ void ArbGeneratorWindow::createSignalCallback()
                     if(j>=length)j = length-1;
                     x = PWMres-MCUData[j];
                     chartSignal.append(QPointF(x,y));
-                    y = spec->Vcc+i;
+                    y = spec->rangeMax+i;
                     chartSignal.append(QPointF(x,y));
                     x = 0;
                     chartSignal.append(QPointF(x,y));
@@ -329,7 +329,7 @@ void ArbGeneratorWindow::createSignalCallback()
             PWMchart->updateTrace(&((*generatorPWMChartData)[i]), i);
             PWMchart->setHorizontalMarker(i,i);
         }
-        PWMchart->setRange(0,maxRes,spec->Vcc*(-0.1),spec->Vcc*1.1+(numChannelsUsed-1));
+        PWMchart->setRange(0,maxRes,spec->rangeMax*(-0.1),spec->rangeMax*1.1+(numChannelsUsed-1));
     }
 
 

@@ -4,9 +4,9 @@
 #include <QObject>
 
 #include "../abstractmodule.h"
-#include "VoltageSourcespec.h"
-#include "VoltageSourceconfig.h"
-#include "VoltageSourcewindow.h"
+#include "voltagesourcespec.h"
+#include "voltagesourceconfig.h"
+#include "voltagesourcewindow.h"
 
 class VoltageSource : public AbstractModule
 {
@@ -29,14 +29,13 @@ public slots:
 private slots:
     //In case hold is needed
 
-    void showHoldButtonCallback();
-    void holdButtonCallback(bool held);
 
 
 private:
     VoltageSourceConfig *config;
-    VoltageSourceWindow *tempWindow;
-   // scpWindow = new ScopeWindow();
+    VoltageSourceWindow *voltSourceWindow;
+
+    void sendDACVoltage(int channelIndex,int dacValue);
 
 };
 

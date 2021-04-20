@@ -18,9 +18,7 @@ void ArbGeneratorSpec::parseSpecification(QByteArray spec)
     stream >> tmp;
     rangeMax = (qreal)(tmp)/1000;
     stream >> tmp;
-    Vcc = (qreal)(tmp)/1000;
-    stream >> tmp;
-    Vref = (qreal)(tmp)/1000;
+    AVddReal = (qreal)(tmp)/1000;
 
     char chars[4] = "";
     for(int i = 0; i < maxDACChannels; i++){

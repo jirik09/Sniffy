@@ -28,8 +28,7 @@ public:
 
     qreal rangeMin;
     qreal rangeMax;
-    qreal Vcc;
-    qreal Vref;
+    qreal AVddReal;
 
 };
 

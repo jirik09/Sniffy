@@ -5,23 +5,21 @@ VoltageSource::VoltageSource(QObject *parent)
     Q_UNUSED(parent);
     moduleSpecification = new VoltageSourceSpec();
     config = new VoltageSourceConfig();
-    tempWindow = new VoltageSourceWindow(config);
-    tempWindow->setObjectName("tmpWindow");
+    voltSourceWindow = new VoltageSourceWindow(config);
+    voltSourceWindow->setObjectName("tmpWindow");
 
 //Set the comm prefix, window name and icon
     //module is not fully initialized - control widget and dock wodget cannot be modified
-    moduleCommandPrefix = "SYST";//cmd->SCOPE;
+    moduleCommandPrefix = cmd->VOLTAGE_SOURCE;
     moduleName = "Voltage source";
     moduleIconURI = Graphics::getGraphicsPath()+"icon_voltage_source.png";
 
-//In case hold button should be shown insert this and connect callback to handle hold/pause
-    connect(this, &AbstractModule::moduleCreated, this, &VoltageSource::showHoldButtonCallback);
-    connect(this, &AbstractModule::holdClicked, this, &VoltageSource::holdButtonCallback);
+    voltSourceWindow->setNumberOfChannels(2);
 }
 
 QWidget *VoltageSource::getWidget()
 {
-    return tempWindow;
+    return voltSourceWindow;
 }
 
 void VoltageSource::parseData(QByteArray data)
@@ -42,7 +40,7 @@ void VoltageSource::parseData(QByteArray data)
 
 void VoltageSource::writeConfiguration()
 {
-    tempWindow->restoreGUIAfterStartup();
+    voltSourceWindow->restoreGUIAfterStartup();
 //TODO this function is called when module is opened
 }
 
@@ -63,22 +61,16 @@ void VoltageSource::startModule()
 
 void VoltageSource::stopModule()
 {
-//TODO stop the module
+    //TODO stop the module
 }
 
-//In case hold is needed
-
-void VoltageSource::showHoldButtonCallback(){
-    this->showModuleHoldButton(true);
+void VoltageSource::sendDACVoltage(int channelIndex, int dacValue)
+{
+    qDebug() << "voltage to be sent" <<dacValue <<channelIndex;
 }
 
-void VoltageSource::holdButtonCallback(bool held){
-    if(held){
-        comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
-        setModuleStatus(ModuleStatus::PAUSE);
-    }else{
-        comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
-        setModuleStatus(ModuleStatus::PLAY);
-    }
-}
+
+
+
+
 
