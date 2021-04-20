@@ -126,3 +126,9 @@ void CounterTabIntervals::setStartButton(bool start){
         buttonStart->setText("Start",0);
     }
 }
+
+void CounterTabIntervals::enableConfigButtons(bool enable){
+    buttonsEventsSeq->setEnabled(enable);
+    switchEdgeEventA->setEnabled(enable);
+    switchEdgeEventB->setEnabled(enable);
+}

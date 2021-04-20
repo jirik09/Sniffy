@@ -572,10 +572,9 @@ void Counter::ratReloadState(){
 void Counter::ratDialSampleCountChangedCallback(float val){    
     config->ratState.sampleCount = val;
     write(cmd->RAT_CH3_SAMPLE_COUNT, val);
-
-    cntWindow->clearDisplay(cntWindow->displayRat, true);
-    setModuleStatus(ModuleStatus::PLAY);
+    startCounting();
     discardHold();
+    cntWindow->clearDisplay(cntWindow->displayRat, true);
 }
 
 /************************************** INTERVALS FUNCTIONS ****************************************/
@@ -584,6 +583,7 @@ void Counter::parseIntervalsCounter(QByteArray data){
     WidgetDisplay *display = cntWindow->displayInt;
 
     cntWindow->tabInter->setStartButton(false);
+    cntWindow->tabInter->enableConfigButtons(true);
     config->intState.running = false;
     setModuleStatus(ModuleStatus::PAUSE);
 
@@ -624,21 +624,19 @@ void Counter::intButtonsStartCallback(){
     if(config->intState.running){
         stopCounting();
         cntWindow->tabInter->setStartButton(!config->intState.running);
+        cntWindow->tabInter->enableConfigButtons(true);
         cntWindow->displayFlagAcquiring(cntWindow->displayInt, false);
         config->intState.running = false;
     }else {
         startCounting();
         cntWindow->tabInter->setStartButton(!config->intState.running);
-        cntWindow->clearDisplay(cntWindow->displayInt, true);
-        //cntWindow->displayFlagAcquiring(cntWindow->displayRat, true);
+        cntWindow->tabInter->enableConfigButtons(false);
+        cntWindow->clearDisplay(cntWindow->displayInt, true);        
         config->intState.running = true;
     }
 }
 
 void Counter::intSwitchEventSequenceChangedCallback(int index){    
-    stopCounting();
-    config->intState.running = false;
-
     if(index){
         write(cmd->INT_EVENT, cmd->INT_EVENT_SEQUENCE_BA);
     }else {
@@ -648,9 +646,6 @@ void Counter::intSwitchEventSequenceChangedCallback(int index){
 }
 
 void Counter::intEventAChangedCallback(int index){
-    stopCounting();
-    config->intState.running = false;
-
     if(index){
         write(cmd->INT_EVENT, cmd->INT_EVENT_FALL_CH1);
     }else {
@@ -660,9 +655,6 @@ void Counter::intEventAChangedCallback(int index){
 }
 
 void Counter::intEventBChangedCallback(int index){
-    stopCounting();
-    config->intState.running = false;
-
     if(index){
         write(cmd->INT_EVENT, cmd->INT_EVENT_FALL_CH2);
     }else {
