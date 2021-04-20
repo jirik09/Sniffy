@@ -56,13 +56,26 @@ QByteArray WidgetDialRange::saveGeometry()
 
 void WidgetDialRange::restoreGeometry(QByteArray geom)
 {
-    qreal max, min;
     QDataStream stream(geom);
     stream >> realValue;
     stream >> dialMaxValue;
-    stream >> min;
-    stream >> max;
-    updateRange(min,max,true);
+    stream >> rangeMin;
+    stream >> rangeMax;
+    dialStep = (rangeMax-rangeMin)/dialMaxValue;
+
+    if(logaritmic){
+        logGain = dialMaxValue/log2(rangeMax/rangeMin);
+        logOffset = -logGain*log2(rangeMin);
+    }
+
+    if(defaultRealValue<rangeMin){
+        realValue=rangeMin;
+        defaultRealValue = realValue;
+    }else if(defaultRealValue>rangeMax){
+        realValue=rangeMax;
+        defaultRealValue = realValue;
+    }
+    updateControls(0,true);
 }
 
 void WidgetDialRange::setColor(QString color){
@@ -293,7 +306,6 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
 void WidgetDialRange::updateRange(float min, float max, bool silent)
 {
     if(rangeMax == max && rangeMin == min){
-       // updateControls(2,silent);
         return;
     }
 
