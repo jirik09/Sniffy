@@ -19,6 +19,7 @@
 
 #include "voltagesourceconfig.h"
 #include "voltagesourcedefs.h"
+#include "../labelformator.h"
 
 namespace Ui {
 class VoltageSourceWindow;
@@ -35,6 +36,10 @@ public:
     void restoreGUIAfterStartup();
     void setNumberOfChannels(int numChannels);
     void setDisplayValue(qreal value, int channelIndex);
+    void setBarValue(qreal value, int channelIndex);
+    void setRange(qreal min, qreal max);
+    void setPins(QString pins[],int numChann);
+    void setRealVdda(qreal value);
 
 private:
     Ui::VoltageSourceWindow *ui;
@@ -49,7 +54,7 @@ private slots:
     void dialChangedCallback(qreal value, int channel);
 
 signals:
-    void voltagechanged(qreal value, int channel);
+    void voltageChanged(qreal value, int channel);
 };
 
 #endif // VOLTAGESOURCEWINDOW_H

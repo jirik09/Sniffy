@@ -19,6 +19,8 @@ void VoltageSourceSpec::parseSpecification(QByteArray spec)
     rangeMax = (qreal)(tmp)/1000;
     stream >> tmp;
     AVddReal = (qreal)(tmp)/1000;
+    stream >> tmp;
+    VddDefault = (qreal)(tmp)/1000;
 
     char chars[4] = "";
     for(int i = 0; i < maxDACChannels; i++){

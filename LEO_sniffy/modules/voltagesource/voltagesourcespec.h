@@ -22,6 +22,7 @@ public:
     qreal rangeMin;
     qreal rangeMax;
     qreal AVddReal;
+    qreal VddDefault;
 };
 
 #endif // VOLTAGESOURCESPEC_H
