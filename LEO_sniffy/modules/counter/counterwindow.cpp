@@ -184,8 +184,7 @@ void CounterWindow::resetPreviousCounterMode(){
         displayLFCh1->hide();
         displayLFCh2->hide();
     }else if(conf->modePrevIndex == CounterMode::RATIO) {
-        displayRat->hide();
-        tabRatio->setStartButton(false);
+        displayRat->hide();        
     }else if(conf->modePrevIndex == CounterMode::INTERVAL) {
         displayInt->hide();
         tabInter->setStartButton(false);

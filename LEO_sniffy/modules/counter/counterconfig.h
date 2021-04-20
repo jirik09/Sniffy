@@ -48,8 +48,7 @@ struct LFState
 
 struct RatState
 {
-    int sampleCount;
-    bool running;
+    int sampleCount;    
 };
 
 struct IntState

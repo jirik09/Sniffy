@@ -103,8 +103,7 @@ private slots:
     void lfDialSampleCountCh2ChangedCallback(float val);
 
     /* Ratio Counter */
-    void ratDialSampleCountChangedCallback(float val);
-    void ratStartCallback(int actualLength);
+    void ratDialSampleCountChangedCallback(float val);    
 
     /* Intervals meas. Counter */
     void intButtonsStartCallback();
@@ -112,6 +111,8 @@ private slots:
     void intEventAChangedCallback(int actualLength);
     void intEventBChangedCallback(int actualLength);
     void intDialTimeoutChangedCallback(float val);
+
+    void discardHold(void);
 };
 
 //#define CALL_MEMBER_FUNCTION(object, ptrToMember)  ((object)->*(ptrToMember))
