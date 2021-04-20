@@ -61,6 +61,8 @@ private slots:
     void startModule();
     void stopModule();
 
+    void setRealFrequencyLabel(QByteArray data);
+
     void buttonStartCallback(int index);
     void switchStepModeCallback(int index);
     void buttonEquidistantModeCallback(int index); // index not used

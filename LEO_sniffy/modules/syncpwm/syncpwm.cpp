@@ -71,7 +71,7 @@ void SyncPwm::parseData(QByteArray data){
         if(dataHeader == "SPPE"){
             stepGenEndNotif();
         }else if (dataHeader == "SPRF"){
-            //int chanIndex = data.remove(0, 4).toUInt();
+            setRealFrequencyLabel(dataToPass);
         }
     }
 }
@@ -111,9 +111,18 @@ QByteArray SyncPwm::getConfiguration(){
 
 void SyncPwm::stepGenEndNotif(){
     spwmWindow->setStartTxt();
-    //spwmWindow->uncheckStartButton();
     config->state = State::STOPPED;
     setModuleStatus(ModuleStatus::PAUSE);
+}
+
+void SyncPwm::setRealFrequencyLabel(QByteArray data){
+    int chanIndex, preDecimal, postDecimal, divider;
+    QDataStream streamBuffer(data);
+    streamBuffer >> chanIndex >> preDecimal >> postDecimal >> divider;
+
+    double realFreq = preDecimal + postDecimal / (double)divider;
+
+    spwmWindow->settings->setRealFrequency(realFreq, chanIndex);
 }
 
 void SyncPwm::setFreq(float val, int chanIndex){
@@ -151,9 +160,11 @@ void SyncPwm::setInvert(int chanIndex){
 
 void SyncPwm::equiModeConfig(){
     skipRepaintLock = true;
+    spwmWindow->disconnectDependentChannels();
     equiModeSetFreq(config->chan[0].freq);
     equiModeSetPhase(config->chan[0].phase);
     equiModeSetDuty(config->chan[0].duty);
+    spwmWindow->connectDependentChannels();
     skipRepaintLock = false;
 }
 
