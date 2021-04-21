@@ -48,7 +48,8 @@ private slots:
 
 private:
     Ui::WidgetFeature *ui;
-    ModuleStatus status;
+    ModuleStatus status;    
+    QIcon icon, iconDisabled;
 };
 
 

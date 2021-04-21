@@ -14,8 +14,7 @@ SyncPwm::SyncPwm(QObject *parent)
     connect(spwmWindow->settings->switchStepMode, &WidgetSwitch::clicked, this, &SyncPwm::switchStepModeCallback);
     connect(spwmWindow->settings->buttonEquidist, &WidgetButtons::clicked, this, &SyncPwm::buttonEquidistantModeCallback);
 
-    int i;
-    for(i = 0; i < CHANNELS_NUM; i++){
+    for(int i = 0; i < CHANNELS_NUM; i++){
         connect(spwmWindow->settings->onOffCh[i], &WidgetSwitch::clicked, this, &SyncPwm::switchOnOffCallback);
         connect(spwmWindow->settings->inverCh[i], &WidgetButtons::clicked, this, &SyncPwm::buttonInvertCallback);
         connect(spwmWindow->settings->dialFreqCh[i], &WidgetDialRange::valueChanged, this, &SyncPwm::dialFreqCallback);
@@ -29,6 +28,7 @@ void SyncPwm::startModule(){
 }
 
 void SyncPwm::stopModule(){
+    write(cmd->SPWM_COMMAND, cmd->STOP);
     write(cmd->SPWM_COMMAND, cmd->SPWM_DEINIT);
 }
 

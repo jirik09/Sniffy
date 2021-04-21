@@ -173,8 +173,9 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
 }
 
 void AbstractModule::widgetControlClickedWheel(QMouseEvent *event){
-    if(event->button() == Qt::MiddleButton)
+    if(event->button() == Qt::MiddleButton){
         closeModule();
+    }
 }
 
 void AbstractModule::setDockWidgetWindow(ModuleDockWidget *dockWidget){
