@@ -55,7 +55,6 @@ private:
 
     void startGenerator ();
     void stopGenerator ();
-    void restartGenerator();
     void setGeneratorDACMode();
     void setGeneratorPWMMode();
     void generatorDeinit();

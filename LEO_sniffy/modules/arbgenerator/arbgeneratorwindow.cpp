@@ -74,6 +74,13 @@ void ArbGeneratorWindow::setSpecification(ArbGeneratorSpec* spec)
     this->spec = spec;
     setting->setMaxNumChannels(spec->maxDACChannels);
     fileLoader->setSignalRangeParameters(spec->DACResolution,spec->rangeMin,spec->rangeMax);
+    for(int i = 0; i < spec->maxDACChannels; i++){
+        if(isPWMbased){
+            setting->separators[i]->setText("Channel " + QString::number(i+1) + " | pin " + spec->channelPWMPins[i]);
+        }else{
+            setting->separators[i]->setText("Channel " + QString::number(i+1) + " | pin " + spec->channelPins[i]);
+        }
+    }
 }
 
 QList<QList<int>> *ArbGeneratorWindow::getGeneratorDACData() const

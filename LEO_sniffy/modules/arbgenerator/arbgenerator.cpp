@@ -40,11 +40,11 @@ void ArbGenerator::parseData(QByteArray data)
             if(data.left(4) == cmd->PWM_GENERATOR){
                 data.remove(0,4);
                 static_cast<ArbGeneratorSpec*>(moduleSpecification)->parsePWMSpecification(data);
+                arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
                 showModuleControl();
             }else{
                 comm->write(cmd->GENERATOR,cmd->CMD_GET_PWM_CONFIG);
-                moduleSpecification->parseSpecification(data);
-                arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
+                moduleSpecification->parseSpecification(data);              
             }
         }else{
             if(data.left(4) != cmd->PWM_GENERATOR){
@@ -120,7 +120,6 @@ QByteArray ArbGenerator::getConfiguration()
 
 void ArbGenerator::startModule()
 {
-    restartGenerator();
     if(isPWMbased){
         setGeneratorPWMMode();
     }else{
@@ -238,11 +237,6 @@ void ArbGenerator::stopGenerator()
     comm->write(cmd->GENERATOR,cmd->CMD_GEN_STOP);
 }
 
-void ArbGenerator::restartGenerator()
-{
-    comm->write(cmd->GENERATOR,cmd->CMD_GEN_RESET);
-}
-
 void ArbGenerator::setGeneratorDACMode()
 {
     comm->write(cmd->GENERATOR,cmd->CMD_GEN_MODE,cmd->CMD_MODE_DAC);
@@ -255,7 +249,7 @@ void ArbGenerator::setGeneratorPWMMode()
 
 void ArbGenerator::generatorDeinit()
 {
-    comm->write(cmd->GENERATOR,cmd->CMD_GEN_DEINIT);
+    comm->write(cmd->GENERATOR,cmd->DEINIT);
 }
 
 void ArbGenerator::setDataLength(int channel, int length)

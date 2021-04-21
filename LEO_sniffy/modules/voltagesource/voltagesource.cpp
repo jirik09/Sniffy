@@ -42,6 +42,7 @@ void VoltageSource::parseData(QByteArray data)
 
 void VoltageSource::writeConfiguration()
 {
+    voltSourceStart();
     voltSourceWindow->restoreGUIAfterStartup();
     voltSourceWindow->setPins(static_cast<VoltageSourceSpec*>(moduleSpecification)->channelPins,MAX_VOLTAGE_SOURCE_CHANNELS);
     voltSourceWindow->setRange(spec->rangeMin,spec->rangeMax);
@@ -62,12 +63,11 @@ QByteArray VoltageSource::getConfiguration()
 
 void VoltageSource::startModule()
 {
-    //TODO start the module
 }
 
 void VoltageSource::stopModule()
 {
-    //TODO stop the module
+    voltSourceStop();
 }
 
 void VoltageSource::voltageChangedCallback(qreal value, int channel)
@@ -97,6 +97,19 @@ void VoltageSource::sendDACVoltage()
     }
     comm->write(tmpHeader+";");
 }
+
+void VoltageSource::voltSourceStop()
+{
+    comm->write(cmd->VOLTAGE_SOURCE+":"+cmd->STOP+ ";");
+}
+
+void VoltageSource::voltSourceStart()
+{
+    comm->write(cmd->VOLTAGE_SOURCE+":"+cmd->START+ ";");
+}
+
+
+
 
 
 

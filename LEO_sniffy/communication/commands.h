@@ -128,6 +128,7 @@ public:
     static const QByteArray CMD_GEN_MODE;
     static const QByteArray CMD_MODE_PWM;
     static const QByteArray CMD_MODE_DAC;
+    static const QByteArray CMD_MODE_VOLT;
     static const QByteArray CMD_GEN_DATA;
     static const QByteArray CMD_GEN_OK;
     static const QByteArray CMD_GEN_NEXT;
@@ -141,7 +142,7 @@ public:
     static const QByteArray CMD_GEN_STOP;
     static const QByteArray CMD_GEN_RESET;
     static const QByteArray CMD_GET_PWM_CONFIG;
-    static const QByteArray CMD_GEN_DEINIT;
+    static const QByteArray DEINIT;
     //static const QByteArray CMD_GEN_PWM_FREQ_PSC;
     //static const QByteArray CMD_GEN_PWM_FREQ_ARR;
     static const QByteArray CMD_GEN_PWM_FREQ_CH1;

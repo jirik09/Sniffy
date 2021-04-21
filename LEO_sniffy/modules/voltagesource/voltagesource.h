@@ -40,7 +40,8 @@ private:
     int DACData [MAX_VOLTAGE_SOURCE_CHANNELS] = {0,0,0,0};
 
     void sendDACVoltage();
-
+    void voltSourceStop();
+    void voltSourceStart();
 };
 
 #endif // VOLTAGESOURCE_H
