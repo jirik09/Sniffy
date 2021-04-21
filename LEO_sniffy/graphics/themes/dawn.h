@@ -154,7 +154,7 @@ QProgressBar::chunk{width: 20px;background-color: #FF%1;}"
 
 #define DAWN_STYLE_MODULE_BUTTON \
 "QPushButton {text-align:left; border: 3px solid " DAWN_WINDOW_APP "; border-radius:2px;qproperty-iconSize: 35px;}\
-QPushButton:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP ";background:" DAWN_WINDOW_CONTROL_HOVER ";}\
+QPushButton:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP ";background:" DAWN_WINDOW_CONTROL_HOVER ";color: #dcdde0;}\
 QPushButton:checked{text-align:left; border: 3px solid " DAWN_WINDOW_APP ";background: #11FFFFFF; color: " DAWN_YELLOW ";}\
 QPushButton:checked:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP "; background:" DAWN_WINDOW_CONTROL_HOVER ";}"
 

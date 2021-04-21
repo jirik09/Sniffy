@@ -60,8 +60,12 @@ void WidgetControlModule::hideStatus(){
     ui->widget_status->hide();
 }
 
+void WidgetControlModule::mousePressEvent(QMouseEvent *event){
+    emit mouseWheelPressEvent(event);
+}
+
 void WidgetControlModule::clickedInternal(){
-    emit clicked (status);
+    emit clicked(status);
 }
 
 void WidgetControlModule::setIcon (QString ImageURI){

@@ -5,6 +5,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QFile>
+
 #include "../GUI/moduledockwidget.h"
 #include "../GUI/widgetcontrolmodule.h"
 #include "../communication/comms.h"
@@ -86,6 +87,7 @@ private:
 
 public slots:
     void widgetControlClicked(ModuleStatus status);
+    void widgetControlClickedWheel(QMouseEvent *event);
     void held(bool held);
 
 signals:
