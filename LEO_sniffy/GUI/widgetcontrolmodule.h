@@ -2,6 +2,7 @@
 #define WIDGETFEATURE_H
 
 #include <QWidget>
+#include <QMouseEvent>
 #include <QtWidgets/QPushButton>
 
 #include "../graphics/graphics.h"
@@ -35,12 +36,15 @@ public:
     void setIcon (QString ImageURI);
     void setName (QString name);
 
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+
 signals:
+    void mouseWheelPressEvent(QMouseEvent *event);
     void clicked(ModuleStatus);
 
-private slots:
-
-    void clickedInternal();
+private slots:    
+    void clickedInternal();    
 
 private:
     Ui::WidgetFeature *ui;

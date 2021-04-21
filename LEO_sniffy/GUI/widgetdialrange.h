@@ -51,7 +51,7 @@ private:
     Ui::WidgetDialRange *ui;
     QList<params_unit> *units;
     int dialMaxValue = DIAL_DEFAULT_RANGE;
-    float realValue;
+    float realValue;    
     float defaultRealValue = 0;
     float labelValue;
 

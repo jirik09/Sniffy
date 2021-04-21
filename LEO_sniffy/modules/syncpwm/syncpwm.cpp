@@ -14,30 +14,14 @@ SyncPwm::SyncPwm(QObject *parent)
     connect(spwmWindow->settings->switchStepMode, &WidgetSwitch::clicked, this, &SyncPwm::switchStepModeCallback);
     connect(spwmWindow->settings->buttonEquidist, &WidgetButtons::clicked, this, &SyncPwm::buttonEquidistantModeCallback);
 
-    connect(spwmWindow->settings->onOffCh[0], &WidgetSwitch::clicked, this, &SyncPwm::switchOnOffCallback);
-    connect(spwmWindow->settings->onOffCh[1], &WidgetSwitch::clicked, this, &SyncPwm::switchOnOffCallback);
-    connect(spwmWindow->settings->onOffCh[2], &WidgetSwitch::clicked, this, &SyncPwm::switchOnOffCallback);
-    connect(spwmWindow->settings->onOffCh[3], &WidgetSwitch::clicked, this, &SyncPwm::switchOnOffCallback);
-
-    connect(spwmWindow->settings->inverCh[0], &WidgetButtons::clicked, this, &SyncPwm::buttonInvertCallback);
-    connect(spwmWindow->settings->inverCh[1], &WidgetButtons::clicked, this, &SyncPwm::buttonInvertCallback);
-    connect(spwmWindow->settings->inverCh[2], &WidgetButtons::clicked, this, &SyncPwm::buttonInvertCallback);
-    connect(spwmWindow->settings->inverCh[3], &WidgetButtons::clicked, this, &SyncPwm::buttonInvertCallback);
-
-    connect(spwmWindow->settings->dialFreqCh[0], &WidgetDialRange::valueChanged, this, &SyncPwm::dialFreqCallback);
-    connect(spwmWindow->settings->dialFreqCh[1], &WidgetDialRange::valueChanged, this, &SyncPwm::dialFreqCallback);
-    connect(spwmWindow->settings->dialFreqCh[2], &WidgetDialRange::valueChanged, this, &SyncPwm::dialFreqCallback);
-    connect(spwmWindow->settings->dialFreqCh[3], &WidgetDialRange::valueChanged, this, &SyncPwm::dialFreqCallback);
-
-    connect(spwmWindow->settings->dialDutyCh[0], &WidgetDialRange::valueChanged, this, &SyncPwm::dialDutyCallback);
-    connect(spwmWindow->settings->dialDutyCh[1], &WidgetDialRange::valueChanged, this, &SyncPwm::dialDutyCallback);
-    connect(spwmWindow->settings->dialDutyCh[2], &WidgetDialRange::valueChanged, this, &SyncPwm::dialDutyCallback);
-    connect(spwmWindow->settings->dialDutyCh[3], &WidgetDialRange::valueChanged, this, &SyncPwm::dialDutyCallback);
-
-    connect(spwmWindow->settings->dialPhaseCh[0], &WidgetDialRange::valueChanged, this, &SyncPwm::dialPhaseCallback);
-    connect(spwmWindow->settings->dialPhaseCh[1], &WidgetDialRange::valueChanged, this, &SyncPwm::dialPhaseCallback);
-    connect(spwmWindow->settings->dialPhaseCh[2], &WidgetDialRange::valueChanged, this, &SyncPwm::dialPhaseCallback);
-    connect(spwmWindow->settings->dialPhaseCh[3], &WidgetDialRange::valueChanged, this, &SyncPwm::dialPhaseCallback);
+    int i;
+    for(i = 0; i < CHANNELS_NUM; i++){
+        connect(spwmWindow->settings->onOffCh[i], &WidgetSwitch::clicked, this, &SyncPwm::switchOnOffCallback);
+        connect(spwmWindow->settings->inverCh[i], &WidgetButtons::clicked, this, &SyncPwm::buttonInvertCallback);
+        connect(spwmWindow->settings->dialFreqCh[i], &WidgetDialRange::valueChanged, this, &SyncPwm::dialFreqCallback);
+        connect(spwmWindow->settings->dialDutyCh[i], &WidgetDialRange::valueChanged, this, &SyncPwm::dialDutyCallback);
+        connect(spwmWindow->settings->dialPhaseCh[i], &WidgetDialRange::valueChanged, this, &SyncPwm::dialPhaseCallback);
+    }
 }
 
 void SyncPwm::startModule(){
@@ -71,7 +55,7 @@ void SyncPwm::parseData(QByteArray data){
         if(dataHeader == "SPPE"){
             stepGenEndNotif();
         }else if (dataHeader == "SPRF"){
-            //int chanIndex = data.remove(0, 4).toUInt();
+            setRealFrequencyLabel(dataToPass);
         }
     }
 }
@@ -111,9 +95,18 @@ QByteArray SyncPwm::getConfiguration(){
 
 void SyncPwm::stepGenEndNotif(){
     spwmWindow->setStartTxt();
-    //spwmWindow->uncheckStartButton();
     config->state = State::STOPPED;
     setModuleStatus(ModuleStatus::PAUSE);
+}
+
+void SyncPwm::setRealFrequencyLabel(QByteArray data){
+    int chanIndex, preDecimal, postDecimal, divider;
+    QDataStream streamBuffer(data);
+    streamBuffer >> chanIndex >> preDecimal >> postDecimal >> divider;
+
+    double realFreq = preDecimal + postDecimal / (double)divider;
+
+    spwmWindow->settings->setRealFrequency(realFreq, chanIndex);
 }
 
 void SyncPwm::setFreq(float val, int chanIndex){
@@ -151,9 +144,11 @@ void SyncPwm::setInvert(int chanIndex){
 
 void SyncPwm::equiModeConfig(){
     skipRepaintLock = true;
+    spwmWindow->disconnectDependentChannels();
     equiModeSetFreq(config->chan[0].freq);
     equiModeSetPhase(config->chan[0].phase);
     equiModeSetDuty(config->chan[0].duty);
+    spwmWindow->connectDependentChannels();
     skipRepaintLock = false;
 }
 

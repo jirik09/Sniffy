@@ -10,6 +10,7 @@
 #include "../../GUI/widgetswitch.h"
 #include "../../GUI/widgetbuttons.h"
 
+#include "syncpwmspec.h"
 #include "syncpwmconfig.h"
 #include "syncpwmdefs.h"
 
@@ -20,6 +21,7 @@ public:
     explicit SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config, QWidget *parent = nullptr);
 
     WidgetSeparator *separator[CHANNELS_NUM];
+    WidgetSeparator *realFreq[CHANNELS_NUM];
 
     WidgetButtons *buttonStart;
     WidgetButtons *buttonEquidist;
@@ -32,12 +34,18 @@ public:
     WidgetDialRange *dialDutyCh[CHANNELS_NUM];
     WidgetDialRange *dialPhaseCh[CHANNELS_NUM];
 
+    void setSpecification(SyncPwmSpec *spec);
+
     void configControlElements(QWidget *parent, int i, int phase);
     void greyOutComplementChanFreqDials(int chanIndex);
+    void setRealFrequency(double val, int chanIndex);    
 
 private:
-
+    QLocale loc;
     SyncPwmConfig *config;
+    SyncPwmSpec *spec;
+
+    QString formatNumber(double val);
 
 signals:
 

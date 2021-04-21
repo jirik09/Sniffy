@@ -33,6 +33,8 @@ public:
     SyncPwmSettings *settings;
     SyncPwmPainter *painter;
 
+    void connectDependentChannels();
+    void disconnectDependentChannels();
     void setSpecification(SyncPwmSpec *spec);
     void restoreGUIAfterStartup();
     void setStartTxt();
@@ -56,9 +58,6 @@ private:
     SyncPwmSpec *spec;
 
     widgetChart *chart;
-
-    void updateChartTimeScale(float timeBase);
-    //void paintTraces();
 };
 
 #endif // SYNCPWMWINDOW_H
