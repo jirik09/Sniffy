@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QtWidgets/QPushButton>
+#include <QBitmap>
 
 #include "../graphics/graphics.h"
 
@@ -49,7 +50,8 @@ private slots:
 private:
     Ui::WidgetFeature *ui;
     ModuleStatus status;    
-    QIcon icon, iconDisabled;
+    QIcon iconAvail, iconLock;
+    QPixmap *iconAreaAvail, *iconAreaLock;
 };
 
 
