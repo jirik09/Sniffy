@@ -6,7 +6,7 @@ CounterWindow::CounterWindow(CounterConfig *conf, QWidget *parent) :
     ui(new Ui::CounterWindow),
     conf(conf)
 {
-    ui->setupUi(this);
+    ui->setupUi(this);        
 
     /* Left panel for data display */
     createAllDisplays();
@@ -58,7 +58,7 @@ void CounterWindow::createAllDisplays(void){
     displayHF->setContentsMargins(5, 5, 5, 5);
     displayHF->setIndicationFlagColor(chan1);
     displayHF->setProgressBarColor(chan1);
-    ui->verticalLayout_display->addWidget(displayHF);
+    ui->verticalLayout_display->addWidget(displayHF);    
 
     displayLFCh1 = createLowFreqDisplays("LowFreqCh1Counter");
     displayLFCh1->setContentsMargins(5, 5, 5, 5);
