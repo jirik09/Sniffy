@@ -35,7 +35,7 @@ private slots:
     void showHoldButtonCallback();
     void holdButtonCallback(bool held);
     void updateSamplingChannel(void);
-    void updateMeasurementGUI(QList<Measurement*> m);
+    void updateMeasurement(QList<Measurement*> m);
     void setAveraging(int value);
     void setNumChannelsEnabled(int value);
     void resetMinMax();

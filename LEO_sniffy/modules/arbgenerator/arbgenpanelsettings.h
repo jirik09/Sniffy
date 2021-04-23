@@ -62,9 +62,10 @@ public:
     int customLength = 0;
 
     //for each channel
+    WidgetSeparator *separators[MAX_ARB_CHANNELS_NUM];
     QScrollArea *verChannArea[MAX_ARB_CHANNELS_NUM];
-    WidgetButtons *buttonsShape[MAX_ARB_CHANNELS_NUM];
 
+    WidgetButtons *buttonsShape[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialFreqCh[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialOffsetCh[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialAmplitudeCh[MAX_ARB_CHANNELS_NUM];

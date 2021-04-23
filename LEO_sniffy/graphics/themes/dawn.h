@@ -136,10 +136,10 @@ QPushButton:hover{background-color: #3C%1;}"
 #define DAWN_STYLE_CHECK_BUTTON \
 "QPushButton{font-weight : bold ;border-radius: 2px; padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
 QPushButton{background-color:" DAWN_BACKGROUND_BUTTON "; color: #FF%1;}\
-QPushButton:disabled{border:none;background-color: " DAWN_BACKGROUND_BUTTON_DISABLED "; color:" DAWN_COMPONENT_DISABLED ";}\
 QPushButton:checked{border:none; background-color:#E4%1; color:" DAWN_WINDOW_WIDGET ";}\
 QPushButton:hover{background-color:#2C%1;}\
-QPushButton:checked:hover{background-color:#FF%1;}"
+QPushButton:checked:hover{background-color:#FF%1;}\
+QPushButton:disabled{border:none;background-color: " DAWN_BACKGROUND_BUTTON_DISABLED "; color:" DAWN_COMPONENT_DISABLED ";}"
 
 #define DAWN_STYLE_PROGRESS_BAR \
 "QProgressBar{border:1px solid " DAWN_TEXT_LABEL ";border-radius:1px;background-color:" DAWN_DISPLAY ";}\
@@ -150,11 +150,11 @@ QProgressBar::chunk{width: 20px;background-color: #FF%1;}"
 /***************** CONCRETE STYLE SHEETS *****************/
 
 #define DAWN_STYLE_CONTROL_BUTTON \
-"QPushButton{background-color:" DAWN_WINDOW_APP ";}"
+"QPushButton{background-color:" DAWN_WINDOW_APP ";qproperty-iconSize: 15px;padding: 5px}"
 
 #define DAWN_STYLE_MODULE_BUTTON \
-"QPushButton {text-align:left; border: 3px solid " DAWN_WINDOW_APP "; border-radius:2px;}\
-QPushButton:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP ";background:" DAWN_WINDOW_CONTROL_HOVER ";}\
+"QPushButton{text-align:left; border: 3px solid " DAWN_WINDOW_APP "; border-radius:2px;qproperty-iconSize: 35px;}\
+QPushButton:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP ";background:" DAWN_WINDOW_CONTROL_HOVER ";color: #dcdde0;}\
 QPushButton:checked{text-align:left; border: 3px solid " DAWN_WINDOW_APP ";background: #11FFFFFF; color: " DAWN_YELLOW ";}\
 QPushButton:checked:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP "; background:" DAWN_WINDOW_CONTROL_HOVER ";}"
 

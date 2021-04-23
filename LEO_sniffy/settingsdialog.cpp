@@ -32,6 +32,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     buttons->addItem(verticalSpacer);
 
+    infoLabel = new WidgetLabel(this,"","");
+    buttons->addWidget(infoLabel);
+
     WidgetSeparator *sep2 = new WidgetSeparator(this);
     buttons->addWidget(sep2);
 
@@ -41,7 +44,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     buttons->addWidget(buttonsDone);
 
     ui->widget->setLayout(buttons);
-
 
     buttonsRestoreSession->setChecked(true,CustomSettings::getRestoreSession());
     selTheme->setSelected(CustomSettings::getThemeIndex());
@@ -57,6 +59,8 @@ SettingsDialog::~SettingsDialog()
 
 void SettingsDialog::open()
 {
+    infoLabel->setValue("");
+    infoLabel->setColor(Graphics::COLOR_TEXT_ALL);
     this->show();
     this->raise();
     this->activateWindow();
@@ -81,5 +85,6 @@ void SettingsDialog::closeDialog(int isCanceled)
 
 void SettingsDialog::restartWarning()
 {
-    restartNeededWarning = true;
+    infoLabel->setValue("Restart needed to take effect");
+    infoLabel->setColor(Graphics::COLOR_WARNING);
 }

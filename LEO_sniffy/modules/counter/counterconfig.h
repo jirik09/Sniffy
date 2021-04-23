@@ -48,8 +48,7 @@ struct LFState
 
 struct RatState
 {
-    int sampleCount;
-    bool running;
+    int sampleCount;    
 };
 
 struct IntState
@@ -77,6 +76,8 @@ public:
     LFState lfState;
     RatState ratState;
     IntState intState;
+
+    bool isHeld = false;
 
 signals:
 

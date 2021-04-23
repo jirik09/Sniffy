@@ -20,8 +20,6 @@ public:
     WidgetDialRange *dialSampleCount;
     WidgetButtons *buttonStart;
 
-    void setStartButton(bool start);
-
 signals:
 
 };

@@ -67,7 +67,7 @@
 
 /***************** GENERAL GLOBAL QT STYLE SHEETS *****************/
 
-#define DARK_STYLE_USE_TRANSPARENCY false  // if true, arguments must define transparency (# removed in code)
+#define DARK_STYLE_USE_TRANSPARENCY false  // if true, the arg %1 must be in some defines (# removed in code)
 #define DARK_STYLE_USE_CUSTOM_DIALS true
 
 #define DARK_STYLE_GLOBAL           DARK_STYLE_OBJECT \

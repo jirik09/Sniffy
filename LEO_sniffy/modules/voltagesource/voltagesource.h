@@ -2,11 +2,12 @@
 #define VOLTAGESOURCE_H
 
 #include <QObject>
+#include <QtEndian>
 
 #include "../abstractmodule.h"
-#include "VoltageSourcespec.h"
-#include "VoltageSourceconfig.h"
-#include "VoltageSourcewindow.h"
+#include "voltagesourcespec.h"
+#include "voltagesourceconfig.h"
+#include "voltagesourcewindow.h"
 
 class VoltageSource : public AbstractModule
 {
@@ -27,17 +28,20 @@ public slots:
     void stopModule();
 
 private slots:
-    //In case hold is needed
+    void voltageChangedCallback(qreal value, int channel);
 
-    void showHoldButtonCallback();
-    void holdButtonCallback(bool held);
 
 
 private:
     VoltageSourceConfig *config;
-    VoltageSourceWindow *tempWindow;
-   // scpWindow = new ScopeWindow();
+    VoltageSourceSpec * spec;
+    VoltageSourceWindow *voltSourceWindow;
 
+    int DACData [MAX_VOLTAGE_SOURCE_CHANNELS] = {0,0,0,0};
+
+    void sendDACVoltage();
+    void voltSourceStop();
+    void voltSourceStart();
 };
 
 #endif // VOLTAGESOURCE_H

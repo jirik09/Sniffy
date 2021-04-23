@@ -63,7 +63,6 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     dialAveraging->setObjectName("voltAvgSamples");
     dialAveraging->setRange(1,64,"x",1,1,4,false);
     dialAveraging->hideUnitSelection();
-    dialAveraging->setColor(Graphics::getChannelColor(1));
     dialAveraging->setNumOfDecimals(0);
     tabs->getLayout(0)->addWidget(dialAveraging);
 

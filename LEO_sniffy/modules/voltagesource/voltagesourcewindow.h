@@ -15,9 +15,11 @@
 #include "../../GUI/widgetselection.h"
 #include "../../GUI/widgetchart.h"
 #include "../../GUI/widgettab.h"
-#include "../../GUI/widgetlabelarea.h"
+#include "../../GUI/widgetdisplay.h"
 
-#include "VoltageSourceconfig.h"
+#include "voltagesourceconfig.h"
+#include "voltagesourcedefs.h"
+#include "../labelformator.h"
 
 namespace Ui {
 class VoltageSourceWindow;
@@ -32,10 +34,27 @@ public:
     ~VoltageSourceWindow();
 
     void restoreGUIAfterStartup();
+    void setNumberOfChannels(int numChannels);
+    void setDisplayValue(qreal value, int channelIndex);
+    void setBarValue(qreal value, int channelIndex);
+    void setRange(qreal min, qreal max);
+    void setPins(QString pins[],int numChann);
+    void setRealVdda(qreal value);
 
 private:
     Ui::VoltageSourceWindow *ui;
     VoltageSourceConfig *config;
+
+    QList<WidgetDisplay *> displays;
+    QList<WidgetDialRange *> dials;
+
+    WidgetLabel *labelVDDA;
+
+private slots:
+    void dialChangedCallback(qreal value, int channel);
+
+signals:
+    void voltageChanged(qreal value, int channel);
 };
 
 #endif // VOLTAGESOURCEWINDOW_H

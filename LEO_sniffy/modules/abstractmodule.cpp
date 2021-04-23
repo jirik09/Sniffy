@@ -119,21 +119,21 @@ void AbstractModule::restoreGeometry(QSettings &layout)
     }
     foreach(dialRange, listDialRange){
         if (!dialRange->objectName().isEmpty() && !layout.value(moduleName+dialRange->objectName()).isNull()){
-             dialRange->restoreGeometry(layout.value(moduleName+dialRange->objectName()).toByteArray());
+            dialRange->restoreGeometry(layout.value(moduleName+dialRange->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: dialRange in "<<moduleName;
         }
     }
     foreach(sel, listSel){
         if (!sel->objectName().isEmpty() && !layout.value(moduleName+sel->objectName()).isNull()){
-             sel->restoreGeometry(layout.value(moduleName+sel->objectName()).toByteArray());
+            sel->restoreGeometry(layout.value(moduleName+sel->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: selection in "<<moduleName;
         }
     }
     foreach(text, listText){
         if (!text->objectName().isEmpty() && !layout.value(moduleName+text->objectName()).isNull()){
-             text->restoreGeometry(layout.value(moduleName+text->objectName()).toByteArray());
+            text->restoreGeometry(layout.value(moduleName+text->objectName()).toByteArray());
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: textInput in "<<moduleName;
         }
@@ -172,6 +172,12 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
     }
 }
 
+void AbstractModule::widgetControlClickedWheel(QMouseEvent *event){
+    if(event->button() == Qt::MiddleButton){
+        closeModule();
+    }
+}
+
 void AbstractModule::setDockWidgetWindow(ModuleDockWidget *dockWidget){
     dockWidgetWindow = dockWidget;
 
@@ -181,7 +187,8 @@ void AbstractModule::setDockWidgetWindow(ModuleDockWidget *dockWidget){
 
 void AbstractModule::setModuleControlWidget(WidgetControlModule *controlWidget){
     moduleControlWidget = controlWidget;
-    connect(moduleControlWidget,SIGNAL(clicked(ModuleStatus)),this,SLOT(widgetControlClicked(ModuleStatus)));
+    connect(moduleControlWidget, &WidgetControlModule::clicked,this, &AbstractModule::widgetControlClicked);
+    connect(moduleControlWidget, &WidgetControlModule::mouseWheelPressEvent,this, &AbstractModule::widgetControlClickedWheel);
 
     moduleControlWidget->setIcon(moduleIconURI);
     dockWinCreated = true;
@@ -262,6 +269,10 @@ void AbstractModule::setModuleName(QString value){
 void AbstractModule::showModuleHoldButton(bool show){
     if(dockWinCreated)
         dockWidgetWindow->showHoldButton(show);
+}
+
+void AbstractModule::enableModuleHoldButton(bool enable){
+    dockWidgetWindow->enableHoldButton(enable);
 }
 
 int AbstractModule::getResources()

@@ -86,9 +86,11 @@ void CounterTabIntervals::eventBEdgeChangedCallback(int index){
     setSeqPicture();
 }
 
-void CounterTabIntervals::setSeqPicture(){
-    QString picPath;
+void CounterTabIntervals::setSeqPicture()
+{
+    setStartButton(false);
 
+    QString picPath;
     if(!seqAB){
         if(eventA && eventB){
             picPath = PATH_IMG_EVENT_AB_FF;
@@ -123,4 +125,10 @@ void CounterTabIntervals::setStartButton(bool start){
         buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
         buttonStart->setText("Start",0);
     }
+}
+
+void CounterTabIntervals::enableConfigButtons(bool enable){
+    buttonsEventsSeq->setEnabled(enable);
+    switchEdgeEventA->setEnabled(enable);
+    switchEdgeEventB->setEnabled(enable);
 }

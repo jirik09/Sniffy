@@ -66,6 +66,10 @@ void ModuleDockWidget::showHoldButton(bool show){
     (show) ? btnHold->show() : btnHold->hide();
 }
 
+void ModuleDockWidget::enableHoldButton(bool enable){
+    btnHold->setChecked(enable);
+}
+
 void ModuleDockWidget::unDockOrMaximize(){
     if(isFloating() && !fullScreen){
 

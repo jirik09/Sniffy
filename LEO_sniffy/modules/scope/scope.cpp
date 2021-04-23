@@ -180,10 +180,8 @@ void Scope::writeConfiguration(){
     updatePretrigger(config->pretriggerPercent);
 
     updateTriggerEdge(config->triggerEdge);
-
-    updateTriggerChannel(config->triggerChannelIndex);
-
     setNumberOfChannels(config->numberOfChannels);
+    updateTriggerChannel(config->triggerChannelIndex);
     updateTriggerMode(config->triggerMode);
 }
 
