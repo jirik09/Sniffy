@@ -51,7 +51,6 @@ private:
     Ui::WidgetFeature *ui;
     ModuleStatus status;    
     QIcon iconAvail, iconLock;
-    QPixmap *iconAreaAvail, *iconAreaLock;
 };
 
 

@@ -73,17 +73,17 @@ void WidgetControlModule::clickedInternal(){
 void WidgetControlModule::setIcon (QString ImageURI){
     QPixmap icon(ImageURI);
 
-    iconAreaAvail = new QPixmap(icon.size());
-    iconAreaLock = new QPixmap(icon.size());
+    QPixmap iconAreaAvail(icon.size());
+    QPixmap iconAreaLock(icon.size());
 
-    iconAreaAvail->fill(Graphics::COLOR_TEXT_ALL);
-    iconAreaLock->fill(Graphics::COLOR_COMPONENT_DISABLED);
+    iconAreaAvail.fill(Graphics::COLOR_TEXT_ALL);
+    iconAreaLock.fill(Graphics::COLOR_COMPONENT_DISABLED);
 
-    iconAreaAvail->setMask(icon.createMaskFromColor(Qt::transparent));
-    iconAreaLock->setMask(icon.createMaskFromColor(Qt::transparent));
+    iconAreaAvail.setMask(icon.createMaskFromColor(Qt::transparent));
+    iconAreaLock.setMask(icon.createMaskFromColor(Qt::transparent));
 
-    this->iconAvail.addPixmap(*iconAreaAvail,QIcon::Normal);
-    this->iconLock.addPixmap(*iconAreaLock,QIcon::Disabled);
+    this->iconAvail.addPixmap(iconAreaAvail,QIcon::Normal);
+    this->iconLock.addPixmap(iconAreaLock,QIcon::Disabled);
 
     ui->pushButton_name->setIcon(iconAvail);
 }
