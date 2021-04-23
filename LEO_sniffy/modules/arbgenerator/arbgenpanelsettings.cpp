@@ -94,8 +94,8 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         setScroll->setLayout(verChanBox);
 
 
-        WidgetSeparator *separator = new WidgetSeparator(parent, "Channel " + chNStr);
-        verChanBox->addWidget(separator);
+        separators[i] = new WidgetSeparator(parent, "Channel " + chNStr);
+        verChanBox->addWidget(separators[i]);
 
         buttonsShape[i] = new WidgetButtons(parent,4,ButtonTypes::RADIO,"",0,i);
         buttonsShape[i]->setObjectName("arbGenBtnshape"+chNStr);
