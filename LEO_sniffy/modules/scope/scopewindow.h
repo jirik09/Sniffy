@@ -54,6 +54,7 @@ public:
     void samplingOngoing();
     void triggerCaptured();
     void setRealSamplingRate(int smpl);
+    void setNumChannels(int channels);
 
     void updateMeasurement(QList<Measurement*> m);
     void updateMath(QVector<QPointF> mathTrace);

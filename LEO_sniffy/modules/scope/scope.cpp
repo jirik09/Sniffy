@@ -169,6 +169,7 @@ void Scope::writeConfiguration(){
 
     isConfigurationWritten = true;
     scpWindow->restoreGUIAfterStartup();
+    scpWindow->setNumChannels(static_cast<ScopeSpec*>(moduleSpecification)->maxADCChannels);
 
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
     updateTimebase(config->timeBase);

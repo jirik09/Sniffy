@@ -520,6 +520,17 @@ void ScopeWindow::setRealSamplingRate(int smpl){
     labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS") + "  ("+LabelFormator::formatOutout(config->dataLength,"")+")");
 }
 
+void ScopeWindow::setNumChannels(int channels){
+    panelMeas->setNumChannels(channels);
+    for (int i = channels;i<MAX_SCOPE_CHANNELS ;i++ ) {
+        panelSet->buttonsChannelEnable->setButtonHidden(true,i);
+        panelSet->buttonsChannelVertical->setButtonHidden(true,i);
+        panelCursors->channelButtons->setButtonHidden(true,i);
+        panelMath->btnChannelFFTSel->setButtonHidden(true,i);
+    }
+
+}
+
 void ScopeWindow::updateChartTimeScale(float timeBase){
     if(previousTimeBase !=0 && previousTimeBase != timeBase){
         chart->setZoom(chart->getZoom()*previousTimeBase/timeBase);
