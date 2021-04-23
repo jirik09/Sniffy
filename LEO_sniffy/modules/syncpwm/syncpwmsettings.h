@@ -20,8 +20,7 @@ class SyncPwmSettings : public QObject
 public:
     explicit SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config, QWidget *parent = nullptr);
 
-    WidgetSeparator *separator[CHANNELS_NUM];
-    WidgetSeparator *realFreq[CHANNELS_NUM];
+    WidgetSeparator *separator[CHANNELS_NUM];    
 
     WidgetButtons *buttonStart;
     WidgetButtons *buttonEquidist;

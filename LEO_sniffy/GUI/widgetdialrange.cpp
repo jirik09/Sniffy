@@ -41,6 +41,11 @@ WidgetDialRange::~WidgetDialRange()
     delete ui;
 }
 
+void WidgetDialRange::setName(QString name)
+{
+    ui->label_name->setText(name);
+}
+
 QByteArray WidgetDialRange::saveGeometry()
 {
     QByteArray *data;

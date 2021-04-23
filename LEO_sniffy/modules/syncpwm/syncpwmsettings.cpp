@@ -33,6 +33,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
     commonButtons->addItem(spacer);
     commonButtons->addWidget(buttonEquidist);
 
+
     /* Channels ------------------------------------------------------------- */
     int phase = 0;
     if(config->layout == Layout::HORIZONTAL){
@@ -52,13 +53,16 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
             horBoxButtons->addWidget(onOffCh[i]);
             horBoxButtons->addItem(spacer);
             horBoxButtons->addWidget(inverCh[i]);
-            horBoxButtons->addWidget(realFreq[i]);
             horBoxDials->addWidget(dialFreqCh[i]);
             horBoxDials->addWidget(dialDutyCh[i]);
             horBoxDials->addWidget(dialPhaseCh[i]);
 
             phase += PI_HALF;
         }
+
+        QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+        destination->addItem(verticalSpacer);
+
     }else {
         QHBoxLayout *horBox = new QHBoxLayout();
         destination->addLayout(horBox);
@@ -75,7 +79,6 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
             verChanBox->addWidget(separator[i]);
             verChanBox->addWidget(onOffCh[i]);
             verChanBox->addWidget(inverCh[i]);
-            verChanBox->addWidget(realFreq[i]);
             verChanBox->addWidget(dialFreqCh[i]);
             verChanBox->addWidget(dialDutyCh[i]);
             verChanBox->addWidget(dialPhaseCh[i]);
@@ -83,9 +86,6 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
             phase += PI_HALF;
         }
     }
-
-    QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    destination->addItem(verticalSpacer);
 }
 
 void SyncPwmSettings::setSpecification(SyncPwmSpec *spec){
@@ -107,9 +107,7 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
     inverCh[i]->setColor(color, 0);
 
     QString chanFreq = formatNumber(config->chan[i].freq);
-    realFreq[i] = new WidgetSeparator(parent, chanFreq);
-
-    dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
+    dialFreqCh[i] = new WidgetDialRange(parent, QString(REAL_FREQ_LITERAL).arg(chanFreq), i);
     dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
     dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, true);
     dialFreqCh[i]->setColor(color);
@@ -133,20 +131,20 @@ void SyncPwmSettings::greyOutComplementChanFreqDials(int chanIndex){
 }
 
 void SyncPwmSettings::setRealFrequency(double val, int chanIndex){
-    QString chanFreq = formatNumber(val);
-    realFreq[chanIndex]->setText(chanFreq);
+    QString chanFreq = QString(REAL_FREQ_LITERAL).arg(formatNumber(val));
+    dialFreqCh[chanIndex]->setName(chanFreq);
 
     if(spec->chans_depend){
         if(chanIndex == spec->drive_chx)
-            realFreq[spec->driven_chx]->setText(chanFreq);
+            dialFreqCh[spec->driven_chx]->setName(chanFreq);
         else if(chanIndex == spec->drive_chy)
-            realFreq[spec->driven_chy]->setText(chanFreq);
+            dialFreqCh[spec->driven_chy]->setName(chanFreq);
     }
 }
 
 QString SyncPwmSettings::formatNumber(double val){
     QString multi = " ";
-    int prec = 4;
+    int prec = 3;
 
     if(val >= 1000){
         multi = " k";
@@ -156,6 +154,6 @@ QString SyncPwmSettings::formatNumber(double val){
         val = val / 1000000;
     }
 
-    return "Real F: " + loc.toString(val, 'f', prec).replace(loc.decimalPoint(), '.') + multi + "Hz";
+    return loc.toString(val, 'f', prec).replace(loc.decimalPoint(), '.') + multi + "Hz";
 }
 

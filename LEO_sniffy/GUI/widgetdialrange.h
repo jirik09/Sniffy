@@ -30,6 +30,7 @@ class WidgetDialRange : public QWidget
 public:
     explicit WidgetDialRange(QWidget *parent = nullptr, QString name = "", int optionalEmitParam = 0);
     ~WidgetDialRange();
+    void setName(QString name);
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
     void addOption (QString unitString,float mult);
