@@ -19,6 +19,7 @@ public:
 
     WidgetButtons *resolutionButtons;
     WidgetTextInput *samplingFrequencyInput;
+    WidgetLabel *samplingFrequencyReal;
     WidgetTextInput *dataLengthInput;
 };
 

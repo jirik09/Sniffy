@@ -24,3 +24,10 @@ void WidgetLabel::setName(QString name){
 void WidgetLabel::setValue(QString value){
     ui->label_value->setText(value);
 }
+
+void WidgetLabel::setColor(QString color)
+{
+    QString style = "QLabel{color:"+color+";}";
+    ui->label_name->setStyleSheet(style);
+    ui->label_value->setStyleSheet(style);
+}

@@ -22,7 +22,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this,true)));
   //  tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
- //   tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
  //   tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
     foreach(QSharedPointer<AbstractModule> mod, tmpModules){

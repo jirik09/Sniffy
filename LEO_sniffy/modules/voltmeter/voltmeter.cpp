@@ -28,7 +28,7 @@ Voltmeter::Voltmeter(QObject *parent)
     connect(this, &AbstractModule::moduleCreated, this, &Voltmeter::showHoldButtonCallback);
     connect(this, &AbstractModule::holdClicked, this, &Voltmeter::holdButtonCallback);
 
-    connect(measCalc, &MeasCalculations::measCalculated, this, &Voltmeter::updateMeasurementGUI);
+    connect(measCalc, &MeasCalculations::measCalculated, this, &Voltmeter::updateMeasurement);
 
     connect(voltWindow, &VoltmeterWindow::averagingChanged, this,&Voltmeter::setAveraging);
     connect(voltWindow, &VoltmeterWindow::numChannelsEnabledChanged, this,&Voltmeter::setNumChannelsEnabled);
@@ -131,6 +131,7 @@ void Voltmeter::writeConfiguration()
     isConfigurationWritten = true;
     //workaround first data was corrupted on channels > 1
     numChannelsEnabled = MAX_VOLTMETER_CHANNELS;
+    comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");
     setDefaultSampling();
 
     voltWindow->restoreGUIAfterStartup();
@@ -155,6 +156,12 @@ QByteArray Voltmeter::getConfiguration()
 
 void Voltmeter::startModule()
 {
+    isStartup = true;
+    samplesTaken = 0;
+    numChannelsEnabled = MAX_VOLTMETER_CHANNELS;
+    for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
+        dataRawVoltage[i].clear();
+    }
     startSampling();
 }
 
@@ -196,7 +203,7 @@ void Voltmeter::updateSamplingChannel(void){
     }
 }
 
-void Voltmeter::updateMeasurementGUI(QList<Measurement *> m)
+void Voltmeter::updateMeasurement(QList<Measurement *> m)
 {
     if(isReferenceMeasured){
         updateSamplingChannel();
@@ -328,7 +335,7 @@ void Voltmeter::setNumberOfChannels(int num){
 
 void Voltmeter::setVDDSampling(){
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_VREF+";");
-    int length = 400 + +samplesToTakeTotal*100;
+    int length = 400 + samplesToTakeTotal*100;
     if(length>2000){
         length = 2000;
     }
@@ -342,6 +349,7 @@ void Voltmeter::setDefaultSampling()
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
     comm->write(cmd->SCOPE,cmd->DATA_LENGTH,config->targetDataLength);
     setNumberOfChannels(numChannelsEnabled);
+
     isReferenceMeasured = false;
 }
 

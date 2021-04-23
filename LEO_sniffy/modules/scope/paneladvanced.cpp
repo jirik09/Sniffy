@@ -15,6 +15,9 @@ PanelAdvanced::PanelAdvanced(QVBoxLayout *destination, QWidget *parent)
     samplingFrequencyInput = new WidgetTextInput(parent,"Sampling","100000",InputTextType::NUMBER);
     destination->addWidget(samplingFrequencyInput);
 
+    samplingFrequencyReal = new WidgetLabel(parent,"Real Sampling","--");
+    destination->addWidget(samplingFrequencyReal);
+
     dataLengthInput = new WidgetTextInput(parent,"Length","1000",InputTextType::NUMBER);
     destination->addWidget(dataLengthInput);
 

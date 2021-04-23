@@ -5,23 +5,22 @@ VoltageSource::VoltageSource(QObject *parent)
     Q_UNUSED(parent);
     moduleSpecification = new VoltageSourceSpec();
     config = new VoltageSourceConfig();
-    tempWindow = new VoltageSourceWindow(config);
-    tempWindow->setObjectName("tmpWindow");
+    voltSourceWindow = new VoltageSourceWindow(config);
+    voltSourceWindow->setObjectName("tmpWindow");
 
-//Set the comm prefix, window name and icon
+    //Set the comm prefix, window name and icon
     //module is not fully initialized - control widget and dock wodget cannot be modified
-    moduleCommandPrefix = "SYST";//cmd->SCOPE;
+    moduleCommandPrefix = cmd->VOLTAGE_SOURCE;
     moduleName = "Voltage source";
     moduleIconURI = Graphics::getGraphicsPath()+"icon_voltage_source.png";
 
-//In case hold button should be shown insert this and connect callback to handle hold/pause
-    connect(this, &AbstractModule::moduleCreated, this, &VoltageSource::showHoldButtonCallback);
-    connect(this, &AbstractModule::holdClicked, this, &VoltageSource::holdButtonCallback);
+    voltSourceWindow->setNumberOfChannels(2);
+    connect(voltSourceWindow,&VoltageSourceWindow::voltageChanged,this,&VoltageSource::voltageChangedCallback);
 }
 
 QWidget *VoltageSource::getWidget()
 {
-    return tempWindow;
+    return voltSourceWindow;
 }
 
 void VoltageSource::parseData(QByteArray data)
@@ -31,8 +30,9 @@ void VoltageSource::parseData(QByteArray data)
     if(dataHeader=="CFG_"){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
+        spec = static_cast<VoltageSourceSpec*>(moduleSpecification);
         showModuleControl();
-//TODO parse message from MCU
+        //TODO parse message from MCU
     }else if(dataHeader=="xxxx"){
 
     }else{
@@ -42,8 +42,13 @@ void VoltageSource::parseData(QByteArray data)
 
 void VoltageSource::writeConfiguration()
 {
-    tempWindow->restoreGUIAfterStartup();
-//TODO this function is called when module is opened
+    voltSourceStart();
+    voltSourceWindow->restoreGUIAfterStartup();
+    voltSourceWindow->setPins(static_cast<VoltageSourceSpec*>(moduleSpecification)->channelPins,MAX_VOLTAGE_SOURCE_CHANNELS);
+    voltSourceWindow->setRange(spec->rangeMin,spec->rangeMax);
+    voltSourceWindow->setRealVdda(spec->AVddReal);
+
+    //TODO this function is called when module is opened
 }
 
 void VoltageSource::parseConfiguration(QByteArray config)
@@ -58,27 +63,56 @@ QByteArray VoltageSource::getConfiguration()
 
 void VoltageSource::startModule()
 {
-//TODO start the module
 }
 
 void VoltageSource::stopModule()
 {
-//TODO stop the module
+    voltSourceStop();
 }
 
-//In case hold is needed
+void VoltageSource::voltageChangedCallback(qreal value, int channel)
+{
+    int tmpDAC = ((pow(2,spec->DACResolution))*(qreal)(value-spec->rangeMin))/(spec->rangeMax-spec->rangeMin) * spec->VddDefault/spec->AVddReal;
+    if (tmpDAC>pow(2,spec->DACResolution)-1) tmpDAC = pow(2,spec->DACResolution)-1;
 
-void VoltageSource::showHoldButtonCallback(){
-    this->showModuleHoldButton(true);
+    DACData[channel] = tmpDAC;
+
+    qreal tmpValue = (qreal(tmpDAC)/(pow(2,spec->DACResolution)-1)*(spec->rangeMax-spec->rangeMin)+spec->rangeMin) * spec->AVddReal/spec->VddDefault;
+    voltSourceWindow->setDisplayValue(tmpValue,channel);
+    voltSourceWindow->setBarValue(tmpDAC/pow(2,spec->DACResolution)*100,channel);
+
+    sendDACVoltage();
+
 }
 
-void VoltageSource::holdButtonCallback(bool held){
-    if(held){
-        comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
-        setModuleStatus(ModuleStatus::PAUSE);
-    }else{
-        comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
-        setModuleStatus(ModuleStatus::PLAY);
+void VoltageSource::sendDACVoltage()
+{
+    comm->write(cmd->VOLTAGE_SOURCE+":"+cmd->CMD_GEN_DAC_VAL+ " ");
+    QByteArray tmpHeader;
+    QDataStream dataStreamHeader(&tmpHeader, QIODevice::WriteOnly);
+
+    for(int i = 0;i<spec->maxDACChannels;i++){
+        qint16  sample = qFromBigEndian<qint16>(DACData[i]);
+        dataStreamHeader << sample;
     }
+    comm->write(tmpHeader+";");
 }
+
+void VoltageSource::voltSourceStop()
+{
+    comm->write(cmd->VOLTAGE_SOURCE+":"+cmd->STOP+ ";");
+}
+
+void VoltageSource::voltSourceStart()
+{
+    comm->write(cmd->VOLTAGE_SOURCE+":"+cmd->START+ ";");
+}
+
+
+
+
+
+
+
+
 
