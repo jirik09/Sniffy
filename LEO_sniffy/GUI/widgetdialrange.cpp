@@ -21,10 +21,10 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
     setStyleSheet(Graphics::STYLE_DIAL);
     ui->comboBox->setStyleSheet(Graphics::STYLE_COMBO_BOX);
 
-//    QString style = "QPushButton:pressed{border: 2px solid rgb(48,48,48);}"
-//                    "QPushButton{border: none;color: rgb(214,214,214);"
-//                    "font: 99 12pt 'MS Shell Dlg 2';font-weight:bold;}";
-//    ui->widget_5->setStyleSheet(style);
+    //    QString style = "QPushButton:pressed{border: 2px solid rgb(48,48,48);}"
+    //                    "QPushButton{border: none;color: rgb(214,214,214);"
+    //                    "font: 99 12pt 'MS Shell Dlg 2';font-weight:bold;}";
+    //    ui->widget_5->setStyleSheet(style);
 
     ui->label_name->setText(name);
     setObjectName(name);
@@ -186,11 +186,11 @@ void WidgetDialRange::dialValueChanged(int in){
 
     //dial change is marginal so do the action
     //if(abs(realValue)>getRealValueFromDial(in+1.5) || abs(realValue)<getRealValueFromDial(in-1.5) ){
-        realValue = NumberParser::getNiceNumber(getRealValueFromDial(in),3);
-        //realValue = getRealValueFromDial(in);
-        realValue = (rangePrecision)*round(realValue/(rangePrecision));
-        updateControls(1);
-   // }
+    realValue = NumberParser::getNiceNumber(getRealValueFromDial(in),3);
+    //realValue = getRealValueFromDial(in);
+    realValue = (rangePrecision)*round(realValue/(rangePrecision));
+    updateControls(1);
+    // }
 }
 
 void WidgetDialRange::unitChanged(int in){
@@ -341,8 +341,8 @@ void WidgetDialRange::enableFineMousePrecision()
 }
 
 void WidgetDialRange::updateControls(int except, bool silent){
-   // qDebug () << realValue << NumberParser::getNiceNumber(realValue/1000,numOfDecimals+1) << NumberParser::getNiceNumber(realValue,numOfDecimals+1);
-       //qDebug () << "pico" << qPow(10,-1)<<qPow(10,0)<<qPow(10,1)<<qPow(10,2);
+    // qDebug () << realValue << NumberParser::getNiceNumber(realValue/1000,numOfDecimals+1) << NumberParser::getNiceNumber(realValue,numOfDecimals+1);
+    //qDebug () << "pico" << qPow(10,-1)<<qPow(10,0)<<qPow(10,1)<<qPow(10,2);
     if(realValue>rangeMax){
         realValue = rangeMax;
     }
@@ -377,8 +377,9 @@ void WidgetDialRange::updateControls(int except, bool silent){
         ui->dial->setValue(getValueForDial(realValue));
         connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
     }
-    if(!silent)
+    if(!silent){
         emit valueChanged(realValue,optionalEmitParam);
+    }
 }
 
 float WidgetDialRange::getRealValueFromDial(int in){

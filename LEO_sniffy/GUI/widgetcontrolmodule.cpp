@@ -12,10 +12,10 @@ WidgetControlModule::WidgetControlModule(QWidget *parent, QString name) :
     ui(new Ui::WidgetFeature)
 {
     ui->setupUi(this);
-    ui->pushButton_name->setStyleSheet(Graphics::STYLE_MODULE_BUTTON);
-    ui->pushButton_name->setCheckable(true);
 
+    ui->pushButton_name->setStyleSheet(Graphics::STYLE_MODULE_BUTTON);
     ui->pushButton_name->setText(name);
+
     ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_stop.png)");
     connect(ui->pushButton_name,SIGNAL(clicked()),this,SLOT(clickedInternal()));
 
@@ -29,25 +29,27 @@ WidgetControlModule::~WidgetControlModule()
 
 void WidgetControlModule::setStatus(ModuleStatus stat){
     if(stat==ModuleStatus::PLAY){
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_play.png)");
         ui->pushButton_name->setChecked(true);
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_play.png)");
     }
     if(stat==ModuleStatus::STOP){
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_stop.png)");
+        ui->pushButton_name->setIcon(iconAvail);
         ui->pushButton_name->setEnabled(true);
         ui->pushButton_name->setChecked(false);
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_stop.png)");        
     }
     if(stat==ModuleStatus::HIDDEN_PLAY){
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_play_hidden.png)");
         ui->pushButton_name->setChecked(true);
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_play_hidden.png)");        
     }
     if(stat==ModuleStatus::PAUSE || stat==ModuleStatus::HIDDEN_PAUSE){
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_pause.png)");
         ui->pushButton_name->setChecked(true);
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_pause.png)");        
     }
     if(stat==ModuleStatus::LOCKED){
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_locked.png)");
+        ui->pushButton_name->setIcon(iconLock);
         ui->pushButton_name->setEnabled(false);
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_locked.png)");                
     }
     status = stat;
 }
@@ -60,12 +62,30 @@ void WidgetControlModule::hideStatus(){
     ui->widget_status->hide();
 }
 
+void WidgetControlModule::mousePressEvent(QMouseEvent *event){
+    emit mouseWheelPressEvent(event);
+}
+
 void WidgetControlModule::clickedInternal(){
-    emit clicked (status);
+    emit clicked(status);
 }
 
 void WidgetControlModule::setIcon (QString ImageURI){
-    ui->pushButton_name->setIcon(QIcon(ImageURI));
+    QPixmap icon(ImageURI);
+
+    iconAreaAvail = new QPixmap(icon.size());
+    iconAreaLock = new QPixmap(icon.size());
+
+    iconAreaAvail->fill(Graphics::COLOR_TEXT_ALL);
+    iconAreaLock->fill(Graphics::COLOR_COMPONENT_DISABLED);
+
+    iconAreaAvail->setMask(icon.createMaskFromColor(Qt::transparent));
+    iconAreaLock->setMask(icon.createMaskFromColor(Qt::transparent));
+
+    this->iconAvail.addPixmap(*iconAreaAvail,QIcon::Normal);
+    this->iconLock.addPixmap(*iconAreaLock,QIcon::Disabled);
+
+    ui->pushButton_name->setIcon(iconAvail);
 }
 
 void WidgetControlModule::setName (QString name){

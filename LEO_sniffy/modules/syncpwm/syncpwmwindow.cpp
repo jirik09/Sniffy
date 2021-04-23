@@ -53,12 +53,22 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
     painter = new SyncPwmPainter(chart, config, this);
 }
 
+void SyncPwmWindow::connectDependentChannels(){
+    connect(settings->dialFreqCh[spec->drive_chx], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
+    connect(settings->dialFreqCh[spec->drive_chy], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
+}
+
+void SyncPwmWindow::disconnectDependentChannels(){
+    disconnect(settings->dialFreqCh[spec->drive_chx], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
+    disconnect(settings->dialFreqCh[spec->drive_chy], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
+}
+
 void SyncPwmWindow::setSpecification(SyncPwmSpec *spec){
     this->spec = spec;
+    settings->setSpecification(spec);
 
     if(spec->chans_depend){
-        connect(settings->dialFreqCh[spec->drive_chx], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
-        connect(settings->dialFreqCh[spec->drive_chy], &WidgetDialRange::valueChanged, this, &SyncPwmWindow::dialFreqCallback);
+        connectDependentChannels();
         settings->greyOutComplementChanFreqDials(spec->driven_chx);
         settings->greyOutComplementChanFreqDials(spec->driven_chy);
     }
@@ -94,22 +104,22 @@ void SyncPwmWindow::uncheckEquidistantButton(){
 
 void SyncPwmWindow::dialFreqCallback(float val, int chanIndex){
     if(chanIndex == spec->drive_chx){
-        settings->dialFreqCh[spec->driven_chx]->setRealValue(val);
+        settings->dialFreqCh[spec->driven_chx]->setRealValue(val, false);
     }else {
-        settings->dialFreqCh[spec->driven_chy]->setRealValue(val);
+        settings->dialFreqCh[spec->driven_chy]->setRealValue(val, false);
     }
 }
 
 void SyncPwmWindow::setFreqDial(float val, int chanIndex){
-    settings->dialFreqCh[chanIndex]->setRealValue(val, 1);
+    settings->dialFreqCh[chanIndex]->setRealValue(val, true);
 }
 
 void SyncPwmWindow::setPhaseDial(float val, int chanIndex){
-    settings->dialPhaseCh[chanIndex]->setRealValue(val, 1);
+    settings->dialPhaseCh[chanIndex]->setRealValue(val, true);
 }
 
 void SyncPwmWindow::setDutyDial(float val, int chanIndex){
-    settings->dialDutyCh[chanIndex]->setRealValue(val, 1);
+    settings->dialDutyCh[chanIndex]->setRealValue(val, true);
 }
 
 void SyncPwmWindow::enableChannel(bool enable,int chanIndex){

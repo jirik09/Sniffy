@@ -52,6 +52,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
             horBoxButtons->addWidget(onOffCh[i]);
             horBoxButtons->addItem(spacer);
             horBoxButtons->addWidget(inverCh[i]);
+            horBoxButtons->addWidget(realFreq[i]);
             horBoxDials->addWidget(dialFreqCh[i]);
             horBoxDials->addWidget(dialDutyCh[i]);
             horBoxDials->addWidget(dialPhaseCh[i]);
@@ -74,6 +75,7 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
             verChanBox->addWidget(separator[i]);
             verChanBox->addWidget(onOffCh[i]);
             verChanBox->addWidget(inverCh[i]);
+            verChanBox->addWidget(realFreq[i]);
             verChanBox->addWidget(dialFreqCh[i]);
             verChanBox->addWidget(dialDutyCh[i]);
             verChanBox->addWidget(dialPhaseCh[i]);
@@ -84,6 +86,10 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     destination->addItem(verticalSpacer);
+}
+
+void SyncPwmSettings::setSpecification(SyncPwmSpec *spec){
+    this->spec = spec;
 }
 
 void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
@@ -99,6 +105,9 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
     inverCh[i]->setObjectName("syncPwmInverCh" + chNStr);
     inverCh[i]->setChecked(false, 0);
     inverCh[i]->setColor(color, 0);
+
+    QString chanFreq = formatNumber(config->chan[i].freq);
+    realFreq[i] = new WidgetSeparator(parent, chanFreq);
 
     dialFreqCh[i] = new WidgetDialRange(parent, "Frequency", i);
     dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
@@ -121,7 +130,32 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
 
 void SyncPwmSettings::greyOutComplementChanFreqDials(int chanIndex){
     dialFreqCh[chanIndex]->setDisabled(true);
-    //dialFreqCh[chanIndex]->setColor(Graphics::COLOR_COMPONENT_DISABLED);
 }
 
+void SyncPwmSettings::setRealFrequency(double val, int chanIndex){
+    QString chanFreq = formatNumber(val);
+    realFreq[chanIndex]->setText(chanFreq);
+
+    if(spec->chans_depend){
+        if(chanIndex == spec->drive_chx)
+            realFreq[spec->driven_chx]->setText(chanFreq);
+        else if(chanIndex == spec->drive_chy)
+            realFreq[spec->driven_chy]->setText(chanFreq);
+    }
+}
+
+QString SyncPwmSettings::formatNumber(double val){
+    QString multi = " ";
+    int prec = 4;
+
+    if(val >= 1000){
+        multi = " k";
+        val = val / 1000;
+    }else if(val >= 1000000){
+        multi = " M";
+        val = val / 1000000;
+    }
+
+    return "Real F: " + loc.toString(val, 'f', prec).replace(loc.decimalPoint(), '.') + multi + "Hz";
+}
 

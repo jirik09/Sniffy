@@ -17,6 +17,7 @@ public:
     ~ModuleDockWidget();
 
     void showHoldButton(bool show);
+    void enableHoldButton(bool enable);
 
 signals:
     void moduleWindowClosing();

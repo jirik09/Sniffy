@@ -32,6 +32,7 @@ public:
 
     void loadGraphics();
     void setStartButton(bool start);
+    void enableConfigButtons(bool enable);
 
 private:
     CounterConfig *conf;
