@@ -26,6 +26,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
         dis->setIndicationFlagColor(Graphics::getChannelColor(index));
         dis->setProgressBarColor(Graphics::getChannelColor(index));
         dis->showLabel(4);
+        dis->setTraceColor(Graphics::getChannelColor(index),0);
         index++;
     }
 

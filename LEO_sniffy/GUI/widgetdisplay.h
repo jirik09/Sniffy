@@ -90,7 +90,8 @@ public:
     void setHistorySize(int smplNumber);
     void appendNewHistorySample(QString prefix, double sample, QString affix, float timeStep = 1);
     void associateSample(int traceIndex, QString prefix, double sample, QString affix);
-    void updateHistoryData(QVector<QPointF> *points, int index);        
+    void updateHistoryData(QVector<QPointF> *points, int index);
+    void setTraceColor(QString color, int index);
 
 private:
     QLocale loc;

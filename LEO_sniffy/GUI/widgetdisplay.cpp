@@ -391,6 +391,11 @@ void WidgetDisplay::updateHistoryData(QVector<QPointF> *points, int index){
     chart->updateTrace(points, index);
 }
 
+void WidgetDisplay::setTraceColor(QString color, int index)
+{
+    chart->setTraceColor(index,QColor(color));
+}
+
 void WidgetDisplay::recalcHistorySizeAndSetDial(int reqSize)
 {
     ui->dial->setValue(reqSize);
