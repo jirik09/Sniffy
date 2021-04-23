@@ -40,7 +40,7 @@ VoltageSourceWindow::VoltageSourceWindow(VoltageSourceConfig *config, QWidget *p
     QVBoxLayout *verChanBox = new QVBoxLayout();
     setScroll->setLayout(verChanBox);
 
-    labelVDDA = new WidgetLabel(this,"real Vcc","--");
+    labelVDDA = new WidgetLabel(this,"Real Vcc","--");
     verChanBox->addWidget(labelVDDA);
 
     WidgetDialRange *dial;

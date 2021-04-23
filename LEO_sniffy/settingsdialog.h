@@ -32,6 +32,8 @@ private:
 
     WidgetButtons *buttonsRestoreSession;
     WidgetSelection * selTheme;
+
+    WidgetLabel *infoLabel;
     WidgetButtons *buttonsDone;
 
     bool restartNeededWarning = false;

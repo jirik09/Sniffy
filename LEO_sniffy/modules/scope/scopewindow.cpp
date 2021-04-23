@@ -519,6 +519,7 @@ void ScopeWindow::triggerCaptured(){
 
 void ScopeWindow::setRealSamplingRate(int smpl){
     labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS") + "  ("+LabelFormator::formatOutout(config->dataLength,"")+")");
+    panelAdvanced->samplingFrequencyReal->setValue(LabelFormator::formatOutout(smpl,"SPS",4));
 }
 
 void ScopeWindow::updateChartTimeScale(float timeBase){

@@ -131,6 +131,7 @@ void Voltmeter::writeConfiguration()
     isConfigurationWritten = true;
     //workaround first data was corrupted on channels > 1
     numChannelsEnabled = MAX_VOLTMETER_CHANNELS;
+    comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");
     setDefaultSampling();
 
     voltWindow->restoreGUIAfterStartup();
@@ -155,6 +156,12 @@ QByteArray Voltmeter::getConfiguration()
 
 void Voltmeter::startModule()
 {
+    isStartup = true;
+    samplesTaken = 0;
+    numChannelsEnabled = MAX_VOLTMETER_CHANNELS;
+    for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
+        dataRawVoltage[i].clear();
+    }
     startSampling();
 }
 
@@ -342,6 +349,7 @@ void Voltmeter::setDefaultSampling()
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
     comm->write(cmd->SCOPE,cmd->DATA_LENGTH,config->targetDataLength);
     setNumberOfChannels(numChannelsEnabled);
+
     isReferenceMeasured = false;
 }
 
