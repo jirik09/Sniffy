@@ -106,11 +106,12 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
     inverCh[i]->setChecked(false, 0);
     inverCh[i]->setColor(color, 0);
 
-    QString chanFreq = formatNumber(config->chan[i].freq);
-    dialFreqCh[i] = new WidgetDialRange(parent, QString(REAL_FREQ_LITERAL).arg(chanFreq), i);
+    dialFreqCh[i] = new WidgetDialRange(parent, "Freq ", i);
     dialFreqCh[i]->setObjectName("syncPwmFreqCh" + chNStr);
     dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, true);
     dialFreqCh[i]->setColor(color);
+    dialFreqCh[i]->setAdditionalLabelText(formatNumber(config->chan[i].freq));
+    dialFreqCh[i]->setAdditionalLabelColor(Graphics::COLOR_TEXT_LABEL);
     dialFreqCh[i]->hideUnitSelection();
 
     dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);
@@ -127,33 +128,30 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
 }
 
 void SyncPwmSettings::greyOutComplementChanFreqDials(int chanIndex){
-    dialFreqCh[chanIndex]->setDisabled(true);
+    dialFreqCh[chanIndex]->disable(true);
 }
 
 void SyncPwmSettings::setRealFrequency(double val, int chanIndex){
-    QString chanFreq = QString(REAL_FREQ_LITERAL).arg(formatNumber(val));
-    dialFreqCh[chanIndex]->setName(chanFreq);
+    QString chanFreq = formatNumber(val);
+    dialFreqCh[chanIndex]->setAdditionalLabelText(chanFreq);
 
     if(spec->chans_depend){
         if(chanIndex == spec->drive_chx)
-            dialFreqCh[spec->driven_chx]->setName(chanFreq);
+            dialFreqCh[spec->driven_chx]->setAdditionalLabelText(chanFreq);
         else if(chanIndex == spec->drive_chy)
-            dialFreqCh[spec->driven_chy]->setName(chanFreq);
+            dialFreqCh[spec->driven_chy]->setAdditionalLabelText(chanFreq);
     }
 }
 
 QString SyncPwmSettings::formatNumber(double val){
-    QString multi = " ";
-    int prec = 3;
-
-    if(val >= 1000){
-        multi = " k";
-        val = val / 1000;
-    }else if(val >= 1000000){
-        multi = " M";
-        val = val / 1000000;
+    int count = 0;
+    int number = (int)val;
+    while(number != 0) {
+       number = number / 10;
+       count++;
     }
+    int prec = MAX_FREQ_DIGIT_NUM - count;
 
-    return loc.toString(val, 'f', prec).replace(loc.decimalPoint(), '.') + multi + "Hz";
+    return loc.toString(val, 'f', prec).replace(loc.decimalPoint(), '.');
 }
 

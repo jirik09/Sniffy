@@ -74,7 +74,7 @@
                                     DARK_STYLE_SPLITTER DARK_STYLE_SCROLLAREA DARK_STYLE_CHECK_BUTTON \
                                     DARK_STYLE_SCROLLBAR DARK_STYLE_MENU DARK_STYLE_TAB \
                                     DARK_STYLE_TOOLTIP DARK_STYLE_COMBO_BOX DARK_STYLE_LINEEDIT \
-                                    DARK_STYLE_LIST_VIEW DARK_STYLE_PROGRESS_BAR
+                                    DARK_STYLE_LIST_VIEW DARK_STYLE_PROGRESS_BAR DARK_STYLE_LABEL
 
 #define DARK_STYLE_OBJECT \
 "QObject{background-color:" DARK_WINDOW_APP ";font: 10pt" DARK_FONT ";color:" DARK_TEXT_ALL ";border:none;}"
@@ -140,6 +140,8 @@ QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED "; color
 #define DARK_STYLE_PROGRESS_BAR \
 "QProgressBar{border:1px solid " DARK_TEXT_LABEL ";border-radius:1px;background-color:" DARK_DISPLAY ";}\
 QProgressBar::chunk{width: 20px;background-color:%1;}"
+
+#define DARK_STYLE_LABEL "QLabel{border-radius: 2px;}"
 
 /***************** CONCRETE STYLE SHEETS *****************/
 
