@@ -19,5 +19,4 @@
 #define FREQ_PRECISION     100
 
 #define MAX_PAINT_PERIODS  300
-
-#define REAL_FREQ_LITERAL "Freq %1"
+#define MAX_FREQ_DIGIT_NUM 8
