@@ -19,3 +19,4 @@
 #define FREQ_PRECISION     100
 
 #define MAX_PAINT_PERIODS  300
+#define MAX_FREQ_DIGIT_NUM 8

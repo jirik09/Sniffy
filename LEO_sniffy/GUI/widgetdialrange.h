@@ -30,6 +30,9 @@ class WidgetDialRange : public QWidget
 public:
     explicit WidgetDialRange(QWidget *parent = nullptr, QString name = "", int optionalEmitParam = 0);
     ~WidgetDialRange();
+    void setName(QString name);
+    void setAdditionalLabelText(QString text);
+    void setAdditionalLabelColor(QString color);
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
     void addOption (QString unitString,float mult);
@@ -43,6 +46,7 @@ public:
     void setDialButtonsColor(QString &bckgndStyleSheet);
     float getDefaultRealValue() const;
     float getRealValue() const;
+    void disable(bool disable);
 
     void setNumOfDecimals(int value);
 

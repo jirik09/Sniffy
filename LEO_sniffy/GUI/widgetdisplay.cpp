@@ -89,6 +89,10 @@ void WidgetDisplay::hideHistoryChartArea(){
     ui->splitter->setSizes(sizes);
 }
 
+void WidgetDisplay::hideHistoryPanel(){
+    ui->verticalWidget_menu->hide();
+}
+
 void WidgetDisplay::setUnitsStyle(QString &unitsStyleSheet){
     ui->styleUnits->setStyleSheet(unitsStyleSheet);
 }

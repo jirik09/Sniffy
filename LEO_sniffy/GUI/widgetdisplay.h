@@ -67,6 +67,8 @@ public:
 
     void changeAvgColor(QColor color);
 
+    void hideHistoryPanel();
+
     /* Label area */
     void configLabel(int labelNumber, const QString text, QString colorStyle, bool visible);
     void setLabelText(int labelNumber, const QString text);
@@ -119,7 +121,7 @@ private:
     /* indication colors */
     QString cFull, cTran1, cTran2, cBlank;
 
-    void hideHistoryChartArea();    
+    void hideHistoryChartArea();        
 
     void configureCustomDial();
     void configureFloatingHistoryNumber();

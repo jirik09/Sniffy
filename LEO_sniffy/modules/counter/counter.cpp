@@ -10,7 +10,7 @@ Counter::Counter(QObject *parent)
     moduleName = "Counter";
     moduleIconURI = Graphics::getGraphicsPath()+"icon_counter.png";
 
-    movAvg = new MovingAverage(2, cntWindow->tabHighFreq);
+    movAvg = new MovingAverage(2, cntWindow->tabHighFreq);       
 
     /* Common Counter Signals/Slots */
     connect(this, &AbstractModule::moduleCreated, this, &Counter::showHoldButtonCallback);

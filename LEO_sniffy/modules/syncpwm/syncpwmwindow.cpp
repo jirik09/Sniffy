@@ -29,6 +29,9 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
         sizes = {wdth*2, wdth};
 
     }else {
+        widget_settings->setMaximumHeight(420);
+        widget_settings->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
+
         splitter = new QSplitter(Qt::Vertical, this);
         splitter->addWidget(widget_settings);
         splitter->addWidget(widget_chart);
