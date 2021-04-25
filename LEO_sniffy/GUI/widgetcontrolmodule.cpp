@@ -32,8 +32,7 @@ void WidgetControlModule::setStatus(ModuleStatus stat){
         ui->pushButton_name->setChecked(true);
         ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_play.png)");
     }
-    if(stat==ModuleStatus::STOP){
-        ui->pushButton_name->setIcon(iconAvail);
+    if(stat==ModuleStatus::STOP){        
         ui->pushButton_name->setEnabled(true);
         ui->pushButton_name->setChecked(false);
         ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_stop.png)");        
@@ -46,8 +45,7 @@ void WidgetControlModule::setStatus(ModuleStatus stat){
         ui->pushButton_name->setChecked(true);
         ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_pause.png)");        
     }
-    if(stat==ModuleStatus::LOCKED){
-        ui->pushButton_name->setIcon(iconLock);
+    if(stat==ModuleStatus::LOCKED){       
         ui->pushButton_name->setEnabled(false);
         ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_locked.png)");                
     }
@@ -72,20 +70,18 @@ void WidgetControlModule::clickedInternal(){
 
 void WidgetControlModule::setIcon (QString ImageURI){
     QPixmap icon(ImageURI);
+    QPixmap iconArea(icon.size());
+    QBitmap iconBitmap = icon.createMaskFromColor(Qt::transparent);
 
-    QPixmap iconAreaAvail(icon.size());
-    QPixmap iconAreaLock(icon.size());
+    iconArea.fill(Graphics::COLOR_TEXT_ALL);
+    iconArea.setMask(iconBitmap);
+    this->icon.addPixmap(iconArea,QIcon::Normal);
 
-    iconAreaAvail.fill(Graphics::COLOR_TEXT_ALL);
-    iconAreaLock.fill(Graphics::COLOR_COMPONENT_DISABLED);
+    iconArea.fill(Graphics::COLOR_COMPONENT_DISABLED);
+    iconArea.setMask(iconBitmap);
+    this->icon.addPixmap(iconArea,QIcon::Disabled);
 
-    iconAreaAvail.setMask(icon.createMaskFromColor(Qt::transparent));
-    iconAreaLock.setMask(icon.createMaskFromColor(Qt::transparent));
-
-    this->iconAvail.addPixmap(iconAreaAvail,QIcon::Normal);
-    this->iconLock.addPixmap(iconAreaLock,QIcon::Disabled);
-
-    ui->pushButton_name->setIcon(iconAvail);
+    ui->pushButton_name->setIcon(this->icon);
 }
 
 void WidgetControlModule::setName (QString name){
