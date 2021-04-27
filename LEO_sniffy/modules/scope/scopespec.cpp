@@ -24,7 +24,7 @@ void ScopeSpec::parseSpecification(QByteArray spec){
     char chars[4] = "";
     for(int i = 0; i < maxADCChannels; i++){
         stream.readRawData(chars, 4);
-        channelPins[i] = QString(chars);
+        channelPins[i] = QString(chars).left(4);
         channelPins[i].remove('_');
     }
 }

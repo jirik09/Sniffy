@@ -30,7 +30,7 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
 
     deviceSelection = new WidgetSelection(WidgetSpecification);
     verticalLayoutSpecification->addWidget(deviceSelection);
-    deviceSelection->addOption("Scanning for available devices",-1);    
+    deviceSelection->addOption("Scanning for available devices",-1);
 
     deviceConnectButton = new WidgetButtons(WidgetSpecification,2);
     deviceConnectButton->setObjectName("connectbutton");
@@ -86,10 +86,10 @@ void DeviceWindow::hideSpecification(){
 void DeviceWindow::addModuleDescription(QString name, QList<QString> labels, QList<QString> values)
 {
     WidgetDesciptionExpand *newDesc = new WidgetDesciptionExpand(WidgetSpecification,name);
-
     for (int i = 0;i<labels.length() && i<values.length() ; i++) {
         newDesc->addLabel(labels.at(i),values.at(i));
     }
+
     modulesDescriptions->append(newDesc);
     descriptorsLayout->addWidget(newDesc);
 }

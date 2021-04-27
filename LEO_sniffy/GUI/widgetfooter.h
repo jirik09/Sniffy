@@ -22,6 +22,7 @@ public:
     explicit WidgetFooter(QWidget *parent = nullptr);
     ~WidgetFooter();
     QPushButton * getPushButtonSize();
+    void setAppearance(bool isWide);
 
 signals:
     void settingsClicked();
@@ -34,7 +35,6 @@ private:
     QMovie *animationForward;
     QMovie *animationBackward;
 
-    void setAppearance(bool isWide);
 
 private slots:
     void settingsCallback();

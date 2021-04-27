@@ -11,28 +11,22 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_v.png); border: none;";
     WidgetDisplay *display;
 
-    display  = new WidgetDisplay("Voltmeter_CH1", "Channel 1", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH1",Graphics::getChannelColor(0),true);
-    displays.append(display);
-    display  = new WidgetDisplay("Voltmeter_CH2", "Channel 2", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH2",Graphics::getChannelColor(1),true);
-    displays.append(display);
-    display  = new WidgetDisplay("Voltmeter_CH3", "Channel 3", styleSheet, true, 1, HISTORY_SIZE, this);
-    display->configLabel(0,"CH3",Graphics::getChannelColor(2),true);
-    displays.append(display);
-    display  = new WidgetDisplay("Voltmeter_CH4", "Channel 4", styleSheet, true, 1, HISTORY_SIZE, this);
-    displays.append(display);
-    display->configLabel(0,"CH4",Graphics::getChannelColor(3),true);
+    for (int i =0;i<MAX_VOLTMETER_CHANNELS ;i++ ) {
+        display  = new WidgetDisplay("Voltmeter_CH"+QString::number(i+1), "Channel "+QString::number(i+1), styleSheet, true, 1, HISTORY_SIZE, this);
+        display->configLabel(0,"CH"+QString::number(i+1),Graphics::getChannelColor(i),true);
+        displays.append(display);
+    }
 
     int index = 0;
     foreach(WidgetDisplay * dis, displays){
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
-        dis->configLabel(2,"VOLTAGE",Graphics::COLOR_TEXT_LABEL,true);
+        dis->configLabel(2,"Voltage",Graphics::COLOR_TEXT_LABEL,true);
         ui->verticalLayout_display->addWidget(dis);
         dis->setIndicationFlagColor(Graphics::getChannelColor(index));
         dis->setProgressBarColor(Graphics::getChannelColor(index));
         dis->showLabel(4);
+        dis->setTraceColor(Graphics::getChannelColor(index),0);
         index++;
     }
 
@@ -45,17 +39,14 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     WidgetSeparator *separatorChannelEnable = new WidgetSeparator(this,"Channel enable");
     tabs->getLayout(0)->addWidget(separatorChannelEnable);
 
-    buttonsChannelEnable = new WidgetButtons(this,4,ButtonTypes::CHECKABLE);
+    buttonsChannelEnable = new WidgetButtons(this,MAX_VOLTMETER_CHANNELS,ButtonTypes::CHECKABLE);
     buttonsChannelEnable->setObjectName("ChannelvoltmeterEnable");
     tabs->getLayout(0)->addWidget(buttonsChannelEnable);
-    buttonsChannelEnable->setText("CH1",0);
-    buttonsChannelEnable->setColor(Graphics::getChannelColor(0),0);
-    buttonsChannelEnable->setText("CH2",1);
-    buttonsChannelEnable->setColor(Graphics::getChannelColor(1),1);
-    buttonsChannelEnable->setText("CH3",2);
-    buttonsChannelEnable->setColor(Graphics::getChannelColor(2),2);
-    buttonsChannelEnable->setText("CH4",3);
-    buttonsChannelEnable->setColor(Graphics::getChannelColor(3),3);
+    for (int i =0;i<MAX_VOLTMETER_CHANNELS ;i++ ) {
+        buttonsChannelEnable->setText("CH"+QString::number(i+1),i);
+        buttonsChannelEnable->setColor(Graphics::getChannelColor(i),i);
+        buttonsChannelEnable->setButtonHidden(true,i);
+    }
 
     buttonsMode = new WidgetButtons(this,2,ButtonTypes::RADIO,"Speed");
     buttonsMode->setObjectName("ChannelVoltmode");
@@ -222,10 +213,11 @@ void VoltmeterWindow::showProgress(int current, int max){
     labelProgress->setValue(QString::number(current)+"/"+QString::number(max));
 }
 
-void VoltmeterWindow::setPins(QString pins[], int numOfCh)
+void VoltmeterWindow::setPinsAndNumChannels(QString pins[], int numOfCh)
 {
     for(int i = 0;i<numOfCh;i++){
         displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::COLOR_TEXT_ALL,true);
+        buttonsChannelEnable->setButtonHidden(false,i);
     }
 }
 

@@ -130,13 +130,13 @@ void Voltmeter::writeConfiguration()
 
     isConfigurationWritten = true;
     //workaround first data was corrupted on channels > 1
-    numChannelsEnabled = MAX_VOLTMETER_CHANNELS;
+    numChannelsEnabled = static_cast<VoltmeterSpec*>(moduleSpecification)->maxADCChannels;
     comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");
     setDefaultSampling();
 
     voltWindow->restoreGUIAfterStartup();
 
-    voltWindow->setPins(static_cast<VoltmeterSpec*>(moduleSpecification)->channelPins,MAX_VOLTMETER_CHANNELS);
+    voltWindow->setPinsAndNumChannels(static_cast<VoltmeterSpec*>(moduleSpecification)->channelPins,static_cast<VoltmeterSpec*>(moduleSpecification)->maxADCChannels);
     setVDDSampling();
     comm->write(moduleCommandPrefix,cmd->SAMPLING_FREQ,5000);
     comm->write(cmd->SCOPE,cmd->DATA_LENGTH,200);
@@ -158,7 +158,7 @@ void Voltmeter::startModule()
 {
     isStartup = true;
     samplesTaken = 0;
-    numChannelsEnabled = MAX_VOLTMETER_CHANNELS;
+    numChannelsEnabled = static_cast<VoltmeterSpec*>(moduleSpecification)->maxADCChannels;
     for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
         dataRawVoltage[i].clear();
     }

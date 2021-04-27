@@ -77,16 +77,19 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     selFFTWindow->addOption("Hamming",FFTWindow::hamming);
     selFFTWindow->addOption("Hann",FFTWindow::hann);
     selFFTWindow->addOption("Blackman",FFTWindow::blackman);
+    selFFTWindow->addOption("Flat top",FFTWindow::flatTop);
     destination->addWidget(selFFTWindow);
+    selFFTWindow->setSelected(3,true);
 
     selFFTLength = new WidgetSelection(parent,"Length");
     selFFTLength->setObjectName("selFFTLength");
-    selFFTLength->addOption("1024",1025);
-    selFFTLength->addOption("2048",2049);
-    selFFTLength->addOption("4096",4097);
-    selFFTLength->addOption("8192",8193);
-    selFFTLength->addOption("16384",16385);
+    selFFTLength->addOption("1024",1024);
+    selFFTLength->addOption("2048",2048);
+    selFFTLength->addOption("4096",4096);
+    selFFTLength->addOption("8192",8192);
+    selFFTLength->addOption("16384",16384);
     destination->addWidget(selFFTLength);
+    selFFTWindow->setSelected(1,true);
 
     swFFTType = new WidgetButtons(parent,2,ButtonTypes::RADIO,"Type");
     swFFTType->setObjectName("FFTTypeSelection");
@@ -100,18 +103,23 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     connect(selFFTLength,&WidgetSelection::selectedIndexChanged,this,&PanelMath::fftCallback);
 
 
+
     dialFFTVertical = new WidgetDial(parent,"Vertical Scale");
     dialFFTVertical->setObjectName("FFTdialVer");
     destination->addWidget(dialFFTVertical);
-    dialFFTHorizontal = new WidgetDial(parent,"Horizontal Scale");
+    /* dialFFTHorizontal = new WidgetDial(parent,"Horizontal Scale");
     dialFFTHorizontal->setObjectName("FFTdialHor");
-    destination->addWidget(dialFFTHorizontal);
+    destination->addWidget(dialFFTHorizontal);*/
     dialFFTShift = new WidgetDialRange(parent,"Shift");
     dialFFTShift->setObjectName("FFTshift");
     dialFFTShift->hideUnitSelection();
     destination->addWidget(dialFFTShift);
     fillVerticalDials();
-    fillHorizontalDials();
+    // fillHorizontalDials();
+
+    connect(dialFFTVertical,&WidgetDial::valueChanged,this,&PanelMath::fftChartCallback);
+    connect(dialFFTShift,&WidgetDialRange::valueChanged,this,&PanelMath::fftChartCallback);
+    connect(swFFTType,&WidgetButtons::clicked,this,&PanelMath::fftChartCallback);
 
     QSpacerItem *verticalSpacer;
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -168,16 +176,17 @@ void PanelMath::typeChanged(int index)
         swFFTType->show();
         selFFTLength->show();
         dialFFTVertical->show();
-        dialFFTHorizontal->show();
+        //dialFFTHorizontal->show();
         dialFFTShift->show();
-        fftCallback();
+        fftTypeCallback();
+        fftChartCallback();
         break;
     }
 
     if(previousMathType == 2){
         emit expressionChanged("");
     }else if(previousMathType == 3){
-        emit fftChanged(0, FFTWindow::rectangular, FFTType::periodogram, 0);
+        emit fftChanged(0, FFTWindow::rectangular, FFTType::periodogram,0);
     }
 
     previousMathType = index;
@@ -191,7 +200,6 @@ void PanelMath::symbolicExpressionCallback(QString exp)
 
 void PanelMath::fftCallback()
 {
-    //TODO emit data from GUI
     emit fftChanged(selFFTLength->getSelectedValue(), (FFTWindow)selFFTWindow->getSelectedValue(), FFTType(swFFTType->getSelectedIndex()),btnChannelFFTSel->getSelectedIndex());
 }
 
@@ -199,6 +207,11 @@ void PanelMath::fftTypeCallback()
 {
     fillVerticalDials();
     fftCallback();
+}
+
+void PanelMath::fftChartCallback()
+{
+    emit fftchartChanged(dialFFTVertical->getRealValue(), dialFFTShift->getRealValue(), swFFTType->getSelectedIndex());
 }
 
 void PanelMath::hideAll()
@@ -215,7 +228,7 @@ void PanelMath::hideAll()
     swFFTType->hide();
     selFFTLength->hide();
     dialFFTVertical->hide();
-    dialFFTHorizontal->hide();
+    //dialFFTHorizontal->hide();
     dialFFTShift->hide();
 }
 
@@ -224,33 +237,33 @@ void PanelMath::fillVerticalDials()
     dialFFTVertical->clearOptions();
 
     if(swFFTType->getSelectedIndex()==0){ //spectrum
-        dialFFTVertical->addOption("10","mV/div",0.01);
-        dialFFTVertical->addOption("20","mV/div",0.02);
-        dialFFTVertical->addOption("50","mV/div",0.05);
-        dialFFTVertical->addOption("100","mV/div",0.1);
-        dialFFTVertical->addOption("200","mV/div",0.2);
-        dialFFTVertical->addOption("500","mV/div",0.5);
-        dialFFTVertical->addOption("1","V/div",1);
-        dialFFTVertical->addOption("2","V/div",2);
-        dialFFTVertical->addOption("5","V/div",5);
-        dialFFTVertical->addOption("10","V/div",10);
-        dialFFTVertical->setDefaultIndex(6);
-        dialFFTShift->setRange(-3.3,6.6,"V",5,0.01,0);
+        dialFFTVertical->addOption("10","VRms/div",10);
+        dialFFTVertical->addOption("5","VRms/div",5);
+        dialFFTVertical->addOption("2","VRms/div",2);
+        dialFFTVertical->addOption("1","VRms/div",1);
+        dialFFTVertical->addOption("500","mVRms/div",0.5);
+        dialFFTVertical->addOption("200","mVRms/div",0.2);
+        dialFFTVertical->addOption("100","mVRms/div",0.1);
+        dialFFTVertical->addOption("50","mVRms/div",0.05);
+        dialFFTVertical->addOption("20","mVRms/div",0.02);
+        dialFFTVertical->addOption("10","mVRms/div",0.01);
+        dialFFTVertical->setDefaultIndex(5);
+        dialFFTShift->setRange(-3.3,6.6,"VRms",5,0.01,0);
     }else{  //periodogram
-        dialFFTVertical->addOption("1","dB/div",1);
-        dialFFTVertical->addOption("2","dB/div",2);
-        dialFFTVertical->addOption("5","dB/div",5);
-        dialFFTVertical->addOption("10","dB/div",10);
-        dialFFTVertical->addOption("20","dB/div",20);
         dialFFTVertical->addOption("50","dB/div",50);
-        dialFFTVertical->setDefaultIndex(3);
-        dialFFTShift->setRange(-100,100,"dB",10,0.1,0);
+        dialFFTVertical->addOption("20","dB/div",20);
+        dialFFTVertical->addOption("10","dB/div",10);
+        dialFFTVertical->addOption("5","dB/div",5);
+        dialFFTVertical->addOption("2","dB/div",2);
+        dialFFTVertical->addOption("1","dB/div",1);
+        dialFFTVertical->setDefaultIndex(1);
+        dialFFTShift->setRange(-100,100,"dB",10,0.1,20);
     }
 }
 
 void PanelMath::fillHorizontalDials()
 {
-    dialFFTHorizontal->addOption("10","Hz/div",10);
+    /*  dialFFTHorizontal->addOption("10","Hz/div",10);
     dialFFTHorizontal->addOption("20","Hz/div",20);
     dialFFTHorizontal->addOption("50","Hz/div",50);
     dialFFTHorizontal->addOption("100","Hz/div",100);
@@ -265,6 +278,6 @@ void PanelMath::fillHorizontalDials()
     dialFFTHorizontal->addOption("100","kHz/div",100000);
     dialFFTHorizontal->addOption("200","kHz/div",200000);
     dialFFTHorizontal->addOption("500","kHz/div",500000);
-    dialFFTHorizontal->setDefaultIndex(6);
+    dialFFTHorizontal->setDefaultIndex(6);*/
 }
 

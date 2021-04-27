@@ -10,6 +10,7 @@
 #include "../../GUI/widgetcontrolmodule.h"
 
 #include "../abstractmodule.h"
+#include "../labelformator.h"
 
 class SyncPwm : public AbstractModule
 {
@@ -28,6 +29,7 @@ private:
     bool skipRepaintLock = false;
 
     void setDutyPhase(quint32 dutyCycle, quint32 phase, quint32 chanIndex);
+    void buildModuleDescription(SyncPwmSpec *spec);
 
     void write(QByteArray feature, QByteArray param);
     void write(QByteArray feature, int param);

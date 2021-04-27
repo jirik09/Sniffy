@@ -32,6 +32,7 @@ public:
 
 signals:
     void loadLayout(QString Devicename);
+    void saveLayout(void);
 
 private:
     QList<DeviceDescriptor> deviceList;

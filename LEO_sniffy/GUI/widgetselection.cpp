@@ -30,7 +30,7 @@ QByteArray WidgetSelection::saveGeometry()
 void WidgetSelection::restoreGeometry(QByteArray geom)
 {
    if(options->length()>geom.toInt())
-        setSelected(geom.toInt());
+        setSelected(geom.toInt(),true);
 }
 
 void WidgetSelection::addOption (QString shownValue,float realValue){

@@ -45,8 +45,8 @@ void Scope::parseData(QByteArray data){
     if(dataHeader=="CFG_"){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
-        showModuleControl();
-
+            showModuleControl();
+            buildModuleDescription(static_cast<ScopeSpec*>(moduleSpecification));
     }else if(dataHeader=="SMPL"){
         if(config->triggerMode!=ScopeTriggerMode::TRIG_STOP){
             scpWindow->samplingOngoing();
@@ -169,6 +169,7 @@ void Scope::writeConfiguration(){
 
     isConfigurationWritten = true;
     scpWindow->restoreGUIAfterStartup();
+    scpWindow->setNumChannels(static_cast<ScopeSpec*>(moduleSpecification)->maxADCChannels);
 
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
     updateTimebase(config->timeBase);
@@ -181,7 +182,7 @@ void Scope::writeConfiguration(){
     updateTriggerEdge(config->triggerEdge);
     setNumberOfChannels(config->numberOfChannels);
     updateTriggerChannel(config->triggerChannelIndex);
-    updateTriggerMode(config->triggerMode);
+    setTriggerMode(config->triggerMode);
 }
 
 void Scope::parseConfiguration(QByteArray config){
@@ -326,6 +327,30 @@ void Scope::clearMeasurement(){
     updateMeasurement(config->scopeMeasList);
 }
 
+void Scope::buildModuleDescription(ScopeSpec *spec)
+{
+    QString name = moduleName;
+    QList<QString> labels ,values;
+
+    labels.append("ADC Channels");
+    values.append(QString::number(spec->maxADCChannels));
+
+    labels.append("Memory size");
+    values.append(LabelFormator::formatOutout(spec->memorySize,"B",1));
+
+    labels.append("Max sampling rate");
+    values.append(LabelFormator::formatOutout(spec->maxSamplingRate12B,"sps",2));
+
+    labels.append("Pins");
+    QString pins;
+    for(int i = 0;i<spec->maxADCChannels;i++){
+        pins += spec->channelPins[i] + ", ";
+    }
+    values.append(pins.left(pins.length()-2));
+
+    showModuleDescription(name, labels, values);
+}
+
 void Scope::updateMeasurement(QList<Measurement*> m){
     scpWindow->updateMeasurement(m);
 }
@@ -356,7 +381,7 @@ void Scope::updateFFTConfig(int length, FFTWindow window, FFTType type, int chan
 
 void Scope::updateFFT()
 {
-    scpWindow->updateFFTchart(FFTCalc->getProcessedData());
+    scpWindow->updateFFTchart(FFTCalc->getProcessedData(), FFTCalc->getMaxFrequency());
 }
 
 void Scope::stopSampling(){

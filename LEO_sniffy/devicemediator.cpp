@@ -27,7 +27,8 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
 
     foreach(QSharedPointer<AbstractModule> mod, tmpModules){
         connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
-        connect(mod.data(), &AbstractModule::releaseConflictingModules, this, &DeviceMediator::releaseConflictingModulesCallback);      
+        connect(mod.data(), &AbstractModule::releaseConflictingModules, this, &DeviceMediator::releaseConflictingModulesCallback);
+        connect(mod.data(), &AbstractModule::moduleDescription, device, &Device::addModuleDescription);
     }
 
     return tmpModules;
@@ -91,6 +92,7 @@ void DeviceMediator::open(int deviceIndex){
 void DeviceMediator::disableModules()
 {
     if(isConnected){
+        emit saveLayout();
         foreach(QSharedPointer<AbstractModule> mod, modules){
             mod->disableModule();
         }

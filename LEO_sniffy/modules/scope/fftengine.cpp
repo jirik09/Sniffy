@@ -20,7 +20,7 @@ void FFTengine::calculate(QVector<QPointF> data,FFTWindow window,FFTType type, i
     dataIn = data;
     //dataIn.resize(2048);
     this->window = window;
-    this->minNFFT = minNFFT;
+    this->lengthNFFT = minNFFT;
     this->type = type;
     this->removeDC = removeDC;
     this->samplingFreq = samplingFreq;
@@ -69,7 +69,7 @@ void FFTengine::run()
         for (int i = 0; i < tmpIn.length(); i++)
             tmpData.append(std::complex<float>(tmpIn.at(i).y(), 0));
 
-        tmpOutput = calculateSpectrum(tmpData,window,minNFFT);
+        tmpOutput = calculateSpectrum(tmpData,window,lengthNFFT);
         outputData = processOutput(tmpOutput,type);
 
         if (abort)
@@ -88,23 +88,37 @@ void FFTengine::run()
 }
 
 QVector<std::complex<float>> FFTengine::calculateSpectrum(QVector<std::complex<float>> data, FFTWindow window, int minNFFT) {
+    if(data.length()>minNFFT){
+        data.resize(minNFFT);
+    }
+
     if (window == FFTWindow::hamming) {
         resizeHamming(data.length());
         for (int i = 0; i < data.size(); i++)
-            data[i] *= hamming.at(i);
+            data[i] *= hamming.at(i)*2.44;
     } else if (window == FFTWindow::hann) {
         resizeHann(data.length());
         for (int i = 0; i < data.size(); i++)
-            data[i] *= hann.at(i);
+            data[i] *= hann.at(i)*2.67;
     } else if (window == FFTWindow::blackman) {
         resizeBlackman(data.length());
         for (int i = 0; i < data.size(); i++)
-            data[i] *= blackman.at(i);
+            data[i] *= blackman.at(i)*3.125;
+    } else if (window == FFTWindow::flatTop) {
+        resizeFlatTop(data.length());
+        for (int i = 0; i < data.size(); i++)
+            data[i] *= flatTop.at(i)*1.33;
+    } else if (window == FFTWindow::rectangular) {
+        resizeFlatTop(data.length());
+        for (int i = 0; i < data.size(); i++)
+            data[i] *= 1.33;
     }
 
     int nfft = nextPow2(data.size());
     if (nfft < minNFFT)
         nfft = minNFFT;
+
+    lengthRatio = (qreal)nfft/data.length();
     data.resize(nfft);
 
     return fft(data);
@@ -119,10 +133,10 @@ QVector<QPointF> FFTengine::processOutput(QVector<std::complex<float>> data, FFT
         freq = i * freqStep;
         if (type == FFTType::periodogram) {
             // |x|^2 calculatd as  x * complex conjugate x;
-            float absSquared = (data.at(i) * std::complex<float>(data.at(i).real(), - data.at(i).imag())).real();
-            result.append(QPointF(freq, 10 * log10(absSquared / nfft)));
+            float absSquared = (data.at(i) * std::complex<float>(data.at(i).real(), - data.at(i).imag())).real()/1000;
+            result.append(QPointF(freq, 10 * log10(absSquared/ nfft*lengthRatio)));
         } else
-            result.append(QPointF(freq, std::abs(data.at(i))));
+            result.append(QPointF(freq, std::abs(data.at(i))/nfft*lengthRatio));
     }
     maxFrequency = freq;
     return result;
@@ -169,6 +183,18 @@ void FFTengine::resizeHann(int length) {
         for (int n = 0; n < length; n++)
             hann[n] = 0.5 * (1 - cos(2 * M_PI * n / length));
     }
+}
+
+void FFTengine::resizeFlatTop(int length) {
+    if (flatTop.size() != length) {
+        flatTop.resize(length);
+        for (int n = 0; n < length; n++)
+            flatTop[n] = 1 - 1.93 *cos(2* M_PI *n/(length - 1)) + 1.29 *cos(4 *M_PI *n/(length - 1)) - 0.388 *cos(6* M_PI *n/(length - 1)) + 0.0322*cos(8* M_PI *n/(length - 1));
+    }
+
+    /*
+
+*/
 }
 
 void FFTengine::resizeBlackman(int length) {
