@@ -390,7 +390,8 @@ void WidgetDisplay::setHistoryMinMaxData(qreal minY, qreal maxY){
 void WidgetDisplay::paintEvent(QPaintEvent *event)
 {
     int width = ui->lcdNumber->size().width()/9;
-    ui->styleUnits->setMaximumSize(QSize(width,width));
+    if(abs(ui->styleUnits->size().width()-width)>5)
+        ui->styleUnits->setMaximumSize(QSize(width,width));
     QWidget::paintEvent(event);
 }
 
