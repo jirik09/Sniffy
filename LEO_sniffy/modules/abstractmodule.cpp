@@ -239,6 +239,7 @@ void AbstractModule::closeModule(){
 
 void AbstractModule::disableModule(){
     moduleControlWidget->hide();
+    moduleRestored = false;
     closeModule();
 }
 

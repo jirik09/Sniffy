@@ -39,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent):
     setupMainWindowComponents();
 
     connect(deviceMediator,&DeviceMediator::loadLayout,this,&MainWindow::loadLayout,Qt::DirectConnection);
+    connect(deviceMediator,&DeviceMediator::saveLayout,this,&MainWindow::saveLayout,Qt::DirectConnection);
+
 }
 
 void MainWindow::createModulesWidgets(){
@@ -141,7 +143,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent (QCloseEvent *event)
 {
-    saveLayout();
     deviceMediator->closeApp();
     event->accept();
 }

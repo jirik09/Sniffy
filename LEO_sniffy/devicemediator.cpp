@@ -91,6 +91,7 @@ void DeviceMediator::open(int deviceIndex){
 void DeviceMediator::disableModules()
 {
     if(isConnected){
+        emit saveLayout();
         foreach(QSharedPointer<AbstractModule> mod, modules){
             mod->disableModule();
         }
