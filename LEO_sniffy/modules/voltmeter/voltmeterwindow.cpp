@@ -12,7 +12,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     WidgetDisplay *display;
 
     for (int i =0;i<MAX_VOLTMETER_CHANNELS ;i++ ) {
-        display  = new WidgetDisplay("Voltmeter_CH"+QString::number(i), "Channel "+QString::number(i), styleSheet, true, 1, HISTORY_SIZE, this);
+        display  = new WidgetDisplay("Voltmeter_CH"+QString::number(i+1), "Channel "+QString::number(i+1), styleSheet, true, 1, HISTORY_SIZE, this);
         display->configLabel(0,"CH"+QString::number(i),Graphics::getChannelColor(i),true);
         displays.append(display);
     }
@@ -21,7 +21,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     foreach(WidgetDisplay * dis, displays){
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
-        dis->configLabel(2,"VOLTAGE",Graphics::COLOR_TEXT_LABEL,true);
+        dis->configLabel(2,"Voltage",Graphics::COLOR_TEXT_LABEL,true);
         ui->verticalLayout_display->addWidget(dis);
         dis->setIndicationFlagColor(Graphics::getChannelColor(index));
         dis->setProgressBarColor(Graphics::getChannelColor(index));

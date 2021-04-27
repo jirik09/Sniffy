@@ -68,7 +68,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     dialTimeBase->setObjectName("TimeBase");
     destination->addWidget(dialTimeBase);
     fillTimeBase();
-    dialTimeBase->setDefaultIndex(10);
+    dialTimeBase->setDefaultIndex(12);
 
     buttonsMemorySet = new WidgetButtons(parent,3,ButtonTypes::RADIO,"Memory");
     buttonsMemorySet->setObjectName("MemorySet");
@@ -98,17 +98,17 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     dialVerticalScale->setObjectName("VerticalScale");
     destination->addWidget(dialVerticalScale);
     dialVerticalScale->setColor(Graphics::getChannelColor(0));
-    dialVerticalScale->addOption("10","mV/div",0.01);
-    dialVerticalScale->addOption("20","mV/div",0.02);
-    dialVerticalScale->addOption("50","mV/div",0.05);
-    dialVerticalScale->addOption("100","mV/div",0.1);
-    dialVerticalScale->addOption("200","mV/div",0.2);
-    dialVerticalScale->addOption("500","mV/div",0.5);
-    dialVerticalScale->addOption("1","V/div",1);
-    dialVerticalScale->addOption("2","V/div",2);
-    dialVerticalScale->addOption("5","V/div",5);
     dialVerticalScale->addOption("10","V/div",10);
-    dialVerticalScale->setDefaultIndex(6);
+    dialVerticalScale->addOption("5","V/div",5);
+    dialVerticalScale->addOption("2","V/div",2);
+    dialVerticalScale->addOption("1","V/div",1);
+    dialVerticalScale->addOption("500","mV/div",0.5);
+    dialVerticalScale->addOption("200","mV/div",0.2);
+    dialVerticalScale->addOption("100","mV/div",0.1);
+    dialVerticalScale->addOption("50","mV/div",0.05);
+    dialVerticalScale->addOption("20","mV/div",0.02);
+    dialVerticalScale->addOption("10","mV/div",0.01);
+    dialVerticalScale->setDefaultIndex(3);
 
     dialVerticalShift = new WidgetDialRange(parent ,"Shift");
     dialVerticalShift->setObjectName("VerticalShift");

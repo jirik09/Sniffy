@@ -300,7 +300,8 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(dialValueChanged(int)));
     connect(ui->lineEdit,SIGNAL(textEdited(QString)),this,SLOT(textEditChanged(QString)));
     connect(ui->lineEdit,SIGNAL(editingFinished()),this,SLOT(textEditFinished()));
-    updateControls(0);
+    //updateControls(0);
+    setRealValue(defaultRealValue);
 }
 
 void WidgetDialRange::updateRange(float min, float max, bool silent)

@@ -182,7 +182,7 @@ void Scope::writeConfiguration(){
     updateTriggerEdge(config->triggerEdge);
     setNumberOfChannels(config->numberOfChannels);
     updateTriggerChannel(config->triggerChannelIndex);
-    updateTriggerMode(config->triggerMode);
+    setTriggerMode(config->triggerMode);
 }
 
 void Scope::parseConfiguration(QByteArray config){
@@ -357,7 +357,7 @@ void Scope::updateFFTConfig(int length, FFTWindow window, FFTType type, int chan
 
 void Scope::updateFFT()
 {
-    scpWindow->updateFFTchart(FFTCalc->getProcessedData());
+    scpWindow->updateFFTchart(FFTCalc->getProcessedData(), FFTCalc->getMaxFrequency());
 }
 
 void Scope::stopSampling(){

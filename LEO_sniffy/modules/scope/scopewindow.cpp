@@ -25,14 +25,26 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
-    chartFFT->setRange(0, 50000, -100, 100);
+    chartFFT->setRange(0, 50000, 0, 8);
     chartFFT->setDataMinMax(0,50000);
     chartFFT->enableLocalMouseZoom();
     chartFFT->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
 
-    ui->verticalLayout_chart->addWidget(chartFFT);
-    ui->verticalLayout_chart->addWidget(chart);
+   // ui->verticalLayout_chart->addWidget(chartFFT);
+   // ui->verticalLayout_chart->addWidget(chart);
+
+    splitter = new QSplitter(Qt::Vertical, this);
+    splitter->addWidget(chartFFT);
+    splitter->addWidget(chart);
+
     chartFFT->hide();
+
+    QList<int> sizes = splitter->sizes();
+    int hght = splitter->height();
+    sizes = {hght, hght};
+    splitter->setSizes(sizes);
+
+    ui->verticalLayout_chart->addWidget(splitter);
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
     ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
@@ -83,6 +95,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     panelMath = new PanelMath(tabs->getLayout(3),tabs);
     connect(panelMath,&PanelMath::expressionChanged,this,&ScopeWindow::mathExpressionCallback);
     connect(panelMath,&PanelMath::fftChanged,this,&ScopeWindow::fftChangedCallback);
+    connect(panelMath,&PanelMath::fftchartChanged,this,&ScopeWindow::fftchartChangedCallback);
 
     // ********************* create panel Advanced ****************
     panelAdvanced = new PanelAdvanced(tabs->getLayout(4),tabs);
@@ -331,10 +344,24 @@ void ScopeWindow::fftChangedCallback(int length, FFTWindow window, FFTType type,
     if(length !=0){
         chartFFT->show();
         chartFFT->clearAll();
-        //paintTraces(ChartData,ChartMathData); TODO paint in a additional chart (clear)
+        ui->widget_top->hide();
     }else{
         chartFFT->hide();
+        ui->widget_top->show();
     }
+}
+
+void ScopeWindow::fftchartChangedCallback(qreal scale, qreal shift, bool isLog)
+{
+    qreal range = scale * 8;
+    qreal min = 0-shift;
+    qreal max = range-shift;
+
+    if(isLog){
+        min -= 4*scale;
+        max -=4*scale;
+    }
+    chartFFT->setRangeY(min,max);
 }
 
 void ScopeWindow::sliderShiftCallback(int value){
@@ -466,12 +493,13 @@ void ScopeWindow::updateMath(QVector<QPointF> mathTrace)
     paintTraces(ChartData,ChartMathData);
 }
 
-void ScopeWindow::updateFFTchart(QVector<QPointF> fftTrace)
+void ScopeWindow::updateFFTchart(QVector<QPointF> fftTrace, qreal maxFreq)
 {
     ChartFFTData = fftTrace;
     chartFFT->clearAll();
     chartFFT->updateTrace(&ChartFFTData,0);
     chartFFT->setTraceColor(0,Graphics::getChannelColor(fftChannelIndex));
+    chartFFT->setDataMinMax(0,maxFreq);
    // qDebug () << "FFT was calculated and received by window" << fftTrace.length();
 }
 

@@ -422,7 +422,7 @@ void widgetChart::formatAxisLabelsForScope(){
     axisX->setLabelsBrush(QBrush(QColor(128,128,128)));
     axisY->setLabelsBrush(QBrush(QColor(128,128,128)));
     axisX->setLabelFormat("%.2g");
-    axisY->setLabelFormat("%.2g");
+    //axisY->setLabelFormat("%.2g");
 
     QFont font = axisX->labelsFont();
     font.setPointSize(8);
