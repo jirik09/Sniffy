@@ -50,7 +50,7 @@ private slots:
 private:
     Ui::WidgetFeature *ui;
     ModuleStatus status;    
-    QIcon iconAvail, iconLock;
+    QIcon icon;
 };
 
 

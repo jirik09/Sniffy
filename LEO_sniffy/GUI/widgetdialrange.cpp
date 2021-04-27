@@ -41,6 +41,18 @@ WidgetDialRange::~WidgetDialRange()
     delete ui;
 }
 
+void WidgetDialRange::setName(QString name){
+    ui->label_name->setText(name);
+}
+
+void WidgetDialRange::setAdditionalLabelText(QString text){
+    ui->label_addition->setText(text);
+}
+
+void WidgetDialRange::setAdditionalLabelColor(QString color){
+    ui->label_addition->setStyleSheet("QLabel{color: "+color+";}");
+}
+
 QByteArray WidgetDialRange::saveGeometry()
 {
     QByteArray *data;
@@ -107,6 +119,11 @@ float WidgetDialRange::getDefaultRealValue() const{
 float WidgetDialRange::getRealValue() const
 {
     return realValue;
+}
+
+void WidgetDialRange::disable(bool disable){
+    this->setDisabled(disable);
+    ui->label_addition->setStyleSheet("QLabel{color: "+Graphics::COLOR_COMPONENT_DISABLED+";}");
 }
 
 void WidgetDialRange::setNumOfDecimals(int value)
