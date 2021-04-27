@@ -69,13 +69,13 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
     dialFreqSweepMax->setObjectName("arbGenfreqSweepMax");
     dialFreqSweepMax->setRange(0.1,1000000,"Hz",10,0.01,1000,true);
 
-    dialFreqSweepTime = new WidgetDialRange(parent,"Sweep time");
-    dialFreqSweepTime->setObjectName("arbGenfreqSweeptime");
-    dialFreqSweepTime->setRange(0.1,60,"s",10,0.1,1,true);
+    dialSweepTime = new WidgetDialRange(parent,"Sweep time");
+    dialSweepTime->setObjectName("arbGenfreqSweeptime");
+    dialSweepTime->setRange(0.1,60,"s",10,0.1,1,true);
 
     sweepControl->addWidget(dialFreqSweepMin);
     sweepControl->addWidget(dialFreqSweepMax);
-    sweepControl->addWidget(dialFreqSweepTime);
+    sweepControl->addWidget(dialSweepTime);
     destination->addLayout(sweepControl);
 
     QHBoxLayout *horBox = new QHBoxLayout();
@@ -216,6 +216,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
     connect(buttonSWSweepEnable,&WidgetButtons::clicked,this,&ArbGenPanelSettings::buttonSweepCallback);
     connect(dialFreqSweepMax,&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::sweepMaxCallback);
     connect(dialFreqSweepMin,&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::sweepMinCallback);
+    connect(dialSweepTime,&WidgetDialRange::valueChanged,this,&ArbGenPanelSettings::sweepSettingsCallback);
 
     QSpacerItem *verticalSpacerW = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     horBox->addItem(verticalSpacerW);
@@ -491,12 +492,12 @@ void ArbGenPanelSettings::buttonSweepCallback(int index)
     if(index == 1){  //sweep is on
         dialFreqSweepMax->show();
         dialFreqSweepMin->show();
-        dialFreqSweepTime->show();
+        dialSweepTime->show();
         isSweepEnabled = true;
     }else{
         dialFreqSweepMax->hide();
         dialFreqSweepMin->hide();
-        dialFreqSweepTime->hide();
+        dialSweepTime->hide();
         isSweepEnabled = false;
     }
     signalChangedCallback();

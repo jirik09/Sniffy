@@ -341,7 +341,7 @@ void ArbGeneratorWindow::createSignalCallback()
 
 
     if(setting->isSweepEnabled){
-        sweepController->setParameters(setting->dialFreqSweepMin->getRealValue(),setting->dialFreqSweepMax->getRealValue(),setting->dialFreqSweepTime->getRealValue());
+        sweepController->setParameters(setting->dialFreqSweepMin->getRealValue(),setting->dialFreqSweepMax->getRealValue(),setting->dialSweepTime->getRealValue());
     }
 
     if(isGenerating){
