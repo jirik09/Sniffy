@@ -24,7 +24,8 @@ public:
     static const QByteArray GENERATOR;
     static const QByteArray VOLTAGE_SOURCE;
     static const QByteArray PWM_GENERATOR;
-    static const QByteArray SYNC_PWM_GEN;
+    static const QByteArray PATTERN_GENERATOR;
+    static const QByteArray SYNC_PWM_GEN;    
     static const QByteArray LOG_ANLYS;
     static const QByteArray COUNTER;
     static const QByteArray SCOPE;

@@ -3,36 +3,34 @@
 PatternGenerator::PatternGenerator(QObject *parent)
 {
     Q_UNUSED(parent);
-    moduleSpecification = new PatternGeneratorSpec();
-    config = new PatternGeneratorConfig();
-    tempWindow = new PatternGeneratorWindow(config);
-    tempWindow->setObjectName("tmpWindow");
 
-//Set the comm prefix, window name and icon
-    //module is not fully initialized - control widget and dock wodget cannot be modified
-    moduleCommandPrefix = "SYST";//cmd->SCOPE;
+    config = new PatternGeneratorConfig();
+    pattGenWindow = new PatternGeneratorWindow(config);
+    pattGenWindow->setObjectName("patternGenWindow");
+
+    moduleCommandPrefix = cmd->PATTERN_GENERATOR;
     moduleName = "Pattern generator";
     moduleIconURI = Graphics::getGraphicsPath()+"icon_pattern_generator.png";
 
-//In case hold button should be shown insert this and connect callback to handle hold/pause
     connect(this, &AbstractModule::moduleCreated, this, &PatternGenerator::showHoldButtonCallback);
     connect(this, &AbstractModule::holdClicked, this, &PatternGenerator::holdButtonCallback);
 }
 
 QWidget *PatternGenerator::getWidget()
 {
-    return tempWindow;
+    return pattGenWindow;
 }
 
-void PatternGenerator::parseData(QByteArray data)
-{
+void PatternGenerator::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
+    QByteArray dataToPass = data.remove(0, 4);
 
-    if(dataHeader=="CFG_"){
-        data.remove(0,4);
-        moduleSpecification->parseSpecification(data);
+    if(dataHeader==cmd->CONFIG){
+        moduleSpecification = new PatternGeneratorSpec(this);
+        moduleSpecification->parseSpecification(dataToPass);
+        pattGenWindow->setSpecification(static_cast<PatternGeneratorSpec*>(moduleSpecification));
         showModuleControl();
-//TODO parse message from MCU
+
     }else if(dataHeader=="xxxx"){
 
     }else{
@@ -42,8 +40,7 @@ void PatternGenerator::parseData(QByteArray data)
 
 void PatternGenerator::writeConfiguration()
 {
-    tempWindow->restoreGUIAfterStartup();
-//TODO this function is called when module is opened
+    pattGenWindow->restoreGUIAfterStartup();
 }
 
 void PatternGenerator::parseConfiguration(QByteArray config)
@@ -58,15 +55,13 @@ QByteArray PatternGenerator::getConfiguration()
 
 void PatternGenerator::startModule()
 {
-//TODO start the module
+
 }
 
 void PatternGenerator::stopModule()
 {
-//TODO stop the module
-}
 
-//In case hold is needed
+}
 
 void PatternGenerator::showHoldButtonCallback(){
     this->showModuleHoldButton(true);

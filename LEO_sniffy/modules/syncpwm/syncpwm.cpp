@@ -46,7 +46,7 @@ void SyncPwm::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
     QByteArray dataToPass = data.remove(0, 4);
 
-    if(dataHeader == "CFG_"){
+    if(dataHeader == cmd->CONFIG){
         moduleSpecification = new SyncPwmSpec(this);
         moduleSpecification->parseSpecification(dataToPass);
         spwmWindow->setSpecification(static_cast<SyncPwmSpec*>(moduleSpecification));

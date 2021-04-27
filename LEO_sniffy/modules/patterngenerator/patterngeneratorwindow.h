@@ -17,7 +17,9 @@
 #include "../../GUI/widgettab.h"
 #include "../../GUI/widgetlabelarea.h"
 
-#include "PatternGeneratorconfig.h"
+#include "patterngeneratorconfig.h"
+#include "patterngeneratorspec.h"
+#include "patterngeneratorsettings.h"
 
 namespace Ui {
 class PatternGeneratorWindow;
@@ -32,10 +34,13 @@ public:
     ~PatternGeneratorWindow();
 
     void restoreGUIAfterStartup();
+    void setSpecification(PatternGeneratorSpec* spec);
 
 private:
     Ui::PatternGeneratorWindow *ui;
     PatternGeneratorConfig *config;
+    PatternGeneratorSpec *spec;
+    PatternGeneratorSettings *setting;
 };
 
 #endif // PATTERNGENERATORWINDOW_H

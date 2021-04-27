@@ -4,9 +4,9 @@
 #include <QObject>
 
 #include "../abstractmodule.h"
-#include "PatternGeneratorspec.h"
-#include "PatternGeneratorconfig.h"
-#include "PatternGeneratorwindow.h"
+#include "patterngeneratorspec.h"
+#include "patterngeneratorconfig.h"
+#include "patterngeneratorwindow.h"
 
 class PatternGenerator : public AbstractModule
 {
@@ -35,7 +35,7 @@ private slots:
 
 private:
     PatternGeneratorConfig *config;
-    PatternGeneratorWindow *tempWindow;
+    PatternGeneratorWindow *pattGenWindow;
    // scpWindow = new ScopeWindow();
 
 };

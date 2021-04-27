@@ -29,7 +29,7 @@ QWidget *ArbGenerator::getWidget()
 {
     return arbGenWindow;
 }
-
+int test1 = 0, test2 = 0, text3 = 0;
 void ArbGenerator::parseData(QByteArray data)
 {
     QByteArray dataHeader = data.left(4);
@@ -42,15 +42,18 @@ void ArbGenerator::parseData(QByteArray data)
                 static_cast<ArbGeneratorSpec*>(moduleSpecification)->parsePWMSpecification(data);
                 arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
                 showModuleControl();
+                test1++;
             }else{
                 comm->write(cmd->GENERATOR,cmd->CMD_GET_PWM_CONFIG);
-                moduleSpecification->parseSpecification(data);              
+                moduleSpecification->parseSpecification(data);
+                test2++;
             }
         }else{
             if(data.left(4) != cmd->PWM_GENERATOR){
                 moduleSpecification->parseSpecification(data);
                 arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
                 showModuleControl();
+                text3++;
             }
         }
     }else if(dataHeader==cmd->CMD_GEN_NEXT){
