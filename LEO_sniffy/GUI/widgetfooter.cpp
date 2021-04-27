@@ -51,6 +51,7 @@ void WidgetFooter::sizeCallback(){
 }
 
 void WidgetFooter::setAppearance(bool isWide){
+    this->isWide = isWide; //save the value if it is called from public
     if(!isWide){
         ui->pushButton_settingsA->show();
         ui->pushButton_settingsB->hide();

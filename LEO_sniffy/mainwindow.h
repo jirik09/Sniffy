@@ -37,9 +37,12 @@ private:
     QString setingsFile;
 
     SettingsDialog *sett;
+    bool isLeftMenuNarrow;
+    WidgetFooter *footer;
 
     void setMenuNarrow();
     void setMenuWide();
+    void recoverLeftMenu(bool isWide);
 
     void setupMainWindowComponents();
     void createModulesWidgets();

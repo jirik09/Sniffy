@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent):
     connect(deviceMediator,&DeviceMediator::loadLayout,this,&MainWindow::loadLayout,Qt::DirectConnection);
     connect(deviceMediator,&DeviceMediator::saveLayout,this,&MainWindow::saveLayout,Qt::DirectConnection);
 
+   // setMenuWide();
 }
 
 void MainWindow::createModulesWidgets(){
@@ -85,7 +86,7 @@ void MainWindow::setupMainWindowComponents(){
     ui->verticalLayout_modules->addItem(verticalSpacer);
     WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget);
     ui->verticalLayout_modules->addWidget(sepa);
-    WidgetFooter *footer = new WidgetFooter();
+    footer = new WidgetFooter();
     ui->verticalLayout_modules->addWidget(footer);
 
     connect(footer,&WidgetFooter::sizeClicked,this,&MainWindow::setMenuSize);
@@ -112,26 +113,24 @@ void MainWindow::setMenuSize(bool isWide){
 void MainWindow::openSettingDialog()
 {
     sett->open();
-    //   sett->show();
-    //   sett->activateWindow();
 }
 
 void MainWindow::setMenuWide(){
     ui->centralwidget->setMinimumSize(250,200);
     ui->centralwidget->setMaximumSize(250,20000);
+    isLeftMenuNarrow = false;
+}
 
-    //    animation->setStartValue(QSize(90, ui->centralwidget->height()));
-    //    animation->setEndValue(QSize(250, ui->centralwidget->height()));
-    //    animation->start();
+void MainWindow::recoverLeftMenu(bool isWide)
+{
+    footer->setAppearance(isWide);
+    setMenuSize(isWide);
 }
 
 void MainWindow::setMenuNarrow(){
     ui->centralwidget->setMinimumSize(90,200);
     ui->centralwidget->setMaximumSize(90,20000);
-
-    //    animation->setStartValue(QSize(250, ui->centralwidget->height()));
-    //    animation->setEndValue(QSize(90, ui->centralwidget->height()));
-    //    animation->start();
+    isLeftMenuNarrow = true;
 }
 
 
@@ -169,6 +168,7 @@ void MainWindow::saveLayout()
             settings.setValue(module->getModuleName()+"status",(int)(module->getModuleStatus()));
         }
         settings.setValue("resourcesInUse",deviceMediator->getResourcesInUse());
+        settings.setValue("LeftMenuNarrow",isLeftMenuNarrow);
     }
 }
 
@@ -188,6 +188,8 @@ void MainWindow::loadLayout(QString deviceName)
     restoreState(layout.value("windowState").toByteArray());
 
     deviceMediator->setResourcesInUse(settings.value("resourcesInUse").toInt());
+    recoverLeftMenu(!settings.value("LeftMenuNarrow").toBool());
+
 }
 
 void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
