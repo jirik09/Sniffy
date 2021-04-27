@@ -21,7 +21,7 @@ public:
     QString getName();
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
-    void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);
+
     void errorHandler(QByteArray error);
 
 private:
@@ -38,6 +38,7 @@ signals:
     void closeDevice();
 
 public slots:
+    void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);
     void parseData(QByteArray);
     void writeConfiguration();
     void parseConfiguration(QByteArray config);

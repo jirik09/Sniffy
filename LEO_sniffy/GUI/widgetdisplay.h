@@ -142,6 +142,8 @@ private:
     void setHistoryMinMaxTime(qreal minX, qreal maxX);
     void setHistoryMinMaxData(qreal minY, qreal maxY);
 
+    void paintEvent(QPaintEvent *event);
+
 private slots:    
     void historyButtonClickedCallback();
     void clearHistoryButtonClickedCallback();

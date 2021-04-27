@@ -224,12 +224,21 @@ void AbstractModule::showModuleControl(){
     moduleControlWidget->show();
 }
 
+void AbstractModule::showModuleDescription(QString name, QList<QString> labels, QList<QString> values)
+{
+    if(!moduleControlWidget->isHidden() && moduleDescriptionShown == false){
+        emit moduleDescription(name, labels, values);
+        moduleDescriptionShown = true;
+    }
+}
+
 void AbstractModule::showModuleWindow(){
     dockWidgetWindow->show();
 }
 
 void AbstractModule::closeModule(){
     dockWidgetWindow->hide();
+
     if(moduleControlWidget->getStatus()!=ModuleStatus::STOP)
         stopModule();
     moduleControlWidget->setStatus(ModuleStatus::STOP);
@@ -240,6 +249,7 @@ void AbstractModule::closeModule(){
 void AbstractModule::disableModule(){
     moduleControlWidget->hide();
     moduleRestored = false;
+    moduleDescriptionShown = false;
     closeModule();
 }
 

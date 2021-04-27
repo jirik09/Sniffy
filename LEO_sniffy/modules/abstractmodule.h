@@ -51,6 +51,7 @@ public:
     ModuleStatus getModuleStatus();
 
     void showModuleControl();
+    void showModuleDescription(QString name, QList<QString> labels, QList<QString> values);
     void showModuleWindow();
     void closeModule();
     void disableModule();
@@ -82,6 +83,7 @@ protected:
 private:
     ModuleDockWidget *dockWidgetWindow;
     WidgetControlModule *moduleControlWidget;
+    bool moduleDescriptionShown = false;
     bool dockWinCreated = false;
     bool moduleRestored = false;
 
@@ -96,6 +98,7 @@ signals:
     void loadModuleLayoutAndConfig(QString moduleName);
     void blockConflictingModules(QString moduleName, int resources);
     void releaseConflictingModules(QString moduleName, int resources);
+    void moduleDescription(QString name, QList<QString> labels, QList<QString> values);
 
 };
 

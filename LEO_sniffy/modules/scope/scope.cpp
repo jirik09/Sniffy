@@ -45,8 +45,8 @@ void Scope::parseData(QByteArray data){
     if(dataHeader=="CFG_"){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
-        showModuleControl();
-
+            showModuleControl();
+            buildModuleDescription(static_cast<ScopeSpec*>(moduleSpecification));
     }else if(dataHeader=="SMPL"){
         if(config->triggerMode!=ScopeTriggerMode::TRIG_STOP){
             scpWindow->samplingOngoing();
@@ -325,6 +325,30 @@ void Scope::clearMeasurement(){
     config->scopeMeasList.clear();
     config->measCount = 0;
     updateMeasurement(config->scopeMeasList);
+}
+
+void Scope::buildModuleDescription(ScopeSpec *spec)
+{
+    QString name = moduleName;
+    QList<QString> labels ,values;
+
+    labels.append("ADC Channels");
+    values.append(QString::number(spec->maxADCChannels));
+
+    labels.append("Memory size");
+    values.append(LabelFormator::formatOutout(spec->memorySize,"B",1));
+
+    labels.append("Max sampling rate");
+    values.append(LabelFormator::formatOutout(spec->maxSamplingRate12B,"sps",2));
+
+    labels.append("Pins");
+    QString pins;
+    for(int i = 0;i<spec->maxADCChannels;i++){
+        pins += spec->channelPins[i] + ", ";
+    }
+    values.append(pins.left(pins.length()-2));
+
+    showModuleDescription(name, labels, values);
 }
 
 void Scope::updateMeasurement(QList<Measurement*> m){

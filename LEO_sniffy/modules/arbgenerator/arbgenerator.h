@@ -53,6 +53,8 @@ private:
     QList<QList<int>> GeneratorData;
     bool dataBeingUploaded = false;
 
+    void buildModuleDescription(ArbGeneratorSpec *spec);
+
     void startGenerator ();
     void stopGenerator ();
     void setGeneratorDACMode();

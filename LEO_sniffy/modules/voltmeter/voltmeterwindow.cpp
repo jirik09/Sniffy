@@ -13,7 +13,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
 
     for (int i =0;i<MAX_VOLTMETER_CHANNELS ;i++ ) {
         display  = new WidgetDisplay("Voltmeter_CH"+QString::number(i+1), "Channel "+QString::number(i+1), styleSheet, true, 1, HISTORY_SIZE, this);
-        display->configLabel(0,"CH"+QString::number(i),Graphics::getChannelColor(i),true);
+        display->configLabel(0,"CH"+QString::number(i+1),Graphics::getChannelColor(i),true);
         displays.append(display);
     }
 

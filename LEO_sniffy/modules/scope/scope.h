@@ -72,6 +72,8 @@ private:
 
     bool isConfigurationWritten = false;
 
+    void buildModuleDescription(ScopeSpec *spec);
+
     //private functions - writing into device only - no logic
     void stopSampling();
     void startSampling();
