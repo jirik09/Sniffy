@@ -27,6 +27,8 @@ public:
 signals:
     void expressionChanged(QString exp);
     void fftChanged(int length, FFTWindow window, FFTType type, int channelIndex);
+    void fftchartChanged(qreal scale, qreal shift, bool isLog = false);
+
 
 public:
     WidgetButtons *mathType;
@@ -46,7 +48,7 @@ public:
     WidgetButtons *swFFTType;
     WidgetSelection *selFFTLength;
     WidgetDial *dialFFTVertical;
-    WidgetDial *dialFFTHorizontal;
+   // WidgetDial *dialFFTHorizontal;
     WidgetDialRange *dialFFTShift;
 
 
@@ -58,6 +60,7 @@ private slots:
     void symbolicExpressionCallback(QString exp);
     void fftCallback();
     void fftTypeCallback();
+    void fftChartCallback();
 
 private:
     void hideAll();

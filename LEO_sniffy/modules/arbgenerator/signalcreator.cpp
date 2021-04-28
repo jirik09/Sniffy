@@ -96,7 +96,7 @@ int SignalCreator::calculateSignalLength(MemoryLength memSet, int customLength,i
             }
             error = abs(signalFreq - (double)(periphClockFrequency) / (div * (int)(tmpSigLeng)));
 
-            if (tmpSigLeng - 0.0000001 > (generatorBufferSize / 2)){
+            if (tmpSigLeng - 0.0000001 > (generatorBufferSize / 2) || tmpSigLeng * signalFreq > maxSamplingRate){
                 div++;
                 iter++;
                 continue;

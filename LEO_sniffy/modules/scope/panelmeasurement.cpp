@@ -136,6 +136,15 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
 
 }
 
+void PanelMeasurement::setNumChannels(int chann)
+{
+    for (int i = chann;i<MAX_SCOPE_CHANNELS ;i++ ) {
+        channelButtons->setButtonHidden(true,i);
+        channelButtonPhaseA->setButtonHidden(true,i);
+        channelButtonPhaseB->setButtonHidden(true,i);
+    }
+}
+
 void PanelMeasurement::RMSClicked(){
     Measurement *m = new Measurement(MeasurementType::RMS,channelButtons->getSelectedIndex());
     emit measurementAdded(m);

@@ -44,7 +44,7 @@ public:
     void showEmptyCalcs();
     void showVddValue(qreal value);
     void showProgress(int current, int max);
-    void setPins(QString pins[], int numOfCh);
+    void setPinsAndNumChannels(QString pins[], int numOfCh);
     void appendDatalog(ChannelData data[], int numChannels);
     void stopDatalog();
     void startDatalog();

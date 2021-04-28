@@ -11,13 +11,15 @@
 #include "../../GUI/widgetlabel.h"
 #include "../../GUI/widgetselection.h"
 
-#include"measurement.h"
+#include "measurement.h"
+#include "scopedefs.h"
 
 class PanelMeasurement: public QObject
 {
     Q_OBJECT
 public:
     explicit PanelMeasurement(QVBoxLayout *destination, QWidget *parent = nullptr);
+    void setNumChannels(int chann);
 
 signals:
     void measurementAdded(Measurement *m);
@@ -42,10 +44,10 @@ public slots:
 
 public:
     WidgetButtons *channelButtons;
+
 private:
     WidgetButtons *channelButtonPhaseA;
     WidgetButtons *channelButtonPhaseB;
-
     QList<WidgetButtons*> measButtons;
 };
 

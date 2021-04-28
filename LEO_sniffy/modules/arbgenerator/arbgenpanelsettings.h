@@ -53,7 +53,7 @@ public:
 
     WidgetDialRange *dialFreqSweepMin;
     WidgetDialRange *dialFreqSweepMax;
-    WidgetDialRange *dialFreqSweepTime;
+    WidgetDialRange *dialSweepTime;
 
     QHBoxLayout *sweepControl;
 

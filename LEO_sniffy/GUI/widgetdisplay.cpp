@@ -387,8 +387,21 @@ void WidgetDisplay::setHistoryMinMaxData(qreal minY, qreal maxY){
     chart->setRangeY(minY, maxY);
 }
 
+void WidgetDisplay::paintEvent(QPaintEvent *event)
+{
+    int width = ui->lcdNumber->size().width()/9;
+    if(abs(ui->styleUnits->size().width()-width)>5)
+        ui->styleUnits->setMaximumSize(QSize(width,width));
+    QWidget::paintEvent(event);
+}
+
 void WidgetDisplay::updateHistoryData(QVector<QPointF> *points, int index){    
     chart->updateTrace(points, index);
+}
+
+void WidgetDisplay::setTraceColor(QString color, int index)
+{
+    chart->setTraceColor(index,QColor(color));
 }
 
 void WidgetDisplay::recalcHistorySizeAndSetDial(int reqSize)

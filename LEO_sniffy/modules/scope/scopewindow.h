@@ -7,6 +7,7 @@
 #include <QToolButton>
 #include <QtCore/QtMath>
 #include <QDebug>
+#include <QSplitter>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"
@@ -54,10 +55,11 @@ public:
     void samplingOngoing();
     void triggerCaptured();
     void setRealSamplingRate(int smpl);
+    void setNumChannels(int channels);
 
     void updateMeasurement(QList<Measurement*> m);
     void updateMath(QVector<QPointF> mathTrace);
-    void updateFFTchart(QVector<QPointF> fftTrace);
+    void updateFFTchart(QVector<QPointF> fftTrace, qreal maxFreq);
     void mathError(int errorPosition);
     void restoreGUIAfterStartup();
 
@@ -97,6 +99,7 @@ private slots:
     void measurementClearCallback();
     void mathExpressionCallback(QString exp);
     void fftChangedCallback(int length, FFTWindow window, FFTType type, int channelIndex);
+    void fftchartChangedCallback(qreal scale, qreal shift, bool isLog = false);
     void sliderShiftCallback(int value);
 
     void chartLocalZoomCallback();
@@ -121,6 +124,7 @@ private:
     widgetChart *chart;
 
     widgetChart *chartFFT;
+    QSplitter *splitter;
 
     QVector<QVector<QPointF>> ChartData;
     QVector<QPointF> ChartMathData;

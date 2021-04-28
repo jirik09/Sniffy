@@ -51,6 +51,7 @@ void SyncPwm::parseData(QByteArray data){
         moduleSpecification->parseSpecification(dataToPass);
         spwmWindow->setSpecification(static_cast<SyncPwmSpec*>(moduleSpecification));
         showModuleControl();
+        buildModuleDescription(static_cast<SyncPwmSpec*>(moduleSpecification));
     }else {
         if(dataHeader == "SPPE"){
             stepGenEndNotif();
@@ -189,6 +190,27 @@ void SyncPwm::setDutyPhase(quint32 dutyCycle, quint32 phase, quint32 chanIndex){
                 +":"+intToSend(phase)
                 +":"+intToSend(PHASE_PRECISION)
                 +":"+intToSend(chanIndex)+";");
+}
+
+void SyncPwm::buildModuleDescription(SyncPwmSpec *spec)
+{
+    QString name = moduleName;
+    QList<QString> labels ,values;
+
+    labels.append("Num Channels");
+    values.append(QString::number(spec->chan_num));
+
+    labels.append("Max frequency");
+    values.append(LabelFormator::formatOutout(spec->max_freq,"Hz",1));
+
+    labels.append("Pins");
+    QString pins;
+    for(int i = 0;i<spec->chan_num;i++){
+        pins += spec->pinsList[i] + ", ";
+    }
+    values.append(pins.left(pins.length()-2));
+
+    showModuleDescription(name, labels, values);
 }
 
 /******************************** Callbacks *********************************/

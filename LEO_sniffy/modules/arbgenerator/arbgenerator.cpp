@@ -41,12 +41,12 @@ void ArbGenerator::parseData(QByteArray data)
                 static_cast<ArbGeneratorSpec*>(moduleSpecification)->parsePWMSpecification(data);
                 arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
                 showModuleControl();
-                test1++;
+                buildModuleDescription(static_cast<ArbGeneratorSpec*>(moduleSpecification));
         }else{
                 moduleSpecification->parseSpecification(data);
                 arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
                 showModuleControl();
-                text3++;
+                buildModuleDescription(static_cast<ArbGeneratorSpec*>(moduleSpecification));
         }
     }else if(dataHeader==cmd->CMD_GEN_NEXT){
         if(!dataBeingUploaded)return;
@@ -190,6 +190,47 @@ void ArbGenerator::quickRestartCalback()
 {
     stopGenerator();
     startGenerator();
+}
+
+void ArbGenerator::buildModuleDescription(ArbGeneratorSpec *spec)
+{
+    QString name = moduleName;
+    QList<QString> labels ,values;
+    if(!isPWMbased) {
+        labels.append("DAC Channels");
+        values.append(QString::number(spec->maxDACChannels));
+
+        labels.append("DAC Resolution");
+        values.append(QString::number(spec->DACResolution));
+
+        labels.append("Memory size");
+        values.append(LabelFormator::formatOutout(spec->generatorBufferSize,"B",1));
+
+        labels.append("Max sampling rate");
+        values.append(LabelFormator::formatOutout(spec->maxSamplingRate,"sps",2));
+
+        labels.append("Pins");
+        QString pins;
+        for(int i = 0;i<spec->maxDACChannels;i++){
+            pins += spec->channelPins[i] + ", ";
+        }
+        values.append(pins.left(pins.length()-2));
+
+    }else{
+        labels.append("PWM Channels");
+        values.append(QString::number(spec->maxPWMChannels));
+
+        labels.append("Timer clock");
+        values.append(LabelFormator::formatOutout(spec->periphPWMClockFrequency,"Hz",1));
+
+        labels.append("Pins");
+        QString pins;
+        for(int i = 0;i<spec->maxDACChannels;i++){
+            pins += spec->channelPWMPins[i] + ", ";
+        }
+        values.append(pins.left(pins.length()-2));
+    }
+    showModuleDescription(name, labels, values);
 }
 
 void ArbGenerator::sendNextData()

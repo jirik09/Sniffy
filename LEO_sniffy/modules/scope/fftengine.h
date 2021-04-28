@@ -9,7 +9,7 @@
 #include <QPointF>
 #include <QDebug>
 
-enum FFTWindow { rectangular = 0, hamming = 1, hann = 2, blackman = 3 };
+enum FFTWindow { rectangular = 0, hamming = 1, hann = 2, blackman = 3, flatTop = 4};
 enum FFTType { spectrum = 0, periodogram = 1};
 
 class FFTengine : public QThread
@@ -34,10 +34,11 @@ private:
     bool abort;
 
 
-    QVector<float> hamming, hann, blackman;
+    QVector<float> hamming, hann, blackman,flatTop;
 
     void resizeHamming(int length);
     void resizeHann(int length);
+    void resizeFlatTop(int length);
     void resizeBlackman(int length);
     int nextPow2(int number);
     QVector<std::complex<float>> calculateSpectrum(QVector<std::complex<float>> data, FFTWindow window, int minNFFT);
@@ -50,8 +51,9 @@ private:
     FFTWindow window;
     qreal samplingFreq;
     qreal maxFrequency;
+    qreal lengthRatio;
     FFTType type;
-    int minNFFT;
+    int lengthNFFT;
     bool removeDC;
 
 

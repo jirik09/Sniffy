@@ -28,6 +28,7 @@ VoltageSourceWindow::VoltageSourceWindow(VoltageSourceConfig *config, QWidget *p
         index++;
         dis->showErrDisplay(false);
         dis->showTerrStyle(false);
+        dis->hideHistoryPanel();
     }
 
     QScrollArea *scrl = new QScrollArea(this);
