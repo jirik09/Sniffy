@@ -21,7 +21,7 @@ public:
     static const QByteArray RESET_DEVICE;
 
 
-    static const QByteArray GENERATOR;
+    static const QByteArray SIGNAL_GENERATOR;
     static const QByteArray VOLTAGE_SOURCE;
     static const QByteArray PWM_GENERATOR;
     static const QByteArray PATTERN_GENERATOR;

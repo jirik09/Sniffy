@@ -8,12 +8,13 @@ ArbGenerator::ArbGenerator(QObject *parent, bool isPWMbased):
     config = new ArbGeneratorConfig();
     arbGenWindow = new ArbGeneratorWindow(config, isPWMbased);
 
-    moduleCommandPrefix = cmd->GENERATOR;
     if(isPWMbased){
+        moduleCommandPrefix = cmd->PWM_GENERATOR;
         arbGenWindow->setObjectName("pwmGenWindow");
         moduleName = "PWM genarator";
         moduleIconURI = Graphics::getGraphicsPath()+"icon_pwm_gen.png";
     }else{
+        moduleCommandPrefix = cmd->SIGNAL_GENERATOR;
         arbGenWindow->setObjectName("arbGenWindow");
         moduleName = "Arbitrary generator";
         moduleIconURI = Graphics::getGraphicsPath()+"icon_signal_generator.png";
@@ -37,24 +38,15 @@ void ArbGenerator::parseData(QByteArray data)
     if(dataHeader==cmd->CONFIG){
         data.remove(0,4);
         if(isPWMbased){
-            if(data.left(4) == cmd->PWM_GENERATOR){
-                data.remove(0,4);
                 static_cast<ArbGeneratorSpec*>(moduleSpecification)->parsePWMSpecification(data);
                 arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
                 showModuleControl();
                 test1++;
-            }else{
-                comm->write(cmd->GENERATOR,cmd->CMD_GET_PWM_CONFIG);
-                moduleSpecification->parseSpecification(data);
-                test2++;
-            }
         }else{
-            if(data.left(4) != cmd->PWM_GENERATOR){
                 moduleSpecification->parseSpecification(data);
                 arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
                 showModuleControl();
                 text3++;
-            }
         }
     }else if(dataHeader==cmd->CMD_GEN_NEXT){
         if(!dataBeingUploaded)return;
@@ -202,7 +194,7 @@ void ArbGenerator::quickRestartCalback()
 
 void ArbGenerator::sendNextData()
 {  
-    comm->write(cmd->GENERATOR+":"+cmd->CMD_GEN_DATA + " ");
+    comm->write(moduleCommandPrefix+":"+cmd->CMD_GEN_DATA + " ");
     if (lengthToSend > SEND_BLOCK_SIZE){
         actualSend = SEND_BLOCK_SIZE;
     }else{
@@ -231,36 +223,36 @@ void ArbGenerator::sendNextData()
 void ArbGenerator::startGenerator()
 {
     setModuleStatus(ModuleStatus::PLAY);
-    comm->write(cmd->GENERATOR,cmd->START);
+    comm->write(moduleCommandPrefix,cmd->START);
 }
 
 void ArbGenerator::stopGenerator()
 {
     setModuleStatus(ModuleStatus::PAUSE);
-    comm->write(cmd->GENERATOR,cmd->CMD_GEN_STOP);
+    comm->write(moduleCommandPrefix,cmd->CMD_GEN_STOP);
 }
 
 void ArbGenerator::setGeneratorDACMode()
 {
-    comm->write(cmd->GENERATOR,cmd->CMD_GEN_MODE,cmd->CMD_MODE_DAC);
+    comm->write(moduleCommandPrefix,cmd->CMD_GEN_MODE,cmd->CMD_MODE_DAC);
 }
 
 void ArbGenerator::setGeneratorPWMMode()
 {
-    comm->write(cmd->GENERATOR,cmd->CMD_GEN_MODE,cmd->CMD_MODE_PWM);
+    comm->write(moduleCommandPrefix,cmd->CMD_GEN_MODE,cmd->CMD_MODE_PWM);
 }
 
 void ArbGenerator::generatorDeinit()
 {
-    comm->write(cmd->GENERATOR,cmd->DEINIT);
+    comm->write(moduleCommandPrefix,cmd->DEINIT);
 }
 
 void ArbGenerator::setDataLength(int channel, int length)
 {
     if(channel==0){
-        comm->write(cmd->GENERATOR,cmd->DATA_LENGTH_CH1,length);
+        comm->write(moduleCommandPrefix,cmd->DATA_LENGTH_CH1,length);
     }else if(channel==1){
-        comm->write(cmd->GENERATOR,cmd->DATA_LENGTH_CH2,length);
+        comm->write(moduleCommandPrefix,cmd->DATA_LENGTH_CH2,length);
     }else{
         qDebug () << "More channels not yet implemented";
     }
@@ -269,9 +261,9 @@ void ArbGenerator::setDataLength(int channel, int length)
 void ArbGenerator::setNumChannels(int numChannels)
 {
     if(numChannels==1){
-        comm->write(cmd->GENERATOR,cmd->CHANNELS,cmd->CHANNELS_1);
+        comm->write(moduleCommandPrefix,cmd->CHANNELS,cmd->CHANNELS_1);
     }else if(numChannels==2){
-        comm->write(cmd->GENERATOR,cmd->CHANNELS,cmd->CHANNELS_2);
+        comm->write(moduleCommandPrefix,cmd->CHANNELS,cmd->CHANNELS_2);
     }else{
         qDebug () << "More channels not yet implemented";
     }
@@ -285,29 +277,29 @@ void ArbGenerator::setSamplingFrequency(int channel, qreal freq)
     if(round(freq) > maxSamplingRate){
         tmp = maxSamplingRate*256 + (channel+1)%256;
     }
-    comm->write(cmd->GENERATOR,cmd->SAMPLING_FREQ,tmp);
+    comm->write(moduleCommandPrefix,cmd->SAMPLING_FREQ,tmp);
 }
 
 void ArbGenerator::setPWMFrequency(int channel, qreal freq)
 {
     if(channel==0){
-        comm->write(cmd->GENERATOR,cmd->CMD_GEN_PWM_FREQ_CH1,freq);
+        comm->write(moduleCommandPrefix,cmd->CMD_GEN_PWM_FREQ_CH1,freq);
     }else{
-        comm->write(cmd->GENERATOR,cmd->CMD_GEN_PWM_FREQ_CH2,freq);
+        comm->write(moduleCommandPrefix,cmd->CMD_GEN_PWM_FREQ_CH2,freq);
     }
 }
 
 void ArbGenerator::genAskForFreq()
 {
-    comm->write(cmd->GENERATOR,cmd->GET_REAL_SMP_FREQ);
+    comm->write(moduleCommandPrefix,cmd->GET_REAL_SMP_FREQ);
 }
 
 void ArbGenerator::setOutputBuffer(bool isEnabled)
 {
     if(isEnabled){
-        comm->write(cmd->GENERATOR,cmd->CMD_GEN_OUTBUFF_ON);
+        comm->write(moduleCommandPrefix,cmd->CMD_GEN_OUTBUFF_ON);
     }else{
-        comm->write(cmd->GENERATOR,cmd->CMD_GEN_OUTBUFF_OFF);
+        comm->write(moduleCommandPrefix,cmd->CMD_GEN_OUTBUFF_OFF);
     }
 }
 

@@ -14,7 +14,7 @@ const QByteArray Commands::CONFIG_REQUEST = "CFG?";
 const QByteArray Commands::IS_SHIELD_CONNECTED = "SH_?";
 const QByteArray Commands::RESET_DEVICE = "RES!";
 
-const QByteArray Commands::GENERATOR = "GENS";
+const QByteArray Commands::SIGNAL_GENERATOR = "GENS";
 const QByteArray Commands::VOLTAGE_SOURCE = "VOUT";
 const QByteArray Commands::PWM_GENERATOR = "GENP";
 const QByteArray Commands::PATTERN_GENERATOR = "GENT";
