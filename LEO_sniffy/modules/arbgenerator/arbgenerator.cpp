@@ -225,7 +225,7 @@ void ArbGenerator::buildModuleDescription(ArbGeneratorSpec *spec)
 
         labels.append("Pins");
         QString pins;
-        for(int i = 0;i<spec->maxDACChannels;i++){
+        for(int i = 0;i<spec->maxPWMChannels;i++){
             pins += spec->channelPWMPins[i] + ", ";
         }
         values.append(pins.left(pins.length()-2));
