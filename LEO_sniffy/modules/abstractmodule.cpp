@@ -239,7 +239,7 @@ void AbstractModule::showModuleWindow(){
 void AbstractModule::closeModule(){
     dockWidgetWindow->hide();
 
-    if(moduleControlWidget->getStatus()!=ModuleStatus::STOP)
+    if(moduleControlWidget->getStatus()!=ModuleStatus::STOP && moduleControlWidget->getStatus()!=ModuleStatus::LOCKED)
         stopModule();
     moduleControlWidget->setStatus(ModuleStatus::STOP);
     if(moduleSpecification != nullptr)
