@@ -48,25 +48,15 @@ void ArbGenerator::parseData(QByteArray data)
                 showModuleControl();
                 buildModuleDescription(static_cast<ArbGeneratorSpec*>(moduleSpecification));
         }
+        genComms = new GenCommons(moduleCommandPrefix,comm,static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate,this);
     }else if(dataHeader==cmd->CMD_GEN_NEXT){
         if(!dataBeingUploaded)return;
-
-        if (lengthToSend == 0){
-            if (sendingChannel == 1 && numChannelsUsed == 2) {
-                lengthToSend = GeneratorData[1].length();
-                lengthSent = 0;
-                memoryIndex = 0;
-                actualSend = 0;
-                sendingChannel = 2;
-                sendNextData();
-            }else if (sendingChannel == numChannelsUsed) {
-                genAskForFreq();
-                startGenerator();
-            }
-        }else {
-            sendNextData();
+        genComms->sendNext();
+        if(genComms->isSentAll()){
+            genComms->genAskForFreq();
+            startGenerator();
         }
-        arbGenWindow->setProgress(totalSent*100/totalToSend);
+        arbGenWindow->setProgress(genComms->getProgress());
 
     }else if(dataHeader==cmd->CMD_GEN_OK){
         if(dataBeingUploaded){
@@ -76,12 +66,12 @@ void ArbGenerator::parseData(QByteArray data)
     }else if(dataHeader==cmd->CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH1){
         quint32 freq;
         freq = qFromBigEndian<quint32>(data.right(4));
-        arbGenWindow->setFrequencyLabels(0,(qreal)(freq)/signalLengths[0]);
+        arbGenWindow->setFrequencyLabels(0,(qreal)(freq)/genComms->getSignaLength(0));
 
     }else if(dataHeader==cmd->CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH2){
         quint32 freq;
         freq = qFromBigEndian<quint32>(data.right(4));
-        arbGenWindow->setFrequencyLabels(1,(qreal)(freq)/signalLengths[1]);
+        arbGenWindow->setFrequencyLabels(1,(qreal)(freq)/genComms->getSignaLength(1));
 
     }else if(dataHeader==cmd->CMD_GEN_PWM_REAL_FREQ_CH1){
         quint32 freq;
@@ -116,9 +106,9 @@ QByteArray ArbGenerator::getConfiguration()
 void ArbGenerator::startModule()
 {
     if(isPWMbased){
-        setGeneratorPWMMode();
+        genComms->setGeneratorPWMMode();
     }else{
-        setGeneratorDACMode();
+        genComms->setGeneratorDACMode();
     }
     setModuleStatus(ModuleStatus::PAUSE);
 }
@@ -126,46 +116,25 @@ void ArbGenerator::startModule()
 void ArbGenerator::stopModule()
 {
     stopGenerator();
-    generatorDeinit();
+    genComms->generatorDeinit();
     arbGenWindow->setGeneratorStopped();
 }
 
 void ArbGenerator::sendSignalCallback(){
     dataBeingUploaded = true;
-    GeneratorData = *arbGenWindow->getGeneratorDACData();
-    numChannelsUsed = GeneratorData.length();
-    totalToSend = totalSent = 0;
-
-    //Memory demand (#Chan * length) has to be reduced first
-    if (numChannelsUsed > 1) {
-        for(int i = 0;i<numChannelsUsed;i++){
-            signalLengths[i] = GeneratorData[i].length();
-            setDataLength(i, signalLengths[i]);
-            totalToSend +=  signalLengths[i];
-        }
-        setNumChannels(numChannelsUsed);
-    }else{
-        setNumChannels(numChannelsUsed);
-        signalLengths[0] = GeneratorData[0].length();
-        setDataLength(0,signalLengths[0]);
-        totalToSend =  signalLengths[0];
-    }
-
+    genComms->setSignaltoSend(arbGenWindow->getGeneratorDACData());
+    numChannelsUsed = arbGenWindow->getGeneratorDACData()->length();
 
     for(int i = 0;i<numChannelsUsed;i++){
-        setSamplingFrequency(i,arbGenWindow->getFrequency(i)*signalLengths[i]);
+        genComms->setSamplingFrequency(i,arbGenWindow->getFrequency(i)*genComms->getSignaLength(i));
     }
 
     if(isPWMbased){
         for(int i = 0;i<numChannelsUsed;i++){
-            setPWMFrequency(i,arbGenWindow->getPWMFrequency(i));
+            genComms->setPWMFrequency(i,arbGenWindow->getPWMFrequency(i));
         }
     }
-
-    lengthToSend = signalLengths[0];
-    lengthSent = memoryIndex = actualSend = 0;
-    sendingChannel = 1;
-    sendNextData();
+    genComms->sendNext();
 }
 
 void ArbGenerator::stopCallback()
@@ -176,14 +145,14 @@ void ArbGenerator::stopCallback()
 
 void ArbGenerator::updateFrequencyCallback() //this function counts only with two channels (logic for more channels as far more complex)
 {
-    if(arbGenWindow->getFrequency(1) != arbGenWindow->getFrequency(0) || signalLengths[0] != signalLengths[1]){
+    if(arbGenWindow->getFrequency(1) != arbGenWindow->getFrequency(0) || genComms->getSignaLength(0) != genComms->getSignaLength(1)){
         for (int i = 0;i<numChannelsUsed;i++){
-            setSamplingFrequency(i,arbGenWindow->getFrequency(i)*signalLengths[i]);
+            genComms->setSamplingFrequency(i,arbGenWindow->getFrequency(i)*genComms->getSignaLength(i));
         }
     }else{
-        setSamplingFrequency(99,arbGenWindow->getFrequency(0)*signalLengths[0]);
+        genComms->setSamplingFrequency(99,arbGenWindow->getFrequency(0)*genComms->getSignaLength(0));
     }
-    genAskForFreq();
+    genComms->genAskForFreq();
 }
 
 void ArbGenerator::quickRestartCalback()
@@ -233,116 +202,18 @@ void ArbGenerator::buildModuleDescription(ArbGeneratorSpec *spec)
     showModuleDescription(name, labels, values);
 }
 
-void ArbGenerator::sendNextData()
-{  
-    comm->write(moduleCommandPrefix+":"+cmd->CMD_GEN_DATA + " ");
-    if (lengthToSend > SEND_BLOCK_SIZE){
-        actualSend = SEND_BLOCK_SIZE;
-    }else{
-        actualSend = lengthToSend;
-    }
-
-    QByteArray tmpHeader;
-    QDataStream dataStreamHeader(&tmpHeader, QIODevice::WriteOnly);
-    int tmp = ((memoryIndex / 256)*256*256*256 + (memoryIndex % 256) * 256*256 + (actualSend * 256) + (sendingChannel));
-    dataStreamHeader << tmp;
-    comm->write(tmpHeader+":");
-
-    QByteArray tmpData;
-    QDataStream dataStreamData(&tmpData, QIODevice::WriteOnly);
-    for (int i = 0; i < actualSend; i++){
-        qint16  sample = qFromBigEndian<qint16>(GeneratorData[sendingChannel-1][lengthSent+i]);
-        dataStreamData <<sample;
-    }
-    comm->write(tmpData+";");
-    lengthSent += actualSend;
-    lengthToSend -= actualSend;
-    memoryIndex += actualSend;
-    totalSent += actualSend;
-}
-
 void ArbGenerator::startGenerator()
 {
     setModuleStatus(ModuleStatus::PLAY);
-    comm->write(moduleCommandPrefix,cmd->START);
+    genComms->startGenerator();
 }
 
 void ArbGenerator::stopGenerator()
 {
     setModuleStatus(ModuleStatus::PAUSE);
-    comm->write(moduleCommandPrefix,cmd->CMD_GEN_STOP);
+    genComms->stopGenerator();
 }
 
-void ArbGenerator::setGeneratorDACMode()
-{
-    comm->write(moduleCommandPrefix,cmd->CMD_GEN_MODE,cmd->CMD_MODE_DAC);
-}
-
-void ArbGenerator::setGeneratorPWMMode()
-{
-    comm->write(moduleCommandPrefix,cmd->CMD_GEN_MODE,cmd->CMD_MODE_PWM);
-}
-
-void ArbGenerator::generatorDeinit()
-{
-    comm->write(moduleCommandPrefix,cmd->DEINIT);
-}
-
-void ArbGenerator::setDataLength(int channel, int length)
-{
-    if(channel==0){
-        comm->write(moduleCommandPrefix,cmd->DATA_LENGTH_CH1,length);
-    }else if(channel==1){
-        comm->write(moduleCommandPrefix,cmd->DATA_LENGTH_CH2,length);
-    }else{
-        qDebug () << "More channels not yet implemented";
-    }
-}
-
-void ArbGenerator::setNumChannels(int numChannels)
-{
-    if(numChannels==1){
-        comm->write(moduleCommandPrefix,cmd->CHANNELS,cmd->CHANNELS_1);
-    }else if(numChannels==2){
-        comm->write(moduleCommandPrefix,cmd->CHANNELS,cmd->CHANNELS_2);
-    }else{
-        qDebug () << "More channels not yet implemented";
-    }
-}
-
-void ArbGenerator::setSamplingFrequency(int channel, qreal freq)
-{
-    int tmp = (int)(round(freq))*256 + (channel+1)%256;
-    int maxSamplingRate = static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate;
-
-    if(round(freq) > maxSamplingRate){
-        tmp = maxSamplingRate*256 + (channel+1)%256;
-    }
-    comm->write(moduleCommandPrefix,cmd->SAMPLING_FREQ,tmp);
-}
-
-void ArbGenerator::setPWMFrequency(int channel, qreal freq)
-{
-    if(channel==0){
-        comm->write(moduleCommandPrefix,cmd->CMD_GEN_PWM_FREQ_CH1,freq);
-    }else{
-        comm->write(moduleCommandPrefix,cmd->CMD_GEN_PWM_FREQ_CH2,freq);
-    }
-}
-
-void ArbGenerator::genAskForFreq()
-{
-    comm->write(moduleCommandPrefix,cmd->GET_REAL_SMP_FREQ);
-}
-
-void ArbGenerator::setOutputBuffer(bool isEnabled)
-{
-    if(isEnabled){
-        comm->write(moduleCommandPrefix,cmd->CMD_GEN_OUTBUFF_ON);
-    }else{
-        comm->write(moduleCommandPrefix,cmd->CMD_GEN_OUTBUFF_OFF);
-    }
-}
 
 
 
