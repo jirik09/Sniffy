@@ -9,6 +9,7 @@
 #include "arbgeneratorconfig.h"
 #include "arbgeneratorwindow.h"
 #include "arbgeneratordefs.h"
+#include "gencommons.h"
 
 
 class ArbGenerator : public AbstractModule
@@ -39,36 +40,16 @@ private slots:
 private:
     ArbGeneratorConfig *config;
     ArbGeneratorWindow *arbGenWindow;
+    GenCommons *genComms;
     bool isPWMbased = false;
 
-    int lengthToSend;
-    int lengthSent;
-    int memoryIndex;
-    int actualSend;
-    int sendingChannel;
     int numChannelsUsed;
-    int totalToSend;
-    int totalSent;
-    int signalLengths[MAX_ARB_CHANNELS_NUM] = {0};
-    QList<QList<int>> GeneratorData;
     bool dataBeingUploaded = false;
 
     void buildModuleDescription(ArbGeneratorSpec *spec);
 
     void startGenerator ();
     void stopGenerator ();
-    void setGeneratorDACMode();
-    void setGeneratorPWMMode();
-    void generatorDeinit();
-    void setDataLength(int channel, int length);
-    void setNumChannels(int numChannels);
-    void setSamplingFrequency (int channel, qreal freq);
-    void setPWMFrequency (int channel, qreal freq);
-    void genAskForFreq();
-    void setOutputBuffer (bool isEnabled);
-    void sendNextData();
-
-
 };
 
 #endif // ARBGENERATOR_H
