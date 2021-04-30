@@ -72,14 +72,16 @@ void ArbGeneratorWindow::restoreGUIAfterStartup()
 void ArbGeneratorWindow::setSpecification(ArbGeneratorSpec* spec)
 {
     this->spec = spec;
-    setting->setMaxNumChannels(spec->maxDACChannels);
-    fileLoader->setSignalRangeParameters(spec->DACResolution,spec->rangeMin,spec->rangeMax);
-    for(int i = 0; i < spec->maxDACChannels; i++){
-        if(isPWMbased){
+    if(isPWMbased){
+        setting->setMaxNumChannels(spec->maxPWMChannels);
+        fileLoader->setSignalRangeParameters(spec->DACResolution,spec->rangeMin,spec->rangeMax);
+        for(int i = 0; i < spec->maxPWMChannels; i++)
             setting->separators[i]->setText("Channel " + QString::number(i+1) + " | pin " + spec->channelPWMPins[i]);
-        }else{
+    }else{
+        setting->setMaxNumChannels(spec->maxDACChannels);
+        fileLoader->setSignalRangeParameters(spec->DACResolution,spec->rangeMin,spec->rangeMax);
+        for(int i = 0; i < spec->maxDACChannels; i++)
             setting->separators[i]->setText("Channel " + QString::number(i+1) + " | pin " + spec->channelPins[i]);
-        }
     }
 }
 

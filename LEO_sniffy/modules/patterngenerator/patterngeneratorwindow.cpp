@@ -22,3 +22,8 @@ void PatternGeneratorWindow::restoreGUIAfterStartup()
     //validate the GUI appereance (colors according to selected channel
     //disabled/enabled buttons accordign to selected function
 }
+
+void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
+{
+
+}
