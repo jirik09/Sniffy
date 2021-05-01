@@ -41,6 +41,9 @@ private:
     PatternGeneratorConfig *config;
     PatternGeneratorSpec *spec;
     PatternGeneratorSettings *setting;
+
+    widgetChart *chart;
+    QVector<QVector<QPointF>> *chartData;
 };
 
 #endif // PATTERNGENERATORWINDOW_H

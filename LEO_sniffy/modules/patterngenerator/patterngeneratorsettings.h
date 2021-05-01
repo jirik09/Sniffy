@@ -2,12 +2,19 @@
 #define PATTERNGENERATORSETTINGS_H
 
 #include <QObject>
+#include <QComboBox>
+#include <QVBoxLayout>
+
+#include "../../GUI/widgetseparator.h"
+#include "../../GUI/widgetselection.h"
 
 class PatternGeneratorSettings : public QObject
 {
     Q_OBJECT
 public:
-    explicit PatternGeneratorSettings(QObject *parent = nullptr);
+    explicit PatternGeneratorSettings(QVBoxLayout *destination, QWidget *parent = nullptr);
+
+    WidgetSelection *comboPatternSelection;
 
 signals:
 
