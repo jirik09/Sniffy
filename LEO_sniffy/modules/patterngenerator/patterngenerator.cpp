@@ -10,10 +10,7 @@ PatternGenerator::PatternGenerator(QObject *parent)
 
     moduleCommandPrefix = cmd->PATTERN_GENERATOR;
     moduleName = "Pattern generator";
-    moduleIconURI = Graphics::getGraphicsPath()+"icon_pattern_generator.png";
-
-    connect(this, &AbstractModule::moduleCreated, this, &PatternGenerator::showHoldButtonCallback);
-    connect(this, &AbstractModule::holdClicked, this, &PatternGenerator::holdButtonCallback);
+    moduleIconURI = Graphics::getGraphicsPath()+"icon_pattern_generator.png";          
 }
 
 QWidget *PatternGenerator::getWidget()
@@ -55,25 +52,13 @@ QByteArray PatternGenerator::getConfiguration()
 
 void PatternGenerator::startModule()
 {
-
+//    setModuleStatus(ModuleStatus::PLAY);
+//    genComms->startGenerator();
 }
 
 void PatternGenerator::stopModule()
 {
-
-}
-
-void PatternGenerator::showHoldButtonCallback(){
-    this->showModuleHoldButton(true);
-}
-
-void PatternGenerator::holdButtonCallback(bool held){
-    if(held){
-        comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
-        setModuleStatus(ModuleStatus::PAUSE);
-    }else{
-        comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
-        setModuleStatus(ModuleStatus::PLAY);
-    }
+//    setModuleStatus(ModuleStatus::PAUSE);
+//    genComms->stopGenerator();
 }
 

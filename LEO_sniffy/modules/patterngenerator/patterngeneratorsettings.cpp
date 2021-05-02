@@ -23,8 +23,7 @@ PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, Pat
 
     createComponents(parent, destination);
 
-    QSpacerItem *verticalSpacer;
-    verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     destination->addItem(verticalSpacer);
 
     connect(comboPatternSelection, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorSettings::patternSelectionChangedCallback);
@@ -37,6 +36,8 @@ void PatternGeneratorSettings::createComponents(QWidget *parent, QVBoxLayout *de
         patternArea[i] = new QWidget(parent, Qt::Window);
         patternArea[i]->setLayout(layout);
         (this->*createPatternComponents[i])(parent, layout);
+        QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        layout->addItem(verticalSpacer);
         destination->addWidget(patternArea[i]);
         patternArea[i]->hide();
     }
@@ -44,9 +45,6 @@ void PatternGeneratorSettings::createComponents(QWidget *parent, QVBoxLayout *de
 
 void PatternGeneratorSettings::createUserDefinedComponents(QWidget *parent, QVBoxLayout *destination)
 {
-    WidgetSeparator *separator = new WidgetSeparator(parent, "User defined options");
-    destination->addWidget(separator);
-
     buttonUserDefLoad = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
     buttonUserDefLoad->setText("Load CSV");
     buttonUserDefLoad->setObjectName("buttonLoadUserDef");
@@ -55,9 +53,6 @@ void PatternGeneratorSettings::createUserDefinedComponents(QWidget *parent, QVBo
 
 void PatternGeneratorSettings::createCounterComponents(QWidget *parent, QVBoxLayout *destination)
 {
-    WidgetSeparator *separator = new WidgetSeparator(parent, "Counter options");
-    destination->addWidget(separator);
-
     dialCounterFreq = new WidgetDialRange(parent, "");
     dialCounterFreq->setName("Frequency");
     dialCounterFreq->hideUnitSelection();
@@ -68,9 +63,6 @@ void PatternGeneratorSettings::createCounterComponents(QWidget *parent, QVBoxLay
 
 void PatternGeneratorSettings::createBinaryCodeComponents(QWidget *parent, QVBoxLayout *destination)
 {
-    WidgetSeparator *separator = new WidgetSeparator(parent, "Binary code options");
-    destination->addWidget(separator);
-
     dialBinaryCodeFreq = new WidgetDialRange(parent, "");
     dialBinaryCodeFreq->setName("Frequency");
     dialBinaryCodeFreq->hideUnitSelection();
@@ -81,9 +73,6 @@ void PatternGeneratorSettings::createBinaryCodeComponents(QWidget *parent, QVBox
 
 void PatternGeneratorSettings::createGreyCodeComponents(QWidget *parent, QVBoxLayout *destination)
 {
-    WidgetSeparator *separator = new WidgetSeparator(parent, "Grey code options");
-    destination->addWidget(separator);
-
     dialGreyCodeFreq = new WidgetDialRange(parent, "");
     dialGreyCodeFreq->setName("Frequency");
     dialGreyCodeFreq->hideUnitSelection();
@@ -109,9 +98,6 @@ void PatternGeneratorSettings::createSpiComponents(QWidget *parent, QVBoxLayout 
 
 void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout *destination)
 {
-    WidgetSeparator *separator = new WidgetSeparator(parent, "I2C options");
-    destination->addWidget(separator);
-
     comboI2cClockFreq = new WidgetSelection(parent, "Speed");
     comboI2cClockFreq->addOption("10 kbit/s", 0);
     comboI2cClockFreq->addOption("100 kbit/s", 1);
@@ -129,6 +115,11 @@ void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout 
 void PatternGeneratorSettings::showComponents(int pattIndex, bool visible)
 {
     patternArea[pattIndex]->setVisible(visible);
+}
+
+void PatternGeneratorSettings::enableComponents(bool enable)
+{
+    patternArea[config->prevIndex]->setEnabled(enable);
 }
 
 void PatternGeneratorSettings::restoreSettingsPanel()

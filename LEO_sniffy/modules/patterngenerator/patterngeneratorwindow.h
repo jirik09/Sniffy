@@ -40,7 +40,7 @@ private:
     Ui::PatternGeneratorWindow *ui;
     PatternGeneratorConfig *config;
     PatternGeneratorSpec *spec;
-    PatternGeneratorSettings *setting;
+    PatternGeneratorSettings *settings;
 
     widgetChart *chart;
     QVector<QVector<QPointF>> *chartData;

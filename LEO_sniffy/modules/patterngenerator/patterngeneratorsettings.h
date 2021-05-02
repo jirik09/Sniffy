@@ -36,6 +36,7 @@ public:
     WidgetSelection *comboI2cCommType;
 
     void restoreSettingsPanel(void);
+    void enableComponents(bool enable);
 
 private:
     PatternGeneratorConfig *config;    

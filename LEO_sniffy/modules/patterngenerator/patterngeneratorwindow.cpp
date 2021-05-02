@@ -27,14 +27,14 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_DEFAULT));
     verticalLayout_chart->addWidget(chart);
 
-    setting = new PatternGeneratorSettings(verticalLayout_settings, config, this);
+    settings = new PatternGeneratorSettings(verticalLayout_settings, config, this);
     //fileLoader = new PatternGeneratorFileLoader();
 
     ui->widget_settings->setLayout(verticalLayout_settings);
     ui->widget_module->resize(600,300);
     ui->widget_module->setLayout(verticalLayout_chart);
 
-    chartData = new QVector<QVector<QPointF>>;   
+    chartData = new QVector<QVector<QPointF>>;
 }
 
 PatternGeneratorWindow::~PatternGeneratorWindow()
@@ -42,10 +42,9 @@ PatternGeneratorWindow::~PatternGeneratorWindow()
     delete ui;
 }
 
-
 void PatternGeneratorWindow::restoreGUIAfterStartup()
 {
-    setting->restoreSettingsPanel();
+    settings->restoreSettingsPanel();
 }
 
 void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
