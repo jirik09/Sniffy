@@ -45,7 +45,7 @@ PatternGeneratorWindow::~PatternGeneratorWindow()
 
 void PatternGeneratorWindow::restoreGUIAfterStartup()
 {
-
+    setting->restoreSettingsPanel();
 }
 
 void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)

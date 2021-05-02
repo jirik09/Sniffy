@@ -12,41 +12,38 @@
 #include "../../GUI/widgetdialrange.h"
 
 #include "patterngeneratorconfig.h"
+#include "patterngeneratordefs.h"
 
 class PatternGeneratorSettings : public QObject
 {
     Q_OBJECT
 public:
-    explicit PatternGeneratorSettings(QVBoxLayout *destination, PatternGeneratorConfig *config, QWidget *parent = nullptr);
+    explicit PatternGeneratorSettings(QVBoxLayout *destination, PatternGeneratorConfig *config, QWidget *parent = nullptr);    
+
+    WidgetButtons *buttonStart;
 
     WidgetSelection *comboPatternSelection;
 
-    WidgetButtons *buttonLoadUserDef;
+    WidgetButtons *buttonUserDefLoad;
 
-    WidgetDialRange *dialFreq;
+    WidgetDialRange *dialCounterFreq;
 
-    void createUserDefinedComponents(QWidget *parent, QVBoxLayout *destination);
-    void createCounterComponents(QWidget *parent, QVBoxLayout *destination);
-    void createGreyCodeComponents(QWidget *parent, QVBoxLayout *destination);
-    void createQuadratureComponents(QWidget *parent, QVBoxLayout *destination);
-    void createUartComponents(QWidget *parent, QVBoxLayout *destination);
-    void createSpiComponents(QWidget *parent, QVBoxLayout *destination);
-    void createI2cComponents(QWidget *parent, QVBoxLayout *destination);
+    WidgetDialRange *dialBinaryCodeFreq;
 
-    void showUserDefinedComponents(bool show);
-    void showCounterComponents(bool show);
-    void showGreyCodeComponents(bool show);
-    void showQuadratureComponents(bool show);
-    void showUartComponents(bool show);
-    void showSpiComponents(bool show);
-    void showI2cComponents(bool show);
+    WidgetDialRange *dialGreyCodeFreq;
+
+    WidgetSelection *comboI2cClockFreq;
+    WidgetSelection *comboI2cCommType;
+
+    void restoreSettingsPanel(void);
 
 private:
-    PatternGeneratorConfig *config;
+    PatternGeneratorConfig *config;    
 
     QList<QString> pattList = {
         "User defined",
         "Counter",
+        "Binary code",
         "Grey code",
         "Quadrature",
         "UART",
@@ -54,22 +51,30 @@ private:
         "I2C"
     };
 
-    /* Must be in line with pattList, to avoid index mismatch
-     * we may use a different approach - mapping QMap<string,funptr>.
-     * Combo then would be willed by the mapped string and function
-     * called by finding the string int the map. */
-    void (PatternGeneratorSettings::*selectPatternComponents[7])(bool) = {
-            &PatternGeneratorSettings::showUserDefinedComponents,
-            &PatternGeneratorSettings::showCounterComponents,
-            &PatternGeneratorSettings::showGreyCodeComponents,
-            &PatternGeneratorSettings::showQuadratureComponents,
-            &PatternGeneratorSettings::showUartComponents,
-            &PatternGeneratorSettings::showSpiComponents,
-            &PatternGeneratorSettings::showI2cComponents,   };
+    QWidget *patternArea[PATTERNS_NUM];
 
-    /*QMap<QString, std::function<void(bool)>> optionFunction {
-    {"User defined", &PatternGeneratorSettings::showUserDefinedComponents}
-    };*/
+    void (PatternGeneratorSettings::*createPatternComponents[PATTERNS_NUM])(QWidget*,QVBoxLayout*) = {
+            &PatternGeneratorSettings::createUserDefinedComponents,
+            &PatternGeneratorSettings::createCounterComponents,
+            &PatternGeneratorSettings::createBinaryCodeComponents,
+            &PatternGeneratorSettings::createGreyCodeComponents,
+            &PatternGeneratorSettings::createQuadratureComponents,
+            &PatternGeneratorSettings::createUartComponents,
+            &PatternGeneratorSettings::createSpiComponents,
+            &PatternGeneratorSettings::createI2cComponents,   };
+
+    void createComponents(QWidget *parent, QVBoxLayout *destination);
+
+    void createUserDefinedComponents(QWidget *parent, QVBoxLayout *destination);
+    void createCounterComponents(QWidget *parent, QVBoxLayout *destination);
+    void createBinaryCodeComponents(QWidget *parent, QVBoxLayout *destination);
+    void createGreyCodeComponents(QWidget *parent, QVBoxLayout *destination);
+    void createQuadratureComponents(QWidget *parent, QVBoxLayout *destination);
+    void createUartComponents(QWidget *parent, QVBoxLayout *destination);
+    void createSpiComponents(QWidget *parent, QVBoxLayout *destination);
+    void createI2cComponents(QWidget *parent, QVBoxLayout *destination);
+
+    void showComponents(int pattIndex, bool visible);
 
 private slots:
     void patternSelectionChangedCallback(int index);

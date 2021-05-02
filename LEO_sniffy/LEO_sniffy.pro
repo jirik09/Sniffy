@@ -197,6 +197,7 @@ HEADERS += \
     modules/numberparser.h \
     modules/patterngenerator/patterngenerator.h \
     modules/patterngenerator/patterngeneratorconfig.h \
+    modules/patterngenerator/patterngeneratordefs.h \
     modules/patterngenerator/patterngeneratorsettings.h \
     modules/patterngenerator/patterngeneratorspec.h \
     modules/patterngenerator/patterngeneratorwindow.h \

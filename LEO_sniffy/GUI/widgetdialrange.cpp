@@ -41,10 +41,6 @@ WidgetDialRange::~WidgetDialRange()
     delete ui;
 }
 
-void WidgetDialRange::setVisible(bool visible){
-    (visible) ? this->show() : this->hide();
-}
-
 void WidgetDialRange::setName(QString name){
     ui->label_name->setText(name);
 }

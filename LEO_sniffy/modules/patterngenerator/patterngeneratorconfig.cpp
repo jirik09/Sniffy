@@ -12,7 +12,6 @@ void PatternGeneratorConfig::parse(QByteArray config)
     stream >> prevIndex;
 
     isConfigurationLoaded = true;
-
 }
 
 QByteArray PatternGeneratorConfig::serialize()
