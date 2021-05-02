@@ -9,10 +9,7 @@ void PatternGeneratorConfig::parse(QByteArray config)
 {
     QDataStream stream(config);
 
-    //TODO parse data from stream
-    //example:
-    //stream >> realSamplingRate;
-    //stream >> ADCresolution;
+    stream >> prevIndex;
 
     isConfigurationLoaded = true;
 
@@ -24,10 +21,7 @@ QByteArray PatternGeneratorConfig::serialize()
     data = new QByteArray();
     QDataStream stream(data,QIODevice::WriteOnly);
 
-    //TODO put data into stream
-    //example:
-    //stream << realSamplingRate;
-    //stream << ADCresolution;
+    stream << prevIndex;
 
     return *data;
 }

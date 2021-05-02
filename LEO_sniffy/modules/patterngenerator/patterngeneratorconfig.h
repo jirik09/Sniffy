@@ -11,9 +11,12 @@ class PatternGeneratorConfig : public AbstractConfiguration
 {
     Q_OBJECT
 public:
-    explicit PatternGeneratorConfig(QObject *parent = nullptr);
+    explicit PatternGeneratorConfig(QObject *parent = nullptr);    
+
     void parse (QByteArray config);
     QByteArray serialize ();
+
+    int prevIndex = 0;
 };
 
 #endif // PATTERNGENERATORCONFIG_H
