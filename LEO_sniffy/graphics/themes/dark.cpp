@@ -43,6 +43,13 @@ Dark::Dark(QObject *parent)
     Graphics::STYLE_TRANSPARENCY_USED = DARK_STYLE_USE_TRANSPARENCY;
 
     Graphics::STYLE_GLOBAL = QString(DARK_STYLE_GLOBAL).arg(DARK_CONTROLS);
+
+    if(DARK_STYLE_USE_TRANSPARENCY){
+        QString color = QString(DARK_CONTROLS).remove("#");
+        Graphics::STYLE_GLOBAL = QString(DARK_STYLE_GLOBAL).arg(color);
+    }else{
+        Graphics::STYLE_GLOBAL = QString(DARK_STYLE_GLOBAL).arg(DARK_CONTROLS);
+    }
 }
 
 QString Dark::getAppGlobalStyle(){
