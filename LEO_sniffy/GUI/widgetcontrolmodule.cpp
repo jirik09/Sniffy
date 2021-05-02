@@ -75,13 +75,14 @@ void WidgetControlModule::setIcon (QString ImageURI){
 
     iconArea.fill(Graphics::COLOR_TEXT_ALL);
     iconArea.setMask(iconBitmap);
-    this->icon.addPixmap(iconArea,QIcon::Normal);
 
+    this->icon = new QIcon();
+    this->icon->addPixmap(iconArea,QIcon::Normal);
     iconArea.fill(Graphics::COLOR_COMPONENT_DISABLED);
     iconArea.setMask(iconBitmap);
-    this->icon.addPixmap(iconArea,QIcon::Disabled);
+    this->icon->addPixmap(iconArea,QIcon::Disabled);
 
-    ui->pushButton_name->setIcon(this->icon);
+    ui->pushButton_name->setIcon(*this->icon);
 }
 
 void WidgetControlModule::setName (QString name){
