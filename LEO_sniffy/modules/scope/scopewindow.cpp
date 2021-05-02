@@ -289,9 +289,11 @@ void ScopeWindow::triggerModeCallback(int index){
         }
     }else if(index==1){
         emit triggerModeChanged(ScopeTriggerMode::TRIG_NORMAL);
+        panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
         panelSet->buttonsTriggerMode->setText("Stop",0);
     }else if (index==2){
         emit triggerModeChanged(ScopeTriggerMode::TRIG_AUTO);
+        panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
         panelSet->buttonsTriggerMode->setText("Stop",0);
     }
 }
@@ -526,8 +528,8 @@ void ScopeWindow::restoreGUIAfterStartup()
     panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
     panelMath->typeChanged(panelMath->mathType->getSelectedIndex());
     if(panelSet->buttonsTriggerMode->getSelectedIndex()==0){
-        panelSet->buttonsTriggerMode->setText("Single");
-        triggerModeCallback(0);
+        panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_RUNNING,0);
+        panelSet->buttonsTriggerMode->setText("Stop",0);
     }
 }
 
