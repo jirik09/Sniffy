@@ -31,7 +31,7 @@ public:
     int getSignaLength(int channelIndex);
 
     //data sending functions
-    void setSignaltoSend(QList<QList<int>> *data);
+    void setSignalToSend(QList<QList<int>> *data);
     void sendNext();
     bool isSentAll();
     qreal getProgress();

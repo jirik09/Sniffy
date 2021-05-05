@@ -122,7 +122,7 @@ void ArbGenerator::stopModule()
 
 void ArbGenerator::sendSignalCallback(){
     dataBeingUploaded = true;
-    genComms->setSignaltoSend(arbGenWindow->getGeneratorDACData());
+    genComms->setSignalToSend(arbGenWindow->getGeneratorDACData());
     numChannelsUsed = arbGenWindow->getGeneratorDACData()->length();
 
     for(int i = 0;i<numChannelsUsed;i++){

@@ -12,7 +12,8 @@ PatternGenerator::PatternGenerator(QObject *parent)
     moduleName = "Pattern generator";
     moduleIconURI = Graphics::getGraphicsPath()+"icon_pattern_generator.png";
 
-    //connect(pattGenWindow->settings->buttonStart, &WidgetButtons::clicked, this, &PatternGenerator::startGenerator());
+    connect(pattGenWindow, &PatternGeneratorWindow::runGenerator, this, &PatternGenerator::startGeneratorCallback);
+    connect(pattGenWindow, &PatternGeneratorWindow::stopGenerator, this, &PatternGenerator::stopGeneratorCallback);
 }
 
 QWidget *PatternGenerator::getWidget()
@@ -58,6 +59,7 @@ QByteArray PatternGenerator::getConfiguration()
 
 void PatternGenerator::startModule()
 {
+    comm->write(moduleCommandPrefix,cmd->CMD_GEN_MODE,cmd->CMD_MODE_PATTERN);
     setModuleStatus(ModuleStatus::PAUSE);
 }
 
@@ -80,6 +82,14 @@ void PatternGenerator::stopGenerator()
     genComms->stopGenerator();
 }
 
+void PatternGenerator::startPatternUpload()
+{
+    dataBeingUploaded = true;
+    genComms->setSignalToSend(pattGenWindow->getPatternData());
+    genComms->setSamplingFrequency(0, pattGenWindow->settings->getFrequency()*genComms->getSignaLength(0));
+    genComms->sendNext();
+}
+
 void PatternGenerator::dataTransferNext()
 {
     if(!dataBeingUploaded)
@@ -98,8 +108,17 @@ void PatternGenerator::dataTransferFinished()
 {
     if(dataBeingUploaded){
         dataBeingUploaded = false;
-        pattGenWindow->setGeneratorState(true);
+        pattGenWindow->setGeneratorState(false);
     }
 }
 
+void PatternGenerator::startGeneratorCallback()
+{
+    startPatternUpload();
+}
 
+void PatternGenerator::stopGeneratorCallback()
+{
+    stopGenerator();
+    dataBeingUploaded = false;
+}

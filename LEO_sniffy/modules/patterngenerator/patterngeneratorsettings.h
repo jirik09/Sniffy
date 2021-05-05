@@ -24,7 +24,8 @@ public:
 
     WidgetSelection *comboPatternSelection;
 
-    WidgetButtons *buttonUserDefLoad;
+    WidgetButtons *buttonUserDefLoadPattern;
+    WidgetDialRange *dialUserDefFreq;
 
     WidgetDialRange *dialCounterFreq;
 
@@ -32,14 +33,17 @@ public:
 
     WidgetDialRange *dialGreyCodeFreq;
 
-    WidgetSelection *comboI2cClockFreq;
-    WidgetSelection *comboI2cCommType;
+    WidgetDialRange *dialQuadratureFreq;
 
-    void restoreSettingsPanel(void);
-    void enableComponents(bool enable);
+    WidgetSelection *comboI2cClockFreq;
+    WidgetSelection *comboI2cCommType;        
+
+    void restoreSettingsAfterStartup(void);
+    void enableGuiComponents(bool enable);
+    qreal getFrequency();
 
 private:
-    PatternGeneratorConfig *config;    
+    PatternGeneratorConfig *config;
 
     QList<QString> pattList = {
         "User defined",
@@ -54,7 +58,7 @@ private:
 
     QWidget *patternArea[PATTERNS_NUM];
 
-    void (PatternGeneratorSettings::*createPatternComponents[PATTERNS_NUM])(QWidget*,QVBoxLayout*) = {
+    void (PatternGeneratorSettings::*createPatternComponents[PATTERNS_NUM])(QWidget*,QVBoxLayout*,int) = {
             &PatternGeneratorSettings::createUserDefinedComponents,
             &PatternGeneratorSettings::createCounterComponents,
             &PatternGeneratorSettings::createBinaryCodeComponents,
@@ -62,23 +66,29 @@ private:
             &PatternGeneratorSettings::createQuadratureComponents,
             &PatternGeneratorSettings::createUartComponents,
             &PatternGeneratorSettings::createSpiComponents,
-            &PatternGeneratorSettings::createI2cComponents,   };
+            &PatternGeneratorSettings::createI2cComponents, };
 
     void createComponents(QWidget *parent, QVBoxLayout *destination);
 
-    void createUserDefinedComponents(QWidget *parent, QVBoxLayout *destination);
-    void createCounterComponents(QWidget *parent, QVBoxLayout *destination);
-    void createBinaryCodeComponents(QWidget *parent, QVBoxLayout *destination);
-    void createGreyCodeComponents(QWidget *parent, QVBoxLayout *destination);
-    void createQuadratureComponents(QWidget *parent, QVBoxLayout *destination);
-    void createUartComponents(QWidget *parent, QVBoxLayout *destination);
-    void createSpiComponents(QWidget *parent, QVBoxLayout *destination);
-    void createI2cComponents(QWidget *parent, QVBoxLayout *destination);
+    void createUserDefinedComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createCounterComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createBinaryCodeComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createGreyCodeComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createQuadratureComponents(QWidget *parent, QVBoxLayout *destination, int index);
+
+    void createUartComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createSpiComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createI2cComponents(QWidget *parent, QVBoxLayout *destination, int index);
+
+    WidgetDialRange *createDial(QWidget *parent, QString objName);
 
     void showComponents(int pattIndex, bool visible);
 
 private slots:
     void patternSelectionChangedCallback(int index);
+
+    void freqChangedDialsCallback(float val);
+    void freqChangedCombosCallback(int index, float realVal);
 
 signals:
 

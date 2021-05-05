@@ -69,7 +69,7 @@ int WidgetSelection::count(){
 
 void WidgetSelection::indexChanged(int index)
 {
-    emit selectedIndexChanged(index);
+    emit selectedIndexChanged(index, options->at(index).realValue);
 }
 
 void WidgetSelection::clear(){

@@ -9,7 +9,10 @@ void PatternGeneratorConfig::parse(QByteArray config)
 {
     QDataStream stream(config);
 
-    stream >> prevIndex;
+    stream >> pattIndex;
+
+    for(int i = 0; i < PATTERNS_NUM; i++)
+        stream >> freq[i];
 
     isConfigurationLoaded = true;
 }
@@ -20,7 +23,10 @@ QByteArray PatternGeneratorConfig::serialize()
     data = new QByteArray();
     QDataStream stream(data,QIODevice::WriteOnly);
 
-    stream << prevIndex;
+    stream << pattIndex;
+
+    for(int i = 0; i < PATTERNS_NUM; i++)
+        stream << freq[i];
 
     return *data;
 }

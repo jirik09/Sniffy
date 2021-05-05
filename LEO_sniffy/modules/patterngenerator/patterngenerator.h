@@ -27,6 +27,10 @@ public slots:
     void startModule();
     void stopModule();
 
+private slots:
+    void startGeneratorCallback();
+    void stopGeneratorCallback();
+
 private:
     PatternGeneratorConfig *config;
     PatternGeneratorWindow *pattGenWindow;   
@@ -34,6 +38,7 @@ private:
 
     bool dataBeingUploaded = false;
 
+    void startPatternUpload();
     void dataTransferNext();
     void dataTransferFinished();
 

@@ -35,6 +35,9 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     ui->widget_module->setLayout(verticalLayout_chart);
 
     chartData = new QVector<QVector<QPointF>>;
+
+    connect(settings->buttonUserDefLoadPattern, &WidgetButtons::clicked, this, &PatternGeneratorWindow::openFileCallback);
+    connect(settings->buttonStart, &WidgetButtons::clicked, this, &PatternGeneratorWindow::runGeneratorCallback);
 }
 
 PatternGeneratorWindow::~PatternGeneratorWindow()
@@ -44,12 +47,17 @@ PatternGeneratorWindow::~PatternGeneratorWindow()
 
 void PatternGeneratorWindow::restoreGUIAfterStartup()
 {
-    settings->restoreSettingsPanel();
+    settings->restoreSettingsAfterStartup();
 }
 
 void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
 {
     this->spec = spec;
+}
+
+QList<QList<int>> *PatternGeneratorWindow::getPatternData() const
+{
+    return patternData;
 }
 
 void PatternGeneratorWindow::setProgress(int percent)
@@ -63,14 +71,40 @@ void PatternGeneratorWindow::setGenerateButton(QString text, QString color)
     settings->buttonStart->setColor(color,0);
 }
 
-void PatternGeneratorWindow::setGeneratorState(bool running)
+void PatternGeneratorWindow::setGeneratorState(bool onClick)
 {
-    if(running)
-        setGenerateButton("Stop", Graphics::COLOR_RUNNING);
-    else
+    if(config->state == PatternGeneratorConfig::State::UPLOADING){
+        if(onClick){
+            config->state = PatternGeneratorConfig::State::STOPPED;
+            setGenerateButton("Start", Graphics::COLOR_CONTROLS);
+            emit stopGenerator();
+        }else{
+            config->state = PatternGeneratorConfig::State::RUNNING;
+            setGenerateButton("Stop", Graphics::COLOR_RUNNING);
+        }
+    }else if(config->state == PatternGeneratorConfig::State::RUNNING){
+        config->state = PatternGeneratorConfig::State::STOPPED;
         setGenerateButton("Start", Graphics::COLOR_CONTROLS);
+        emit stopGenerator();
+    }else if(config->state == PatternGeneratorConfig::State::STOPPED){
+        config->state = PatternGeneratorConfig::State::UPLOADING;
+        setGenerateButton("Uploading",Graphics::COLOR_WARNING);
+        emit runGenerator();
+    }
 
-    isGenerating = running;
-    settings->enableComponents(!running);
+    settings->enableGuiComponents(config->state==PatternGeneratorConfig::State::STOPPED);
+}
+
+void PatternGeneratorWindow::runGeneratorCallback()
+{
+    setGeneratorState(true);
+}
+
+void PatternGeneratorWindow::openFileCallback()
+{
+    QString fileName;
+    int tmp = 0;
+    fileName = QFileDialog::getOpenFileName(this,"Select input file","","Text files (*.csv *.txt)");
+    /* TODO: creeate file loader */
 }
 

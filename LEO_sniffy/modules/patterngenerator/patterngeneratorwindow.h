@@ -5,6 +5,7 @@
 #include <QScrollArea>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QFileDialog>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"
@@ -33,14 +34,16 @@ public:
     explicit PatternGeneratorWindow(PatternGeneratorConfig *config, QWidget *parent = nullptr);
     ~PatternGeneratorWindow();
 
-    PatternGeneratorSettings *settings;
+    PatternGeneratorSettings *settings;    
 
     void restoreGUIAfterStartup();
     void setSpecification(PatternGeneratorSpec* spec);
 
+    QList<QList<int>> *getPatternData() const;
+
     void setProgress(int percent);
     void setGenerateButton(QString text, QString color);
-    void setGeneratorState(bool running);
+    void setGeneratorState(bool onClick);
 
 private:
     Ui::PatternGeneratorWindow *ui;
@@ -50,7 +53,15 @@ private:
     widgetChart *chart;
     QVector<QVector<QPointF>> *chartData;
 
-    bool isGenerating = false;
+    QList<QList<int>> *patternData;
+
+private slots:
+    void runGeneratorCallback();
+    void openFileCallback();
+
+signals:
+    void runGenerator();
+    void stopGenerator();
 };
 
 #endif // PATTERNGENERATORWINDOW_H

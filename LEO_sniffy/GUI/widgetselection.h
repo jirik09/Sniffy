@@ -41,7 +41,7 @@ public:
 private slots:
     void indexChanged(int index);
 signals:
-    void selectedIndexChanged(int index);
+    void selectedIndexChanged(int index, float realValue = 0);
 };
 
 #endif // WIDGETSELECTION_H

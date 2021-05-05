@@ -130,6 +130,7 @@ public:
     static const QByteArray CMD_MODE_PWM;
     static const QByteArray CMD_MODE_DAC;
     static const QByteArray CMD_MODE_VOLT;
+    static const QByteArray CMD_MODE_PATTERN;
     static const QByteArray CMD_GEN_DATA;
     static const QByteArray CMD_GEN_OK;
     static const QByteArray CMD_GEN_NEXT;

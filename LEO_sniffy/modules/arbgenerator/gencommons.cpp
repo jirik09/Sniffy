@@ -98,7 +98,7 @@ int GenCommons::getSignaLength(int channelIndex)
     return -1;
 }
 
-void GenCommons::setSignaltoSend(QList<QList<int> > *data)
+void GenCommons::setSignalToSend(QList<QList<int> > *data)
 {
     generatorData = *data;
     numChannelsUsed = generatorData.length();
