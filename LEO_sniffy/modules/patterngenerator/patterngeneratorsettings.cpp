@@ -29,6 +29,29 @@ PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, Pat
     connect(comboPatternSelection, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorSettings::patternSelectionChangedCallback);
 }
 
+void PatternGeneratorSettings::showComponents(int pattIndex, bool visible)
+{
+    patternArea[pattIndex]->setVisible(visible);
+}
+
+void PatternGeneratorSettings::enableComponents(bool enable)
+{
+    patternArea[config->prevIndex]->setEnabled(enable);
+}
+
+void PatternGeneratorSettings::restoreSettingsPanel()
+{
+    showComponents(config->prevIndex, true);
+    comboPatternSelection->setSelected(config->prevIndex, true);
+}
+
+void PatternGeneratorSettings::patternSelectionChangedCallback(int index)
+{
+    showComponents(config->prevIndex, false);
+    showComponents(index, true);
+    config->prevIndex = index;
+}
+
 void PatternGeneratorSettings::createComponents(QWidget *parent, QVBoxLayout *destination)
 {
     for (int i=0; i<pattList.length(); i++){
@@ -110,27 +133,4 @@ void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout 
     comboI2cCommType->addOption("Read", 0);
     comboI2cCommType->addOption("Write", 1);
     destination->addWidget(comboI2cCommType);
-}
-
-void PatternGeneratorSettings::showComponents(int pattIndex, bool visible)
-{
-    patternArea[pattIndex]->setVisible(visible);
-}
-
-void PatternGeneratorSettings::enableComponents(bool enable)
-{
-    patternArea[config->prevIndex]->setEnabled(enable);
-}
-
-void PatternGeneratorSettings::restoreSettingsPanel()
-{
-    showComponents(config->prevIndex, true);
-    comboPatternSelection->setSelected(config->prevIndex, true);
-}
-
-void PatternGeneratorSettings::patternSelectionChangedCallback(int index)
-{
-    showComponents(config->prevIndex, false);
-    showComponents(index, true);
-    config->prevIndex = index;
 }

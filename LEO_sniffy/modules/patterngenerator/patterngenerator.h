@@ -31,6 +31,14 @@ private:
     PatternGeneratorConfig *config;
     PatternGeneratorWindow *pattGenWindow;   
     GenCommons *genComms;
+
+    bool dataBeingUploaded = false;
+
+    void dataTransferNext();
+    void dataTransferFinished();
+
+    void startGenerator();
+    void stopGenerator();
 };
 
 #endif // PATTERNGENERATOR_H

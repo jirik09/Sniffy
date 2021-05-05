@@ -51,3 +51,26 @@ void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
 {
     this->spec = spec;
 }
+
+void PatternGeneratorWindow::setProgress(int percent)
+{
+    setGenerateButton("Uploading "+ QString::number(percent)+ "%", Graphics::COLOR_WARNING);
+}
+
+void PatternGeneratorWindow::setGenerateButton(QString text, QString color)
+{
+    settings->buttonStart->setText(text);
+    settings->buttonStart->setColor(color,0);
+}
+
+void PatternGeneratorWindow::setGeneratorState(bool running)
+{
+    if(running)
+        setGenerateButton("Stop", Graphics::COLOR_RUNNING);
+    else
+        setGenerateButton("Start", Graphics::COLOR_CONTROLS);
+
+    isGenerating = running;
+    settings->enableComponents(!running);
+}
+

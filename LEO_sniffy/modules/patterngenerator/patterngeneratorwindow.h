@@ -33,17 +33,24 @@ public:
     explicit PatternGeneratorWindow(PatternGeneratorConfig *config, QWidget *parent = nullptr);
     ~PatternGeneratorWindow();
 
+    PatternGeneratorSettings *settings;
+
     void restoreGUIAfterStartup();
     void setSpecification(PatternGeneratorSpec* spec);
+
+    void setProgress(int percent);
+    void setGenerateButton(QString text, QString color);
+    void setGeneratorState(bool running);
 
 private:
     Ui::PatternGeneratorWindow *ui;
     PatternGeneratorConfig *config;
-    PatternGeneratorSpec *spec;
-    PatternGeneratorSettings *settings;
+    PatternGeneratorSpec *spec;    
 
     widgetChart *chart;
     QVector<QVector<QPointF>> *chartData;
+
+    bool isGenerating = false;
 };
 
 #endif // PATTERNGENERATORWINDOW_H

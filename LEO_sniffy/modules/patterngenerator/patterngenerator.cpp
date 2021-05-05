@@ -10,7 +10,9 @@ PatternGenerator::PatternGenerator(QObject *parent)
 
     moduleCommandPrefix = cmd->PATTERN_GENERATOR;
     moduleName = "Pattern generator";
-    moduleIconURI = Graphics::getGraphicsPath()+"icon_pattern_generator.png";          
+    moduleIconURI = Graphics::getGraphicsPath()+"icon_pattern_generator.png";
+
+    //connect(pattGenWindow->settings->buttonStart, &WidgetButtons::clicked, this, &PatternGenerator::startGenerator());
 }
 
 QWidget *PatternGenerator::getWidget()
@@ -28,10 +30,14 @@ void PatternGenerator::parseData(QByteArray data){
         pattGenWindow->setSpecification(static_cast<PatternGeneratorSpec*>(moduleSpecification));
         showModuleControl();
 
-    }else if(dataHeader=="xxxx"){
+    }else if(dataHeader==cmd->CMD_GEN_NEXT){
+        dataTransferNext();
+
+    }else if(dataHeader==cmd->CMD_GEN_OK){
+        dataTransferFinished();
 
     }else{
-        //qDebug()<<data;
+        qDebug()<<"[PATTERN GEN] Unhandled incomming data!"<<data;
     }
 }
 
@@ -52,13 +58,48 @@ QByteArray PatternGenerator::getConfiguration()
 
 void PatternGenerator::startModule()
 {
-//    setModuleStatus(ModuleStatus::PLAY);
-//    genComms->startGenerator();
+    setModuleStatus(ModuleStatus::PAUSE);
 }
 
 void PatternGenerator::stopModule()
 {
-//    setModuleStatus(ModuleStatus::PAUSE);
-//    genComms->stopGenerator();
+    stopGenerator();
+    genComms->generatorDeinit();
+    pattGenWindow->setGeneratorState(false);
 }
+
+void PatternGenerator::startGenerator()
+{
+    setModuleStatus(ModuleStatus::PLAY);
+    genComms->startGenerator();
+}
+
+void PatternGenerator::stopGenerator()
+{
+    setModuleStatus(ModuleStatus::PAUSE);
+    genComms->stopGenerator();
+}
+
+void PatternGenerator::dataTransferNext()
+{
+    if(!dataBeingUploaded)
+        return;
+
+    genComms->sendNext();
+    if(genComms->isSentAll()){
+        genComms->genAskForFreq();
+        startGenerator();
+    }
+
+    pattGenWindow->setProgress(genComms->getProgress());
+}
+
+void PatternGenerator::dataTransferFinished()
+{
+    if(dataBeingUploaded){
+        dataBeingUploaded = false;
+        pattGenWindow->setGeneratorState(true);
+    }
+}
+
 
