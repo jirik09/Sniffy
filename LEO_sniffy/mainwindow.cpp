@@ -84,7 +84,7 @@ void MainWindow::setupMainWindowComponents(){
     ui->verticalLayout_modules->addWidget(sep);
     QSpacerItem * verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
     ui->verticalLayout_modules->addItem(verticalSpacer);
-    WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget);
+    WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget,"Ver 0.1");
     ui->verticalLayout_modules->addWidget(sepa);
     footer = new WidgetFooter();
     ui->verticalLayout_modules->addWidget(footer);

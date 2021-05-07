@@ -132,7 +132,7 @@ QComboBox QAbstractItemView{selection-background-color:" DARK_WINDOW_CONTROL_HOV
 "QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
 QPushButton{background-color:#FF%1;color:" DARK_TEXT_COMPONENT ";}\
 QPushButton:disabled{border:none;background-color:" DARK_BACKGROUND_BUTTON_DISABLED ";color:" DARK_COMPONENT_DISABLED ";}\
-QPushButton:pressed{background-color: #88%1;}\
+QPushButton:pressed{background-color: #88%1;border: 2px solid " DARK_WINDOW_WIDGET";}\
 QPushButton:hover{background-color: #7B%1;}"
 
 #define DARK_STYLE_CHECK_BUTTON \
