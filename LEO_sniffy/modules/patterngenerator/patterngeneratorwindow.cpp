@@ -34,8 +34,10 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     ui->widget_module->resize(600,300);
     ui->widget_module->setLayout(verticalLayout_chart);
 
-    chartData = new QVector<QVector<QPointF>>;
+    chartData = new QVector<QVector<QPointF>>;    
+    patternData = new QList<quint8>;
 
+    connect(settings, &PatternGeneratorSettings::patternSelectionChanged, this, &PatternGeneratorWindow::patternSelectionChangedCallback);
     connect(settings->buttonUserDefLoadPattern, &WidgetButtons::clicked, this, &PatternGeneratorWindow::openFileCallback);
     connect(settings->buttonStart, &WidgetButtons::clicked, this, &PatternGeneratorWindow::runGeneratorCallback);
 }
@@ -53,11 +55,6 @@ void PatternGeneratorWindow::restoreGUIAfterStartup()
 void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
 {
     this->spec = spec;
-}
-
-QList<QList<int>> *PatternGeneratorWindow::getPatternData() const
-{
-    return patternData;
 }
 
 void PatternGeneratorWindow::setProgress(int percent)
@@ -93,6 +90,16 @@ void PatternGeneratorWindow::setGeneratorState(bool onClick)
     }
 
     settings->enableGuiComponents(config->state==PatternGeneratorConfig::State::STOPPED);
+}
+
+QList<quint8> *PatternGeneratorWindow::getPatternData() const
+{
+    return patternData;
+}
+
+void PatternGeneratorWindow::patternSelectionChangedCallback(int index)
+{
+   // patternData =
 }
 
 void PatternGeneratorWindow::runGeneratorCallback()

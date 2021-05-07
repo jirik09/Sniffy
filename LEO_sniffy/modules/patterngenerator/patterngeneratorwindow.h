@@ -37,13 +37,13 @@ public:
     PatternGeneratorSettings *settings;    
 
     void restoreGUIAfterStartup();
-    void setSpecification(PatternGeneratorSpec* spec);
-
-    QList<QList<int>> *getPatternData() const;
+    void setSpecification(PatternGeneratorSpec* spec);    
 
     void setProgress(int percent);
     void setGenerateButton(QString text, QString color);
     void setGeneratorState(bool onClick);
+
+    QList<quint8> *getPatternData() const;
 
 private:
     Ui::PatternGeneratorWindow *ui;
@@ -52,10 +52,11 @@ private:
 
     widgetChart *chart;
     QVector<QVector<QPointF>> *chartData;
-
-    QList<QList<int>> *patternData;
+    QList<quint8> *patternData;
 
 private slots:
+    void patternSelectionChangedCallback(int index);
+
     void runGeneratorCallback();
     void openFileCallback();
 

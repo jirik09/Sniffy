@@ -91,6 +91,7 @@ private slots:
     void freqChangedCombosCallback(int index, float realVal);
 
 signals:
+    void patternSelectionChanged(int index);
 
 };
 

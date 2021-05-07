@@ -124,7 +124,8 @@ QTabBar::tab:selected{border-bottom-color: " DAWN_YELLOW ";}"
 #define DAWN_STYLE_COMBO_BOX \
 "QComboBox{background-color:" DAWN_DATA_INPUT_AREA ";}\
 QComboBox:hover{border: 1px solid " DAWN_COMPONENT_DISABLED ";}\
-QComboBox QAbstractItemView{selection-background-color:" DAWN_WINDOW_CONTROL_HOVER ";background-color:" DAWN_DATA_INPUT_AREA ";}"
+QComboBox QAbstractItemView{selection-background-color:" DAWN_WINDOW_CONTROL_HOVER ";background-color:" DAWN_DATA_INPUT_AREA ";}\
+QComboBox:disabled{background-color:" DAWN_BACKGROUND_BUTTON_DISABLED ";color:" DAWN_COMPONENT_DISABLED ";}"
 
 #define DAWN_STYLE_PUSH_BUTTON \
 "QPushButton{font-weight : bold ;border-radius: 2px; padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\

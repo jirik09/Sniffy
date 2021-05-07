@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include "../abstractmodule.h"
-#include "../arbgenerator/arbgenerator.h"
+#include "../arbgenerator/gencommons.h"
 #include "patterngeneratorspec.h"
 #include "patterngeneratorconfig.h"
 #include "patterngeneratorwindow.h"
@@ -27,23 +27,23 @@ public slots:
     void startModule();
     void stopModule();
 
-private slots:
-    void startGeneratorCallback();
-    void stopGeneratorCallback();
-
 private:
     PatternGeneratorConfig *config;
     PatternGeneratorWindow *pattGenWindow;   
-    GenCommons *genComms;
+    GenCommons *genComms;    
 
     bool dataBeingUploaded = false;
+
+    void startGenerator();
+    void stopGenerator();
 
     void startPatternUpload();
     void dataTransferNext();
     void dataTransferFinished();
 
-    void startGenerator();
-    void stopGenerator();
+private slots:
+    void startGeneratorCallback();
+    void stopGeneratorCallback();
 };
 
 #endif // PATTERNGENERATOR_H

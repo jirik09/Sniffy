@@ -31,6 +31,8 @@ void PatternGenerator::parseData(QByteArray data){
         pattGenWindow->setSpecification(static_cast<PatternGeneratorSpec*>(moduleSpecification));
         showModuleControl();
 
+        genComms = new GenCommons(moduleCommandPrefix, comm, static_cast<PatternGeneratorSpec*>(moduleSpecification)->maxSamplingRate, this);
+
     }else if(dataHeader==cmd->CMD_GEN_NEXT){
         dataTransferNext();
 
@@ -82,14 +84,6 @@ void PatternGenerator::stopGenerator()
     genComms->stopGenerator();
 }
 
-void PatternGenerator::startPatternUpload()
-{
-    dataBeingUploaded = true;
-    genComms->setSignalToSend(pattGenWindow->getPatternData());
-    genComms->setSamplingFrequency(0, pattGenWindow->settings->getFrequency()*genComms->getSignaLength(0));
-    genComms->sendNext();
-}
-
 void PatternGenerator::dataTransferNext()
 {
     if(!dataBeingUploaded)
@@ -110,6 +104,14 @@ void PatternGenerator::dataTransferFinished()
         dataBeingUploaded = false;
         pattGenWindow->setGeneratorState(false);
     }
+}
+
+void PatternGenerator::startPatternUpload()
+{
+    dataBeingUploaded = true;
+    genComms->setSignalToSend(pattGenWindow->getPatternData());
+    genComms->setSamplingFrequency(0, pattGenWindow->settings->getFrequency()*genComms->getSignaLength(0));
+    genComms->sendNext();
 }
 
 void PatternGenerator::startGeneratorCallback()

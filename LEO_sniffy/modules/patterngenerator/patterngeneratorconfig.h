@@ -30,7 +30,7 @@ public:
     enum class State { STOPPED = 0,
                        RUNNING = 1,
                        UPLOADING = 2
-                     } state;
+                     } state = State::STOPPED;
 
     int pattIndex = 0;
 

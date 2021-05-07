@@ -14,6 +14,7 @@ public:
     explicit PatternGeneratorSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);
 
+    int maxSamplingRate;
     QString chanPins[MAX_PATT_CHANNELS_NUM];
 };
 

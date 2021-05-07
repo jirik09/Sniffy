@@ -30,7 +30,7 @@ QWidget *ArbGenerator::getWidget()
 {
     return arbGenWindow;
 }
-int test1 = 0, test2 = 0, text3 = 0;
+
 void ArbGenerator::parseData(QByteArray data)
 {
     QByteArray dataHeader = data.left(4);

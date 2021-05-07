@@ -32,6 +32,7 @@ public:
 
     //data sending functions
     void setSignalToSend(QList<QList<int>> *data);
+    void setSignalToSend(QList<quint8> *data);
     void sendNext();
     bool isSentAll();
     qreal getProgress();

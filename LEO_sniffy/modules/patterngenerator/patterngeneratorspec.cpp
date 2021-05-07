@@ -9,7 +9,7 @@ void PatternGeneratorSpec::parseSpecification(QByteArray spec)
 {
     QDataStream stream(spec);
 
-    stream >> resources;
+    stream >> resources >> maxSamplingRate;
 
     char chars[4] = "";
     for(int i = 0; i < chanPins->size(); i++){

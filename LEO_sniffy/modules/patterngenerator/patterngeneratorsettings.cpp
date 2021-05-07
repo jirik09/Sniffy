@@ -120,7 +120,7 @@ void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout 
     destination->addWidget(comboI2cCommType);    
 
     config->freq[index] = comboI2cClockFreq->getSelectedValue();
-    connect(comboI2cClockFreq, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorSettings::freqChangedDialsCallback);
+    connect(comboI2cClockFreq, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorSettings::freqChangedCombosCallback);
 }
 
 WidgetDialRange *PatternGeneratorSettings::createDial(QWidget *parent, QString objName)
@@ -140,7 +140,8 @@ void PatternGeneratorSettings::showComponents(int pattIndex, bool visible)
 }
 
 void PatternGeneratorSettings::enableGuiComponents(bool enable)
-{
+{    
+    comboPatternSelection->setEnabled(enable);
     patternArea[config->pattIndex]->setEnabled(enable);
 }
 
@@ -157,6 +158,8 @@ void PatternGeneratorSettings::patternSelectionChangedCallback(int index)
     showComponents(index, true);
 
     config->pattIndex = index;
+
+    emit patternSelectionChanged(index);
 }
 
 void PatternGeneratorSettings::freqChangedDialsCallback(float val)
