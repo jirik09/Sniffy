@@ -35,7 +35,7 @@
 #define DARK_WARNING "#d2803c"                  //Warning or working color button
 #define DARK_RUNNING "#1a9c25"                  //color of button when running
 #define DARK_UNUSED "#7a7a7a"                   //color of button when its function is none or disable
-#define DARK_BACKGROUND_FOCUS_IN "#303030"      //background area of data inputs when focused in by mouse
+#define DARK_BACKGROUND_FOCUS_IN "#323232"      //background area of data inputs when focused in by mouse
 #define DARK_DATA_INPUT_AREA "#282828"          //backgrounf of user text / number inputs
 
 /* DISPLAY & CHART & GRID & LEGEND */
@@ -45,29 +45,32 @@
 #define DARK_DISPLAY DARK_CHART
 
 /* COLORS */
-#define DARK_BLUE "#2fa0d0"
-#define DARK_ORANGE "#d2803c"
-#define DARK_GREEN "#2cb689"
-#define DARK_PURPLE "#b45464"
-#define DARK_YELLOW "#b89b00"
-#define DARK_RED "#bd4236"
-#define DARK_BLUE_DARK "#4762cf"
-#define DARK_PINK "#cd72bf"
+
+#define DARK_BLUE   "#189ae0"
+#define DARK_RED "#d13e57"
+#define DARK_GREEN  "#2cb65c"
+#define DARK_ORANGE "#e18728"
+#define DARK_PURPLE "#b317da"
+#define DARK_BROWN "#9b642c"
+#define DARK_YELLOW "#c0c700"
+#define DARK_BLUE_DARK "#2720b6"
+#define DARK_PINK "#ff6ba3"
+//extend colors
 
 /* CHANNELS */
 #define DARK_CHANNEL_1 DARK_BLUE
-#define DARK_CHANNEL_2 DARK_PURPLE
-#define DARK_CHANNEL_3 DARK_GREEN
-#define DARK_CHANNEL_4 DARK_YELLOW
-#define DARK_CHANNEL_5 DARK_ORANGE
-#define DARK_CHANNEL_6 DARK_RED
+#define DARK_CHANNEL_2 DARK_ORANGE
+#define DARK_CHANNEL_3 DARK_RED
+#define DARK_CHANNEL_4 DARK_GREEN
+#define DARK_CHANNEL_5 DARK_PURPLE
+#define DARK_CHANNEL_6 DARK_YELLOW
 #define DARK_CHANNEL_7 DARK_BLUE_DARK
 #define DARK_CHANNEL_8 DARK_PINK
 
 
 /***************** GENERAL GLOBAL QT STYLE SHEETS *****************/
 
-#define DARK_STYLE_USE_TRANSPARENCY false  // if true, the arg %1 must be in some defines (# removed in code)
+#define DARK_STYLE_USE_TRANSPARENCY true  // if true, the arg %1 must be in some defines (# removed in code)
 #define DARK_STYLE_USE_CUSTOM_DIALS true
 
 #define DARK_STYLE_GLOBAL           DARK_STYLE_OBJECT \
@@ -94,8 +97,8 @@
 #define DARK_STYLE_SCROLLBAR \
 "QScrollBar:vertical{border: none;width: 10px;margin: 0 0 0 0;}\
 QScrollBar:horizontal{border: none;height: 10px;margin: 0 0 0 0;}\
-QScrollBar::handle:vertical{border: none;background-color:" DARK_CONTROLS ";min-height: 38px;}\
-QScrollBar::handle:horizontal {border: none;background-color:" DARK_CONTROLS ";min-width: 38px;}\
+QScrollBar::handle:vertical{border-radius: 4px;border: none;background-color:" DARK_CONTROLS ";min-height: 38px;}\
+QScrollBar::handle:horizontal {border-radius: 4px;border: none;background-color:" DARK_CONTROLS ";min-width: 38px;}\
 QScrollBar::add-line{height: 0px;border: none;background-color:" DARK_CONTROLS ";}\
 QScrollBar::sub-line{height: 0px;border: none;background-color:" DARK_CONTROLS ";}\
 QScrollBar::add-page,QScrollBar::sub-page{background-color:" DARK_WINDOW_APP";}\
@@ -127,19 +130,22 @@ QComboBox QAbstractItemView{selection-background-color:" DARK_WINDOW_CONTROL_HOV
 
 #define DARK_STYLE_PUSH_BUTTON \
 "QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
-QPushButton{border:none;background-color: %1;color:" DARK_TEXT_COMPONENT ";}\
-QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED ";color:" DARK_COMPONENT_DISABLED ";}\
-QPushButton:pressed{border: 2px solid " DARK_WINDOW_WIDGET ";}"
+QPushButton{background-color:#FF%1;color:" DARK_TEXT_COMPONENT ";}\
+QPushButton:disabled{border:none;background-color:" DARK_BACKGROUND_BUTTON_DISABLED ";color:" DARK_COMPONENT_DISABLED ";}\
+QPushButton:pressed{background-color: #88%1;border: 2px solid " DARK_WINDOW_WIDGET";}\
+QPushButton:hover{background-color: #7B%1;}"
 
 #define DARK_STYLE_CHECK_BUTTON \
 "QPushButton{padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
-QPushButton:checked{border: none;background-color:%1; color:" DARK_TEXT_COMPONENT ";}\
-QPushButton{border: none;background-color:" DARK_BACKGROUND_BUTTON ";}\
-QPushButton:disabled{background-color:" DARK_BACKGROUND_BUTTON_DISABLED "; color:" DARK_COMPONENT_DISABLED ";}"
+QPushButton{background-color:" DARK_BACKGROUND_BUTTON "; color: #FF%1;}\
+QPushButton:checked{border:none; background-color:#FF%1; color:" DARK_TEXT_COMPONENT ";}\
+QPushButton:hover{background-color:#4C%1;}\
+QPushButton:checked:hover{background-color:#BB%1;}\
+QPushButton:disabled{border:none;background-color: " DARK_BACKGROUND_BUTTON_DISABLED "; color:" DARK_COMPONENT_DISABLED ";}"
 
 #define DARK_STYLE_PROGRESS_BAR \
 "QProgressBar{border:1px solid " DARK_TEXT_LABEL ";border-radius:1px;background-color:" DARK_DISPLAY ";}\
-QProgressBar::chunk{width: 20px;background-color:%1;}"
+QProgressBar::chunk{width: 20px;background-color:#FF%1;}"
 
 #define DARK_STYLE_LABEL "QLabel{border-radius: 2px;}"
 
@@ -149,8 +155,11 @@ QProgressBar::chunk{width: 20px;background-color:%1;}"
 "QPushButton{background-color:" DARK_WINDOW_APP ";qproperty-iconSize: 15px;padding: 5px}"
 
 #define DARK_STYLE_MODULE_BUTTON \
-"QPushButton {text-align:left;qproperty-iconSize: 35px;}\
-QPushButton:hover{background-color:" DARK_BACKGROUND_BUTTON ";border-radius:5px;}"
+"QPushButton {text-align:left;qproperty-iconSize: 35px;color: " DARK_TEXT_ALL ";border-radius:5px;}\
+QPushButton:disabled{color:" DARK_COMPONENT_DISABLED ";}\
+QPushButton:hover{background-color:" DARK_BACKGROUND_BUTTON ";}\
+QPushButton:checked{background-color:" DARK_DATA_INPUT_AREA ";}\
+QPushButton:checked:hover{background-color:" DARK_BACKGROUND_BUTTON ";}"
 
 #define DARK_STYLE_HOLD_BUTTON \
 "QPushButton{padding-top: 0px;padding-bottom:1px;padding-left:0px;padding-right:0px;font-size:10px;}\

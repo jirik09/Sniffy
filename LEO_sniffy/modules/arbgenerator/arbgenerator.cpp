@@ -38,17 +38,14 @@ void ArbGenerator::parseData(QByteArray data)
     if(dataHeader==cmd->CONFIG){
         data.remove(0,4);
         if(isPWMbased){
-                static_cast<ArbGeneratorSpec*>(moduleSpecification)->parsePWMSpecification(data);
-                arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
-                showModuleControl();
-                buildModuleDescription(static_cast<ArbGeneratorSpec*>(moduleSpecification));
+            static_cast<ArbGeneratorSpec*>(moduleSpecification)->parsePWMSpecification(data);
         }else{
-                moduleSpecification->parseSpecification(data);
-                arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
-                showModuleControl();
-                buildModuleDescription(static_cast<ArbGeneratorSpec*>(moduleSpecification));
+            moduleSpecification->parseSpecification(data);
         }
+        arbGenWindow->setSpecification(static_cast<ArbGeneratorSpec*>(moduleSpecification));
         genComms = new GenCommons(moduleCommandPrefix,comm,static_cast<ArbGeneratorSpec*>(moduleSpecification)->maxSamplingRate,this);
+        showModuleControl();
+        buildModuleDescription(static_cast<ArbGeneratorSpec*>(moduleSpecification));
     }else if(dataHeader==cmd->CMD_GEN_NEXT){
         if(!dataBeingUploaded)return;
         genComms->sendNext();
