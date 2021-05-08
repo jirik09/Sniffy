@@ -17,16 +17,6 @@ public:
     void parse (QByteArray config);
     QByteArray serialize ();
 
-//    enum class Pattern { USER_DEFINED = 0,
-//                         COUNTER,
-//                         BINARY_CODE,
-//                         GREY_CODE,
-//                         QUADRATURE,
-//                         UART,
-//                         SPI,
-//                         I2C
-//                       } pattern;
-
     enum class State { STOPPED = 0,
                        RUNNING = 1,
                        UPLOADING = 2

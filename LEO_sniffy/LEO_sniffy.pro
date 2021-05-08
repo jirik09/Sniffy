@@ -85,6 +85,7 @@ SOURCES += \
     modules/numberparser.cpp \
     modules/patterngenerator/patterngenerator.cpp \
     modules/patterngenerator/patterngeneratorconfig.cpp \
+    modules/patterngenerator/patterngeneratorpatterns.cpp \
     modules/patterngenerator/patterngeneratorsettings.cpp \
     modules/patterngenerator/patterngeneratorspec.cpp \
     modules/patterngenerator/patterngeneratorwindow.cpp \
@@ -198,6 +199,7 @@ HEADERS += \
     modules/patterngenerator/patterngenerator.h \
     modules/patterngenerator/patterngeneratorconfig.h \
     modules/patterngenerator/patterngeneratordefs.h \
+    modules/patterngenerator/patterngeneratorpatterns.h \
     modules/patterngenerator/patterngeneratorsettings.h \
     modules/patterngenerator/patterngeneratorspec.h \
     modules/patterngenerator/patterngeneratorwindow.h \

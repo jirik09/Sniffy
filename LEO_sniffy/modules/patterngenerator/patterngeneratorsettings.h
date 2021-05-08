@@ -21,6 +21,7 @@ public:
     explicit PatternGeneratorSettings(QVBoxLayout *destination, PatternGeneratorConfig *config, QWidget *parent = nullptr);    
 
     WidgetButtons *buttonStart;
+    WidgetButtons *buttonSetDefault;
 
     WidgetSelection *comboPatternSelection;
 
@@ -31,7 +32,7 @@ public:
 
     WidgetDialRange *dialBinaryCodeFreq;
 
-    WidgetDialRange *dialGreyCodeFreq;
+    WidgetDialRange *dialGrayCodeFreq;
 
     WidgetDialRange *dialQuadratureFreq;
 
@@ -49,7 +50,7 @@ private:
         "User defined",
         "Counter",
         "Binary code",
-        "Grey code",
+        "Gray code",
         "Quadrature",
         "UART",
         "SPI",
@@ -62,7 +63,7 @@ private:
             &PatternGeneratorSettings::createUserDefinedComponents,
             &PatternGeneratorSettings::createCounterComponents,
             &PatternGeneratorSettings::createBinaryCodeComponents,
-            &PatternGeneratorSettings::createGreyCodeComponents,
+            &PatternGeneratorSettings::createGrayCodeComponents,
             &PatternGeneratorSettings::createQuadratureComponents,
             &PatternGeneratorSettings::createUartComponents,
             &PatternGeneratorSettings::createSpiComponents,
@@ -73,9 +74,8 @@ private:
     void createUserDefinedComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createCounterComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createBinaryCodeComponents(QWidget *parent, QVBoxLayout *destination, int index);
-    void createGreyCodeComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createGrayCodeComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createQuadratureComponents(QWidget *parent, QVBoxLayout *destination, int index);
-
     void createUartComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createSpiComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createI2cComponents(QWidget *parent, QVBoxLayout *destination, int index);

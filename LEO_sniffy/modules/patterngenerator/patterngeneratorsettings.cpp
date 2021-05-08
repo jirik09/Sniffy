@@ -23,6 +23,11 @@ PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, Pat
 
     createComponents(parent, destination);
 
+    buttonSetDefault = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
+    buttonSetDefault->setText("Default");
+    buttonSetDefault->setObjectName("buttonPattGenSetDefault");
+    destination->addWidget(buttonSetDefault);
+
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     destination->addItem(verticalSpacer);
 
@@ -78,12 +83,12 @@ void PatternGeneratorSettings::createBinaryCodeComponents(QWidget *parent, QVBox
     connect(dialBinaryCodeFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorSettings::freqChangedDialsCallback);
 }
 
-void PatternGeneratorSettings::createGreyCodeComponents(QWidget *parent, QVBoxLayout *destination, int index)
+void PatternGeneratorSettings::createGrayCodeComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-    dialGreyCodeFreq = createDial(parent, "dialGreyCodeFreq");
-    destination->addWidget(dialGreyCodeFreq);
-    config->freq[index] = dialGreyCodeFreq->getRealValue();
-    connect(dialGreyCodeFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorSettings::freqChangedDialsCallback);
+    dialGrayCodeFreq = createDial(parent, "dialGrayCodeFreq");
+    destination->addWidget(dialGrayCodeFreq);
+    config->freq[index] = dialGrayCodeFreq->getRealValue();
+    connect(dialGrayCodeFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorSettings::freqChangedDialsCallback);
 }
 
 void PatternGeneratorSettings::createQuadratureComponents(QWidget *parent, QVBoxLayout *destination, int index)

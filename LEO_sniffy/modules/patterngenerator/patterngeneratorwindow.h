@@ -21,6 +21,7 @@
 #include "patterngeneratorconfig.h"
 #include "patterngeneratorspec.h"
 #include "patterngeneratorsettings.h"
+#include "patterngeneratorpatterns.h"
 
 namespace Ui {
 class PatternGeneratorWindow;
@@ -35,6 +36,7 @@ public:
     ~PatternGeneratorWindow();
 
     PatternGeneratorSettings *settings;    
+    PatternGeneratorPatterns *patterns;
 
     void restoreGUIAfterStartup();
     void setSpecification(PatternGeneratorSpec* spec);    

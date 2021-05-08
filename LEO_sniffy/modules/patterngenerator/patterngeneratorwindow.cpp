@@ -28,6 +28,7 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     verticalLayout_chart->addWidget(chart);
 
     settings = new PatternGeneratorSettings(verticalLayout_settings, config, this);
+    patterns = new PatternGeneratorPatterns(this);
     //fileLoader = new PatternGeneratorFileLoader();
 
     ui->widget_settings->setLayout(verticalLayout_settings);
@@ -50,6 +51,7 @@ PatternGeneratorWindow::~PatternGeneratorWindow()
 void PatternGeneratorWindow::restoreGUIAfterStartup()
 {
     settings->restoreSettingsAfterStartup();
+    patterns->getData(config->pattIndex);
 }
 
 void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
@@ -99,7 +101,7 @@ QList<quint8> *PatternGeneratorWindow::getPatternData() const
 
 void PatternGeneratorWindow::patternSelectionChangedCallback(int index)
 {
-   // patternData =
+    patternData = patterns->getData(index);
 }
 
 void PatternGeneratorWindow::runGeneratorCallback()
