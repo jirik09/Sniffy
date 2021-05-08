@@ -23,13 +23,13 @@ PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, Pat
 
     createComponents(parent, destination);
 
+    QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    destination->addItem(verticalSpacer);
+
     buttonSetDefault = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
     buttonSetDefault->setText("Default");
     buttonSetDefault->setObjectName("buttonPattGenSetDefault");
     destination->addWidget(buttonSetDefault);
-
-    QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    destination->addItem(verticalSpacer);
 
     connect(comboPatternSelection, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorSettings::patternSelectionChangedCallback);
 }

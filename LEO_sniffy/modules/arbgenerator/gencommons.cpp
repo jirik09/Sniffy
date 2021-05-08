@@ -129,9 +129,11 @@ void GenCommons::setSignalToSend(QList<QList<int>> *data)
 /* Single channel */
 void GenCommons::setSignalToSend(QList<quint8> *data)
 {
+    QList<int> *tmpData = new QList<int>;
     for(int i = 0; i < data->length(); i++)
-        generatorData[0][i] = data->at(i);
+        tmpData->append(data->at(i));
 
+    generatorData.append(*tmpData);
     numChannelsUsed = 1;
     totalToSend = totalSent = 0;
     allSent = false;

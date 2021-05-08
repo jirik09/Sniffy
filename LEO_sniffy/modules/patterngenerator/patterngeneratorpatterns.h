@@ -97,6 +97,9 @@ private:
     QVector<std::function<QSharedPointer<Pattern>()>> createPattern = {
             [] { return QSharedPointer<Pattern>(new UserDefined); },
             [] { return QSharedPointer<Pattern>(new CounterClock); },
+            [] { return QSharedPointer<Pattern>(new BinaryCode); },
+            [] { return QSharedPointer<Pattern>(new GrayCode); },
+            [] { return QSharedPointer<Pattern>(new Quadrature); },
     };
 };
 

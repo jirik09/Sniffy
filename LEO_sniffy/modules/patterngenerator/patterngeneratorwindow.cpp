@@ -95,7 +95,7 @@ void PatternGeneratorWindow::setGeneratorState(bool onClick)
 }
 
 QList<quint8> *PatternGeneratorWindow::getPatternData() const
-{
+{   
     return patternData;
 }
 
