@@ -148,6 +148,7 @@ void PatternGeneratorSettings::enableGuiComponents(bool enable)
 {    
     comboPatternSelection->setEnabled(enable);
     patternArea[config->pattIndex]->setEnabled(enable);
+    buttonSetDefault->setEnabled(enable);
 }
 
 qreal PatternGeneratorSettings::getFrequency()

@@ -9,14 +9,8 @@
 
 typedef quint8 patttype;
 
-//#define B1 (patttype)0x01
-//#define B2 (patttype)0x02
-//#define B3 (patttype)0x04
-//#define B4 (patttype)0x08
-//#define B5 (patttype)0x10
-//#define B6 (patttype)0x20
-//#define B7 (patttype)0x40
-//#define B8 (patttype)0x80
+#define CLOCK_MASK(i) (patttype)((i%2) ? 0x7F : 0xFF)
+#define CLOCK_CH8 0x80
 
 class Pattern : public QObject
 {

@@ -51,7 +51,7 @@ PatternGeneratorWindow::~PatternGeneratorWindow()
 void PatternGeneratorWindow::restoreGUIAfterStartup()
 {
     settings->restoreSettingsAfterStartup();
-    patterns->getData(config->pattIndex);
+    patternData = patterns->getData(config->pattIndex);
 }
 
 void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
@@ -94,7 +94,7 @@ void PatternGeneratorWindow::setGeneratorState(bool onClick)
     settings->enableGuiComponents(config->state==PatternGeneratorConfig::State::STOPPED);
 }
 
-QList<quint8> *PatternGeneratorWindow::getPatternData() const
+QList<quint8> *PatternGeneratorWindow::getPatternData()
 {   
     return patternData;
 }

@@ -32,9 +32,9 @@ QList<patttype> *PatternGeneratorPatterns::getData(int index)
 
 void PatternGeneratorPatterns::modifyPattern(int channel, int position, bool level)
 {
-    quint8 rData = pattern[index]->getData()->at(position);
+    patttype rData = pattern[index]->getData()->at(position);
 
-    quint8 wData;
+    patttype wData;
     if(level)
         wData = rData | (1<<channel);
     else
@@ -44,19 +44,19 @@ void PatternGeneratorPatterns::modifyPattern(int channel, int position, bool lev
 }
 
 QList<patttype> *UserDefined::create(int len)
-{    
+{        
     for(int i = 0; i < len; i++)
-        data->append(0);
+        data->append(0 & CLOCK_MASK(i));
 
     return data;
 }
 
 QList<patttype> *CounterClock::create(int len)
 {
-    quint8 clockShift = 1;
+    patttype counterShift = 1;
     for(int i = 0; i < len; i++){
-        data->append(clockShift);
-        clockShift <<= 1;
+        data->append((counterShift | CLOCK_CH8) & CLOCK_MASK(i));
+        counterShift <<= 1;
     }
 
     return data;
@@ -64,17 +64,22 @@ QList<patttype> *CounterClock::create(int len)
 
 QList<patttype> *BinaryCode::create(int chanNum)
 {
-    for(quint8 val = 0; val < (chanNum*chanNum); val++)
-        data->append(val);
+    int i = 0;
+    for(patttype val = 0; val < (chanNum*chanNum); val++){
+        data->append((val | CLOCK_CH8) & CLOCK_MASK(i));
+        i++;
+    }
 
     return data;
 }
 
 QList<patttype> *GrayCode::create(int chanNum)
 {
-    for(quint8 val = 0; val < (chanNum*chanNum); val++){
+    int i = 0;
+    for(patttype val = 0; val < (chanNum*chanNum); val++){
         val ^= (val >> 1);
-        data->append(val);
+        data->append((val | CLOCK_CH8) & CLOCK_MASK(i));
+        i++;
     }
 
     return data;

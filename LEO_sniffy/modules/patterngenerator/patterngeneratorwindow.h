@@ -45,7 +45,7 @@ public:
     void setGenerateButton(QString text, QString color);
     void setGeneratorState(bool onClick);
 
-    QList<quint8> *getPatternData() const;
+    QList<quint8> *getPatternData();
 
 private:
     Ui::PatternGeneratorWindow *ui;
