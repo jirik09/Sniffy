@@ -133,7 +133,9 @@ void GenCommons::setSignalToSend(QList<quint8> *data)
     for(int i = 0; i < data->length(); i++)
         tmpData.append(data->at(i));
 
+    generatorData.clear();
     generatorData.append(tmpData);
+
     numChannelsUsed = 1;
     totalToSend = totalSent = 0;
     allSent = false;

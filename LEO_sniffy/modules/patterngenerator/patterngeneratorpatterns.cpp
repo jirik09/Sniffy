@@ -46,7 +46,7 @@ void PatternGeneratorPatterns::modifyPattern(int channel, int position, bool lev
 QList<patttype> *UserDefined::create(int len)
 {        
     for(int i = 0; i < len; i++)
-        data->append(0 & CLOCK_MASK(i));
+        data->append((0 | CLOCK_CH8) & CLOCK_MASK(i));
 
     return data;
 }
@@ -55,7 +55,7 @@ QList<patttype> *CounterClock::create(int len)
 {
     patttype counterShift = 1;
     for(int i = 0; i < len; i++){
-        data->append((counterShift | CLOCK_CH8) & CLOCK_MASK(i));
+        data->append(counterShift);
         counterShift <<= 1;
     }
 
