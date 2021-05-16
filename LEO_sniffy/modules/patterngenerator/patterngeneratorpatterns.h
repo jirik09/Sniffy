@@ -4,8 +4,10 @@
 #include <QObject>
 #include <QVector>
 #include <QSharedPointer>
+#include <math.h>
 
 #include "patterngeneratordefs.h"
+#include "patterngeneratorconfig.h"
 
 typedef quint8 patttype;
 
@@ -18,6 +20,7 @@ class Pattern : public QObject
 public:
     explicit Pattern(QObject *parent = nullptr);
     virtual QList<patttype> *getData() = 0;
+    virtual QList<patttype> *create(int) = 0;
 };
 
 class UserDefined : public Pattern
@@ -26,9 +29,9 @@ class UserDefined : public Pattern
 public:
     explicit UserDefined();
     QList<patttype> *getData() override;
+    QList<patttype> *create(int len) override;
 private:
-    QList<patttype> *data;
-    QList<patttype> *create(int len);
+    QList<patttype> *data;    
 };
 
 class CounterClock : public Pattern
@@ -37,9 +40,9 @@ class CounterClock : public Pattern
 public:
     explicit CounterClock();
     QList<patttype> *getData() override;
+    QList<patttype> *create(int len) override;
 private:
-    QList<patttype> *data;
-    QList<patttype> *create(int len);
+    QList<patttype> *data;    
 };
 
 class BinaryCode : public Pattern
@@ -48,9 +51,9 @@ class BinaryCode : public Pattern
 public:
     explicit BinaryCode();
     QList<patttype> *getData() override;
+    QList<patttype> *create(int chanNum) override;
 private:
-    QList<patttype> *data;
-    QList<patttype> *create(int chanNum);
+    QList<patttype> *data;    
 };
 
 class GrayCode : public Pattern
@@ -59,9 +62,9 @@ class GrayCode : public Pattern
 public:
     explicit GrayCode();
     QList<patttype> *getData() override;
+    QList<patttype> *create(int chanNum) override;
 private:
-    QList<patttype> *data;
-    QList<patttype> *create(int chanNum);
+    QList<patttype> *data;    
 };
 
 class Quadrature : public Pattern
@@ -70,9 +73,9 @@ class Quadrature : public Pattern
 public:
     explicit Quadrature();
     QList<patttype> *getData() override;
+    QList<patttype> *create(int len) override;
 private:
-    QList<patttype> *data;
-    QList<patttype> *create(int len);
+    QList<patttype> *data;    
 };
 
 class PatternGeneratorPatterns : public QObject
@@ -81,14 +84,16 @@ class PatternGeneratorPatterns : public QObject
 public:
     explicit PatternGeneratorPatterns(QObject *parent = nullptr);
 
-    QList<patttype> *getData(int index);
+    QList<patttype> *createPatternOrJustGetData(int index, int len);
+    QList<patttype> *setDataLen(int index, int len);
+    QList<patttype> *setDefault(int index);
     void modifyPattern(int channel, int position, bool level);
 
-private:
+private:    
     int index;
     QSharedPointer<Pattern> pattern[PATTERNS_NUM];
 
-    QVector<std::function<QSharedPointer<Pattern>()>> createPattern = {
+    QVector<std::function<QSharedPointer<Pattern>()>> createPatternObj = {
             [] { return QSharedPointer<Pattern>(new UserDefined); },
             [] { return QSharedPointer<Pattern>(new CounterClock); },
             [] { return QSharedPointer<Pattern>(new BinaryCode); },

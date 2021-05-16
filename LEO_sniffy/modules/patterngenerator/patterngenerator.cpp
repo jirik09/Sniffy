@@ -110,7 +110,7 @@ void PatternGenerator::startPatternUpload()
 {
     dataBeingUploaded = true;    
     genComms->setSignalToSend(pattGenWindow->getPatternData());
-    genComms->setSamplingFrequency(0, pattGenWindow->settings->getFrequency()*genComms->getSignaLength(0));
+    genComms->setSamplingFrequency(0, config->freq[config->pattIndex]*genComms->getSignaLength(0));
     genComms->sendNext();
 }
 

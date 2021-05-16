@@ -22,6 +22,7 @@
 #include "patterngeneratorspec.h"
 #include "patterngeneratorsettings.h"
 #include "patterngeneratorpatterns.h"
+#include "patterngeneratorpainter.h"
 
 namespace Ui {
 class PatternGeneratorWindow;
@@ -45,12 +46,13 @@ public:
     void setGenerateButton(QString text, QString color);
     void setGeneratorState(bool onClick);
 
-    QList<quint8> *getPatternData();
+    QList<quint8> *getPatternData();    
 
 private:
     Ui::PatternGeneratorWindow *ui;
     PatternGeneratorConfig *config;
     PatternGeneratorSpec *spec;    
+    PatternGeneratorPainter *painter;
 
     widgetChart *chart;
     QVector<QVector<QPointF>> *chartData;
@@ -61,6 +63,11 @@ private slots:
 
     void runGeneratorCallback();
     void openFileCallback();
+    void restorePattern();   
+
+    void freqChangedDialsCallback(float val);
+    void freqChangedCombosCallback(int index, float realVal);
+    void dataLenChangedDialsCallback(float val);
 
 signals:
     void runGenerator();

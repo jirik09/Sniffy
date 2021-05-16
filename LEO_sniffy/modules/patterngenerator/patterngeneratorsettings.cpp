@@ -29,9 +29,7 @@ PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, Pat
     buttonSetDefault = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
     buttonSetDefault->setText("Default");
     buttonSetDefault->setObjectName("buttonPattGenSetDefault");
-    destination->addWidget(buttonSetDefault);
-
-    connect(comboPatternSelection, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorSettings::patternSelectionChangedCallback);
+    destination->addWidget(buttonSetDefault);    
 }
 
 void PatternGeneratorSettings::restoreSettingsAfterStartup()
@@ -61,42 +59,69 @@ void PatternGeneratorSettings::createUserDefinedComponents(QWidget *parent, QVBo
     buttonUserDefLoadPattern->setObjectName("buttonLoadUserDef");
     destination->addWidget(buttonUserDefLoadPattern);
 
-    dialUserDefFreq = createDial(parent, "dialUserDefFreq");
+    dialUserDefFreq = createFrequencyDial(parent, "dialUserDefFreq");
     destination->addWidget(dialUserDefFreq);
-    config->freq[index] = dialUserDefFreq->getRealValue();
-    connect(dialUserDefFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorSettings::freqChangedDialsCallback);
+
+    dialUserDefLength = new WidgetDialRange(parent, "");
+    dialUserDefLength->setName("Data Length");
+    dialUserDefLength->hideUnitSelection();
+    dialUserDefLength->setRange(2, 100, "Tick", 1, 1, PATT_DEFAULT_DATA_LENGTH, false, 0);
+    dialUserDefLength->setObjectName("dialUserDefLength");
+    destination->addWidget(dialUserDefLength);
+
+    config->freq[index] = dialUserDefFreq->getRealValue();       
 }
 
 void PatternGeneratorSettings::createCounterComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-    dialCounterFreq = createDial(parent, "dialCounterFreq");
-    destination->addWidget(dialCounterFreq);    
+    dialCounterFreq = createFrequencyDial(parent, "dialCounterFreq");
+    destination->addWidget(dialCounterFreq);
+
+    dialCounterLength = new WidgetDialRange(parent, "");
+    dialCounterLength->setName("Data Length");
+    dialCounterLength->hideUnitSelection();
+    dialCounterLength->setRange(2, 100, "Tick", 1, 1, PATT_DEFAULT_DATA_LENGTH, false, 0);
+    dialCounterLength->setObjectName("dialCounterLength");
+    destination->addWidget(dialCounterLength);
+
     config->freq[index] = dialCounterFreq->getRealValue();
-    connect(dialCounterFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorSettings::freqChangedDialsCallback);
 }
 
 void PatternGeneratorSettings::createBinaryCodeComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-    dialBinaryCodeFreq = createDial(parent, "dialBinaryCodeFreq");
+    dialBinaryCodeFreq = createFrequencyDial(parent, "dialBinaryCodeFreq");
     destination->addWidget(dialBinaryCodeFreq);    
-    config->freq[index] = dialCounterFreq->getRealValue();
-    connect(dialBinaryCodeFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorSettings::freqChangedDialsCallback);
+
+    dialBinaryChanNum = new WidgetDialRange(parent, "");
+    dialBinaryChanNum->setName("Channel no.");
+    dialBinaryChanNum->hideUnitSelection();
+    dialBinaryChanNum->setRange(2, PATT_DEFAULT_DATA_LENGTH, "#", 1, 1, PATT_DEFAULT_DATA_LENGTH, false, 0);
+    dialBinaryChanNum->setObjectName("dialBinaryChanNum");
+    destination->addWidget(dialBinaryChanNum);
+
+    config->freq[index] = dialCounterFreq->getRealValue();    
 }
 
 void PatternGeneratorSettings::createGrayCodeComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-    dialGrayCodeFreq = createDial(parent, "dialGrayCodeFreq");
+    dialGrayCodeFreq = createFrequencyDial(parent, "dialGrayCodeFreq");
     destination->addWidget(dialGrayCodeFreq);
-    config->freq[index] = dialGrayCodeFreq->getRealValue();
-    connect(dialGrayCodeFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorSettings::freqChangedDialsCallback);
+
+    dialGrayCodeChanNum = new WidgetDialRange(parent, "");
+    dialGrayCodeChanNum->setName("Channel no.");
+    dialGrayCodeChanNum->hideUnitSelection();
+    dialGrayCodeChanNum->setRange(2, PATT_DEFAULT_DATA_LENGTH, "#", 1, 1, PATT_DEFAULT_DATA_LENGTH, false, 0);
+    dialGrayCodeChanNum->setObjectName("dialGrayCodeChanNum");
+    destination->addWidget(dialGrayCodeChanNum);
+
+    config->freq[index] = dialGrayCodeFreq->getRealValue();    
 }
 
 void PatternGeneratorSettings::createQuadratureComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-    dialQuadratureFreq = createDial(parent, "dialQuadratureFreq");
+    dialQuadratureFreq = createFrequencyDial(parent, "dialQuadratureFreq");
     destination->addWidget(dialQuadratureFreq);
-    config->freq[index] = dialQuadratureFreq->getRealValue();
-    connect(dialQuadratureFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorSettings::freqChangedDialsCallback);
+    config->freq[index] = dialQuadratureFreq->getRealValue();    
 }
 
 void PatternGeneratorSettings::createUartComponents(QWidget *parent, QVBoxLayout *destination, int index)
@@ -124,16 +149,15 @@ void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout 
     comboI2cCommType->addOption("Write", 1);
     destination->addWidget(comboI2cCommType);    
 
-    config->freq[index] = comboI2cClockFreq->getSelectedValue();
-    connect(comboI2cClockFreq, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorSettings::freqChangedCombosCallback);
+    config->freq[index] = comboI2cClockFreq->getSelectedValue();    
 }
 
-WidgetDialRange *PatternGeneratorSettings::createDial(QWidget *parent, QString objName)
+WidgetDialRange *PatternGeneratorSettings::createFrequencyDial(QWidget *parent, QString objName)
 {
     WidgetDialRange *dial = new WidgetDialRange(parent, "");
     dial->setName("Frequency");
     dial->hideUnitSelection();
-    dial->setRange(1, 36000000, "Hz", 1, 1, 1000, true, 2);
+    dial->setRange(1, PATT_DEFAULT_GEN_FREQ, "Hz", 1, 1, 1000, true, 2);
     dial->setObjectName(objName);
 
     return dial;
@@ -150,32 +174,3 @@ void PatternGeneratorSettings::enableGuiComponents(bool enable)
     patternArea[config->pattIndex]->setEnabled(enable);
     buttonSetDefault->setEnabled(enable);
 }
-
-qreal PatternGeneratorSettings::getFrequency()
-{
-    return config->freq[config->pattIndex];
-}
-
-/******************************** Callbacks *********************************/
-
-void PatternGeneratorSettings::patternSelectionChangedCallback(int index)
-{
-    showComponents(config->pattIndex, false);
-    showComponents(index, true);
-
-    config->pattIndex = index;
-
-    emit patternSelectionChanged(index);
-}
-
-void PatternGeneratorSettings::freqChangedDialsCallback(float val)
-{
-    config->freq[config->pattIndex] = val;
-}
-
-void PatternGeneratorSettings::freqChangedCombosCallback(int index, float realVal)
-{
-    Q_UNUSED(index);
-    config->freq[config->pattIndex] = realVal;
-}
-

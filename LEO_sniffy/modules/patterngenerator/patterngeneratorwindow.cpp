@@ -22,25 +22,37 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     verticalLayout_chart->setContentsMargins(0,0,0,0);
     verticalLayout_chart->setSpacing(0);
 
-    chart = new widgetChart(widget_chart, 4);
-    chart->setRange(0, 1, 0, 1);
-    chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_DEFAULT));
+    chart = new widgetChart(widget_chart, MAX_PATT_CHANNELS_NUM);
     verticalLayout_chart->addWidget(chart);
-
-    settings = new PatternGeneratorSettings(verticalLayout_settings, config, this);
-    patterns = new PatternGeneratorPatterns(this);
-    //fileLoader = new PatternGeneratorFileLoader();
 
     ui->widget_settings->setLayout(verticalLayout_settings);
     ui->widget_module->resize(600,300);
     ui->widget_module->setLayout(verticalLayout_chart);
 
-    chartData = new QVector<QVector<QPointF>>;    
+    chartData = new QVector<QVector<QPointF>>;
     patternData = new QList<quint8>;
 
-    connect(settings, &PatternGeneratorSettings::patternSelectionChanged, this, &PatternGeneratorWindow::patternSelectionChangedCallback);
-    connect(settings->buttonUserDefLoadPattern, &WidgetButtons::clicked, this, &PatternGeneratorWindow::openFileCallback);
+    settings = new PatternGeneratorSettings(verticalLayout_settings, config, this);
+    patterns = new PatternGeneratorPatterns(this);
+    painter = new PatternGeneratorPainter(chart, config, this);
+    //fileLoader = new PatternGeneratorFileLoader();
+
+    connect(settings->comboPatternSelection, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorWindow::patternSelectionChangedCallback);
     connect(settings->buttonStart, &WidgetButtons::clicked, this, &PatternGeneratorWindow::runGeneratorCallback);
+    connect(settings->buttonSetDefault, &WidgetButtons::clicked, this, &PatternGeneratorWindow::restorePattern);
+
+    connect(settings->buttonUserDefLoadPattern, &WidgetButtons::clicked, this, &PatternGeneratorWindow::openFileCallback);
+    connect(settings->dialUserDefFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::freqChangedDialsCallback);
+    connect(settings->dialCounterFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::freqChangedDialsCallback);
+    connect(settings->dialBinaryCodeFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::freqChangedDialsCallback);
+    connect(settings->dialGrayCodeFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::freqChangedDialsCallback);
+    connect(settings->dialQuadratureFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::freqChangedDialsCallback);
+    connect(settings->comboI2cClockFreq, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorWindow::freqChangedCombosCallback);
+
+    connect(settings->dialUserDefLength, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
+    connect(settings->dialCounterLength, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
+    connect(settings->dialBinaryChanNum, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
+    connect(settings->dialGrayCodeChanNum, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
 }
 
 PatternGeneratorWindow::~PatternGeneratorWindow()
@@ -51,7 +63,9 @@ PatternGeneratorWindow::~PatternGeneratorWindow()
 void PatternGeneratorWindow::restoreGUIAfterStartup()
 {
     settings->restoreSettingsAfterStartup();
-    patternData = patterns->getData(config->pattIndex);
+    patternData = patterns->createPatternOrJustGetData(config->pattIndex, config->dataLen[config->pattIndex]);
+
+    painter->repaint(patternData);
 }
 
 void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
@@ -99,11 +113,6 @@ QList<quint8> *PatternGeneratorWindow::getPatternData()
     return patternData;
 }
 
-void PatternGeneratorWindow::patternSelectionChangedCallback(int index)
-{
-    patternData = patterns->getData(index);
-}
-
 void PatternGeneratorWindow::runGeneratorCallback()
 {
     setGeneratorState(true);
@@ -115,5 +124,43 @@ void PatternGeneratorWindow::openFileCallback()
     int tmp = 0;
     fileName = QFileDialog::getOpenFileName(this,"Select input file","","Text files (*.csv *.txt)");
     /* TODO: creeate file loader */
+}
+
+void PatternGeneratorWindow::restorePattern()
+{
+    patterns->setDefault(config->pattIndex);
+}
+
+/******************************** Common Callbacks *********************************/
+
+void PatternGeneratorWindow::patternSelectionChangedCallback(int index)
+{
+    patternData = patterns->createPatternOrJustGetData(index, config->dataLen[index]);
+
+    settings->showComponents(config->pattIndex, false);
+    settings->showComponents(index, true);
+
+    config->pattIndex = index;
+    painter->repaint(patternData);
+}
+
+void PatternGeneratorWindow::freqChangedDialsCallback(float val)
+{
+    config->freq[config->pattIndex] = val;    
+    painter->repaint(patternData);
+}
+
+void PatternGeneratorWindow::freqChangedCombosCallback(int index, float realVal)
+{
+    Q_UNUSED(index);
+    config->freq[config->pattIndex] = realVal;
+    painter->repaint(patternData);
+}
+
+void PatternGeneratorWindow::dataLenChangedDialsCallback(float val)
+{
+    config->dataLen[config->pattIndex] = val;
+    patternData = patterns->setDataLen(config->pattIndex, val);
+    painter->repaint(patternData);
 }
 

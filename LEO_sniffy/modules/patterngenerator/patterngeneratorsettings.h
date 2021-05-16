@@ -27,12 +27,16 @@ public:
 
     WidgetButtons *buttonUserDefLoadPattern;
     WidgetDialRange *dialUserDefFreq;
+    WidgetDialRange *dialUserDefLength;
 
-    WidgetDialRange *dialCounterFreq;
+    WidgetDialRange *dialCounterFreq;    
+    WidgetDialRange *dialCounterLength;
 
-    WidgetDialRange *dialBinaryCodeFreq;
+    WidgetDialRange *dialBinaryCodeFreq;    
+    WidgetDialRange *dialBinaryChanNum;
 
     WidgetDialRange *dialGrayCodeFreq;
+    WidgetDialRange *dialGrayCodeChanNum;
 
     WidgetDialRange *dialQuadratureFreq;
 
@@ -41,7 +45,7 @@ public:
 
     void restoreSettingsAfterStartup(void);
     void enableGuiComponents(bool enable);
-    qreal getFrequency();
+    void showComponents(int pattIndex, bool visible);
 
 private:
     PatternGeneratorConfig *config;
@@ -80,19 +84,10 @@ private:
     void createSpiComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createI2cComponents(QWidget *parent, QVBoxLayout *destination, int index);
 
-    WidgetDialRange *createDial(QWidget *parent, QString objName);
-
-    void showComponents(int pattIndex, bool visible);
-
-private slots:
-    void patternSelectionChangedCallback(int index);
-
-    void freqChangedDialsCallback(float val);
-    void freqChangedCombosCallback(int index, float realVal);
+    WidgetDialRange *createFrequencyDial(QWidget *parent, QString objName);        
 
 signals:
     void patternSelectionChanged(int index);
-
 };
 
 #endif // PATTERNGENERATORSETTINGS_H

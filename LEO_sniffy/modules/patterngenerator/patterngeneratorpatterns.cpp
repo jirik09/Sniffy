@@ -1,12 +1,20 @@
 #include "patterngeneratorpatterns.h"
 
+/****************************** CONSTRUCTORS START :D ******************************/
 Pattern::Pattern(QObject *parent) : QObject(parent){}
 
-UserDefined::UserDefined(){ data = new QList<patttype>; create(8); }
-CounterClock::CounterClock(){ data = new QList<patttype>; create(8); }
-BinaryCode::BinaryCode(){ data = new QList<patttype>; create(4); }
-GrayCode::GrayCode(){ data = new QList<patttype>; create(4); }
-Quadrature::Quadrature(){ data = new QList<patttype>; create(8); }
+UserDefined::UserDefined(){ data = new QList<patttype>; }
+CounterClock::CounterClock(){ data = new QList<patttype>; }
+BinaryCode::BinaryCode(){ data = new QList<patttype>; }
+GrayCode::GrayCode(){ data = new QList<patttype>; }
+Quadrature::Quadrature(){ data = new QList<patttype>; }
+
+PatternGeneratorPatterns::PatternGeneratorPatterns(QObject *parent) : QObject(parent)
+{
+    for(int i = 0; i < PATTERNS_NUM; i++)
+        pattern[i] = nullptr;
+}
+/****************************** CONSTRUCTORS END :D ******************************/
 
 QList<patttype> *UserDefined::getData(){ return data; }
 QList<patttype> *CounterClock::getData(){ return data; }
@@ -14,20 +22,26 @@ QList<patttype> *BinaryCode::getData(){ return data; }
 QList<patttype> *GrayCode::getData(){ return data; }
 QList<patttype> *Quadrature::getData(){ return data; }
 
-PatternGeneratorPatterns::PatternGeneratorPatterns(QObject *parent) : QObject(parent)
-{
-    for(int i = 0; i < PATTERNS_NUM; i++)
-        pattern[i] = nullptr;
-}
-
-QList<patttype> *PatternGeneratorPatterns::getData(int index)
+QList<patttype> *PatternGeneratorPatterns::createPatternOrJustGetData(int index, int len)
 {
     this->index = index;
 
-    if(pattern[index] == nullptr)
-        pattern[index] = createPattern[index]();
+    if(pattern[index] == nullptr){
+        pattern[index] = createPatternObj[index]();
+        pattern[index]->create(len);
+    }
 
     return pattern[index]->getData();
+}
+
+QList<patttype> *PatternGeneratorPatterns::setDataLen(int index, int len)
+{
+    return pattern[index]->create(len);
+}
+
+QList<patttype> *PatternGeneratorPatterns::setDefault(int index)
+{
+    return pattern[index]->create(PATT_DEFAULT_DATA_LENGTH);
 }
 
 void PatternGeneratorPatterns::modifyPattern(int channel, int position, bool level)
@@ -45,6 +59,8 @@ void PatternGeneratorPatterns::modifyPattern(int channel, int position, bool lev
 
 QList<patttype> *UserDefined::create(int len)
 {        
+    data->clear();
+
     for(int i = 0; i < len; i++)
         data->append((0 | CLOCK_CH8) & CLOCK_MASK(i));
 
@@ -53,6 +69,8 @@ QList<patttype> *UserDefined::create(int len)
 
 QList<patttype> *CounterClock::create(int len)
 {
+    data->clear();
+
     patttype counterShift = 1;
     for(int i = 0; i < len; i++){
         data->append(counterShift);
@@ -64,10 +82,12 @@ QList<patttype> *CounterClock::create(int len)
 
 QList<patttype> *BinaryCode::create(int chanNum)
 {
-    int i = 0;
-    for(patttype val = 0; val < (chanNum*chanNum); val++){
-        data->append((val | CLOCK_CH8) & CLOCK_MASK(i));
-        i++;
+    data->clear();
+
+    int val = 0;
+    for(int i = 0; i < (1 << chanNum); i++){
+        data->append(val);
+        val++;
     }
 
     return data;
@@ -75,11 +95,13 @@ QList<patttype> *BinaryCode::create(int chanNum)
 
 QList<patttype> *GrayCode::create(int chanNum)
 {
-    int i = 0;
-    for(patttype val = 0; val < (chanNum*chanNum); val++){
-        val ^= (val >> 1);
-        data->append((val | CLOCK_CH8) & CLOCK_MASK(i));
-        i++;
+    data->clear();
+
+    int val;
+    for (int i = 0; i < (1 << chanNum); i++)
+    {
+        val = (i ^ (i >> 1));
+        data->append(val);
     }
 
     return data;
@@ -87,7 +109,7 @@ QList<patttype> *GrayCode::create(int chanNum)
 
 QList<patttype> *Quadrature::create(int len)
 {
-
+    data->clear();
 
     return data;
 }

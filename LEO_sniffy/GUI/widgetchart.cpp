@@ -177,7 +177,7 @@ void widgetChart::createSeries(QAbstractSeries *series){
 
 
 bool widgetChart::eventFilter(QObject *obj, QEvent *event)
-{
+{    
     Q_UNUSED(obj);
     if(event->type() == QEvent::GraphicsSceneWheel){ //zoom by wheel
         QGraphicsSceneWheelEvent *ev = (QGraphicsSceneWheelEvent*) event;

@@ -25,6 +25,7 @@ public:
     int pattIndex = 0;
 
     qreal freq[PATTERNS_NUM];
+    float dataLen[PATTERNS_NUM];
 };
 
 #endif // PATTERNGENERATORCONFIG_H
