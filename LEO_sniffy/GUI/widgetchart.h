@@ -31,22 +31,22 @@ class widgetChart;
 
 enum class MarkerType
 {
-ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK, CROSS, CIRCLE,TRIGGER
+    ARROW_DOWN_BIG, ARROW_UP_SMALL, ARROW_DOWN_SMALL, TICK, CROSS, CIRCLE,TRIGGER
 };
 
 enum class Cursor
 {
-CURSOR_A, CURSOR_B
+    CURSOR_A, CURSOR_B
 };
 
 enum class ChartMode
 {
-LINE, SPLINE, SCATTER
+    LINE, SPLINE, SCATTER
 };
 
 enum class EventSelection
 {
-ALL, CLICKS_ONLY
+    ALL, CLICKS_ONLY
 };
 
 class widgetChart : public QWidget
@@ -73,7 +73,7 @@ public:
     void setRangeY(qreal minY, qreal maxY);
     void setRange(qreal minX, qreal maxX, qreal minY, qreal maxY);
     qreal getSignalValue (int traceIndex, qreal time);
-    void setMargins(int left, int top, int right, int bottom);    
+    void setMargins(int left, int top, int right, int bottom);
 
     void setZoom(float invZoom);
     qreal getZoom();
@@ -114,9 +114,9 @@ private:
     QMenu *menu;
     QAction *spline, *line, *scatter, *btnOpenGL;
     enum enable {DISABLED, ENABLED} openGL = DISABLED;
-    ChartMode chartMode = ChartMode::LINE;    
+    ChartMode chartMode = ChartMode::LINE;
 
-    int maxTraces;    
+    int maxTraces;
 
     qreal minX = 0;
     qreal maxX = 1;

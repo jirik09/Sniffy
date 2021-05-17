@@ -58,7 +58,7 @@ void PatternGeneratorPainter::configDefaultChart(){
     chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
     chart->setMargins(-12, -5, -6, -10);
     chart->setLabelsVisible(true, false);
-    chart->setRange(0, 1, 0, PATT_RANGE_CHAN1_LOG1 + 1);
+    chart->setRange(0, 1, 0.9, PATT_RANGE_CHAN1_LOG1 + 0.9);
     for(int i = 0; i < MAX_PATT_CHANNELS_NUM; i++)
         chart->setTraceColor(i, Graphics::getChannelColor(0));
 }

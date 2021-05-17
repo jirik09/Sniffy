@@ -169,13 +169,17 @@ void PatternGeneratorWindow::dataLenChangedDialsCallback(float val)
 
 void PatternGeneratorWindow::chartLeftClickCallback(QGraphicsSceneMouseEvent *event)
 {
-    int exp = (patterns->isExponencial()) ? 2 : 1;
+    int dataLen = config->dataLen[config->pattIndex];
+    int dataNum = (patterns->isExponencial()) ? qPow(2, dataLen) : dataLen;
 
-    int height = chart->geometry().height();
-    int width = chart->geometry().width();
+    qreal height = chart->geometry().height();
+    qreal width = chart->geometry().width();
 
-    int position = (event->pos().x() / width) * qPow(config->dataLen[config->pattIndex], exp);
-    int channel = (event->pos().y() / height) * MAX_PATT_CHANNELS_NUM;
+    int position = ((event->pos().x() - 25) / (width - 44)) * dataNum;
+    int channel = ((event->pos().y() - 23) / (height - 27)) * MAX_PATT_CHANNELS_NUM;
+
+    if(position >= dataNum)
+        position = dataNum - 1;
 
     patternData = patterns->modifyPattern(channel, position);
 

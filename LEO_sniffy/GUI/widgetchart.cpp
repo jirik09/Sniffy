@@ -232,7 +232,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     }
 
     if(event->type() == QEvent::GraphicsSceneMouseRelease){
-        mousePressed = false;        
+        mousePressed = false;
         QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
         emit mouseLeftClickEvent(ev);
         QApplication::restoreOverrideCursor();
@@ -629,8 +629,6 @@ void widgetChart::clearAllCursors()
     cursorsHorizontal[0]->clear();
     cursorsHorizontal[1]->clear();
 }
-
-
 
 void widgetChart::initContextMenu(){
     menu = new QMenu(tr("Context menu"), this);
