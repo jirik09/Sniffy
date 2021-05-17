@@ -181,6 +181,9 @@ void PatternGeneratorWindow::chartLeftClickCallback(QGraphicsSceneMouseEvent *ev
     if(position >= dataNum)
         position = dataNum - 1;
 
+    if(position < 0)
+        position = 0;
+
     patternData = patterns->modifyPattern(channel, position);
 
     painter->repaint(patternData);
