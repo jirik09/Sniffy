@@ -179,26 +179,44 @@ void widgetChart::createSeries(QAbstractSeries *series){
 bool widgetChart::eventFilter(QObject *obj, QEvent *event)
 {    
     Q_UNUSED(obj);
-    if(event->type() == QEvent::GraphicsSceneWheel){ //zoom by wheel
-        QGraphicsSceneWheelEvent *ev = (QGraphicsSceneWheelEvent*) event;
-        qreal tmp = ev->delta();
-        if(tmp>=0){
-            localZoom = localZoom *qPow(1.001,tmp);
-        }else{
-            localZoom = localZoom / qPow(1.001,-tmp);
-            if(localZoom<1)
-                localZoom=1;
+
+    if(eventSel != EventSelection::CLICKS_ONLY){
+        if(event->type() == QEvent::GraphicsSceneWheel){ //zoom by wheel
+            QGraphicsSceneWheelEvent *ev = (QGraphicsSceneWheelEvent*) event;
+            qreal tmp = ev->delta();
+            if(tmp>=0){
+                localZoom = localZoom *qPow(1.001,tmp);
+            }else{
+                localZoom = localZoom / qPow(1.001,-tmp);
+                if(localZoom<1)
+                    localZoom=1;
+            }
+            emit localZoomChanged();
+            updateAxis();
         }
-        emit localZoomChanged();
-        updateAxis();
-    }
-    if(event->type() == QEvent::GraphicsSceneMouseDoubleClick){ //restore zoom on double click
-        localZoom = 1;
-        shift = abs(minX)/(maxX-minX);
-        if(shift>1)shift = 1;
-        if(shift<0)shift = 0;
-        emit localZoomChanged();
-        updateAxis();
+
+        if(event->type() == QEvent::GraphicsSceneMouseDoubleClick){ //restore zoom on double click
+            localZoom = 1;
+            shift = abs(minX)/(maxX-minX);
+            if(shift>1)shift = 1;
+            if(shift<0)shift = 0;
+            emit localZoomChanged();
+            updateAxis();
+        }
+
+        if(event->type() == QEvent::GraphicsSceneMouseMove){ //move signal when dragged
+
+            QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+            qreal distance = ((ev->pos().x()- mousePressedPoint.x())/chart->geometry().width())/(localZoom/invZoom);
+            shift = initMouseShift - distance;
+            if(shift>1){
+                shift = 1;
+            }else if(shift<0){
+                shift = 0;
+            }
+            emit localZoomChanged();
+            updateAxis();
+        }
     }
 
     if(event->type() == QEvent::GraphicsSceneMousePress){ //drag signal
@@ -214,27 +232,16 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     }
 
     if(event->type() == QEvent::GraphicsSceneMouseRelease){
-        mousePressed = false;
-        QApplication::restoreOverrideCursor();
-    }
-
-    if(event->type() == QEvent::GraphicsSceneMouseMove){ //move signal when dragged
-
+        mousePressed = false;        
         QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
-        qreal distance = ((ev->pos().x()- mousePressedPoint.x())/chart->geometry().width())/(localZoom/invZoom);
-        shift = initMouseShift - distance;
-        if(shift>1){
-            shift = 1;
-        }else if(shift<0){
-            shift = 0;
-        }
-        emit localZoomChanged();
-        updateAxis();
+        emit mouseLeftClickEvent(ev);
+        QApplication::restoreOverrideCursor();
     }
 
     if(event->type() == QEvent::GraphicsSceneHoverEnter){
         QApplication::setOverrideCursor(QCursor(Qt::OpenHandCursor));
     }
+
     if(event->type() == QEvent::GraphicsSceneHoverLeave){
         QApplication::restoreOverrideCursor();
     }
@@ -283,7 +290,7 @@ void widgetChart::updateAxis(){
     qreal tmpMax = (maxX-minX)*invZoom/localZoom+tmpMin;
     axisX->setRange(tmpMin,tmpMax);
 
-  /*  if(!seriesList.isEmpty() && seriesList.at(0)->count()>1){
+    /*  if(!seriesList.isEmpty() && seriesList.at(0)->count()>1){
         qreal percent = (tmpMax-tmpMin)/(seriesList.at(0)->points().last().x()-seriesList.at(0)->points().first().x());
         int samplesshown = percent*seriesList.at(0)->count();
        // qDebug() << "Update axis " +QString::number(samplesshown)<<"points";
@@ -388,9 +395,10 @@ qreal widgetChart::getShift()
     return shift;
 }
 
-void widgetChart::enableLocalMouseZoom()
+void widgetChart::enableLocalMouseEvents(EventSelection sel)
 {
     chart->installEventFilter(this);
+    eventSel = sel;
 }
 
 void widgetChart::setGridLinesVisible(bool gridVisibleX, bool gridVisibleY){
@@ -415,7 +423,7 @@ void widgetChart::setGraphColor(QColor qColor){
 }
 
 void widgetChart::setTraceColor(int index, QColor color){
-    seriesList.at(index)->setColor(color);    
+    seriesList.at(index)->setColor(color);
 }
 
 void widgetChart::formatAxisLabelsForScope(){
@@ -636,7 +644,7 @@ void widgetChart::initContextMenu(){
     scatter  = new QAction("Points", this);
     scatter->setCheckable(true);
     scatter->setChecked(false);
-   /* btnOpenGL = new QAction("Use OpenGL", this);
+    /* btnOpenGL = new QAction("Use OpenGL", this);
     btnOpenGL->setCheckable(true);
     btnOpenGL->setChecked(true);*/
 

@@ -69,6 +69,8 @@ private slots:
     void freqChangedCombosCallback(int index, float realVal);
     void dataLenChangedDialsCallback(float val);
 
+    void chartLeftClickCallback(QGraphicsSceneMouseEvent* event);
+
 signals:
     void runGenerator();
     void stopGenerator();

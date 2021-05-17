@@ -21,6 +21,7 @@ public:
     explicit Pattern(QObject *parent = nullptr);
     virtual QList<patttype> *getData() = 0;
     virtual QList<patttype> *create(int) = 0;
+    virtual  bool isExponencial() = 0;
 };
 
 class UserDefined : public Pattern
@@ -30,8 +31,10 @@ public:
     explicit UserDefined();
     QList<patttype> *getData() override;
     QList<patttype> *create(int len) override;
+    bool  isExponencial() override;
 private:
-    QList<patttype> *data;    
+    QList<patttype> *data;
+    const bool exp = false;
 };
 
 class CounterClock : public Pattern
@@ -41,8 +44,10 @@ public:
     explicit CounterClock();
     QList<patttype> *getData() override;
     QList<patttype> *create(int len) override;
+    bool isExponencial() override;
 private:
-    QList<patttype> *data;    
+    QList<patttype> *data;
+    const bool exp = false;
 };
 
 class BinaryCode : public Pattern
@@ -52,8 +57,10 @@ public:
     explicit BinaryCode();
     QList<patttype> *getData() override;
     QList<patttype> *create(int chanNum) override;
+    bool isExponencial() override;
 private:
-    QList<patttype> *data;    
+    QList<patttype> *data;
+    const bool exp = true;
 };
 
 class GrayCode : public Pattern
@@ -63,8 +70,10 @@ public:
     explicit GrayCode();
     QList<patttype> *getData() override;
     QList<patttype> *create(int chanNum) override;
+    bool isExponencial() override;
 private:
-    QList<patttype> *data;    
+    QList<patttype> *data;
+    const bool exp = true;
 };
 
 class Quadrature : public Pattern
@@ -72,10 +81,12 @@ class Quadrature : public Pattern
     Q_OBJECT
 public:
     explicit Quadrature();
+    const bool exp = false;
     QList<patttype> *getData() override;
     QList<patttype> *create(int len) override;
+    bool isExponencial() override;
 private:
-    QList<patttype> *data;    
+    QList<patttype> *data;
 };
 
 class PatternGeneratorPatterns : public QObject
@@ -87,7 +98,8 @@ public:
     QList<patttype> *createPatternOrJustGetData(int index, int len);
     QList<patttype> *setDataLen(int index, int len);
     QList<patttype> *setDefault(int index);
-    void modifyPattern(int channel, int position, bool level);
+    QList<patttype> *modifyPattern(int channel, int position);
+    bool isExponencial();
 
 private:    
     int index;

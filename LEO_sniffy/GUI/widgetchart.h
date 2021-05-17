@@ -44,6 +44,11 @@ enum class ChartMode
 LINE, SPLINE, SCATTER
 };
 
+enum class EventSelection
+{
+ALL, CLICKS_ONLY
+};
+
 class widgetChart : public QWidget
 {
     Q_OBJECT
@@ -53,6 +58,9 @@ class widgetChart : public QWidget
 public:
     explicit widgetChart(QWidget *parent = nullptr, int maxTraces = 1);
     ~widgetChart();
+
+    EventSelection eventSel = EventSelection::ALL;
+
     void clearAll();
     void clearPoints(int startIndex, int endIndex);
     void clearPoint(int traceIndex, int index);
@@ -73,7 +81,7 @@ public:
     void setLocalZoom(const qreal &value);
     void setShift (float shift);
     qreal getShift();
-    void enableLocalMouseZoom();
+    void enableLocalMouseEvents(EventSelection sel);
 
     void setGridLinesVisible(bool gridVisibleX, bool gridVisibleY);
     void setGridDensity(int tickX, int tickY);
@@ -106,9 +114,9 @@ private:
     QMenu *menu;
     QAction *spline, *line, *scatter, *btnOpenGL;
     enum enable {DISABLED, ENABLED} openGL = DISABLED;
-    ChartMode chartMode = ChartMode::LINE;
+    ChartMode chartMode = ChartMode::LINE;    
 
-    int maxTraces;
+    int maxTraces;    
 
     qreal minX = 0;
     qreal maxX = 1;
@@ -123,6 +131,7 @@ private:
     bool mousePressed = false;
     QPointF mousePressedPoint;
     qreal initMouseShift;
+    bool mouseClickEventOnly = false;
 
     QChart *chart;
 
@@ -153,6 +162,7 @@ private:
 signals:
     void chartSeriesChanged();
     void localZoomChanged();
+    void mouseLeftClickEvent(QGraphicsSceneMouseEvent* event);
 
 private slots:
     void switchToSplineSeriesCallback();

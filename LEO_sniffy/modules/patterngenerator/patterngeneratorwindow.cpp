@@ -23,6 +23,7 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     verticalLayout_chart->setSpacing(0);
 
     chart = new widgetChart(widget_chart, MAX_PATT_CHANNELS_NUM);
+    chart->enableLocalMouseEvents(EventSelection::CLICKS_ONLY);
     verticalLayout_chart->addWidget(chart);
 
     ui->widget_settings->setLayout(verticalLayout_settings);
@@ -53,6 +54,8 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     connect(settings->dialCounterLength, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
     connect(settings->dialBinaryChanNum, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
     connect(settings->dialGrayCodeChanNum, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
+
+    connect(chart, &widgetChart::mouseLeftClickEvent, this, &PatternGeneratorWindow::chartLeftClickCallback);
 }
 
 PatternGeneratorWindow::~PatternGeneratorWindow()
@@ -146,7 +149,7 @@ void PatternGeneratorWindow::patternSelectionChangedCallback(int index)
 
 void PatternGeneratorWindow::freqChangedDialsCallback(float val)
 {
-    config->freq[config->pattIndex] = val;    
+    config->freq[config->pattIndex] = val;
     painter->repaint(patternData);
 }
 
@@ -163,4 +166,21 @@ void PatternGeneratorWindow::dataLenChangedDialsCallback(float val)
     patternData = patterns->setDataLen(config->pattIndex, val);
     painter->repaint(patternData);
 }
+
+void PatternGeneratorWindow::chartLeftClickCallback(QGraphicsSceneMouseEvent *event)
+{
+    int exp = (patterns->isExponencial()) ? 2 : 1;
+
+    int height = chart->geometry().height();
+    int width = chart->geometry().width();
+
+    int position = (event->pos().x() / width) * qPow(config->dataLen[config->pattIndex], exp);
+    int channel = (event->pos().y() / height) * MAX_PATT_CHANNELS_NUM;
+
+    patternData = patterns->modifyPattern(channel, position);
+
+    painter->repaint(patternData);
+}
+
+
 
