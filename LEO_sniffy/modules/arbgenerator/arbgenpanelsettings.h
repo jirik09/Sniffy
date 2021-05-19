@@ -30,9 +30,9 @@ public:
     void setChannelShapeControl(int index, int shape);
     void restoreGUI();
     void setMaxNumChannels(int numChannels);
-    void setLabels(QString freq, QString length, int index);
-    void setFreqLabel(QString freq, int index);
-    void setPWMFreqLabel(QString freq, int index);
+    void setDataLengthLabels(int length, int index);
+    void setFreqLabel(qreal freq, int index,int precision = 4);
+    void setPWMFreqLabel(qreal freq, int index, int precision = 3);
     void setPWMResolutionLabel(QString res, int index);
     void disableGUI();
     void enableGUI();
@@ -72,13 +72,11 @@ public:
     WidgetDialRange *dialDutyCh[MAX_ARB_CHANNELS_NUM];
     WidgetDialRange *dialPhaseCh[MAX_ARB_CHANNELS_NUM];
     WidgetSwitch *syncwithCh1[MAX_ARB_CHANNELS_NUM];
-    WidgetLabel *labelRealFreq[MAX_ARB_CHANNELS_NUM];
     WidgetLabel *labelDataLength[MAX_ARB_CHANNELS_NUM];
     WidgetSwitch *swSyncWithCH1[MAX_ARB_CHANNELS_NUM];
     WidgetSwitch *swSyncPWMWithCH1[MAX_ARB_CHANNELS_NUM];
 
     WidgetDialRange *dialPWMFreqCh[MAX_ARB_CHANNELS_NUM];
-    WidgetLabel *labelRealPWMFreq[MAX_ARB_CHANNELS_NUM];
     WidgetLabel *labelPWMResolution[MAX_ARB_CHANNELS_NUM];
 
     SignalShape signalShape[MAX_ARB_CHANNELS_NUM];
