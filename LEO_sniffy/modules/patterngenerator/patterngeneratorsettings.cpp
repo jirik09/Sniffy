@@ -27,9 +27,11 @@ PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, Pat
     destination->addItem(verticalSpacer);
 
     buttonSetDefault = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
-    buttonSetDefault->setText("Default");
+    buttonSetDefault->setText("Reset");
     buttonSetDefault->setObjectName("buttonPattGenSetDefault");
-    destination->addWidget(buttonSetDefault);    
+    destination->addWidget(buttonSetDefault);
+
+    connect(buttonSetDefault, &WidgetButtons::clicked, this, &PatternGeneratorSettings::resetPatternCallback);
 }
 
 void PatternGeneratorSettings::restoreSettingsAfterStartup()
@@ -121,6 +123,7 @@ void PatternGeneratorSettings::createQuadratureComponents(QWidget *parent, QVBox
 {
     dialQuadratureFreq = createFrequencyDial(parent, "dialQuadratureFreq");
     destination->addWidget(dialQuadratureFreq);
+
     config->freq[index] = dialQuadratureFreq->getRealValue();    
 }
 
@@ -157,11 +160,67 @@ WidgetDialRange *PatternGeneratorSettings::createFrequencyDial(QWidget *parent, 
     WidgetDialRange *dial = new WidgetDialRange(parent, "");
     dial->setName("Frequency");
     dial->hideUnitSelection();
-    dial->setRange(1, PATT_DEFAULT_GEN_FREQ, "Hz", 1, 1, 1000, true, 2);
+    dial->setRange(1, MAX_PATT_GEN_FREQ, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
     dial->setObjectName(objName);
 
     return dial;
 }
+
+/******************************************************************************************/
+
+void PatternGeneratorSettings::resetPatternCallback(int index)
+{
+    Q_UNUSED(index);
+    (this->*resetPatternComponents[config->pattIndex])();
+}
+
+void PatternGeneratorSettings::resetUserDefinedComponents(){
+    resetFreqAndDataLenDials(dialUserDefFreq, dialUserDefLength);
+}
+
+void PatternGeneratorSettings::resetCounterComponents(){
+    resetFreqAndDataLenDials(dialCounterFreq, dialCounterLength);
+}
+
+void PatternGeneratorSettings::resetBinaryCodeComponents(){
+    resetFreqAndDataLenDials(dialBinaryCodeFreq, dialBinaryChanNum);
+}
+
+void PatternGeneratorSettings::resetGrayCodeComponents(){
+    resetFreqAndDataLenDials(dialGrayCodeFreq, dialGrayCodeChanNum);
+}
+
+void PatternGeneratorSettings::resetQuadratureComponents()
+{
+    dialQuadratureFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    config->freq[config->pattIndex] = dialQuadratureFreq->getRealValue();
+
+}
+
+void PatternGeneratorSettings::resetUartComponents()
+{
+
+}
+
+void PatternGeneratorSettings::resetSpiComponents()
+{
+
+}
+
+void PatternGeneratorSettings::resetI2cComponents()
+{
+
+}
+
+void PatternGeneratorSettings::resetFreqAndDataLenDials(WidgetDialRange *freqDial, WidgetDialRange *dataLenDial)
+{
+    freqDial->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    dataLenDial->setRealValue(PATT_DEFAULT_DATA_LENGTH, true);
+    config->freq[config->pattIndex] = freqDial->getRealValue();
+    config->dataLen[config->pattIndex] = dataLenDial->getRealValue();
+}
+
+/******************************************************************************************/
 
 void PatternGeneratorSettings::showComponents(int pattIndex, bool visible)
 {

@@ -21,7 +21,7 @@ public:
     explicit Pattern(QObject *parent = nullptr);
     virtual QList<patttype> *getData() = 0;
     virtual QList<patttype> *create(int) = 0;
-    virtual  bool isExponencial() = 0;
+    virtual  bool isExponencial() = 0;    
 };
 
 class UserDefined : public Pattern
@@ -31,7 +31,7 @@ public:
     explicit UserDefined();
     QList<patttype> *getData() override;
     QList<patttype> *create(int len) override;
-    bool  isExponencial() override;
+    bool  isExponencial() override;    
 private:
     QList<patttype> *data;
     const bool exp = false;

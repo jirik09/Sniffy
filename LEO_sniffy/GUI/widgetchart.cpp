@@ -411,6 +411,10 @@ void widgetChart::setGridDensity(int tickX, int tickY){
     axisY->setTickCount(tickY);
 }
 
+void widgetChart::setGridHorizontalDensity(int tickX){
+    axisX->setTickCount(tickX);
+}
+
 void widgetChart::setGraphColor(QColor qColor){
     axisX->setLabelsBrush(QBrush(qColor));
     axisY->setLabelsBrush(QBrush(qColor));

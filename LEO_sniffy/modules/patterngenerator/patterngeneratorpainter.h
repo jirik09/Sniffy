@@ -6,6 +6,7 @@
 #include "../../GUI/widgetchart.h"
 
 #include "patterngeneratorconfig.h"
+#include "patterngeneratorpatterns.h"
 
 class PatternGeneratorPainter : public QObject
 {

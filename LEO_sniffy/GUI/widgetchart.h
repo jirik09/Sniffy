@@ -85,6 +85,7 @@ public:
 
     void setGridLinesVisible(bool gridVisibleX, bool gridVisibleY);
     void setGridDensity(int tickX, int tickY);
+    void setGridHorizontalDensity(int tickX);
 
     void formatAxisLabelsForScope();
     void formatLabels(QString axisXLabelForm, QString axisYLabelForm);

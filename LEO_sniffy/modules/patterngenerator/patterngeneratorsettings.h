@@ -39,6 +39,7 @@ public:
     WidgetDialRange *dialGrayCodeChanNum;
 
     WidgetDialRange *dialQuadratureFreq;
+    WidgetDialRange *dialQuadratureChanNum;
 
     WidgetSelection *comboI2cClockFreq;
     WidgetSelection *comboI2cCommType;        
@@ -61,7 +62,7 @@ private:
         "I2C"
     };
 
-    QWidget *patternArea[PATTERNS_NUM];
+    QWidget *patternArea[PATTERNS_NUM];    
 
     void (PatternGeneratorSettings::*createPatternComponents[PATTERNS_NUM])(QWidget*,QVBoxLayout*,int) = {
             &PatternGeneratorSettings::createUserDefinedComponents,
@@ -72,6 +73,16 @@ private:
             &PatternGeneratorSettings::createUartComponents,
             &PatternGeneratorSettings::createSpiComponents,
             &PatternGeneratorSettings::createI2cComponents, };
+
+    void (PatternGeneratorSettings::*resetPatternComponents[PATTERNS_NUM])() = {
+            &PatternGeneratorSettings::resetUserDefinedComponents,
+            &PatternGeneratorSettings::resetCounterComponents,
+            &PatternGeneratorSettings::resetBinaryCodeComponents,
+            &PatternGeneratorSettings::resetGrayCodeComponents,
+            &PatternGeneratorSettings::resetQuadratureComponents,
+            &PatternGeneratorSettings::resetUartComponents,
+            &PatternGeneratorSettings::resetSpiComponents,
+            &PatternGeneratorSettings::resetI2cComponents, };
 
     void createComponents(QWidget *parent, QVBoxLayout *destination);
 
@@ -84,10 +95,24 @@ private:
     void createSpiComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createI2cComponents(QWidget *parent, QVBoxLayout *destination, int index);
 
-    WidgetDialRange *createFrequencyDial(QWidget *parent, QString objName);        
+    WidgetDialRange *createFrequencyDial(QWidget *parent, QString objName);
+
+    void resetUserDefinedComponents();
+    void resetCounterComponents();
+    void resetBinaryCodeComponents();
+    void resetGrayCodeComponents();
+    void resetQuadratureComponents();
+    void resetUartComponents();
+    void resetSpiComponents();
+    void resetI2cComponents();
+
+    void resetFreqAndDataLenDials(WidgetDialRange *freqDial, WidgetDialRange *dataLenDial);
 
 signals:
     void patternSelectionChanged(int index);
+
+private slots:
+    void resetPatternCallback(int index);
 };
 
 #endif // PATTERNGENERATORSETTINGS_H

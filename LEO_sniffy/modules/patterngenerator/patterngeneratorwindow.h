@@ -63,13 +63,13 @@ private slots:
 
     void runGeneratorCallback();
     void openFileCallback();
-    void restorePattern();   
+    void resetPatternCallback();   
 
     void freqChangedDialsCallback(float val);
     void freqChangedCombosCallback(int index, float realVal);
     void dataLenChangedDialsCallback(float val);
 
-    void chartLeftClickCallback(QGraphicsSceneMouseEvent* event);
+    void chartEditDataOnLeftClickCallback(QGraphicsSceneMouseEvent* event);
 
 signals:
     void runGenerator();

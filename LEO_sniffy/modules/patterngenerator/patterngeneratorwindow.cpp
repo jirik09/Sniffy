@@ -40,7 +40,7 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
 
     connect(settings->comboPatternSelection, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorWindow::patternSelectionChangedCallback);
     connect(settings->buttonStart, &WidgetButtons::clicked, this, &PatternGeneratorWindow::runGeneratorCallback);
-    connect(settings->buttonSetDefault, &WidgetButtons::clicked, this, &PatternGeneratorWindow::restorePattern);
+    connect(settings->buttonSetDefault, &WidgetButtons::clicked, this, &PatternGeneratorWindow::resetPatternCallback);
 
     connect(settings->buttonUserDefLoadPattern, &WidgetButtons::clicked, this, &PatternGeneratorWindow::openFileCallback);
     connect(settings->dialUserDefFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::freqChangedDialsCallback);
@@ -55,7 +55,7 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     connect(settings->dialBinaryChanNum, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
     connect(settings->dialGrayCodeChanNum, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
 
-    connect(chart, &widgetChart::mouseLeftClickEvent, this, &PatternGeneratorWindow::chartLeftClickCallback);
+    connect(chart, &widgetChart::mouseLeftClickEvent, this, &PatternGeneratorWindow::chartEditDataOnLeftClickCallback);
 }
 
 PatternGeneratorWindow::~PatternGeneratorWindow()
@@ -129,9 +129,10 @@ void PatternGeneratorWindow::openFileCallback()
     /* TODO: creeate file loader */
 }
 
-void PatternGeneratorWindow::restorePattern()
+void PatternGeneratorWindow::resetPatternCallback()
 {
-    patterns->setDefault(config->pattIndex);
+    patternData = patterns->setDefault(config->pattIndex);
+    painter->repaint(patternData);
 }
 
 /******************************** Common Callbacks *********************************/
@@ -167,7 +168,7 @@ void PatternGeneratorWindow::dataLenChangedDialsCallback(float val)
     painter->repaint(patternData);
 }
 
-void PatternGeneratorWindow::chartLeftClickCallback(QGraphicsSceneMouseEvent *event)
+void PatternGeneratorWindow::chartEditDataOnLeftClickCallback(QGraphicsSceneMouseEvent *event)
 {
     int dataLen = config->dataLen[config->pattIndex];
     int dataNum = (patterns->isExponencial()) ? qPow(2, dataLen) : dataLen;
@@ -176,12 +177,11 @@ void PatternGeneratorWindow::chartLeftClickCallback(QGraphicsSceneMouseEvent *ev
     qreal width = chart->geometry().width();
 
     int position = ((event->pos().x() - 25) / (width - 44)) * dataNum;
-    int channel = ((event->pos().y() - 23) / (height - 27)) * MAX_PATT_CHANNELS_NUM;
+    int channel = ((event->pos().y() - 20) / (height - 30)) * MAX_PATT_CHANNELS_NUM;
 
     if(position >= dataNum)
         position = dataNum - 1;
-
-    if(position < 0)
+    else if(position < 0)
         position = 0;
 
     patternData = patterns->modifyPattern(channel, position);
