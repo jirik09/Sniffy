@@ -12,7 +12,7 @@ PanelAdvanced::PanelAdvanced(QVBoxLayout *destination, QWidget *parent)
 
     destination->addWidget(new WidgetSeparator(parent,"Sampling"));
 
-    samplingFrequencyInput = new WidgetTextInput(parent,"Sampling","100000",InputTextType::NUMBER);
+    samplingFrequencyInput = new WidgetTextInput(parent,"Sampling","100k",InputTextType::NUMBER);
     destination->addWidget(samplingFrequencyInput);
 
     samplingFrequencyReal = new WidgetLabel(parent,"Real Sampling","--");
