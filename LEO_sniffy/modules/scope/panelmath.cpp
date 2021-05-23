@@ -153,6 +153,8 @@ void PanelMath::symbolicError(int errorPosition)
 
 void PanelMath::typeChanged(int index)
 {
+    if(previousMathType == index && index != 0)
+        return;
     hideAll();
 
     switch (index) {
