@@ -64,7 +64,6 @@ void WidgetTextInput::processInput()
 
 bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
     bool processTextEdit = false;
-    qDebug () << "EVENT" <<event->type();
     if(event->type()==QEvent::Show)graphicsShown = true;
     if(event->type()==QEvent::Hide)graphicsShown = false;
 

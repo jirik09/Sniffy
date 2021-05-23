@@ -46,7 +46,7 @@ Scope::Scope(QObject *parent)
     connect(timeAndMemoryHandle,&TimeBaseAndMemory::updateSamplingFrequency,this, &Scope::setSamplingFrequency);
     connect(timeAndMemoryHandle,&TimeBaseAndMemory::updateMemorySamplesLength,this, &Scope::setDataLength);
     connect(timeAndMemoryHandle,&TimeBaseAndMemory::updateNumChannels,this, &Scope::setNumberOfChannels);
-
+    connect(timeAndMemoryHandle,&TimeBaseAndMemory::updateDataResolution,this, &Scope::setResolution);
 }
 
 void Scope::parseData(QByteArray data){
@@ -179,18 +179,22 @@ void Scope::writeConfiguration(){
     isConfigurationWritten = true;
     scpWindow->restoreGUIAfterStartup();
     scpWindow->setNumChannels(specification->maxADCChannels);
+    scpWindow->setRealSamplingRateAndLlength(config->realSamplingRate,config->dataLength);
 
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
 
     timeAndMemoryHandle->setMaxParams(specification->memorySize,specification->maxADCChannels);
 
-    setSamplingFrequency(config->requestedSamplingRate);
+    setResolution(config->ADCresolution);
     setDataLength(config->dataLength);
+    setSamplingFrequency(config->requestedSamplingRate);
     updateTriggerLevel(config->triggerLevelPercent);
     updatePretrigger(config->pretriggerPercent);
     updateTriggerEdge(config->triggerEdge);
     setNumberOfChannels(config->numberOfChannels);
     updateTriggerChannel(config->triggerChannelIndex);
+    if(config->triggerMode==ScopeTriggerMode::TRIG_STOP)
+        config->triggerMode=ScopeTriggerMode::TRIG_SINGLE;
     setTriggerMode(config->triggerMode);
 }
 
@@ -269,8 +273,7 @@ void Scope::updateMemoryCustomLength(int length)
 
 void Scope::updateResolution(int resolution)
 {
-    config->ADCresolution = resolution;
-    setResolution(resolution);
+    timeAndMemoryHandle->setDataResolution(resolution);
 }
 
 void Scope::updateChannelsEnable(int buttonStatus){

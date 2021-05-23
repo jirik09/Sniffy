@@ -3,7 +3,6 @@
 TimeBaseAndMemory::TimeBaseAndMemory(ScopeConfig *config,QObject *parent) :  QObject(parent), config(config)
 {
     totalnumOfDiv = qreal(DEFAULT_MEM_SAMPLES_LENGTH)/DEFAULT_SAMPL_PER_DIV;
-  //  samplesPerDiv = DEFAULT_SAMPL_PER_DIV;
 }
 
 void TimeBaseAndMemory::setMaxParams(int memorySize, int numChannels)
@@ -41,14 +40,6 @@ void TimeBaseAndMemory::overWriteMemoryLength(int samples)
     config->dataLength = fmin(samples,tmpMaxSamples);
     config->timeBase = (qreal)config->dataLength/totalnumOfDiv/config->requestedSamplingRate;
     emit updateMemorySamplesLength(config->dataLength);
-
-   /* config->memPolicy = MemoryPolicy::NORMAL;
-    int tmpMaxSamples = maxMemorySize / config->numberOfChannels / (config->ADCresolution>8?2:1);
-    config->dataLength = fmin(samples,tmpMaxSamples);
-    samplesPerDiv = config->dataLength / DEFAULT_CHART_DIV;
-    totalnumOfDiv = DEFAULT_CHART_DIV;
-    setTimeBase((float)config->dataLength/config->requestedSamplingRate/DEFAULT_CHART_DIV);
-    emit updateMemorySamplesLength(config->dataLength);*/
 }
 
 void TimeBaseAndMemory::setMemoryPolicy(MemoryPolicy policy)
@@ -76,8 +67,18 @@ void TimeBaseAndMemory::setNumOfChannels(int chanNum)
 
 void TimeBaseAndMemory::setDataResolution(int bits)
 {
-    //TODO
-    config->ADCresolution = bits;
+    if(config->ADCresolution != bits){
+        if(config->ADCresolution > bits){
+            config->ADCresolution = bits;
+            emit updateDataResolution(bits);
+            handleMemoryPolicy();
+        }else{
+            config->ADCresolution = bits;
+            handleMemoryPolicy();
+            emit updateDataResolution(bits);
+        }
+        emit updateSamplingFrequency(config->requestedSamplingRate);
+    }
 }
 
 void TimeBaseAndMemory::handleMemoryPolicy(){
@@ -100,12 +101,6 @@ void TimeBaseAndMemory::handleMemoryPolicy(){
         emit updateMemorySamplesLength(config->dataLength);
     }
     setTimeBase(config->timeBase);
-}
-
-qreal TimeBaseAndMemory::getNumOfDiv() const
-{
-  //  return totalnumOfDiv;
-    return 0;
 }
 
 qreal TimeBaseAndMemory::getZoom() const
