@@ -21,7 +21,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (new SyncPwm(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this,true)));
-  //  tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
+    tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
  //   tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
@@ -147,8 +147,6 @@ void DeviceMediator::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
     QByteArray dataToPass = data.right(data.length()-4);
 
-    //What if data belongs to voltmeter and scope???????????
-    //Solution1: each module has to know if it is running or not and handle data correctly.
     foreach(QSharedPointer<AbstractModule> module, modules){
         if(dataHeader == module->getCommandPrefix() && (module->isActive() || dataToPass.left(4) == "CFG_" || dataToPass.left(4) == "ACK_")){
             module->parseData(dataToPass);
@@ -164,7 +162,9 @@ void DeviceMediator::parseData(QByteArray data){
         if (data.right(1)=="E"){
             qDebug() << "DEVICE ERROR " << QString::number((uint8_t)((data.right(2)).at(0)));
         }
-
+        if(data.left(3)=="DBG"){
+            qDebug() << "DEBUG MCU: " << data.right(data.length()-4);
+        }
     }
 }
 

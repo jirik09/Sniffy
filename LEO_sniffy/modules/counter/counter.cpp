@@ -3,8 +3,10 @@
 Counter::Counter(QObject *parent)
 {
     Q_UNUSED(parent);
+
     config = new CounterConfig(this);
     cntWindow = new CounterWindow(config);
+    cntWindow->setObjectName("cntWindow");
 
     moduleCommandPrefix = cmd->COUNTER;
     moduleName = "Counter";
@@ -78,7 +80,7 @@ void Counter::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
     QByteArray dataToPass = data.remove(0, 4);
 
-    if(dataHeader == "CFG_"){
+    if(dataHeader == cmd->CONFIG){
         moduleSpecification = new CounterSpec(this);
         moduleSpecification->parseSpecification(dataToPass);
         cntWindow->setSpecification(static_cast<CounterSpec*>(moduleSpecification));

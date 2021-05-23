@@ -67,6 +67,7 @@ SOURCES += \
     modules/arbgenerator/arbgeneratorwindow.cpp \
     modules/arbgenerator/arbgenpanelsettings.cpp \
     modules/arbgenerator/arbgensweepcontroller.cpp \
+    modules/arbgenerator/gencommons.cpp \
     modules/arbgenerator/signalcreator.cpp \
     modules/counter/counter.cpp \
     modules/counter/counterconfig.cpp \
@@ -84,6 +85,7 @@ SOURCES += \
     modules/numberparser.cpp \
     modules/patterngenerator/patterngenerator.cpp \
     modules/patterngenerator/patterngeneratorconfig.cpp \
+    modules/patterngenerator/patterngeneratorsettings.cpp \
     modules/patterngenerator/patterngeneratorspec.cpp \
     modules/patterngenerator/patterngeneratorwindow.cpp \
     modules/pwmgenerator/pwmgeneratorconfig.cpp \
@@ -175,6 +177,7 @@ HEADERS += \
     modules/arbgenerator/arbgeneratorwindow.h \
     modules/arbgenerator/arbgenpanelsettings.h \
     modules/arbgenerator/arbgensweepcontroller.h \
+    modules/arbgenerator/gencommons.h \
     modules/arbgenerator/signalcreator.h \
     modules/counter/counter.h \
     modules/counter/counterconfig.h \
@@ -194,6 +197,7 @@ HEADERS += \
     modules/numberparser.h \
     modules/patterngenerator/patterngenerator.h \
     modules/patterngenerator/patterngeneratorconfig.h \
+    modules/patterngenerator/patterngeneratorsettings.h \
     modules/patterngenerator/patterngeneratorspec.h \
     modules/patterngenerator/patterngeneratorwindow.h \
     modules/pwmgenerator/pwmgenerator.h \

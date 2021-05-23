@@ -239,11 +239,14 @@ void AbstractModule::showModuleWindow(){
 void AbstractModule::closeModule(){
     dockWidgetWindow->hide();
 
-    if(moduleControlWidget->getStatus()!=ModuleStatus::STOP)
+    if(moduleControlWidget->getStatus()!=ModuleStatus::STOP && moduleControlWidget->getStatus()!=ModuleStatus::LOCKED){
         stopModule();
-    moduleControlWidget->setStatus(ModuleStatus::STOP);
-    if(moduleSpecification != nullptr)
-        emit releaseConflictingModules(moduleName, moduleSpecification->getResources());
+        moduleControlWidget->setStatus(ModuleStatus::STOP);
+        if(moduleSpecification != nullptr)
+            emit releaseConflictingModules(moduleName, moduleSpecification->getResources());
+    }
+
+
 }
 
 void AbstractModule::disableModule(){
