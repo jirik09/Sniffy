@@ -145,8 +145,6 @@ private:
     void fillTimeBase();
     void paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPointF> mathSeries);
     void paintMath(QVector<QPointF> mathSeries);
-
-    float previousTimeBase = 0;
 };
 
 #endif // WINDOWSCOPE_H

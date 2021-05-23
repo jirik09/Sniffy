@@ -18,9 +18,6 @@ void ScopeConfig::parse(QByteArray config)
     stream >> triggerLevel;// = 32767; //16bit number
     stream >> pretrigger;// = 32767; //16bit number
 
-    for(int i = 0; i<MAX_SCOPE_CHANNELS;i++){
-        stream >> enabledChannels[i];
-    }
     //parameters for GUI
     stream >> triggerLevelPercent;// = 50; //0-100% number
     stream >> pretriggerPercent;// = 50; //0-100% number
@@ -52,8 +49,6 @@ void ScopeConfig::parse(QByteArray config)
     stream >> cursorsActiveIndex;
     stream >> timeMin;// = -0.01;
     stream >> timeMax;// = 0.01;
-    stream >> chartLocalZoom;
-    stream >> chartShift;
     stream >> measCount;
 
     MeasurementType type;
@@ -90,9 +85,6 @@ QByteArray ScopeConfig::serialize()
     stream << triggerLevel;// = 32767; //16bit number
     stream << pretrigger;// = 32767; //16bit number
 
-    for(int i = 0; i<MAX_SCOPE_CHANNELS;i++){
-        stream << enabledChannels[i];
-    }
     //parameters for GUI
     stream << triggerLevelPercent;// = 50; //0-100% number
     stream << pretriggerPercent;// = 50; //0-100% number
@@ -124,8 +116,6 @@ QByteArray ScopeConfig::serialize()
     stream << cursorsActiveIndex;
     stream << timeMin;// = -0.01;
     stream << timeMax;// = 0.01;
-    stream << chartLocalZoom;
-    stream << chartShift;
     stream << measCount;
     for(int i = 0; i<measCount;i++){
         stream << scopeMeasList[i]->getType();

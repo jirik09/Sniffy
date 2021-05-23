@@ -231,13 +231,11 @@ void ScopeWindow::channelVerticalShiftCallback(float value){
 }
 
 void ScopeWindow::timeBaseCallback(float value){
-    emit timeBaseChanged(value);
     updateChartTimeScale(value);
-    previousTimeBase = value;
+    emit timeBaseChanged(value);
 }
 void ScopeWindow::SamplingFreqCustomInputCallback(int freq){
     samlingFrequecyCustomInputChanged(freq);
- //   timeBaseCallback(1.0/(qreal)(freq)*100);
 }
 
 void ScopeWindow::dataLengthInputCallback(int length)
@@ -375,7 +373,6 @@ void ScopeWindow::fftchartChangedCallback(qreal scale, qreal shift, bool isLog)
 
 void ScopeWindow::sliderShiftCallback(int value){
     chart->setShift((float)value/10);
-    config->chartShift = (float)value/10;
 }
 
 void ScopeWindow::chartLocalZoomCallback()
@@ -519,8 +516,6 @@ void ScopeWindow::mathError(int errorPosition)
 
 void ScopeWindow::restoreGUIAfterStartup()
 {
-    chart->setLocalZoom(config->chartLocalZoom);
-    chart->setShift(config->chartShift);
     ui->sliderSignal->setValue((chart->getShift()*2000)-1000);
 
     int vertical = panelSet->buttonsChannelVertical->getSelectedIndex();
@@ -567,19 +562,17 @@ void ScopeWindow::setNumChannels(int channels){
         panelCursors->channelButtons->setButtonHidden(true,i);
         panelMath->btnChannelFFTSel->setButtonHidden(true,i);
     }
-
 }
 
 void ScopeWindow::updateChartTimeScale(float timeBase){
-    if(previousTimeBase !=0 && previousTimeBase != timeBase){
-        chart->setZoom(chart->getZoom()*previousTimeBase/timeBase);
+    if(config->timeBase !=0 && config->timeBase != timeBase){
+        chart->setZoom(chart->getZoom()*config->timeBase/timeBase);
     }
     if(chart->getLocalZoom()!=1.0){
         labelInfoPanel->setStyleSheet("QLabel#label_scale {color:"+Graphics::COLOR_WARNING+";}");
     }else{
         labelInfoPanel->setStyleSheet("color:"+Graphics::COLOR_TEXT_ALL+";");
     }
-    config->chartLocalZoom = chart->getLocalZoom();
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/div"));
 }
 

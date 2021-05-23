@@ -30,6 +30,7 @@ void TimeBaseAndMemory::setTimeBase(qreal secPerDiv)
 void TimeBaseAndMemory::overWriteSamplingFreq(int freq)
 {
     config->requestedSamplingRate = freq;
+    config->timeBase = (qreal)config->dataLength/totalnumOfDiv/config->requestedSamplingRate;
     emit updateSamplingFrequency(config->requestedSamplingRate);
 }
 

@@ -36,7 +36,6 @@ public:
 
 
     //parameters for GUI
-    int enabledChannels[MAX_SCOPE_CHANNELS] = {1,0 ,0, 0};
     float triggerLevelPercent = 50; //0-100% number
     float pretriggerPercent = 50; //0-100% number
     int requestedSamplingRate = 100000;
@@ -59,8 +58,6 @@ public:
     int cursorsActiveIndex = 0;
     float timeMin = -0.01;
     float timeMax = 0.01;
-    qreal chartLocalZoom = 1;
-    qreal chartShift = 1;
 
     int measCount = 0;
     QList<Measurement *> scopeMeasList;
