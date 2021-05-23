@@ -5,6 +5,7 @@ Scope::Scope(QObject *parent)
     Q_UNUSED(parent);
     config = new ScopeConfig();
     moduleSpecification = new ScopeSpec();
+    specification = static_cast<ScopeSpec*>(moduleSpecification);
     measCalc = new MeasCalculations();
     mathCalc = new MathCalculations();
     FFTCalc = new FFTengine();
@@ -17,6 +18,7 @@ Scope::Scope(QObject *parent)
     moduleIconURI = Graphics::getGraphicsPath()+"icon_scope.png";
 
     scopeData = new QVector<QVector<QPointF>>;
+    timeAndMemoryHandle = new TimeBaseAndMemory(config,this);
 
     //connect signals from GUI into scope
     connect(scpWindow, &ScopeWindow::timeBaseChanged,this,&Scope::updateTimebase);
@@ -26,7 +28,10 @@ Scope::Scope(QObject *parent)
     connect(scpWindow, &ScopeWindow::triggerModeChanged,this,&Scope::updateTriggerMode);
     connect(scpWindow, &ScopeWindow::triggerEdgeChanged,this,&Scope::updateTriggerEdge);
     connect(scpWindow, &ScopeWindow::triggerChannelChanged,this,&Scope::updateTriggerChannel);
-    connect(scpWindow, &ScopeWindow::memoryLengthChanged,this,&Scope::updateMemoryLength);
+    connect(scpWindow, &ScopeWindow::memoryPolicyChanged,this,&Scope::updateMemoryPolicy);
+    connect(scpWindow, &ScopeWindow::memoryCustomLengthChanged,this,&Scope::updateMemoryCustomLength);
+    connect(scpWindow, &ScopeWindow::samlingFrequecyCustomInputChanged,this,&Scope::updateCustomSamplingFreq);
+
     connect(scpWindow, &ScopeWindow::resolutionChanged,this,&Scope::updateResolution);
 
     connect(scpWindow, &ScopeWindow::measurementChanged,this, &Scope::addMeasurement);
@@ -37,6 +42,11 @@ Scope::Scope(QObject *parent)
     connect(scpWindow, &ScopeWindow::fftChanged,this,&Scope::updateFFTConfig);
     connect(mathCalc, &MathCalculations::mathCalculated, this, &Scope::updateMath);
     connect(FFTCalc, &FFTengine::fftCalculated, this, &Scope::updateFFT);
+
+    connect(timeAndMemoryHandle,&TimeBaseAndMemory::updateSamplingFrequency,this, &Scope::setSamplingFrequency);
+    connect(timeAndMemoryHandle,&TimeBaseAndMemory::updateMemorySamplesLength,this, &Scope::setDataLength);
+    connect(timeAndMemoryHandle,&TimeBaseAndMemory::updateNumChannels,this, &Scope::setNumberOfChannels);
+
 }
 
 void Scope::parseData(QByteArray data){
@@ -45,8 +55,8 @@ void Scope::parseData(QByteArray data){
     if(dataHeader=="CFG_"){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
-            showModuleControl();
-            buildModuleDescription(static_cast<ScopeSpec*>(moduleSpecification));
+        showModuleControl();
+        buildModuleDescription(specification);
     }else if(dataHeader=="SMPL"){
         if(config->triggerMode!=ScopeTriggerMode::TRIG_STOP){
             scpWindow->samplingOngoing();
@@ -62,7 +72,7 @@ void Scope::parseData(QByteArray data){
         qreal x(0);
         qreal y(0);
         int resolution;
-        int length;
+        int length, samples;
         int samplingFreq;
         int currentChannel=0;
         int numChannels=1;
@@ -77,7 +87,7 @@ void Scope::parseData(QByteArray data){
             resolution = tmpByte;
             config->ADCresolution = resolution;
             streamBuffLeng>>length;
-            config->dataLength = resolution>8?length/2:length;
+            samples = resolution>8?length/2:length;
             streamBuffLeng>>tmpShort;
             config->rangeMin = (qint16)tmpShort;
             streamBuffLeng>>tmpShort;
@@ -99,7 +109,7 @@ void Scope::parseData(QByteArray data){
             }
 
             if(resolution>8){
-                minX = float(config->dataLength)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
+                minX = float(samples)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
                 config->timeMin = minX;
                 for (int j(0); j < length/2; j++){
                     streamBuffLeng>>tmpByte;
@@ -113,7 +123,7 @@ void Scope::parseData(QByteArray data){
                 maxX = x;
                 config->timeMax = maxX;
             }else{
-                minX = float(config->dataLength)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
+                minX = float(samples)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
                 config->timeMin = minX;
                 for (int j(0); j < length; j++){
                     streamBuffLeng>>tmpByte;
@@ -145,11 +155,10 @@ void Scope::parseData(QByteArray data){
             }
             scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
 
-            //signal sometimes need to be zoomed to show correct value V/div
-            float zoomMultSampling = float(config->requestedSamplingRate)/config->realSamplingRate;
-            float zoomMultLength = config->signalMegazoom==true?1:(float)config->dataLength/1200;
-            scpWindow->setDataMinMaxTimeAndZoom(minX,maxX,zoomMultSampling*zoomMultLength);
-            scpWindow->setRealSamplingRate(samplingFreq);
+            qreal zoomMultSampling = float(config->requestedSamplingRate)/config->realSamplingRate;//signal sometimes need to be zoomed to show correct value V/div
+            qreal zoomMultLength = config->memPolicy==MemoryPolicy::ZOOM?(float)samples/config->dataLength:(float)samples/DEFAULT_MEM_SAMPLES_LENGTH;
+            scpWindow->setDataMinMaxTimeAndZoom(minX,maxX,zoomMultSampling*zoomMultLength*timeAndMemoryHandle->getDefaultZoom());
+            scpWindow->setRealSamplingRateAndLlength(samplingFreq,samples);
 
             //handle single trigger
             if(config->triggerMode!=ScopeTriggerMode::TRIG_SINGLE){
@@ -169,16 +178,16 @@ void Scope::writeConfiguration(){
 
     isConfigurationWritten = true;
     scpWindow->restoreGUIAfterStartup();
-    scpWindow->setNumChannels(static_cast<ScopeSpec*>(moduleSpecification)->maxADCChannels);
+    scpWindow->setNumChannels(specification->maxADCChannels);
 
     comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
-    updateTimebase(config->timeBase);
 
+    timeAndMemoryHandle->setMaxParams(specification->memorySize,specification->maxADCChannels);
+
+    setSamplingFrequency(config->requestedSamplingRate);
     setDataLength(config->dataLength);
-
     updateTriggerLevel(config->triggerLevelPercent);
     updatePretrigger(config->pretriggerPercent);
-
     updateTriggerEdge(config->triggerEdge);
     setNumberOfChannels(config->numberOfChannels);
     updateTriggerChannel(config->triggerChannelIndex);
@@ -209,14 +218,12 @@ QWidget* Scope::getWidget(){
 }
 
 void Scope::updateTimebase(float div){
-    config->timeBase = div;
-    if(config->signalMegazoom==true){
-        config->requestedSamplingRate = round(float(config->dataLength)/(12.0*div)+0.49);
-    }else{
-        config->requestedSamplingRate = round(float(100)/(div)+0.49);
-    }
-    setSamplingFrequency(config->requestedSamplingRate);
-    //updateTriggerMode(config->triggerMode);
+    timeAndMemoryHandle->setTimeBase(div);
+}
+
+void Scope::updateCustomSamplingFreq(int freq)
+{
+    timeAndMemoryHandle->setSamplingFreq(freq);
 }
 
 void Scope::updatePretrigger(float percentage){
@@ -251,28 +258,13 @@ void Scope::updateTriggerChannel(int index){
     config->triggerChannelIndex=index;
     setTriggerChannel(index);
 }
-void Scope::updateMemoryLength(int length){
-    if(length==0){
-        config->dataLength = 1200;
-        config->longestDataLength = false;
-        config->signalMegazoom = false;
-    }
-    if(length>0 && length<10){
-        config->longestDataLength = true;
-        config->signalMegazoom = length==2?true:false;
+void Scope::updateMemoryPolicy(int memPolicyIndex){
+    timeAndMemoryHandle->setMemoryLength((MemoryPolicy)memPolicyIndex);
+}
 
-        if(config->ADCresolution>8){
-            config->dataLength = static_cast<ScopeSpec*>(moduleSpecification)->memorySize/config->numberOfChannels/2;
-        }else{
-            config->dataLength = static_cast<ScopeSpec*>(moduleSpecification)->memorySize/config->numberOfChannels;
-        }
-    }else if (length > 0 && length >=100){
-        config->dataLength = length;
-        config->longestDataLength = false;
-        config->signalMegazoom = false;
-    }
-    updateTimebase(config->timeBase);
-    setDataLength(config->dataLength);
+void Scope::updateMemoryCustomLength(int length)
+{
+    timeAndMemoryHandle->setMemoryLength(length);
 }
 
 void Scope::updateResolution(int resolution)
@@ -282,34 +274,8 @@ void Scope::updateResolution(int resolution)
 }
 
 void Scope::updateChannelsEnable(int buttonStatus){
-    if(buttonStatus & 0x01){
-        config->enabledChannels[0]=1;
-        config->numberOfChannels = 1;
-    }
-    if(buttonStatus & 0x02){
-        config->enabledChannels[1]=1;
-        config->numberOfChannels = 2;
-    }
-    if(buttonStatus & 0x04){
-        config->enabledChannels[2]=1;
-        config->numberOfChannels = 3;
-    }
-    if(buttonStatus & 0x08){
-        config->enabledChannels[3]=1;
-        config->numberOfChannels = 4;
-    }
-    if(config->longestDataLength == true){
-        setDataLength(1200);
-        setNumberOfChannels(config->numberOfChannels);
-        if(config->signalMegazoom==true){
-            updateMemoryLength(2);
-        }else{
-            updateMemoryLength(1);
-        }
-    }else{
-        setNumberOfChannels(config->numberOfChannels);
-    }
     scpWindow->showDataTraces(*scopeData,config->timeBase,config->triggerChannelIndex);
+    timeAndMemoryHandle->setNumOfChannels(fmax(log2(buttonStatus),0)+1);
 }
 
 void Scope::addMeasurement(Measurement *m){

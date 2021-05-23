@@ -24,8 +24,7 @@ void ScopeConfig::parse(QByteArray config)
     //parameters for GUI
     stream >> triggerLevelPercent;// = 50; //0-100% number
     stream >> pretriggerPercent;// = 50; //0-100% number
-    stream >> longestDataLength;// = false;
-    stream >> signalMegazoom;// = false;
+    stream >> memPolicy;
     stream >> requestedSamplingRate;// = 10000;
 
     //params common for both
@@ -97,8 +96,7 @@ QByteArray ScopeConfig::serialize()
     //parameters for GUI
     stream << triggerLevelPercent;// = 50; //0-100% number
     stream << pretriggerPercent;// = 50; //0-100% number
-    stream << longestDataLength;// = false;
-    stream << signalMegazoom;// = false;
+    stream << memPolicy;
     stream << requestedSamplingRate;// = 10000;
 
     //params common for both

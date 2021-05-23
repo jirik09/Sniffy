@@ -11,8 +11,6 @@
 
 #include "../abstractconfiguration.h"
 
-
-
 class ScopeConfig : public AbstractConfiguration
 {
     Q_OBJECT
@@ -27,7 +25,7 @@ public:
     //parameters really in HW (received each time with data)
     int realSamplingRate;
     int ADCresolution;
-    int dataLength = 1200;
+    int dataLength = DEFAULT_MEM_SAMPLES_LENGTH;
     int rangeMin; //mV
     int rangeMax; //mv
 
@@ -41,15 +39,14 @@ public:
     int enabledChannels[MAX_SCOPE_CHANNELS] = {1,0 ,0, 0};
     float triggerLevelPercent = 50; //0-100% number
     float pretriggerPercent = 50; //0-100% number
-    bool longestDataLength = false;
-    bool signalMegazoom = false;
-    int requestedSamplingRate = 10000;
+    int requestedSamplingRate = 100000;
 
     //params common for both
     ScopeTriggerMode triggerMode = ScopeTriggerMode::TRIG_AUTO;
     int triggerChannelIndex = 0;
     ScopeTriggerEdge triggerEdge = ScopeTriggerEdge::EDGE_RISING;
     float timeBase = 0.001;
+    MemoryPolicy memPolicy = MemoryPolicy::NORMAL;
 
 
     //parems from GUI

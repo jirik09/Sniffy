@@ -54,7 +54,7 @@ public:
     void singleSamplingDone();
     void samplingOngoing();
     void triggerCaptured();
-    void setRealSamplingRate(int smpl);
+    void setRealSamplingRateAndLlength(int smpl, int len);
     void setNumChannels(int channels);
 
     void updateMeasurement(QList<Measurement*> m);
@@ -66,7 +66,9 @@ public:
 
 signals:
     void timeBaseChanged(float value);
-    void memoryLengthChanged(int length);
+    void memoryPolicyChanged(int index);
+    void memoryCustomLengthChanged(int length);
+    void samlingFrequecyCustomInputChanged(int freq);
     void triggerModeChanged(ScopeTriggerMode);
     void triggerEdgeChanged(ScopeTriggerEdge);
     void pretriggerChanged(float value);
@@ -86,10 +88,11 @@ private slots:
     void channelVerticalScaleCallback(float value);
     void channelVerticalShiftCallback(float value);
     void timeBaseCallback(float value);
-    void samplingFreqInputCallback (int freq);
+    void SamplingFreqCustomInputCallback (int freq);
     void dataLengthInputCallback (int length);
     void channelEnableCallback(int buttonStatus);
-    void longMemoryCallback(int index);
+    void memoryPolicyCallback(int index);
+    void memoryCustomLengthCallback(int index);
     void pretriggerCallback(float value);
     void triggerValueCallback(float value);
     void triggerChannelCallback(int index);

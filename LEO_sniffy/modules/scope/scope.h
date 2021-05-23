@@ -8,10 +8,12 @@
 #include <QList>
 #include <QSettings>
 
+#include "timebaseandmemory.h"
 #include "scopewindow.h"
 #include "scopeconfig.h"
 #include "scopespec.h"
 #include "fftengine.h"
+
 
 #include "communication/commands.h"
 #include "communication/comms.h"
@@ -39,12 +41,14 @@ public slots:
     void stopModule();
 
     void updateTimebase(float div);
+    void updateCustomSamplingFreq(int freq);
     void updatePretrigger(float percentage);
     void updateTriggerLevel(float percentage);
     void updateTriggerMode(ScopeTriggerMode mode);
     void updateTriggerEdge(ScopeTriggerEdge edge);
     void updateTriggerChannel(int index);
-    void updateMemoryLength(int length);
+    void updateMemoryPolicy(int memPolicyIndex);
+    void updateMemoryCustomLength(int length);
     void updateResolution(int resolution);
     void updateChannelsEnable(int buttonStatus);
     void addMeasurement(Measurement *m);
@@ -58,7 +62,8 @@ public slots:
 private:
     ScopeWindow *scpWindow;
     ScopeConfig *config;
-   // ScopeSpec *specification;
+    TimeBaseAndMemory *timeAndMemoryHandle;
+    ScopeSpec *specification;
     MeasCalculations *measCalc;
     MathCalculations *mathCalc;
     FFTengine *FFTCalc;

@@ -428,8 +428,6 @@ void widgetChart::formatAxisLabelsForScope(){
     font.setPointSize(8);
     axisX->setLabelsFont(font);
     axisY->setLabelsFont(font);
-    axisX->setTickCount(11);
-    axisY->setTickCount(9);
 }
 
 void widgetChart::formatLabels(QString axisXLabelForm, QString axisYLabelForm){

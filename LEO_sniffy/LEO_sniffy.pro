@@ -105,6 +105,7 @@ SOURCES += \
     modules/scope/scopeconfig.cpp \
     modules/scope/scopespec.cpp \
     modules/scope/scopewindow.cpp \
+    modules/scope/timebaseandmemory.cpp \
     modules/syncpwm/syncpwm.cpp \
     modules/syncpwm/syncpwmconfig.cpp \
     modules/syncpwm/syncpwmpainter.cpp \
@@ -218,6 +219,7 @@ HEADERS += \
     modules/scope/scopedefs.h \
     modules/scope/scopespec.h \
     modules/scope/scopewindow.h \
+    modules/scope/timebaseandmemory.h \
     modules/syncpwm/syncpwm.h \
     modules/syncpwm/syncpwmconfig.h \
     modules/syncpwm/syncpwmdefs.h \

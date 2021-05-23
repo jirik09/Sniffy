@@ -23,6 +23,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseZoom();
     chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
+    chart->setGridDensity(DEFAULT_CHART_DIV+1,9);
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
     chartFFT->setRange(0, 50000, 0, 8);
@@ -70,7 +71,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     connect(panelSet->buttonsTriggerEdge,SIGNAL(clicked(int)),this,SLOT(triggerEdgeCallback(int)));
     connect(panelSet->buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
     connect(panelSet->dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
-    connect(panelSet->buttonsMemorySet,&WidgetButtons::clicked,this,&ScopeWindow::longMemoryCallback);
+    connect(panelSet->buttonsMemorySet,&WidgetButtons::clicked,this,&ScopeWindow::memoryPolicyCallback);
 
     connect(panelSet->buttonsChannelVertical,&WidgetButtons::clicked,this, &ScopeWindow::channelVerticalCallback);
     connect(panelSet->dialVerticalScale,&WidgetDial::valueChanged,this,&ScopeWindow::channelVerticalScaleCallback);
@@ -100,8 +101,8 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     // ********************* create panel Advanced ****************
     panelAdvanced = new PanelAdvanced(tabs->getLayout(4),tabs);
     connect(panelAdvanced->resolutionButtons,&WidgetButtons::clicked,this,&ScopeWindow::resolutionChangedCallback);
-    connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::samplingFreqInputCallback);
-    connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::longMemoryCallback);
+    connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::SamplingFreqCustomInputCallback);
+    connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::memoryCustomLengthCallback);
 
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
@@ -203,7 +204,7 @@ void ScopeWindow::paintMath(QVector<QPointF> mathSeries){
 
 void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
     chart->setDataMinMax(minX,maxX);
-    chart->setZoom(zoom*1.2);
+    chart->setZoom(zoom);
 }
 
 void ScopeWindow::channelVerticalCallback(int index){
@@ -234,17 +235,23 @@ void ScopeWindow::timeBaseCallback(float value){
     updateChartTimeScale(value);
     previousTimeBase = value;
 }
-void ScopeWindow::samplingFreqInputCallback(int freq){
-    timeBaseCallback(1.0/(qreal)(freq)*100);
+void ScopeWindow::SamplingFreqCustomInputCallback(int freq){
+    samlingFrequecyCustomInputChanged(freq);
+ //   timeBaseCallback(1.0/(qreal)(freq)*100);
 }
 
 void ScopeWindow::dataLengthInputCallback(int length)
 {
-    if (length>=100) emit memoryLengthChanged(length);
+    if (length>=100) emit memoryPolicyChanged(length);
 }
 
-void ScopeWindow::longMemoryCallback(int index){
-    emit memoryLengthChanged(index);
+void ScopeWindow::memoryPolicyCallback(int index){
+    emit memoryPolicyChanged(index);
+}
+
+void ScopeWindow::memoryCustomLengthCallback(int number)
+{
+    emit memoryCustomLengthChanged(number);
 }
 
 void ScopeWindow::pretriggerCallback(float value){
@@ -547,8 +554,8 @@ void ScopeWindow::triggerCaptured(){
     labelInfoPanel->setTriggerLabelText("Trig");
 }
 
-void ScopeWindow::setRealSamplingRate(int smpl){
-    labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS") + "  ("+LabelFormator::formatOutout(config->dataLength,"")+")");
+void ScopeWindow::setRealSamplingRateAndLlength(int smpl, int len){
+    labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS") + "  ("+LabelFormator::formatOutout(len,"")+")");
     panelAdvanced->samplingFrequencyReal->setValue(LabelFormator::formatOutout(smpl,"SPS",4));
 }
 

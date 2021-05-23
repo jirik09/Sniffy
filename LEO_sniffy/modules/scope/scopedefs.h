@@ -16,6 +16,16 @@ enum class ScopeTriggerEdge
     EDGE_FALLING
 };
 
+enum class MemoryPolicy
+{
+    NORMAL = 0,
+    LONG = 1,
+    ZOOM = 2,
+};
+
 #define MAX_SCOPE_CHANNELS 4
+#define DEFAULT_MEM_SAMPLES_LENGTH 1200
+#define DEFAULT_CHART_DIV 10
+#define DEFAULT_SAMPL_PER_DIV 100
 
 #endif // SCOPEDEFS_H
