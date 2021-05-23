@@ -27,17 +27,18 @@ void TimeBaseAndMemory::setTimeBase(qreal secPerDiv)
     }
 }
 
-void TimeBaseAndMemory::setSamplingFreq(int freq)
+void TimeBaseAndMemory::overWriteSamplingFreq(int freq)
 {
     config->requestedSamplingRate = freq;
     emit updateSamplingFrequency(config->requestedSamplingRate);
 }
 
-void TimeBaseAndMemory::setMemoryLength(int samples)
+void TimeBaseAndMemory::overWriteMemoryLength(int samples)
 {
+    config->memPolicy = MemoryPolicy::OVERWRITE;
     int tmpMaxSamples = maxMemorySize / config->numberOfChannels / (config->ADCresolution>8?2:1);
     config->dataLength = fmin(samples,tmpMaxSamples);
-    totalnumOfDiv = qreal(config->dataLength)/DEFAULT_SAMPL_PER_DIV;
+    config->timeBase = (qreal)config->dataLength/totalnumOfDiv/config->requestedSamplingRate;
     emit updateMemorySamplesLength(config->dataLength);
 
    /* config->memPolicy = MemoryPolicy::NORMAL;
@@ -49,7 +50,7 @@ void TimeBaseAndMemory::setMemoryLength(int samples)
     emit updateMemorySamplesLength(config->dataLength);*/
 }
 
-void TimeBaseAndMemory::setMemoryLength(MemoryPolicy policy)
+void TimeBaseAndMemory::setMemoryPolicy(MemoryPolicy policy)
 {
     if(policy!= config->memPolicy){
         config->memPolicy= policy;
@@ -88,9 +89,10 @@ void TimeBaseAndMemory::handleMemoryPolicy(){
     case MemoryPolicy::ZOOM:
         tmpMemLen = maxMemorySize / config->numberOfChannels / (config->ADCresolution>8?2:1);
         break;
+    case MemoryPolicy::OVERWRITE:
+        tmpMemLen = config->dataLength; //do nothing
+        break;
     }
-  //  totalnumOfDiv = qreal(tmpMemLen)/DEFAULT_SAMPL_PER_DIV;
-  //  samplesPerDiv = DEFAULT_SAMPL_PER_DIV;
 
     if(tmpMemLen != config->dataLength){
         config->dataLength = tmpMemLen;
@@ -105,7 +107,14 @@ qreal TimeBaseAndMemory::getNumOfDiv() const
     return 0;
 }
 
-qreal TimeBaseAndMemory::getDefaultZoom() const
+qreal TimeBaseAndMemory::getZoom() const
 {
-    return qreal(DEFAULT_MEM_SAMPLES_LENGTH)/DEFAULT_SAMPL_PER_DIV/DEFAULT_CHART_DIV;
+    qreal zoomMultLength = 1;
+    if(config->memPolicy==MemoryPolicy::OVERWRITE){
+        zoomMultLength = 1;
+    }else if(config->memPolicy!=MemoryPolicy::ZOOM){
+        zoomMultLength = (qreal)config->dataLength/DEFAULT_MEM_SAMPLES_LENGTH;
+    }
+    qreal defaultZoom =  qreal(DEFAULT_MEM_SAMPLES_LENGTH)/DEFAULT_SAMPL_PER_DIV/DEFAULT_CHART_DIV;
+    return defaultZoom*zoomMultLength;
 }

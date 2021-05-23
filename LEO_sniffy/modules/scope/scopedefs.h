@@ -21,6 +21,7 @@ enum class MemoryPolicy
     NORMAL = 0,
     LONG = 1,
     ZOOM = 2,
+    OVERWRITE
 };
 
 #define MAX_SCOPE_CHANNELS 4

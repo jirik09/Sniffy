@@ -18,14 +18,14 @@ public:
     void setMaxParams(int memorySize, int numChannels);
 
     void setTimeBase(qreal secPerDiv);
-    void setSamplingFreq(int freq);
-    void setMemoryLength(int samples);
-    void setMemoryLength(MemoryPolicy policy);
+    void overWriteSamplingFreq(int freq);
+    void overWriteMemoryLength(int samples);
+    void setMemoryPolicy(MemoryPolicy policy);
     void setNumOfChannels(int chanNum);
     void setDataResolution(int bits);
 
     qreal getNumOfDiv() const;
-    qreal getDefaultZoom() const;
+    qreal getZoom() const;
 
 private:
     ScopeConfig *config;

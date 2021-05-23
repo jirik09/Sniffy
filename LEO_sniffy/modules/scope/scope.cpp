@@ -156,8 +156,8 @@ void Scope::parseData(QByteArray data){
             scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
 
             qreal zoomMultSampling = float(config->requestedSamplingRate)/config->realSamplingRate;//signal sometimes need to be zoomed to show correct value V/div
-            qreal zoomMultLength = config->memPolicy==MemoryPolicy::ZOOM?(float)samples/config->dataLength:(float)samples/DEFAULT_MEM_SAMPLES_LENGTH;
-            scpWindow->setDataMinMaxTimeAndZoom(minX,maxX,zoomMultSampling*zoomMultLength*timeAndMemoryHandle->getDefaultZoom());
+            qreal zoomMultLength = (float)samples/config->dataLength;
+            scpWindow->setDataMinMaxTimeAndZoom(minX,maxX,zoomMultSampling*zoomMultLength*timeAndMemoryHandle->getZoom());
             scpWindow->setRealSamplingRateAndLlength(samplingFreq,samples);
 
             //handle single trigger
@@ -223,7 +223,7 @@ void Scope::updateTimebase(float div){
 
 void Scope::updateCustomSamplingFreq(int freq)
 {
-    timeAndMemoryHandle->setSamplingFreq(freq);
+    timeAndMemoryHandle->overWriteSamplingFreq(freq);
 }
 
 void Scope::updatePretrigger(float percentage){
@@ -259,12 +259,12 @@ void Scope::updateTriggerChannel(int index){
     setTriggerChannel(index);
 }
 void Scope::updateMemoryPolicy(int memPolicyIndex){
-    timeAndMemoryHandle->setMemoryLength((MemoryPolicy)memPolicyIndex);
+    timeAndMemoryHandle->setMemoryPolicy((MemoryPolicy)memPolicyIndex);
 }
 
 void Scope::updateMemoryCustomLength(int length)
 {
-    timeAndMemoryHandle->setMemoryLength(length);
+    timeAndMemoryHandle->overWriteMemoryLength(length);
 }
 
 void Scope::updateResolution(int resolution)
