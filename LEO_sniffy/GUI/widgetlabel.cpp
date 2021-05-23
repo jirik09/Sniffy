@@ -25,6 +25,11 @@ void WidgetLabel::setValue(QString value){
     ui->label_value->setText(value);
 }
 
+void WidgetLabel::setValueAlignment(Qt::AlignmentFlag align)
+{
+        ui->label_value->setAlignment(align);
+}
+
 void WidgetLabel::setColor(QString color)
 {
     QString style = "QLabel{color:"+color+";}";

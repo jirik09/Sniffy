@@ -17,6 +17,7 @@ public:
 
     void setName(QString name);
     void setValue(QString value);
+    void setValueAlignment(Qt::AlignmentFlag align);
     void setColor(QString color);
 
 private:
