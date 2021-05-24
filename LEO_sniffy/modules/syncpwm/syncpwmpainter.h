@@ -12,26 +12,21 @@ class SyncPwmPainter : public QObject
 {
     Q_OBJECT
 public:
-    explicit SyncPwmPainter(widgetChart *chart, SyncPwmConfig *config, QObject *parent = nullptr);
-
-    SyncPwmConfig *config;
-    widgetChart *chart;
-
-    QVector<QVector<QPointF>> *points;   
+    explicit SyncPwmPainter(widgetChart *chart, SyncPwmConfig *config, QObject *parent = nullptr);       
 
     void repaint();
-    void repaint(int chanIndex); 
-
     void enableChannel(bool enable, int chanIndex);
 
-private:    
+private:
+    SyncPwmConfig *config;
+    widgetChart *chart;
+    QVector<QVector<QPointF>> *points;
     qreal freq;
 
     qreal setTimeScale();
     void configDefaultChart();
 
-    void recalculate();
-    void recalculate(int chanIndex);
+    void recalculate();    
 
 signals:
 

@@ -98,7 +98,8 @@ int GenCommons::getSignaLength(int channelIndex)
     return -1;
 }
 
-void GenCommons::setSignaltoSend(QList<QList<int> > *data)
+/* Multiple channels */
+void GenCommons::setSignalToSend(QList<QList<int>> *data)
 {
     generatorData = *data;
     numChannelsUsed = generatorData.length();
@@ -119,6 +120,30 @@ void GenCommons::setSignaltoSend(QList<QList<int> > *data)
         setDataLength(0,signalLengths[0]);
         totalToSend =  signalLengths[0];
     }
+
+    lengthToSend = signalLengths[0];
+    lengthSent = memoryIndex = actualSend = 0;
+    sendingChannel = 1;
+}
+
+/* Single channel */
+void GenCommons::setSignalToSend(QList<quint8> *data)
+{
+    QList<int> tmpData;
+    for(int i = 0; i < data->length(); i++)
+        tmpData.append(data->at(i));
+
+    generatorData.clear();
+    generatorData.append(tmpData);
+
+    numChannelsUsed = 1;
+    totalToSend = totalSent = 0;
+    allSent = false;
+
+    setNumChannels(1);
+    signalLengths[0] = generatorData[0].length();
+    setDataLength(0, signalLengths[0]);
+    totalToSend =  signalLengths[0];
 
     lengthToSend = signalLengths[0];
     lengthSent = memoryIndex = actualSend = 0;
@@ -172,7 +197,7 @@ void GenCommons::sendNextBlock()
     QDataStream dataStreamData(&tmpData, QIODevice::WriteOnly);
     for (int i = 0; i < actualSend; i++){
         qint16  sample = qFromBigEndian<qint16>(generatorData[sendingChannel-1][lengthSent+i]);
-        dataStreamData <<sample;
+        dataStreamData << sample;
     }
     comm->write(tmpData+";");
     lengthSent += actualSend;

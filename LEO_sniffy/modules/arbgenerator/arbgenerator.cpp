@@ -30,7 +30,7 @@ QWidget *ArbGenerator::getWidget()
 {
     return arbGenWindow;
 }
-int test1 = 0, test2 = 0, text3 = 0;
+
 void ArbGenerator::parseData(QByteArray data)
 {
     QByteArray dataHeader = data.left(4);
@@ -119,7 +119,7 @@ void ArbGenerator::stopModule()
 
 void ArbGenerator::sendSignalCallback(){
     dataBeingUploaded = true;
-    genComms->setSignaltoSend(arbGenWindow->getGeneratorDACData());
+    genComms->setSignalToSend(arbGenWindow->getGeneratorDACData());
     numChannelsUsed = arbGenWindow->getGeneratorDACData()->length();
 
     for(int i = 0;i<numChannelsUsed;i++){

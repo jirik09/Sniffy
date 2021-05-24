@@ -46,7 +46,7 @@ public:
     void setDialButtonsColor(QString &bckgndStyleSheet);
     float getDefaultRealValue() const;
     float getRealValue() const;
-    void disable(bool disable);
+    void disable(bool disable);    
 
     void setNumOfDecimals(int value);
 

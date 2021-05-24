@@ -13,7 +13,7 @@ WidgetSelection::WidgetSelection(QWidget *parent, QString name) :
     ui->setupUi(this);
     ui->label->setText(name);
     setStyleSheet(Graphics::STYLE_COMBO_BOX);
-    options = new QList<params_sel>;    
+    options = new QList<params_sel>;
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
 }
 
@@ -29,7 +29,7 @@ QByteArray WidgetSelection::saveGeometry()
 
 void WidgetSelection::restoreGeometry(QByteArray geom)
 {
-   if(options->length()>geom.toInt())
+    if(options->length()>geom.toInt())
         setSelected(geom.toInt(),true);
 }
 
@@ -69,7 +69,8 @@ int WidgetSelection::count(){
 
 void WidgetSelection::indexChanged(int index)
 {
-    emit selectedIndexChanged(index);
+    if(index >= 0)
+        emit selectedIndexChanged(index, options->at(index).realValue);
 }
 
 void WidgetSelection::clear(){
