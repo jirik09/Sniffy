@@ -11,6 +11,7 @@
 #include "../../GUI/widgetbuttons.h"
 #include "../../GUI/widgetdialrange.h"
 
+#include "patterngeneratorspec.h"
 #include "patterngeneratorconfig.h"
 #include "patterngeneratordefs.h"
 
@@ -39,12 +40,13 @@ public:
     WidgetDialRange *dialGrayCodeChanNum;
 
     WidgetDialRange *dialQuadratureFreq;
-    WidgetDialRange *dialQuadratureChanNum;
+    WidgetSelection *comboQuadratureSeqAbba;
 
     WidgetSelection *comboI2cClockFreq;
     WidgetSelection *comboI2cCommType;        
 
     void restoreSettingsAfterStartup(void);
+    void setSpecification(PatternGeneratorSpec* spec);
     void enableGuiComponents(bool enable);
     void showComponents(int pattIndex, bool visible);
 

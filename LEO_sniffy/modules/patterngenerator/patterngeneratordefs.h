@@ -4,8 +4,8 @@
 #include <qtypeinfo.h>
 
 #define PATTERNS_NUM  8
-#define MAX_PATT_CHANNELS_NUM 8
-#define MAX_PATT_GEN_FREQ 18000000
+#define PATT_MAX_CHANNELS_NUM 8
+#define PATT_MIN_GEN_FREQ (float)0.01
 
 #define PATT_RANGE_CHAN1_LOG1 24
 #define PATT_RANGE_CHAN1_LOG0 22

@@ -8,7 +8,7 @@ PatternGeneratorConfig::PatternGeneratorConfig(QObject *parent)
     for(int i = 0; i < firstFivePatts; i++){
         freq[i] = PATT_DEFAULT_GEN_FREQ;
         dataLen[i] = PATT_DEFAULT_DATA_LENGTH;
-    }
+    }  
 }
 
 void PatternGeneratorConfig::parse(QByteArray config)

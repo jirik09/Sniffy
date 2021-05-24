@@ -22,7 +22,7 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     verticalLayout_chart->setContentsMargins(0,0,0,0);
     verticalLayout_chart->setSpacing(0);
 
-    chart = new widgetChart(widget_chart, MAX_PATT_CHANNELS_NUM);
+    chart = new widgetChart(widget_chart, PATT_MAX_CHANNELS_NUM);
     chart->enableLocalMouseEvents(EventSelection::CLICKS_ONLY);
     verticalLayout_chart->addWidget(chart);
 
@@ -55,6 +55,8 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     connect(settings->dialBinaryChanNum, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
     connect(settings->dialGrayCodeChanNum, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
 
+    connect(settings->comboQuadratureSeqAbba, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorWindow::quadratureSequenceChangedCallback);
+
     connect(chart, &widgetChart::mouseLeftClickEvent, this, &PatternGeneratorWindow::chartEditDataOnLeftClickCallback);
 }
 
@@ -74,6 +76,7 @@ void PatternGeneratorWindow::restoreGUIAfterStartup()
 void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
 {
     this->spec = spec;
+    settings->setSpecification(spec);
 }
 
 void PatternGeneratorWindow::setProgress(int percent)
@@ -168,6 +171,12 @@ void PatternGeneratorWindow::dataLenChangedDialsCallback(float val)
     painter->repaint(patternData);
 }
 
+void PatternGeneratorWindow::quadratureSequenceChangedCallback(int index)
+{    
+    patternData = patterns->setQuadratureSequence(index==0);
+    painter->repaint(patternData);
+}
+
 void PatternGeneratorWindow::chartEditDataOnLeftClickCallback(QGraphicsSceneMouseEvent *event)
 {
     int dataLen = config->dataLen[config->pattIndex];
@@ -177,7 +186,7 @@ void PatternGeneratorWindow::chartEditDataOnLeftClickCallback(QGraphicsSceneMous
     qreal width = chart->geometry().width();
 
     int position = ((event->pos().x() - 25) / (width - 44)) * dataNum;
-    int channel = ((event->pos().y() - 20) / (height - 30)) * MAX_PATT_CHANNELS_NUM;
+    int channel = ((event->pos().y() - 20) / (height - 30)) * PATT_MAX_CHANNELS_NUM;
 
     if(position >= dataNum)
         position = dataNum - 1;

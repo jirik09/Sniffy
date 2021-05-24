@@ -80,13 +80,15 @@ class Quadrature : public Pattern
 {
     Q_OBJECT
 public:
-    explicit Quadrature();
-    const bool exp = false;
+    explicit Quadrature();    
     QList<patttype> *getData() override;
-    QList<patttype> *create(int len) override;
+    QList<patttype> *create(int len = PATT_DEFAULT_DATA_LENGTH) override;
     bool isExponencial() override;
+    QList<patttype> *setSequence(bool seqAb);
 private:
     QList<patttype> *data;
+    bool seqAb = true;
+    const bool exp = false;
 };
 
 class PatternGeneratorPatterns : public QObject
@@ -101,9 +103,12 @@ public:
     QList<patttype> *modifyPattern(int channel, int position);
     bool isExponencial();
 
+    QList<patttype> *setQuadratureSequence(bool seqAb);
+
 private:    
     int index;
     QSharedPointer<Pattern> pattern[PATTERNS_NUM];
+    Quadrature *quadPattern;
 
     QVector<std::function<QSharedPointer<Pattern>()>> createPatternObj = {
             [] { return QSharedPointer<Pattern>(new UserDefined); },

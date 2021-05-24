@@ -12,7 +12,7 @@ void PatternGeneratorPainter::repaint(QList<quint8> *data)
     recalculate(data);
 
     chart->clearAll();
-    for(int i = 0; i < MAX_PATT_CHANNELS_NUM; i++){
+    for(int i = 0; i < PATT_MAX_CHANNELS_NUM; i++){
         QVector<QPointF> vector = points->at(i);
         chart->updateTrace(&vector, i);
     }
@@ -22,8 +22,8 @@ void PatternGeneratorPainter::recalculate(QList<quint8> *data)
 {
     points->clear();
 
-    qreal dataLen = data->length();
-    qreal timScale = (1 / config->freq[config->pattIndex]) * dataLen;
+    qreal dataLen = data->length();    
+    qreal timScale = 1 / config->freq[config->pattIndex];
     qreal step = timScale / dataLen;
     qreal stepSum;
     int log0, log1;
@@ -35,7 +35,7 @@ void PatternGeneratorPainter::recalculate(QList<quint8> *data)
     else
         chart->setGridHorizontalDensity(dataLen+1);
 
-    for(int ch = 0; ch < MAX_PATT_CHANNELS_NUM; ch++){
+    for(int ch = 0; ch < PATT_MAX_CHANNELS_NUM; ch++){
 
         log1 = PATT_RANGE_CHAN1_LOG1 - ch * 3;
         log0 = PATT_RANGE_CHAN1_LOG0 - ch * 3;
@@ -65,6 +65,6 @@ void PatternGeneratorPainter::configDefaultChart(){
     chart->setMargins(-12, -5, -6, -4);
     chart->setLabelsVisible(true, false);
     chart->setRange(0, 1, 0.97, PATT_RANGE_CHAN1_LOG1 + 0.98);
-    for(int i = 0; i < MAX_PATT_CHANNELS_NUM; i++)
+    for(int i = 0; i < PATT_MAX_CHANNELS_NUM; i++)
         chart->setTraceColor(i, Graphics::getChannelColor(0));
 }

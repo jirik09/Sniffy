@@ -65,10 +65,16 @@ bool PatternGeneratorPatterns::isExponencial()
     return pattern[index]->isExponencial();
 }
 
+QList<patttype> *PatternGeneratorPatterns::setQuadratureSequence(bool seqAb)
+{
+    quadPattern = static_cast<Quadrature*>(pattern[4].get());
+    return quadPattern->setSequence(seqAb);
+}
+
 /****************************** CREATE PATTERN FUNS ******************************/
 
 QList<patttype> *UserDefined::create(int len)
-{        
+{
     data->clear();
 
     for(int i = 0; i < len; i++)
@@ -118,7 +124,31 @@ QList<patttype> *GrayCode::create(int chanNum)
 
 QList<patttype> *Quadrature::create(int len)
 {
+    Q_UNUSED(len);
     data->clear();
 
+    const int chan = 2;
+    if(seqAb){
+        for (int i = 0; i < 2; i++) {
+            data->append(0 | ((0^0) << chan));
+            data->append(1 | ((1^0) << chan));
+            data->append(3 | ((1^1) << chan));
+            data->append(2 | ((0^1) << chan));
+        }
+    }else {
+        for (int i = 0; i < 2; i++) {
+            data->append(0 | (0 << chan));
+            data->append(2 | (1 << chan));
+            data->append(3 | (0 << chan));
+            data->append(1 | (1 << chan));
+        }
+    }
+
     return data;
+}
+
+QList<patttype> *Quadrature::setSequence(bool seqAb)
+{
+    this->seqAb = seqAb;
+    return create();
 }

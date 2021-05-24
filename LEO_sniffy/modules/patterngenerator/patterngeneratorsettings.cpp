@@ -40,6 +40,17 @@ void PatternGeneratorSettings::restoreSettingsAfterStartup()
     comboPatternSelection->setSelected(config->pattIndex, true);
 }
 
+void PatternGeneratorSettings::setSpecification(PatternGeneratorSpec *spec)
+{
+    int maxSamplingFreq = spec->maxSamplingRate / 2;
+
+    dialUserDefFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
+    dialCounterFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
+    dialBinaryCodeFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
+    dialGrayCodeFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
+    dialQuadratureFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
+}
+
 void PatternGeneratorSettings::createComponents(QWidget *parent, QVBoxLayout *destination)
 {
     for (int i=0; i<pattList.length(); i++){
@@ -71,7 +82,7 @@ void PatternGeneratorSettings::createUserDefinedComponents(QWidget *parent, QVBo
     dialUserDefLength->setObjectName("dialUserDefLength");
     destination->addWidget(dialUserDefLength);
 
-    config->freq[index] = dialUserDefFreq->getRealValue();       
+    config->freq[index] = dialUserDefFreq->getRealValue();
 }
 
 void PatternGeneratorSettings::createCounterComponents(QWidget *parent, QVBoxLayout *destination, int index)
@@ -124,6 +135,11 @@ void PatternGeneratorSettings::createQuadratureComponents(QWidget *parent, QVBox
     dialQuadratureFreq = createFrequencyDial(parent, "dialQuadratureFreq");
     destination->addWidget(dialQuadratureFreq);
 
+    comboQuadratureSeqAbba = new WidgetSelection(parent, "Speed");
+    comboQuadratureSeqAbba->addOption("A/B", 0);
+    comboQuadratureSeqAbba->addOption("B/A", 1);
+    destination->addWidget(comboQuadratureSeqAbba);
+
     config->freq[index] = dialQuadratureFreq->getRealValue();    
 }
 
@@ -160,7 +176,7 @@ WidgetDialRange *PatternGeneratorSettings::createFrequencyDial(QWidget *parent, 
     WidgetDialRange *dial = new WidgetDialRange(parent, "");
     dial->setName("Frequency");
     dial->hideUnitSelection();
-    dial->setRange(1, MAX_PATT_GEN_FREQ, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
+    dial->setRange(1, 4800000, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
     dial->setObjectName(objName);
 
     return dial;
@@ -193,8 +209,10 @@ void PatternGeneratorSettings::resetGrayCodeComponents(){
 void PatternGeneratorSettings::resetQuadratureComponents()
 {
     dialQuadratureFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
-    config->freq[config->pattIndex] = dialQuadratureFreq->getRealValue();
+    comboQuadratureSeqAbba->setSelected(0, false);
 
+    config->freq[config->pattIndex] = dialQuadratureFreq->getRealValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
 }
 
 void PatternGeneratorSettings::resetUartComponents()

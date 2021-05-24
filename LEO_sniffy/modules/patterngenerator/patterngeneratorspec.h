@@ -15,7 +15,7 @@ public:
     void parseSpecification(QByteArray spec);
 
     int maxSamplingRate;
-    QString chanPins[MAX_PATT_CHANNELS_NUM];
+    QString chanPins[PATT_MAX_CHANNELS_NUM];
 };
 
 #endif // PATTERNGENERATORSPEC_H

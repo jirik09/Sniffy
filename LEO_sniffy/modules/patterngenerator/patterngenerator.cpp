@@ -69,7 +69,8 @@ void PatternGenerator::stopModule()
 {
     stopGenerator();
     genComms->generatorDeinit();
-    pattGenWindow->setGeneratorState(false);
+    config->state = PatternGeneratorConfig::State::STOPPED;
+    pattGenWindow->setGenerateButton("Start", Graphics::COLOR_CONTROLS);
 }
 
 void PatternGenerator::startGenerator()
