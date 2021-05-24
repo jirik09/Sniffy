@@ -131,7 +131,7 @@ QComboBox:disabled{background-color:" DAWN_BACKGROUND_BUTTON_DISABLED ";color:" 
 "QPushButton{font-weight : bold ;border-radius: 2px; padding-top: 1px;padding-bottom: 1px;padding-left: 3px;padding-right: 3px;}\
 QPushButton{background-color:" DAWN_BACKGROUND_BUTTON ";color: #FF%1;}\
 QPushButton:disabled{border:none;background-color:" DAWN_BACKGROUND_BUTTON_DISABLED ";color:" DAWN_COMPONENT_DISABLED ";}\
-QPushButton:pressed{background-color: #88%1;}\
+QPushButton:pressed{background-color: #88%1;border: 2px solid " DAWN_WINDOW_WIDGET ";}\
 QPushButton:hover{background-color: #3C%1;}"
 
 #define DAWN_STYLE_CHECK_BUTTON \
