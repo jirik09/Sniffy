@@ -126,12 +126,16 @@ void ArbGeneratorWindow::setGeneratorStopped()
 
 void ArbGeneratorWindow::setFrequencyLabels(int channel, qreal freq)
 {
-    setting->setFreqLabel(LabelFormator::formatOutout(freq,"Hz",5),channel);
+    QString col = Graphics::COLOR_TEXT_LABEL;
+    if(abs(freq/setting->dialFreqCh[channel]->getRealValue()-1)>0.01){
+        col = Graphics::COLOR_WARNING;
+    }
+    setting->setFreqLabel(freq,channel,5);
 }
 
 void ArbGeneratorWindow::setPWMFrequencyLabels(int channel, qreal freq)
 {
-    setting->setPWMFreqLabel(LabelFormator::formatOutout(freq,"Hz",4),channel);
+    setting->setPWMFreqLabel(freq,channel,4);
 }
 
 void ArbGeneratorWindow::setGenerateButton(QString text, QString color)
@@ -189,6 +193,7 @@ void ArbGeneratorWindow::createSignalCallback()
                 while(PWMres>65535)
                     PWMres = (PWMres+1)/2-1;
                 setting->setPWMResolutionLabel(LabelFormator::formatOutout(log2(PWMres),"Bits",1),i);
+                setting->setPWMFreqLabel(spec->periphPWMClockFrequency/PWMres,i);
             }
 
             chartSignal.clear();
@@ -206,7 +211,8 @@ void ArbGeneratorWindow::createSignalCallback()
                 div = spec->periphClockFrequency/spec->maxSamplingRate;
             }
             qreal realfreq = spec->periphClockFrequency/(qreal)((int)(div))/length;
-            setting->setLabels(LabelFormator::formatOutout(realfreq,"Hz",4),QString::number(length),i);
+            setting->setDataLengthLabels(length,i);
+            setting->setFreqLabel(realfreq,i);
 
             if(shape->at(i) == SignalShape::ARB){
                 signalData = fileLoader->getSignal(i);
