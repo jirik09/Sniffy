@@ -210,7 +210,6 @@ void PatternGeneratorSettings::resetQuadratureComponents()
 {
     dialQuadratureFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
     comboQuadratureSeqAbba->setSelected(0, false);
-
     config->freq[config->pattIndex] = dialQuadratureFreq->getRealValue();
     config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
 }
