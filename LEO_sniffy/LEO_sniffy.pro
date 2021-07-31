@@ -1,6 +1,6 @@
 QT       += core gui serialport
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 CONFIG += c++11
 
@@ -22,9 +22,11 @@ SOURCES += \
     GUI/customcombobox.cpp \
     GUI/customdial.cpp \
     GUI/moduledockwidget.cpp \
+    GUI/qcustomplot.cpp \
     GUI/widgetbuttons.cpp \
     GUI/widgetchart.cpp \
     GUI/widgetcontrolmodule.cpp \
+    GUI/widgetcustomplot.cpp \
     GUI/widgetdesciptionexpand.cpp \
     GUI/widgetdial.cpp \
     GUI/widgetdialrange.cpp \
@@ -134,9 +136,11 @@ HEADERS += \
     GUI/customcombobox.h \
     GUI/customdial.h \
     GUI/moduledockwidget.h \
+    GUI/qcustomplot.h \
     GUI/widgetbuttons.h \
     GUI/widgetchart.h \
     GUI/widgetcontrolmodule.h \
+    GUI/widgetcustomplot.h \
     GUI/widgetdesciptionexpand.h \
     GUI/widgetdial.h \
     GUI/widgetdialrange.h \
@@ -252,6 +256,7 @@ HEADERS += \
 FORMS += \
     GUI/widgetbuttons.ui \
     GUI/widgetchart.ui \
+    GUI/widgetcustomplot.ui \
     GUI/widgetdesciptionexpand.ui \
     GUI/widgetdial.ui \
     GUI/widgetdialrange.ui \

@@ -36,7 +36,7 @@ public:
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);
     void addOption (QString unitString,float mult);
-    void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false, int numOfDecimals = 2);
+    void setRange(float min, float max, QString unitString, float buttonStep = 1, float precision = 1, float defaultValue = 0, bool log = false, int numOfDecimals = 2, bool silent = false);
     void updateRange(float min, float max, bool silent = false);
     void enableFineMousePrecision();
     void setRealValue(float value, bool silent = false);

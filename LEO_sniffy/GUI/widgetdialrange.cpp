@@ -242,7 +242,7 @@ smalestUnitMult -   smallest unit to be shown in comboBox unit selection (1 by d
 defaultValue - selected by default (0 by default)
 log - bool type true=log scale, false=lin scale (false by default)
 */
-void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic, int numOfDecimals){
+void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic, int numOfDecimals, bool silent){
 
     if(units->length()>0){
         disconnect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
@@ -318,7 +318,7 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     connect(ui->lineEdit,SIGNAL(textEdited(QString)),this,SLOT(textEditChanged(QString)));
     connect(ui->lineEdit,SIGNAL(editingFinished()),this,SLOT(textEditFinished()));
     //updateControls(0);
-    setRealValue(defaultRealValue);
+    setRealValue(defaultRealValue, silent);
 }
 
 void WidgetDialRange::updateRange(float min, float max, bool silent)
