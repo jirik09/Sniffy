@@ -70,10 +70,10 @@ void PatternGeneratorPainter::recalculate(QList<quint8> *data)
         for(int d = 0; d < dataLen; d++){
 
             if(data->at(d) & (1 << ch)){
-                tmpVector.append(QPointF(stepSum, log1));
+                tmpVector.append(QPointF(stepSum+step/10000, log1));
                 tmpVector.append(QPointF(stepSum+step, log1));
             }else {
-                tmpVector.append(QPointF(stepSum, log0));
+                tmpVector.append(QPointF(stepSum+step/10000, log0));
                 tmpVector.append(QPointF(stepSum+step, log0));
             }
             stepSum += step;

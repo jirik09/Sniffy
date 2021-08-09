@@ -18,11 +18,14 @@ WidgetCustomPlot::WidgetCustomPlot(QWidget *parent, int maxTraces) :
 
     plot->xAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
     plot->yAxis->ticker()->setTickStepStrategy(QCPAxisTicker::tssMeetTickCount);
-    //plot->yAxis->ticker()->setTickCount(7);
+
+    //plot->yAxis->setUpperEnding(QCPLineEnding::esBar);
 
     plot->yAxis->setTicks(false);
     plot->xAxis->setSubTicks(false);
     plot->yAxis->setSubTicks(false);
+
+    //plot->xAxis->setTickLength(0, 5);
 
     for(int i = 0; i < maxTraces; i++){
         plot->addGraph();
@@ -97,7 +100,7 @@ void WidgetCustomPlot::setGridDensity(int tickX, int tickY)
 
 void WidgetCustomPlot::setGridHorizontalDensity(int tickX)
 {    
-    plot->xAxis->ticker()->setTickCount(tickX);
+    plot->xAxis->ticker()->setTickCount(tickX);        
     plot->replot();
 }
 
