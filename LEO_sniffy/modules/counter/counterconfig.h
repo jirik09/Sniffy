@@ -29,11 +29,9 @@ struct HFState
     int gateTimeIndexBackup;
 };
 
-
-
 struct LFState
 {
-    enum class ActiveChan { CHAN1 = 0, CHAN2 = 1 } activeChan;    
+    enum class ActiveChan { CHAN1 = 0, CHAN2 = 1 } activeChan;
 
     struct Channel
     {
@@ -48,7 +46,7 @@ struct LFState
 
 struct RatState
 {
-    int sampleCount;    
+    int sampleCount;
 };
 
 struct IntState

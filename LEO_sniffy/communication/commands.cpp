@@ -119,6 +119,7 @@ const QByteArray Commands::CMD_GEN_MODE = "MODE";
 const QByteArray Commands::CMD_MODE_PWM = "PWM_";
 const QByteArray Commands::CMD_MODE_DAC = "DAC_";
 const QByteArray Commands::CMD_MODE_VOLT = "VOLT";
+const QByteArray Commands::CMD_MODE_PATTERN = "PATT";
 const QByteArray Commands::CMD_GEN_DATA = "DATA";
 const QByteArray Commands::CMD_GEN_OK = "G_OK";
 const QByteArray Commands::CMD_GEN_NEXT = "G_NX";

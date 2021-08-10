@@ -5,6 +5,7 @@
 #include <QScrollArea>
 #include <QDebug>
 #include <QVBoxLayout>
+#include <QFileDialog>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"
@@ -20,6 +21,8 @@
 #include "patterngeneratorconfig.h"
 #include "patterngeneratorspec.h"
 #include "patterngeneratorsettings.h"
+#include "patterngeneratorpatterns.h"
+#include "patterngeneratorpainter.h"
 
 namespace Ui {
 class PatternGeneratorWindow;
@@ -33,14 +36,46 @@ public:
     explicit PatternGeneratorWindow(PatternGeneratorConfig *config, QWidget *parent = nullptr);
     ~PatternGeneratorWindow();
 
+    PatternGeneratorSettings *settings;    
+    PatternGeneratorPatterns *patterns;
+
     void restoreGUIAfterStartup();
-    void setSpecification(PatternGeneratorSpec* spec);
+    void setSpecification(PatternGeneratorSpec* spec);    
+
+    void setProgress(int percent);
+    void setGenerateButton(QString text, QString color);
+    void setGeneratorState(bool onClick);
+
+    QList<quint8> *getPatternData();    
 
 private:
     Ui::PatternGeneratorWindow *ui;
     PatternGeneratorConfig *config;
-    PatternGeneratorSpec *spec;
-    PatternGeneratorSettings *setting;
+    PatternGeneratorSpec *spec;    
+    PatternGeneratorPainter *painter;
+
+    widgetChart *chart;
+    QVector<QVector<QPointF>> *chartData;
+    QList<quint8> *patternData;
+
+private slots:
+    void patternSelectionChangedCallback(int index);
+
+    void runGeneratorCallback();
+    void openFileCallback();
+    void resetPatternCallback();   
+
+    void freqChangedDialsCallback(float val);
+    void freqChangedCombosCallback(int index, float realVal);
+    void dataLenChangedDialsCallback(float val);
+
+    void quadratureSequenceChangedCallback(int index);
+
+    void chartEditDataOnLeftClickCallback(QGraphicsSceneMouseEvent* event);
+
+signals:
+    void runGenerator();
+    void stopGenerator();
 };
 
 #endif // PATTERNGENERATORWINDOW_H

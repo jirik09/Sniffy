@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QDataStream>
 #include "../abstractspecification.h"
+#include "patterngeneratordefs.h"
 
 class PatternGeneratorSpec : public AbstractSpecification
 {
@@ -13,8 +14,8 @@ public:
     explicit PatternGeneratorSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);
 
-    int specificationVariable;
-
+    int maxSamplingRate;
+    QString chanPins[PATT_MAX_CHANNELS_NUM];
 };
 
 #endif // PATTERNGENERATORSPEC_H

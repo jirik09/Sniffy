@@ -218,7 +218,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
 }
 
 void ArbGenPanelSettings::setChannelShown(int index, bool isShown)
-{
+{       
     if(isShown){
         verChannArea[index]->show();
     }else{

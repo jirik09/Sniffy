@@ -12,8 +12,8 @@ PatternGenerator::PatternGenerator(QObject *parent)
     moduleName = "Pattern generator";
     moduleIconURI = Graphics::getGraphicsPath()+"icon_pattern_generator.png";
 
-    connect(this, &AbstractModule::moduleCreated, this, &PatternGenerator::showHoldButtonCallback);
-    connect(this, &AbstractModule::holdClicked, this, &PatternGenerator::holdButtonCallback);
+    connect(pattGenWindow, &PatternGeneratorWindow::runGenerator, this, &PatternGenerator::startGeneratorCallback);
+    connect(pattGenWindow, &PatternGeneratorWindow::stopGenerator, this, &PatternGenerator::stopGeneratorCallback);
 }
 
 QWidget *PatternGenerator::getWidget()
@@ -31,10 +31,16 @@ void PatternGenerator::parseData(QByteArray data){
         pattGenWindow->setSpecification(static_cast<PatternGeneratorSpec*>(moduleSpecification));
         showModuleControl();
 
-    }else if(dataHeader=="xxxx"){
+        genComms = new GenCommons(moduleCommandPrefix, comm, static_cast<PatternGeneratorSpec*>(moduleSpecification)->maxSamplingRate, this);
+
+    }else if(dataHeader==cmd->CMD_GEN_NEXT){
+        dataTransferNext();
+
+    }else if(dataHeader==cmd->CMD_GEN_OK){
+        dataTransferFinished();
 
     }else{
-        //qDebug()<<data;
+        qDebug()<<"[PATTERN GEN] Unhandled incomming data!"<<data;
     }
 }
 
@@ -55,25 +61,67 @@ QByteArray PatternGenerator::getConfiguration()
 
 void PatternGenerator::startModule()
 {
-
+    comm->write(moduleCommandPrefix,cmd->CMD_GEN_MODE,cmd->CMD_MODE_PATTERN);
+    setModuleStatus(ModuleStatus::PAUSE);
 }
 
 void PatternGenerator::stopModule()
 {
-
+    stopGenerator();
+    genComms->generatorDeinit();
+    config->state = PatternGeneratorConfig::State::STOPPED;
+    pattGenWindow->setGenerateButton("Start", Graphics::COLOR_CONTROLS);
 }
 
-void PatternGenerator::showHoldButtonCallback(){
-    this->showModuleHoldButton(true);
+void PatternGenerator::startGenerator()
+{
+    setModuleStatus(ModuleStatus::PLAY);
+    genComms->startGenerator();
 }
 
-void PatternGenerator::holdButtonCallback(bool held){
-    if(held){
-        comm->write(moduleCommandPrefix+":"+cmd->PAUSE+";");
-        setModuleStatus(ModuleStatus::PAUSE);
-    }else{
-        comm->write(moduleCommandPrefix+":"+cmd->UNPAUSE+";");
-        setModuleStatus(ModuleStatus::PLAY);
+void PatternGenerator::stopGenerator()
+{
+    setModuleStatus(ModuleStatus::PAUSE);
+    genComms->stopGenerator();
+}
+
+void PatternGenerator::dataTransferNext()
+{
+    if(!dataBeingUploaded)
+        return;
+
+    genComms->sendNext();
+    if(genComms->isSentAll()){
+        genComms->genAskForFreq();
+        startGenerator();
+    }
+
+    pattGenWindow->setProgress(genComms->getProgress());
+}
+
+void PatternGenerator::dataTransferFinished()
+{
+    if(dataBeingUploaded){
+        dataBeingUploaded = false;
+        pattGenWindow->setGeneratorState(false);
     }
 }
 
+void PatternGenerator::startPatternUpload()
+{
+    dataBeingUploaded = true;    
+    genComms->setSignalToSend(pattGenWindow->getPatternData());
+    genComms->setSamplingFrequency(0, config->freq[config->pattIndex]*genComms->getSignaLength(0));
+    genComms->sendNext();
+}
+
+void PatternGenerator::startGeneratorCallback()
+{
+    startPatternUpload();
+}
+
+void PatternGenerator::stopGeneratorCallback()
+{
+    stopGenerator();
+    dataBeingUploaded = false;
+}

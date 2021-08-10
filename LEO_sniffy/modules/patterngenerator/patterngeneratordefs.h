@@ -1,0 +1,18 @@
+#ifndef PATTERNGENERATORDEFS_H
+#define PATTERNGENERATORDEFS_H
+
+#include <qtypeinfo.h>
+
+#define PATTERNS_NUM  8
+#define PATT_MAX_CHANNELS_NUM 8
+#define PATT_MIN_GEN_FREQ (float)0.01
+
+#define PATT_RANGE_CHAN1_LOG1 24
+#define PATT_RANGE_CHAN1_LOG0 22
+
+#define PATT_DEFAULT_GEN_FREQ 1000
+#define PATT_DEFAULT_DATA_LENGTH 8
+
+enum class ModeRW { RAED = 0, WRITE };
+
+#endif // PATTERNGENERATORDEFS_H

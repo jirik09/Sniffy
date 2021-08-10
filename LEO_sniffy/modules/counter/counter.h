@@ -32,13 +32,6 @@ private:
     void startCounting();
     void stopCounting();
 
-    /* Common functions */
-    //typedef void (Counter::*funPointer)();
-//    /*funPointer*/ void (Counter::*reloadModeState[4])() = { &Counter::hfReloadState,
-//                                          &Counter::lfReloadState,
-//                                          &Counter::ratReloadState,
-//                                          &Counter::intReloadState };
-
     QString formatNumber(WidgetDisplay *display, double valToFormat, double error);
     QString formatErrNumber(WidgetDisplay *display, double errToFormat);
     void displayValues(WidgetDisplay *display, QString val, QString avg, QString qerr, QString terr);

@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "../abstractmodule.h"
+#include "../arbgenerator/gencommons.h"
 #include "patterngeneratorspec.h"
 #include "patterngeneratorconfig.h"
 #include "patterngeneratorwindow.h"
@@ -26,18 +27,23 @@ public slots:
     void startModule();
     void stopModule();
 
-private slots:
-    //In case hold is needed
-
-    void showHoldButtonCallback();
-    void holdButtonCallback(bool held);
-
-
 private:
     PatternGeneratorConfig *config;
-    PatternGeneratorWindow *pattGenWindow;
-   // scpWindow = new ScopeWindow();
+    PatternGeneratorWindow *pattGenWindow;   
+    GenCommons *genComms;    
 
+    bool dataBeingUploaded = false;
+
+    void startGenerator();
+    void stopGenerator();
+
+    void startPatternUpload();
+    void dataTransferNext();
+    void dataTransferFinished();
+
+private slots:
+    void startGeneratorCallback();
+    void stopGeneratorCallback();
 };
 
 #endif // PATTERNGENERATOR_H

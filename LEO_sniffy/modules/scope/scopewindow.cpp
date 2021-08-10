@@ -21,14 +21,14 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
 
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
-    chart->enableLocalMouseZoom();
+    chart->enableLocalMouseEvents(EventSelection::ALL);
     chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
     chart->setGridDensity(DEFAULT_CHART_DIV+1,9);
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
     chartFFT->setRange(0, 50000, 0, 8);
     chartFFT->setDataMinMax(0,50000);
-    chartFFT->enableLocalMouseZoom();
+    chartFFT->enableLocalMouseEvents(EventSelection::ALL);
     chartFFT->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
 
    // ui->verticalLayout_chart->addWidget(chartFFT);
