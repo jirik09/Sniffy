@@ -166,7 +166,7 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
             }
 
             labelInfoPanel->setChannelLabelVisible(i,true);
-            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/div"));
+            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/"));
 
             panelCursors->cursorHorADial->updateRange(config->timeMin,config->timeMax);
             panelCursors->cursorHorBDial->updateRange(config->timeMin,config->timeMax);
@@ -199,7 +199,7 @@ void ScopeWindow::paintMath(QVector<QPointF> mathSeries){
     }
 
     labelInfoPanel->setChannelLabelVisible(4,true);
-    labelInfoPanel->setChannelScale(4,LabelFormator::formatOutout(config->channelScale[4],"V/div"));
+    labelInfoPanel->setChannelScale(4,LabelFormator::formatOutout(config->channelScale[4],"V/"));
 }
 
 void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
@@ -573,7 +573,7 @@ void ScopeWindow::updateChartTimeScale(float timeBase){
     }else{
         labelInfoPanel->setStyleSheet("color:"+Graphics::COLOR_TEXT_ALL+";");
     }
-    labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/div"));
+    labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/"));
 }
 
 
