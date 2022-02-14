@@ -15,7 +15,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     destination->addWidget(new WidgetSeparator(parent,""));
 
 
-    channelButtons = new WidgetButtons(parent,4,ButtonTypes::RADIO,"");
+    channelButtons = new WidgetButtons(parent,5,ButtonTypes::RADIO,"");
     channelButtons->setObjectName("cursorChannSelection");
     destination->addWidget(channelButtons);
     channelButtons->setText("CH1",0);
@@ -26,11 +26,13 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     channelButtons->setColor(Graphics::getChannelColor(2),2);
     channelButtons->setText("CH4",3);
     channelButtons->setColor(Graphics::getChannelColor(3),3);
+    channelButtons->setText("Math/FFT",4);
+    channelButtons->setColor(Graphics::getChannelColor(4),4);
     channelButtons->setEnabled(false);
 
     cursorHorADial = new WidgetDialRange(parent ,"Cursor A");
     cursorHorADial->setObjectName("horCurA");
-    cursorHorADial->setRange(-0.0001,0.0001,"s",0.1,0.000000001,0);
+    cursorHorADial->setRange(-0.0001,0.0001,"s",0.1,0.0000001,0);
     cursorHorADial->setColor(Graphics::getChannelColor(0));
     cursorHorADial->hideUnitSelection();
     cursorHorADial->enableFineMousePrecision();
@@ -39,7 +41,7 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
 
     cursorHorBDial = new WidgetDialRange(parent ,"Cursor B");
     cursorHorBDial->setObjectName("horCurB");
-    cursorHorBDial->setRange(-0.0001,0.0001,"s",0.1,0.000000001,0);
+    cursorHorBDial->setRange(-0.0001,0.0001,"s",0.1,0.0000001,0);
     cursorHorBDial->setColor(Graphics::getChannelColor(0));
     cursorHorBDial->hideUnitSelection();
     cursorHorBDial->enableFineMousePrecision();
@@ -63,6 +65,42 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorVerBDial->enableFineMousePrecision();
     destination->addWidget(cursorVerBDial);
     cursorVerBDial->hide();
+
+    cursorFFTHorADial = new WidgetDialRange(parent ,"Cursor A");
+    cursorFFTHorADial->setObjectName("FFThorCurA");
+    cursorFFTHorADial->setRange(01,1000,"Hz",1,1,0);
+    cursorFFTHorADial->setColor(Graphics::getChannelColor(0));
+    cursorFFTHorADial->hideUnitSelection();
+    cursorFFTHorADial->enableFineMousePrecision();
+    destination->addWidget(cursorFFTHorADial);
+    cursorFFTHorADial->hide();
+
+    cursorFFTHorBDial = new WidgetDialRange(parent ,"Cursor B");
+    cursorFFTHorBDial->setObjectName("FFThorCurB");
+    cursorFFTHorBDial->setRange(1,1000,"Hz",1,1,0);
+    cursorFFTHorBDial->setColor(Graphics::getChannelColor(0));
+    cursorFFTHorBDial->hideUnitSelection();
+    cursorFFTHorBDial->enableFineMousePrecision();
+    destination->addWidget(cursorFFTHorBDial);
+    cursorFFTHorBDial->hide();
+
+    cursorFFTVerADial = new WidgetDialRange(parent ,"Cursor A");
+    cursorFFTVerADial->setObjectName("FFTverCurA");
+    cursorFFTVerADial->setRange(-1,1,"V",10,0.01,0);
+    cursorFFTVerADial->setColor(Graphics::getChannelColor(0));
+    cursorFFTVerADial->hideUnitSelection();
+    cursorFFTVerADial->enableFineMousePrecision();
+    destination->addWidget(cursorFFTVerADial);
+    cursorFFTVerADial->hide();
+
+    cursorFFTVerBDial = new WidgetDialRange(parent ,"Cursor B");
+    cursorFFTVerBDial->setObjectName("FFTverCurB");
+    cursorFFTVerBDial->setRange(-1,1,"V",10,0.01,0);
+    cursorFFTVerBDial->setColor(Graphics::getChannelColor(0));
+    cursorFFTVerBDial->hideUnitSelection();
+    cursorFFTVerBDial->enableFineMousePrecision();
+    destination->addWidget(cursorFFTVerBDial);
+    cursorFFTVerBDial->hide();
 
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized

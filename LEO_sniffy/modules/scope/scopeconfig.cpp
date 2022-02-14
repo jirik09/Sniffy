@@ -47,6 +47,7 @@ void ScopeConfig::parse(QByteArray config)
 
     stream >> cursorChannelIndex;
     stream >> cursorsActiveIndex;
+    stream >> FFTenabled;
     stream >> timeMin;// = -0.01;
     stream >> timeMax;// = 0.01;
     stream >> measCount;
@@ -114,6 +115,7 @@ QByteArray ScopeConfig::serialize()
 
     stream << cursorChannelIndex;
     stream << cursorsActiveIndex;
+    stream << FFTenabled;
     stream << timeMin;// = -0.01;
     stream << timeMax;// = 0.01;
     stream << measCount;
@@ -122,6 +124,7 @@ QByteArray ScopeConfig::serialize()
         stream << scopeMeasList[i]->getLabel();
         stream << scopeMeasList[i]->getChannelIndex();
     }
+
 
  //   qDebug() << "Cofig from scope is being serialized "+*data;
     return *data;

@@ -103,6 +103,7 @@ private slots:
     void mathExpressionCallback(QString exp);
     void fftChangedCallback(int length, FFTWindow window, FFTType type, int channelIndex);
     void fftchartChangedCallback(qreal scale, qreal shift, bool isLog = false);
+    void mathTypeChangedCallback(int index);
     void sliderShiftCallback(int value);
 
     void chartLocalZoomCallback();
@@ -116,6 +117,7 @@ private slots:
     void resolutionChangedCallback(int index);
 
     void updateCursorReadings();
+    void setHorizontalCursor(int channelIndex, qreal value, Cursor type);
 
 
 public:

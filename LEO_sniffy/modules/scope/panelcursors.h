@@ -28,6 +28,12 @@ public:
     WidgetDialRange *cursorVerADial;
     WidgetDialRange *cursorVerBDial;
 
+    WidgetDialRange *cursorFFTHorADial;
+    WidgetDialRange *cursorFFTHorBDial;
+
+    WidgetDialRange *cursorFFTVerADial;
+    WidgetDialRange *cursorFFTVerBDial;
+
 
 };
 
