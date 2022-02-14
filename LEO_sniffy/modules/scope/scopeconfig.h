@@ -62,6 +62,7 @@ public:
     int measCount = 0;
     QList<Measurement *> scopeMeasList;
     bool FFTenabled = false;
+    bool FFTisLog = false;
 
 };
 

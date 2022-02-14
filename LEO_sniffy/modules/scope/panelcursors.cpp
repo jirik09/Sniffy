@@ -108,3 +108,63 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     destination->addItem(verticalSpacer);
 }
+
+void PanelCursors::ValidatePanelGUI(int type)
+{
+    int channel = channelButtons->getSelectedIndex();
+    if(type == 0){  //none
+        channelButtons->setEnabled(false);
+        cursorHorADial->hide();
+        cursorHorBDial->hide();
+        cursorVerADial->hide();
+        cursorVerBDial->hide();
+        cursorFFTHorADial->hide();
+        cursorFFTHorBDial->hide();
+        cursorFFTVerADial->hide();
+        cursorFFTVerBDial->hide();
+
+    }else if(type == 1){  //horizontal
+        channelButtons->setEnabled(true);
+        if(channelButtons->getSelectedIndex() == 4){
+            cursorFFTHorADial->show();
+            cursorFFTHorBDial->show();
+            cursorFFTHorADial->setColor(Graphics::getChannelColor(channel));
+            cursorFFTHorBDial->setColor(Graphics::getChannelColor(channel));
+            cursorHorADial->hide();
+            cursorHorBDial->hide();
+        }else{
+            cursorHorADial->show();
+            cursorHorBDial->show();
+            cursorHorADial->setColor(Graphics::getChannelColor(channel));
+            cursorHorBDial->setColor(Graphics::getChannelColor(channel));
+            cursorFFTHorADial->hide();
+            cursorFFTHorBDial->hide();
+        }
+        cursorVerADial->hide();
+        cursorVerBDial->hide();
+        cursorFFTVerADial->hide();
+        cursorFFTVerBDial->hide();
+
+    }else if(type == 2){  //vertical
+        channelButtons->setEnabled(true);
+        cursorHorADial->hide();
+        cursorHorBDial->hide();
+        cursorFFTHorADial->hide();
+        cursorFFTHorBDial->hide();
+        if(channelButtons->getSelectedIndex() == 4){
+            cursorVerADial->hide();
+            cursorVerBDial->hide();
+            cursorFFTVerADial->show();
+            cursorFFTVerBDial->show();
+            cursorFFTVerADial->setColor(Graphics::getChannelColor(channel));
+            cursorFFTVerBDial->setColor(Graphics::getChannelColor(channel));
+        }else{
+            cursorFFTVerADial->hide();
+            cursorFFTVerBDial->hide();
+            cursorVerADial->show();
+            cursorVerBDial->show();
+            cursorVerADial->setColor(Graphics::getChannelColor(channel));
+            cursorVerBDial->setColor(Graphics::getChannelColor(channel));
+        }
+    }
+}

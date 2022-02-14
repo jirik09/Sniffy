@@ -110,14 +110,13 @@ private slots:
 
     void cursorTypeCallback(int index);
     void cursorChannelCallback(int index);
-    void cursorValueHorACallback(float value);
-    void cursorValueHorBCallback(float value);
-    void cursorValueVerACallback(float value);
-    void cursorValueVerBCallback(float value);
+    void cursorValueHorCallback();
+    void cursorValueVerCallback();
     void resolutionChangedCallback(int index);
 
     void updateCursorReadings();
-    void setHorizontalCursor(int channelIndex, qreal value, Cursor type);
+    void setHorizontalCursors(int channelIndex);
+    void setVerticalCursors(int channelIndex);
 
 
 public:

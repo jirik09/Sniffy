@@ -28,8 +28,11 @@ public:
     void setMeasurements(QList<Measurement *> meas);
     void setCursorVoltageReadings(qreal curA, qreal curB);
     void setCursorTimeReadings(qreal curA, qreal curB);
+    void setCursorFFTFreqReadings(qreal curA, qreal curB);
+    void setCursorFFTAmplitudeReadings(qreal curA, qreal curB, QString unit);
     void setCursorReadingsColor(int channelIndex);
     void hideCursorReadings();
+    void hideCursorReadingsHor();
 
     void hideChannelLabels();
 
