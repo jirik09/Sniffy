@@ -7,7 +7,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     maxTraces(maxTraces)
 {
     ui->setupUi(this);
-    setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    setStyleSheet("background-color:" + Graphics::COLOR_WINDOW_WIDGET);
 
     chart = new QChart();
     chart->legend()->hide();
@@ -25,6 +25,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignLeft);
+
 
     //init traces
     for (int i = 0; i < maxTraces; i++) {
@@ -82,10 +83,14 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
         seriesCursor->attachAxis(axisY);
     }
 
-
     QChartView *chartView = new QChartView(chart);
-    ui->horizontalLayout_chart->addWidget(chartView);
 
+    ui->horizontalLayout_chart->addWidget(chartView);
+//    chartView->setStyleSheet("anchors { fill: parent; margins: -15 }");
+//    chart->setMargins(QMargins(0,0,0,0));
+    chart->setBackgroundRoundness(0);
+
+    setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
     initContextMenu();
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),

@@ -17,21 +17,16 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_WINDOW_WIDGET);
 
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseEvents(EventSelection::ALL);
-    chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
     chartFFT->setRange(0, 50000, 0, 8);
     chartFFT->setDataMinMax(0,50000);
     chartFFT->enableLocalMouseEvents(EventSelection::ALL);
-    chartFFT->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
-
-   // ui->verticalLayout_chart->addWidget(chartFFT);
-   // ui->verticalLayout_chart->addWidget(chart);
 
     splitter = new QSplitter(Qt::Vertical, this);
     splitter->addWidget(chartFFT);
@@ -47,7 +42,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     ui->verticalLayout_chart->addWidget(splitter);
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
-    ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_WINDOW_WIDGET);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************
@@ -116,7 +111,7 @@ ScopeWindow::~ScopeWindow()
 void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
     ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url("+Graphics::getGraphicsPath()+"signalBackground.png) center;"
-                                        "background-color: "+Graphics::COLOR_DATA_INPUT_AREA+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
+                                        "background-color: "+Graphics::COLOR_WINDOW_WIDGET+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
                                                                                          "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
                                                                                          "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+"px;}");
     event->accept();
