@@ -7,8 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>584</width>
-    <height>78</height>
+    <height>97</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -53,7 +59,7 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <property name="spacing">
-         <number>5</number>
+         <number>3</number>
         </property>
         <item>
          <widget class="QLabel" name="label_ch1">
@@ -212,7 +218,7 @@
         <property name="minimumSize">
          <size>
           <width>150</width>
-          <height>45</height>
+          <height>0</height>
          </size>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -229,12 +235,12 @@
           <number>5</number>
          </property>
          <property name="bottomMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <item>
           <layout class="QGridLayout" name="gridLayout">
            <property name="spacing">
-            <number>2</number>
+            <number>0</number>
            </property>
            <item row="2" column="2">
             <widget class="QLabel" name="label_meas9">
@@ -357,7 +363,7 @@
         <property name="minimumSize">
          <size>
           <width>120</width>
-          <height>60</height>
+          <height>0</height>
          </size>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -374,12 +380,12 @@
           <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
-            <number>2</number>
+            <number>0</number>
            </property>
            <item>
             <widget class="QLabel" name="label_Vcursor_title">
@@ -425,7 +431,7 @@
         <property name="minimumSize">
          <size>
           <width>120</width>
-          <height>60</height>
+          <height>0</height>
          </size>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -442,12 +448,12 @@
           <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <property name="spacing">
-            <number>2</number>
+            <number>0</number>
            </property>
            <item>
             <widget class="QLabel" name="label_Hcursor_title">

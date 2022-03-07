@@ -23,6 +23,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseEvents(EventSelection::ALL);
     chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
+    chart->setGridDensity(DEFAULT_CHART_DIV+1,9);
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
     chartFFT->setRange(0, 50000, 0, 8);
@@ -30,8 +31,8 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chartFFT->enableLocalMouseEvents(EventSelection::ALL);
     chartFFT->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
 
-   // ui->verticalLayout_chart->addWidget(chartFFT);
-   // ui->verticalLayout_chart->addWidget(chart);
+    // ui->verticalLayout_chart->addWidget(chartFFT);
+    // ui->verticalLayout_chart->addWidget(chart);
 
     splitter = new QSplitter(Qt::Vertical, this);
     splitter->addWidget(chartFFT);
@@ -70,7 +71,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     connect(panelSet->buttonsTriggerEdge,SIGNAL(clicked(int)),this,SLOT(triggerEdgeCallback(int)));
     connect(panelSet->buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
     connect(panelSet->dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
-    connect(panelSet->buttonsMemorySet,&WidgetButtons::clicked,this,&ScopeWindow::longMemoryCallback);
+    connect(panelSet->buttonsMemorySet,&WidgetButtons::clicked,this,&ScopeWindow::memoryPolicyCallback);
 
     connect(panelSet->buttonsChannelVertical,&WidgetButtons::clicked,this, &ScopeWindow::channelVerticalCallback);
     connect(panelSet->dialVerticalScale,&WidgetDial::valueChanged,this,&ScopeWindow::channelVerticalScaleCallback);
@@ -86,22 +87,27 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     panelCursors = new PanelCursors(tabs->getLayout(2),tabs);
     connect(panelCursors->cursorTypeButtons,&WidgetButtons::clicked,this,&ScopeWindow::cursorTypeCallback);
     connect(panelCursors->channelButtons,&WidgetButtons::clicked,this,&ScopeWindow::cursorChannelCallback);
-    connect(panelCursors->cursorHorADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueHorACallback);
-    connect(panelCursors->cursorHorBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueHorBCallback);
-    connect(panelCursors->cursorVerADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerACallback);
-    connect(panelCursors->cursorVerBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerBCallback);
+    connect(panelCursors->cursorHorADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueHorCallback);
+    connect(panelCursors->cursorHorBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueHorCallback);
+    connect(panelCursors->cursorFFTHorADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueHorCallback);
+    connect(panelCursors->cursorFFTHorBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueHorCallback);
+    connect(panelCursors->cursorVerADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerCallback);
+    connect(panelCursors->cursorVerBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerCallback);
+    connect(panelCursors->cursorFFTVerADial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerCallback);
+    connect(panelCursors->cursorFFTVerBDial,&WidgetDialRange::valueChanged,this,&ScopeWindow::cursorValueVerCallback);
 
     // ********************* create panel Math ****************
     panelMath = new PanelMath(tabs->getLayout(3),tabs);
     connect(panelMath,&PanelMath::expressionChanged,this,&ScopeWindow::mathExpressionCallback);
     connect(panelMath,&PanelMath::fftChanged,this,&ScopeWindow::fftChangedCallback);
     connect(panelMath,&PanelMath::fftchartChanged,this,&ScopeWindow::fftchartChangedCallback);
+    connect(panelMath,&PanelMath::mathTypeChanged,this,&ScopeWindow::mathTypeChangedCallback);
 
     // ********************* create panel Advanced ****************
     panelAdvanced = new PanelAdvanced(tabs->getLayout(4),tabs);
     connect(panelAdvanced->resolutionButtons,&WidgetButtons::clicked,this,&ScopeWindow::resolutionChangedCallback);
-    connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::samplingFreqInputCallback);
-    connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::longMemoryCallback);
+    connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::SamplingFreqCustomInputCallback);
+    connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::memoryCustomLengthCallback);
 
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
@@ -165,16 +171,24 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
             }
 
             labelInfoPanel->setChannelLabelVisible(i,true);
-            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/div"));
+            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/d"));
 
-            panelCursors->cursorHorADial->updateRange(config->timeMin,config->timeMax);
-            panelCursors->cursorHorBDial->updateRange(config->timeMin,config->timeMax);
-            panelCursors->cursorVerADial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
-            panelCursors->cursorVerBDial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
-            if(config->cursorsActiveIndex == 2){
-                chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
-                chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
+            if(config->FFTenabled){
+                panelCursors->cursorFFTHorADial->updateRange(0,config->realSamplingRate/2);
+                panelCursors->cursorFFTHorBDial->updateRange(0,config->realSamplingRate/2);
+            }else{
+                panelCursors->cursorHorADial->updateRange(config->timeMin,config->timeMax);
+                panelCursors->cursorHorBDial->updateRange(config->timeMin,config->timeMax);
+                panelCursors->cursorVerADial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
+                panelCursors->cursorVerBDial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
             }
+
+            if(config->cursorsActiveIndex == 2){
+               // setVerticalCursors(config->cursorChannelIndex);
+               // chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
+               // chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
+            }
+            updateCursorReadings();
         }
     }
     chart->setVerticalMarker(triggerChannelIndex,0);
@@ -198,12 +212,12 @@ void ScopeWindow::paintMath(QVector<QPointF> mathSeries){
     }
 
     labelInfoPanel->setChannelLabelVisible(4,true);
-    labelInfoPanel->setChannelScale(4,LabelFormator::formatOutout(config->channelScale[4],"V/div"));
+    labelInfoPanel->setChannelScale(4,LabelFormator::formatOutout(config->channelScale[4],"V/d"));
 }
 
 void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
     chart->setDataMinMax(minX,maxX);
-    chart->setZoom(zoom*1.2);
+    chart->setZoom(zoom);
 }
 
 void ScopeWindow::channelVerticalCallback(int index){
@@ -227,24 +241,29 @@ void ScopeWindow::channelVerticalScaleCallback(float value){
 void ScopeWindow::channelVerticalShiftCallback(float value){
     config->channelOffset[config->selectedChannelIndexVertical] = value;
     paintTraces(ChartData,ChartMathData);
+    cursorValueVerCallback();
 }
 
 void ScopeWindow::timeBaseCallback(float value){
-    emit timeBaseChanged(value);
     updateChartTimeScale(value);
-    previousTimeBase = value;
+    emit timeBaseChanged(value);
 }
-void ScopeWindow::samplingFreqInputCallback(int freq){
-    timeBaseCallback(1.0/(qreal)(freq)*100);
+void ScopeWindow::SamplingFreqCustomInputCallback(int freq){
+    emit samlingFrequecyCustomInputChanged(freq);
 }
 
 void ScopeWindow::dataLengthInputCallback(int length)
 {
-    if (length>=100) emit memoryLengthChanged(length);
+    if (length>=100) emit memoryPolicyChanged(length);
 }
 
-void ScopeWindow::longMemoryCallback(int index){
-    emit memoryLengthChanged(index);
+void ScopeWindow::memoryPolicyCallback(int index){
+    emit memoryPolicyChanged(index);
+}
+
+void ScopeWindow::memoryCustomLengthCallback(int number)
+{
+    emit memoryCustomLengthChanged(number);
 }
 
 void ScopeWindow::pretriggerCallback(float value){
@@ -347,8 +366,10 @@ void ScopeWindow::fftChangedCallback(int length, FFTWindow window, FFTType type,
         chartFFT->show();
         chartFFT->clearAll();
         ui->widget_top->hide();
+        config->FFTenabled = true;
     }else{
         chartFFT->hide();
+        config->FFTenabled = false;
         ui->widget_top->show();
     }
 }
@@ -364,11 +385,24 @@ void ScopeWindow::fftchartChangedCallback(qreal scale, qreal shift, bool isLog)
         max -=4*scale;
     }
     chartFFT->setRangeY(min,max);
+    panelCursors->cursorFFTVerADial->updateRange(min,max);
+    panelCursors->cursorFFTVerBDial->updateRange(min,max);
+
+    QString unit = isLog?"dB":"Vrms";
+    panelCursors->cursorFFTVerADial->updateBaseUnit(unit);
+    panelCursors->cursorFFTVerBDial->updateBaseUnit(unit);
+
+    config->FFTisLog = isLog;
+}
+
+void ScopeWindow::mathTypeChangedCallback(int index)
+{
+    Q_UNUSED(index);
+    cursorTypeCallback(panelCursors->cursorTypeButtons->getSelectedIndex());
 }
 
 void ScopeWindow::sliderShiftCallback(int value){
     chart->setShift((float)value/10);
-    config->chartShift = (float)value/10;
 }
 
 void ScopeWindow::chartLocalZoomCallback()
@@ -382,79 +416,46 @@ void ScopeWindow::chartLocalZoomCallback()
 void ScopeWindow::cursorTypeCallback(int index)
 {
     chart->clearAllCursors();
+    chartFFT->clearAllCursors();
+    panelCursors->ValidatePanelGUI(index);
+    config->cursorsActiveIndex = index;
+
     if(index==0){
-        config->cursorsActiveIndex = 0;
-        panelCursors->channelButtons->setEnabled(false);
-        panelCursors->cursorHorADial->hide();
-        panelCursors->cursorHorBDial->hide();
-        panelCursors->cursorVerADial->hide();
-        panelCursors->cursorVerBDial->hide();
-    }else if(index==1){ //Horizontal
-        config->cursorsActiveIndex = 1;
-        panelCursors->channelButtons->setEnabled(true);
-        panelCursors->cursorHorADial->show();
-        panelCursors->cursorHorBDial->show();
-        panelCursors->cursorVerADial->hide();
-        panelCursors->cursorVerBDial->hide();
-    }else if(index==2){ //Vertical
-        config->cursorsActiveIndex = 2;
-        panelCursors->channelButtons->setEnabled(true);
-        panelCursors->cursorHorADial->hide();
-        panelCursors->cursorHorBDial->hide();
-        panelCursors->cursorVerADial->show();
-        panelCursors->cursorVerBDial->show();
+        labelInfoPanel->hideCursorReadings();
+        chart->clearAllCursors();
+        chartFFT->clearAllCursors();
     }
-    labelInfoPanel->hideCursorReadings();
-    cursorChannelCallback(config->cursorChannelIndex);
-    updateCursorReadings();
+    if(index!=0){
+        cursorChannelCallback(config->cursorChannelIndex);
+    }
 }
 
 void ScopeWindow::cursorChannelCallback(int index)
 {
     config->cursorChannelIndex = index;
-    panelCursors->cursorHorADial->setColor(Graphics::getChannelColor(index));
-    panelCursors->cursorHorBDial->setColor(Graphics::getChannelColor(index));
-    panelCursors->cursorVerADial->setColor(Graphics::getChannelColor(index));
-    panelCursors->cursorVerBDial->setColor(Graphics::getChannelColor(index));
+    panelCursors->ValidatePanelGUI(config->cursorsActiveIndex);
     if(config->cursorsActiveIndex == 2){
-        chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
-        chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
+        setVerticalCursors(config->cursorChannelIndex);
     }
     if(config->cursorsActiveIndex == 1){
-        chart->setHorizontalCursor(config->cursorChannelIndex,panelCursors->cursorHorADial->getRealValue(),Cursor::CURSOR_A);
-        chart->setHorizontalCursor(config->cursorChannelIndex,panelCursors->cursorHorBDial->getRealValue(),Cursor::CURSOR_B);
+        setHorizontalCursors(config->cursorChannelIndex);
     }
     labelInfoPanel->setCursorReadingsColor(config->cursorChannelIndex);
+    updateCursorReadings();
 }
 
-void ScopeWindow::cursorValueHorACallback(float value)
+void ScopeWindow::cursorValueHorCallback()
 {
     if(config->cursorsActiveIndex == 1){
-        chart->setHorizontalCursor(config->cursorChannelIndex,value,Cursor::CURSOR_A);
+        setHorizontalCursors(config->cursorChannelIndex);
         updateCursorReadings();
     }
 }
 
-void ScopeWindow::cursorValueHorBCallback(float value)
-{
-    if(config->cursorsActiveIndex == 1){
-        chart->setHorizontalCursor(config->cursorChannelIndex,value,Cursor::CURSOR_B);
-        updateCursorReadings();
-    }
-}
-
-void ScopeWindow::cursorValueVerACallback(float value)
+void ScopeWindow::cursorValueVerCallback()
 {
     if(config->cursorsActiveIndex == 2){
-        chart->setVerticalCursor(config->cursorChannelIndex,(value+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
-        updateCursorReadings();
-    }
-}
-
-void ScopeWindow::cursorValueVerBCallback(float value)
-{
-    if(config->cursorsActiveIndex == 2){
-        chart->setVerticalCursor(config->cursorChannelIndex,(value+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
+        setVerticalCursors(config->cursorChannelIndex);
         updateCursorReadings();
     }
 }
@@ -469,19 +470,65 @@ void ScopeWindow::resolutionChangedCallback(int index){
 
 void ScopeWindow::updateCursorReadings()
 {
+    qreal curA, curB;
     if(config->cursorsActiveIndex == 2){
-        qreal curA = panelCursors->cursorVerADial->getRealValue();
-        qreal curB = panelCursors->cursorVerBDial->getRealValue();
-        labelInfoPanel->setCursorVoltageReadings(curA,curB);
+        labelInfoPanel->hideCursorReadingsHor();
+        if(config->cursorChannelIndex == 4){
+            curA = panelCursors->cursorFFTVerADial->getRealValue();
+            curB = panelCursors->cursorFFTVerBDial->getRealValue();
+            QString unit = config->FFTisLog?"dB":"Vrms";
+            labelInfoPanel->setCursorFFTAmplitudeReadings(curA,curB,unit);
+        }else{
+            curA = panelCursors->cursorVerADial->getRealValue();
+            curB = panelCursors->cursorVerBDial->getRealValue();
+            labelInfoPanel->setCursorVoltageReadings(curA,curB);
+        }
     }
     if(config->cursorsActiveIndex == 1){
-        qreal curA = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorADial->getRealValue());
-        qreal curB = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorBDial->getRealValue());
-        curA = (curA * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
-        curB = (curB * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
+        if(config->cursorChannelIndex == 4){
+            curA = chartFFT->getSignalValue(0,panelCursors->cursorFFTHorADial->getRealValue());
+            curB = chartFFT->getSignalValue(0,panelCursors->cursorFFTHorBDial->getRealValue());
+            labelInfoPanel->setCursorFFTFreqReadings(panelCursors->cursorFFTHorADial->getRealValue(),panelCursors->cursorFFTHorBDial->getRealValue());
+            QString unit = config->FFTisLog?"dB":"Vrms";
+            labelInfoPanel->setCursorFFTAmplitudeReadings(curA,curB,unit);
+        }else{
+            curA = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorADial->getRealValue());
+            curB = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorBDial->getRealValue());
+            curA = (curA * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
+            curB = (curB * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
+            labelInfoPanel->setCursorVoltageReadings(curA,curB);
+            labelInfoPanel->setCursorTimeReadings(panelCursors->cursorHorADial->getRealValue(),panelCursors->cursorHorBDial->getRealValue());
+        }
+    }
+}
 
-        labelInfoPanel->setCursorVoltageReadings(curA,curB);
-        labelInfoPanel->setCursorTimeReadings(panelCursors->cursorHorADial->getRealValue(),panelCursors->cursorHorBDial->getRealValue());
+void ScopeWindow::setHorizontalCursors(int channelIndex){
+    qreal value;
+    if(config->FFTenabled && panelCursors->channelButtons->getSelectedIndex()==4){
+        value = panelCursors->cursorFFTHorADial->getRealValue();
+        chartFFT->setHorizontalCursor(channelIndex, value, Cursor::CURSOR_A);
+        value = panelCursors->cursorFFTHorBDial->getRealValue();
+        chartFFT->setHorizontalCursor(channelIndex, value, Cursor::CURSOR_B);
+        chart->clearAllCursors();
+    }else{
+        value = panelCursors->cursorHorADial->getRealValue();
+        chart->setHorizontalCursor(channelIndex, value, Cursor::CURSOR_A);
+        value = panelCursors->cursorHorBDial->getRealValue();
+        chart->setHorizontalCursor(channelIndex, value, Cursor::CURSOR_B);
+        chartFFT->clearAllCursors();
+    }
+}
+
+void ScopeWindow::setVerticalCursors(int channelIndex)
+{
+    if(config->FFTenabled && panelCursors->channelButtons->getSelectedIndex()==4){
+        chartFFT->setVerticalCursor(channelIndex,panelCursors->cursorFFTVerADial->getRealValue(),Cursor::CURSOR_A);
+        chartFFT->setVerticalCursor(channelIndex,panelCursors->cursorFFTVerBDial->getRealValue(),Cursor::CURSOR_B);
+        chart->clearAllCursors();
+    }else{
+        chart->setVerticalCursor(channelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[channelIndex])/config->channelScale[channelIndex],Cursor::CURSOR_A);
+        chart->setVerticalCursor(channelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[channelIndex])/config->channelScale[channelIndex],Cursor::CURSOR_B);
+        chartFFT->clearAllCursors();
     }
 }
 
@@ -502,7 +549,7 @@ void ScopeWindow::updateFFTchart(QVector<QPointF> fftTrace, qreal maxFreq)
     chartFFT->updateTrace(&ChartFFTData,0);
     chartFFT->setTraceColor(0,Graphics::getChannelColor(fftChannelIndex));
     chartFFT->setDataMinMax(0,maxFreq);
-   // qDebug () << "FFT was calculated and received by window" << fftTrace.length();
+    // qDebug () << "FFT was calculated and received by window" << fftTrace.length();
 }
 
 void ScopeWindow::mathError(int errorPosition)
@@ -512,8 +559,6 @@ void ScopeWindow::mathError(int errorPosition)
 
 void ScopeWindow::restoreGUIAfterStartup()
 {
-    chart->setLocalZoom(config->chartLocalZoom);
-    chart->setShift(config->chartShift);
     ui->sliderSignal->setValue((chart->getShift()*2000)-1000);
 
     int vertical = panelSet->buttonsChannelVertical->getSelectedIndex();
@@ -547,8 +592,8 @@ void ScopeWindow::triggerCaptured(){
     labelInfoPanel->setTriggerLabelText("Trig");
 }
 
-void ScopeWindow::setRealSamplingRate(int smpl){
-    labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS") + "  ("+LabelFormator::formatOutout(config->dataLength,"")+")");
+void ScopeWindow::setRealSamplingRateAndLlength(int smpl, int len){
+    labelInfoPanel->setSamplingRateLabelText(LabelFormator::formatOutout(smpl,"SPS") + "  ("+LabelFormator::formatOutout(len,"")+")");
     panelAdvanced->samplingFrequencyReal->setValue(LabelFormator::formatOutout(smpl,"SPS",4));
 }
 
@@ -560,20 +605,18 @@ void ScopeWindow::setNumChannels(int channels){
         panelCursors->channelButtons->setButtonHidden(true,i);
         panelMath->btnChannelFFTSel->setButtonHidden(true,i);
     }
-
 }
 
 void ScopeWindow::updateChartTimeScale(float timeBase){
-    if(previousTimeBase !=0 && previousTimeBase != timeBase){
-        chart->setZoom(chart->getZoom()*previousTimeBase/timeBase);
+    if(config->timeBase !=0 && config->timeBase != timeBase){
+        chart->setZoom(chart->getZoom()*config->timeBase/timeBase);
     }
     if(chart->getLocalZoom()!=1.0){
         labelInfoPanel->setStyleSheet("QLabel#label_scale {color:"+Graphics::COLOR_WARNING+";}");
     }else{
         labelInfoPanel->setStyleSheet("color:"+Graphics::COLOR_TEXT_ALL+";");
     }
-    config->chartLocalZoom = chart->getLocalZoom();
-    labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/div"));
+    labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/d"));
 }
 
 

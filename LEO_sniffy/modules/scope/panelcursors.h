@@ -16,6 +16,7 @@ class PanelCursors : public QObject
     Q_OBJECT
 public:
     explicit PanelCursors(QVBoxLayout *destination, QWidget *parent = nullptr);
+    void ValidatePanelGUI(int type);
 
 signals:
 
@@ -27,6 +28,12 @@ public:
 
     WidgetDialRange *cursorVerADial;
     WidgetDialRange *cursorVerBDial;
+
+    WidgetDialRange *cursorFFTHorADial;
+    WidgetDialRange *cursorFFTHorBDial;
+
+    WidgetDialRange *cursorFFTVerADial;
+    WidgetDialRange *cursorFFTVerBDial;
 
 
 };

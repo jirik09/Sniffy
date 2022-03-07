@@ -22,6 +22,7 @@ public:
 signals:
     void moduleWindowClosing();
     void holdClicked(bool holdClicked);
+    void hideModuleWindowClicked();
 
 private slots:
     void unDockOrMaximize();

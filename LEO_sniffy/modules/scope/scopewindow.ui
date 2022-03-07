@@ -10,13 +10,13 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>350</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>500</width>
-    <height>350</height>
+    <height>300</height>
    </size>
   </property>
   <property name="contextMenuPolicy">
@@ -53,6 +53,12 @@
       <number>5</number>
      </property>
      <widget class="QWidget" name="widget_left" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="styleSheet">
        <string notr="true"/>
       </property>
@@ -156,7 +162,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>100</height>
+           <height>0</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -229,7 +235,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>25</height>
+           <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
