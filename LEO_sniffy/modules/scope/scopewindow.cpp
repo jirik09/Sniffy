@@ -241,6 +241,7 @@ void ScopeWindow::channelVerticalScaleCallback(float value){
 void ScopeWindow::channelVerticalShiftCallback(float value){
     config->channelOffset[config->selectedChannelIndexVertical] = value;
     paintTraces(ChartData,ChartMathData);
+    cursorValueVerCallback();
 }
 
 void ScopeWindow::timeBaseCallback(float value){

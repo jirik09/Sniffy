@@ -62,11 +62,11 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
     sweepControl = new QHBoxLayout();
     dialFreqSweepMin = new WidgetDialRange(parent,"Min frequency");
     dialFreqSweepMin->setObjectName("arbGenfreqSweepMin");
-    dialFreqSweepMin->setRange(0.1,1000000,"Hz",1,0.01,1000,true);
+    dialFreqSweepMin->setRange(0.01,1000000,"Hz",1,0.01,1000,true);
 
     dialFreqSweepMax = new WidgetDialRange(parent,"Max frequency");
     dialFreqSweepMax->setObjectName("arbGenfreqSweepMax");
-    dialFreqSweepMax->setRange(0.1,1000000,"Hz",1,0.01,1000,true);
+    dialFreqSweepMax->setRange(0.01,1000000,"Hz",1,0.01,1000,true);
 
     dialSweepTime = new WidgetDialRange(parent,"Sweep time");
     dialSweepTime->setObjectName("arbGenfreqSweeptime");
@@ -113,7 +113,7 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
         dialFreqCh[i] = new WidgetDialRange(parent,"Frequency",i);
         dialFreqCh[i]->setObjectName("arbGenfreq"+chNStr);
         dialFreqCh[i]->setNumOfDecimals(3);
-        dialFreqCh[i]->setRange(0.1,1000000,"Hz",1,0.01,1000,true);
+        dialFreqCh[i]->setRange(0.01,1000000,"Hz",1,0.01,1000,true);
         dialFreqCh[i]->setColor(Graphics::getChannelColor(i));
         dialFreqCh[i]->setAdditionalLabelColor(Graphics::COLOR_TEXT_LABEL);
         verChanBox->addWidget(dialFreqCh[i]);
