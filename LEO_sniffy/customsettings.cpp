@@ -42,9 +42,12 @@ bool CustomSettings::askToSaveSession()
     if(restoreSession == 0) return false;
 
     QMessageBox msgBox;
-    msgBox.setText("Save session");
-    msgBox.setInformativeText("Do you want to save current session?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+    msgBox.setWindowTitle("Save session");
+    msgBox.setWindowIcon(QIcon(":/graphics/graphics/logo_color.png"));
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setStyleSheet("QPushButton{width:50px;}");
+    msgBox.setText("Do you want to save current session?");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setDefaultButton(QMessageBox::Cancel);
     int ret = msgBox.exec();
 
@@ -117,9 +120,14 @@ bool CustomSettings::askForSessionRestore(QString device)
     }
 
     QMessageBox msgBox;
-    msgBox.setText("Session restore");
-    msgBox.setInformativeText("Session for "+device+" found. Do you want to restore?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
+    msgBox.setWindowTitle("Session restore");
+    msgBox.setWindowIcon(QIcon(":/graphics/graphics/logo_color.png"));
+    msgBox.setStyleSheet("QPushButton{width:50px;}");
+    msgBox.setText("Do you want to restore previous session");
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setInformativeText("for: "+device+" ");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No );
     msgBox.setDefaultButton(QMessageBox::Cancel);
     int ret = msgBox.exec();
 

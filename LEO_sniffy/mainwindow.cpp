@@ -23,8 +23,9 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowIcon(QIcon(":/graphics/graphics/logo_color.png"));
 
-    ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_sniffy.png);");    
+    ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_gray_full.png);");
     ui->centralwidget->setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_APP+";}"
                                      "QWidget#centralwidget{border-right: 1px solid"+Graphics::COLOR_TEXT_LABEL+";}");
 

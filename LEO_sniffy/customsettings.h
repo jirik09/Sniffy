@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QFile>
+#include <QIcon>
 #include <QSettings>
 #include <QMessageBox>
 

@@ -80,7 +80,7 @@
                                     DARK_STYLE_LIST_VIEW DARK_STYLE_PROGRESS_BAR DARK_STYLE_LABEL
 
 #define DARK_STYLE_OBJECT \
-"QObject{background-color:" DARK_WINDOW_APP ";font: 10pt" DARK_FONT ";color:" DARK_TEXT_ALL ";border:none;}"
+"QObject{background-color:" DARK_WINDOW_APP ";font: 9pt" DARK_FONT ";color:" DARK_TEXT_ALL ";border:none;}"
 
 #define DARK_STYLE_DOCK_WIDGET \
 "QDockWidget{border: 3px solid; background-color:" DARK_WINDOW_DOCK_WIDGET ";}"
@@ -106,7 +106,7 @@ QScrollBar:handle:hover{background-color:" DARK_WINDOW_CONTROL_HOVER ";}"
 
 #define DARK_STYLE_LINEEDIT \
 "QLineEdit::focus{border:none;background-color:" DARK_BACKGROUND_FOCUS_IN "}\
-QLineEdit{border:none;background-color:" DARK_DATA_INPUT_AREA ";font:12pt " DARK_FONT ";padding:0px;margin:0px;}"
+QLineEdit{border:none;background-color:" DARK_DATA_INPUT_AREA ";font:11pt " DARK_FONT ";padding:0px;margin:0px;}"
 
 #define DARK_STYLE_MENU \
 "QMenu::item{background-color:" DARK_DATA_INPUT_AREA ";}\
@@ -155,7 +155,7 @@ QProgressBar::chunk{width: 20px;background-color:#FF%1;}"
 "QPushButton{background-color:" DARK_WINDOW_APP ";qproperty-iconSize: 15px;padding: 5px}"
 
 #define DARK_STYLE_MODULE_BUTTON \
-"QPushButton {text-align:left;qproperty-iconSize: 35px;color: " DARK_TEXT_ALL ";border-radius:5px;}\
+"QPushButton {text-align:left;qproperty-iconSize: 32px;color: " DARK_TEXT_ALL ";border-radius:5px;}\
 QPushButton:disabled{color:" DARK_COMPONENT_DISABLED ";}\
 QPushButton:hover{background-color:" DARK_BACKGROUND_BUTTON ";}\
 QPushButton:checked{background-color:" DARK_DATA_INPUT_AREA ";}\
@@ -172,11 +172,11 @@ QPushButton:hover{border-width:2px;}"
 #define DARK_STYLE_DIAL DARK_STYLE_LINEEDIT \
 "QWidget:disabled{color:" DARK_COMPONENT_DISABLED ";}\
 QWidget{color:" DARK_TEXT_COMPONENT ";}\
-QPushButton{font: 12pt" DARK_FONT ";}"
+QPushButton{font: 11pt" DARK_FONT ";}"
 
 #define DARK_STYLE_TEXTINPUT \
 "QWidget:disabled{ color:" DARK_COMPONENT_DISABLED ";}\
-QWidget{font: 10pt" DARK_FONT "; color:" DARK_TEXT_COMPONENT ";}"
+QWidget{font: 9pt" DARK_FONT "; color:" DARK_TEXT_COMPONENT ";}"
 
 #define DARK_STYLE_MODULE_DOCK_WIDGET DARK_STYLE_WIDGET DARK_STYLE_DOCK_WIDGET
 

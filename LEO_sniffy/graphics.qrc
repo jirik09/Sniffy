@@ -180,6 +180,8 @@
         <file>graphics/themes/dawn/icon_voltage_source.png</file>
         <file>graphics/themes/dawn/arrow_down.png</file>
         <file>graphics/themes/dawn/arrow_up.png</file>
+        <file>graphics/logo_color.png</file>
+        <file>graphics/themes/dark/logo_gray_full.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

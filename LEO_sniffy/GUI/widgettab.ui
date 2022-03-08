@@ -18,7 +18,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -30,12 +30,12 @@
     <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>5</number>
+    <number>3</number>
    </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_1">
       <attribute name="title">
@@ -43,7 +43,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_tab1">
        <property name="spacing">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -68,12 +68,12 @@
             <x>0</x>
             <y>0</y>
             <width>734</width>
-            <height>267</height>
+            <height>266</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_1">
            <property name="spacing">
-            <number>5</number>
+            <number>3</number>
            </property>
            <property name="leftMargin">
             <number>5</number>
@@ -99,7 +99,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_tab2">
        <property name="spacing">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -124,12 +124,12 @@
             <x>0</x>
             <y>0</y>
             <width>734</width>
-            <height>267</height>
+            <height>266</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <property name="spacing">
-            <number>5</number>
+            <number>3</number>
            </property>
            <property name="leftMargin">
             <number>5</number>
@@ -155,7 +155,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_tab3">
        <property name="spacing">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -180,12 +180,12 @@
             <x>0</x>
             <y>0</y>
             <width>734</width>
-            <height>267</height>
+            <height>266</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="spacing">
-            <number>5</number>
+            <number>3</number>
            </property>
            <property name="leftMargin">
             <number>5</number>
@@ -211,7 +211,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_tab4">
        <property name="spacing">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -236,12 +236,12 @@
             <x>0</x>
             <y>0</y>
             <width>734</width>
-            <height>267</height>
+            <height>266</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
-            <number>5</number>
+            <number>3</number>
            </property>
            <property name="leftMargin">
             <number>5</number>
@@ -267,7 +267,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_tab5">
        <property name="spacing">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -292,12 +292,12 @@
             <x>0</x>
             <y>0</y>
             <width>734</width>
-            <height>267</height>
+            <height>266</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
            <property name="spacing">
-            <number>5</number>
+            <number>3</number>
            </property>
            <property name="leftMargin">
             <number>5</number>
@@ -323,7 +323,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_tab6">
        <property name="spacing">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -348,12 +348,12 @@
             <x>0</x>
             <y>0</y>
             <width>734</width>
-            <height>267</height>
+            <height>266</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <property name="spacing">
-            <number>5</number>
+            <number>3</number>
            </property>
            <property name="leftMargin">
             <number>5</number>
