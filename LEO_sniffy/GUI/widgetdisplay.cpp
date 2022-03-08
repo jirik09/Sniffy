@@ -44,19 +44,19 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     style = "QObject{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}";
     ui->line->setStyleSheet(style);
 
-    style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
+    style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
             "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
     ui->pushButton_history->setStyleSheet(style);
 
-    style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
+    style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
             "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
     ui->pushButton_list->setStyleSheet(style);
 
-    style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_clear_history.png);}"
+    style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_clear_history.png);}"
             "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
     ui->pushButton_clear->setStyleSheet(style);
 
-    style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_save.png);}"
+    style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_save.png);}"
             "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
     ui->pushButton_save->setStyleSheet(style);
 
@@ -296,13 +296,11 @@ void WidgetDisplay::configureFloatingHistoryNumber(){
 
 void WidgetDisplay::createHistoryChart(int historyTracesNum){
     chart = new widgetChart(ui->verticalWidget_history, historyTracesNum);
-    chart->setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
     chart->setLabelsSize(7);
     chart->formatLabels("%.1f", "%.2g");
-    // chart->setGridLinesVisible(true, true);
     chart->setGridDensity(5, 5);
     chart->setLabelsVisible(true, true);
-    chart->setMargins(-12, -5, -6, -10);
+    chart->setMargins(-12, -20, -16,-10);
     chart->setRangeY(0, 3.3);
     chart->setDataMinMax(0, 10);
     ui->horizontalWidget_graph_2->addWidget(chart);
@@ -439,12 +437,12 @@ void WidgetDisplay::historyButtonClickedCallback(){
 
     if(historyView == DISABLED){
         sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
-        style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_history_on.png);}"
+        style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_history_on.png);}"
                 "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         historyView = ENABLED;
     }else {
         sizes = {0, cmpltWidth};
-        style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
+        style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
                 "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         historyView = DISABLED;
     }
@@ -456,13 +454,13 @@ void WidgetDisplay::historyButtonClickedCallback(){
 void WidgetDisplay::listChartSwitchClickedCallback(){
     QString style;
     if(listView == DISABLED){
-        style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_chart.png);}"
+        style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_chart.png);}"
                 "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         chart->hide();
         list->show();
         listView = ENABLED;
     }else {
-        style = "QPushButton{image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
+        style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
                 "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
         chart->show();
         list->hide();

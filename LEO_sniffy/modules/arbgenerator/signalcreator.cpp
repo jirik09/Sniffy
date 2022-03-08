@@ -70,7 +70,7 @@ QVector<qreal> SignalCreator::createSignal(SignalShape shape, int numSamples, qr
 
 int SignalCreator::calculateSignalLength(MemoryLength memSet, int customLength,int generatorBufferSize, qreal signalFreq, int maxSamplingRate, int periphClockFrequency)
 {
-    int outputLeng;
+    int outputLeng=0;
     int divA = periphClockFrequency / maxSamplingRate;
     int divB;
     int div;

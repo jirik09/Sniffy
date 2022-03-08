@@ -17,12 +17,14 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_WINDOW_WIDGET);
+    ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    ui->widget_left->setContentsMargins(4,4,4,4);
 
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseEvents(EventSelection::ALL);
     chart->hideAxislabels();
+    chart->setMargins(-29,-25,-25,-23);
     chart->setGridDensity(DEFAULT_CHART_DIV+1,9);
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
@@ -43,8 +45,9 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
 
     ui->verticalLayout_chart->addWidget(splitter);
 
+
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
-    ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_WINDOW_WIDGET);
+    ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************
@@ -119,7 +122,7 @@ void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
     ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url("+Graphics::getGraphicsPath()+"signalBackground.png) center;"
                                         "background-color: "+Graphics::COLOR_WINDOW_WIDGET+";border: 1px solid "+Graphics::COLOR_TEXT_LABEL+";margin-top: 3px;margin-bottom: 3px;}"
-                                                                                         "QSlider::handle:horizontal {background: rgba(0, 0, 0, 100);border: 2px solid "+Graphics::COLOR_TEXT_LABEL+";margin-top: -3px;"
+                                                                                         "QSlider::handle:horizontal {background: #ba"+Graphics::COLOR_BACKGROUND_BUTTON.remove("#") + ";border: 2px solid "+Graphics::COLOR_TEXT_LABEL+";margin-top: -3px;"
                                                                                          "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+"px;}");
     event->accept();
 }

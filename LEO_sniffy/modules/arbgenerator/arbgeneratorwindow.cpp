@@ -20,15 +20,17 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
     verticalLayout_settings->setSpacing(2);
 
     widget_chart->setContentsMargins(0,0,0,0);
-    verticalLayout_chart->setContentsMargins(0,0,0,0);
+    verticalLayout_chart->setContentsMargins(4,4,4,4);
     verticalLayout_chart->setSpacing(0);
 
     chart = new widgetChart(widget_chart, 4);
     chart->setRange(0, 1, 0, 1);
+    chart->setMargins(-10,-20,-13,-10);
     verticalLayout_chart->addWidget(chart);
 
     PWMchart = new widgetChart(widget_chart, 4);
     PWMchart->setRange(0, 1, 0, 1);
+    PWMchart->setMargins(-10,-20,-13,-10);
     verticalLayout_chart->addWidget(PWMchart);
     if(!isPWMbased){
         PWMchart->hide();
@@ -38,7 +40,7 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
     fileLoader = new ArbGeneratorFileLoader();
 
     ui->widget_settings->setLayout(verticalLayout_settings);
-    ui->widget_module->resize(600,300);
+    ui->widget_module->resize(2000,300);
     ui->widget_module->setLayout(verticalLayout_chart);
 
     generatorChartData = new QVector<QVector<QPointF>>;
@@ -163,7 +165,7 @@ void ArbGeneratorWindow::createSignalCallback()
     QVector<QPointF> chartSignal;
     qreal x(0);
     qreal y(0);
-    int PWMres;
+    int PWMres = 0;
     int tmpDAC;
     qreal maxX = -10000;
     qreal maxRes = -10000;

@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent):
     this->setWindowIcon(QIcon(":/graphics/graphics/logo_color.png"));
 
     ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_gray_full.png);");
-    ui->centralwidget->setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_APP+";}"
+    ui->centralwidget->setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}"
                                      "QWidget#centralwidget{border-right: 1px solid"+Graphics::COLOR_TEXT_LABEL+";}");
 
     setWindowTitle("LEO sniffy");
