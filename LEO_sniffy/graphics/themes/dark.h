@@ -39,7 +39,7 @@
 #define DARK_DATA_INPUT_AREA "#282828"          //backgrounf of user text / number inputs
 
 /* DISPLAY & CHART & GRID & LEGEND */
-#define DARK_CHART "#262626"                    //chart background colors
+#define DARK_CHART "#272727"                    //chart background colors
 #define DARK_CHART_GRIDLEG_DEFAULT "#e4e4e4"
 #define DARK_CHART_GRIDLEG_LOW_CONTRAST "#7c7c7c"
 #define DARK_DISPLAY DARK_CHART

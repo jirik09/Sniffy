@@ -20,7 +20,7 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
     verticalLayout_settings->setSpacing(2);
 
     widget_chart->setContentsMargins(0,0,0,0);
-    verticalLayout_chart->setContentsMargins(5,5,5,5);
+    verticalLayout_chart->setContentsMargins(0,0,0,0);
     verticalLayout_chart->setSpacing(0);
 
     chart = new widgetChart(widget_chart, 4);
@@ -165,7 +165,7 @@ void ArbGeneratorWindow::createSignalCallback()
     QVector<QPointF> chartSignal;
     qreal x(0);
     qreal y(0);
-    int PWMres;
+    int PWMres = 0;
     int tmpDAC;
     qreal maxX = -10000;
     qreal maxRes = -10000;

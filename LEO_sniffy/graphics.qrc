@@ -182,6 +182,8 @@
         <file>graphics/themes/dawn/arrow_up.png</file>
         <file>graphics/logo_color.png</file>
         <file>graphics/themes/dark/logo_gray_full.png</file>
+        <file>graphics/themes/light/logo_gray_full.png</file>
+        <file>graphics/themes/dawn/logo_gray_full.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

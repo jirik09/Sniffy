@@ -39,7 +39,7 @@
 #define DAWN_DATA_INPUT_AREA "#121721" //"#141824" //backgrounf of user text / number inputs
 
 /* DISPLAY & CHART & GRID & LEGEND */
-#define DAWN_CHART DAWN_WINDOW_APP                   //chart background colors
+#define DAWN_CHART DAWN_DATA_INPUT_AREA                   //chart background colors
 #define DAWN_CHART_GRIDLEG_DEFAULT "#b0b4bd"
 #define DAWN_CHART_GRIDLEG_LOW_CONTRAST "#6b6f79"
 #define DAWN_DISPLAY DAWN_CHART
@@ -154,9 +154,9 @@ QProgressBar::chunk{width: 20px;background-color: #FF%1;}"
 "QPushButton{background-color:" DAWN_WINDOW_APP ";qproperty-iconSize: 15px;padding: 5px}"
 
 #define DAWN_STYLE_MODULE_BUTTON \
-"QPushButton{text-align:left; border: 3px solid " DAWN_WINDOW_APP "; border-radius:2px;qproperty-iconSize: 35px;}\
-QPushButton:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP ";background:" DAWN_WINDOW_CONTROL_HOVER ";color: #dcdde0;}\
-QPushButton:checked{text-align:left; border: 3px solid " DAWN_WINDOW_APP ";background: #11FFFFFF; color: " DAWN_YELLOW ";}\
+"QPushButton{text-align:left; border-radius:2px;qproperty-iconSize: 35px;}\
+QPushButton:hover{text-align:left; border: 2px solid " DAWN_WINDOW_APP ";background:" DAWN_WINDOW_CONTROL_HOVER ";color: #dcdde0;}\
+QPushButton:checked{text-align:left; background: #11FFFFFF; color: " DAWN_YELLOW ";}\
 QPushButton:checked:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP "; background:" DAWN_WINDOW_CONTROL_HOVER ";}"
 
 #define DAWN_STYLE_HOLD_BUTTON \

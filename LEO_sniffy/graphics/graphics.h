@@ -27,6 +27,7 @@ public:
     static QString COLOR_WINDOW_WIDGET;
     static QString COLOR_BACKGROUND_FOCUS_IN;
     static QString COLOR_COMPONENT_DISABLED;
+    static QString COLOR_BACKGROUND_BUTTON;
     static QString COLOR_DATA_INPUT_AREA;
     static QString COLOR_CONTROLS;
     static QString COLOR_DISPLAY;
