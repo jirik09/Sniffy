@@ -67,6 +67,7 @@ public:
     void updateTrace(QVector<QPointF> *points, int index);
     void appendToTrace(int index, QVector<QPointF> *points);
     void updateAxis();
+    void hideAxislabels();
 
     void setDataMinMax(qreal minX, qreal maxX);
     void setRangeX(qreal minX, qreal maxX);

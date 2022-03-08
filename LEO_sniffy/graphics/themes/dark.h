@@ -155,7 +155,7 @@ QProgressBar::chunk{width: 20px;background-color:#FF%1;}"
 "QPushButton{background-color:" DARK_WINDOW_APP ";qproperty-iconSize: 15px;padding: 5px}"
 
 #define DARK_STYLE_MODULE_BUTTON \
-"QPushButton {text-align:left;qproperty-iconSize: 35px;color: " DARK_TEXT_ALL ";border-radius:5px;}\
+"QPushButton {text-align:left;qproperty-iconSize: 32px;color: " DARK_TEXT_ALL ";border-radius:5px;}\
 QPushButton:disabled{color:" DARK_COMPONENT_DISABLED ";}\
 QPushButton:hover{background-color:" DARK_BACKGROUND_BUTTON ";}\
 QPushButton:checked{background-color:" DARK_DATA_INPUT_AREA ";}\

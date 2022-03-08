@@ -22,6 +22,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseEvents(EventSelection::ALL);
+    chart->hideAxislabels();
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
     chartFFT->setRange(0, 50000, 0, 8);
@@ -111,8 +112,8 @@ ScopeWindow::~ScopeWindow()
 void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
     ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url("+Graphics::getGraphicsPath()+"signalBackground.png) center;"
-                                        "background-color: "+Graphics::COLOR_WINDOW_WIDGET+";border: 1px solid #777;margin-top: 3px;margin-bottom: 3px;}"
-                                                                                         "QSlider::handle:horizontal {background: rgba(0, 0, 0, 150);border: 2px solid #777;margin-top: -3px;"
+                                        "background-color: "+Graphics::COLOR_WINDOW_WIDGET+";border: 1px solid "+Graphics::COLOR_TEXT_LABEL+";margin-top: 3px;margin-bottom: 3px;}"
+                                                                                         "QSlider::handle:horizontal {background: rgba(0, 0, 0, 100);border: 2px solid "+Graphics::COLOR_TEXT_LABEL+";margin-top: -3px;"
                                                                                          "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+"px;}");
     event->accept();
 }

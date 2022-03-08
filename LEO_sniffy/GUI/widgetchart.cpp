@@ -17,7 +17,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->setAcceptHoverEvents(true);
     this->setMouseTracking(true);
 
-    QMargins *chrtMargin = new QMargins(0,5,0,0);
+    QMargins *chrtMargin = new QMargins(0,0,0,0);
     chart->setMargins(*chrtMargin);
 
     axisX = new QValueAxis;
@@ -25,7 +25,6 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
 
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignLeft);
-
 
     //init traces
     for (int i = 0; i < maxTraces; i++) {
@@ -86,8 +85,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QChartView *chartView = new QChartView(chart);
 
     ui->horizontalLayout_chart->addWidget(chartView);
-//    chartView->setStyleSheet("anchors { fill: parent; margins: -15 }");
-//    chart->setMargins(QMargins(0,0,0,0));
+    chart->setMargins(QMargins(0,-12,0,0));
     chart->setBackgroundRoundness(0);
 
     setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
@@ -318,6 +316,13 @@ void widgetChart::updateAxis(){
             switchToLineSeriesSeamless(); //todo no need to call this every time
         }
     }*/
+}
+
+void widgetChart::hideAxislabels()
+{
+    axisX->setLabelsVisible(false);
+    axisY->setLabelsVisible(false);
+    setMargins(-22,-15,-15,-13);
 }
 
 void widgetChart::setDataMinMax(qreal minX, qreal maxX){
