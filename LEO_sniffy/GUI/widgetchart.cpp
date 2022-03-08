@@ -7,7 +7,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     maxTraces(maxTraces)
 {
     ui->setupUi(this);
-    setStyleSheet("background-color:" + Graphics::COLOR_WINDOW_WIDGET);
+    setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
 
     chart = new QChart();
     chart->legend()->hide();
@@ -322,7 +322,6 @@ void widgetChart::hideAxislabels()
 {
     axisX->setLabelsVisible(false);
     axisY->setLabelsVisible(false);
-    setMargins(-22,-15,-15,-13);
 }
 
 void widgetChart::setDataMinMax(qreal minX, qreal maxX){

@@ -296,13 +296,11 @@ void WidgetDisplay::configureFloatingHistoryNumber(){
 
 void WidgetDisplay::createHistoryChart(int historyTracesNum){
     chart = new widgetChart(ui->verticalWidget_history, historyTracesNum);
-    chart->setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
     chart->setLabelsSize(7);
     chart->formatLabels("%.1f", "%.2g");
-    // chart->setGridLinesVisible(true, true);
     chart->setGridDensity(5, 5);
     chart->setLabelsVisible(true, true);
-    chart->setMargins(-12, -5, -6, -10);
+    chart->setMargins(-12, -20, -16,-10);
     chart->setRangeY(0, 3.3);
     chart->setDataMinMax(0, 10);
     ui->horizontalWidget_graph_2->addWidget(chart);

@@ -17,12 +17,13 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_WINDOW_WIDGET);
+    ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
 
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseEvents(EventSelection::ALL);
     chart->hideAxislabels();
+    chart->setMargins(-29,-25,-25,-23);
     chart->setGridDensity(DEFAULT_CHART_DIV+1,9);
 
     chartFFT = new widgetChart(ui->widget_chart, 5);
@@ -44,7 +45,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     ui->verticalLayout_chart->addWidget(splitter);
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
-    ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_WINDOW_WIDGET);
+    ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************

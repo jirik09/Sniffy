@@ -15,6 +15,7 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
     QVBoxLayout *verticalLayout_settings = new QVBoxLayout();
 
     widget_chart->setLayout(verticalLayout_chart);
+    widget_chart->setContentsMargins(5,5,5,5);
     widget_settings->setLayout(verticalLayout_settings);
 
     QList<int> sizes;
