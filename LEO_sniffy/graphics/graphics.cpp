@@ -37,6 +37,7 @@ QString Graphics::COLOR_WINDOW_APP;
 QString Graphics::COLOR_WINDOW_WIDGET;
 QString Graphics::COLOR_BACKGROUND_FOCUS_IN;
 QString Graphics::COLOR_COMPONENT_DISABLED;
+QString Graphics::COLOR_BACKGROUND_BUTTON;
 QString Graphics::COLOR_DATA_INPUT_AREA;
 QString Graphics::COLOR_CONTROLS;
 QString Graphics::COLOR_DISPLAY;

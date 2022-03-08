@@ -13,7 +13,11 @@ WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftName, QString rightName,
 {
     ui->setupUi(this);
 
-    ui->label_name->setText(name);
+    if(name != ""){
+        ui->label_name->setText(name);
+    }else{
+        ui->label_name->hide();
+    }
     setObjectName(name);
 
     ui->pushButton_left->setCheckable(true);

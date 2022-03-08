@@ -82,7 +82,7 @@ void TimeBaseAndMemory::setDataResolution(int bits)
 }
 
 void TimeBaseAndMemory::handleMemoryPolicy(){
-    int tmpMemLen;
+    int tmpMemLen=0;
     switch (config->memPolicy) {
     case MemoryPolicy::NORMAL:
         tmpMemLen = DEFAULT_MEM_SAMPLES_LENGTH;

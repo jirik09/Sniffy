@@ -31,8 +31,8 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
     units = new QList<params_unit>;
     ui->dial->setCustomGraphics(Graphics::STYLE_CUSTOM_DIALS_USED);
 
-    this->setMinimumSize(170,85);
-    this->setMaximumSize(400,120);
+   // this->setMinimumSize(170,85);
+  // this->setMaximumSize(400,120);
     setColor(Graphics::COLOR_CONTROLS);
 }
 
@@ -101,17 +101,6 @@ void WidgetDialRange::setColor(QString color){
     ui->pushButton_minus->setStyleSheet(style);
 }
 
-void WidgetDialRange::setDialColor(QString &textStyleSheet){
-    ui->widget_dial->setStyleSheet(textStyleSheet);
-    qDebug () << "OBSOLETE use setColor instead";
-}
-
-void WidgetDialRange::setDialButtonsColor(QString &bckgndStyleSheet){
-    ui->pushButton_plus->setStyleSheet(bckgndStyleSheet);
-    ui->pushButton_minus->setStyleSheet(bckgndStyleSheet);
-    qDebug () << "OBSOLETE use setColor instead";
-}
-
 float WidgetDialRange::getDefaultRealValue() const{
     return defaultRealValue;
 }
@@ -158,8 +147,8 @@ void WidgetDialRange::updateBaseUnit(QString unit)
 void WidgetDialRange::hideUnitSelection(void){
     ui->comboBox->close();
     ui->widget_4->close();
-    this->setMinimumSize(170,60);
-    this->setMaximumSize(400,95);
+ //   this->setMinimumSize(170,60);
+ //   this->setMaximumSize(400,95);
 }
 
 void WidgetDialRange::plusClicked(){

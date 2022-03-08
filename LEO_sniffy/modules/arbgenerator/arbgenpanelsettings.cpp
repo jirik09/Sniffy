@@ -13,13 +13,13 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
 
     buttonsEnable = new WidgetButtons(parent,4,ButtonTypes::RADIO,"Number of channels");
     buttonsEnable->setObjectName("arbGenBtnEnableChannel");
-    buttonsEnable->setText("  One  ",0);
+    buttonsEnable->setText("   One   ",0);
     buttonsEnable->setColor(Graphics::getChannelColor(0),0);
-    buttonsEnable->setText("  Two  ",1);
+    buttonsEnable->setText("   Two   ",1);
     buttonsEnable->setColor(Graphics::getChannelColor(1),1);
-    buttonsEnable->setText("  Three  ",2);
+    buttonsEnable->setText("   Three   ",2);
     buttonsEnable->setColor(Graphics::getChannelColor(2),2);
-    buttonsEnable->setText("  Four  ",3);
+    buttonsEnable->setText("   Four   ",3);
     buttonsEnable->setColor(Graphics::getChannelColor(3),3);
 
     buttonsMemory = new WidgetButtons(parent,3,ButtonTypes::RADIO,"Memory");

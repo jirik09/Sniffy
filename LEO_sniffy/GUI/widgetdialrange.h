@@ -43,8 +43,6 @@ public:
     void setRealValue(float value, bool silent = false);
     void hideUnitSelection(void);
     void setColor(QString color);
-    void setDialColor(QString &styleSheet);
-    void setDialButtonsColor(QString &bckgndStyleSheet);
     float getDefaultRealValue() const;
     float getRealValue() const;
     void disable(bool disable);    
