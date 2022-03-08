@@ -43,6 +43,7 @@ private:
     InputTextType inputType;
     QString lastParsed = "1";
     qreal number = 0;
+    bool graphicsShown = false;
 
 
 private slots:

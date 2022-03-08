@@ -134,6 +134,16 @@ void WidgetDialRange::addOption (QString unit,float mult){
     ui->comboBox->addItem(unit);
 }
 
+void WidgetDialRange::updateBaseUnit(QString unit)
+{
+    for(int i = 0;i<units->length();i++){
+        params_unit *tmpUnit = new params_unit();
+        tmpUnit->mult = units->at(i).mult;
+        tmpUnit->unit = units->at(i).mult==1?unit:units->at(i).unit.at(0)+unit;
+        units->replace(i,*tmpUnit);
+    }
+}
+
 void WidgetDialRange::hideUnitSelection(void){
     ui->comboBox->close();
     ui->widget_4->close();

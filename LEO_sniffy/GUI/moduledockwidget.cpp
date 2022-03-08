@@ -92,7 +92,11 @@ void ModuleDockWidget::unDockOrMaximize(){
 }
 
 void ModuleDockWidget::dockOrMinimize(){
-    setFloating(false);
+    if(isFloating()){
+        setFloating(false);
+    }else{
+        emit hideModuleWindowClicked();
+    }
 }
 
 void ModuleDockWidget::close(){
