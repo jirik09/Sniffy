@@ -20,7 +20,7 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
     verticalLayout_settings->setSpacing(2);
 
     widget_chart->setContentsMargins(0,0,0,0);
-    verticalLayout_chart->setContentsMargins(0,0,0,0);
+    verticalLayout_chart->setContentsMargins(4,4,4,4);
     verticalLayout_chart->setSpacing(0);
 
     chart = new widgetChart(widget_chart, 4);

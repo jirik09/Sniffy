@@ -18,6 +18,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     ui->setupUi(this);
 
     ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    ui->widget_left->setContentsMargins(4,4,4,4);
 
     chart = new widgetChart(ui->widget_chart, 5);
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);

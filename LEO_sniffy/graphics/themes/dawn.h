@@ -36,10 +36,10 @@
 #define DAWN_RUNNING "#319c22"                  //color of button when running
 #define DAWN_UNUSED "#434651"                   //color of button when its function is none or disable
 #define DAWN_BACKGROUND_FOCUS_IN "#161b27"      //background area of data inputs when focused in by mouse
-#define DAWN_DATA_INPUT_AREA "#121721" //"#141824" //backgrounf of user text / number inputs
+#define DAWN_DATA_INPUT_AREA "#0e131b" //"#141824" //backgrounf of user text / number inputs
 
 /* DISPLAY & CHART & GRID & LEGEND */
-#define DAWN_CHART DAWN_DATA_INPUT_AREA                   //chart background colors
+#define DAWN_CHART DAWN_WINDOW_APP                   //chart background colors
 #define DAWN_CHART_GRIDLEG_DEFAULT "#b0b4bd"
 #define DAWN_CHART_GRIDLEG_LOW_CONTRAST "#6b6f79"
 #define DAWN_DISPLAY DAWN_CHART
@@ -77,7 +77,7 @@
                                     DAWN_STYLE_LIST_VIEW DAWN_STYLE_PROGRESS_BAR DAWN_STYLE_LABEL
 
 #define DAWN_STYLE_OBJECT \
-"QObject{background-color:" DAWN_WINDOW_APP ";font: 10pt" DAWN_FONT ";color:" DAWN_TEXT_ALL ";border:none;}"
+"QObject{background-color:" DAWN_WINDOW_APP ";font: 9pt" DAWN_FONT ";color:" DAWN_TEXT_ALL ";border:none;}"
 
 #define DAWN_STYLE_DOCK_WIDGET \
 "QDockWidget{border: 3px solid; background-color:" DAWN_WINDOW_DOCK_WIDGET ";}"
@@ -102,7 +102,7 @@ QScrollBar::add-page,QScrollBar::sub-page{background-color: #44a1a4ab;}\
 QScrollBar:handle:hover{background-color: #bba1a4ab;}"
 
 #define DAWN_STYLE_LINEEDIT \
-"QLineEdit{border:none;background-color:" DAWN_DATA_INPUT_AREA ";font:12pt " DAWN_FONT ";padding:0px;margin:0px;}\
+"QLineEdit{border:none;background-color:" DAWN_DATA_INPUT_AREA ";font:11pt " DAWN_FONT ";padding:0px;margin:0px;}\
 QLineEdit::focus{border:none;background-color:" DAWN_BACKGROUND_FOCUS_IN ";}"
 
 #define DAWN_STYLE_MENU \
@@ -154,10 +154,10 @@ QProgressBar::chunk{width: 20px;background-color: #FF%1;}"
 "QPushButton{background-color:" DAWN_WINDOW_APP ";qproperty-iconSize: 15px;padding: 5px}"
 
 #define DAWN_STYLE_MODULE_BUTTON \
-"QPushButton{text-align:left; border-radius:2px;qproperty-iconSize: 35px;}\
-QPushButton:hover{text-align:left; border: 2px solid " DAWN_WINDOW_APP ";background:" DAWN_WINDOW_CONTROL_HOVER ";color: #dcdde0;}\
-QPushButton:checked{text-align:left; background: #11FFFFFF; color: " DAWN_YELLOW ";}\
-QPushButton:checked:hover{text-align:left; border: 3px solid " DAWN_WINDOW_APP "; background:" DAWN_WINDOW_CONTROL_HOVER ";}"
+"QPushButton{text-align:left; border: 3px solid " DAWN_WINDOW_WIDGET "; border-radius:2px;qproperty-iconSize: 35px;}\
+QPushButton:hover{text-align:left; border: 3px solid " DAWN_WINDOW_WIDGET ";background:" DAWN_WINDOW_CONTROL_HOVER ";color: #dcdde0;}\
+QPushButton:checked{text-align:left; border: 3px solid " DAWN_WINDOW_WIDGET ";background: #11FFFFFF; color: " DAWN_YELLOW ";}\
+QPushButton:checked:hover{text-align:left; border: 3px solid " DAWN_WINDOW_WIDGET "; background:" DAWN_WINDOW_CONTROL_HOVER ";}"
 
 #define DAWN_STYLE_HOLD_BUTTON \
 "QPushButton{font-weight:bold;padding-top: 0px;padding-bottom:1px;padding-left:0px;padding-right:0px;font-size:10px;}\
@@ -170,11 +170,11 @@ QPushButton:hover{background-color:#3Cfa961b;border-color:" DAWN_WARNING ";color
 #define DAWN_STYLE_DIAL DAWN_STYLE_LINEEDIT \
 "QWidget:disabled{color:" DAWN_COMPONENT_DISABLED ";}\
 QWidget{color:" DAWN_TEXT_COMPONENT ";}\
-QPushButton{font: 12pt" DAWN_FONT ";}"
+QPushButton{font: 11pt" DAWN_FONT ";}"
 
 #define DAWN_STYLE_TEXTINPUT \
 "QWidget:disabled{ color:" DAWN_COMPONENT_DISABLED ";}\
-QWidget{font: 10pt" DAWN_FONT "; color:" DAWN_TEXT_COMPONENT ";}"
+QWidget{font: 9pt" DAWN_FONT "; color:" DAWN_TEXT_COMPONENT ";}"
 
 #define DAWN_STYLE_MODULE_DOCK_WIDGET DAWN_STYLE_WIDGET DAWN_STYLE_DOCK_WIDGET
 

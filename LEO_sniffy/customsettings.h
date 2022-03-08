@@ -7,6 +7,8 @@
 #include <QSettings>
 #include <QMessageBox>
 
+#include "graphics/graphics.h"
+
 class CustomSettings : public QObject
 {
     Q_OBJECT
