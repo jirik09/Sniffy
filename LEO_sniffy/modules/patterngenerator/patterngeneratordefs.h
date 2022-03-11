@@ -3,7 +3,7 @@
 
 #include <qtypeinfo.h>
 
-#define PATTERNS_USE_QCUSTOM_PLOT  1
+#define PATTERNS_USE_QCUSTOM_PLOT  0
 
 #define PATTERNS_NUM  8
 #define PATT_MAX_CHANNELS_NUM 8

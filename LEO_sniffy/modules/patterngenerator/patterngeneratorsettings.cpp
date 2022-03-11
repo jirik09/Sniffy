@@ -174,7 +174,7 @@ void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout 
 WidgetDialRange *PatternGeneratorSettings::createFrequencyDial(QWidget *parent, QString objName)
 {
     WidgetDialRange *dial = new WidgetDialRange(parent, "");
-    dial->setName("Frequency");
+    dial->setName("Cycle frequency");
     dial->hideUnitSelection();
     dial->setRange(1, 4800000, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
     dial->setObjectName(objName);

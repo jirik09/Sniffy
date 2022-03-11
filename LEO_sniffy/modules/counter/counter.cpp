@@ -85,6 +85,7 @@ void Counter::parseData(QByteArray data){
         moduleSpecification->parseSpecification(dataToPass);
         cntWindow->setSpecification(static_cast<CounterSpec*>(moduleSpecification));
         showModuleControl();
+        buildModuleDescription(static_cast<CounterSpec*>(moduleSpecification));
 
     }else {
         if(config->isHeld)
@@ -100,6 +101,27 @@ void Counter::parseData(QByteArray data){
             parseIntervalsCounter(dataToPass);
         }
     }
+}
+
+void Counter::buildModuleDescription(CounterSpec *spec)
+{
+    QString name = moduleName;
+    QList<QString> labels ,values;
+
+    labels.append("Pins - High freq (<"+LabelFormator::formatOutout(spec->hf_max,"Hz",0)+")");
+    values.append(spec->pins.hf_ch1);
+
+    labels.append("Pins - Low freq (<"+LabelFormator::formatOutout(spec->lf_max,"Hz",0)+")");
+    values.append(spec->pins.lf_ch1+", "+spec->pins.lf_ch2);
+
+    labels.append("Pins - Freq ratio");
+    values.append("Ref:" + spec->pins.rat_ref+"  In:"+spec->pins.rat_ch3);
+
+    labels.append("Pins - Inervals");
+    values.append(spec->pins.int_ch1+", "+spec->pins.int_ch2);
+
+
+    showModuleDescription(name, labels, values);
 }
 
 /************************************** COMMON FUNCTIONS ****************************************/
