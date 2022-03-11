@@ -153,6 +153,8 @@ void PanelMath::symbolicError(int errorPosition)
 
 void PanelMath::typeChanged(int index)
 {
+    if(previousMathType == index && index != 0)
+        return;
     hideAll();
 
     switch (index) {
@@ -188,6 +190,7 @@ void PanelMath::typeChanged(int index)
     }else if(previousMathType == 3){
         emit fftChanged(0, FFTWindow::rectangular, FFTType::periodogram,0);
     }
+    emit mathTypeChanged(index);
 
     previousMathType = index;
 }

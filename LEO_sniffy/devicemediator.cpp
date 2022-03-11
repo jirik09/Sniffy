@@ -21,7 +21,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (new SyncPwm(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new ArbGenerator(this,true)));
-    tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
+    //tmpModules.append(QSharedPointer<AbstractModule> (new PatternGenerator(this)));
     tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
  //   tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
@@ -154,16 +154,16 @@ void DeviceMediator::parseData(QByteArray data){
         }
     }
     if(!isDataPassed){
-        if(data.length()<30){
-            qDebug() << "ERROR: this data was not passed to any module" << data;
-        }else{
-            qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
-        }
         if (data.right(1)=="E"){
             qDebug() << "DEVICE ERROR " << QString::number((uint8_t)((data.right(2)).at(0)));
-        }
-        if(data.left(3)=="DBG"){
+        }else if(data.left(3)=="DBG"){
             qDebug() << "DEBUG MCU: " << data.right(data.length()-4);
+        }else{
+            if(data.length()<30){
+                qDebug() << "ERROR: this data was not passed to any module" << data;
+            }else{
+                qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
+            }
         }
     }
 }

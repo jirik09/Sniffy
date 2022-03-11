@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>292</width>
-    <height>90</height>
+    <height>85</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>200</width>
-    <height>90</height>
+    <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>4000</width>
-    <height>120</height>
+    <height>85</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -48,7 +48,7 @@
     <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>5</number>
+    <number>2</number>
    </property>
    <item>
     <widget class="QWidget" name="widget" native="true">
@@ -66,7 +66,7 @@
        <number>7</number>
       </property>
       <property name="topMargin">
-       <number>5</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
@@ -82,9 +82,15 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>40</height>
+         </size>
+        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <property name="spacing">
-          <number>5</number>
+          <number>4</number>
          </property>
          <property name="leftMargin">
           <number>0</number>
@@ -101,7 +107,7 @@
          <item>
           <widget class="QWidget" name="widget_5" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -109,12 +115,12 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>40</height>
+             <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>40</width>
+             <width>25</width>
              <height>16777215</height>
             </size>
            </property>
@@ -123,7 +129,7 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <property name="spacing">
-             <number>5</number>
+             <number>4</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -140,7 +146,7 @@
             <item>
              <widget class="QPushButton" name="pushButton_plus">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -148,22 +154,41 @@
               <property name="minimumSize">
                <size>
                 <width>25</width>
-                <height>20</height>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>30</width>
-                <height>30</height>
+                <height>9999</height>
                </size>
               </property>
               <property name="font">
                <font>
                 <pointsize>12</pointsize>
+                <weight>50</weight>
+                <italic>false</italic>
+                <bold>false</bold>
+                <underline>false</underline>
+                <strikeout>false</strikeout>
+                <stylestrategy>PreferDefault</stylestrategy>
+                <kerning>true</kerning>
                </font>
+              </property>
+              <property name="mouseTracking">
+               <bool>false</bool>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
               </property>
               <property name="text">
                <string>+</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
               </property>
               <property name="autoRepeat">
                <bool>true</bool>
@@ -173,7 +198,7 @@
             <item>
              <widget class="QPushButton" name="pushButton_minus">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -181,13 +206,13 @@
               <property name="minimumSize">
                <size>
                 <width>25</width>
-                <height>20</height>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>30</width>
-                <height>30</height>
+                <height>9999</height>
                </size>
               </property>
               <property name="font">
@@ -197,6 +222,12 @@
               </property>
               <property name="text">
                <string>–</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
               </property>
               <property name="autoRepeat">
                <bool>true</bool>
@@ -209,7 +240,7 @@
          <item>
           <widget class="QWidget" name="widget_6" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -217,15 +248,18 @@
            <property name="minimumSize">
             <size>
              <width>95</width>
-             <height>40</height>
+             <height>0</height>
             </size>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="spacing">
+             <number>2</number>
+            </property>
             <property name="leftMargin">
              <number>5</number>
             </property>
             <property name="topMargin">
-             <number>5</number>
+             <number>0</number>
             </property>
             <property name="rightMargin">
              <number>5</number>
@@ -244,7 +278,13 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>15</height>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>50</height>
                </size>
               </property>
               <property name="text">
@@ -263,7 +303,7 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>25</height>
+                <height>0</height>
                </size>
               </property>
               <property name="styleSheet">
@@ -296,7 +336,7 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>25</height>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="maximumSize">
@@ -308,14 +348,14 @@
                  <property name="font">
                   <font>
                    <family>MS Shell Dlg 2</family>
-                   <pointsize>14</pointsize>
+                   <pointsize>12</pointsize>
                    <weight>50</weight>
                    <italic>false</italic>
                    <bold>false</bold>
                   </font>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">font: 14pt &quot;MS Shell Dlg 2&quot;;</string>
+                  <string notr="true"/>
                  </property>
                  <property name="text">
                   <string>Value</string>
@@ -400,7 +440,7 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>20</height>
+             <height>0</height>
             </size>
            </property>
           </widget>
@@ -421,8 +461,8 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>50</width>
-       <height>50</height>
+       <width>40</width>
+       <height>40</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -439,19 +479,26 @@
        <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>5</number>
+       <number>2</number>
       </property>
       <property name="topMargin">
        <number>0</number>
       </property>
       <property name="rightMargin">
-       <number>5</number>
+       <number>2</number>
       </property>
       <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
-       <widget class="CustomDial" name="dial"/>
+       <widget class="CustomDial" name="dial">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -460,14 +507,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CustomComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">GUI/customcombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>CustomDial</class>
    <extends>QDial</extends>
    <header location="global">GUI/customdial.h</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">GUI/customcombobox.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

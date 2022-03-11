@@ -92,7 +92,6 @@ void PatternGeneratorPainter::configDefaultChart(){
         for(int i = 0; i < PATT_MAX_CHANNELS_NUM; i++)
             plot->setTraceColor(i, Graphics::getChannelColor(0));
     }else {
-        chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
         chart->setGridHorizontalDensity(PATT_DEFAULT_DATA_LENGTH+1);
         chart->setMargins(-12, -5, -6, -4);
         chart->setLabelsVisible(true, false);

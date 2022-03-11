@@ -47,6 +47,7 @@ public:
 
     QByteArray getCommandPrefix();
     void hideModuleStatus();
+    void moduleRestoredHidden();
     void setModuleStatus(ModuleStatus stat);
     ModuleStatus getModuleStatus();
 
@@ -89,6 +90,7 @@ private:
 
 public slots:
     void widgetControlClicked(ModuleStatus status);
+    void widgetHideWindowClicked();
     void widgetControlClickedWheel(QMouseEvent *event);
     void held(bool held);
 

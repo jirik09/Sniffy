@@ -10,13 +10,13 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>350</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>500</width>
-    <height>350</height>
+    <height>300</height>
    </size>
   </property>
   <property name="contextMenuPolicy">
@@ -30,7 +30,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -53,6 +53,12 @@
       <number>5</number>
      </property>
      <widget class="QWidget" name="widget_left" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="styleSheet">
        <string notr="true"/>
       </property>
@@ -61,16 +67,16 @@
         <number>0</number>
        </property>
        <property name="leftMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="topMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="rightMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <property name="bottomMargin">
-        <number>5</number>
+        <number>0</number>
        </property>
        <item>
         <widget class="QWidget" name="widget_top" native="true">
@@ -100,13 +106,13 @@
            <number>0</number>
           </property>
           <property name="leftMargin">
-           <number>30</number>
+           <number>20</number>
           </property>
           <property name="topMargin">
-           <number>10</number>
+           <number>5</number>
           </property>
           <property name="rightMargin">
-           <number>30</number>
+           <number>20</number>
           </property>
           <property name="bottomMargin">
            <number>0</number>
@@ -114,7 +120,7 @@
           <item>
            <widget class="QSlider" name="sliderSignal">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -140,6 +146,9 @@
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
+            <property name="invertedControls">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
          </layout>
@@ -156,7 +165,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>100</height>
+           <height>0</height>
           </size>
          </property>
          <property name="styleSheet">
@@ -229,7 +238,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>25</height>
+           <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -255,7 +264,7 @@
            <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>5</number>
+           <number>3</number>
           </property>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_info">
@@ -263,10 +272,10 @@
              <number>0</number>
             </property>
             <property name="leftMargin">
-             <number>15</number>
+             <number>5</number>
             </property>
             <property name="rightMargin">
-             <number>15</number>
+             <number>5</number>
             </property>
            </layout>
           </item>

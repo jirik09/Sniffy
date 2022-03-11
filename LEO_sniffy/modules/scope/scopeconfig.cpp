@@ -18,14 +18,10 @@ void ScopeConfig::parse(QByteArray config)
     stream >> triggerLevel;// = 32767; //16bit number
     stream >> pretrigger;// = 32767; //16bit number
 
-    for(int i = 0; i<MAX_SCOPE_CHANNELS;i++){
-        stream >> enabledChannels[i];
-    }
     //parameters for GUI
     stream >> triggerLevelPercent;// = 50; //0-100% number
     stream >> pretriggerPercent;// = 50; //0-100% number
-    stream >> longestDataLength;// = false;
-    stream >> signalMegazoom;// = false;
+    stream >> memPolicy;
     stream >> requestedSamplingRate;// = 10000;
 
     //params common for both
@@ -51,10 +47,9 @@ void ScopeConfig::parse(QByteArray config)
 
     stream >> cursorChannelIndex;
     stream >> cursorsActiveIndex;
+    stream >> FFTenabled;
     stream >> timeMin;// = -0.01;
     stream >> timeMax;// = 0.01;
-    stream >> chartLocalZoom;
-    stream >> chartShift;
     stream >> measCount;
 
     MeasurementType type;
@@ -91,14 +86,10 @@ QByteArray ScopeConfig::serialize()
     stream << triggerLevel;// = 32767; //16bit number
     stream << pretrigger;// = 32767; //16bit number
 
-    for(int i = 0; i<MAX_SCOPE_CHANNELS;i++){
-        stream << enabledChannels[i];
-    }
     //parameters for GUI
     stream << triggerLevelPercent;// = 50; //0-100% number
     stream << pretriggerPercent;// = 50; //0-100% number
-    stream << longestDataLength;// = false;
-    stream << signalMegazoom;// = false;
+    stream << memPolicy;
     stream << requestedSamplingRate;// = 10000;
 
     //params common for both
@@ -124,16 +115,16 @@ QByteArray ScopeConfig::serialize()
 
     stream << cursorChannelIndex;
     stream << cursorsActiveIndex;
+    stream << FFTenabled;
     stream << timeMin;// = -0.01;
     stream << timeMax;// = 0.01;
-    stream << chartLocalZoom;
-    stream << chartShift;
     stream << measCount;
     for(int i = 0; i<measCount;i++){
         stream << scopeMeasList[i]->getType();
         stream << scopeMeasList[i]->getLabel();
         stream << scopeMeasList[i]->getChannelIndex();
     }
+
 
  //   qDebug() << "Cofig from scope is being serialized "+*data;
     return *data;

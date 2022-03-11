@@ -23,9 +23,10 @@ MainWindow::MainWindow(QWidget *parent):
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowIcon(QIcon(":/graphics/graphics/logo_color.png"));
 
-    ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_sniffy.png);");    
-    ui->centralwidget->setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_APP+";}"
+    ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_gray_full.png);");
+    ui->centralwidget->setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}"
                                      "QWidget#centralwidget{border-right: 1px solid"+Graphics::COLOR_TEXT_LABEL+";}");
 
     setWindowTitle("LEO sniffy");
@@ -221,13 +222,15 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 
                 module->restoreGeometry(layout);
                 module->setModuleStatus(status);
-                if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE){
+                if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE || status == ModuleStatus::HIDDEN_PAUSE){
                     /*if(status == ModuleStatus::PAUSE)
                         status = ModuleStatus::PLAY;*/
                     module->writeConfiguration();
                     module->startModule();
+                    if(status == ModuleStatus::HIDDEN_PAUSE || status == ModuleStatus::HIDDEN_PLAY){
+                        module->moduleRestoredHidden();
+                    }
                 }
-
                 module->setModuleRestored(true);
             }
         }

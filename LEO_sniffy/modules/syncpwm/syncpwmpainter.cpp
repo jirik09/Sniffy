@@ -105,8 +105,7 @@ qreal SyncPwmPainter::setTimeScale(){
 }
 
 void SyncPwmPainter::configDefaultChart(){
-    chart->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
-    chart->setMargins(-12, -5, -6, -10);
+    chart->setMargins(-34, -25, -17, -10);
     chart->setLabelsVisible(true, false);
     chart->setRange(0, 1, 0, RANGE_CHAN1_LOG1 + 1);
     for(int i = 0; i < CHANNELS_NUM; i++)

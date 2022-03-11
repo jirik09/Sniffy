@@ -127,6 +127,24 @@ void WidgetLabelArea::setCursorTimeReadings(qreal curA, qreal curB)
     ui->widget_Hcursors->show();
 }
 
+void WidgetLabelArea::setCursorFFTFreqReadings(qreal curA, qreal curB)
+{
+    ui->label_Hcursor_title->setText("A: "+ LabelFormator::formatOutout(curA,"Hz"));
+    ui->label_Hcursor1->setText("B: "+ LabelFormator::formatOutout(curB,"Hz"));
+    ui->label_Hcursor2->setText("Diff: "+ LabelFormator::formatOutout(curA-curB,"Hz"));
+    ui->label_Hcursor3->setText("");
+    ui->widget_Hcursors->show();
+}
+
+void WidgetLabelArea::setCursorFFTAmplitudeReadings(qreal curA, qreal curB, QString unit)
+{
+    ui->label_Vcursor_title->setText("Cursors:");
+    ui->label_Vcursor1->setText("A: "+ LabelFormator::formatOutout(curA,unit));
+    ui->label_Vcursor2->setText("B: "+ LabelFormator::formatOutout(curB,unit));
+    ui->label_Vcursor3->setText("Diff: "+ LabelFormator::formatOutout(curA-curB,unit));
+    ui->widget_Vcursors->show();
+}
+
 void WidgetLabelArea::setCursorReadingsColor(int channelIndex)
 {
     ui->widget_Hcursors->setStyleSheet("color:"+Graphics::getChannelColor(channelIndex));
@@ -136,6 +154,11 @@ void WidgetLabelArea::setCursorReadingsColor(int channelIndex)
 void WidgetLabelArea::hideCursorReadings()
 {
     ui->widget_Vcursors->hide();
+    ui->widget_Hcursors->hide();
+}
+
+void WidgetLabelArea::hideCursorReadingsHor()
+{
     ui->widget_Hcursors->hide();
 }
 

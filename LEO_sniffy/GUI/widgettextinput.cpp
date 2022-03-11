@@ -64,8 +64,11 @@ void WidgetTextInput::processInput()
 
 bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
     bool processTextEdit = false;
-    if(event->type() == QEvent::FocusOut) processTextEdit = true;
-    if(event->type() == QEnterEvent::KeyRelease){
+    if(event->type()==QEvent::Show)graphicsShown = true;
+    if(event->type()==QEvent::Hide)graphicsShown = false;
+
+    if(graphicsShown && event->type() == QEvent::FocusOut) processTextEdit = true;
+    if(graphicsShown && event->type() == QEnterEvent::KeyRelease){
         QKeyEvent *ev = (QKeyEvent*)event;
         if( (ev->key() == Qt::Key_Enter) || (ev->key() == Qt::Key_Return)) processTextEdit = true;
     }

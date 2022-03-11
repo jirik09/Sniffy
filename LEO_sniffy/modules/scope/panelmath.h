@@ -26,6 +26,7 @@ public:
 
 signals:
     void expressionChanged(QString exp);
+    void mathTypeChanged(int index);
     void fftChanged(int length, FFTWindow window, FFTType type, int channelIndex);
     void fftchartChanged(qreal scale, qreal shift, bool isLog = false);
 

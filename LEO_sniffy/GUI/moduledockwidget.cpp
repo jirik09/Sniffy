@@ -12,7 +12,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     QWidget *titleBar = new QWidget();
 
     QHBoxLayout* titleBarLayout = new QHBoxLayout();
-    titleBarLayout->setContentsMargins(5,2,5,2);
+    titleBarLayout->setContentsMargins(5,0,5,0);
     titleBar->setLayout(titleBarLayout);
 
     titleBar->setStyleSheet(Graphics::STYLE_DOCK_WINDOW);
@@ -35,18 +35,21 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
 
     QPushButton *down = new QPushButton();
     down->resize(10,10);
+    down->setContentsMargins(5,0,5,0);
     down->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
     down->setIcon(QIcon(Graphics::getGraphicsPath()+"dock.png"));
     titleBarLayout->addWidget(down);
 
     QPushButton *up = new QPushButton();
     up->resize(10,10);
+    up->setContentsMargins(5,0,5,0);
     up->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
     up->setIcon(QIcon(Graphics::getGraphicsPath()+"unDock.png"));
     titleBarLayout->addWidget(up);
 
     QPushButton *exit = new QPushButton();
     exit->resize(10,10);
+    exit->setContentsMargins(5,0,5,0);
     exit->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_EXIT_HOVER+";}");
     exit->setIcon(QIcon(Graphics::getGraphicsPath()+"exit.png"));
     titleBarLayout->addWidget(exit);
@@ -92,7 +95,11 @@ void ModuleDockWidget::unDockOrMaximize(){
 }
 
 void ModuleDockWidget::dockOrMinimize(){
-    setFloating(false);
+    if(isFloating()){
+        setFloating(false);
+    }else{
+        emit hideModuleWindowClicked();
+    }
 }
 
 void ModuleDockWidget::close(){

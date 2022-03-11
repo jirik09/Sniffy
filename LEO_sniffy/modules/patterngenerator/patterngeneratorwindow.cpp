@@ -129,7 +129,6 @@ void PatternGeneratorWindow::runGeneratorCallback()
 void PatternGeneratorWindow::openFileCallback()
 {
     QString fileName;
-    int tmp = 0;
     fileName = QFileDialog::getOpenFileName(this,"Select input file","","Text files (*.csv *.txt)");
     /* TODO: creeate file loader */
 }

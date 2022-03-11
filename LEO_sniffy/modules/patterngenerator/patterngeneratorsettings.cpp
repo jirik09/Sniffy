@@ -145,12 +145,12 @@ void PatternGeneratorSettings::createQuadratureComponents(QWidget *parent, QVBox
 
 void PatternGeneratorSettings::createUartComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-
+Q_UNUSED(parent);Q_UNUSED(destination);Q_UNUSED(index);
 }
 
 void PatternGeneratorSettings::createSpiComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-
+Q_UNUSED(parent);Q_UNUSED(destination);Q_UNUSED(index);
 }
 
 void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout *destination, int index)

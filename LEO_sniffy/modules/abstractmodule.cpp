@@ -172,6 +172,11 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
     }
 }
 
+void AbstractModule::widgetHideWindowClicked()
+{
+    widgetControlClicked(moduleControlWidget->getStatus());
+}
+
 void AbstractModule::widgetControlClickedWheel(QMouseEvent *event){
     if(event->button() == Qt::MiddleButton){
         closeModule();
@@ -183,6 +188,7 @@ void AbstractModule::setDockWidgetWindow(ModuleDockWidget *dockWidget){
 
     connect(dockWidgetWindow, &ModuleDockWidget::moduleWindowClosing, this, &AbstractModule::closeModule);
     connect(dockWidgetWindow, &ModuleDockWidget::holdClicked, this, &AbstractModule::held);
+    connect(dockWidgetWindow, &ModuleDockWidget::hideModuleWindowClicked, this, &AbstractModule::widgetHideWindowClicked);
 }
 
 void AbstractModule::setModuleControlWidget(WidgetControlModule *controlWidget){
@@ -208,6 +214,11 @@ void AbstractModule::setComms(Comms *communication){
 
 void AbstractModule::hideModuleStatus(){
     moduleControlWidget->hideStatus();
+}
+
+void AbstractModule::moduleRestoredHidden()
+{
+    widgetControlClicked(getModuleStatus()); //module was restored hidden and doesn't react corectly on first click.
 }
 
 void AbstractModule::setModuleStatus(ModuleStatus stat){
