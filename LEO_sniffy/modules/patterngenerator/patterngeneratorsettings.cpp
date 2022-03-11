@@ -44,11 +44,11 @@ void PatternGeneratorSettings::setSpecification(PatternGeneratorSpec *spec)
 {
     int maxSamplingFreq = spec->maxSamplingRate / 2;
 
-    dialUserDefFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
-    dialCounterFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
-    dialBinaryCodeFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
-    dialGrayCodeFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
-    dialQuadratureFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2);
+    dialUserDefFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    dialCounterFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    dialBinaryCodeFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    dialGrayCodeFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    dialQuadratureFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
 }
 
 void PatternGeneratorSettings::createComponents(QWidget *parent, QVBoxLayout *destination)
@@ -210,7 +210,6 @@ void PatternGeneratorSettings::resetQuadratureComponents()
 {
     dialQuadratureFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
     comboQuadratureSeqAbba->setSelected(0, false);
-
     config->freq[config->pattIndex] = dialQuadratureFreq->getRealValue();
     config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
 }

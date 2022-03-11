@@ -107,8 +107,7 @@ public:
 
 private:    
     int index;
-    QSharedPointer<Pattern> pattern[PATTERNS_NUM];
-    Quadrature *quadPattern;
+    QSharedPointer<Pattern> pattern[PATTERNS_NUM];    
 
     QVector<std::function<QSharedPointer<Pattern>()>> createPatternObj = {
             [] { return QSharedPointer<Pattern>(new UserDefined); },
