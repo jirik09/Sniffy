@@ -22,20 +22,21 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     verticalLayout_chart->setContentsMargins(0,0,0,0);
     verticalLayout_chart->setSpacing(0);
 
-    chart = new widgetChart(widget_chart, PATT_MAX_CHANNELS_NUM);
-    chart->enableLocalMouseEvents(EventSelection::CLICKS_ONLY);
-    verticalLayout_chart->addWidget(chart);
+    painter = new PatternGeneratorPainter(config, this);
+
+    if(PATTERNS_USE_QCUSTOM_PLOT)
+        verticalLayout_chart->addWidget(painter->plot);
+    else
+        verticalLayout_chart->addWidget(painter->chart);    
 
     ui->widget_settings->setLayout(verticalLayout_settings);
     ui->widget_module->resize(600,300);
     ui->widget_module->setLayout(verticalLayout_chart);
 
-    chartData = new QVector<QVector<QPointF>>;
-    patternData = new QList<quint8>;
+    patternData = new QList<patttype>;
 
     settings = new PatternGeneratorSettings(verticalLayout_settings, config, this);
-    patterns = new PatternGeneratorPatterns(this);
-    painter = new PatternGeneratorPainter(chart, config, this);
+    patterns = new PatternGeneratorPatterns(this);    
     //fileLoader = new PatternGeneratorFileLoader();
 
     connect(settings->comboPatternSelection, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorWindow::patternSelectionChangedCallback);
@@ -57,7 +58,8 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
 
     connect(settings->comboQuadratureSeqAbba, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorWindow::quadratureSequenceChangedCallback);
 
-    connect(chart, &widgetChart::mouseLeftClickEvent, this, &PatternGeneratorWindow::chartEditDataOnLeftClickCallback);
+    if(!PATTERNS_USE_QCUSTOM_PLOT)
+        connect(painter->chart, &widgetChart::mouseLeftClickEvent, this, &PatternGeneratorWindow::chartEditDataOnLeftClickCallback);
 }
 
 PatternGeneratorWindow::~PatternGeneratorWindow()
@@ -114,7 +116,7 @@ void PatternGeneratorWindow::setGeneratorState(bool onClick)
     settings->enableGuiComponents(config->state==PatternGeneratorConfig::State::STOPPED);
 }
 
-QList<quint8> *PatternGeneratorWindow::getPatternData()
+QList<patttype> *PatternGeneratorWindow::getPatternData()
 {   
     return patternData;
 }
@@ -181,8 +183,8 @@ void PatternGeneratorWindow::chartEditDataOnLeftClickCallback(QGraphicsSceneMous
     int dataLen = config->dataLen[config->pattIndex];
     int dataNum = (patterns->isExponencial()) ? qPow(2, dataLen) : dataLen;
 
-    qreal height = chart->geometry().height();
-    qreal width = chart->geometry().width();
+    qreal height = painter->chart->geometry().height();
+    qreal width = painter->chart->geometry().width();
 
     int position = ((event->pos().x() - 25) / (width - 44)) * dataNum;
     int channel = ((event->pos().y() - 20) / (height - 30)) * PATT_MAX_CHANNELS_NUM;
