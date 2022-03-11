@@ -9,6 +9,7 @@
 #include "communication/commands.h"
 #include "communication/comms.h"
 #include "math/movingaverage.h"
+#include "../labelformator.h"
 
 #include "../../GUI/widgetcontrolmodule.h"
 
@@ -31,6 +32,7 @@ private:
 
     void startCounting();
     void stopCounting();
+    void buildModuleDescription(CounterSpec *spec);
 
     QString formatNumber(WidgetDisplay *display, double valToFormat, double error);
     QString formatErrNumber(WidgetDisplay *display, double errToFormat);

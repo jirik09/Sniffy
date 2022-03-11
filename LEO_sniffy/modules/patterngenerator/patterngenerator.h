@@ -36,6 +36,7 @@ private:
 
     void startGenerator();
     void stopGenerator();
+    void buildModuleDescription(PatternGeneratorSpec *spec);
 
     void startPatternUpload();
     void dataTransferNext();
