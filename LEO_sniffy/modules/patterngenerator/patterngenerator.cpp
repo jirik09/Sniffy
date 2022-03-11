@@ -30,6 +30,7 @@ void PatternGenerator::parseData(QByteArray data){
         moduleSpecification->parseSpecification(dataToPass);
         pattGenWindow->setSpecification(static_cast<PatternGeneratorSpec*>(moduleSpecification));
         showModuleControl();
+        buildModuleDescription(static_cast<PatternGeneratorSpec*>(moduleSpecification));
 
         genComms = new GenCommons(moduleCommandPrefix, comm, static_cast<PatternGeneratorSpec*>(moduleSpecification)->maxSamplingRate, this);
 
@@ -42,6 +43,26 @@ void PatternGenerator::parseData(QByteArray data){
     }else{
         qDebug()<<"[PATTERN GEN] Unhandled incomming data!"<<data;
     }
+}
+
+void PatternGenerator::buildModuleDescription(PatternGeneratorSpec *spec)
+{
+    QString name = moduleName;
+    QList<QString> labels ,values;
+
+    labels.append("Number of Channels");
+    values.append(QString::number(PATT_MAX_CHANNELS_NUM));
+
+    labels.append("Max sampling rate");
+    values.append(LabelFormator::formatOutout(spec->maxSamplingRate,"sps",2));
+
+    labels.append("Pins");
+    QString pins;
+    for(int i = 0;i<PATT_MAX_CHANNELS_NUM;i++){
+        pins += spec->chanPins[i] + ", ";
+    }
+    values.append(pins.left(pins.length()-2));
+    showModuleDescription(name, labels, values);
 }
 
 void PatternGenerator::writeConfiguration()

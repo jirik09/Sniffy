@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "../../GUI/widgetchart.h"
+#include "../../GUI/widgetcustomplot.h"
 
 #include "patterngeneratorconfig.h"
 #include "patterngeneratorpatterns.h"
@@ -12,13 +13,15 @@ class PatternGeneratorPainter : public QObject
 {
     Q_OBJECT
 public:
-    explicit PatternGeneratorPainter(widgetChart *chart, PatternGeneratorConfig *config, QObject *parent = nullptr);
+    explicit PatternGeneratorPainter(PatternGeneratorConfig *config, QWidget *parent = nullptr);
 
     void repaint(QList<quint8> *data);
 
+    WidgetCustomPlot *plot;
+    widgetChart *chart;
+
 private:
     PatternGeneratorConfig *config;
-    widgetChart *chart;
 
     QVector<QVector<QPointF>> *points;
 

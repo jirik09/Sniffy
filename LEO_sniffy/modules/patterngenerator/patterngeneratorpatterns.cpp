@@ -66,9 +66,8 @@ bool PatternGeneratorPatterns::isExponencial()
 }
 
 QList<patttype> *PatternGeneratorPatterns::setQuadratureSequence(bool seqAb)
-{
-    quadPattern = static_cast<Quadrature*>(pattern[4].get());
-    return quadPattern->setSequence(seqAb);
+{        
+    return static_cast<Quadrature*>(pattern[4].get())->setSequence(seqAb);
 }
 
 /****************************** CREATE PATTERN FUNS ******************************/

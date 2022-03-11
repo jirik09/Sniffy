@@ -17,6 +17,7 @@
 #include "../../GUI/widgetchart.h"
 #include "../../GUI/widgettab.h"
 #include "../../GUI/widgetlabelarea.h"
+#include "../../GUI/qcustomplot.h"
 
 #include "patterngeneratorconfig.h"
 #include "patterngeneratorspec.h"
@@ -46,7 +47,7 @@ public:
     void setGenerateButton(QString text, QString color);
     void setGeneratorState(bool onClick);
 
-    QList<quint8> *getPatternData();    
+    QList<patttype> *getPatternData();
 
 private:
     Ui::PatternGeneratorWindow *ui;
@@ -54,9 +55,11 @@ private:
     PatternGeneratorSpec *spec;    
     PatternGeneratorPainter *painter;
 
-    widgetChart *chart;
-    QVector<QVector<QPointF>> *chartData;
-    QList<quint8> *patternData;
+//    QCustomPlot *plot;
+//    QCPGraph *graph;
+//    widgetChart *chart;
+
+    QList<patttype> *patternData;
 
 private slots:
     void patternSelectionChangedCallback(int index);
