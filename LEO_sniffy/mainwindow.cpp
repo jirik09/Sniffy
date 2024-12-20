@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     setWindowTitle("LEO sniffy");
     sett = new SettingsDialog(this);
+    logindial = new LoginDialog(this);
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     //ui->widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -87,11 +88,16 @@ void MainWindow::setupMainWindowComponents(){
     ui->verticalLayout_modules->addItem(verticalSpacer);
     WidgetSeparator *sepa = new WidgetSeparator(ui->centralwidget,"Ver 0.1");
     ui->verticalLayout_modules->addWidget(sepa);
+    loginInfo = new WidgetLoginInfo();
+    ui->verticalLayout_modules->addWidget(loginInfo);
     footer = new WidgetFooter();
     ui->verticalLayout_modules->addWidget(footer);
 
+
     connect(footer,&WidgetFooter::sizeClicked,this,&MainWindow::setMenuSize);
     connect(footer,&WidgetFooter::settingsClicked,this,&MainWindow::openSettingDialog);
+    connect(loginInfo,&WidgetLoginInfo::loginDialogClicked,this,&MainWindow::openLoginDialog);
+    connect(logindial,&LoginDialog::loginInfoChanged,this,&MainWindow::updateLoginInfo);
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
@@ -109,6 +115,16 @@ void MainWindow::setMenuSize(bool isWide){
     }else{
         setMenuNarrow();
     }
+}
+
+void MainWindow::openLoginDialog()
+{
+    logindial->open();
+}
+
+void MainWindow::updateLoginInfo()
+{
+    loginInfo->updateInfo();
 }
 
 void MainWindow::openSettingDialog()

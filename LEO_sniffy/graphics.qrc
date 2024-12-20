@@ -184,6 +184,15 @@
         <file>graphics/themes/dark/logo_gray_full.png</file>
         <file>graphics/themes/light/logo_gray_full.png</file>
         <file>graphics/themes/dawn/logo_gray_full.png</file>
+        <file>graphics/themes/dark/user.png</file>
+        <file>graphics/themes/dark/user_error.png</file>
+        <file>graphics/themes/dark/user_ok.png</file>
+        <file>graphics/themes/dawn/user.png</file>
+        <file>graphics/themes/dawn/user_error.png</file>
+        <file>graphics/themes/dawn/user_ok.png</file>
+        <file>graphics/themes/light/user.png</file>
+        <file>graphics/themes/light/user_error.png</file>
+        <file>graphics/themes/light/user_ok.png</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

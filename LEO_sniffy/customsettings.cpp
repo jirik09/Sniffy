@@ -9,6 +9,10 @@ int CustomSettings::restoreSession;
 int CustomSettings::sessionRestoreAnswer;
 int CustomSettings::themeIndex;
 QList<QString> *CustomSettings::themesList = nullptr;
+QString CustomSettings::userEmail;
+QString CustomSettings::userPin;
+QString CustomSettings::loginToken;
+QDateTime CustomSettings::tokenValidity;
 
 void CustomSettings::loadSettings(QString fileName)
 {
@@ -20,9 +24,18 @@ void CustomSettings::loadSettings(QString fileName)
         restoreSession = settings.value("restoreSession").toInt();
         themeIndex = settings.value("theme").toInt();
 
-    }else{ // set dafeulf values if settings file doesnt exist
+        userEmail = settings.value("email").toString();
+        userPin = settings.value("pin").toString();
+        loginToken = settings.value("token").toString();
+        tokenValidity = settings.value("validity").toDateTime();
+
+    }else{ // set default values if settings file doesnt exist
         restoreSession = 1;
         themeIndex = 0;
+        userEmail = "Unknown user";
+        userPin = "0000";
+        loginToken = "none";
+        tokenValidity = QDateTime(QDate(2000,1,1),QTime(0,0));
 
     }
     sessionRestoreAnswer = -1;
@@ -34,6 +47,12 @@ void CustomSettings::saveSettings()
 
     settings.setValue("restoreSession", restoreSession);
     settings.setValue("theme", themeIndex);
+
+    settings.setValue("email", userEmail);
+    settings.setValue("pin", userPin);
+    settings.setValue("token", loginToken);
+    settings.setValue("validity", tokenValidity);
+
 }
 
 bool CustomSettings::askToSaveSession()
@@ -102,6 +121,46 @@ void CustomSettings::setThemesList(QList<QString> *list)
 QList<QString>* CustomSettings::getThemesList()
 {
     return themesList;
+}
+
+QString CustomSettings::getUserEmail()
+{
+    return userEmail;
+}
+
+void CustomSettings::setUserEmail(const QString &value)
+{
+    userEmail = value;
+}
+
+QString CustomSettings::getUserPin()
+{
+    return userPin;
+}
+
+void CustomSettings::setUserPin(const QString &value)
+{
+    userPin = value;
+}
+
+QString CustomSettings::getLoginToken()
+{
+    return loginToken;
+}
+
+void CustomSettings::setLoginToken(const QString &value)
+{
+    loginToken = value;
+}
+
+QDateTime CustomSettings::getTokenValidity()
+{
+    return tokenValidity;
+}
+
+void CustomSettings::setTokenValidity(const QDateTime &value)
+{
+    tokenValidity = value;
 }
 
 int CustomSettings::getRestoreSession()
