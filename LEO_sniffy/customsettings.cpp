@@ -1,4 +1,5 @@
 #include "customsettings.h"
+#include "qdebug.h"
 
 CustomSettings::CustomSettings(QObject *parent) : QObject(parent)
 {
@@ -11,7 +12,7 @@ int CustomSettings::themeIndex;
 QList<QString> *CustomSettings::themesList = nullptr;
 QString CustomSettings::userEmail;
 QString CustomSettings::userPin;
-QString CustomSettings::loginToken;
+QByteArray CustomSettings::loginToken;
 QDateTime CustomSettings::tokenValidity;
 
 void CustomSettings::loadSettings(QString fileName)
@@ -26,7 +27,7 @@ void CustomSettings::loadSettings(QString fileName)
 
         userEmail = settings.value("email").toString();
         userPin = settings.value("pin").toString();
-        loginToken = settings.value("token").toString();
+        loginToken = QByteArray::fromHex(settings.value("token").toByteArray());
         tokenValidity = settings.value("validity").toDateTime();
 
     }else{ // set default values if settings file doesnt exist
@@ -143,12 +144,12 @@ void CustomSettings::setUserPin(const QString &value)
     userPin = value;
 }
 
-QString CustomSettings::getLoginToken()
+QByteArray CustomSettings::getLoginToken()
 {
     return loginToken;
 }
 
-void CustomSettings::setLoginToken(const QString &value)
+void CustomSettings::setLoginToken(const QByteArray &value)
 {
     loginToken = value;
 }

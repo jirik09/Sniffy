@@ -85,7 +85,7 @@ void LoginDialog::buttonAction(int isCanceled)
 
 void LoginDialog::replyFinished(QNetworkReply *pReply)
 {
-    QByteArray data=pReply->readAll();
+    QByteArray data = (pReply->readAll());
 
 
     if(data =="Expired"){
@@ -96,7 +96,7 @@ void LoginDialog::replyFinished(QNetworkReply *pReply)
         info->setColor(Graphics::COLOR_ERROR);
     }else{
         QString validity(data.left(19));
-        QString token(data.mid(19,data.length()-19));
+        QByteArray token = (data.mid(19,256));
         CustomSettings::setLoginToken(token);
         CustomSettings::setTokenValidity(QDateTime::fromString(validity,"yyyy-MM-dd hh:mm:ss"));
         CustomSettings::saveSettings();

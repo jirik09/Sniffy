@@ -40,8 +40,8 @@ public:
     static QString getUserPin();
     static void setUserPin(const QString &value);
 
-    static QString getLoginToken();
-    static void setLoginToken(const QString &value);
+    static QByteArray getLoginToken();
+    static void setLoginToken(const QByteArray &value);
 
     static QDateTime getTokenValidity();
     static void setTokenValidity(const QDateTime &value);
@@ -56,7 +56,7 @@ private:
 
     static QString userEmail;
     static QString userPin;
-    static QString loginToken;
+    static QByteArray loginToken;
     static QDateTime tokenValidity;
 
 signals:
