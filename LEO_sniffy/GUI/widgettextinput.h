@@ -32,6 +32,8 @@ public:
     QString getText();
     qreal getValue();
     void processInput();
+    void setAsPassword();
+    void setText(QString txt);
 
 signals:
     void textChanged(QString text);

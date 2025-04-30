@@ -5,6 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 CONFIG += c++11
 
 QT += charts
+QT += network
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -35,6 +36,7 @@ SOURCES += \
     GUI/widgetlabel.cpp \
     GUI/widgetlabelarea.cpp \
     GUI/widgetlist.cpp \
+    GUI/widgetlogininfo.cpp \
     GUI/widgetselection.cpp \
     GUI/widgetseparator.cpp \
     GUI/widgetswitch.cpp \
@@ -54,6 +56,7 @@ SOURCES += \
     graphics/themes/dark.cpp \
     graphics/themes/dawn.cpp \
     graphics/themes/light.cpp \
+    logindialog.cpp \
     main.cpp \
     mainwindow.cpp \
     math/movingaverage.cpp \
@@ -150,6 +153,7 @@ HEADERS += \
     GUI/widgetlabel.h \
     GUI/widgetlabelarea.h \
     GUI/widgetlist.h \
+    GUI/widgetlogininfo.h \
     GUI/widgetselection.h \
     GUI/widgetseparator.h \
     GUI/widgetswitch.h \
@@ -170,6 +174,7 @@ HEADERS += \
     graphics/themes/dark.h \
     graphics/themes/dawn.h \
     graphics/themes/light.h \
+    logindialog.h \
     mainwindow.h \
     math/movingaverage.h \
     math/timing.h \
@@ -267,12 +272,14 @@ FORMS += \
     GUI/widgetlabel.ui \
     GUI/widgetlabelarea.ui \
     GUI/widgetlist.ui \
+    GUI/widgetlogininfo.ui \
     GUI/widgetmodule.ui \
     GUI/widgetselection.ui \
     GUI/widgetseparator.ui \
     GUI/widgetswitch.ui \
     GUI/widgettab.ui \
     GUI/widgettextinput.ui \
+    logindialog.ui \
     mainwindow.ui \
     modules/arbgenerator/arbgeneratorwindow.ui \
     modules/counter/counterwindow.ui \

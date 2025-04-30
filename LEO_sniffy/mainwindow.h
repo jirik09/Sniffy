@@ -13,6 +13,8 @@
 #include "devicemediator.h"
 #include "settingsdialog.h"
 #include "GUI/widgetfooter.h"
+#include "logindialog.h"
+#include "GUI/widgetlogininfo.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -37,8 +39,11 @@ private:
     QString setingsFile;
 
     SettingsDialog *sett;
+    LoginDialog *logindial;
+
     bool isLeftMenuNarrow;
     WidgetFooter *footer;
+    WidgetLoginInfo *loginInfo;
 
     void setMenuNarrow();
     void setMenuWide();
@@ -53,6 +58,8 @@ private slots:
     void loadLayout(QString deviceName);
     void loadModuleLayoutAndConfigCallback(QString moduleName);
     void setMenuSize(bool isWide);
+    void openLoginDialog();
+    void updateLoginInfo();
     void openSettingDialog();
 };
 #endif // MAINWINDOW_H

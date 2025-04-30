@@ -62,6 +62,16 @@ void WidgetTextInput::processInput()
     }
 }
 
+void WidgetTextInput::setAsPassword()
+{
+    ui->lineEdit->setEchoMode(QLineEdit::Password);
+}
+
+void WidgetTextInput::setText(QString txt)
+{
+    ui->lineEdit->setText(txt);
+}
+
 bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
     bool processTextEdit = false;
     if(event->type()==QEvent::Show)graphicsShown = true;
