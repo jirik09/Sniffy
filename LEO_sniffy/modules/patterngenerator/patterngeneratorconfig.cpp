@@ -1,4 +1,6 @@
 #include "patterngeneratorconfig.h"
+#include <QDataStream>
+#include <QIODevice>
 
 PatternGeneratorConfig::PatternGeneratorConfig(QObject *parent)
 {
@@ -27,9 +29,8 @@ void PatternGeneratorConfig::parse(QByteArray config)
 
 QByteArray PatternGeneratorConfig::serialize()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocation avoids leak
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     stream << pattIndex;
 
@@ -38,5 +39,5 @@ QByteArray PatternGeneratorConfig::serialize()
         stream << dataLen[i];
     }
 
-    return *data;
+    return data; // return by value (NRVO / move)
 }

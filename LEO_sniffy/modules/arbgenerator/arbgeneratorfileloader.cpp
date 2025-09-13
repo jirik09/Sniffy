@@ -1,4 +1,5 @@
 #include "arbgeneratorfileloader.h"
+#include <QLocale>
 
 ArbGeneratorFileLoader::ArbGeneratorFileLoader(QObject *parent) :
     QObject(parent)

@@ -55,15 +55,14 @@ void WidgetDialRange::setAdditionalLabelColor(QString color){
 
 QByteArray WidgetDialRange::saveGeometry()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocated
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     stream << realValue;
     stream << dialMaxValue;
     stream << rangeMin;
     stream << rangeMax;
-    return *data;
+    return data;
 }
 
 void WidgetDialRange::restoreGeometry(QByteArray geom)

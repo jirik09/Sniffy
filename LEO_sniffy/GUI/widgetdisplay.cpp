@@ -81,7 +81,18 @@ WidgetDisplay::~WidgetDisplay()
 }
 
 QString WidgetDisplay::formatNumber(double val, char f, int prec){
-    return loc.toString(val, f, prec).replace(loc.decimalPoint(), '.');
+    // Normalize decimal separator to '.' regardless of locale.
+    QString str = loc.toString(val, f, prec);
+    const QString decimalStr = loc.decimalPoint();
+    if (!decimalStr.isEmpty() && decimalStr != QStringLiteral(".")) {
+        // If decimalStr has length 1 we can safely use QChar overload for speed.
+        if (decimalStr.size() == 1) {
+            str.replace(decimalStr.at(0), QLatin1Char('.'));
+        } else {
+            str.replace(decimalStr, QStringLiteral("."));
+        }
+    }
+    return str;
 }
 
 void WidgetDisplay::hideHistoryChartArea(){

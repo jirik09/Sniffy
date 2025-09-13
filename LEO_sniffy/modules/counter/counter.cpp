@@ -252,7 +252,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     displayValues(display, formatNumber(display, val, qerr+terr), strAvg, strQerr, strTerr);
 
     /* History section */
-    QString pm(0x00B1);
+    const QString pm = QString(QChar(0x00B1));
     QString quant = (isFrequency) ? " Hz": " s";
 
     cntWindow->appendNewHistorySample(display, "", val, quant, (float)config->hfState.gateTime/(float)1000);
@@ -386,7 +386,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         mode = "xx";
     }
 
-    QString pm(0x00B1);
+    const QString pm = QString(QChar(0x00B1));
 
     if(mode == "FPME"){
         strVal = formatNumber(display, val1, qerr+terr);
@@ -629,7 +629,7 @@ void Counter::parseIntervalsCounter(QByteArray data){
         cntWindow->displayFlagAcquiring(display, false);
 
         /* History section */
-        QString pm(0x00B1);
+    const QString pm = QString(QChar(0x00B1));
         cntWindow->appendNewHistorySample(display, "Time interval: ", val, " Sec");
         cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr);
         cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr);

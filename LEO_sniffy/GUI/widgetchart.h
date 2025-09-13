@@ -21,7 +21,8 @@
 #include "../graphics/graphics.h"
 #include "../math/timing.h"
 
-QT_CHARTS_USE_NAMESPACE
+// Qt6: QT_CHARTS_USE_NAMESPACE macro removed (no longer required)
+// Using explicit QtCharts:: prefix instead for clarity where needed.
 
 
 
@@ -103,7 +104,7 @@ public:
 
 private:
     const int NUM_SAMPLES_TO_SWITCH=450;
-    Ui::widgetChart *ui;
+    Ui::widgetChart *ui; // forward-declared from generated ui file
     QList<QXYSeries *> seriesList;
     QList<QScatterSeries *> markersHorizontal;
     int markerHorizontalIndex=0;

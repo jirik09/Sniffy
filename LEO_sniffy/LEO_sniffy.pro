@@ -5,6 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 CONFIG += c++11
 
 QT += charts
+QT += openglwidgets
 QT += network
 
 # The following define makes your compiler emit warnings if you use
