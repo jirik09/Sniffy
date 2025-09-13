@@ -1,5 +1,5 @@
 #include "logindialog.h"
-#include "ui_login.h"
+#include "ui_logindialog.h"
 
 #include <QDebug>
 
@@ -38,7 +38,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
     buttonsDone->setText(" Close ",1);
     layout->addWidget(buttonsDone);
 
-    ui->widget->setLayout(layout);
+    ui->widgetLogin->setLayout(layout);
 
     userEmail->setText(CustomSettings::getUserEmail());
 
