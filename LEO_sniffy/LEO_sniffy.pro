@@ -298,6 +298,9 @@ FORMS += \
 TRANSLATIONS += \
     LEO_sniffy_en_GB.ts
 
+QMAKE_CXXFLAGS += \
+    -Wall -Wextra -Wpedantic -O2 -std=c++17
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

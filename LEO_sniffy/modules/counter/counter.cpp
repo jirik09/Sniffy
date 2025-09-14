@@ -429,7 +429,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
 
         /* History section */
         cntWindow->appendNewHistorySample(display, "PW ", val1, " s");
-        cntWindow->associateToHistorySample(display, 1, ", DC ", val2, " \%");
+        cntWindow->associateToHistorySample(display, 1, ", DC ", val2, " %");
         cntWindow->associateToHistorySample(display, 2, " ");
     }
 }

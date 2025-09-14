@@ -115,8 +115,8 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
     dialFreqCh[i]->hideUnitSelection();
 
     dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);
-    dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
-    dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, DEFAULT_DC, false);
+    dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);    
+    dialDutyCh[i]->setRange(0, 100, "%", 1, 1, DEFAULT_DC, false);
     dialDutyCh[i]->setColor(color);
     dialDutyCh[i]->hideUnitSelection();
 

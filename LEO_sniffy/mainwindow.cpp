@@ -54,27 +54,29 @@ void MainWindow::createModulesWidgets(){
     QString moduleName;
 
     int listSize = modulesList.size();
-    WidgetControlModule *WidgetModule[listSize];
-    ModuleDockWidget *dockWidget[listSize];
+    std::vector<WidgetControlModule*> widgetModules;
+    std::vector<ModuleDockWidget*> dockWidgets;
+    widgetModules.resize(listSize, nullptr);
+    dockWidgets.resize(listSize, nullptr);
 
     int index;
     foreach(module, modulesList){
         index = modulesList.indexOf(module);
         moduleName = module->getModuleName();
 
-        WidgetModule[index] = new WidgetControlModule(ui->centralwidget, moduleName);
-        ui->verticalLayout_modules->addWidget(WidgetModule[index]);
-        WidgetModule[index]->setStatus(ModuleStatus::STOP);        
-        WidgetModule[index]->hide();
+    widgetModules[index] = new WidgetControlModule(ui->centralwidget, moduleName);
+    ui->verticalLayout_modules->addWidget(widgetModules[index]);
+    widgetModules[index]->setStatus(ModuleStatus::STOP);
+    widgetModules[index]->hide();
 
-        dockWidget[index] = new ModuleDockWidget(this, moduleName);
+    dockWidgets[index] = new ModuleDockWidget(this, moduleName);
 
-        module->setDockWidgetWindow(dockWidget[index]);
-        module->setModuleControlWidget(WidgetModule[index]);
+    module->setDockWidgetWindow(dockWidgets[index]);
+    module->setModuleControlWidget(widgetModules[index]);
 
-        dockWidget[index]->setWidget(module->getWidget());
+    dockWidgets[index]->setWidget(module->getWidget());
 
-        addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget[index]);
+    addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgets[index]);
         connect(module.data(),&AbstractModule::loadModuleLayoutAndConfig,this,&MainWindow::loadModuleLayoutAndConfigCallback);
     }
 
