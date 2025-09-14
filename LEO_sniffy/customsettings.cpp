@@ -14,6 +14,7 @@ QString CustomSettings::userEmail;
 QString CustomSettings::userPin;
 QByteArray CustomSettings::loginToken;
 QDateTime CustomSettings::tokenValidity;
+QString CustomSettings::lastLoginFailureReason;
 
 void CustomSettings::loadSettings(QString fileName)
 {
@@ -29,7 +30,7 @@ void CustomSettings::loadSettings(QString fileName)
         userPin = settings.value("pin").toString();
         loginToken = QByteArray::fromHex(settings.value("token").toByteArray());
         tokenValidity = settings.value("validity").toDateTime();
-
+        lastLoginFailureReason = settings.value("last_login_failure").toString();
     }else{ // set default values if settings file doesnt exist
         restoreSession = 1;
         themeIndex = 0;
@@ -37,7 +38,7 @@ void CustomSettings::loadSettings(QString fileName)
         userPin = "0000";
         loginToken = "none";
         tokenValidity = QDateTime(QDate(2000,1,1),QTime(0,0));
-
+        lastLoginFailureReason = "";
     }
     sessionRestoreAnswer = -1;
 }
@@ -53,6 +54,7 @@ void CustomSettings::saveSettings()
     settings.setValue("pin", userPin);
     settings.setValue("token", loginToken);
     settings.setValue("validity", tokenValidity);
+    settings.setValue("last_login_failure", lastLoginFailureReason);
 
 }
 
@@ -162,6 +164,16 @@ QDateTime CustomSettings::getTokenValidity()
 void CustomSettings::setTokenValidity(const QDateTime &value)
 {
     tokenValidity = value;
+}
+
+QString CustomSettings::getLastLoginFailure()
+{
+    return lastLoginFailureReason;
+}
+
+void CustomSettings::setLastLoginFailure(const QString &value)
+{
+    lastLoginFailureReason = value;
 }
 
 int CustomSettings::getRestoreSession()
