@@ -143,6 +143,7 @@
         <file>graphics/themes/dawn/settings_vertical.png</file>
         <file>graphics/themes/dawn/no_device.png</file>
         <file>graphics/themes/dawn/Nucleo-F303RE.png</file>
+        <file>graphics/themes/dawn/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/dawn/Nucleo-G474RE.png</file>
         <file>graphics/themes/dawn/unknown_device.png</file>
         <file>graphics/themes/dawn/icon_counter.png</file>
