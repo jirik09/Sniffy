@@ -1,4 +1,5 @@
 #include "syncpwmspec.h"
+#include "modules/common/specutils.h"
 
 SyncPwmSpec::SyncPwmSpec(QObject *parent)
 {
@@ -11,12 +12,7 @@ void SyncPwmSpec::parseSpecification(QByteArray spec){
     stream >> chans_depend >> drive_chx >> drive_chy >> driven_chx >> driven_chy;
     stream >> max_freq >> chan_num;
 
-    char chars[4] = "";
-    for(int i = 0; i < pinsList.size(); i++){
-        stream.readRawData(chars, 4);
-        pinsList[i] = QString(chars);
-        pinsList[i].remove('_');
-    }
+    SpecParsing::readPins4(stream, pinsList.size(), [&](int i, const QString &pin){ pinsList[i] = pin; });
 
     pins.chan1 = pinsList.at(0);
     pins.chan2 = pinsList.at(1);
