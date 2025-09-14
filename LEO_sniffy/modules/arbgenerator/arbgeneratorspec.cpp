@@ -1,5 +1,5 @@
 #include "arbgeneratorspec.h"
-#include "modules/common/specutils.h"
+#include "modules/specutils.h"
 
 ArbGeneratorSpec::ArbGeneratorSpec(QObject *parent)
 {

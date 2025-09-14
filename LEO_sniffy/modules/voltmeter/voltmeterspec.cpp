@@ -1,5 +1,5 @@
 #include "voltmeterspec.h"
-#include "modules/common/specutils.h"
+#include "modules/specutils.h"
 
 VoltmeterSpec::VoltmeterSpec(QObject *parent)
 {

@@ -1,5 +1,5 @@
 #include "scopespec.h"
-#include "modules/common/specutils.h"
+#include "modules/specutils.h"
 
 #include <QDebug>
 #include <QDataStream>

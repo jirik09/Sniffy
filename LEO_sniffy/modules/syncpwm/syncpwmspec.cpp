@@ -1,5 +1,5 @@
 #include "syncpwmspec.h"
-#include "modules/common/specutils.h"
+#include "modules/specutils.h"
 
 SyncPwmSpec::SyncPwmSpec(QObject *parent)
 {

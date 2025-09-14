@@ -1,5 +1,5 @@
 #include "voltagesourcespec.h"
-#include "modules/common/specutils.h"
+#include "modules/specutils.h"
 
 VoltageSourceSpec::VoltageSourceSpec(QObject *parent)
 {

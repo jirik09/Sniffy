@@ -1,5 +1,5 @@
 #include "counterspec.h"
-#include "modules/common/specutils.h"
+#include "modules/specutils.h"
 
 CounterSpec::CounterSpec(QObject *parent)
 {

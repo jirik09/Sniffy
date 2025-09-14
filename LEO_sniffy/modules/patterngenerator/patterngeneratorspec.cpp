@@ -1,5 +1,5 @@
 #include "patterngeneratorspec.h"
-#include "modules/common/specutils.h"
+#include "modules/specutils.h"
 
 PatternGeneratorSpec::PatternGeneratorSpec(QObject *parent)
 {
