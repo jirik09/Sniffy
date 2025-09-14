@@ -9,17 +9,17 @@ Class for buttons.
 #include "widgetbuttons.h"
 #include "ui_widgetbuttons.h"
 
-WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString name, int defaultSelectedIndex, int optionalEmitParam) :
+WidgetButtons::WidgetButtons(QWidget *parent, int buttonCount, ButtonTypes buttonType, QString labelName, int defaultSelectedIndex, int optionalEmitParam) :
     QWidget(parent),
     ui(new Ui::WidgetButtons),
     optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
-    setObjectName(name);
+    setObjectName(labelName);
 
-    this->type = type;
-    if(name != ""){
-        ui->label->setText(name);
+    this->type = buttonType;
+    if(labelName != ""){
+        ui->label->setText(labelName);
     }else{
         ui->label->hide();
     }
@@ -34,22 +34,22 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
     pushButtonsList.append(ui->pushButton_8);
 
 
-    if(num<=1)
+    if(buttonCount<=1)
         ui->pushButton_2->hide();
-    if(num<=2)
+    if(buttonCount<=2)
         ui->pushButton_3->hide();
-    if(num<=3)
+    if(buttonCount<=3)
         ui->pushButton_4->hide();
-    if(num<=4)
+    if(buttonCount<=4)
         ui->pushButton_5->hide();
-    if(num<=5)
+    if(buttonCount<=5)
         ui->pushButton_6->hide();
-    if(num<=6)
+    if(buttonCount<=6)
         ui->pushButton_7->hide();
-    if(num<=7)
+    if(buttonCount<=7)
         ui->pushButton_8->hide();
 
-    if(type==ButtonTypes::CHECKABLE || type==ButtonTypes::RADIO){
+    if(buttonType==ButtonTypes::CHECKABLE || buttonType==ButtonTypes::RADIO){
         for (QPushButton *btn : pushButtonsList) {
             if(btn) btn->setCheckable(true);
         }

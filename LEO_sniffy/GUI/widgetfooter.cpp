@@ -50,9 +50,9 @@ void WidgetFooter::sizeCallback(){
     emit sizeClicked(isWide);
 }
 
-void WidgetFooter::setAppearance(bool isWide){
-    this->isWide = isWide; //save the value if it is called from public
-    if(!isWide){
+void WidgetFooter::setAppearance(bool wide){
+    this->isWide = wide; //save the value if it is called from public
+    if(!wide){
         ui->pushButton_settingsA->show();
         ui->pushButton_settingsB->hide();
         ui->label_settings->setText("");
