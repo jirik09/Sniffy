@@ -23,9 +23,8 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
     QByteArray received;
     DeviceDescriptor desc;
 
-    foreach (tmpPort, ports){
-
-        QSerialPortInfo portIn (tmpPort.portName());
+    for (const QSerialPortInfo &tmpPortInfo : ports){
+        QSerialPortInfo portIn (tmpPortInfo.portName());
 
         sPort = new QSerialPort(portIn,nullptr);
 

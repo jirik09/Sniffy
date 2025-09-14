@@ -18,7 +18,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     }
 
     int index = 0;
-    foreach(WidgetDisplay * dis, displays){
+    for (WidgetDisplay *dis : displays) {
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
         dis->configLabel(2,"Voltage",Graphics::COLOR_TEXT_LABEL,true);

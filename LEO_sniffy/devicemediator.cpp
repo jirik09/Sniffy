@@ -25,7 +25,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList(){
     tmpModules.append(QSharedPointer<AbstractModule> (new VoltageSource(this)));
  //   tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
-    foreach(QSharedPointer<AbstractModule> mod, tmpModules){
+    for (const QSharedPointer<AbstractModule>& mod : tmpModules) {
         connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
         connect(mod.data(), &AbstractModule::releaseConflictingModules, this, &DeviceMediator::releaseConflictingModulesCallback);
         connect(mod.data(), &AbstractModule::moduleDescription, device, &Device::addModuleDescription);
@@ -89,7 +89,7 @@ void DeviceMediator::open(int deviceIndex){
         communication->write("SYST:PIN_:"+CustomSettings::getUserPin().toUtf8()+";");
         communication->write("TKN_:TIME:"+CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8()+";");
         communication->write("TKN_:DATA:"+CustomSettings::getLoginToken()+";");
-        foreach(QSharedPointer<AbstractModule> mod, modules){
+        for (const QSharedPointer<AbstractModule>& mod : modules) {
             mod->setComms(communication);
         }
         emit loadLayout(deviceList.at(deviceIndex).deviceName);
@@ -100,7 +100,7 @@ void DeviceMediator::disableModules()
 {
     if(isConnected){
         emit saveLayout();
-        foreach(QSharedPointer<AbstractModule> mod, modules){
+        for (const QSharedPointer<AbstractModule>& mod : modules) {
             mod->disableModule();
         }
         communication->close();
@@ -113,7 +113,7 @@ void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int res
     if(resourcesInUse & resources){
         qDebug () << "FATAL ERROR - trying to open conflicting resources";
     }
-    foreach(QSharedPointer<AbstractModule> mod, modules){
+    for (const QSharedPointer<AbstractModule>& mod : modules) {
         if(mod->getResources() & resources && mod->getModuleName()!=moduleName)
             mod->setModuleStatus(ModuleStatus::LOCKED);
     }
@@ -123,7 +123,7 @@ void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int res
 void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int resources)
 {
     resourcesInUse = (resourcesInUse ^ resources) & resourcesInUse;
-    foreach(QSharedPointer<AbstractModule> mod, modules){
+    for (const QSharedPointer<AbstractModule>& mod : modules) {
         if(((mod->getResources() ^ resources)& resourcesInUse)==0 && mod->getModuleName()!=moduleName)
             mod->setModuleStatus(ModuleStatus::STOP);
     }
@@ -154,7 +154,7 @@ void DeviceMediator::parseData(QByteArray data){
     QByteArray dataHeader = data.left(4);
     QByteArray dataToPass = data.right(data.length()-4);
 
-    foreach(QSharedPointer<AbstractModule> module, modules){
+    for (const QSharedPointer<AbstractModule>& module : modules) {
         if(dataHeader == module->getCommandPrefix() && (module->isActive() || dataToPass.left(4) == "CFG_" || dataToPass.left(4) == "ACK_")){
             module->parseData(dataToPass);
             isDataPassed=true;

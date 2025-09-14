@@ -13,6 +13,8 @@ QT += network
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+# Enforce modern range-based for usage (all legacy foreach removed)
+DEFINES += QT_NO_FOREACH
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -299,7 +301,7 @@ TRANSLATIONS += \
     LEO_sniffy_en_GB.ts
 
 QMAKE_CXXFLAGS += \
-    -Wall -Wextra -Wpedantic -O2 -std=c++17
+    -Wall -Wextra -Wpedantic -Wshadow -O2 -std=c++17
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

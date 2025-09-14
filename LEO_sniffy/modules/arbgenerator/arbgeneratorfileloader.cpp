@@ -86,7 +86,7 @@ int ArbGeneratorFileLoader::parseFile(QString file)
 
         //parse first line
         channelIndex = 0;
-        foreach(QString str, inList){
+        for (const QString &str : inList) {
             parsed = parse(str,sample);
             if(!parsed && channelIndex==0) break;  //first line first column is not parsed  --> it is probably lable --> skip first line
             if(parsed){
@@ -101,7 +101,7 @@ int ArbGeneratorFileLoader::parseFile(QString file)
         while (run){
             inList = tmpStr.split(splitter);
             channelIndex = 0;
-            foreach(QString str, inList){
+                for (const QString &str : inList) {
                 parsed = parse(str,sample);
                 if(parsed){
                     parsedData[channelIndex].append(sample);
@@ -123,7 +123,7 @@ int ArbGeneratorFileLoader::parseFile(QString file)
         qreal diff = 0;
         qreal prevSmpl = 0;
         isSampleRateDefined = true;
-        foreach(sample, parsedData[0]){
+            for (qreal sample : parsedData[0]) {
             if(diff!=0){
                 if(diff - (sample - prevSmpl)> 0.000001){
                     isSampleRateDefined = false;

@@ -26,6 +26,12 @@
 #ifndef QCUSTOMPLOT_H
 #define QCUSTOMPLOT_H
 
+// Suppress -Wshadow warnings for third-party library code (QCustomPlot)
+#if defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wshadow"
+#endif
+
 #include <QtCore/qglobal.h>
 
 // some Qt version/configuration dependent macros to include or exclude certain code paths:
@@ -38,6 +44,10 @@
 #  if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
 #    define QCP_OPENGL_OFFSCREENSURFACE
 #  endif
+#endif
+
+#if defined(__GNUC__)
+#  pragma GCC diagnostic pop
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
@@ -4033,7 +4043,7 @@ PlottableType *QCustomPlot::plottableAt(const QPointF &pos, bool onlySelectable,
   QVariant resultDetails;
   double resultDistance = mSelectionTolerance; // only regard clicks with distances smaller than mSelectionTolerance as selections, so initialize with that value
   
-  foreach (QCPAbstractPlottable *plottable, mPlottables)
+  for (QCPAbstractPlottable *plottable : mPlottables)
   {
     PlottableType *currentPlottable = qobject_cast<PlottableType*>(plottable);
     if (!currentPlottable || (onlySelectable && !currentPlottable->selectable())) // we could have also passed onlySelectable to the selectTest function, but checking here is faster, because we have access to QCPAbstractPlottable::selectable
@@ -4079,7 +4089,7 @@ ItemType *QCustomPlot::itemAt(const QPointF &pos, bool onlySelectable) const
   ItemType *resultItem = 0;
   double resultDistance = mSelectionTolerance; // only regard clicks with distances smaller than mSelectionTolerance as selections, so initialize with that value
   
-  foreach (QCPAbstractItem *item, mItems)
+  for (QCPAbstractItem *item : mItems)
   {
     ItemType *currentItem = qobject_cast<ItemType*>(item);
     if (!currentItem || (onlySelectable && !currentItem->selectable())) // we could have also passed onlySelectable to the selectTest function, but checking here is faster, because we have access to QCPAbstractItem::selectable

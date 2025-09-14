@@ -214,7 +214,7 @@ void Voltmeter::updateMeasurement(QList<Measurement *> m)
     }else{
         samplesTaken++;
         voltWindow->showProgress(samplesTaken,samplesToTakeTotal);
-        foreach(Measurement* meas, m){
+        for (Measurement* meas : m) {
             if(meas->getType() == MeasurementType::MEAN){
                 dataRawVoltage[meas->getChannelIndex()].append(meas->getValue()*(realVdd/static_cast<VoltmeterSpec*>(moduleSpecification)->Vref));
             }
@@ -234,7 +234,7 @@ void Voltmeter::updateMeasurement(QList<Measurement *> m)
                     data[i].min = data[i].voltage;
                 }
             }
-            foreach(Measurement* meas, m){
+            for (Measurement* meas : m) {
                 if(meas->getType() == MeasurementType::PKPK){
                     data[meas->getChannelIndex()].ripple = meas->getValue();
                 }
@@ -259,7 +259,7 @@ qreal Voltmeter::getAverage(QList<qreal> *list)
 {
     qreal out = 0;
     if (list->length()>=1){
-        foreach(qreal num, *list){
+        for (qreal num : *list) {
             out += num;
         }
         out = out/list->length();

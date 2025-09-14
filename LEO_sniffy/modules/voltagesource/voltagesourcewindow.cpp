@@ -19,7 +19,7 @@ VoltageSourceWindow::VoltageSourceWindow(VoltageSourceConfig *config, QWidget *p
     }
 
     int index = 0;
-    foreach(WidgetDisplay * dis, displays){
+    for (WidgetDisplay *dis : displays) {
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
         dis->configLabel(2,"Voltage Source",Graphics::COLOR_TEXT_LABEL,true);

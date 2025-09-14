@@ -18,8 +18,9 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     labelList.append(ui->label_3);
     labelList.append(ui->label_4);
 
-    foreach(QLabel* label, labelList)
+    for (QLabel* label : labelList) {
         label->hide();
+    }
 
     ui->label_0->setText(firstLabelText);
     ui->label_0->show();

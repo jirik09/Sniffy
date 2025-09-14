@@ -60,7 +60,7 @@ void MainWindow::createModulesWidgets(){
     dockWidgets.resize(listSize, nullptr);
 
     int index;
-    foreach(module, modulesList){
+    for (const QSharedPointer<AbstractModule>& module : modulesList) {
         index = modulesList.indexOf(module);
         moduleName = module->getModuleName();
 
@@ -177,12 +177,12 @@ void MainWindow::saveLayout()
         layout.setValue("geometry", saveGeometry());
         layout.setValue("windowState", saveState());
 
-        foreach(module, modulesList){
+        for (const QSharedPointer<AbstractModule>& module : modulesList) {
             module->saveGeometry(layout);
         }
 
         QSettings settings(configFile, QSettings::IniFormat);
-        foreach(module, modulesList){
+        for (const QSharedPointer<AbstractModule>& module : modulesList) {
             settings.setValue(module->getModuleName()+"config",module->getConfiguration());
             settings.setValue(module->getModuleName()+"status",(int)(module->getModuleStatus()));
         }
@@ -231,7 +231,7 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
     ModuleStatus status;
     QByteArray config;
 
-    foreach(module, modulesList){
+    for (const QSharedPointer<AbstractModule>& module : modulesList) {
         if(module->getModuleName()==moduleName){
             if(!module->isModuleRestored()){
                 status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();

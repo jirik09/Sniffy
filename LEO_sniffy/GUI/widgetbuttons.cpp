@@ -50,8 +50,8 @@ WidgetButtons::WidgetButtons(QWidget *parent, int num,ButtonTypes type, QString 
         ui->pushButton_8->hide();
 
     if(type==ButtonTypes::CHECKABLE || type==ButtonTypes::RADIO){
-        foreach(QPushButton *btn, pushButtonsList){
-            btn->setCheckable(true);
+        for (QPushButton *btn : pushButtonsList) {
+            if(btn) btn->setCheckable(true);
         }
         setChecked(true,defaultSelectedIndex);
     }
@@ -163,8 +163,8 @@ bool WidgetButtons::isChecked (int index){
 }
 
 int WidgetButtons::getSelectedIndex(){
-    foreach(QPushButton *pb, pushButtonsList){
-        if(pb->isChecked())
+    for (QPushButton *pb : pushButtonsList) {
+        if(pb && pb->isChecked())
             return pushButtonsList.indexOf(pb);
     }
     return -1;
@@ -225,8 +225,8 @@ void WidgetButtons::button_8_Clicked(){
 }
 
 void WidgetButtons::uncheckAll(){
-    foreach(QPushButton *btn, pushButtonsList){
-        btn->setChecked(false);
+    for (QPushButton *btn : pushButtonsList) {
+        if(btn) btn->setChecked(false);
     }
 }
 
@@ -239,15 +239,12 @@ void WidgetButtons::setChecked (bool checked, int index){
 
 void WidgetButtons::setButtonHidden(bool hidden, int index)
 {
-    int i = 0;
-    foreach(QPushButton *btn, pushButtonsList){
-        if(index==i){
-            if(hidden){
-                btn->hide();
-            }else{
-                btn->show();
-            }
+    if (index < 0 || index >= pushButtonsList.size()) return;
+    if (QPushButton *btn = pushButtonsList.at(index)) {
+        if(hidden){
+            btn->hide();
+        }else{
+            btn->show();
         }
-        i++;
     }
 }
