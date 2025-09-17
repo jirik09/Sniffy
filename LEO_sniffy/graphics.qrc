@@ -21,6 +21,7 @@
         <file>graphics/themes/dark/settings_vertical.png</file>
         <file>graphics/themes/dark/no_device.png</file>
         <file>graphics/themes/dark/Nucleo-F303RE.png</file>
+        <file>graphics/themes/dark/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/dark/Nucleo-G474RE.png</file>
         <file>graphics/themes/dark/unknown_device.png</file>
         <file>graphics/themes/dark/icon_counter.png</file>
@@ -97,6 +98,7 @@
         <file>graphics/themes/light/menu_burger_button_backw.gif</file>
         <file>graphics/themes/light/no_device.png</file>
         <file>graphics/themes/light/Nucleo-F303RE.png</file>
+        <file>graphics/themes/light/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/light/Nucleo-G474RE.png</file>
         <file>graphics/themes/light/separator.png</file>
         <file>graphics/themes/light/settings_gear.png</file>

@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include <QFileInfo>
 
 QSharedPointer<AbstractTheme> Graphics::theme = nullptr;
 QList<QString> *Graphics::themeList = nullptr;
@@ -19,6 +20,30 @@ QList<QString> *Graphics::initThemesList(){
 
 QString Graphics::getGraphicsPath(){
     return theme->getGraphicsPath();
+}
+
+QString Graphics::getBoardImage(const QString &boardBaseName){
+    const QString basePath = getGraphicsPath();
+    if(boardBaseName.isEmpty())
+        return basePath + "unknown_device.png";
+
+    const QString candidate = basePath + boardBaseName + ".png";
+    if(QFileInfo::exists(candidate))
+        return candidate;
+
+    return basePath + "unknown_device.png";
+}
+
+QString Graphics::getBoardPinoutImage(const QString &boardBaseName){
+    if(boardBaseName.isEmpty())
+        return QString();
+
+    const QString basePath = getGraphicsPath();
+    const QString pinout = basePath + boardBaseName + "-pinout.png";
+    if(QFileInfo::exists(pinout))
+        return pinout;
+        
+    return QString();
 }
 
 QString Graphics::getChannelColor(int channelIndex){

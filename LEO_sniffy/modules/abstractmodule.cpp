@@ -273,6 +273,7 @@ QString AbstractModule::getModuleName()
 void AbstractModule::setModuleName(QString value){
     moduleName = value;
     moduleControlWidget->setName(moduleName);
+    emit moduleNameChanged(moduleName);
 }
 
 /* This function must be called after dockWidget is created.

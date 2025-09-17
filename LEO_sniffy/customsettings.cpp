@@ -29,10 +29,13 @@ void CustomSettings::loadSettings(QString fileName)
         userEmail = settings.value("email").toString();
         userPin = settings.value("pin").toString();
         loginToken = QByteArray::fromHex(settings.value("token").toByteArray());
+        // Previously this used QByteArray::fromHex which corrupted an already ASCII token on reload.
+        // Store and load the token verbatim to keep what the server provided.
+        // loginToken = settings.value("token").toByteArray();
         tokenValidity = settings.value("validity").toDateTime();
         lastLoginFailureReason = settings.value("last_login_failure").toString();
     }else{ // set default values if settings file doesnt exist
-        restoreSession = 1;
+        restoreSession = 0; // default: No session restore
         themeIndex = 0;
         userEmail = "Unknown user";
         userPin = "0000";
@@ -52,6 +55,13 @@ void CustomSettings::saveSettings()
 
     settings.setValue("email", userEmail);
     settings.setValue("pin", userPin);
+    // Safeguard: do not overwrite an existing valid token with an empty placeholder inadvertently
+    if(loginToken.isEmpty()){
+        QByteArray existing = settings.value("token").toByteArray();
+        if(!existing.isEmpty()){
+            loginToken = existing; // preserve previous token
+        }
+    }
     settings.setValue("token", loginToken);
     settings.setValue("validity", tokenValidity);
     settings.setValue("last_login_failure", lastLoginFailureReason);
@@ -169,6 +179,15 @@ void CustomSettings::setTokenValidity(const QDateTime &value)
 QString CustomSettings::getLastLoginFailure()
 {
     return lastLoginFailureReason;
+}
+
+bool CustomSettings::hasValidLogin()
+{
+    // Valid if token not 'none', validity in future, and last failure empty
+    if(loginToken.isEmpty() || loginToken == QByteArray("none")) return false;
+    if(!tokenValidity.isValid()) return false;
+    if(tokenValidity < QDateTime::currentDateTime()) return false;
+    return true;
 }
 
 void CustomSettings::setLastLoginFailure(const QString &value)

@@ -6,14 +6,18 @@ namespace SpecParsing {
 
 // Remove padding underscores, replace non-printable / non-ASCII with '?'
 inline QString sanitizePin(QString s) {
-    s.remove('_');
-    for (int i = 0; i < s.size(); ++i) {
-        const QChar qc = s.at(i);
-        if (qc.unicode() < 0x20 || qc.unicode() > 0x7E) {
-            s.replace(i, 1, QLatin1Char('?'));
-        }
+    // Replace non-printable chars with nothing (strip) but keep valid ASCII alphanumerics
+    QString cleaned;
+    cleaned.reserve(s.size());
+    for(QChar qc : s){
+        ushort u = qc.unicode();
+        if(u < 0x20 || u > 0x7E) continue; // skip non-printable/out-of-range
+        cleaned.append(qc);
     }
-    return s;
+    // Trim only trailing underscores (common padding) not internal ones
+    while(cleaned.endsWith('_')) cleaned.chop(1);
+    if(cleaned.isEmpty()) return QStringLiteral("-");
+    return cleaned;
 }
 
 inline bool readOnePin4(QDataStream &stream, QString &out) {

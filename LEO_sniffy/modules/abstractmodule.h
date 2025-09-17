@@ -71,6 +71,9 @@ public:
     bool isModuleRestored() const;
     void setModuleRestored(bool value);
 
+    // Accessor for the module control widget (used by MainWindow for UI tweaks)
+    WidgetControlModule* getModuleControlWidget() const { return moduleControlWidget; }
+
 protected:
     QString moduleName;
     QString moduleIconURI;
@@ -101,6 +104,8 @@ signals:
     void blockConflictingModules(QString moduleName, int resources);
     void releaseConflictingModules(QString moduleName, int resources);
     void moduleDescription(QString name, QList<QString> labels, QList<QString> values);
+    // Emitted when the module's display name changes (e.g., Device renamed after handshake)
+    void moduleNameChanged(const QString &name);
 
 };
 

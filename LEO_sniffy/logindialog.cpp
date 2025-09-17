@@ -17,7 +17,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
     layout->setContentsMargins(5,5,5,5);
 
     userEmail= new WidgetTextInput(this,"User email  ");
-    userPIN = new WidgetTextInput(this, "PIN  ","",InputTextType::NUMBER);
+    userPIN = new WidgetTextInput(this, "PIN  ", "", InputTextType::NUMBER);
     userPIN->setAsPassword();
     layout->addWidget(userEmail);
     layout->addWidget(userPIN);
@@ -62,13 +62,59 @@ LoginDialog::LoginDialog(QWidget *parent) :
     });
 
     connect(buttonsDone,&WidgetButtons::clicked,this,&LoginDialog::buttonAction);
-
-
 }
 
 LoginDialog::~LoginDialog()
 {
     delete ui;
+}
+
+// Helper: central failure handling to eliminate repetitive code blocks
+void LoginDialog::reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color){
+    info->setName(uiMessage);
+    info->setColor(color);
+    emit loginFailed(failureCode);
+    CustomSettings::setLastLoginFailure(failureCode);
+    CustomSettings::saveSettings();
+}
+
+// Helper: start the network request after inputs validated
+void LoginDialog::startLoginNetworkRequest(const QString &email, const QString &pinHash){
+    CustomSettings::setUserEmail(email);
+    CustomSettings::setUserPin(pinHash);
+    CustomSettings::saveSettings();
+
+    QUrl auth = QUrl(QStringLiteral("https://sniffy.cz/sniffy_auth.php"));
+    QUrlQuery query;
+    query.addQueryItem("email", CustomSettings::getUserEmail());
+    query.addQueryItem("pin", CustomSettings::getUserPin());
+    auth.setQuery(query);
+
+    QNetworkRequest req(auth);
+    req.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("LEO_sniffy/1.0"));
+    req.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+
+    info->setName("Verifying...");
+    info->setColor(Graphics::COLOR_TEXT_LABEL);
+    requestInFlight = true;
+    buttonsDone->setEnabled(false);
+    qInfo() << "[Login] Sending request for" << email;
+    currentReply = networkManager->get(req);
+    timeoutTimer.start();
+}
+
+// Helper: finalize successful login
+void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &token){
+    CustomSettings::setLoginToken(token);
+    CustomSettings::setTokenValidity(validity);
+    CustomSettings::setLastLoginFailure("");
+    CustomSettings::saveSettings();
+
+    info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy hh:mm"));
+    info->setColor(Graphics::COLOR_TEXT_ALL);
+    emit loginInfoChanged();
+    qInfo() << "[Login] Success valid till" << CustomSettings::getTokenValidity();
+    close();
 }
 
 void LoginDialog::open()
@@ -93,49 +139,20 @@ void LoginDialog::buttonAction(int isCanceled)
 
     const QString email = userEmail->getText().trimmed();
     if(email.isEmpty()){
-        info->setName("Email required");
-        info->setColor(Graphics::COLOR_ERROR);
-        emit loginFailed("empty-email");
-        CustomSettings::setLastLoginFailure("empty-email");
-        CustomSettings::saveSettings();
+        reportFailure("Email required","empty-email");
         return;
     }
 
-    // PIN numeric extraction (defenzivně)
+    // PIN numeric extraction (defensive)
     bool ok=false;
     int pinValue = userPIN->getText().trimmed().toInt(&ok);
     if(!ok){
-        info->setName("PIN must be number");
-        info->setColor(Graphics::COLOR_ERROR);
-        emit loginFailed("pin-not-numeric");
-        CustomSettings::setLastLoginFailure("pin-not-numeric");
-        CustomSettings::saveSettings();
+        reportFailure("PIN must be number","pin-not-numeric");
         return;
     }
 
-    CustomSettings::setUserEmail(email);
     QString pinHash = QString(QCryptographicHash::hash(QString::number(pinValue + 1297).toUtf8(),QCryptographicHash::Sha1).toHex());
-    CustomSettings::setUserPin(pinHash);
-    CustomSettings::saveSettings();
-
-    // Prefer HTTPS (případný redirect by prodloužil dobu)
-    QUrl auth = QUrl(QStringLiteral("https://sniffy.cz/sniffy_auth.php"));
-    QUrlQuery query;
-    query.addQueryItem("email", CustomSettings::getUserEmail());
-    query.addQueryItem("pin", CustomSettings::getUserPin());
-    auth.setQuery(query);
-
-    QNetworkRequest req(auth);
-    req.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("LEO_sniffy/1.0"));
-    req.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
-
-    info->setName("Verifying...");
-    info->setColor(Graphics::COLOR_TEXT_LABEL);
-    requestInFlight = true;
-    buttonsDone->setEnabled(false); // disable both buttons logically (WidgetButtons manages internally)
-    qInfo() << "[Login] Sending request for" << email;
-    currentReply = networkManager->get(req);
-    timeoutTimer.start();
+    startLoginNetworkRequest(email, pinHash);
 }
 
 void LoginDialog::replyFinished(QNetworkReply *pReply)
@@ -150,11 +167,7 @@ void LoginDialog::replyFinished(QNetworkReply *pReply)
     currentReply = nullptr;
 
     if(pReply->error() != QNetworkReply::NoError){
-        info->setName("Network error: " + pReply->errorString());
-        info->setColor(Graphics::COLOR_ERROR);
-        emit loginFailed("network-error:"+pReply->errorString());
-        CustomSettings::setLastLoginFailure("network-error:"+pReply->errorString());
-        CustomSettings::saveSettings();
+        reportFailure("Network error: " + pReply->errorString(), "network-error:"+pReply->errorString());
         qInfo() << "[Login] Network error" << pReply->errorString();
         pReply->deleteLater();
         return;
@@ -162,11 +175,7 @@ void LoginDialog::replyFinished(QNetworkReply *pReply)
 
     int httpStatus = pReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if(httpStatus != 200){
-        info->setName(QString("HTTP %1").arg(httpStatus));
-        info->setColor(Graphics::COLOR_ERROR);
-        emit loginFailed(QStringLiteral("http-%1").arg(httpStatus));
-        CustomSettings::setLastLoginFailure(QStringLiteral("http-%1").arg(httpStatus));
-        CustomSettings::saveSettings();
+        reportFailure(QString("HTTP %1").arg(httpStatus), QStringLiteral("http-%1").arg(httpStatus));
         qInfo() << "[Login] HTTP error" << httpStatus;
         pReply->deleteLater();
         return;
@@ -176,57 +185,29 @@ void LoginDialog::replyFinished(QNetworkReply *pReply)
     pReply->deleteLater();
 
     if(data == "Expired"){
-        info->setName("Token expired – login on www.sniffy.cz");
-        info->setColor(Graphics::COLOR_WARNING);
-        emit loginFailed("expired");
-        CustomSettings::setLastLoginFailure("expired");
-        CustomSettings::saveSettings();
+        reportFailure("Token expired – login on www.sniffy.cz","expired", Graphics::COLOR_WARNING);
         qInfo() << "[Login] Token expired";
         return;
     }else if(data == "wrongPin"){
-        info->setName("Wrong pin or email");
-        info->setColor(Graphics::COLOR_ERROR);
-        emit loginFailed("wrong-pin");
-        CustomSettings::setLastLoginFailure("wrong-pin");
-        CustomSettings::saveSettings();
+        reportFailure("Wrong pin or email","wrong-pin");
         qInfo() << "[Login] Wrong pin";
         return;
     }
 
-    if(data.size() < 20){ // minimálně 19 znaků datetime + něco tokenu
-        info->setName("Invalid server response");
-        info->setColor(Graphics::COLOR_ERROR);
-        emit loginFailed("invalid-response-too-short");
-        CustomSettings::setLastLoginFailure("invalid-response-too-short");
-        CustomSettings::saveSettings();
+    if(data.size() < 20){
+        reportFailure("Invalid server response","invalid-response-too-short");
         qInfo() << "[Login] Response too short";
         return;
     }
 
     QString validityString = QString::fromLatin1(data.left(19));
     QDateTime validity = QDateTime::fromString(validityString, "yyyy-MM-dd hh:mm:ss");
-    QByteArray token = data.mid(19); // zbytek
+    QByteArray token = data.mid(19);
     if(!validity.isValid() || token.isEmpty()){
-        info->setName("Invalid response format");
-        info->setColor(Graphics::COLOR_ERROR);
-        emit loginFailed("invalid-response-format");
-        CustomSettings::setLastLoginFailure("invalid-response-format");
-        CustomSettings::saveSettings();
+        reportFailure("Invalid response format","invalid-response-format");
         qInfo() << "[Login] Invalid response format";
         return;
     }
-
-    CustomSettings::setLoginToken(token);
-    CustomSettings::setTokenValidity(validity);
-    CustomSettings::saveSettings();
-
-    info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy hh:mm"));
-    info->setColor(Graphics::COLOR_TEXT_ALL);
-    emit loginInfoChanged();
-    CustomSettings::setLastLoginFailure("");
-    CustomSettings::saveSettings();
-    qInfo() << "[Login] Success valid till" << CustomSettings::getTokenValidity();
-    // UX: zavřít dialog po úspěchu
-    this->close();
+    finalizeSuccess(validity, token);
 
 }

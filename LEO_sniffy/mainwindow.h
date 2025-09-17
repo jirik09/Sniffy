@@ -34,6 +34,7 @@ private:
     DeviceMediator *deviceMediator;
     QPropertyAnimation *animation;
     QList<QSharedPointer<AbstractModule>> modulesList;
+    QSharedPointer<AbstractModule> deviceModule; // first module (Device)
     QString layoutFile;
     QString configFile;
     QString setingsFile;
@@ -41,7 +42,7 @@ private:
     SettingsDialog *sett;
     LoginDialog *logindial;
 
-    bool isLeftMenuNarrow;
+    bool isLeftMenuNarrow = false; // default to wide menu
     WidgetFooter *footer;
     WidgetLoginInfo *loginInfo;
 
@@ -53,6 +54,8 @@ private:
     void createModulesWidgets();
 
     void saveLayout();
+    // Update left menu to compact (narrow) or expanded (wide): hide/show texts accordingly
+    void updateLeftMenuCompact(bool compact);
 
 private slots:
     void loadLayout(QString deviceName);

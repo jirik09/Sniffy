@@ -49,6 +49,9 @@ public:
     static QString getLastLoginFailure();
     static void setLastLoginFailure(const QString &value);
 
+    // Authentication helpers
+    static bool hasValidLogin();
+
 private:
     static QString settingFile;
 

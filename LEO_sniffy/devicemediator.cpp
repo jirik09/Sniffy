@@ -70,17 +70,22 @@ void DeviceMediator::open(int deviceIndex){
 
         QString layoutFile;
         QString configFile;
-        layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceList.at(deviceIndex).deviceName+".lay";
-        configFile = QApplication::applicationDirPath() + "/sessions/"+deviceList.at(deviceIndex).deviceName+".cfg";
+        const QString devName = deviceList.at(deviceIndex).deviceName;
+        if(devName.isEmpty()){
+            CustomSettings::setNoSessionfound();
+        } else {
+            layoutFile = QApplication::applicationDirPath() + "/sessions/"+devName+".lay";
+            configFile = QApplication::applicationDirPath() + "/sessions/"+devName+".cfg";
         QSharedPointer<AbstractModule> module;
 
-        QFile file(layoutFile);
-        QFile fileMod(configFile);
+            QFile file(layoutFile);
+            QFile fileMod(configFile);
 
-        if(file.exists() && fileMod.exists()){
-            CustomSettings::askForSessionRestore(deviceList.at(deviceIndex).deviceName);
-        }else{
-            CustomSettings::setNoSessionfound();
+            if(file.exists() && fileMod.exists()){
+                CustomSettings::askForSessionRestore(devName);
+            }else{
+                CustomSettings::setNoSessionfound();
+            }
         }
 
         //send and valiadate token
