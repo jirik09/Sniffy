@@ -17,12 +17,10 @@ void DeviceScanner::searchForDevices(bool isSearchEnaled)
 void DeviceScanner::run()
 {
     isRunning = true;
-    QList<DeviceDescriptor> tempDeviceList = *new QList<DeviceDescriptor>;
+    QList<DeviceDescriptor> tempDeviceList;
     while(isRunning){
         if(isSearchEnaled){
             tempDeviceList.clear();
-            QDateTime date = QDateTime::currentDateTime();
-            //qDebug() << "SCANNING "<<date.time() <<"("<<currentDeviceList.length() << tempDeviceList.length()<<")";
             SerialLine::getAvailableDevices(&tempDeviceList,0);
 
             if(!deviceListsEqual(tempDeviceList,currentDeviceList)){
@@ -31,10 +29,12 @@ void DeviceScanner::run()
                 isSearchEnaled = false;
                 emit newDevicesScanned(currentDeviceList);
             }
+            // backoff a little to avoid hammering the system
+            thread()->msleep(200);
         }else{
             thread()->msleep(1500);
         }
-        thread()->msleep(1250);
+        thread()->msleep(800);
     }
 }
 

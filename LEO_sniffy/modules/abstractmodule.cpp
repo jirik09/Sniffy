@@ -194,7 +194,8 @@ QByteArray AbstractModule::getCommandPrefix()
 
 void AbstractModule::setComms(Comms *communication){
     comm = communication;
-    cmd = new Commands();
+    if (!cmd) cmd = new Commands();
+    // Send CONFIG? request
     comm->write(moduleCommandPrefix+":"+Commands::CONFIG_REQUEST+";");
 }
 
