@@ -6,6 +6,8 @@ widgetTab::widgetTab(QWidget *parent, int num) :
     ui(new Ui::widgetTab)
 {
     ui->setupUi(this);
+    // Default to the first tab (index 0)
+    ui->tabWidget->setCurrentIndex(0);
 
     if(num<=5)
         ui->tabWidget->removeTab(5);

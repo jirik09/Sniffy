@@ -24,7 +24,8 @@ void CustomSettings::loadSettings(QString fileName)
         QSettings settings(settingFile, QSettings::IniFormat);
 
         restoreSession = settings.value("restoreSession").toInt();
-        themeIndex = settings.value("theme").toInt();
+        // Prefer Dawn as default if key is missing
+        themeIndex = settings.contains("theme") ? settings.value("theme").toInt() : 2;
 
         userEmail = settings.value("email").toString();
         userPin = settings.value("pin").toString();
@@ -36,7 +37,8 @@ void CustomSettings::loadSettings(QString fileName)
         lastLoginFailureReason = settings.value("last_login_failure").toString();
     }else{ // set default values if settings file doesnt exist
         restoreSession = 0; // default: No session restore
-        themeIndex = 0;
+        // Default theme: Dawn
+        themeIndex = 2;
         userEmail = "Unknown user";
         userPin = "0000";
         loginToken = "none";
