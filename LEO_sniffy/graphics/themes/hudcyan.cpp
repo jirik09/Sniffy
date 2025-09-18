@@ -1,0 +1,58 @@
+#include "hudcyan.h"
+
+HudCyan::HudCyan(QObject *parent)
+{
+    Q_UNUSED(parent);
+
+    Graphics::COLOR_WINDOW_APP = HUD_APP_BG;
+    Graphics::COLOR_WINDOW_WIDGET = HUD_WIDGET_BG;
+
+    Graphics::COLOR_BACKGROUND_FOCUS_IN = HUD_FOCUS_BG;
+    Graphics::COLOR_COMPONENT_DISABLED = HUD_DISABLED;
+    Graphics::COLOR_BACKGROUND_BUTTON = HUD_BTN_BG;
+    Graphics::COLOR_CONTROLS = HUD_TEXT_MAIN;
+    Graphics::COLOR_DATA_INPUT_AREA = HUD_INPUT_BG;
+    Graphics::COLOR_DISPLAY = HUD_CHART_BG;
+    Graphics::COLOR_CHART = HUD_CHART_BG;
+    Graphics::COLOR_CHART_GRIDLEG_DEFAULT = HUD_GRID_DEF;
+    Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST = HUD_GRID_LOW;
+    Graphics::COLOR_TEXT_ALL = HUD_TEXT_MAIN;
+    Graphics::COLOR_TEXT_LABEL = HUD_TEXT_LABEL;
+    Graphics::COLOR_TEXT_COMPONENT = HUD_TEXT_COMP;
+    Graphics::COLOR_WINDOW_CONTROL_HOVER = HUD_HOVER;
+    Graphics::COLOR_WINDOW_EXIT_HOVER = HUD_EXIT_HOVER;
+    Graphics::COLOR_WARNING = HUD_WARNING;
+    Graphics::COLOR_ERROR = HUD_ERROR;
+    Graphics::COLOR_RUNNING = HUD_RUNNING;
+    Graphics::COLOR_UNUSED = HUD_DISABLED;
+
+    Graphics::STYLE_PUSH_BUTTON = HUD_STYLE_PUSH_BUTTON;
+    Graphics::STYLE_CHECK_BUTTON = HUD_STYLE_CHECK_BUTTON;
+    Graphics::STYLE_PROGRESS_BAR = HUD_STYLE_PROGRESS_BAR;
+    Graphics::STYLE_COMBO_BOX = HUD_STYLE_COMBO_BOX;
+    Graphics::STYLE_CONTROL_BUTTON = HUD_STYLE_CONTROL_BUTTON;
+    Graphics::STYLE_MODULE_BUTTON = HUD_STYLE_MODULE_BUTTON;
+    Graphics::STYLE_HOLD_BUTTON = HUD_STYLE_HOLD_BUTTON;
+    Graphics::STYLE_DIAL = HUD_STYLE_DIAL;
+    Graphics::STYLE_TEXTINPUT = HUD_STYLE_TEXTINPUT;
+    Graphics::STYLE_DOCK_WIDGET = HUD_STYLE_MODULE_DOCK_WIDGET;
+    Graphics::STYLE_DOCK_WINDOW = HUD_STYLE_OBJECT;
+
+    Graphics::STYLE_CUSTOM_DIALS_USED = HUD_STYLE_USE_CUSTOM_DIALS;
+    Graphics::STYLE_TRANSPARENCY_USED = HUD_STYLE_USE_TRANSPARENCY;
+
+    QString accent = QString(HUD_CYAN).remove("#");
+    Graphics::STYLE_GLOBAL = QString(HUD_STYLE_GLOBAL).arg(accent);
+}
+
+QString HudCyan::getAppGlobalStyle(){
+    return Graphics::STYLE_GLOBAL;
+}
+
+QString HudCyan::getGraphicsPath(){
+    return HUD_GRAPHICS_PATH;
+}
+
+QString HudCyan::getChannelColor(int channelIndex){
+    return chanColor.at(channelIndex).name();
+}
