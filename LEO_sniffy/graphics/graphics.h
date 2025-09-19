@@ -12,7 +12,6 @@
 #include "graphics/themes/dawn.h"
 #include "graphics/themes/aurora.h"
 #include "graphics/themes/neomorph.h"
-#include "graphics/themes/sunset.h"
 #include "graphics/themes/tealanalytics.h"
 #include "graphics/themes/hudcyan.h"
 #include "graphics/abstracttheme.h"

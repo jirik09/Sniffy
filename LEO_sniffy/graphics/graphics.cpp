@@ -7,12 +7,11 @@ QList<QString> *Graphics::themeList = nullptr;
 QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {  
         [] { return QSharedPointer<AbstractTheme>(new Dark); },
         [] { return QSharedPointer<AbstractTheme>(new Light); },
-    [] { return QSharedPointer<AbstractTheme>(new Dawn); },
-    [] { return QSharedPointer<AbstractTheme>(new Aurora); },
-    [] { return QSharedPointer<AbstractTheme>(new Neomorph); },
-    [] { return QSharedPointer<AbstractTheme>(new Sunset); },
-    [] { return QSharedPointer<AbstractTheme>(new TealAnalytics); },
-    [] { return QSharedPointer<AbstractTheme>(new HudCyan); },
+        [] { return QSharedPointer<AbstractTheme>(new Dawn); },
+        [] { return QSharedPointer<AbstractTheme>(new Aurora); },
+        [] { return QSharedPointer<AbstractTheme>(new Neomorph); },
+        [] { return QSharedPointer<AbstractTheme>(new TealAnalytics); },
+        [] { return QSharedPointer<AbstractTheme>(new HudCyan); },
 };
 
 QList<QString> *Graphics::initThemesList(){
@@ -22,7 +21,6 @@ QList<QString> *Graphics::initThemesList(){
     themeList->append(((QString)(typeid(Dawn).name())).remove(0,1));
     themeList->append(((QString)(typeid(Aurora).name())).remove(0,1));
     themeList->append(((QString)(typeid(Neomorph).name())).remove(0,1));
-    themeList->append(((QString)(typeid(Sunset).name())).remove(0,1));
     themeList->append(((QString)(typeid(TealAnalytics).name())).remove(0,1));
     themeList->append(((QString)(typeid(HudCyan).name())).remove(0,1));
     return themeList;
@@ -42,13 +40,6 @@ QString Graphics::getGraphicsPath(){
         const QString testAsset = base + "logo_sniffy.png";
         if(!QFileInfo::exists(testAsset)){
             return QString(base).replace("/neomorph/","/light/");
-        }
-    }
-    // Sunset theme falls back to Dawn assets if not present
-    if(base.contains("/sunset/")){
-        const QString testAsset = base + "logo_sniffy.png";
-        if(!QFileInfo::exists(testAsset)){
-            return QString(base).replace("/sunset/","/dawn/");
         }
     }
     // TealAnalytics and HudCyan fall back to Dark assets if not present
@@ -85,12 +76,6 @@ QString Graphics::getBoardImage(const QString &boardBaseName){
         if(QFileInfo::exists(lightCandidate)) return lightCandidate;
         return lightBase + "unknown_device.png";
     }
-    if(basePath.contains("/sunset/")){
-        const QString dawnBase = QString(basePath).replace("/sunset/","/dawn/");
-        const QString dawnCandidate = dawnBase + boardBaseName + ".png";
-        if(QFileInfo::exists(dawnCandidate)) return dawnCandidate;
-        return dawnBase + "unknown_device.png";
-    }
     if(basePath.contains("/tealanalytics/")){
         const QString darkBase = QString(basePath).replace("/tealanalytics/","/dark/");
         const QString darkCandidate = darkBase + boardBaseName + ".png";
@@ -125,11 +110,6 @@ QString Graphics::getBoardPinoutImage(const QString &boardBaseName){
         const QString lightBase = QString(basePath).replace("/neomorph/","/light/");
         const QString lightPinout = lightBase + boardBaseName + "-pinout.png";
         if(QFileInfo::exists(lightPinout)) return lightPinout;
-    }
-    if(basePath.contains("/sunset/")){
-        const QString dawnBase = QString(basePath).replace("/sunset/","/dawn/");
-        const QString dawnPinout = dawnBase + boardBaseName + "-pinout.png";
-        if(QFileInfo::exists(dawnPinout)) return dawnPinout;
     }
     if(basePath.contains("/tealanalytics/")){
         const QString darkBase = QString(basePath).replace("/tealanalytics/","/dark/");
