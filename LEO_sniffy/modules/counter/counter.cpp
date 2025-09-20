@@ -267,7 +267,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     if(!isFrequency && val>0)
         val = 1 / val;
 
-    display->updateProgressBar(val);
+    display->setProgressValue(val);
     config->hfState.quantState = HFState::QuantitySwitched::NO;
 }
 
@@ -400,12 +400,12 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         if(isRangeExceeded(val1)){
             cntWindow->clearDisplay(display, false);
             cntWindow->displayFlagSwitchMode(display, true);
-            display->updateProgressBar(static_cast<CounterSpec*>(moduleSpecification)->lf_max);
+            display->setProgressValue(static_cast<CounterSpec*>(moduleSpecification)->lf_max);
         }else {
             displayValues(display, strVal, "", strQerr, strTerr);
             cntWindow->showPMErrorSigns(display, true);
             cntWindow->displayFlagAcquiring(display, false);
-            display->updateProgressBar(val1);
+            display->setProgressValue(val1);
 
             QString quant;
             if(isFrequency){
