@@ -2,6 +2,7 @@
 #include "ui_logindialog.h"
 
 #include <QDebug>
+#include <QLabel>
 
 LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent),
@@ -23,7 +24,25 @@ LoginDialog::LoginDialog(QWidget *parent) :
     layout->addWidget(userPIN);
     WidgetSeparator *sep1 = new WidgetSeparator(this,"");
     layout->addWidget(sep1);
-    info = new WidgetLabel(this,"First time here? register at www.sniffy.cz"); ////TODO create this as link
+
+    // Static register link label (clickable)
+    QLabel *registerLink = new QLabel(this);
+    registerLink->setTextFormat(Qt::RichText);
+    registerLink->setTextInteractionFlags(Qt::TextBrowserInteraction | Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse);
+    registerLink->setOpenExternalLinks(true);
+    // Use existing color constants only; fallback to text label color for link if accent not defined
+    registerLink->setStyleSheet(QString(
+        "QLabel { color:%1; } "
+        "a { color:%2; text-decoration:none; } "
+        "a:hover { text-decoration:underline; }")
+        .arg(Graphics::COLOR_TEXT_LABEL, Graphics::COLOR_TEXT_LABEL));
+    registerLink->setText(
+        "First time here? Register at "
+        "<a href=\"https://www.sniffy.cz\" target=\"_blank\">www.sniffy.cz</a>");
+    layout->addWidget(registerLink);
+
+    // 'info' now strictly for status messages (initially empty)
+    info = new WidgetLabel(this,"");
     layout->addWidget(info);
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
