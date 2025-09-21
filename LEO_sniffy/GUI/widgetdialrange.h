@@ -48,6 +48,9 @@ public:
     void disable(bool disable);    
 
     void setNumOfDecimals(int value);
+    // Added getters for current numeric range to support accurate percent mapping
+    float getRangeMin() const { return rangeMin; }
+    float getRangeMax() const { return rangeMax; }
 
 private:
     int optionalEmitParam;

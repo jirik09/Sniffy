@@ -32,8 +32,10 @@ void CustomDial::drawMarker(bool draw)
 }
 
 void CustomDial::mouseMoveEvent(QMouseEvent *me) {
-    double relativeX = me->x() - mousePressX+0.01;
-    double relativeY = me->y() - mousePressY+0.01;
+    // Qt6: x()/y() deprecated -> use position()
+    const QPointF pos = me->position();
+    double relativeX = pos.x() - mousePressX + 0.01;
+    double relativeY = pos.y() - mousePressY + 0.01;
 
     //double distance = sqrt(relativeX*relativeX + relativeY*relativeY); //distance from initial point
     double distance = abs(relativeX - relativeY) /sqrt(2); //distance from -xy axis
@@ -57,8 +59,9 @@ void CustomDial::mouseMoveEvent(QMouseEvent *me) {
 
 void CustomDial::mousePressEvent(QMouseEvent *me) {
     emit dialPressed(me);
-    mousePressX = me->x();
-    mousePressY = me->y();
+    const QPointF pos = me->position();
+    mousePressX = pos.x();
+    mousePressY = pos.y();
     initialDialValue = QDial::value();
 }
 

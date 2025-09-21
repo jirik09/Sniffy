@@ -43,7 +43,7 @@ private:
 
     Ui::WidgetTextInput *ui;
     InputTextType inputType;
-    QString lastParsed = "1";
+    QString lastParsed = "";
     qreal number = 0;
     bool graphicsShown = false;
 

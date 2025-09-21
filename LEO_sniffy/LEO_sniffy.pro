@@ -5,6 +5,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 CONFIG += c++11
 
 QT += charts
+QT += openglwidgets
 QT += network
 
 # The following define makes your compiler emit warnings if you use
@@ -12,6 +13,8 @@ QT += network
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+# Enforce modern range-based for usage (all legacy foreach removed)
+DEFINES += QT_NO_FOREACH
 
 # You can also make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -55,6 +58,10 @@ SOURCES += \
     graphics/graphics.cpp \
     graphics/themes/dark.cpp \
     graphics/themes/dawn.cpp \
+    graphics/themes/aurora.cpp \
+    graphics/themes/neomorph.cpp \
+    graphics/themes/tealanalytics.cpp \
+    graphics/themes/hudcyan.cpp \
     graphics/themes/light.cpp \
     logindialog.cpp \
     main.cpp \
@@ -173,6 +180,10 @@ HEADERS += \
     graphics/graphics.h \
     graphics/themes/dark.h \
     graphics/themes/dawn.h \
+    graphics/themes/aurora.h \
+    graphics/themes/neomorph.h \
+    graphics/themes/tealanalytics.h \
+    graphics/themes/hudcyan.h \
     graphics/themes/light.h \
     logindialog.h \
     mainwindow.h \
@@ -296,6 +307,9 @@ FORMS += \
 
 TRANSLATIONS += \
     LEO_sniffy_en_GB.ts
+
+QMAKE_CXXFLAGS += \
+    -Wall -Wextra -Wpedantic
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

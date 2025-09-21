@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 
-#include <QTextCodec>
+#include <QSerialPort>
 
 #include <QApplication>
 #include "devicedescriptor.h"
@@ -9,7 +9,7 @@
 
 int main(int argc, char *argv[])
 {    
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
+    // Qt6: QTextCodec setCodecForLocale removed (UTF-8 is default). Removed obsolete call.
 
     QApplication app(argc, argv);
     qRegisterMetaType<QList<Measurement *>>();

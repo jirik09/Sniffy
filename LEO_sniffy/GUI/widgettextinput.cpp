@@ -13,6 +13,18 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, I
     ui->lineEdit->installEventFilter(this);
     inputType = type;
 
+    /* Initialize lastParsed only if NUMBER and initial value parses, 
+    preventing fallback inserting a default digit on first focus loss. */
+    if(inputType == InputTextType::NUMBER){
+        bool ok=false; qreal v = NumberParser::parse(value,ok);
+        if(ok){
+            number = v;
+            lastParsed = value;
+        }else{
+            lastParsed.clear();
+        }
+    }
+
     QString style = Graphics::STYLE_TEXTINPUT;
     ui->label->setStyleSheet(style);
 
@@ -51,13 +63,19 @@ void WidgetTextInput::processInput()
         emit textChanged(ui->lineEdit->text());
     }else if(inputType == InputTextType::NUMBER){
         bool success = false ;
-        qreal value = NumberParser::parse(ui->lineEdit->text(),success);
+        QString current = ui->lineEdit->text();
+        qreal value = NumberParser::parse(current,success);
         if (success){
             number = value;
             emit numberChanged(number);
-            lastParsed = ui->lineEdit->text();
+            lastParsed = current;
         }else{
-            ui->lineEdit->setText(lastParsed);
+            // If we have no lastParsed yet, keep field empty rather than forcing a placeholder digit.
+            if(!lastParsed.isEmpty()){
+                ui->lineEdit->setText(lastParsed);
+            }else{
+                ui->lineEdit->clear();
+            }
         }
     }
 }

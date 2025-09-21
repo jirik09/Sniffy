@@ -115,8 +115,8 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
     dialFreqCh[i]->hideUnitSelection();
 
     dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);
-    dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);
-    dialDutyCh[i]->setRange(0, 100, "\%", 1, 1, DEFAULT_DC, false);
+    dialDutyCh[i]->setObjectName("syncPwmDutyCh" + chNStr);    
+    dialDutyCh[i]->setRange(0, 100, "%", 1, 1, DEFAULT_DC, false);
     dialDutyCh[i]->setColor(color);
     dialDutyCh[i]->hideUnitSelection();
 
@@ -145,13 +145,19 @@ void SyncPwmSettings::setRealFrequency(double val, int chanIndex){
 
 QString SyncPwmSettings::formatNumber(double val){
     int count = 0;
-    int number = (int)val;
+    int number = static_cast<int>(val);
     while(number != 0) {
-       number = number / 10;
+       number /= 10;
        count++;
     }
     int prec = MAX_FREQ_DIGIT_NUM - count;
+    if (prec < 0) prec = 0; // guard
 
-    return loc.toString(val, 'f', prec).replace(loc.decimalPoint(), '.');
+    QString s = loc.toString(val, 'f', prec);
+    const QString dec = loc.decimalPoint();
+    if(!dec.isEmpty() && dec != "."){
+        s.replace(dec, QStringLiteral("."));
+    }
+    return s;
 }
 

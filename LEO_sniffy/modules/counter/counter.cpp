@@ -252,7 +252,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     displayValues(display, formatNumber(display, val, qerr+terr), strAvg, strQerr, strTerr);
 
     /* History section */
-    QString pm(0x00B1);
+    const QString pm = QString(QChar(0x00B1));
     QString quant = (isFrequency) ? " Hz": " s";
 
     cntWindow->appendNewHistorySample(display, "", val, quant, (float)config->hfState.gateTime/(float)1000);
@@ -267,7 +267,7 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     if(!isFrequency && val>0)
         val = 1 / val;
 
-    display->updateProgressBar(val);
+    display->setProgressValue(val);
     config->hfState.quantState = HFState::QuantitySwitched::NO;
 }
 
@@ -386,7 +386,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         mode = "xx";
     }
 
-    QString pm(0x00B1);
+    const QString pm = QString(QChar(0x00B1));
 
     if(mode == "FPME"){
         strVal = formatNumber(display, val1, qerr+terr);
@@ -400,12 +400,12 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         if(isRangeExceeded(val1)){
             cntWindow->clearDisplay(display, false);
             cntWindow->displayFlagSwitchMode(display, true);
-            display->updateProgressBar(static_cast<CounterSpec*>(moduleSpecification)->lf_max);
+            display->setProgressValue(static_cast<CounterSpec*>(moduleSpecification)->lf_max);
         }else {
             displayValues(display, strVal, "", strQerr, strTerr);
             cntWindow->showPMErrorSigns(display, true);
             cntWindow->displayFlagAcquiring(display, false);
-            display->updateProgressBar(val1);
+            display->setProgressValue(val1);
 
             QString quant;
             if(isFrequency){
@@ -429,7 +429,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
 
         /* History section */
         cntWindow->appendNewHistorySample(display, "PW ", val1, " s");
-        cntWindow->associateToHistorySample(display, 1, ", DC ", val2, " \%");
+        cntWindow->associateToHistorySample(display, 1, ", DC ", val2, " %");
         cntWindow->associateToHistorySample(display, 2, " ");
     }
 }
@@ -629,7 +629,7 @@ void Counter::parseIntervalsCounter(QByteArray data){
         cntWindow->displayFlagAcquiring(display, false);
 
         /* History section */
-        QString pm(0x00B1);
+    const QString pm = QString(QChar(0x00B1));
         cntWindow->appendNewHistorySample(display, "Time interval: ", val, " Sec");
         cntWindow->associateToHistorySample(display, 1, ", " + pm + "qerr ", qerr);
         cntWindow->associateToHistorySample(display, 2, " " + pm + "terr ", terr);

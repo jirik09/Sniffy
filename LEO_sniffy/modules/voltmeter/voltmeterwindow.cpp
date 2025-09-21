@@ -18,13 +18,17 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     }
 
     int index = 0;
-    foreach(WidgetDisplay * dis, displays){
+    for (WidgetDisplay *dis : displays) {
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
         dis->configLabel(2,"Voltage",Graphics::COLOR_TEXT_LABEL,true);
         ui->verticalLayout_display->addWidget(dis);
         dis->setIndicationFlagColor(Graphics::getChannelColor(index));
-        dis->setProgressBarColor(Graphics::getChannelColor(index));
+        // Switch to vertical progress bar for voltmeter
+        dis->useVerticalProgressBar(true);        
+        dis->setProgressRange(0,100);
+        dis->setProgressValue(25);
+        dis->setProgressColor(Graphics::getChannelColor(index));
         dis->showLabel(4);
         dis->setTraceColor(Graphics::getChannelColor(index),0);
         index++;
@@ -139,10 +143,10 @@ void VoltmeterWindow::restoreGUIAfterStartup()
 void VoltmeterWindow::showData(ChannelData data[], int numChannels){
     for(int i = 0;i<numChannels;i++){
         displays.at(i)->displayString(displays.at(i)->formatNumber(data[i].voltage,'f',4));
-        displays.at(i)->updateProgressBar(data[i].percent);
         displays.at(i)->appendNewHistorySample("",data[i].voltage , "V", 1);
-
-
+        int pctInt = static_cast<int>(data[i].percent + 0.5);
+        if(pctInt < 0) pctInt = 0; else if(pctInt > 100) pctInt = 100;
+        displays.at(i)->setProgressValue(pctInt);     
         displays.at(i)->drawIndicationFlag(4);
 
         if(buttonsCalc->getSelectedIndex()==0){

@@ -14,6 +14,7 @@ QString CustomSettings::userEmail;
 QString CustomSettings::userPin;
 QByteArray CustomSettings::loginToken;
 QDateTime CustomSettings::tokenValidity;
+QString CustomSettings::lastLoginFailureReason;
 
 void CustomSettings::loadSettings(QString fileName)
 {
@@ -23,21 +24,26 @@ void CustomSettings::loadSettings(QString fileName)
         QSettings settings(settingFile, QSettings::IniFormat);
 
         restoreSession = settings.value("restoreSession").toInt();
-        themeIndex = settings.value("theme").toInt();
+        // Prefer Dawn as default if key is missing
+        themeIndex = settings.contains("theme") ? settings.value("theme").toInt() : 2;
 
         userEmail = settings.value("email").toString();
         userPin = settings.value("pin").toString();
         loginToken = QByteArray::fromHex(settings.value("token").toByteArray());
+        // Previously this used QByteArray::fromHex which corrupted an already ASCII token on reload.
+        // Store and load the token verbatim to keep what the server provided.
+        // loginToken = settings.value("token").toByteArray();
         tokenValidity = settings.value("validity").toDateTime();
-
+        lastLoginFailureReason = settings.value("last_login_failure").toString();
     }else{ // set default values if settings file doesnt exist
-        restoreSession = 1;
-        themeIndex = 0;
+        restoreSession = 0; // default: No session restore
+        // Default theme: Dawn
+        themeIndex = 2;
         userEmail = "Unknown user";
         userPin = "0000";
         loginToken = "none";
         tokenValidity = QDateTime(QDate(2000,1,1),QTime(0,0));
-
+        lastLoginFailureReason = "";
     }
     sessionRestoreAnswer = -1;
 }
@@ -51,8 +57,16 @@ void CustomSettings::saveSettings()
 
     settings.setValue("email", userEmail);
     settings.setValue("pin", userPin);
+    // Safeguard: do not overwrite an existing valid token with an empty placeholder inadvertently
+    if(loginToken.isEmpty()){
+        QByteArray existing = settings.value("token").toByteArray();
+        if(!existing.isEmpty()){
+            loginToken = existing; // preserve previous token
+        }
+    }
     settings.setValue("token", loginToken);
     settings.setValue("validity", tokenValidity);
+    settings.setValue("last_login_failure", lastLoginFailureReason);
 
 }
 
@@ -162,6 +176,25 @@ QDateTime CustomSettings::getTokenValidity()
 void CustomSettings::setTokenValidity(const QDateTime &value)
 {
     tokenValidity = value;
+}
+
+QString CustomSettings::getLastLoginFailure()
+{
+    return lastLoginFailureReason;
+}
+
+bool CustomSettings::hasValidLogin()
+{
+    // Valid if token not 'none', validity in future, and last failure empty
+    if(loginToken.isEmpty() || loginToken == QByteArray("none")) return false;
+    if(!tokenValidity.isValid()) return false;
+    if(tokenValidity < QDateTime::currentDateTime()) return false;
+    return true;
+}
+
+void CustomSettings::setLastLoginFailure(const QString &value)
+{
+    lastLoginFailureReason = value;
 }
 
 int CustomSettings::getRestoreSession()

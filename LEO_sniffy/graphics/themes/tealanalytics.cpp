@@ -1,0 +1,58 @@
+#include "tealanalytics.h"
+
+TealAnalytics::TealAnalytics(QObject *parent)
+{
+    Q_UNUSED(parent);
+
+    Graphics::COLOR_WINDOW_APP = TEAL_APP_BG;
+    Graphics::COLOR_WINDOW_WIDGET = TEAL_WIDGET_BG;
+
+    Graphics::COLOR_BACKGROUND_FOCUS_IN = TEAL_FOCUS_BG;
+    Graphics::COLOR_COMPONENT_DISABLED = TEAL_DISABLED;
+    Graphics::COLOR_BACKGROUND_BUTTON = TEAL_BTN_BG;
+    Graphics::COLOR_CONTROLS = TEAL_TEXT_MAIN;
+    Graphics::COLOR_DATA_INPUT_AREA = TEAL_INPUT_BG;
+    Graphics::COLOR_DISPLAY = TEAL_CHART_BG;
+    Graphics::COLOR_CHART = TEAL_CHART_BG;
+    Graphics::COLOR_CHART_GRIDLEG_DEFAULT = TEAL_GRID_DEF;
+    Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST = TEAL_GRID_LOW;
+    Graphics::COLOR_TEXT_ALL = TEAL_TEXT_MAIN;
+    Graphics::COLOR_TEXT_LABEL = TEAL_TEXT_LABEL;
+    Graphics::COLOR_TEXT_COMPONENT = TEAL_TEXT_COMP;
+    Graphics::COLOR_WINDOW_CONTROL_HOVER = TEAL_HOVER;
+    Graphics::COLOR_WINDOW_EXIT_HOVER = TEAL_EXIT_HOVER;
+    Graphics::COLOR_WARNING = TEAL_WARNING;
+    Graphics::COLOR_ERROR = TEAL_ERROR;
+    Graphics::COLOR_RUNNING = TEAL_RUNNING;
+    Graphics::COLOR_UNUSED = TEAL_DISABLED;
+
+    Graphics::STYLE_PUSH_BUTTON = TEAL_STYLE_PUSH_BUTTON;
+    Graphics::STYLE_CHECK_BUTTON = TEAL_STYLE_CHECK_BUTTON;
+    Graphics::STYLE_PROGRESS_BAR = TEAL_STYLE_PROGRESS_BAR;
+    Graphics::STYLE_COMBO_BOX = TEAL_STYLE_COMBO_BOX;
+    Graphics::STYLE_CONTROL_BUTTON = TEAL_STYLE_CONTROL_BUTTON;
+    Graphics::STYLE_MODULE_BUTTON = TEAL_STYLE_MODULE_BUTTON;
+    Graphics::STYLE_HOLD_BUTTON = TEAL_STYLE_HOLD_BUTTON;
+    Graphics::STYLE_DIAL = TEAL_STYLE_DIAL;
+    Graphics::STYLE_TEXTINPUT = TEAL_STYLE_TEXTINPUT;
+    Graphics::STYLE_DOCK_WIDGET = TEAL_STYLE_MODULE_DOCK_WIDGET;
+    Graphics::STYLE_DOCK_WINDOW = TEAL_STYLE_OBJECT;
+
+    Graphics::STYLE_CUSTOM_DIALS_USED = TEAL_STYLE_USE_CUSTOM_DIALS;
+    Graphics::STYLE_TRANSPARENCY_USED = TEAL_STYLE_USE_TRANSPARENCY;
+
+    QString accent = QString(TEAL_CYAN).remove("#");
+    Graphics::STYLE_GLOBAL = QString(TEAL_STYLE_GLOBAL).arg(accent);
+}
+
+QString TealAnalytics::getAppGlobalStyle(){
+    return Graphics::STYLE_GLOBAL;
+}
+
+QString TealAnalytics::getGraphicsPath(){
+    return TEAL_GRAPHICS_PATH;
+}
+
+QString TealAnalytics::getChannelColor(int channelIndex){
+    return chanColor.at(channelIndex).name();
+}

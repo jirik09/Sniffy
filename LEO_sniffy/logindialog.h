@@ -10,6 +10,7 @@
 #include <QCryptographicHash>
 #include <QNetworkAccessManager>
 #include <QtNetwork>
+#include <QTimer>
 
 #include "GUI/widgetbuttons.h"
 #include "GUI/widgetselection.h"
@@ -38,8 +39,25 @@ private:
     WidgetLabel *info;
 
     WidgetButtons *buttonsDone;
+    QNetworkAccessManager *networkManager {nullptr};
+    /*
+    "In-flight reply" refers to a response that has been requested but has not yet been received.
+    The request is currently "in-flight", and the reply is pending. Purpose:
+    - Timeout and retry logic: The system may wait for an in-flight reply, and if it doesn't arrive in time, it can retry.
+    - Asynchronous architectures: In GUI or async RPC calls, some replies may not have arrived yet, while the program continues execution.
+    */    
+    bool requestInFlight {false};
+    QNetworkReply *currentReply {nullptr};
+    QTimer timeoutTimer; // 15s timeout for login requests
+
+    // Helper methods to reduce duplication
+    void reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color = Graphics::COLOR_ERROR);
+    void startLoginNetworkRequest(const QString &email, const QString &pinHash);
+    void finalizeSuccess(const QDateTime &validity, const QByteArray &token);
+
 signals:
     void loginInfoChanged();
+    void loginFailed(const QString &message);
 
 private slots:
     void buttonAction(int isCanceled);

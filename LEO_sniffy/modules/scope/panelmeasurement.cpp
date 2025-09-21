@@ -205,7 +205,7 @@ void PanelMeasurement::clearClicked(){
 }
 
 void PanelMeasurement::setMeasButtonsColor(int index){
-    foreach(WidgetButtons* but, measButtons){
+    for (WidgetButtons* but : measButtons) {
         if(index==0)
             but->setColor(Graphics::getChannelColor(0),0);
         if(index==1)

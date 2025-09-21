@@ -22,8 +22,8 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     measLabelList.append(ui->label_meas8);
     measLabelList.append(ui->label_meas9);
 
-    foreach(QLabel *label, measLabelList){
-        label->hide();
+    for (QLabel *label : measLabelList) {
+        if(label) label->hide();
     }
 
     channLabelList.append(ui->label_ch1);
@@ -40,8 +40,8 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     ui->label_math1->setStyleSheet("color:"+Graphics::getChannelColor(4));
     ui->label_math2->setStyleSheet("color:"+Graphics::getChannelColor(5));
 
-    foreach(QLabel *label, channLabelList){
-        label->hide();
+    for (QLabel *label : channLabelList) {
+        if(label) label->hide();
     }
     this->setStyleSheet("QWidget{background-color:" + Graphics::COLOR_DATA_INPUT_AREA + ";}");
 
@@ -61,8 +61,8 @@ void WidgetLabelArea::setChannelLabelVisible(int channelIndex, bool isVisible){
 }
 
 void WidgetLabelArea::hideChannelLabels(){
-    foreach(QLabel *label, channLabelList){
-        label->hide();
+    for (QLabel *label : channLabelList) {
+        if(label) label->hide();
     }
 }
 
@@ -92,14 +92,15 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
 
     if(meas.length()==0){
         ui->widget_meas->hide();
-        foreach(QLabel *label, measLabelList){
-            label->hide();
+        for (QLabel *label : measLabelList) {
+            if(label) label->hide();
         }
     }else{
         ui->widget_meas->show();
     }
 
-    foreach(Measurement* m, meas){
+    for (Measurement* m : meas) {
+        if (fillIndex >= measLabelList.size()) break;
         measLabelList.at(fillIndex)->setText(m->getLabel()+" "+m->getValueString());
         measLabelList.at(fillIndex)->show();
         measLabelList.at(fillIndex)->setStyleSheet("color:"+Graphics::getChannelColor(m->getChannelIndex()));

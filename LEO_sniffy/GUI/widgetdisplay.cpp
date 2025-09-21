@@ -1,5 +1,6 @@
 #include "widgetdisplay.h"
 #include "ui_widgetdisplay.h"
+#include <QTimer>
 
 WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unitsStyleSheet,
                              bool showPrgrssBar, int historyTracesNum, int historySize,
@@ -18,8 +19,9 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     labelList.append(ui->label_3);
     labelList.append(ui->label_4);
 
-    foreach(QLabel* label, labelList)
+    for (QLabel* label : labelList) {
         label->hide();
+    }
 
     ui->label_0->setText(firstLabelText);
     ui->label_0->show();
@@ -81,7 +83,18 @@ WidgetDisplay::~WidgetDisplay()
 }
 
 QString WidgetDisplay::formatNumber(double val, char f, int prec){
-    return loc.toString(val, f, prec).replace(loc.decimalPoint(), '.');
+    // Normalize decimal separator to '.' regardless of locale.
+    QString str = loc.toString(val, f, prec);
+    const QString decimalStr = loc.decimalPoint();
+    if (!decimalStr.isEmpty() && decimalStr != QStringLiteral(".")) {
+        // If decimalStr has length 1 we can safely use QChar overload for speed.
+        if (decimalStr.size() == 1) {
+            str.replace(decimalStr.at(0), QLatin1Char('.'));
+        } else {
+            str.replace(decimalStr, QStringLiteral("."));
+        }
+    }
+    return str;
 }
 
 void WidgetDisplay::hideHistoryChartArea(){
@@ -114,7 +127,7 @@ void WidgetDisplay::setTerrStyle(QString &terrStyleSheet){
 }
 
 void WidgetDisplay::setBarStyle(QString &barStyleSheet){
-    ui->progressBar->setStyleSheet(barStyleSheet);
+    ui->progressBar_horizontal->setStyleSheet(barStyleSheet);
 }
 
 void WidgetDisplay::showQerrStyle(bool visible){
@@ -139,7 +152,7 @@ void WidgetDisplay::showErrDisplay(bool visible){
 }
 
 void WidgetDisplay::showBarDisplay(bool visible){
-    (visible) ? ui->horizontalWidget_bar->show() : ui->horizontalWidget_bar->hide();
+    (visible) ? ui->horizontalWidget_horizontal_bar->show() : ui->horizontalWidget_horizontal_bar->hide();
 }
 
 void WidgetDisplay::displayNumber(double number){
@@ -179,25 +192,141 @@ void WidgetDisplay::changeAvgColor(QColor color){
     ui->lcdNumber_avg->setPalette(palette);
 }
 
+/* ================= HORIZONTAL PROGRESS BAR ================= */
 void WidgetDisplay::showProgressBar(bool visible){
-    (visible) ? ui->progressBar->show() : ui->progressBar->hide();
+    (visible) ? ui->progressBar_horizontal->show() : ui->progressBar_horizontal->hide();
 }
 
-void WidgetDisplay::setProgressBarRange(int min, int max){
-    ui->progressBar->setRange(min, max);
+// removed legacy per-orientation setters; see unified API below
+
+/* ================= VERTICAL PROGRESS BAR ================= */
+// removed legacy per-orientation setters; see unified API below
+
+void WidgetDisplay::useVerticalProgressBar(bool enabled){
+    verticalMode = enabled;
+    if(enabled){
+        showProgressBar(false);
+        ui->horizontalWidget_horizontal_bar->hide();
+        ui->horizontalWidget_vertical_bar->show();
+        if(!simpleVBar){
+            simpleVBar = new SimpleVProgressBar(ui->horizontalWidget_vertical_bar);
+            ui->progressBar_vertical->hide();
+            ui->horizontalLayout_verticalBar->addWidget(simpleVBar);
+            simpleVBar->setRange(0,100);
+            // Theme-based colors: background same as widget, subtle frame, bar color set later via setProgressColor
+            simpleVBar->setBackgroundColor(QColor(Graphics::COLOR_DISPLAY));
+            simpleVBar->setFrameColor(QColor(60,60,60));
+            ui->horizontalLayout_verticalBar->setContentsMargins(0,0,0,0);
+            simpleVBar->setContentsMargins(0,0,0,0);
+            simpleVBar->setMaximumWidth(25); // leave space if layout draws padding so right border stays visible
+        }
+        simpleVBar->show();
+        // Ensure new vertical bar frame color matches lcdNumber color
+        syncProgressBorderToNumber();
+    }else{
+        ui->horizontalWidget_vertical_bar->hide();
+        ui->horizontalWidget_horizontal_bar->show();
+        showProgressBar(true);
+        // Ensure horizontal border is synced after switch
+        syncProgressBorderToNumber();
+    }
 }
 
-void WidgetDisplay::setProgressBarColor(QString color){
+/* ================= Unified Progress Bar API ================= */
+void WidgetDisplay::setProgressValue(int value){
+    if(verticalMode){
+        if(simpleVBar){
+            int clamped = qBound(simpleVBar->minimum(), value, simpleVBar->maximum());
+            simpleVBar->setValue(clamped);
+        }else{
+            int clamped = qBound(ui->progressBar_vertical->minimum(), value, ui->progressBar_vertical->maximum());
+            ui->progressBar_vertical->setValue(clamped);
+        }
+    }else{
+        int clamped = qBound(ui->progressBar_horizontal->minimum(), value, ui->progressBar_horizontal->maximum());
+        ui->progressBar_horizontal->setValue(clamped);
+    }
+}
+
+void WidgetDisplay::setProgressRange(int min, int max){
+    if(verticalMode){
+        if(simpleVBar) simpleVBar->setRange(min,max); else ui->progressBar_vertical->setRange(min,max);
+    }else{
+        ui->progressBar_horizontal->setRange(min,max);
+    }
+}
+
+void WidgetDisplay::setProgressColor(QString color){
     if(Graphics::STYLE_TRANSPARENCY_USED)
         color = color.remove("#");
-    ui->progressBar->setStyleSheet(QString(Graphics::STYLE_PROGRESS_BAR).arg(color));
-    ui->progressBar->repaint();
+    if(verticalMode){
+        if(simpleVBar){
+            QColor c(color.left(1) == "#" ? color : ("#"+color));
+            simpleVBar->setColor(c);
+        }else{
+            // Minimal styling for fallback native vertical (rarely used now)
+            QString base = QString("QProgressBar:vertical{background:#222;border:1px solid #444;}"
+                                   "QProgressBar::chunk:vertical{background:%1;margin:0;}").arg(color);
+            ui->progressBar_vertical->setStyleSheet(base);
+        }
+    }else{
+        QString base = QString(Graphics::STYLE_PROGRESS_BAR).arg(color);
+        base.replace("width: 20px;", "");
+        // Simple substring search: find "border:1px solid" then up to next semicolon.
+        int idx = base.indexOf("border:1px solid");
+        if(idx >= 0){
+            int semi = base.indexOf(';', idx);
+            if(semi > idx){
+                // Replace that segment with uniform border color
+                QString replacement = QString("border:1px solid #%1").arg(QString(color).remove("#"));
+                base.replace(idx, semi - idx, replacement);
+            }
+        }
+        ui->progressBar_horizontal->setStyleSheet(base);
+    }
+    // Sync frame/border to lcdNumber text color
+    syncProgressBorderToNumber();
 }
 
-void WidgetDisplay::updateProgressBar(int value){
-    ui->progressBar->setValue(value);
-    ui->progressBar->repaint();
+QColor WidgetDisplay::currentLcdColor() const {
+    return ui->lcdNumber->palette().color(QPalette::WindowText);
 }
+
+void WidgetDisplay::syncProgressBorderToNumber(){
+    QColor lcdCol = currentLcdColor();
+    QString lcdHex = lcdCol.name(QColor::HexRgb); // #RRGGBB
+    if(verticalMode){
+        if(simpleVBar){
+            simpleVBar->setFrameColor(lcdCol);
+        }else{
+            QString style = ui->progressBar_vertical->styleSheet();
+            int idx = style.indexOf("border:1px solid");
+            if(idx >= 0){
+                int semi = style.indexOf(';', idx);
+                if(semi > idx){
+                    QString replacement = QString("border:1px solid %1").arg(lcdHex);
+                    style.replace(idx, semi-idx, replacement);
+                    ui->progressBar_vertical->setStyleSheet(style);
+                }
+            }
+        }
+    }else{
+        QString style = ui->progressBar_horizontal->styleSheet();
+        int idx = style.indexOf("border:1px solid");
+        if(idx >= 0){
+            int semi = style.indexOf(';', idx);
+            if(semi > idx){
+                QString replacement = QString("border:1px solid %1").arg(lcdHex);
+                style.replace(idx, semi-idx, replacement);
+                ui->progressBar_horizontal->setStyleSheet(style);
+            }
+        }
+        if(simpleVBar){ // Keep custom vertical bar consistent even if currently hidden
+            simpleVBar->setFrameColor(lcdCol);
+        }
+    }
+}
+
 
 void WidgetDisplay::configLabel(int labelNumber, QString text, QString colorStyle, bool isVisible){
     labelList.at(labelNumber)->setText(text);

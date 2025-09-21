@@ -1,10 +1,10 @@
 #include "widgetcustomplot.h"
 #include "ui_widgetcustomplot.h"
 
-WidgetCustomPlot::WidgetCustomPlot(QWidget *parent, int maxTraces) :
+WidgetCustomPlot::WidgetCustomPlot(QWidget *parent, int traceCapacity) :
     QWidget(parent),
     ui(new Ui::WidgetCustomPlot),
-    maxTraces(maxTraces)
+    maxTraces(traceCapacity)
 {
     ui->setupUi(this);
     setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);

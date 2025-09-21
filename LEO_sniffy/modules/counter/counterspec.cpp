@@ -1,4 +1,5 @@
 #include "counterspec.h"
+#include "modules/specutils.h"
 
 CounterSpec::CounterSpec(QObject *parent)
 {
@@ -10,12 +11,7 @@ void CounterSpec::parseSpecification(QByteArray spec){
     stream >> hf_min_Tg5s >> hf_min_Tg10s >> lf_max >> lf_min;
     stream >> rat_max_ref >> rat_max_chan;
 
-    char chars[4] = "";
-    for(int i = 0; i < pinsList.size(); i++){
-        stream.readRawData(chars, 4);
-        pinsList[i] = QString(chars);
-        pinsList[i].remove('_');
-    }
+    SpecParsing::readPins4(stream, pinsList.size(), [&](int i, const QString &pin){ pinsList[i] = pin; });
 
     pins.hf_ch1 = pinsList.at(0);
     pins.lf_ch1 = pinsList.at(1);

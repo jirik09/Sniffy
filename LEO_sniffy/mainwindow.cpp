@@ -54,27 +54,38 @@ void MainWindow::createModulesWidgets(){
     QString moduleName;
 
     int listSize = modulesList.size();
-    WidgetControlModule *WidgetModule[listSize];
-    ModuleDockWidget *dockWidget[listSize];
+    std::vector<WidgetControlModule*> widgetModules;
+    std::vector<ModuleDockWidget*> dockWidgets;
+    widgetModules.resize(listSize, nullptr);
+    dockWidgets.resize(listSize, nullptr);
 
     int index;
-    foreach(module, modulesList){
+    for (const QSharedPointer<AbstractModule>& module : modulesList) {
         index = modulesList.indexOf(module);
         moduleName = module->getModuleName();
+        if(index == 0 && moduleName == "Device"){
+            deviceModule = module;
+            // When device name changes after handshake (e.g., to NUCLEO-..), re-apply compact hiding if left menu is narrow
+            connect(module.data(), &AbstractModule::moduleNameChanged, this, [this](const QString &){
+                if (isLeftMenuNarrow) {
+                    updateLeftMenuCompact(true);
+                }
+            });
+        }
 
-        WidgetModule[index] = new WidgetControlModule(ui->centralwidget, moduleName);
-        ui->verticalLayout_modules->addWidget(WidgetModule[index]);
-        WidgetModule[index]->setStatus(ModuleStatus::STOP);        
-        WidgetModule[index]->hide();
+    widgetModules[index] = new WidgetControlModule(ui->centralwidget, moduleName);
+    ui->verticalLayout_modules->addWidget(widgetModules[index]);
+    widgetModules[index]->setStatus(ModuleStatus::STOP);
+    widgetModules[index]->hide();
 
-        dockWidget[index] = new ModuleDockWidget(this, moduleName);
+    dockWidgets[index] = new ModuleDockWidget(this, moduleName);
 
-        module->setDockWidgetWindow(dockWidget[index]);
-        module->setModuleControlWidget(WidgetModule[index]);
+    module->setDockWidgetWindow(dockWidgets[index]);
+    module->setModuleControlWidget(widgetModules[index]);
 
-        dockWidget[index]->setWidget(module->getWidget());
+    dockWidgets[index]->setWidget(module->getWidget());
 
-        addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidget[index]);
+    addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgets[index]);
         connect(module.data(),&AbstractModule::loadModuleLayoutAndConfig,this,&MainWindow::loadModuleLayoutAndConfigCallback);
     }
 
@@ -136,6 +147,8 @@ void MainWindow::setMenuWide(){
     ui->centralwidget->setMinimumSize(250,200);
     ui->centralwidget->setMaximumSize(250,20000);
     isLeftMenuNarrow = false;
+    updateLeftMenuCompact(false);
+    if (loginInfo) loginInfo->setCompact(false);
 }
 
 void MainWindow::recoverLeftMenu(bool isWide)
@@ -148,6 +161,8 @@ void MainWindow::setMenuNarrow(){
     ui->centralwidget->setMinimumSize(90,200);
     ui->centralwidget->setMaximumSize(90,20000);
     isLeftMenuNarrow = true;
+    updateLeftMenuCompact(true);
+    if (loginInfo) loginInfo->setCompact(true);
 }
 
 
@@ -166,21 +181,24 @@ void MainWindow::closeEvent (QCloseEvent *event)
 void MainWindow::saveLayout()
 {
     if(deviceMediator->getIsConnected()){
+        // Prevent creating ".cfg" / ".lay" with empty device name
+        const QString devName = deviceMediator->getDeviceName();
+        if(devName.isEmpty()) return;
         if(!CustomSettings::askToSaveSession())return;
         QSharedPointer<AbstractModule> module;
-        layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
-        configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
+        layoutFile = QApplication::applicationDirPath() + "/sessions/"+devName+".lay";
+        configFile = QApplication::applicationDirPath() + "/sessions/"+devName+".cfg";
 
         QSettings layout(layoutFile, QSettings::IniFormat);
         layout.setValue("geometry", saveGeometry());
         layout.setValue("windowState", saveState());
 
-        foreach(module, modulesList){
+        for (const QSharedPointer<AbstractModule>& module : modulesList) {
             module->saveGeometry(layout);
         }
 
         QSettings settings(configFile, QSettings::IniFormat);
-        foreach(module, modulesList){
+        for (const QSharedPointer<AbstractModule>& module : modulesList) {
             settings.setValue(module->getModuleName()+"config",module->getConfiguration());
             settings.setValue(module->getModuleName()+"status",(int)(module->getModuleStatus()));
         }
@@ -189,9 +207,26 @@ void MainWindow::saveLayout()
     }
 }
 
+void MainWindow::updateLeftMenuCompact(bool compact)
+{
+    // Only the Device label is shown beside icon; in narrow mode hide it, show in wide mode
+    if (deviceModule && deviceModule->getModuleControlWidget()){
+        if (compact) deviceModule->getModuleControlWidget()->setName("");
+        else deviceModule->getModuleControlWidget()->setName(deviceModule->getModuleName());
+    }
+    // Update login info: relies on its own layout; refreshing will keep texts, but the UI spec requires hiding text in narrow mode
+    if (loginInfo){
+        // A simple approach: when compact, set both labels to empty via the updateInfo path isn’t accessible.
+        // We can emit a fake state by temporarily overriding CustomSettings email; avoid that.
+        // Minimal: do nothing; if needed we can extend WidgetLoginInfo with a compact mode API.
+        loginInfo->updateInfo();
+    }
+}
+
 void MainWindow::loadLayout(QString deviceName)
 {
     if(!CustomSettings::isSessionRestoreRequest())return;
+    if(deviceName.isEmpty()) return;
 
     layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".lay";
     configFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".cfg";
@@ -215,8 +250,10 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
 
     QString layoutFile;
     QString configFile;
-    layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".lay";
-    configFile = QApplication::applicationDirPath() + "/sessions/"+deviceMediator->getDeviceName()+".cfg";
+    const QString devName = deviceMediator->getDeviceName();
+    if(devName.isEmpty()) return;
+    layoutFile = QApplication::applicationDirPath() + "/sessions/"+devName+".lay";
+    configFile = QApplication::applicationDirPath() + "/sessions/"+devName+".cfg";
     QSharedPointer<AbstractModule> module;
 
     QFile file(layoutFile);
@@ -229,7 +266,7 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
     ModuleStatus status;
     QByteArray config;
 
-    foreach(module, modulesList){
+    for (const QSharedPointer<AbstractModule>& module : modulesList) {
         if(module->getModuleName()==moduleName){
             if(!module->isModuleRestored()){
                 status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();

@@ -6,26 +6,26 @@ Comment: similar to button widget set to 2 buttons, radio and on off text. Diffe
 #include "widgetswitch.h"
 #include "ui_widgetswitch.h"
 
-WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftName, QString rightName, QString name, int optionalEmitParam) :
+WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftLabel, QString rightLabel, QString switchName, int optionalEmitParam) :
     QWidget(parent),
     ui(new Ui::WidgetSwitch),
     optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
 
-    if(name != ""){
-        ui->label_name->setText(name);
+    if(switchName != ""){
+        ui->label_name->setText(switchName);
     }else{
         ui->label_name->hide();
     }
-    setObjectName(name);
+    setObjectName(switchName);
 
     ui->pushButton_left->setCheckable(true);
     ui->pushButton_right->setCheckable(true);
     setLeft(true);
 
-    ui->pushButton_left->setText(leftName);
-    ui->pushButton_right->setText(rightName);
+    ui->pushButton_left->setText(leftLabel);
+    ui->pushButton_right->setText(rightLabel);
 
     setColor(Graphics::getChannelColor(0));
 

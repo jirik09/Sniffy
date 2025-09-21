@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QString>
 #include <QLocale>
+#include <QDebug>
 
 #include <QtCharts/QXYSeries>
 #include <QtCharts/QSplineSeries>
@@ -20,6 +21,7 @@
 #include "GUI/widgetchart.h"
 #include "GUI/widgetlist.h"
 #include "GUI/widgetdialrange.h"
+#include "GUI/simplevprogressbar.h"
 
 #include "math/timing.h"
 #include "../graphics/graphics.h"
@@ -82,9 +84,15 @@ public:
 
     /* Progress bar */
     void showProgressBar(bool visible);
-    void setProgressBarRange(int min, int max);
-    void updateProgressBar(int value);
-    void setProgressBarColor(QString color);
+    // Convenience: switch to vertical bar (hide horizontal) or vice versa
+    void useVerticalProgressBar(bool enabled);
+    
+    // Unified API (preferred): orientation automatically selected by current mode
+    void setProgressValue(int value);          // replaces updateProgressBar*()
+    void setProgressRange(int min, int max);   // replaces setProgressBar*Range()
+    void setProgressColor(QString color);      // replaces setProgressBar*Color()
+    void syncProgressBorderToNumber();         // sync progress bar border/frame to lcdNumber text color
+    QColor currentLcdColor() const;            // helper to obtain lcdNumber text color
 
     /* History area */
     void setHistorySize(int smplNumber);
@@ -92,6 +100,7 @@ public:
     void associateSample(int traceIndex, QString prefix, double sample, QString affix);
     void updateHistoryData(QVector<QPointF> *points, int index);
     void setTraceColor(QString color, int index);
+
 
 private:
     QLocale loc;
@@ -121,6 +130,9 @@ private:
 
     /* indication colors */
     QString cFull, cTran1, cTran2, cBlank;
+
+    bool verticalMode = false;                // explicit orientation state
+    SimpleVProgressBar *simpleVBar = nullptr; // custom vertical painter
 
     void hideHistoryChartArea();        
 
@@ -159,5 +171,8 @@ private slots:
     void changeHistorySizeTo1000();
 
 };
+
+// NOTE: Horizontal/vertical specific progress bar setters and updaters were removed
+// in favor of the unified setProgress* API.
 
 #endif // WIDGETDISPLAY_H

@@ -1,4 +1,6 @@
 #include "scopeconfig.h"
+#include <QDataStream>
+#include <QIODevice>
 
 ScopeConfig::ScopeConfig(QObject *parent)
 {
@@ -72,9 +74,8 @@ void ScopeConfig::parse(QByteArray config)
 
 QByteArray ScopeConfig::serialize()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocated avoids leak
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     stream << realSamplingRate;// = 1000;
     stream << ADCresolution;// = 12;
@@ -126,8 +127,8 @@ QByteArray ScopeConfig::serialize()
     }
 
 
- //   qDebug() << "Cofig from scope is being serialized "+*data;
-    return *data;
+ //   qDebug() << "Cofig from scope is being serialized "+data;
+     return data;
 
 }
 

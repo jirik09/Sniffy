@@ -1,4 +1,6 @@
 #include "syncpwmconfig.h"
+#include <QDataStream>
+#include <QIODevice>
 
 SyncPwmConfig::SyncPwmConfig(QObject *parent)
 {
@@ -39,9 +41,8 @@ void SyncPwmConfig::parse(QByteArray config)
 
 QByteArray SyncPwmConfig::serialize()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocated
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     SyncPwmConfig::state = State::STOPPED;
     stream << layout << state << common.stepMode << common.equiMode;
@@ -54,5 +55,5 @@ QByteArray SyncPwmConfig::serialize()
         stream << SyncPwmConfig::chan[i].phase;
     }
 
-    return *data;
+    return data;
 }

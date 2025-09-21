@@ -27,6 +27,8 @@ private:
 
 public slots:
     void updateInfo();
+    // Toggle compact mode (hide texts when true)
+    void setCompact(bool compact);
 
 private slots:
     void loginCallback();

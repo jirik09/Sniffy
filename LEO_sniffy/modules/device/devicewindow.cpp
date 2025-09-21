@@ -1,5 +1,7 @@
 #include "devicewindow.h"
 #include "ui_devicewindow.h"
+#include <QEvent>
+#include <QMouseEvent>
 
 DeviceWindow::DeviceWindow(QWidget *parent) :
     QWidget(parent),
@@ -51,6 +53,7 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
     // *************************** end adding widgets to specification area *************************
 
     hideSpecification();
+    ui->widget_device->installEventFilter(this);
 }
 
 DeviceWindow::~DeviceWindow()
@@ -60,13 +63,11 @@ DeviceWindow::~DeviceWindow()
 
 void DeviceWindow::showSpecification(DeviceSpec *spec){
     //qDebug() << "update specification got to GUI";
-    QString devicePreviewImage = Graphics::getGraphicsPath()+spec->device+".png";
-
-    if(QFileInfo::exists(devicePreviewImage)){
-        ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+spec->device+".png);");
-    }else{
-        ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"unknown_device.png);");
-    }
+    const QString baseName = spec->device; // e.g. Nucleo-F303RE
+    const QString boardImg = Graphics::getBoardImage(baseName);
+    ui->widget_device->setStyleSheet("image: url(" + boardImg + ");");
+    currentDeviceBaseImage = baseName;
+    showingPinout = false;
 
     QList<WidgetDesciptionExpand *>::iterator it;
     for (it = modulesDescriptions->begin(); it != modulesDescriptions->end(); ++it){
@@ -111,6 +112,27 @@ void DeviceWindow::clearModuleDescriptions()
     verticalLayoutSpecification->addItem(verticalSpacer);
 
     modulesDescriptions->clear();
+}
+
+bool DeviceWindow::eventFilter(QObject *watched, QEvent *event){
+    if(watched == ui->widget_device && event->type() == QEvent::MouseButtonRelease){
+        auto *me = static_cast<QMouseEvent*>(event);
+        if(me->button() == Qt::LeftButton && !currentDeviceBaseImage.isEmpty()){
+            const QString pinoutPath = Graphics::getBoardPinoutImage(currentDeviceBaseImage);
+            if(!pinoutPath.isEmpty()){
+                if(!showingPinout){
+                    ui->widget_device->setStyleSheet("image: url(" + pinoutPath + ");");
+                    showingPinout = true;
+                } else {
+                    const QString normalPath = Graphics::getBoardImage(currentDeviceBaseImage);
+                    ui->widget_device->setStyleSheet("image: url(" + normalPath + ");");
+                    showingPinout = false;
+                }
+                return true;
+            }
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 

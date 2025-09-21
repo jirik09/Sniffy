@@ -10,6 +10,10 @@
 #include "graphics/themes/dark.h"
 #include "graphics/themes/light.h"
 #include "graphics/themes/dawn.h"
+#include "graphics/themes/aurora.h"
+#include "graphics/themes/neomorph.h"
+#include "graphics/themes/tealanalytics.h"
+#include "graphics/themes/hudcyan.h"
 #include "graphics/abstracttheme.h"
 
 class Graphics : public QObject
@@ -18,6 +22,10 @@ class Graphics : public QObject
 
 public:
     static QString getGraphicsPath();
+    // Returns full path (resource or filesystem path) to board base image if exists, else unknown_device.png
+    static QString getBoardImage(const QString &boardBaseName);
+    // Returns pinout image path if available for current theme, otherwise empty QString
+    static QString getBoardPinoutImage(const QString &boardBaseName);
     static QString getChannelColor(int channelIndex);
 
     static QList<QString> *initThemesList();
