@@ -11,7 +11,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Login");
 
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
+    setStyleSheet("QWidget{background-color:"+Graphics::palette().windowWidget+";}");
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing(2);
@@ -35,7 +35,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
         "QLabel { color:%1; } "
         "a { color:%2; text-decoration:none; } "
         "a:hover { text-decoration:underline; }")
-        .arg(Graphics::COLOR_TEXT_LABEL, Graphics::COLOR_TEXT_LABEL));
+        .arg(Graphics::palette().textLabel, Graphics::palette().textLabel));
     registerLink->setText(
         "First time here? Register at "
         "<a href=\"https://www.sniffy.cz\" target=\"_blank\">www.sniffy.cz</a>");
@@ -73,7 +73,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
         CustomSettings::setLastLoginFailure("timeout");
         CustomSettings::saveSettings();
         info->setName("Login timeout");
-        info->setColor(Graphics::COLOR_ERROR);
+    info->setColor(Graphics::palette().error);
         currentReply->abort();
         requestInFlight = false;
         buttonsDone->setEnabled(true);
@@ -114,7 +114,7 @@ void LoginDialog::startLoginNetworkRequest(const QString &email, const QString &
     req.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
     info->setName("Verifying...");
-    info->setColor(Graphics::COLOR_TEXT_LABEL);
+    info->setColor(Graphics::palette().textLabel);
     requestInFlight = true;
     buttonsDone->setEnabled(false);
     qInfo() << "[Login] Sending request for" << email;
@@ -130,7 +130,7 @@ void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &t
     CustomSettings::saveSettings();
 
     info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy hh:mm"));
-    info->setColor(Graphics::COLOR_TEXT_ALL);
+    info->setColor(Graphics::palette().textAll);
     emit loginInfoChanged();
     qInfo() << "[Login] Success valid till" << CustomSettings::getTokenValidity();
     close();
@@ -139,7 +139,7 @@ void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &t
 void LoginDialog::open()
 {
     //  infoLabel->setValue("");
-    //  infoLabel->setColor(Graphics::COLOR_TEXT_ALL);
+    //  (legacy) infoLabel color line removed after palette migration
     this->show();
     this->raise();
     this->activateWindow();
@@ -204,7 +204,7 @@ void LoginDialog::replyFinished(QNetworkReply *pReply)
     pReply->deleteLater();
 
     if(data == "Expired"){
-        reportFailure("Token expired – login on www.sniffy.cz","expired", Graphics::COLOR_WARNING);
+    reportFailure("Token expired – login on www.sniffy.cz","expired", Graphics::palette().warning);
         qInfo() << "[Login] Token expired";
         return;
     }else if(data == "wrongPin"){

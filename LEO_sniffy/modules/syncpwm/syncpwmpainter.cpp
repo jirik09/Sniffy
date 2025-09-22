@@ -87,7 +87,7 @@ void SyncPwmPainter::enableChannel(bool enable, int chanIndex){
     if(enable)
         chart->setTraceColor(chanIndex, Graphics::getChannelColor(chanIndex));
     else
-        chart->setTraceColor(chanIndex, QColor(Graphics::COLOR_COMPONENT_DISABLED));
+        chart->setTraceColor(chanIndex, QColor(Graphics::palette().componentDisabled));
 
     repaint();
 }

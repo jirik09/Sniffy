@@ -20,8 +20,9 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
     ui(new Ui::WidgetDialRange)
 {
     ui->setupUi(this);
-    setStyleSheet(Graphics::STYLE_DIAL);
-    ui->comboBox->setStyleSheet(Graphics::STYLE_COMBO_BOX);
+    const auto &p = Graphics::palette();
+    setStyleSheet(p.styleDial);
+    ui->comboBox->setStyleSheet(p.styleComboBox);
 
     //    QString style = "QPushButton:pressed{border: 2px solid rgb(48,48,48);}"
     //                    "QPushButton{border: none;color: rgb(214,214,214);"
@@ -31,11 +32,11 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
     ui->label_name->setText(name);
     setObjectName(name);
     // units list now value-based (no heap allocation)
-    ui->dial->setCustomGraphics(Graphics::STYLE_CUSTOM_DIALS_USED);
+    ui->dial->setCustomGraphics(Graphics::palette().styleCustomDialsUsed);
 
    // this->setMinimumSize(170,85);
   // this->setMaximumSize(400,120);
-    setColor(Graphics::COLOR_CONTROLS);
+    setColor(Graphics::palette().controls);
 }
 
 WidgetDialRange::~WidgetDialRange()
@@ -92,7 +93,7 @@ void WidgetDialRange::restoreGeometry(QByteArray geom)
 }
 
 void WidgetDialRange::setColor(QString color){
-    ui->widget_dial->setStyleSheet(StyleHelper::dialWithTextColor(Graphics::STYLE_DIAL, color));
+    ui->widget_dial->setStyleSheet(StyleHelper::dialWithTextColor(Graphics::palette().styleDial, color));
     ui->pushButton_plus->setStyleSheet(StyleHelper::pushButton(color));
     ui->pushButton_minus->setStyleSheet(StyleHelper::pushButton(color));
 }
@@ -108,7 +109,7 @@ float WidgetDialRange::getRealValue() const
 
 void WidgetDialRange::disable(bool disable){
     this->setDisabled(disable);
-    ui->label_addition->setStyleSheet("QLabel{color: "+Graphics::COLOR_COMPONENT_DISABLED+";}");
+    ui->label_addition->setStyleSheet("QLabel{color: "+Graphics::palette().componentDisabled+";}");
 }
 
 void WidgetDialRange::setNumOfDecimals(int value)

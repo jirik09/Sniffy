@@ -85,7 +85,7 @@ bool WidgetSwitch::isCheckedRight(){
 
 void WidgetSwitch::setColor(QString color)
 {
-    if(Graphics::STYLE_TRANSPARENCY_USED)
+    if(Graphics::palette().styleTransparencyUsed)
         color = color.remove("#");
 
     styleSelected = StyleHelper::switchSelected(color);

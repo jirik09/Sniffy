@@ -1,58 +1,14 @@
 #include "aurora.h"
+#include "../graphics.h" // ThemePalette definition
 
-Aurora::Aurora(QObject *parent)
-{
-    Q_UNUSED(parent);
-
-    Graphics::COLOR_WINDOW_APP = AURORA_WINDOW_APP;
-    Graphics::COLOR_WINDOW_WIDGET = AURORA_WINDOW_WIDGET;
-
-    Graphics::COLOR_BACKGROUND_FOCUS_IN = AURORA_BACKGROUND_FOCUS_IN;
-    Graphics::COLOR_COMPONENT_DISABLED = AURORA_COMPONENT_DISABLED;
-    Graphics::COLOR_BACKGROUND_BUTTON = AURORA_BACKGROUND_BUTTON;
-    Graphics::COLOR_CONTROLS = AURORA_CONTROLS;
-    Graphics::COLOR_DATA_INPUT_AREA = AURORA_DATA_INPUT_AREA;
-    Graphics::COLOR_DISPLAY = AURORA_DISPLAY;
-    Graphics::COLOR_CHART = AURORA_CHART;
-    Graphics::COLOR_CHART_GRIDLEG_DEFAULT = AURORA_CHART_GRIDLEG_DEFAULT;
-    Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST = AURORA_CHART_GRIDLEG_LOW_CONTRAST;
-    Graphics::COLOR_TEXT_ALL = AURORA_TEXT_ALL;
-    Graphics::COLOR_TEXT_LABEL = AURORA_TEXT_LABEL;
-    Graphics::COLOR_TEXT_COMPONENT = AURORA_TEXT_COMPONENT;
-    Graphics::COLOR_WINDOW_CONTROL_HOVER = AURORA_WINDOW_CONTROL_HOVER;
-    Graphics::COLOR_WINDOW_EXIT_HOVER = AURORA_WINDOW_EXIT_HOVER;
-    Graphics::COLOR_WARNING = AURORA_WARNING;
-    Graphics::COLOR_ERROR = AURORA_ERROR;
-    Graphics::COLOR_RUNNING = AURORA_RUNNING;
-    Graphics::COLOR_UNUSED = AURORA_UNUSED;
-
-    /* These called with QString().arg() from code (must have %1) */
-    Graphics::STYLE_PUSH_BUTTON = AURORA_STYLE_PUSH_BUTTON;
-    Graphics::STYLE_CHECK_BUTTON = AURORA_STYLE_CHECK_BUTTON;
-    Graphics::STYLE_PROGRESS_BAR = AURORA_STYLE_PROGRESS_BAR;
-
-    Graphics::STYLE_COMBO_BOX = AURORA_STYLE_COMBO_BOX;
-    Graphics::STYLE_CONTROL_BUTTON = AURORA_STYLE_CONTROL_BUTTON;
-    Graphics::STYLE_MODULE_BUTTON = AURORA_STYLE_MODULE_BUTTON;
-    Graphics::STYLE_HOLD_BUTTON = AURORA_STYLE_HOLD_BUTTON;
-    Graphics::STYLE_DIAL = AURORA_STYLE_DIAL;
-    Graphics::STYLE_TEXTINPUT = AURORA_STYLE_TEXTINPUT;
-    Graphics::STYLE_DOCK_WIDGET = AURORA_STYLE_MODULE_DOCK_WIDGET;
-    Graphics::STYLE_DOCK_WINDOW = AURORA_STYLE_OBJECT;
-
-    Graphics::STYLE_CUSTOM_DIALS_USED = AURORA_STYLE_USE_CUSTOM_DIALS;
-    Graphics::STYLE_TRANSPARENCY_USED = AURORA_STYLE_USE_TRANSPARENCY;
-
-    if(AURORA_STYLE_USE_TRANSPARENCY){
-        QString color = QString(AURORA_CONTROLS).remove("#");
-        Graphics::STYLE_GLOBAL = QString(AURORA_STYLE_GLOBAL).arg(color);
-    }else{
-        Graphics::STYLE_GLOBAL = QString(AURORA_STYLE_GLOBAL).arg(AURORA_CONTROLS);
-    }
-}
+Aurora::Aurora(QObject *parent){ Q_UNUSED(parent); }
 
 QString Aurora::getAppGlobalStyle(){
-    return Graphics::STYLE_GLOBAL;
+    if(AURORA_STYLE_USE_TRANSPARENCY){
+        QString color = QString(AURORA_CONTROLS).remove("#");
+        return QString(AURORA_STYLE_GLOBAL).arg(color);
+    }
+    return QString(AURORA_STYLE_GLOBAL).arg(AURORA_CONTROLS);
 }
 
 QString Aurora::getGraphicsPath(){
@@ -61,4 +17,48 @@ QString Aurora::getGraphicsPath(){
 
 QString Aurora::getChannelColor(int channelIndex){
     return chanColor.at(channelIndex).name();
+}
+
+ThemePalette Aurora::buildPalette(){
+    ThemePalette p;
+    p.windowApp = AURORA_WINDOW_APP;
+    p.windowWidget = AURORA_WINDOW_WIDGET;
+    p.backgroundFocusIn = AURORA_BACKGROUND_FOCUS_IN;
+    p.componentDisabled = AURORA_COMPONENT_DISABLED;
+    p.backgroundButton = AURORA_BACKGROUND_BUTTON;
+    p.dataInputArea = AURORA_DATA_INPUT_AREA;
+    p.controls = AURORA_CONTROLS;
+    p.display = AURORA_DISPLAY;
+    p.chart = AURORA_CHART;
+    p.chartGridlegDefault = AURORA_CHART_GRIDLEG_DEFAULT;
+    p.chartGridlegLowContrast = AURORA_CHART_GRIDLEG_LOW_CONTRAST;
+    p.textAll = AURORA_TEXT_ALL;
+    p.textLabel = AURORA_TEXT_LABEL;
+    p.textComponent = AURORA_TEXT_COMPONENT;
+    p.windowControlHover = AURORA_WINDOW_CONTROL_HOVER;
+    p.windowExitHover = AURORA_WINDOW_EXIT_HOVER;
+    p.warning = AURORA_WARNING;
+    p.error = AURORA_ERROR;
+    p.running = AURORA_RUNNING;
+    p.unused = AURORA_UNUSED;
+    p.stylePushButton = AURORA_STYLE_PUSH_BUTTON;
+    p.styleCheckButton = AURORA_STYLE_CHECK_BUTTON;
+    p.styleProgressBar = AURORA_STYLE_PROGRESS_BAR;
+    p.styleComboBox = AURORA_STYLE_COMBO_BOX;
+    p.styleControlButton = AURORA_STYLE_CONTROL_BUTTON;
+    p.styleModuleButton = AURORA_STYLE_MODULE_BUTTON;
+    p.styleHoldButton = AURORA_STYLE_HOLD_BUTTON;
+    p.styleDial = AURORA_STYLE_DIAL;
+    p.styleTextInput = AURORA_STYLE_TEXTINPUT;
+    p.styleDockWidget = AURORA_STYLE_MODULE_DOCK_WIDGET;
+    p.styleDockWindow = AURORA_STYLE_OBJECT;
+    p.styleCustomDialsUsed = AURORA_STYLE_USE_CUSTOM_DIALS;
+    p.styleTransparencyUsed = AURORA_STYLE_USE_TRANSPARENCY;
+    if(AURORA_STYLE_USE_TRANSPARENCY){
+        QString color = QString(AURORA_CONTROLS).remove("#");
+        p.styleGlobal = QString(AURORA_STYLE_GLOBAL).arg(color);
+    } else {
+        p.styleGlobal = QString(AURORA_STYLE_GLOBAL).arg(AURORA_CONTROLS);
+    }
+    return p;
 }

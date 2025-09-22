@@ -17,7 +17,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->widget_top -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    ui->widget_top -> setStyleSheet("background-color:" + Graphics::palette().dataInputArea);
     ui->widget_left->setContentsMargins(4,4,4,4);
 
     chart = new widgetChart(ui->widget_chart, 5);
@@ -47,7 +47,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
 
 
     labelInfoPanel = new WidgetLabelArea(ui->widget_info);
-    ui->widget_info -> setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    ui->widget_info -> setStyleSheet("background-color:" + Graphics::palette().dataInputArea);
     ui->verticalLayout_info->addWidget(labelInfoPanel);
 
     // ********************* insert top options *********************
@@ -120,9 +120,14 @@ ScopeWindow::~ScopeWindow()
 
 void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
+    // Build slider stylesheet:
+    // - Groove uses themed background + frame.
+    // - Handle color uses an 0xBA (~73% alpha) prefix plus the base button color without '#'.
+    //   We call QString(Graphics::palette().backgroundButton).remove("#") on a temporary copy so
+    //   the cached palette string is never mutated; only the formatted value is used here.
     ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url("+Graphics::getGraphicsPath()+"signalBackground.png) center;"
-                                        "background-color: "+Graphics::COLOR_WINDOW_WIDGET+";border: 1px solid "+Graphics::COLOR_TEXT_LABEL+";margin-top: 3px;margin-bottom: 3px;}"
-                                                                                         "QSlider::handle:horizontal {background: #ba"+Graphics::COLOR_BACKGROUND_BUTTON.remove("#") + ";border: 2px solid "+Graphics::COLOR_TEXT_LABEL+";margin-top: -3px;"
+                                        "background-color: "+Graphics::palette().windowWidget+";border: 1px solid "+Graphics::palette().textLabel+";margin-top: 3px;margin-bottom: 3px;}"
+                                                                                         "QSlider::handle:horizontal {background: #ba"+QString(Graphics::palette().backgroundButton).remove("#") + ";border: 2px solid "+Graphics::palette().textLabel+";margin-top: -3px;"
                                                                                          "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+"px;}");
     event->accept();
 }
@@ -295,23 +300,23 @@ void ScopeWindow::triggerEdgeCallback(int index){
 void ScopeWindow::triggerModeCallback(int index){
     if(index==0){
         if(panelSet->buttonsTriggerMode->getText(0)=="Stop"){
-            panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
+            panelSet->buttonsTriggerMode->setColor(Graphics::palette().warning,0);
             emit triggerModeChanged(ScopeTriggerMode::TRIG_STOP);
             panelSet->buttonsTriggerMode->setText("Single",0);
             labelInfoPanel->setTriggerLabelText("");
 
         }else if(panelSet->buttonsTriggerMode->getText(0)=="Single"){
             emit triggerModeChanged(ScopeTriggerMode::TRIG_SINGLE);
-            panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_RUNNING,0);
+            panelSet->buttonsTriggerMode->setColor(Graphics::palette().running,0);
             panelSet->buttonsTriggerMode->setText("Stop",0);
         }
     }else if(index==1){
         emit triggerModeChanged(ScopeTriggerMode::TRIG_NORMAL);
-        panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
+        panelSet->buttonsTriggerMode->setColor(Graphics::palette().warning,0);
         panelSet->buttonsTriggerMode->setText("Stop",0);
     }else if (index==2){
         emit triggerModeChanged(ScopeTriggerMode::TRIG_AUTO);
-        panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
+        panelSet->buttonsTriggerMode->setColor(Graphics::palette().warning,0);
         panelSet->buttonsTriggerMode->setText("Stop",0);
     }
 }
@@ -572,14 +577,14 @@ void ScopeWindow::restoreGUIAfterStartup()
     panelMeas->setMeasButtonsColor(panelMeas->channelButtons->getSelectedIndex());
     panelMath->typeChanged(panelMath->mathType->getSelectedIndex());
     if(panelSet->buttonsTriggerMode->getSelectedIndex()==0){
-        panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_RUNNING,0);
+        panelSet->buttonsTriggerMode->setColor(Graphics::palette().running,0);
         panelSet->buttonsTriggerMode->setText("Stop",0);
     }
 }
 
 void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
-    panelSet->buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
+    panelSet->buttonsTriggerMode->setColor(Graphics::palette().warning,0);
     labelInfoPanel->setTriggerLabelText("");
 }
 
@@ -611,9 +616,9 @@ void ScopeWindow::updateChartTimeScale(float timeBase){
         chart->setZoom(chart->getZoom()*config->timeBase/timeBase);
     }
     if(chart->getLocalZoom()!=1.0){
-        labelInfoPanel->setStyleSheet("QLabel#label_scale {color:"+Graphics::COLOR_WARNING+";}");
+        labelInfoPanel->setStyleSheet("QLabel#label_scale {color:"+Graphics::palette().warning+";}");
     }else{
-        labelInfoPanel->setStyleSheet("color:"+Graphics::COLOR_TEXT_ALL+";");
+        labelInfoPanel->setStyleSheet("color:"+Graphics::palette().textAll+";");
     }
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/d"));
 }

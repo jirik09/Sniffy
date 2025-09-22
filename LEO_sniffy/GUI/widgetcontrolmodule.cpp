@@ -13,7 +13,7 @@ WidgetControlModule::WidgetControlModule(QWidget *parent, QString name) :
 {
     ui->setupUi(this);
 
-    ui->pushButton_name->setStyleSheet(Graphics::STYLE_MODULE_BUTTON);
+    ui->pushButton_name->setStyleSheet(Graphics::palette().styleModuleButton);
     ui->pushButton_name->setText(name);
 
     ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_stop.png)");
@@ -77,13 +77,13 @@ void WidgetControlModule::setIcon (QString ImageURI){
     QBitmap mask = basePixmap.createMaskFromColor(Qt::transparent);
 
     // Normal state
-    rendered.fill(Graphics::COLOR_TEXT_ALL);
+    rendered.fill(Graphics::palette().textAll);
     rendered.setMask(mask);
     icon = QIcon();
     icon.addPixmap(rendered, QIcon::Normal);
 
     // Disabled state
-    rendered.fill(Graphics::COLOR_COMPONENT_DISABLED);
+    rendered.fill(Graphics::palette().componentDisabled);
     rendered.setMask(mask);
     icon.addPixmap(rendered, QIcon::Disabled);
 

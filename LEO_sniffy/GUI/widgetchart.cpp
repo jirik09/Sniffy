@@ -7,13 +7,13 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     maxTraces(maxTraces)
 {
     ui->setupUi(this);
-    setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    setStyleSheet("background-color:" + Graphics::palette().dataInputArea);
 
     chart = new QChart();
     chart->legend()->hide();
     chart->setObjectName("chart");
 
-    chart->setBackgroundBrush(QColor(Graphics::COLOR_CHART));
+    chart->setBackgroundBrush(QColor(Graphics::palette().chart));
     chart->setAcceptHoverEvents(true);
     this->setMouseTracking(true);
 
@@ -87,7 +87,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->setMargins(QMargins(0,-12,0,0));
     chart->setBackgroundRoundness(0);
 
-    setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
+    setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
     initContextMenu();
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),

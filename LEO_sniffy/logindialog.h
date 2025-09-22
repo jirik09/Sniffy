@@ -51,7 +51,7 @@ private:
     QTimer timeoutTimer; // 15s timeout for login requests
 
     // Helper methods to reduce duplication
-    void reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color = Graphics::COLOR_ERROR);
+    void reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color = Graphics::palette().error);
     void startLoginNetworkRequest(const QString &email, const QString &pinHash);
     void finalizeSuccess(const QDateTime &validity, const QByteArray &token);
 

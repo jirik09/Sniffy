@@ -1,4 +1,5 @@
 #include "graphics.h"
+#include <functional>
 #include <QFileInfo>
 
 namespace Graphics {
@@ -86,8 +87,10 @@ QSharedPointer<AbstractTheme> setTheme(int themeIndex){
         return nullptr;
     }
     theme = createTheme[themeIndex]();
-    cachedPalette = currentPalette();
-    paletteInitialized = true;
+    if(theme){
+        cachedPalette = theme->buildPalette();
+        paletteInitialized = true;
+    }
     return theme;
 }
 
@@ -95,50 +98,7 @@ QSharedPointer<AbstractTheme> getThemeInstance(){
     return theme;
 }
 
-ThemePalette currentPalette(){
-    ThemePalette p;
-    p.windowApp = COLOR_WINDOW_APP;
-    p.windowWidget = COLOR_WINDOW_WIDGET;
-    p.backgroundFocusIn = COLOR_BACKGROUND_FOCUS_IN;
-    p.componentDisabled = COLOR_COMPONENT_DISABLED;
-    p.backgroundButton = COLOR_BACKGROUND_BUTTON;
-    p.dataInputArea = COLOR_DATA_INPUT_AREA;
-    p.controls = COLOR_CONTROLS;
-    p.display = COLOR_DISPLAY;
-    p.chart = COLOR_CHART;
-    p.chartGridlegDefault = COLOR_CHART_GRIDLEG_DEFAULT;
-    p.chartGridlegLowContrast = COLOR_CHART_GRIDLEG_LOW_CONTRAST;
-    p.textAll = COLOR_TEXT_ALL;
-    p.textLabel = COLOR_TEXT_LABEL;
-    p.textComponent = COLOR_TEXT_COMPONENT;
-    p.windowControlHover = COLOR_WINDOW_CONTROL_HOVER;
-    p.windowExitHover = COLOR_WINDOW_EXIT_HOVER;
-    p.warning = COLOR_WARNING;
-    p.error = COLOR_ERROR;
-    p.running = COLOR_RUNNING;
-    p.unused = COLOR_UNUSED;
-    p.stylePushButton = STYLE_PUSH_BUTTON;
-    p.styleCheckButton = STYLE_CHECK_BUTTON;
-    p.styleProgressBar = STYLE_PROGRESS_BAR;
-    p.styleComboBox = STYLE_COMBO_BOX;
-    p.styleControlButton = STYLE_CONTROL_BUTTON;
-    p.styleModuleButton = STYLE_MODULE_BUTTON;
-    p.styleHoldButton = STYLE_HOLD_BUTTON;
-    p.styleDial = STYLE_DIAL;
-    p.styleTextInput = STYLE_TEXTINPUT;
-    p.styleDockWidget = STYLE_DOCK_WIDGET;
-    p.styleDockWindow = STYLE_DOCK_WINDOW;
-    p.styleCustomDialsUsed = STYLE_CUSTOM_DIALS_USED;
-    p.styleTransparencyUsed = STYLE_TRANSPARENCY_USED;
-    p.styleGlobal = STYLE_GLOBAL;
-    return p;
-}
-
 const ThemePalette &palette(){
-    if(!paletteInitialized){
-        cachedPalette = currentPalette();
-        paletteInitialized = true;
-    }
     return cachedPalette;
 }
 
@@ -164,41 +124,6 @@ QString applyPathFallback(const QString &base, const QString &testFileName){
     return base; // last resort return original even if file missing
 }
 
-QString COLOR_WINDOW_APP;
-QString COLOR_WINDOW_WIDGET;
-QString COLOR_BACKGROUND_FOCUS_IN;
-QString COLOR_COMPONENT_DISABLED;
-QString COLOR_BACKGROUND_BUTTON;
-QString COLOR_DATA_INPUT_AREA;
-QString COLOR_CONTROLS;
-QString COLOR_DISPLAY;
-QString COLOR_CHART;
-QString COLOR_CHART_GRIDLEG_DEFAULT;
-QString COLOR_CHART_GRIDLEG_LOW_CONTRAST;
-QString COLOR_TEXT_ALL;
-QString COLOR_TEXT_LABEL;
-QString COLOR_TEXT_COMPONENT;
-QString COLOR_WINDOW_CONTROL_HOVER;
-QString COLOR_WINDOW_EXIT_HOVER;
-QString COLOR_WARNING;
-QString COLOR_ERROR;
-QString COLOR_RUNNING;
-QString COLOR_UNUSED;
-
-QString STYLE_PUSH_BUTTON;
-QString STYLE_CHECK_BUTTON;
-QString STYLE_PROGRESS_BAR;
-QString STYLE_COMBO_BOX;
-QString STYLE_CONTROL_BUTTON;
-QString STYLE_MODULE_BUTTON;
-QString STYLE_HOLD_BUTTON;
-QString STYLE_DIAL;
-QString STYLE_TEXTINPUT;
-QString STYLE_DOCK_WIDGET;
-QString STYLE_DOCK_WINDOW;
-
-bool STYLE_CUSTOM_DIALS_USED = false;
-bool STYLE_TRANSPARENCY_USED = false;
-QString STYLE_GLOBAL;
+// Legacy globals removed after palette migration.
 
 } // namespace Graphics

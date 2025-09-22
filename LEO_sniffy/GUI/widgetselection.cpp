@@ -14,7 +14,7 @@ WidgetSelection::WidgetSelection(QWidget *parent, QString name) :
 {
     ui->setupUi(this);
     ui->label->setText(name);
-    setStyleSheet(Graphics::STYLE_COMBO_BOX);
+    setStyleSheet(Graphics::palette().styleComboBox);
     // options list starts empty
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
 }

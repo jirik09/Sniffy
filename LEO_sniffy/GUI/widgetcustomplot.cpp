@@ -7,13 +7,13 @@ WidgetCustomPlot::WidgetCustomPlot(QWidget *parent, int traceCapacity) :
     maxTraces(traceCapacity)
 {
     ui->setupUi(this);
-    setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    setStyleSheet("background-color:" + Graphics::palette().dataInputArea);
 
     // Parent plot to this widget (not the external parent) to ensure proper ownership
     plot = new QCustomPlot(this);
     plot->setObjectName("plot");
 
-    plot->setBackground(QColor(Graphics::COLOR_CHART));
+    plot->setBackground(QColor(Graphics::palette().chart));
     plot->setMouseTracking(true);
     plot->setInteractions(QCP::iNone);
 

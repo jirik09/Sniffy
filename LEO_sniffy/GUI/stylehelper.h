@@ -8,15 +8,17 @@ namespace StyleHelper {
 
 // Centralized helpers for commonly repeated style patterns.
 inline QString pushButton(const QString &baseColorHex) {
+    const auto &p = Graphics::palette();
     QString color = baseColorHex;
-    QString c = Graphics::STYLE_TRANSPARENCY_USED ? QString(color).remove("#") : color;
-    return QString(Graphics::STYLE_PUSH_BUTTON).arg(c);
+    QString c = p.styleTransparencyUsed ? QString(color).remove("#") : color;
+    return QString(p.stylePushButton).arg(c);
 }
 
 inline QString checkButton(const QString &baseColorHex) {
+    const auto &p = Graphics::palette();
     QString color = baseColorHex;
-    QString c = Graphics::STYLE_TRANSPARENCY_USED ? QString(color).remove("#") : color;
-    return QString(Graphics::STYLE_CHECK_BUTTON).arg(c);
+    QString c = p.styleTransparencyUsed ? QString(color).remove("#") : color;
+    return QString(p.styleCheckButton).arg(c);
 }
 
 inline QString dialWithTextColor(const QString &dialStyle, const QString &textColor){
@@ -28,18 +30,20 @@ inline QString separatorLabel(const QString &textColor){
 }
 
 inline QString textInputLabel(){
-    return Graphics::STYLE_TEXTINPUT; // already full rule
+    return Graphics::palette().styleTextInput; // already full rule
 }
 
 inline QString textInputField(){
-    return Graphics::STYLE_TEXTINPUT +
-           "QWidget{background-color:" + Graphics::COLOR_DATA_INPUT_AREA + "} "
-           "QWidget::focus{background-color:" + Graphics::COLOR_BACKGROUND_FOCUS_IN + ";}";
+    const auto &p = Graphics::palette();
+    return p.styleTextInput +
+           "QWidget{background-color:" + p.dataInputArea + "} "
+           "QWidget::focus{background-color:" + p.backgroundFocusIn + ";}";
 }
 
 inline QString switchSelected(const QString &baseColor){
-    QString c = Graphics::STYLE_TRANSPARENCY_USED ? QString(baseColor).remove('#') : baseColor;
-    return QString(Graphics::STYLE_CHECK_BUTTON).arg(c);
+    const auto &p = Graphics::palette();
+    QString c = p.styleTransparencyUsed ? QString(baseColor).remove('#') : baseColor;
+    return QString(p.styleCheckButton).arg(c);
 }
 
 inline QString switchNotSelected(const QString &selectedStyle){

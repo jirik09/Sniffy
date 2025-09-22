@@ -15,12 +15,13 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     optionalEmitParam(optionalEmitParam)
 {
     ui->setupUi(this);
-    setStyleSheet(Graphics::STYLE_DIAL);
-    ui->comboBox->setStyleSheet(Graphics::STYLE_COMBO_BOX);
+    const auto &p = Graphics::palette();
+    setStyleSheet(p.styleDial);
+    ui->comboBox->setStyleSheet(p.styleComboBox);
 
     ui->label_name->setText(name);
     ui->dial->setPageStep(1);
-    ui->dial->setCustomGraphics(Graphics::STYLE_CUSTOM_DIALS_USED);
+    ui->dial->setCustomGraphics(Graphics::palette().styleCustomDialsUsed);
     setObjectName(name);
 
     connect(ui->pushButton_plus,SIGNAL(clicked()),this,SLOT(plusClicked()));
@@ -28,7 +29,7 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
     // options container default constructed (value semantics)
-    setColor(Graphics::COLOR_CONTROLS);
+    setColor(Graphics::palette().controls);
 }
 
 WidgetDial::~WidgetDial()
@@ -97,7 +98,7 @@ void WidgetDial::setSelectedIndex(int index, bool silent){
 }
 
 void WidgetDial::setColor(QString color){
-    ui->widget_dial->setStyleSheet(StyleHelper::dialWithTextColor(Graphics::STYLE_DIAL, color));
+    ui->widget_dial->setStyleSheet(StyleHelper::dialWithTextColor(Graphics::palette().styleDial, color));
     ui->pushButton_plus->setStyleSheet(StyleHelper::pushButton(color));
     ui->pushButton_minus->setStyleSheet(StyleHelper::pushButton(color));
 }

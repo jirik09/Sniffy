@@ -40,26 +40,26 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
 
     QString style;
 
-    style = "QObject{background-color:"+Graphics::COLOR_DISPLAY+";}";
+    style = "QObject{background-color:"+Graphics::palette().display+";}";
     setStyleSheet(style);
 
-    style = "QObject{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}";
+    style = "QObject{background-color:"+Graphics::palette().windowWidget+";}";
     ui->line->setStyleSheet(style);
 
     style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
-            "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+            "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
     ui->pushButton_history->setStyleSheet(style);
 
     style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
-            "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+            "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
     ui->pushButton_list->setStyleSheet(style);
 
     style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_clear_history.png);}"
-            "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+            "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
     ui->pushButton_clear->setStyleSheet(style);
 
     style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_save.png);}"
-            "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+            "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
     ui->pushButton_save->setStyleSheet(style);
 
     connect(ui->pushButton_history, SIGNAL(clicked()),
@@ -214,7 +214,7 @@ void WidgetDisplay::useVerticalProgressBar(bool enabled){
             ui->horizontalLayout_verticalBar->addWidget(simpleVBar);
             simpleVBar->setRange(0,100);
             // Theme-based colors: background same as widget, subtle frame, bar color set later via setProgressColor
-            simpleVBar->setBackgroundColor(QColor(Graphics::COLOR_DISPLAY));
+            simpleVBar->setBackgroundColor(QColor(Graphics::palette().display));
             simpleVBar->setFrameColor(QColor(60,60,60));
             ui->horizontalLayout_verticalBar->setContentsMargins(0,0,0,0);
             simpleVBar->setContentsMargins(0,0,0,0);
@@ -257,7 +257,7 @@ void WidgetDisplay::setProgressRange(int min, int max){
 }
 
 void WidgetDisplay::setProgressColor(QString color){
-    if(Graphics::STYLE_TRANSPARENCY_USED)
+    if(Graphics::palette().styleTransparencyUsed)
         color = color.remove("#");
     if(verticalMode){
         if(simpleVBar){
@@ -270,7 +270,7 @@ void WidgetDisplay::setProgressColor(QString color){
             ui->progressBar_vertical->setStyleSheet(base);
         }
     }else{
-        QString base = QString(Graphics::STYLE_PROGRESS_BAR).arg(color);
+    QString base = QString(Graphics::palette().styleProgressBar).arg(color);
         base.replace("width: 20px;", "");
         // Simple substring search: find "border:1px solid" then up to next semicolon.
         int idx = base.indexOf("border:1px solid");
@@ -410,7 +410,7 @@ void WidgetDisplay::configureCustomDial(){
     ui->dial->setRange(100, 1000);
     ui->dial->setPageStep(100);
     ui->dial->setSingleStep(20);
-    ui->dial->setCustomGraphics(Graphics::STYLE_CUSTOM_DIALS_USED);
+    ui->dial->setCustomGraphics(Graphics::palette().styleCustomDialsUsed);
 }
 
 void WidgetDisplay::configureFloatingHistoryNumber(){
@@ -418,7 +418,7 @@ void WidgetDisplay::configureFloatingHistoryNumber(){
     ui->dial->setToolTip(QString::number(historySize));
     labelFloatHistNum = new QLabel(this);
     labelFloatHistNum->setGeometry(ui->dial->x()+10, ui->dial->y()+64, 30, 20);
-    labelFloatHistNum->setStyleSheet("QLabel{background-color:"+Graphics::COLOR_WINDOW_APP+";}");
+    labelFloatHistNum->setStyleSheet("QLabel{background-color:"+Graphics::palette().windowApp+";}");
     labelFloatHistNum->hide();
     labelFloatHistNum->setNum(100);
 }
@@ -567,12 +567,12 @@ void WidgetDisplay::historyButtonClickedCallback(){
     if(historyView == DISABLED){
         sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
         style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_history_on.png);}"
-                "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+                "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
         historyView = ENABLED;
     }else {
         sizes = {0, cmpltWidth};
         style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
-                "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+                "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
         historyView = DISABLED;
     }
 
@@ -584,13 +584,13 @@ void WidgetDisplay::listChartSwitchClickedCallback(){
     QString style;
     if(listView == DISABLED){
         style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_chart.png);}"
-                "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+                "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
         chart->hide();
         list->show();
         listView = ENABLED;
     }else {
         style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
-                "QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}";
+                "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
         chart->show();
         list->hide();
         listView = DISABLED;

@@ -83,7 +83,7 @@ void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
 
 void PatternGeneratorWindow::setProgress(int percent)
 {
-    setGenerateButton("Uploading "+ QString::number(percent)+ "%", Graphics::COLOR_WARNING);
+    setGenerateButton("Uploading "+ QString::number(percent)+ "%", Graphics::palette().warning);
 }
 
 void PatternGeneratorWindow::setGenerateButton(QString text, QString color)
@@ -97,19 +97,19 @@ void PatternGeneratorWindow::setGeneratorState(bool onClick)
     if(config->state == PatternGeneratorConfig::State::UPLOADING){
         if(onClick){
             config->state = PatternGeneratorConfig::State::STOPPED;
-            setGenerateButton("Start", Graphics::COLOR_CONTROLS);
+            setGenerateButton("Start", Graphics::palette().controls);
             emit stopGenerator();
         }else{
             config->state = PatternGeneratorConfig::State::RUNNING;
-            setGenerateButton("Stop", Graphics::COLOR_RUNNING);
+            setGenerateButton("Stop", Graphics::palette().running);
         }
     }else if(config->state == PatternGeneratorConfig::State::RUNNING){
         config->state = PatternGeneratorConfig::State::STOPPED;
-        setGenerateButton("Start", Graphics::COLOR_CONTROLS);
+    setGenerateButton("Start", Graphics::palette().controls);
         emit stopGenerator();
     }else if(config->state == PatternGeneratorConfig::State::STOPPED){
         config->state = PatternGeneratorConfig::State::UPLOADING;
-        setGenerateButton("Uploading",Graphics::COLOR_WARNING);
+    setGenerateButton("Uploading",Graphics::palette().warning);
         emit runGenerator();
     }
 

@@ -57,7 +57,7 @@ WidgetButtons::WidgetButtons(QWidget *parent, int buttonCount, ButtonTypes butto
     }
 
     for(int i = 0; i < 8 ; i++){
-        setColor(Graphics::COLOR_CONTROLS,i);
+    setColor(Graphics::palette().controls,i);
     }
 
     connect(ui->pushButton_1,SIGNAL(clicked()),this,SLOT(button_1_Clicked()));
@@ -134,12 +134,13 @@ QString WidgetButtons::getText(int index){
 void WidgetButtons::setColor(QString text, int index){
     QString tempStyleSheet = "";
     if (index>=0 && index<8){
-        if(Graphics::STYLE_TRANSPARENCY_USED)
+        const auto &p = Graphics::palette();
+        if(p.styleTransparencyUsed)
             text = text.remove("#");
         if(type == ButtonTypes::CHECKABLE || type == ButtonTypes::RADIO){
-            tempStyleSheet = QString(Graphics::STYLE_CHECK_BUTTON).arg(text);
+            tempStyleSheet = QString(p.styleCheckButton).arg(text);
         }else{
-            tempStyleSheet = QString(Graphics::STYLE_PUSH_BUTTON).arg(text);
+            tempStyleSheet = QString(p.stylePushButton).arg(text);
         }
         pushButtonsList.at(index)->setStyleSheet(tempStyleSheet);
     }

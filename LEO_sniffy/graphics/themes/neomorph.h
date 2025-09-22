@@ -5,7 +5,7 @@
 #include <QColor>
 
 #include "../abstracttheme.h"
-#include "../graphics.h"
+struct ThemePalette; // forward declaration
 
 #define NEOMORPH_GRAPHICS_PATH  ":/graphics/graphics/themes/neomorph/"
 #define NEOMORPH_FONT           "'Segoe UI'"
@@ -176,6 +176,7 @@ public:
     QString getGraphicsPath();
 
     QString getChannelColor(int channelIndex);
+    ThemePalette buildPalette() override; // new palette builder
 
 private:
     QList<QColor> chanColor =

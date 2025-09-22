@@ -5,7 +5,7 @@
 #include <QColor>
 
 #include "../abstracttheme.h"
-#include "../graphics.h"
+struct ThemePalette; // forward declaration
 
 #define TEAL_GRAPHICS_PATH  ":/graphics/graphics/themes/tealanalytics/"
 #define TEAL_FONT           "'Segoe UI'"
@@ -158,6 +158,7 @@ public:
     QString getGraphicsPath();
 
     QString getChannelColor(int channelIndex);
+    ThemePalette buildPalette() override; // new palette builder
 
 private:
     QList<QColor> chanColor =

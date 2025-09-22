@@ -9,19 +9,19 @@ SyncPwmSettings::SyncPwmSettings(QVBoxLayout *destination, SyncPwmConfig *config
 
     switchStepMode = new WidgetSwitch(parent, " Continuous ", "     Step     ", "");
     switchStepMode->setObjectName("syncPwmStepButton");
-    switchStepMode->setColor(Graphics::COLOR_CONTROLS);
+    switchStepMode->setColor(Graphics::palette().controls);
 
     buttonStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
     buttonStart->setText("Start", 0);
     buttonStart->setChecked(false, 0);
     buttonStart->setObjectName("syncPwmStartButton");
-    buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
+    buttonStart->setColor(Graphics::palette().controls,0);
 
     buttonEquidist = new WidgetButtons(parent, 1, ButtonTypes::CHECKABLE, "", 0);
     buttonEquidist->setText("Equidistant", 0);
     buttonEquidist->setObjectName("syncPwmEquidistButton");
     buttonEquidist->setChecked(false, 0);
-    buttonEquidist->setColor(Graphics::COLOR_CONTROLS, 0);
+    buttonEquidist->setColor(Graphics::palette().controls, 0);
 
     QSpacerItem *spacer = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
     QHBoxLayout *commonButtons = new QHBoxLayout();
@@ -111,7 +111,7 @@ void SyncPwmSettings::configControlElements(QWidget *parent, int i, int phase){
     dialFreqCh[i]->setRange(0, 36000000, "Hz", 1, 1, DEFAULT_FREQUENCY, true);
     dialFreqCh[i]->setColor(color);
     dialFreqCh[i]->setAdditionalLabelText(formatNumber(config->chan[i].freq));
-    dialFreqCh[i]->setAdditionalLabelColor(Graphics::COLOR_TEXT_LABEL);
+    dialFreqCh[i]->setAdditionalLabelColor(Graphics::palette().textLabel);
     dialFreqCh[i]->hideUnitSelection();
 
     dialDutyCh[i] = new WidgetDialRange(parent, "Duty cycle", i);

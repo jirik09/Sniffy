@@ -1,52 +1,11 @@
 #include "tealanalytics.h"
+#include "../graphics.h" // ThemePalette definition
 
-TealAnalytics::TealAnalytics(QObject *parent)
-{
-    Q_UNUSED(parent);
-
-    Graphics::COLOR_WINDOW_APP = TEAL_APP_BG;
-    Graphics::COLOR_WINDOW_WIDGET = TEAL_WIDGET_BG;
-
-    Graphics::COLOR_BACKGROUND_FOCUS_IN = TEAL_FOCUS_BG;
-    Graphics::COLOR_COMPONENT_DISABLED = TEAL_DISABLED;
-    Graphics::COLOR_BACKGROUND_BUTTON = TEAL_BTN_BG;
-    Graphics::COLOR_CONTROLS = TEAL_TEXT_MAIN;
-    Graphics::COLOR_DATA_INPUT_AREA = TEAL_INPUT_BG;
-    Graphics::COLOR_DISPLAY = TEAL_CHART_BG;
-    Graphics::COLOR_CHART = TEAL_CHART_BG;
-    Graphics::COLOR_CHART_GRIDLEG_DEFAULT = TEAL_GRID_DEF;
-    Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST = TEAL_GRID_LOW;
-    Graphics::COLOR_TEXT_ALL = TEAL_TEXT_MAIN;
-    Graphics::COLOR_TEXT_LABEL = TEAL_TEXT_LABEL;
-    Graphics::COLOR_TEXT_COMPONENT = TEAL_TEXT_COMP;
-    Graphics::COLOR_WINDOW_CONTROL_HOVER = TEAL_HOVER;
-    Graphics::COLOR_WINDOW_EXIT_HOVER = TEAL_EXIT_HOVER;
-    Graphics::COLOR_WARNING = TEAL_WARNING;
-    Graphics::COLOR_ERROR = TEAL_ERROR;
-    Graphics::COLOR_RUNNING = TEAL_RUNNING;
-    Graphics::COLOR_UNUSED = TEAL_DISABLED;
-
-    Graphics::STYLE_PUSH_BUTTON = TEAL_STYLE_PUSH_BUTTON;
-    Graphics::STYLE_CHECK_BUTTON = TEAL_STYLE_CHECK_BUTTON;
-    Graphics::STYLE_PROGRESS_BAR = TEAL_STYLE_PROGRESS_BAR;
-    Graphics::STYLE_COMBO_BOX = TEAL_STYLE_COMBO_BOX;
-    Graphics::STYLE_CONTROL_BUTTON = TEAL_STYLE_CONTROL_BUTTON;
-    Graphics::STYLE_MODULE_BUTTON = TEAL_STYLE_MODULE_BUTTON;
-    Graphics::STYLE_HOLD_BUTTON = TEAL_STYLE_HOLD_BUTTON;
-    Graphics::STYLE_DIAL = TEAL_STYLE_DIAL;
-    Graphics::STYLE_TEXTINPUT = TEAL_STYLE_TEXTINPUT;
-    Graphics::STYLE_DOCK_WIDGET = TEAL_STYLE_MODULE_DOCK_WIDGET;
-    Graphics::STYLE_DOCK_WINDOW = TEAL_STYLE_OBJECT;
-
-    Graphics::STYLE_CUSTOM_DIALS_USED = TEAL_STYLE_USE_CUSTOM_DIALS;
-    Graphics::STYLE_TRANSPARENCY_USED = TEAL_STYLE_USE_TRANSPARENCY;
-
-    QString accent = QString(TEAL_CYAN).remove("#");
-    Graphics::STYLE_GLOBAL = QString(TEAL_STYLE_GLOBAL).arg(accent);
-}
+TealAnalytics::TealAnalytics(QObject *parent){ Q_UNUSED(parent); }
 
 QString TealAnalytics::getAppGlobalStyle(){
-    return Graphics::STYLE_GLOBAL;
+    QString accent = QString(TEAL_CYAN).remove("#");
+    return QString(TEAL_STYLE_GLOBAL).arg(accent);
 }
 
 QString TealAnalytics::getGraphicsPath(){
@@ -55,4 +14,44 @@ QString TealAnalytics::getGraphicsPath(){
 
 QString TealAnalytics::getChannelColor(int channelIndex){
     return chanColor.at(channelIndex).name();
+}
+
+ThemePalette TealAnalytics::buildPalette(){
+    ThemePalette p;
+    p.windowApp = TEAL_APP_BG;
+    p.windowWidget = TEAL_WIDGET_BG;
+    p.backgroundFocusIn = TEAL_FOCUS_BG;
+    p.componentDisabled = TEAL_DISABLED;
+    p.backgroundButton = TEAL_BTN_BG;
+    p.dataInputArea = TEAL_INPUT_BG;
+    p.controls = TEAL_TEXT_MAIN;
+    p.display = TEAL_CHART_BG;
+    p.chart = TEAL_CHART_BG;
+    p.chartGridlegDefault = TEAL_GRID_DEF;
+    p.chartGridlegLowContrast = TEAL_GRID_LOW;
+    p.textAll = TEAL_TEXT_MAIN;
+    p.textLabel = TEAL_TEXT_LABEL;
+    p.textComponent = TEAL_TEXT_COMP;
+    p.windowControlHover = TEAL_HOVER;
+    p.windowExitHover = TEAL_EXIT_HOVER;
+    p.warning = TEAL_WARNING;
+    p.error = TEAL_ERROR;
+    p.running = TEAL_RUNNING;
+    p.unused = TEAL_DISABLED;
+    p.stylePushButton = TEAL_STYLE_PUSH_BUTTON;
+    p.styleCheckButton = TEAL_STYLE_CHECK_BUTTON;
+    p.styleProgressBar = TEAL_STYLE_PROGRESS_BAR;
+    p.styleComboBox = TEAL_STYLE_COMBO_BOX;
+    p.styleControlButton = TEAL_STYLE_CONTROL_BUTTON;
+    p.styleModuleButton = TEAL_STYLE_MODULE_BUTTON;
+    p.styleHoldButton = TEAL_STYLE_HOLD_BUTTON;
+    p.styleDial = TEAL_STYLE_DIAL;
+    p.styleTextInput = TEAL_STYLE_TEXTINPUT;
+    p.styleDockWidget = TEAL_STYLE_MODULE_DOCK_WIDGET;
+    p.styleDockWindow = TEAL_STYLE_OBJECT;
+    p.styleCustomDialsUsed = TEAL_STYLE_USE_CUSTOM_DIALS;
+    p.styleTransparencyUsed = TEAL_STYLE_USE_TRANSPARENCY;
+    QString accent = QString(TEAL_CYAN).remove("#");
+    p.styleGlobal = QString(TEAL_STYLE_GLOBAL).arg(accent);
+    return p;
 }
