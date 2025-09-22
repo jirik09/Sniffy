@@ -55,7 +55,7 @@ public:
 private:
     int optionalEmitParam;
     Ui::WidgetDialRange *ui;
-    QList<params_unit> *units;
+    QList<params_unit> units; // direct ownership (no heap allocation)
     int dialMaxValue = DIAL_DEFAULT_RANGE;
     float realValue;    
     float defaultRealValue = 0;

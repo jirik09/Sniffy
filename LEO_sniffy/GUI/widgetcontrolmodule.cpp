@@ -69,20 +69,25 @@ void WidgetControlModule::clickedInternal(){
 }
 
 void WidgetControlModule::setIcon (QString ImageURI){
-    QPixmap icon(ImageURI);
-    QPixmap iconArea(icon.size());
-    QBitmap iconBitmap = icon.createMaskFromColor(Qt::transparent);
+    QPixmap basePixmap(ImageURI);
+    if(basePixmap.isNull()){
+        return; // invalid path
+    }
+    QPixmap rendered(basePixmap.size());
+    QBitmap mask = basePixmap.createMaskFromColor(Qt::transparent);
 
-    iconArea.fill(Graphics::COLOR_TEXT_ALL);
-    iconArea.setMask(iconBitmap);
+    // Normal state
+    rendered.fill(Graphics::COLOR_TEXT_ALL);
+    rendered.setMask(mask);
+    icon = QIcon();
+    icon.addPixmap(rendered, QIcon::Normal);
 
-    this->icon = new QIcon();
-    this->icon->addPixmap(iconArea,QIcon::Normal);
-    iconArea.fill(Graphics::COLOR_COMPONENT_DISABLED);
-    iconArea.setMask(iconBitmap);
-    this->icon->addPixmap(iconArea,QIcon::Disabled);
+    // Disabled state
+    rendered.fill(Graphics::COLOR_COMPONENT_DISABLED);
+    rendered.setMask(mask);
+    icon.addPixmap(rendered, QIcon::Disabled);
 
-    ui->pushButton_name->setIcon(*this->icon);
+    ui->pushButton_name->setIcon(icon);
 }
 
 void WidgetControlModule::setName (QString name){

@@ -5,6 +5,8 @@ Widget with combobox.
 */
 #include "widgetselection.h"
 #include "ui_widgetselection.h"
+#include "../diagnostics.h"
+#include "../statehelper.h"
 
 WidgetSelection::WidgetSelection(QWidget *parent, QString name) :
     QWidget(parent),
@@ -13,7 +15,7 @@ WidgetSelection::WidgetSelection(QWidget *parent, QString name) :
     ui->setupUi(this);
     ui->label->setText(name);
     setStyleSheet(Graphics::STYLE_COMBO_BOX);
-    options = new QList<params_sel>;
+    // options list starts empty
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
 }
 
@@ -24,28 +26,34 @@ WidgetSelection::~WidgetSelection()
 
 QByteArray WidgetSelection::saveGeometry()
 {
-    return  QByteArray::number(getSelectedIndex());
+    return StateHelper::pack(getSelectedIndex());
 }
 
 void WidgetSelection::restoreGeometry(QByteArray geom)
 {
-    if(options->length()>geom.toInt())
-        setSelected(geom.toInt(),true);
+    int idx=0; bool ok = StateHelper::unpack(geom, idx);
+    if(ok && idx >=0 && idx < options.size()) {
+        setSelected(idx,true);
+    } else {
+        SNIFFY_LOG_INFO("WidgetSelection restoreGeometry ignored invalid index:" << geom);
+    }
 }
 
 void WidgetSelection::addOption (QString shownValue,float realValue){
-    params_sel *par = new params_sel();
-    par->shownValue = shownValue;
-    par->realValue = realValue;
-    options->append(*par);
-
+    params_sel par { shownValue, realValue };
+    bool first = options.isEmpty();
+    options.append(par);
     ui->comboBox->addItem(shownValue);
-
-    if(options->length()>1)
-        setSelected(0);
+    if(first){
+        setSelected(0,true); // silent initial select
+    }
 }
 
 void WidgetSelection::setSelected(int index, bool silent){
+    if(index < 0 || index >= ui->comboBox->count()){
+        SNIFFY_LOG_WARN("setSelected invalid index:" << index);
+        return;
+    }
     if(silent)
         disconnect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(indexChanged(int)));
     ui->comboBox->setCurrentIndex(index);
@@ -60,7 +68,9 @@ int WidgetSelection::getSelectedIndex(){
 
 qreal WidgetSelection::getSelectedValue()
 {
-    return options->at(getSelectedIndex()).realValue;
+    int idx = getSelectedIndex();
+    if(idx < 0 || idx >= options.size()) return 0;
+    return options.at(idx).realValue;
 }
 
 int WidgetSelection::count(){
@@ -69,10 +79,13 @@ int WidgetSelection::count(){
 
 void WidgetSelection::indexChanged(int index)
 {
-    if(index >= 0)
-        emit selectedIndexChanged(index, options->at(index).realValue);
+    if(index >= 0 && index < options.size())
+        emit selectedIndexChanged(index, options.at(index).realValue);
+    else
+        SNIFFY_LOG_WARN("indexChanged received invalid index:" << index);
 }
 
 void WidgetSelection::clear(){
     ui->comboBox->clear();
+    options.clear();
 }

@@ -6,6 +6,7 @@ Class for widget with dial and controls
 */
 #include "widgetdial.h"
 #include "ui_widgetdial.h"
+#include "stylehelper.h"
 
 
 WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
@@ -26,7 +27,7 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     connect(ui->pushButton_minus,SIGNAL(clicked()),this,SLOT(minusClicked()));
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
-    options = new QList<params_dial>;
+    // options container default constructed (value semantics)
     setColor(Graphics::COLOR_CONTROLS);
 }
 
@@ -49,17 +50,17 @@ void WidgetDial::restoreGeometry(QByteArray geom)
 
 void WidgetDial::addOption (QString shownValue, QString unit,float realValue){
 
-    params_dial *par = new params_dial();
-    par->shownValue = shownValue;
-    par->unit = unit;
-    par->realValue = realValue;
-    options->append(*par);
+    params_dial par;
+    par.shownValue = shownValue;
+    par.unit = unit;
+    par.realValue = realValue;
+    options.append(par);
 
     ui->comboBox->addItem(shownValue + " " +unit);
 
-    ui->dial->setMaximum(options->length()-1);
+    ui->dial->setMaximum(options.length()-1);
 
-    if(options->length()==1){
+    if(options.length()==1){
         setSelectedIndex(0);
     }
 }
@@ -67,7 +68,7 @@ void WidgetDial::addOption (QString shownValue, QString unit,float realValue){
 void WidgetDial::clearOptions()
 {
     ui->comboBox->clear();
-    options->clear();
+    options.clear();
 }
 
 int WidgetDial::getSelectedIndex() const
@@ -77,30 +78,28 @@ int WidgetDial::getSelectedIndex() const
 
 qreal WidgetDial::getRealValue() const
 {
-    return options->at(selectedIndex).realValue;
+    if(selectedIndex >=0 && selectedIndex < options.size())
+        return options.at(selectedIndex).realValue;
+    return 0.0;
 }
 
 void WidgetDial::setSelectedIndex(int index, bool silent){
+    if(index < 0 || index >= options.size()) return;
     ui->dial->setValue(index);
     ui->comboBox->setCurrentIndex(index);
 
-    ui->label_unit->setText(options->at(index).unit);
-    ui->label_value->setText(options->at(index).shownValue);
+    ui->label_unit->setText(options.at(index).unit);
+    ui->label_value->setText(options.at(index).shownValue);
     selectedIndex = index;
     if(!silent){
-        emit valueChanged(options->at(index).realValue,optionalEmitParam);
+        emit valueChanged(options.at(index).realValue,optionalEmitParam);
     }
 }
 
 void WidgetDial::setColor(QString color){
-    QString style = Graphics::STYLE_DIAL+"QWidget{color:"+color+";}";
-    ui->widget_dial->setStyleSheet(style);
-
-    if(Graphics::STYLE_TRANSPARENCY_USED)
-        color = color.remove("#");
-    style = QString(Graphics::STYLE_PUSH_BUTTON).arg(color);
-    ui->pushButton_plus->setStyleSheet(style);
-    ui->pushButton_minus->setStyleSheet(style);
+    ui->widget_dial->setStyleSheet(StyleHelper::dialWithTextColor(Graphics::STYLE_DIAL, color));
+    ui->pushButton_plus->setStyleSheet(StyleHelper::pushButton(color));
+    ui->pushButton_minus->setStyleSheet(StyleHelper::pushButton(color));
 }
 
 int WidgetDial::getDefaultIndex() const
@@ -116,8 +115,8 @@ void WidgetDial::setDefaultIndex(int index)
 
 void WidgetDial::plusClicked(){
     selectedIndex++;
-    if(selectedIndex>=options->length()){
-        selectedIndex = options->length()-1;
+    if(selectedIndex>=options.length()){
+        selectedIndex = options.length()-1;
     }
     ui->comboBox->setCurrentIndex(selectedIndex);
 }
@@ -131,7 +130,7 @@ void WidgetDial::minusClicked(){
 }
 
 void WidgetDial::valChanged(int in){
-    if(in>=0 && in<options->length()){
+    if(in>=0 && in<options.length()){
         setSelectedIndex(in);
     }
 }

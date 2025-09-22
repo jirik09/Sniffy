@@ -5,6 +5,7 @@ Comment: similar to button widget set to 2 buttons, radio and on off text. Diffe
 */
 #include "widgetswitch.h"
 #include "ui_widgetswitch.h"
+#include "stylehelper.h"
 
 WidgetSwitch::WidgetSwitch(QWidget *parent, QString leftLabel, QString rightLabel, QString switchName, int optionalEmitParam) :
     QWidget(parent),
@@ -87,8 +88,8 @@ void WidgetSwitch::setColor(QString color)
     if(Graphics::STYLE_TRANSPARENCY_USED)
         color = color.remove("#");
 
-    styleSelected = QString(Graphics::STYLE_CHECK_BUTTON).arg(color);
-    styleNotSelected = styleSelected;
+    styleSelected = StyleHelper::switchSelected(color);
+    styleNotSelected = StyleHelper::switchNotSelected(styleSelected);
 
     if(ui->pushButton_right->isChecked()){
         setRight(true);

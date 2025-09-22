@@ -26,8 +26,8 @@ public:
 private:
     Ui::WidgetDesciptionExpand *ui;
 
-    QList<WidgetLabel*> *labels;
-    QVBoxLayout *labelsLayout;
+    QList<WidgetLabel*> labels; // children owned by ui->widget_info via layout parentage
+    QVBoxLayout *labelsLayout {nullptr};
     bool isHidden = false;
 
 private slots:
