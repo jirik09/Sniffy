@@ -5,15 +5,15 @@
 #include <QTimer>
 #include <QEventLoop>
 
-class Timing
-{
+/*
+ * Timing
+ * Provides a blocking sleep that still processes queued Qt events (via QEventLoop::exec()).
+ * Use sparingly on the GUI thread; for long operations prefer asynchronous design.
+ */
+class Timing {
 public:
     Timing();
-
-    void sleep(int msec);
-
-private:
-
+    void sleep(int msec); // Blocks approximately msec while allowing event processing
 };
 
 #endif // TIMING_H
