@@ -15,6 +15,7 @@
 #include "graphics/themes/neomorph.h"
 #include "graphics/themes/tealanalytics.h"
 #include "graphics/themes/hudcyan.h"
+#include "graphics/themes/msdos.h"
 #include "graphics/abstracttheme.h"
 
 // Aggregated palette (snapshot) of all color/style values. Keeping QString for existing usage.

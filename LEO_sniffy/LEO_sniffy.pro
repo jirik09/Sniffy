@@ -62,6 +62,7 @@ SOURCES += \
     graphics/themes/neomorph.cpp \
     graphics/themes/tealanalytics.cpp \
     graphics/themes/hudcyan.cpp \
+    graphics/themes/msdos.cpp \
     graphics/themes/light.cpp \
     logindialog.cpp \
     main.cpp \
@@ -184,6 +185,7 @@ HEADERS += \
     graphics/themes/neomorph.h \
     graphics/themes/tealanalytics.h \
     graphics/themes/hudcyan.h \
+    graphics/themes/msdos.h \
     graphics/themes/light.h \
     logindialog.h \
     mainwindow.h \

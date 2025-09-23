@@ -10,13 +10,14 @@ static ThemePalette cachedPalette; // updated when setTheme called
 static bool paletteInitialized = false;
 
 QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {  
-        [] { return QSharedPointer<AbstractTheme>(new Dark); },
-        [] { return QSharedPointer<AbstractTheme>(new Light); },
-        [] { return QSharedPointer<AbstractTheme>(new Dawn); },
-        [] { return QSharedPointer<AbstractTheme>(new Aurora); },
-        [] { return QSharedPointer<AbstractTheme>(new Neomorph); },
-        [] { return QSharedPointer<AbstractTheme>(new TealAnalytics); },
-        [] { return QSharedPointer<AbstractTheme>(new HudCyan); },
+    [] { return QSharedPointer<AbstractTheme>(new Dark); },
+    [] { return QSharedPointer<AbstractTheme>(new Light); },
+    [] { return QSharedPointer<AbstractTheme>(new Dawn); },
+    [] { return QSharedPointer<AbstractTheme>(new Aurora); },
+    [] { return QSharedPointer<AbstractTheme>(new Neomorph); },
+    [] { return QSharedPointer<AbstractTheme>(new TealAnalytics); },
+    [] { return QSharedPointer<AbstractTheme>(new HudCyan); },
+    [] { return QSharedPointer<AbstractTheme>(new MSDos); },
 };
 
 QList<QString> *initThemesList(){
@@ -30,6 +31,7 @@ QList<QString> *initThemesList(){
         themeList->append(((QString)(typeid(Neomorph).name())).remove(0,1));
         themeList->append(((QString)(typeid(TealAnalytics).name())).remove(0,1));
         themeList->append(((QString)(typeid(HudCyan).name())).remove(0,1));
+        themeList->append(((QString)(typeid(MSDos).name())).remove(0,1));
     }
     return themeList;
 }
@@ -108,6 +110,7 @@ QString applyPathFallback(const QString &base, const QString &testFileName){
 
     struct PatternFallback { const char* pattern; const char* replacement; };
     static const PatternFallback orderedFallbacks[] = {
+        {"/msdos/", "/dark/"}, // MSDOS theme currently reuses dark assets if not provided
         {"/aurora/", "/dawn/"},
         {"/neomorph/", "/light/"},
         {"/tealanalytics/", "/dark/"},
