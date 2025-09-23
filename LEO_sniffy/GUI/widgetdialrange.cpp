@@ -10,6 +10,8 @@ Class for widget with dial and controls with range
 
 #include "widgetdialrange.h"
 #include "ui_widgetdialrange.h"
+#include <cmath>
+#include "stylehelper.h"
 
 
 WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmitParam) :
@@ -18,8 +20,9 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
     ui(new Ui::WidgetDialRange)
 {
     ui->setupUi(this);
-    setStyleSheet(Graphics::STYLE_DIAL);
-    ui->comboBox->setStyleSheet(Graphics::STYLE_COMBO_BOX);
+    const auto &p = Graphics::palette();
+    setStyleSheet(p.styleDial);
+    ui->comboBox->setStyleSheet(p.styleComboBox);
 
     //    QString style = "QPushButton:pressed{border: 2px solid rgb(48,48,48);}"
     //                    "QPushButton{border: none;color: rgb(214,214,214);"
@@ -28,12 +31,12 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
 
     ui->label_name->setText(name);
     setObjectName(name);
-    units = new QList<params_unit>;
-    ui->dial->setCustomGraphics(Graphics::STYLE_CUSTOM_DIALS_USED);
+    // units list now value-based (no heap allocation)
+    ui->dial->setCustomGraphics(Graphics::palette().styleCustomDialsUsed);
 
    // this->setMinimumSize(170,85);
   // this->setMaximumSize(400,120);
-    setColor(Graphics::COLOR_CONTROLS);
+    setColor(Graphics::palette().controls);
 }
 
 WidgetDialRange::~WidgetDialRange()
@@ -55,15 +58,14 @@ void WidgetDialRange::setAdditionalLabelColor(QString color){
 
 QByteArray WidgetDialRange::saveGeometry()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocated
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     stream << realValue;
     stream << dialMaxValue;
     stream << rangeMin;
     stream << rangeMax;
-    return *data;
+    return data;
 }
 
 void WidgetDialRange::restoreGeometry(QByteArray geom)
@@ -91,14 +93,9 @@ void WidgetDialRange::restoreGeometry(QByteArray geom)
 }
 
 void WidgetDialRange::setColor(QString color){
-    QString style = Graphics::STYLE_DIAL+"QWidget{color:"+color+";}";
-    ui->widget_dial->setStyleSheet(style);
-
-    if(Graphics::STYLE_TRANSPARENCY_USED)
-        color = color.remove("#");
-    style = QString(Graphics::STYLE_PUSH_BUTTON).arg(color);
-    ui->pushButton_plus->setStyleSheet(style);
-    ui->pushButton_minus->setStyleSheet(style);
+    ui->widget_dial->setStyleSheet(StyleHelper::dialWithTextColor(Graphics::palette().styleDial, color));
+    ui->pushButton_plus->setStyleSheet(StyleHelper::pushButton(color));
+    ui->pushButton_minus->setStyleSheet(StyleHelper::pushButton(color));
 }
 
 float WidgetDialRange::getDefaultRealValue() const{
@@ -112,7 +109,7 @@ float WidgetDialRange::getRealValue() const
 
 void WidgetDialRange::disable(bool disable){
     this->setDisabled(disable);
-    ui->label_addition->setStyleSheet("QLabel{color: "+Graphics::COLOR_COMPONENT_DISABLED+";}");
+    ui->label_addition->setStyleSheet("QLabel{color: "+Graphics::palette().componentDisabled+";}");
 }
 
 void WidgetDialRange::setNumOfDecimals(int value)
@@ -121,26 +118,23 @@ void WidgetDialRange::setNumOfDecimals(int value)
 }
 
 void WidgetDialRange::setRealValue(float value, bool silent){
+    if(std::isnan(value) || std::isinf(value)) return;
     realValue = value;
     updateControls(0,silent);
 }
 
 void WidgetDialRange::addOption (QString unit,float mult){
-    params_unit *tmpUnit = new params_unit();
-    tmpUnit->mult = mult;
-    tmpUnit->unit = unit;
-
-    units->append(*tmpUnit);
+    params_unit tmpUnit; tmpUnit.mult = mult; tmpUnit.unit = unit;
+    units.append(tmpUnit);
     ui->comboBox->addItem(unit);
 }
 
 void WidgetDialRange::updateBaseUnit(QString unit)
 {
-    for(int i = 0;i<units->length();i++){
-        params_unit *tmpUnit = new params_unit();
-        tmpUnit->mult = units->at(i).mult;
-        tmpUnit->unit = units->at(i).mult==1?unit:units->at(i).unit.at(0)+unit;
-        units->replace(i,*tmpUnit);
+    for(int i = 0;i<units.length();i++){
+        params_unit tmpUnit; tmpUnit.mult = units.at(i).mult;
+        tmpUnit.unit = units.at(i).mult==1?unit:units.at(i).unit.at(0)+unit;
+        units.replace(i,tmpUnit);
     }
 }
 
@@ -210,7 +204,8 @@ void WidgetDialRange::dialValueChanged(int in){
 }
 
 void WidgetDialRange::unitChanged(int in){
-    realValue = realValue*units->at(in).mult/unitMult;
+    if(in < 0 || in >= units.size()) return;
+    realValue = realValue*units.at(in).mult/unitMult;
     updateControls(0);
 }
 
@@ -243,9 +238,9 @@ log - bool type true=log scale, false=lin scale (false by default)
 */
 void WidgetDialRange::setRange(float min, float max, QString baseUnit, float buttonStep, float smalestUnitMult, float defaultValue, bool isLogaritmic, int numOfDecimals, bool silent){
 
-    if(units->length()>0){
+    if(!units.isEmpty()){
         disconnect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
-        units->clear();
+        units.clear();
         ui->comboBox->clear();
         connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(unitChanged(int)));
     }
@@ -293,15 +288,15 @@ void WidgetDialRange::setRange(float min, float max, QString baseUnit, float but
     }
     if (smalestUnitMult<1){
         addOption("m"+baseUnit,0.001);
-        ui->comboBox->setCurrentIndex(units->length()-1);
-        unitMult = units->last().mult;
+    ui->comboBox->setCurrentIndex(units.length()-1);
+    unitMult = units.last().mult;
     }
 
     //  if(max>9 && max<1000){
     addOption(baseUnit,1);
-    ui->comboBox->setCurrentIndex(units->length()-1);
-    // unitString = units->last().unit;
-    unitMult = units->last().mult;
+    ui->comboBox->setCurrentIndex(units.length()-1);
+    // unitString tracked dynamically when updating controls
+    unitMult = units.last().mult;
     //  }
 
     if(max>=1000){
@@ -370,10 +365,10 @@ void WidgetDialRange::updateControls(int except, bool silent){
         //calculate the unit mult and label value from real value and available ranges in units selection
         int i = 0;
         float tempLabelVal = 0;
-        for(i = units->length()-1;i>=0;i--){
-            tempLabelVal = realValue / units->at(i).mult;
-            unitMult = units->at(i).mult;
-            unitString = units->at(i).unit;
+        for(i = units.length()-1;i>=0;i--){
+            tempLabelVal = realValue / units.at(i).mult;
+            unitMult = units.at(i).mult;
+            unitString = units.at(i).unit;
             labelValue = tempLabelVal;
 
             //qDebug( "Handling exception not caught in slot. %d  %d", ui->comboBox->count(), i);

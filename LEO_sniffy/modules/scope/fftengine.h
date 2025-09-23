@@ -9,8 +9,7 @@
 #include <QPointF>
 #include <QDebug>
 
-enum FFTWindow { rectangular = 0, hamming = 1, hann = 2, blackman = 3, flatTop = 4};
-enum FFTType { spectrum = 0, periodogram = 1};
+#include "fftdefs.h" // central enum definitions
 
 class FFTengine : public QThread
 {
@@ -18,6 +17,11 @@ class FFTengine : public QThread
 public:
     explicit FFTengine(QObject *parent = nullptr);
     ~FFTengine();
+
+    Q_DISABLE_COPY(FFTengine)
+    // Thread objects should not be moved either once started; explicitly delete moves.
+    FFTengine(FFTengine&&) = delete;
+    FFTengine& operator=(FFTengine&&) = delete;
 
     void calculate(QVector<QPointF> data,FFTWindow window,FFTType type, int minNFFT,bool removeDC, qreal samplingFreq);
     QVector<QPointF> getProcessedData();
@@ -32,6 +36,8 @@ private:
     QWaitCondition condition;
     bool restart;
     bool abort;
+
+    // Pre-sized reusable window buffers (grown on demand). Avoids reallocations inside loop.
 
 
     QVector<float> hamming, hann, blackman,flatTop;

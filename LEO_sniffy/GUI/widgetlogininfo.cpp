@@ -35,3 +35,8 @@ void WidgetLoginInfo::updateInfo(){
         ui->label_valid->setText("Valid till: "+CustomSettings::getTokenValidity().date().toString("dd.MM.yyyy"));
     }
 }
+
+void WidgetLoginInfo::setCompact(bool compact){
+    ui->label_email->setVisible(!compact);
+    ui->label_valid->setVisible(!compact);
+}

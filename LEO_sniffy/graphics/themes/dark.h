@@ -5,7 +5,6 @@
 #include <QColor>
 
 #include "../abstracttheme.h"
-#include "../graphics.h"
 
 #define DARK_GRAPHICS_PATH  ":/graphics/graphics/themes/dark/"
 #define DARK_FONT           "'MS Shell Dlg 2'"
@@ -190,6 +189,7 @@ public:
     QString getGraphicsPath();
 
     QString getChannelColor(int channelIndex);
+    ThemePalette buildPalette() override;
 
 private:
     QList<QColor> chanColor =

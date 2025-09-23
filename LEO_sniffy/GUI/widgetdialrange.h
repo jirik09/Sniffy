@@ -48,11 +48,14 @@ public:
     void disable(bool disable);    
 
     void setNumOfDecimals(int value);
+    // Added getters for current numeric range to support accurate percent mapping
+    float getRangeMin() const { return rangeMin; }
+    float getRangeMax() const { return rangeMax; }
 
 private:
     int optionalEmitParam;
     Ui::WidgetDialRange *ui;
-    QList<params_unit> *units;
+    QList<params_unit> units; // direct ownership (no heap allocation)
     int dialMaxValue = DIAL_DEFAULT_RANGE;
     float realValue;    
     float defaultRealValue = 0;

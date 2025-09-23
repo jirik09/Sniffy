@@ -15,7 +15,7 @@ class WidgetCustomPlot : public QWidget
 {
     Q_OBJECT
 public:
-    explicit WidgetCustomPlot(QWidget *parent = nullptr, int maxTraces = 1);
+    explicit WidgetCustomPlot(QWidget *parent = nullptr, int traceCapacity = 1);
     ~WidgetCustomPlot();
 
     void clearAll();

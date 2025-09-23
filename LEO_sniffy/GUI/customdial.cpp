@@ -32,8 +32,10 @@ void CustomDial::drawMarker(bool draw)
 }
 
 void CustomDial::mouseMoveEvent(QMouseEvent *me) {
-    double relativeX = me->x() - mousePressX+0.01;
-    double relativeY = me->y() - mousePressY+0.01;
+    // Qt6: x()/y() deprecated -> use position()
+    const QPointF pos = me->position();
+    double relativeX = pos.x() - mousePressX + 0.01;
+    double relativeY = pos.y() - mousePressY + 0.01;
 
     //double distance = sqrt(relativeX*relativeX + relativeY*relativeY); //distance from initial point
     double distance = abs(relativeX - relativeY) /sqrt(2); //distance from -xy axis
@@ -57,8 +59,9 @@ void CustomDial::mouseMoveEvent(QMouseEvent *me) {
 
 void CustomDial::mousePressEvent(QMouseEvent *me) {
     emit dialPressed(me);
-    mousePressX = me->x();
-    mousePressY = me->y();
+    const QPointF pos = me->position();
+    mousePressX = pos.x();
+    mousePressY = pos.y();
     initialDialValue = QDial::value();
 }
 
@@ -119,10 +122,10 @@ void CustomDial::paintEvent(QPaintEvent* evt)
     //draw background arc
     if(drawMark){
         bs = (Qt::BrushStyle)(size/30+3); //5 for static size
-        painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_DATA_INPUT_AREA)),bs));
+    painter.setPen(QPen(QBrush(QColor(Graphics::palette().dataInputArea)),bs));
     }else {
         bs = (Qt::BrushStyle)2;
-        painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_TEXT_LABEL)),bs));
+    painter.setPen(QPen(QBrush(QColor(Graphics::palette().textLabel)),bs));
     }
 
     painter.drawArc(rect,0,360*16);
@@ -133,11 +136,11 @@ void CustomDial::paintEvent(QPaintEvent* evt)
 
     if(drawMark){
         //draw marker
-        painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_TEXT_ALL)),size/15+4)); //8 for static size
+    painter.setPen(QPen(QBrush(QColor(Graphics::palette().textAll)),size/15+4)); //8 for static size
         painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
         //draw click pointer
         if(mousePressX!=0){
-            painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_TEXT_LABEL)),4));
+            painter.setPen(QPen(QBrush(QColor(Graphics::palette().textLabel)),4));
             painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
         }
     }

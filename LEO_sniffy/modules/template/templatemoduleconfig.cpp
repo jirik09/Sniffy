@@ -1,4 +1,6 @@
 #include "templatemoduleconfig.h"
+#include <QDataStream>
+#include <QIODevice>
 
 TemplateModuleConfig::TemplateModuleConfig(QObject *parent)
 {
@@ -20,14 +22,13 @@ void TemplateModuleConfig::parse(QByteArray config)
 
 QByteArray TemplateModuleConfig::serialize()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocation
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     //TODO put data into stream
     //example:
     //stream << realSamplingRate;
     //stream << ADCresolution;
 
-    return *data;
+    return data;
 }

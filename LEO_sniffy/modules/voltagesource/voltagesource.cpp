@@ -78,8 +78,10 @@ void VoltageSource::voltageChangedCallback(qreal value, int channel)
     DACData[channel] = tmpDAC;
 
     qreal tmpValue = (qreal(tmpDAC)/(pow(2,spec->DACResolution)-1)*(spec->rangeMax-spec->rangeMin)+spec->rangeMin) * spec->AVddReal/spec->VddDefault;
+    // Update numeric display with reconstructed actual value
     voltSourceWindow->setDisplayValue(tmpValue,channel);
-    voltSourceWindow->setBarValue(tmpDAC/pow(2,spec->DACResolution)*100,channel);
+    // Provide raw voltage (value) to bar; bar will map using dial range only once.
+    voltSourceWindow->setBarValue(value,channel);
 
     sendDACVoltage();
 

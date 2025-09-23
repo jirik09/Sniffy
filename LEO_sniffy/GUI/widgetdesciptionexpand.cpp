@@ -8,8 +8,6 @@ WidgetDesciptionExpand::WidgetDesciptionExpand(QWidget *parent, QString name) :
     ui->setupUi(this);
 
     ui->widget_sep->setText(name);
-    labels = new QList<WidgetLabel *>;
-
     labelsLayout = new QVBoxLayout();
     labelsLayout->setSpacing(0);
     labelsLayout->setContentsMargins(0,0,0,0);
@@ -26,17 +24,30 @@ WidgetDesciptionExpand::~WidgetDesciptionExpand()
 
 void WidgetDesciptionExpand::addLabel(QString name, QString value)
 {
-    WidgetLabel *lbl = new WidgetLabel(ui->widget_info,name,value);
-    labels->append(lbl);
+    if(!labelsLayout->parent()){
+        ui->widget_info->setLayout(labelsLayout);
+    }
+    auto *lbl = new WidgetLabel(ui->widget_info,name,value);
+    labels.append(lbl);
     labelsLayout->addWidget(lbl);
-    ui->widget_info->setLayout(labelsLayout);
 }
 
 void WidgetDesciptionExpand::clearLabels()
 {
-    labelsLayout->deleteLater();
-    labels->clear();
-    labelsLayout = new QVBoxLayout();
+    // Remove and delete child widgets explicitly
+    for(auto *w : labels){
+        if(w){
+            w->setParent(nullptr);
+            w->deleteLater();
+        }
+    }
+    labels.clear();
+    if(labelsLayout){
+        // Leave layout in place; Qt will delete it with parent. Just remove its items.
+        while(auto *item = labelsLayout->takeAt(0)){
+            delete item; // deletes item wrapper, widget already scheduled for deletion
+        }
+    }
 }
 
 bool WidgetDesciptionExpand::eventFilter(QObject *obj, QEvent *event)

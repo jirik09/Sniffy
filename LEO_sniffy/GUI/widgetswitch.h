@@ -14,7 +14,7 @@ class WidgetSwitch : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetSwitch(QWidget *parent = nullptr, QString leftName = "", QString rightName = "", QString name = "", int optionalEmitParam = 0);
+    explicit WidgetSwitch(QWidget *parent = nullptr, QString leftLabel = "", QString rightLabel = "", QString switchName = "", int optionalEmitParam = 0);
     ~WidgetSwitch();
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);

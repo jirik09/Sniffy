@@ -49,6 +49,8 @@ private:
     QList<WidgetDialRange *> dials;
 
     WidgetLabel *labelVDDA;
+    QVector<qreal> rangeMins;
+    QVector<qreal> rangeMaxs;
 
 private slots:
     void dialChangedCallback(qreal value, int channel);

@@ -32,6 +32,8 @@ public:
 
     WidgetSelection *deviceSelection;
     WidgetButtons *deviceConnectButton;
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     QWidget *WidgetSpecification;
@@ -44,6 +46,9 @@ private:
     WidgetDesciptionExpand *devDesc;
 
     Ui::DeviceWindow *ui;
+
+    QString currentDeviceBaseImage; // e.g. "Nucleo-F303RE"
+    bool showingPinout = false;
 };
 
 #endif // WINDOWSCAN_H

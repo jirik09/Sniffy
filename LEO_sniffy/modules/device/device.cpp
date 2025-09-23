@@ -40,9 +40,9 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
     int i = 0;
 
     deviceWindow->deviceSelection->clear();
-    foreach(devStr, list){
-        deviceWindow->deviceSelection->addOption(devStr.deviceName + " (" + devStr.port + ")",i);
-        i++;
+    for (const DeviceDescriptor &devStr : list) {
+        deviceWindow->deviceSelection->addOption(devStr.deviceName + " (" + devStr.port + ")", i);
+        ++i;
     }
     if(deviceWindow->deviceSelection->count()==0){
         deviceWindow->deviceSelection->addOption("No devices were found",0);

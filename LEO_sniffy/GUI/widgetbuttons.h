@@ -26,7 +26,7 @@ class WidgetButtons : public QWidget
     Q_OBJECT
 
 public:
-    explicit WidgetButtons(QWidget *parent = nullptr, int num = 1, ButtonTypes type = ButtonTypes::NORMAL, QString name = "", int defaultSelectedIndex = 0, int optionalEmitParam = 0);
+    explicit WidgetButtons(QWidget *parent = nullptr, int buttonCount = 1, ButtonTypes buttonType = ButtonTypes::NORMAL, QString labelName = "", int defaultSelectedIndex = 0, int optionalEmitParam = 0);
     ~WidgetButtons();
     QByteArray saveGeometry();
     void restoreGeometry(QByteArray geom);

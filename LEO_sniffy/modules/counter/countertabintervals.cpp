@@ -15,7 +15,7 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, CounterConfig
     dialTimeout = new WidgetDialRange(parent ,"Timeout");
     dialTimeout->setObjectName("dialIntTimeout");
     dialTimeout->setRange(1, INTERVAL_TIMEOUT_MAX, "Sec", 1, 1, INTERVAL_TIMEOUT_DEFAULT, false, 0);
-    dialTimeout->setColor(Graphics::COLOR_CONTROLS);
+    dialTimeout->setColor(Graphics::palette().controls);
     dialTimeout->hideUnitSelection();    
     destination->addWidget(dialTimeout);
 
@@ -34,13 +34,13 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, CounterConfig
     switchEdgeEventA = new WidgetSwitch(parent, "Rising", "Falling", "");
     switchEdgeEventA->setObjectName("edgeEventA");
     switchEdgeEventA->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-    switchEdgeEventA->setColor(Graphics::COLOR_CONTROLS);
+    switchEdgeEventA->setColor(Graphics::palette().controls);
     horizontalLayout_switchArea->addWidget(switchEdgeEventA);
 
     switchEdgeEventB = new WidgetSwitch(parent, "Rising", "Falling", "");
     switchEdgeEventB->setObjectName("edgeEventB");
     switchEdgeEventB->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-    switchEdgeEventB->setColor(Graphics::COLOR_CONTROLS);
+    switchEdgeEventB->setColor(Graphics::palette().controls);
     horizontalLayout_switchArea->addWidget(switchEdgeEventB);
 
     labelPicEventsSeq = new QLabel(parent);
@@ -119,10 +119,10 @@ void CounterTabIntervals::setSeqPicture()
 
 void CounterTabIntervals::setStartButton(bool start){
     if(start){
-        buttonStart->setColor(Graphics::COLOR_RUNNING,0);
+    buttonStart->setColor(Graphics::palette().running,0);
         buttonStart->setText("Stop",0);
     }else{
-        buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
+    buttonStart->setColor(Graphics::palette().controls,0);
         buttonStart->setText("Start",0);
     }
 }

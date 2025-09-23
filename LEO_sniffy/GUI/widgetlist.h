@@ -32,8 +32,8 @@ public:
 
 private:
     Ui::WidgetList *ui;
-    QStringListModel *model;
-    QStringList list;
+    QStringListModel *model; // owned by this via QObject parent
+    QStringList list;        // newest entries are prepended
 };
 
 #endif // WIDGETLIST_H

@@ -2,33 +2,52 @@
 #define WINDOWSCOPE_H
 
 #include <QWidget>
-#include <QScrollArea>
-#include <QVBoxLayout>
-#include <QToolButton>
-#include <QtCore/QtMath>
-#include <QDebug>
 #include <QSplitter>
+#include <limits>
 
-#include "../../GUI/widgetcontrolmodule.h"
-#include "../../GUI/widgetseparator.h"
-#include "../../GUI/widgetdial.h"
-#include "../../GUI/widgetdialrange.h"
-#include "../../GUI/widgetbuttons.h"
-#include "../../GUI/widgetlabel.h"
-#include "../../GUI/widgetselection.h"
-#include "../../GUI/widgetchart.h"
-#include "../../GUI/widgettab.h"
-#include "../../GUI/widgetlabelarea.h"
-
-#include "../labelformator.h"
+#if defined(__cpp_lib_span) && __cpp_lib_span >= 202002L
+    #include <span>
+    template<typename T>
+    using ViewSpan = std::span<T>;
+#else
+    template<typename T>
+    class ViewSpan { // Minimal shim (read-only) if std::span not available
+    public:
+        ViewSpan(const T* data=nullptr, size_t size=0):m_data(data),m_size(size){}
+        const T* begin() const { return m_data; }
+        const T* end() const { return m_data + m_size; }
+        const T* data() const { return m_data; }
+        size_t size() const { return m_size; }
+        bool empty() const { return m_size==0; }
+    private:
+        const T* m_data;
+        size_t m_size;
+    };
+#endif
 
 #include "scopedefs.h"
-#include "panelsettings.h"
-#include "panelmeasurement.h"
-#include "panelcursors.h"
-#include "panelmath.h"
-#include "paneladvanced.h"
-#include "scopeconfig.h"
+#include <limits>
+
+// Lightweight FFT enum definitions (avoid including full fftengine in header)
+#include "fftdefs.h"
+
+// Forward declarations to keep header light
+class widgetChart;
+class WidgetLabelArea;
+class PanelSettings;
+class PanelMeasurement;
+class PanelCursors;
+class PanelMath;
+class PanelAdvanced;
+class ScopeConfig;
+class Measurement;
+class WidgetButtons;
+class WidgetDial;
+class WidgetDialRange;
+class WidgetTextInput;
+
+#include <QVector>
+#include <QPointF>
 
 #define CHART_MAX_Y 7
 #define CHART_MIN_Y -1
@@ -47,7 +66,7 @@ public:
     void paintEvent(QPaintEvent *event);
 
 
-    void showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex);
+    void showDataTraces(const QVector<QVector<QPointF>> &dataSeries, float timeBase, int triggerChannelIndex);
 
     void setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom);
 
@@ -122,6 +141,12 @@ private slots:
 public:
 
 private:
+    struct ChannelTransformCache {
+        float lastScale = std::numeric_limits<float>::quiet_NaN();
+        float lastOffset = std::numeric_limits<float>::quiet_NaN();
+        QVector<QPointF> transformed;
+        bool dirty = true;
+    };
     Ui::ScopeWindow *ui;
     PanelSettings *panelSet;
     ScopeConfig *config;
@@ -144,8 +169,17 @@ private:
 
     void updateChartTimeScale(float timeBase);
     void fillTimeBase();
-    void paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPointF> mathSeries);
-    void paintMath(QVector<QPointF> mathSeries);
+    void paintTraces(const QVector<QVector<QPointF>> &dataSeries, const QVector<QPointF> &mathSeries);
+    void paintMath(const QVector<QPointF> &mathSeries);
+    void validateAndApplyTriggerChannel(int buttonStatus);
+    void updateTriggerChannelButtons(int buttonStatus);
+    // Transform cache helpers
+    void initTransformCache();
+    void invalidateAllTransforms();
+    void invalidateChannelTransform(int channelIndex);
+    const QVector<QPointF>& getTransformedChannel(int ch, const QVector<QPointF>& src) ;
+
+    QVector<ChannelTransformCache> transformCache; // size TOTAL_SCOPE_TRACES
 };
 
 #endif // WINDOWSCOPE_H

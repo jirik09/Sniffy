@@ -46,7 +46,7 @@ void MeasCalculations::run()
         }
         mutex.unlock();
 
-        foreach(Measurement* m, meas){
+        for (Measurement* m : meas) {
             qint8 channelIndex = m->getChannelIndex();
 
             if(channelIndex>=data.length() && m->getType()!=MeasurementType::PHASE){
@@ -146,7 +146,7 @@ void MeasCalculations::calculateVolt(QVector<QPointF> data, qint32 ch){
     Mean[ch] = 0;
     Max[ch] = std::numeric_limits<qreal>::min();
     Min[ch] = std::numeric_limits<qreal>::max();;
-    foreach (QPointF pt, data){
+    for (const QPointF &pt : data) {
 
         RMS[ch] += qPow(pt.y(),2);
         Mean[ch] += pt.y();

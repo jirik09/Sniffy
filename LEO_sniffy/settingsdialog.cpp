@@ -8,7 +8,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Settings");
 
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
+    setStyleSheet("QWidget{background-color:"+Graphics::palette().windowWidget+";}");
 
     QVBoxLayout *buttons = new QVBoxLayout();
     buttons->setSpacing(2);
@@ -60,7 +60,7 @@ SettingsDialog::~SettingsDialog()
 void SettingsDialog::open()
 {
     infoLabel->setValue("");
-    infoLabel->setColor(Graphics::COLOR_TEXT_ALL);
+    infoLabel->setColor(Graphics::palette().textAll);
     this->show();
     this->raise();
     this->activateWindow();
@@ -86,5 +86,5 @@ void SettingsDialog::closeDialog(int isCanceled)
 void SettingsDialog::restartWarning()
 {
     infoLabel->setValue("Restart needed to take effect");
-    infoLabel->setColor(Graphics::COLOR_WARNING);
+    infoLabel->setColor(Graphics::palette().warning);
 }

@@ -6,7 +6,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     setAllowedAreas(Qt::RightDockWidgetArea);
     setObjectName(title);
     hide();
-    setStyleSheet(Graphics::STYLE_DOCK_WIDGET);
+    setStyleSheet(Graphics::palette().styleDockWidget);
 
     // ***************** create title bar and window contorl icons *************
     QWidget *titleBar = new QWidget();
@@ -15,7 +15,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     titleBarLayout->setContentsMargins(5,0,5,0);
     titleBar->setLayout(titleBarLayout);
 
-    titleBar->setStyleSheet(Graphics::STYLE_DOCK_WINDOW);
+    titleBar->setStyleSheet(Graphics::palette().styleDockWindow);
     titleBarLayout->addWidget(new QLabel(title));
 
     titleBarLayout->addItem(new QSpacerItem(6, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -27,7 +27,7 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     btnHold->resize(38, 12);
     btnHold->setMaximumSize(36, 13);
     btnHold->setText("HOLD");
-    btnHold->setStyleSheet(Graphics::STYLE_HOLD_BUTTON);
+    btnHold->setStyleSheet(Graphics::palette().styleHoldButton);
     btnHold->hide();
     titleBarLayout->addWidget(btnHold);
     titleBarLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
@@ -36,21 +36,21 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     QPushButton *down = new QPushButton();
     down->resize(10,10);
     down->setContentsMargins(5,0,5,0);
-    down->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
+    down->setStyleSheet(Graphics::palette().styleControlButton+"QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}");
     down->setIcon(QIcon(Graphics::getGraphicsPath()+"dock.png"));
     titleBarLayout->addWidget(down);
 
     QPushButton *up = new QPushButton();
     up->resize(10,10);
     up->setContentsMargins(5,0,5,0);
-    up->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
+    up->setStyleSheet(Graphics::palette().styleControlButton+"QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}");
     up->setIcon(QIcon(Graphics::getGraphicsPath()+"unDock.png"));
     titleBarLayout->addWidget(up);
 
     QPushButton *exit = new QPushButton();
     exit->resize(10,10);
     exit->setContentsMargins(5,0,5,0);
-    exit->setStyleSheet(Graphics::STYLE_CONTROL_BUTTON+"QPushButton:hover{background-color:"+Graphics::COLOR_WINDOW_EXIT_HOVER+";}");
+    exit->setStyleSheet(Graphics::palette().styleControlButton+"QPushButton:hover{background-color:"+Graphics::palette().windowExitHover+";}");
     exit->setIcon(QIcon(Graphics::getGraphicsPath()+"exit.png"));
     titleBarLayout->addWidget(exit);
 

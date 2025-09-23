@@ -57,19 +57,22 @@ void CounterWindow::createAllDisplays(void){
     displayHF = createHighFreqDisplay();
     displayHF->setContentsMargins(5, 5, 5, 5);
     displayHF->setIndicationFlagColor(chan1);
-    displayHF->setProgressBarColor(chan1);
+    displayHF->setProgressColor(chan1);
+    displayHF->useVerticalProgressBar(false);
     ui->verticalLayout_display->addWidget(displayHF);    
 
     displayLFCh1 = createLowFreqDisplays("LowFreqCh1Counter");
     displayLFCh1->setContentsMargins(5, 5, 5, 5);
     displayLFCh1->setIndicationFlagColor(chan1);
-    displayLFCh1->setProgressBarColor(chan1);
+    displayLFCh1->setProgressColor(chan1);
+    displayLFCh1->useVerticalProgressBar(false);
     ui->verticalLayout_display->addWidget(displayLFCh1);
 
     displayLFCh2 = createLowFreqDisplays("LowFreqCh2Counter");
     displayLFCh2->setContentsMargins(5, 0, 5, 5);
     displayLFCh2->setIndicationFlagColor(chan2);
-    displayLFCh2->setProgressBarColor(chan2);
+    displayLFCh2->setProgressColor(chan2);
+    displayLFCh2->useVerticalProgressBar(false);
     ui->verticalLayout_display->addWidget(displayLFCh2);
 
     displayRat = createRatioDisplay();
@@ -143,7 +146,7 @@ void CounterWindow::configureAllDisplays(void){
 }
 
 void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor){
-    display->configLabel(LABELNUM_QUAN, quantity, Graphics::COLOR_TEXT_LABEL, true);
+    display->configLabel(LABELNUM_QUAN, quantity, Graphics::palette().textLabel, true);
     display->configLabel(LABELNUM_CHAN, channel, sideLabelsColor, true);
     display->configLabel(LABELNUM_INDIC, "    ", sideLabelsColor, true);
 }
@@ -155,13 +158,14 @@ void CounterWindow::setSpecification(CounterSpec *spec){
 
 void CounterWindow::configureDisplaysDynamicAttr(){
     configureDisplaysDynamicLabels(displayHF, spec->pins.hf_ch1, CHANNEL_1);
-    displayHF->setProgressBarRange(spec->hf_min_Tg100ms, spec->hf_max);
+    // Start range at 0 to guarantee visual empty state when frequency drops
+    displayHF->setProgressRange(0, spec->hf_max);
 
     configureDisplaysDynamicLabels(displayLFCh1, spec->pins.lf_ch1, CHANNEL_1);
-    displayLFCh1->setProgressBarRange(spec->lf_min, spec->lf_max);
+    displayLFCh1->setProgressRange(0, spec->lf_max);
 
     configureDisplaysDynamicLabels(displayLFCh2, spec->pins.lf_ch2, CHANNEL_2);
-    displayLFCh2->setProgressBarRange(spec->lf_min, spec->lf_max);
+    displayLFCh2->setProgressRange(0, spec->lf_max);
 
     configureDisplaysDynamicLabels(displayRat, spec->pins.rat_ref + "/" + spec->pins.rat_ch3, CHANNEL_1);
     configureDisplaysDynamicLabels(displayInt, spec->pins.int_ch1 + " - " + spec->pins.int_ch2, CHANNEL_1);
@@ -169,7 +173,7 @@ void CounterWindow::configureDisplaysDynamicAttr(){
 
 void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin, int chan){
     display->configLabel(LABELNUM_PINS, pin, Graphics::getChannelColor(chan), true);
-    display->configLabel(LABELNUM_FLAG, "", Graphics::COLOR_WARNING, true);
+    display->configLabel(LABELNUM_FLAG, "", Graphics::palette().warning, true);
 }
 
 void CounterWindow::switchCounterModeCallback(int index){
@@ -298,7 +302,7 @@ void CounterWindow::hfSwitchErrorAvgCallback(int index){
 }
 
 void CounterWindow::hfSetColorRemainSec(bool waiting){
-    QColor color = (waiting) ? Graphics::COLOR_TEXT_LABEL : Graphics::COLOR_TEXT_ALL;
+    QColor color = (waiting) ? Graphics::palette().textLabel : Graphics::palette().textAll;
     displayHF->changeAvgColor(color);
 }
 

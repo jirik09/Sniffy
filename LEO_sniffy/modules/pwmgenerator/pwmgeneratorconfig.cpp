@@ -1,4 +1,6 @@
 #include "pwmgeneratorconfig.h"
+#include <QDataStream>
+#include <QIODevice>
 
 PWMGeneratorConfig::PWMGeneratorConfig(QObject *parent)
 {
@@ -20,14 +22,13 @@ void PWMGeneratorConfig::parse(QByteArray config)
 
 QByteArray PWMGeneratorConfig::serialize()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocated
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     //TODO put data into stream
     //example:
     //stream << realSamplingRate;
     //stream << ADCresolution;
 
-    return *data;
+    return data; // NRVO / move
 }

@@ -25,6 +25,10 @@ enum class MemoryPolicy
 };
 
 #define MAX_SCOPE_CHANNELS 4
+// Math trace is treated as an extra (virtual) channel appended after the real channels.
+// Keep this centralized so any future change in channel layout propagates safely.
+constexpr int MATH_CHANNEL_INDEX = MAX_SCOPE_CHANNELS; // e.g. 4
+constexpr int TOTAL_SCOPE_TRACES = MAX_SCOPE_CHANNELS + 1; // real channels + math
 #define DEFAULT_MEM_SAMPLES_LENGTH 1200
 #define DEFAULT_CHART_DIV 10
 #define DEFAULT_SAMPL_PER_DIV 100

@@ -78,19 +78,20 @@ int MathCalculations::calcSymbolic(QVector<QVector<QPointF> > inData, QVector<QP
         return -1;
     }
 
-    te_variable vars[variableCount];
+    std::vector<te_variable> vars;
+    vars.reserve(static_cast<size_t>(variableCount));
     if(variableCount>=2){
-        vars[0] = {"t", &t,TE_VARIABLE,NULL};
-        vars[1] = {"a", &a,TE_VARIABLE,NULL};
+        vars.push_back(te_variable{"t", &t, TE_VARIABLE, nullptr});
+        vars.push_back(te_variable{"a", &a, TE_VARIABLE, nullptr});
     }
-    if(variableCount>=3)vars[2]= {"b", &b,TE_VARIABLE,NULL};
-    if(variableCount>=4)vars[3]= {"c", &c,TE_VARIABLE,NULL};
-    if(variableCount>=5)vars[4]= {"d", &d,TE_VARIABLE,NULL};
+    if(variableCount>=3) vars.push_back(te_variable{"b", &b, TE_VARIABLE, nullptr});
+    if(variableCount>=4) vars.push_back(te_variable{"c", &c, TE_VARIABLE, nullptr});
+    if(variableCount>=5) vars.push_back(te_variable{"d", &d, TE_VARIABLE, nullptr});
 
     std::string ex = expression.toStdString();
     const char *expChar = ex.data();
     int err;
-    te_expr *n = te_compile(expChar, vars, variableCount, &err);
+    te_expr *n = te_compile(expChar, vars.data(), static_cast<int>(vars.size()), &err);
 
     if(err!=0){
         te_free(n);

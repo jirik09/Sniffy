@@ -32,6 +32,9 @@
    <property name="leftMargin">
     <number>6</number>
    </property>
+   <property name="rightMargin">
+    <number>4</number>
+   </property>
    <property name="bottomMargin">
     <number>6</number>
    </property>
@@ -114,7 +117,7 @@
          <string>Burger</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
         <property name="wordWrap">
          <bool>false</bool>
@@ -151,7 +154,7 @@
       <bool>false</bool>
      </property>
      <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
    </item>

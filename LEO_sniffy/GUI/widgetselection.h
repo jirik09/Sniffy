@@ -27,7 +27,7 @@ public:
 
 private:
     Ui::WidgetSelection *ui;
-    QList<params_sel> *options;
+    QList<params_sel> options; // value semantics
     int selectedIndex;
 
 public:

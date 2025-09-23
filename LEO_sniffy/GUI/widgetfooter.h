@@ -22,7 +22,7 @@ public:
     explicit WidgetFooter(QWidget *parent = nullptr);
     ~WidgetFooter();
     QPushButton * getPushButtonSize();
-    void setAppearance(bool isWide);
+    void setAppearance(bool wide);
 
 signals:
     void settingsClicked();

@@ -25,7 +25,7 @@ PanelSettings::PanelSettings(QVBoxLayout *destination, QWidget *parent ) : QObje
     buttonsTriggerMode->setObjectName("TriggerMode");
     destination->addWidget(buttonsTriggerMode);
     buttonsTriggerMode->setText("Stop",0);
-    buttonsTriggerMode->setColor(Graphics::COLOR_WARNING,0);
+    buttonsTriggerMode->setColor(Graphics::palette().warning,0);
     buttonsTriggerMode->setText("Normal",1);
     buttonsTriggerMode->setText("Auto",2);
 

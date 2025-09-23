@@ -2,6 +2,7 @@
 #define MOVINGAVERAGE_H
 
 #include <QObject>
+#include <QList>
 
 class MovingAverage : public QObject
 {
@@ -19,8 +20,9 @@ public:
     void clear();
 
 private:
-    QList<double> buffer;
-    uint buffSize;
+    QList<double> buffer;      // newest element at index 0
+    uint buffSize;             // fixed target window size
+    double runningSum {0.0};   // sum of current elements (valid when buffer.count() > 0)
 
     void removeItems(uint sampleCount);
     void clearBuffer();

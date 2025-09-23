@@ -17,12 +17,12 @@ WidgetFooter::WidgetFooter(QWidget *parent) :
 
     ui->pushButton_settingsA->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_gear.png"));
     ui->pushButton_settingsB->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_gear.png"));
-    ui->pushButton_settingsA->setStyleSheet("QPushButton{border:none;} QPushButton:hover{border:none;background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
-    ui->pushButton_settingsB->setStyleSheet("QPushButton{border:none;} QPushButton:hover{border:none;background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
+    ui->pushButton_settingsA->setStyleSheet("QPushButton{border:none;} QPushButton:hover{border:none;background-color:"+Graphics::palette().windowControlHover+";}");
+    ui->pushButton_settingsB->setStyleSheet("QPushButton{border:none;} QPushButton:hover{border:none;background-color:"+Graphics::palette().windowControlHover+";}");
 
     animationForward = new QMovie(Graphics::getGraphicsPath()+"menu_burger_button.gif");
     animationBackward = new QMovie(Graphics::getGraphicsPath()+"menu_burger_button_backw.gif");
-    ui->label_burgerAnim->setStyleSheet("QLabel:hover{background-color:"+Graphics::COLOR_WINDOW_CONTROL_HOVER+";}");
+    ui->label_burgerAnim->setStyleSheet("QLabel:hover{background-color:"+Graphics::palette().windowControlHover+";}");
 
     QSize *size = new QSize(30, 30);
     animationForward->setScaledSize(*size);
@@ -50,9 +50,9 @@ void WidgetFooter::sizeCallback(){
     emit sizeClicked(isWide);
 }
 
-void WidgetFooter::setAppearance(bool isWide){
-    this->isWide = isWide; //save the value if it is called from public
-    if(!isWide){
+void WidgetFooter::setAppearance(bool wide){
+    this->isWide = wide; //save the value if it is called from public
+    if(!wide){
         ui->pushButton_settingsA->show();
         ui->pushButton_settingsB->hide();
         ui->label_settings->setText("");

@@ -101,12 +101,12 @@ qreal ArbGeneratorWindow::getPWMFrequency(int channel)
 
 void ArbGeneratorWindow::setProgress(int percent)
 {
-    setGenerateButton("Uploading "+ QString::number(percent)+ "%",Graphics::COLOR_WARNING);
+    setGenerateButton("Uploading "+ QString::number(percent)+ "%",Graphics::palette().warning);
 }
 
 void ArbGeneratorWindow::setGeneratorRuning()
 {
-    setGenerateButton("Stop",Graphics::COLOR_RUNNING);
+    setGenerateButton("Stop",Graphics::palette().running);
     isGenerating = true;
     if(setting->isSweepEnabled){
         sweepController->startTimer();
@@ -115,7 +115,7 @@ void ArbGeneratorWindow::setGeneratorRuning()
 
 void ArbGeneratorWindow::setGeneratorStopped()
 {
-    setGenerateButton("Start",Graphics::COLOR_CONTROLS);
+    setGenerateButton("Start",Graphics::palette().controls);
     isGenerating = false;
     createSignalCallback();
     if(setting->isSweepEnabled){
@@ -126,9 +126,9 @@ void ArbGeneratorWindow::setGeneratorStopped()
 
 void ArbGeneratorWindow::setFrequencyLabels(int channel, qreal freq)
 {
-    QString col = Graphics::COLOR_TEXT_LABEL;
+    QString col = Graphics::palette().textLabel;
     if(abs(freq/setting->dialFreqCh[channel]->getRealValue()-1)>0.01){
-        col = Graphics::COLOR_WARNING;
+    col = Graphics::palette().warning;
     }
     setting->setFreqLabel(freq,channel,5);
 }
@@ -148,7 +148,7 @@ void ArbGeneratorWindow::runGeneratorCallback()
 {
     if(setting->buttonsGenerate->getText(0) == "Start"){
         emit runGenerator();
-        setGenerateButton("Uploading",Graphics::COLOR_WARNING);
+    setGenerateButton("Uploading",Graphics::palette().warning);
         setting->disableGUI();
     }else{
         emit stopGenerator();

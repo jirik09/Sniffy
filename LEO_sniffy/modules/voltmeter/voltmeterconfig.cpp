@@ -1,4 +1,6 @@
 #include "voltmeterconfig.h"
+#include <QDataStream>
+#include <QIODevice>
 
 VoltmeterConfig::VoltmeterConfig(QObject *parent)
 {
@@ -20,14 +22,13 @@ void VoltmeterConfig::parse(QByteArray config)
 
 QByteArray VoltmeterConfig::serialize()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocated
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     //TODO put data into stream
     //example:
     //stream << realSamplingRate;
     //stream << ADCresolution;
 
-    return *data;
+    return data;
 }
