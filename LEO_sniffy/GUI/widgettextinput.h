@@ -34,6 +34,8 @@ public:
     void processInput();
     void setAsPassword();
     void setText(QString txt);
+    // Set placeholder (non-editable hint) with optional custom color (falls back to style if empty color)
+    void setPlaceholder(const QString &text, const QColor &color = QColor());
 
 signals:
     void textChanged(QString text);
@@ -46,6 +48,8 @@ private:
     QString lastParsed = "";
     qreal number = 0;
     bool graphicsShown = false;
+    QString placeholderText;
+    QColor placeholderColor;
 
 
 private slots:

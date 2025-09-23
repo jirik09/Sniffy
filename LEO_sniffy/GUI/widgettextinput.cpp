@@ -89,6 +89,19 @@ void WidgetTextInput::setText(QString txt)
     ui->lineEdit->setText(txt);
 }
 
+void WidgetTextInput::setPlaceholder(const QString &text, const QColor &color){
+    placeholderText = text;
+    placeholderColor = color;
+    ui->lineEdit->setPlaceholderText(text);
+    if(color.isValid()){
+        QPalette p = ui->lineEdit->palette();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
+        p.setColor(QPalette::PlaceholderText, color);
+#endif
+        ui->lineEdit->setPalette(p);
+    }
+}
+
 bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
     bool processTextEdit = false;
     if(event->type()==QEvent::Show)graphicsShown = true;

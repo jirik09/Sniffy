@@ -18,6 +18,8 @@ LoginDialog::LoginDialog(QWidget *parent) :
     layout->setContentsMargins(5,5,5,5);
 
     userEmail= new WidgetTextInput(this,"User email  ");
+    // Use placeholder instead of editable sentinel
+    userEmail->setPlaceholder("Unknown user", QColor(160,160,160));
     userPIN = new WidgetTextInput(this, "PIN  ", "", InputTextType::NUMBER);
     userPIN->setAsPassword();
     layout->addWidget(userEmail);
@@ -30,14 +32,15 @@ LoginDialog::LoginDialog(QWidget *parent) :
     registerLink->setTextFormat(Qt::RichText);
     registerLink->setTextInteractionFlags(Qt::TextBrowserInteraction | Qt::LinksAccessibleByKeyboard | Qt::LinksAccessibleByMouse);
     registerLink->setOpenExternalLinks(true);
-    // Use existing color constants only; fallback to text label color for link if accent not defined
+    registerLink->setAlignment(Qt::AlignHCenter); // center whole block
     registerLink->setStyleSheet(QString(
         "QLabel { color:%1; } "
         "a { color:%2; text-decoration:none; } "
         "a:hover { text-decoration:underline; }")
         .arg(Graphics::palette().textLabel, Graphics::palette().textLabel));
+    // Two-line text: second line centered as well, per request (both lines centered)
     registerLink->setText(
-        "First time here? Register at "
+        "First time here?<br/>Register at "
         "<a href=\"https://www.sniffy.cz\" target=\"_blank\">www.sniffy.cz</a>");
     layout->addWidget(registerLink);
 
@@ -58,7 +61,9 @@ LoginDialog::LoginDialog(QWidget *parent) :
 
     ui->widgetLogin->setLayout(layout);
 
-    userEmail->setText(CustomSettings::getUserEmail());
+    if(!(CustomSettings::getUserEmail().isEmpty() || CustomSettings::getUserEmail()=="Unknown user")){
+        userEmail->setText(CustomSettings::getUserEmail());
+    } // else leave empty so placeholder shows
 
     // Persistent network manager
     networkManager = new QNetworkAccessManager(this);
