@@ -33,10 +33,8 @@ void CustomSettings::loadSettings(QString fileName)
             userEmail.clear();
         }
         userPin = settings.value("pin").toString();
-        loginToken = QByteArray::fromHex(settings.value("token").toByteArray());
-        // Previously this used QByteArray::fromHex which corrupted an already ASCII token on reload.
-        // Store and load the token verbatim to keep what the server provided.
-        // loginToken = settings.value("token").toByteArray();
+        loginToken = settings.value("token").toByteArray();
+
         tokenValidity = settings.value("validity").toDateTime();
         lastLoginFailureReason = settings.value("last_login_failure").toString();
     }else{ // set default values if settings file doesnt exist
