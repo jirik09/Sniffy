@@ -1,61 +1,15 @@
 #include "light.h"
+#include "../graphics.h" // For ThemePalette definition
 
-Light::Light(QObject *parent)
-{
-    Q_UNUSED(parent);
-
-    Graphics::COLOR_WINDOW_APP = LIGHT_WINDOW_APP;
-    Graphics::COLOR_WINDOW_WIDGET = LIGHT_WINDOW_WIDGET;
-
-    Graphics::COLOR_BACKGROUND_FOCUS_IN = LIGHT_BACKGROUND_FOCUS_IN;
-    Graphics::COLOR_COMPONENT_DISABLED = LIGHT_COMPONENT_DISABLED;
-    Graphics::COLOR_BACKGROUND_BUTTON = LIGHT_BACKGROUND_BUTTON;
-    Graphics::COLOR_CONTROLS = LIGHT_CONTROLS;
-    Graphics::COLOR_DATA_INPUT_AREA = LIGHT_DATA_INPUT_AREA;
-    Graphics::COLOR_DISPLAY = LIGHT_DISPLAY;
-    Graphics::COLOR_CHART = LIGHT_CHART;
-    Graphics::COLOR_CHART_GRIDLEG_DEFAULT = LIGHT_CHART_GRIDLEG_DEFAULT;
-    Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST = LIGHT_CHART_GRIDLEG_LOW_CONTRAST;
-    Graphics::COLOR_TEXT_ALL = LIGHT_TEXT_ALL;
-    Graphics::COLOR_TEXT_LABEL = LIGHT_TEXT_LABEL;
-    Graphics::COLOR_TEXT_COMPONENT = LIGHT_TEXT_COMPONENT;
-    Graphics::COLOR_WINDOW_CONTROL_HOVER = LIGHT_WINDOW_CONTROL_HOVER;
-    Graphics::COLOR_WINDOW_EXIT_HOVER = LIGHT_WINDOW_EXIT_HOVER;
-    Graphics::COLOR_WARNING = LIGHT_WARNING;
-    Graphics::COLOR_ERROR = LIGHT_ERROR;
-    Graphics::COLOR_RUNNING = LIGHT_RUNNING;
-    Graphics::COLOR_UNUSED = LIGHT_UNUSED;
-
-    /* These called with QString().arg() from code (must have %1) */
-    Graphics::STYLE_PUSH_BUTTON = LIGHT_STYLE_PUSH_BUTTON;
-    Graphics::STYLE_CHECK_BUTTON = LIGHT_STYLE_CHECK_BUTTON;
-    Graphics::STYLE_PROGRESS_BAR = LIGHT_STYLE_PROGRESS_BAR;
-
-    Graphics::STYLE_COMBO_BOX = LIGHT_STYLE_COMBO_BOX;
-    Graphics::STYLE_CONTROL_BUTTON = LIGHT_STYLE_CONTROL_BUTTON;
-    Graphics::STYLE_MODULE_BUTTON = LIGHT_STYLE_MODULE_BUTTON;
-    Graphics::STYLE_HOLD_BUTTON = LIGHT_STYLE_HOLD_BUTTON;
-    Graphics::STYLE_DIAL = LIGHT_STYLE_DIAL;
-    Graphics::STYLE_TEXTINPUT = LIGHT_STYLE_TEXTINPUT;
-    Graphics::STYLE_DOCK_WIDGET = LIGHT_STYLE_MODULE_DOCK_WIDGET;
-    Graphics::STYLE_DOCK_WINDOW = LIGHT_STYLE_OBJECT;
-
-    Graphics::STYLE_CUSTOM_DIALS_USED = LIGHT_STYLE_USE_CUSTOM_DIALS;
-    Graphics::STYLE_TRANSPARENCY_USED = LIGHT_STYLE_USE_TRANSPARENCY;
-
-    Graphics::STYLE_GLOBAL = QString(LIGHT_STYLE_GLOBAL).arg(LIGHT_CONTROLS);
-
-    if(LIGHT_STYLE_USE_TRANSPARENCY){
-        QString color = QString(LIGHT_CONTROLS).remove("#");
-        Graphics::STYLE_GLOBAL = QString(LIGHT_STYLE_GLOBAL).arg(color);
-    }else{
-        Graphics::STYLE_GLOBAL = QString(LIGHT_STYLE_GLOBAL).arg(LIGHT_CONTROLS);
-    }
-}
+Light::Light(QObject *parent){ Q_UNUSED(parent); }
 
 
 QString Light::getAppGlobalStyle(){
-    return Graphics::STYLE_GLOBAL;
+    if(LIGHT_STYLE_USE_TRANSPARENCY){
+        QString color = QString(LIGHT_CONTROLS).remove("#");
+        return QString(LIGHT_STYLE_GLOBAL).arg(color);
+    }
+    return QString(LIGHT_STYLE_GLOBAL).arg(LIGHT_CONTROLS);
 }
 
 QString Light::getGraphicsPath(){
@@ -64,4 +18,48 @@ QString Light::getGraphicsPath(){
 
 QString Light::getChannelColor(int channelIndex){
     return chanColor.at(channelIndex).name();
+}
+
+ThemePalette Light::buildPalette(){
+    ThemePalette p;
+    p.windowApp = LIGHT_WINDOW_APP;
+    p.windowWidget = LIGHT_WINDOW_WIDGET;
+    p.backgroundFocusIn = LIGHT_BACKGROUND_FOCUS_IN;
+    p.componentDisabled = LIGHT_COMPONENT_DISABLED;
+    p.backgroundButton = LIGHT_BACKGROUND_BUTTON;
+    p.dataInputArea = LIGHT_DATA_INPUT_AREA;
+    p.controls = LIGHT_CONTROLS;
+    p.display = LIGHT_DISPLAY;
+    p.chart = LIGHT_CHART;
+    p.chartGridlegDefault = LIGHT_CHART_GRIDLEG_DEFAULT;
+    p.chartGridlegLowContrast = LIGHT_CHART_GRIDLEG_LOW_CONTRAST;
+    p.textAll = LIGHT_TEXT_ALL;
+    p.textLabel = LIGHT_TEXT_LABEL;
+    p.textComponent = LIGHT_TEXT_COMPONENT;
+    p.windowControlHover = LIGHT_WINDOW_CONTROL_HOVER;
+    p.windowExitHover = LIGHT_WINDOW_EXIT_HOVER;
+    p.warning = LIGHT_WARNING;
+    p.error = LIGHT_ERROR;
+    p.running = LIGHT_RUNNING;
+    p.unused = LIGHT_UNUSED;
+    p.stylePushButton = LIGHT_STYLE_PUSH_BUTTON;
+    p.styleCheckButton = LIGHT_STYLE_CHECK_BUTTON;
+    p.styleProgressBar = LIGHT_STYLE_PROGRESS_BAR;
+    p.styleComboBox = LIGHT_STYLE_COMBO_BOX;
+    p.styleControlButton = LIGHT_STYLE_CONTROL_BUTTON;
+    p.styleModuleButton = LIGHT_STYLE_MODULE_BUTTON;
+    p.styleHoldButton = LIGHT_STYLE_HOLD_BUTTON;
+    p.styleDial = LIGHT_STYLE_DIAL;
+    p.styleTextInput = LIGHT_STYLE_TEXTINPUT;
+    p.styleDockWidget = LIGHT_STYLE_MODULE_DOCK_WIDGET;
+    p.styleDockWindow = LIGHT_STYLE_OBJECT;
+    p.styleCustomDialsUsed = LIGHT_STYLE_USE_CUSTOM_DIALS;
+    p.styleTransparencyUsed = LIGHT_STYLE_USE_TRANSPARENCY;
+    if(LIGHT_STYLE_USE_TRANSPARENCY){
+        QString color = QString(LIGHT_CONTROLS).remove("#");
+        p.styleGlobal = QString(LIGHT_STYLE_GLOBAL).arg(color);
+    } else {
+        p.styleGlobal = QString(LIGHT_STYLE_GLOBAL).arg(LIGHT_CONTROLS);
+    }
+    return p;
 }

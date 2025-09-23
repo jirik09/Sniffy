@@ -43,7 +43,7 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     for (QLabel *label : channLabelList) {
         if(label) label->hide();
     }
-    this->setStyleSheet("QWidget{background-color:" + Graphics::COLOR_DATA_INPUT_AREA + ";}");
+    this->setStyleSheet("QWidget{background-color:" + Graphics::palette().dataInputArea + ";}");
 
 }
 

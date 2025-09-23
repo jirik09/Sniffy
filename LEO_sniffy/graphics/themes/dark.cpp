@@ -1,60 +1,15 @@
 #include "dark.h"
+#include "../graphics.h" // For ThemePalette definition
 
-Dark::Dark(QObject *parent)
-{
-    Q_UNUSED(parent);
-
-    Graphics::COLOR_WINDOW_APP = DARK_WINDOW_APP;
-    Graphics::COLOR_WINDOW_WIDGET = DARK_WINDOW_WIDGET;
-
-    Graphics::COLOR_BACKGROUND_FOCUS_IN = DARK_BACKGROUND_FOCUS_IN;
-    Graphics::COLOR_COMPONENT_DISABLED = DARK_COMPONENT_DISABLED;
-    Graphics::COLOR_BACKGROUND_BUTTON = DARK_BACKGROUND_BUTTON;
-    Graphics::COLOR_CONTROLS = DARK_CONTROLS;
-    Graphics::COLOR_DATA_INPUT_AREA = DARK_DATA_INPUT_AREA;
-    Graphics::COLOR_DISPLAY = DARK_DISPLAY;
-    Graphics::COLOR_CHART = DARK_CHART;
-    Graphics::COLOR_CHART_GRIDLEG_DEFAULT = DARK_CHART_GRIDLEG_DEFAULT;
-    Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST = DARK_CHART_GRIDLEG_LOW_CONTRAST;
-    Graphics::COLOR_TEXT_ALL = DARK_TEXT_ALL;
-    Graphics::COLOR_TEXT_LABEL = DARK_TEXT_LABEL;
-    Graphics::COLOR_TEXT_COMPONENT = DARK_TEXT_COMPONENT;
-    Graphics::COLOR_WINDOW_CONTROL_HOVER = DARK_WINDOW_CONTROL_HOVER;
-    Graphics::COLOR_WINDOW_EXIT_HOVER = DARK_WINDOW_EXIT_HOVER;
-    Graphics::COLOR_WARNING = DARK_WARNING;
-    Graphics::COLOR_ERROR = DARK_ERROR;
-    Graphics::COLOR_RUNNING = DARK_RUNNING;
-    Graphics::COLOR_UNUSED = DARK_UNUSED;
-
-    /* These called with QString().arg() from code (must have %1) */
-    Graphics::STYLE_PUSH_BUTTON = DARK_STYLE_PUSH_BUTTON;
-    Graphics::STYLE_CHECK_BUTTON = DARK_STYLE_CHECK_BUTTON;
-    Graphics::STYLE_PROGRESS_BAR = DARK_STYLE_PROGRESS_BAR;
-
-    Graphics::STYLE_COMBO_BOX = DARK_STYLE_COMBO_BOX;
-    Graphics::STYLE_CONTROL_BUTTON = DARK_STYLE_CONTROL_BUTTON;
-    Graphics::STYLE_MODULE_BUTTON = DARK_STYLE_MODULE_BUTTON;
-    Graphics::STYLE_HOLD_BUTTON = DARK_STYLE_HOLD_BUTTON;
-    Graphics::STYLE_DIAL = DARK_STYLE_DIAL;
-    Graphics::STYLE_TEXTINPUT = DARK_STYLE_TEXTINPUT;
-    Graphics::STYLE_DOCK_WIDGET = DARK_STYLE_MODULE_DOCK_WIDGET;
-    Graphics::STYLE_DOCK_WINDOW = DARK_STYLE_OBJECT;
-
-    Graphics::STYLE_CUSTOM_DIALS_USED = DARK_STYLE_USE_CUSTOM_DIALS;
-    Graphics::STYLE_TRANSPARENCY_USED = DARK_STYLE_USE_TRANSPARENCY;
-
-    Graphics::STYLE_GLOBAL = QString(DARK_STYLE_GLOBAL).arg(DARK_CONTROLS);
-
-    if(DARK_STYLE_USE_TRANSPARENCY){
-        QString color = QString(DARK_CONTROLS).remove("#");
-        Graphics::STYLE_GLOBAL = QString(DARK_STYLE_GLOBAL).arg(color);
-    }else{
-        Graphics::STYLE_GLOBAL = QString(DARK_STYLE_GLOBAL).arg(DARK_CONTROLS);
-    }
-}
+Dark::Dark(QObject *parent) { Q_UNUSED(parent); }
 
 QString Dark::getAppGlobalStyle(){
-    return Graphics::STYLE_GLOBAL;
+    // Fallback for any legacy call: compute on the fly (no caching needed here)
+    if(DARK_STYLE_USE_TRANSPARENCY){
+        QString color = QString(DARK_CONTROLS).remove("#");
+        return QString(DARK_STYLE_GLOBAL).arg(color);
+    }
+    return QString(DARK_STYLE_GLOBAL).arg(DARK_CONTROLS);
 }
 
 QString Dark::getGraphicsPath(){
@@ -63,4 +18,48 @@ QString Dark::getGraphicsPath(){
 
 QString Dark::getChannelColor(int channelIndex){
     return chanColor.at(channelIndex).name();
+}
+
+ThemePalette Dark::buildPalette(){
+    ThemePalette p;
+    p.windowApp = DARK_WINDOW_APP;
+    p.windowWidget = DARK_WINDOW_WIDGET;
+    p.backgroundFocusIn = DARK_BACKGROUND_FOCUS_IN;
+    p.componentDisabled = DARK_COMPONENT_DISABLED;
+    p.backgroundButton = DARK_BACKGROUND_BUTTON;
+    p.dataInputArea = DARK_DATA_INPUT_AREA;
+    p.controls = DARK_CONTROLS;
+    p.display = DARK_DISPLAY;
+    p.chart = DARK_CHART;
+    p.chartGridlegDefault = DARK_CHART_GRIDLEG_DEFAULT;
+    p.chartGridlegLowContrast = DARK_CHART_GRIDLEG_LOW_CONTRAST;
+    p.textAll = DARK_TEXT_ALL;
+    p.textLabel = DARK_TEXT_LABEL;
+    p.textComponent = DARK_TEXT_COMPONENT;
+    p.windowControlHover = DARK_WINDOW_CONTROL_HOVER;
+    p.windowExitHover = DARK_WINDOW_EXIT_HOVER;
+    p.warning = DARK_WARNING;
+    p.error = DARK_ERROR;
+    p.running = DARK_RUNNING;
+    p.unused = DARK_UNUSED;
+    p.stylePushButton = DARK_STYLE_PUSH_BUTTON;
+    p.styleCheckButton = DARK_STYLE_CHECK_BUTTON;
+    p.styleProgressBar = DARK_STYLE_PROGRESS_BAR;
+    p.styleComboBox = DARK_STYLE_COMBO_BOX;
+    p.styleControlButton = DARK_STYLE_CONTROL_BUTTON;
+    p.styleModuleButton = DARK_STYLE_MODULE_BUTTON;
+    p.styleHoldButton = DARK_STYLE_HOLD_BUTTON;
+    p.styleDial = DARK_STYLE_DIAL;
+    p.styleTextInput = DARK_STYLE_TEXTINPUT;
+    p.styleDockWidget = DARK_STYLE_MODULE_DOCK_WIDGET;
+    p.styleDockWindow = DARK_STYLE_OBJECT;
+    p.styleCustomDialsUsed = DARK_STYLE_USE_CUSTOM_DIALS;
+    p.styleTransparencyUsed = DARK_STYLE_USE_TRANSPARENCY;
+    if(DARK_STYLE_USE_TRANSPARENCY){
+        QString color = QString(DARK_CONTROLS).remove("#");
+        p.styleGlobal = QString(DARK_STYLE_GLOBAL).arg(color);
+    } else {
+        p.styleGlobal = QString(DARK_STYLE_GLOBAL).arg(DARK_CONTROLS);
+    }
+    return p;
 }

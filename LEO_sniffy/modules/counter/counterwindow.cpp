@@ -146,7 +146,7 @@ void CounterWindow::configureAllDisplays(void){
 }
 
 void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString channel, QString quantity, QString sideLabelsColor){
-    display->configLabel(LABELNUM_QUAN, quantity, Graphics::COLOR_TEXT_LABEL, true);
+    display->configLabel(LABELNUM_QUAN, quantity, Graphics::palette().textLabel, true);
     display->configLabel(LABELNUM_CHAN, channel, sideLabelsColor, true);
     display->configLabel(LABELNUM_INDIC, "    ", sideLabelsColor, true);
 }
@@ -173,7 +173,7 @@ void CounterWindow::configureDisplaysDynamicAttr(){
 
 void CounterWindow::configureDisplaysDynamicLabels(WidgetDisplay *display, QString pin, int chan){
     display->configLabel(LABELNUM_PINS, pin, Graphics::getChannelColor(chan), true);
-    display->configLabel(LABELNUM_FLAG, "", Graphics::COLOR_WARNING, true);
+    display->configLabel(LABELNUM_FLAG, "", Graphics::palette().warning, true);
 }
 
 void CounterWindow::switchCounterModeCallback(int index){
@@ -302,7 +302,7 @@ void CounterWindow::hfSwitchErrorAvgCallback(int index){
 }
 
 void CounterWindow::hfSetColorRemainSec(bool waiting){
-    QColor color = (waiting) ? Graphics::COLOR_TEXT_LABEL : Graphics::COLOR_TEXT_ALL;
+    QColor color = (waiting) ? Graphics::palette().textLabel : Graphics::palette().textAll;
     displayHF->changeAvgColor(color);
 }
 

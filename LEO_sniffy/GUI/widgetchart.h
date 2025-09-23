@@ -83,6 +83,7 @@ public:
     void setLocalZoom(const qreal &value);
     void setShift (float shift);
     qreal getShift();
+    qreal getShiftPercent() const; // new: returns -100..100 percent form
     void enableLocalMouseEvents(EventSelection sel);
 
     void setGridLinesVisible(bool gridVisibleX, bool gridVisibleY);
@@ -144,13 +145,13 @@ private:
     QValueAxis *axisY_UnitRange;
     QValueAxis *axisX_FFT;
 
-    QPainterPath *MarkerPath_ArrowDownBig;
-    QPainterPath *MarkerPath_ArrowDownSmall;
-    QPainterPath *MarkerPath_ArrowUpSmall;
-    QPainterPath *MarkerPath_Tick;
-    QPainterPath *MarkerPath_Cross;
-    QPainterPath *MarkerPath_Circle;
-    QPainterPath *MarkerPath_Trigger;
+    QPainterPath MarkerPath_ArrowDownBig;
+    QPainterPath MarkerPath_ArrowDownSmall;
+    QPainterPath MarkerPath_ArrowUpSmall;
+    QPainterPath MarkerPath_Tick;
+    QPainterPath MarkerPath_Cross;
+    QPainterPath MarkerPath_Circle;
+    QPainterPath MarkerPath_Trigger;
 
     void initContextMenu();
     void createHorizontalMarkers();
@@ -161,6 +162,16 @@ private:
     void createSeries(QAbstractSeries *series);
 
     bool eventFilter(QObject *obj, QEvent *event) override;
+
+    // mapping helpers
+    static inline qreal percentToInternalShift(float percent){
+        // incoming range -100..100 -> internal 0..1
+        return (percent + 100.f)/200.f;
+    }
+    static inline float internalShiftToPercent(qreal internal){
+        // internal 0..1 -> -100..100
+        return static_cast<float>(internal*200.0 - 100.0);
+    }
 
 signals:
     void chartSeriesChanged();

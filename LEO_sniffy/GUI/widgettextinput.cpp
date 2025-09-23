@@ -1,5 +1,6 @@
 #include "widgettextinput.h"
 #include "ui_widgettextinput.h"
+#include "stylehelper.h"
 
 WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, InputTextType type) :
     QWidget(parent),
@@ -25,11 +26,8 @@ WidgetTextInput::WidgetTextInput(QWidget *parent, QString name, QString value, I
         }
     }
 
-    QString style = Graphics::STYLE_TEXTINPUT;
-    ui->label->setStyleSheet(style);
-
-    style = Graphics::STYLE_TEXTINPUT+"QWidget{background-color:"+Graphics::COLOR_DATA_INPUT_AREA+"} QWidget::focus{background-color:"+Graphics::COLOR_BACKGROUND_FOCUS_IN+";}";
-    ui->lineEdit->setStyleSheet(style);
+    ui->label->setStyleSheet(StyleHelper::textInputLabel());
+    ui->lineEdit->setStyleSheet(StyleHelper::textInputField());
 }
 
 WidgetTextInput::~WidgetTextInput()
@@ -44,6 +42,7 @@ QByteArray WidgetTextInput::saveGeometry()
 
 void WidgetTextInput::restoreGeometry(QByteArray geom)
 {
+    if(geom.isEmpty()) return;
     ui->lineEdit->setText(geom);
 }
 
@@ -90,15 +89,29 @@ void WidgetTextInput::setText(QString txt)
     ui->lineEdit->setText(txt);
 }
 
+void WidgetTextInput::setPlaceholder(const QString &text, const QColor &color){
+    placeholderText = text;
+    placeholderColor = color;
+    ui->lineEdit->setPlaceholderText(text);
+    if(color.isValid()){
+        QPalette p = ui->lineEdit->palette();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 12, 0))
+        p.setColor(QPalette::PlaceholderText, color);
+#endif
+        ui->lineEdit->setPalette(p);
+    }
+}
+
 bool WidgetTextInput::eventFilter(QObject *obj, QEvent *event){
     bool processTextEdit = false;
     if(event->type()==QEvent::Show)graphicsShown = true;
     if(event->type()==QEvent::Hide)graphicsShown = false;
 
     if(graphicsShown && event->type() == QEvent::FocusOut) processTextEdit = true;
-    if(graphicsShown && event->type() == QEnterEvent::KeyRelease){
-        QKeyEvent *ev = (QKeyEvent*)event;
-        if( (ev->key() == Qt::Key_Enter) || (ev->key() == Qt::Key_Return)) processTextEdit = true;
+    if(graphicsShown && event->type() == QEvent::KeyRelease){
+        auto *ev = static_cast<QKeyEvent*>(event);
+        if(ev->key() == Qt::Key_Enter || ev->key() == Qt::Key_Return)
+            processTextEdit = true;
     }
 
     if(processTextEdit){

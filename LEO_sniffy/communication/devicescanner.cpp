@@ -11,30 +11,30 @@ DeviceScanner::~DeviceScanner()
 
 void DeviceScanner::searchForDevices(bool isSearchEnaled)
 {
-    this->isSearchEnaled = isSearchEnaled;
+    this->isSearchEnaled.store(isSearchEnaled, std::memory_order_relaxed);
 }
 
 void DeviceScanner::run()
 {
     isRunning = true;
     QList<DeviceDescriptor> tempDeviceList;
-    while(isRunning){
-        if(isSearchEnaled){
+    while(isRunning.load(std::memory_order_relaxed)){
+        if(isSearchEnaled.load(std::memory_order_relaxed)){
             tempDeviceList.clear();
             SerialLine::getAvailableDevices(&tempDeviceList,0);
 
             if(!deviceListsEqual(tempDeviceList,currentDeviceList)){
                 currentDeviceList = tempDeviceList;
                // qDebug() << "new devices found"<<currentDeviceList.length();
-                isSearchEnaled = false;
+                isSearchEnaled.store(false, std::memory_order_relaxed);
                 emit newDevicesScanned(currentDeviceList);
             }
             // backoff a little to avoid hammering the system
-            thread()->msleep(200);
+            QThread::msleep(200);
         }else{
-            thread()->msleep(1500);
+            QThread::msleep(1500);
         }
-        thread()->msleep(800);
+        QThread::msleep(800);
     }
 }
 
@@ -55,7 +55,7 @@ bool DeviceScanner::deviceListsEqual(QList<DeviceDescriptor> &listA, QList<Devic
 
 void DeviceScanner::quit()
 {
-    isRunning = false;
+    isRunning.store(false, std::memory_order_relaxed);
 }
 
 

@@ -5,7 +5,7 @@
 #include <QColor>
 
 #include "../abstracttheme.h"
-#include "../graphics.h"
+struct ThemePalette; // forward declaration
 
 #define HUD_GRAPHICS_PATH  ":/graphics/graphics/themes/hudcyan/"
 #define HUD_FONT           "'Segoe UI'"
@@ -161,6 +161,7 @@ public:
     QString getGraphicsPath();
 
     QString getChannelColor(int channelIndex);
+    ThemePalette buildPalette() override; // new palette builder
 
 private:
     QList<QColor> chanColor =

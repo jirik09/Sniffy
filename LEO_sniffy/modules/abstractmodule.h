@@ -82,7 +82,6 @@ protected:
     QByteArray moduleCommandPrefix;
 
     AbstractSpecification* moduleSpecification = nullptr;
-    Graphics *theme;
 
 private:
     ModuleDockWidget *dockWidgetWindow;

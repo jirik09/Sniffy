@@ -42,7 +42,7 @@ public:
 private:
     Ui::WidgetDial *ui;
     int optionalEmitParam = 0;
-    QList<params_dial> *options;
+    QList<params_dial> options; // value container (owned directly)
     int selectedIndex;
     int defaultIndex = 0;
 

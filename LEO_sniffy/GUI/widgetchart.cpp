@@ -7,18 +7,17 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     maxTraces(maxTraces)
 {
     ui->setupUi(this);
-    setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    setStyleSheet("background-color:" + Graphics::palette().dataInputArea);
 
     chart = new QChart();
     chart->legend()->hide();
     chart->setObjectName("chart");
 
-    chart->setBackgroundBrush(QColor(Graphics::COLOR_CHART));
+    chart->setBackgroundBrush(QColor(Graphics::palette().chart));
     chart->setAcceptHoverEvents(true);
     this->setMouseTracking(true);
 
-    QMargins *chrtMargin = new QMargins(0,0,0,0);
-    chart->setMargins(*chrtMargin);
+    chart->setMargins(QMargins(0,0,0,0));
 
     axisX = new QValueAxis;
     axisY = new QValueAxis;
@@ -88,7 +87,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->setMargins(QMargins(0,-12,0,0));
     chart->setBackgroundRoundness(0);
 
-    setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
+    setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
     initContextMenu();
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -228,10 +227,6 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         mousePressedPoint = ev->pos();
         initMouseShift = shift;
         QApplication::setOverrideCursor(QCursor(Qt::ClosedHandCursor));
-        while (mousePressed) {
-            Timing *timer = new Timing();
-            timer->sleep(100);
-        }
     }
 
     if(event->type() == QEvent::GraphicsSceneMouseRelease){
@@ -279,8 +274,11 @@ void widgetChart::clearPoint(int traceIndex, int index){
 }
 
 void widgetChart::updateTrace(QVector<QPointF> *points, int index){
-    const QVector<QPointF> &seriesData = *points;
-    seriesList[index]->replace(seriesData);
+    if(!points || index < 0 || index >= seriesList.size()) {
+        qWarning() << "widgetChart::updateTrace invalid index or null points" << index;
+        return;
+    }
+    seriesList[index]->replace(*points);
 }
 
 void widgetChart::appendToTrace(int index, QVector<QPointF> *points){
@@ -368,8 +366,7 @@ qreal widgetChart::getSignalValue(int traceIndex, qreal time)
 }
 
 void widgetChart::setMargins(int left, int top, int right, int bottom){
-    QMargins *chrtMargin = new QMargins(left, top, right, bottom);
-    chart->setMargins(*chrtMargin);
+    chart->setMargins(QMargins(left, top, right, bottom));
 }
 
 void widgetChart::setZoom(float zoom){
@@ -395,13 +392,18 @@ void widgetChart::setLocalZoom(const qreal &value)
 
 /* range -100 to 100 (represents percent value) */
 void widgetChart::setShift (float shift){
-    this->shift = (shift/2+50)/100;
+    this->shift = percentToInternalShift(shift);
     updateAxis();
 }
 
 qreal widgetChart::getShift()
 {
     return shift;
+}
+
+qreal widgetChart::getShiftPercent() const
+{
+    return internalShiftToPercent(shift);
 }
 
 void widgetChart::enableLocalMouseEvents(EventSelection sel)
@@ -436,6 +438,10 @@ void widgetChart::setGraphColor(QColor qColor){
 }
 
 void widgetChart::setTraceColor(int index, QColor color){
+    if(index < 0 || index >= seriesList.size()) {
+        qWarning() << "widgetChart::setTraceColor invalid index" << index;
+        return;
+    }
     seriesList.at(index)->setColor(color);
 }
 
@@ -488,48 +494,45 @@ void widgetChart::createVerticalMarkers(){
 
 void widgetChart::initBrushes()
 {
-    MarkerPath_ArrowDownBig = new QPainterPath();
-    MarkerPath_ArrowDownBig->lineTo(10,20);
-    MarkerPath_ArrowDownBig->lineTo(20,0);
+    MarkerPath_ArrowDownBig = QPainterPath();
+    MarkerPath_ArrowDownBig.lineTo(10,20);
+    MarkerPath_ArrowDownBig.lineTo(20,0);
 
-    MarkerPath_Tick = new QPainterPath(QPoint(0,7));
-    MarkerPath_Tick->lineTo(14,7);
-    MarkerPath_Tick->lineTo(19,10);
-    MarkerPath_Tick->lineTo(14,13);
-    MarkerPath_Tick->lineTo(0,13);
+    MarkerPath_Tick = QPainterPath(QPoint(0,7));
+    MarkerPath_Tick.lineTo(14,7);
+    MarkerPath_Tick.lineTo(19,10);
+    MarkerPath_Tick.lineTo(14,13);
+    MarkerPath_Tick.lineTo(0,13);
 
-    MarkerPath_ArrowDownSmall = new QPainterPath(QPointF(5,0));
-    MarkerPath_ArrowDownSmall->lineTo(10,10);
-    MarkerPath_ArrowDownSmall->lineTo(15,0);
+    MarkerPath_ArrowDownSmall = QPainterPath(QPointF(5,0));
+    MarkerPath_ArrowDownSmall.lineTo(10,10);
+    MarkerPath_ArrowDownSmall.lineTo(15,0);
 
-    MarkerPath_ArrowUpSmall = new QPainterPath(QPointF(5,20));
-    MarkerPath_ArrowUpSmall->lineTo(10,10);
-    MarkerPath_ArrowUpSmall->lineTo(15,20);
+    MarkerPath_ArrowUpSmall = QPainterPath(QPointF(5,20));
+    MarkerPath_ArrowUpSmall.lineTo(10,10);
+    MarkerPath_ArrowUpSmall.lineTo(15,20);
 
+    MarkerPath_Cross = QPainterPath(QPointF(7,7));
+    MarkerPath_Cross.lineTo(13,13);
+    MarkerPath_Cross.moveTo(7,13);
+    MarkerPath_Cross.lineTo(13,7);
 
-    MarkerPath_Cross = new QPainterPath(QPointF(7,7));
-    MarkerPath_Cross->lineTo(13,13);
-    MarkerPath_Cross->moveTo(7,13);
-    MarkerPath_Cross->lineTo(13,7);
+    MarkerPath_Circle = QPainterPath(QPointF(10,10));
+    MarkerPath_Circle.arcTo(QRectF(8,8,4,4),0,360*16);
 
-    MarkerPath_Circle = new QPainterPath(QPointF(10,10));
-    MarkerPath_Circle->arcTo(QRectF(8,8,4,4),0,360*16);
-
-    MarkerPath_Trigger = new QPainterPath(QPointF(0,5));
-    MarkerPath_Trigger->lineTo(15,5);
-    MarkerPath_Trigger->lineTo(20,10);
-    MarkerPath_Trigger->lineTo(15,15);
-
-    MarkerPath_Trigger->lineTo(13,15);
-    MarkerPath_Trigger->lineTo(13,10);
-    MarkerPath_Trigger->lineTo(16,10);
-    MarkerPath_Trigger->lineTo(16,7);
-    MarkerPath_Trigger->lineTo(7,7);
-    MarkerPath_Trigger->lineTo(7,10);
-    MarkerPath_Trigger->lineTo(10,10);
-    MarkerPath_Trigger->lineTo(10,15);
-
-    MarkerPath_Trigger->lineTo(0,15);
+    MarkerPath_Trigger = QPainterPath(QPointF(0,5));
+    MarkerPath_Trigger.lineTo(15,5);
+    MarkerPath_Trigger.lineTo(20,10);
+    MarkerPath_Trigger.lineTo(15,15);
+    MarkerPath_Trigger.lineTo(13,15);
+    MarkerPath_Trigger.lineTo(13,10);
+    MarkerPath_Trigger.lineTo(16,10);
+    MarkerPath_Trigger.lineTo(16,7);
+    MarkerPath_Trigger.lineTo(7,7);
+    MarkerPath_Trigger.lineTo(7,10);
+    MarkerPath_Trigger.lineTo(10,10);
+    MarkerPath_Trigger.lineTo(10,15);
+    MarkerPath_Trigger.lineTo(0,15);
 
 }
 
@@ -544,92 +547,81 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
     painter.setBrush(painter.pen().color());
     switch (type) {
     case MarkerType::ARROW_DOWN_BIG:
-        painter.drawPath(*MarkerPath_ArrowDownBig);
+    painter.drawPath(MarkerPath_ArrowDownBig);
         break;
     case MarkerType::ARROW_UP_SMALL:
-        painter.drawPath(*MarkerPath_ArrowUpSmall);
+    painter.drawPath(MarkerPath_ArrowUpSmall);
         break;
     case MarkerType::ARROW_DOWN_SMALL:
-        painter.drawPath(*MarkerPath_ArrowDownSmall);
+    painter.drawPath(MarkerPath_ArrowDownSmall);
         break;
     case MarkerType::TICK:
-        painter.drawPath(*MarkerPath_Tick);
+    painter.drawPath(MarkerPath_Tick);
         break;
     case MarkerType::CROSS:
         painter.setPen(QPen(QBrush(QColor(Graphics::getChannelColor(channelIndex))), 2.0));
-        painter.drawPath(*MarkerPath_Cross);
+    painter.drawPath(MarkerPath_Cross);
         break;
     case MarkerType::CIRCLE:
-        painter.drawPath(*MarkerPath_Circle);
+    painter.drawPath(MarkerPath_Circle);
         break;
     case MarkerType::TRIGGER:
-        painter.drawPath(*MarkerPath_Trigger);
+    painter.drawPath(MarkerPath_Trigger);
         break;
     }
     return marker;
 }
 
 void widgetChart::setHorizontalMarker(int channelIndex, qreal value, MarkerType type){
-    QPointF pt = QPointF(0.005,value);
-    QList<QPointF> *lst = new QList<QPointF>;
-    lst->append(pt);
-    markersHorizontal[markerHorizontalIndex]->setBrush(getBrush(channelIndex,type));
-    markersHorizontal[markerHorizontalIndex]->replace(*lst);
-    markerHorizontalIndex++;
+    if(markerHorizontalIndex < markersHorizontal.size()){
+        const QPointF pt(0.005,value);
+        QVector<QPointF> pts{pt};
+        markersHorizontal[markerHorizontalIndex]->setBrush(getBrush(channelIndex,type));
+        markersHorizontal[markerHorizontalIndex]->replace(pts);
+        ++markerHorizontalIndex;
+    }
 }
 
 void widgetChart::setVerticalMarker(int channelIndex, qreal value){
-    QPointF pt = QPointF(value,0.99);
-    triggerShift = value;
-    QList<QPointF> *lst = new QList<QPointF>;
-    lst->append(pt);
-    markersVertical[markerVerticalIndex]->setBrush(getBrush(channelIndex,MarkerType::ARROW_DOWN_BIG));
-    markersVertical[markerVerticalIndex]->replace(*lst);
-    markerVerticalIndex++;
+    if(markerVerticalIndex < markersVertical.size()){
+        const QPointF pt(value,0.99);
+        triggerShift = value;
+        QVector<QPointF> pts{pt};
+        markersVertical[markerVerticalIndex]->setBrush(getBrush(channelIndex,MarkerType::ARROW_DOWN_BIG));
+        markersVertical[markerVerticalIndex]->replace(pts);
+        ++markerVerticalIndex;
+    }
 }
 
 void widgetChart::setHorizontalCursor(int channelIndex, qreal value, Cursor type)
 {
-    QPointF start = QPointF(value,0.0);
-    QPointF end = QPointF(value,1.0);
-    QList<QPointF> *lst = new QList<QPointF>;
-    lst->append(start);
-    lst->append(end);
-
-    QPen *pen = new QPen();
-    pen->setColor(Graphics::getChannelColor(channelIndex));
-    pen->setWidth(2);
+    const QVector<QPointF> pts{QPointF(value,0.0), QPointF(value,1.0)};
+    QPen pen(Graphics::getChannelColor(channelIndex));
+    pen.setWidth(2);
     if(type == Cursor::CURSOR_A){
-        pen->setStyle(Qt::DashLine);
-        cursorsHorizontal[0]->setPen(*pen);
-        cursorsHorizontal[0]->replace(*lst);
+        pen.setStyle(Qt::DashLine);
+        cursorsHorizontal[0]->setPen(pen);
+        cursorsHorizontal[0]->replace(pts);
     }else{
-        pen->setStyle(Qt::DashDotLine);
-        cursorsHorizontal[1]->setPen(*pen);
-        cursorsHorizontal[1]->replace(*lst);
+        pen.setStyle(Qt::DashDotLine);
+        cursorsHorizontal[1]->setPen(pen);
+        cursorsHorizontal[1]->replace(pts);
     }
 }
 
 void widgetChart::setVerticalCursor(int channelIndex, qreal value, Cursor type)
 {
-    QPointF start = QPointF(0.0,value);
-    QPointF end = QPointF(1.0,value);
-    QList<QPointF> *lst = new QList<QPointF>;
-    lst->append(start);
-    lst->append(end);
-
-    QPen *pen = new QPen();
-    pen->setColor(Graphics::getChannelColor(channelIndex));
-    pen->setWidth(2);
-
+    const QVector<QPointF> pts{QPointF(0.0,value), QPointF(1.0,value)};
+    QPen pen(Graphics::getChannelColor(channelIndex));
+    pen.setWidth(2);
     if(type == Cursor::CURSOR_A){
-        pen->setStyle(Qt::DashLine);
-        cursorsVertical[0]->setPen(*pen);
-        cursorsVertical[0]->replace(*lst);
+        pen.setStyle(Qt::DashLine);
+        cursorsVertical[0]->setPen(pen);
+        cursorsVertical[0]->replace(pts);
     }else{
-        pen->setStyle(Qt::DashDotLine);
-        cursorsVertical[1]->setPen(*pen);
-        cursorsVertical[1]->replace(*lst);
+        pen.setStyle(Qt::DashDotLine);
+        cursorsVertical[1]->setPen(pen);
+        cursorsVertical[1]->replace(pts);
     }
 }
 

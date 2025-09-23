@@ -28,6 +28,10 @@ void CustomSettings::loadSettings(QString fileName)
         themeIndex = settings.contains("theme") ? settings.value("theme").toInt() : 2;
 
         userEmail = settings.value("email").toString();
+        if(userEmail == "Unknown user"){
+            // Treat legacy sentinel as empty so UI shows placeholder instead of editable text
+            userEmail.clear();
+        }
         userPin = settings.value("pin").toString();
         loginToken = QByteArray::fromHex(settings.value("token").toByteArray());
         // Previously this used QByteArray::fromHex which corrupted an already ASCII token on reload.
@@ -55,7 +59,12 @@ void CustomSettings::saveSettings()
     settings.setValue("restoreSession", restoreSession);
     settings.setValue("theme", themeIndex);
 
-    settings.setValue("email", userEmail);
+    // Never persist legacy sentinel; store empty instead
+    if(userEmail == "Unknown user"){
+        settings.setValue("email", "");
+    }else{
+        settings.setValue("email", userEmail);
+    }
     settings.setValue("pin", userPin);
     // Safeguard: do not overwrite an existing valid token with an empty placeholder inadvertently
     if(loginToken.isEmpty()){

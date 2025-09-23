@@ -21,7 +21,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     for (WidgetDisplay *dis : displays) {
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
-        dis->configLabel(2,"Voltage",Graphics::COLOR_TEXT_LABEL,true);
+    dis->configLabel(2,"Voltage",Graphics::palette().textLabel,true);
         ui->verticalLayout_display->addWidget(dis);
         dis->setIndicationFlagColor(Graphics::getChannelColor(index));
         // Switch to vertical progress bar for voltmeter
@@ -83,7 +83,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonsCalc->setText("Min/Max",0);
     buttonsCalc->setText("Ripple",1);
     buttonsCalc->setText("None",2);
-    buttonsCalc->setColor(Graphics::COLOR_UNUSED,2);
+    buttonsCalc->setColor(Graphics::palette().unused,2);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
     QSpacerItem *verticalSpacer;
@@ -106,7 +106,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
     buttonStartLog->setObjectName("buttonlogcontrol");
     tabs->getLayout(1)->addWidget(buttonStartLog);
     buttonStartLog->setText("Start",0);
-    buttonStartLog->setColor(Graphics::COLOR_WARNING,0);
+    buttonStartLog->setColor(Graphics::palette().warning,0);
     buttonStartLog->enableAll(false);
 
     // Separator at the end is very important otherwise controls would not be nicely shown when maximized
@@ -220,7 +220,7 @@ void VoltmeterWindow::showProgress(int current, int max){
 void VoltmeterWindow::setPinsAndNumChannels(QString pins[], int numOfCh)
 {
     for(int i = 0;i<numOfCh;i++){
-        displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::COLOR_TEXT_ALL,true);
+    displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::palette().textAll,true);
         buttonsChannelEnable->setButtonHidden(false,i);
     }
 }
@@ -249,7 +249,7 @@ void VoltmeterWindow::stopDatalog()
         logFile->close();
         isDataLogRunning = false;
         buttonStartLog->setText("Start",0);
-        buttonStartLog->setColor(Graphics::COLOR_WARNING,0);
+    buttonStartLog->setColor(Graphics::palette().warning,0);
         buttonSelectFile->enableAll(true);
         labelFile->setValue("Log stopped (" + QString::number(logSampleIndex) + " smpl)");
     }
@@ -277,7 +277,7 @@ void VoltmeterWindow::startDatalog()
             *logStream << "\n";
             isDataLogRunning = true;
             buttonStartLog->setText("Stop",0);
-            buttonStartLog->setColor(Graphics::COLOR_RUNNING,0);
+            buttonStartLog->setColor(Graphics::palette().running,0);
             buttonSelectFile->enableAll(false);
         }else{
             labelFile->setValue("Error opening file");

@@ -28,6 +28,9 @@ class Scope : public AbstractModule
     Q_OBJECT
 public:
     explicit Scope(QObject *parent = nullptr);
+    ~Scope() override; // custom to ensure orderly shutdown before QObject chain
+
+    Q_DISABLE_COPY(Scope)
 
     QWidget* getWidget();
 
@@ -60,14 +63,17 @@ public slots:
     void clearMeasurement();
 
 private:
-    ScopeWindow *scpWindow;
-    ScopeConfig *config;
-    TimeBaseAndMemory *timeAndMemoryHandle;
-    ScopeSpec *specification;
-    MeasCalculations *measCalc;
-    MathCalculations *mathCalc;
-    FFTengine *FFTCalc;
-    QVector<QVector<QPointF>> *scopeData;
+    // Raw pointers below are owned and deleted via QObject parent/child hierarchy
+    // (they are constructed with 'this' or have their own internal lifetime). Adding
+    // documentation here clarifies that manual delete is intentionally omitted.
+    ScopeWindow *scpWindow = nullptr;        // QObject child
+    ScopeConfig *config = nullptr;           // QObject child
+    TimeBaseAndMemory *timeAndMemoryHandle = nullptr; // QObject child
+    ScopeSpec *specification = nullptr;      // QObject child
+    MeasCalculations *measCalc = nullptr;    // QObject child
+    MathCalculations *mathCalc = nullptr;    // QObject child
+    FFTengine *FFTCalc = nullptr;            // QObject child (thread)
+    QVector<QVector<QPointF>> scopeData;     // value storage (was pointer)
     QString mathExpression;
 
     int FFTlength = 0;

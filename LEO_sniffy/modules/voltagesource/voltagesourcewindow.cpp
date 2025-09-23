@@ -25,7 +25,7 @@ VoltageSourceWindow::VoltageSourceWindow(VoltageSourceConfig *config, QWidget *p
     for (WidgetDisplay *dis : displays) {
         dis->setContentsMargins(5, 5, 5, 5);
         dis->showAvgDisplay(false);
-        dis->configLabel(2,"Voltage Source",Graphics::COLOR_TEXT_LABEL,true);
+    dis->configLabel(2,"Voltage Source",Graphics::palette().textLabel,true);
         // Use vertical progress bar like Voltmeter
         dis->useVerticalProgressBar(true);
         // Initial default range 0..100 (we will remap when real range set)
@@ -137,7 +137,7 @@ void VoltageSourceWindow::setRange(qreal min, qreal max)
 void VoltageSourceWindow::setPins(QString pins[], int numChann)
 {
     for(int i = 0;i<numChann;i++){
-        displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::COLOR_TEXT_ALL,true);
+    displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::palette().textAll,true);
     }
 }
 

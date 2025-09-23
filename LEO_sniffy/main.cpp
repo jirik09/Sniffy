@@ -8,7 +8,7 @@
 #include "customsettings.h"
 
 int main(int argc, char *argv[])
-{    
+{
     // Qt6: QTextCodec setCodecForLocale removed (UTF-8 is default). Removed obsolete call.
 
     QApplication app(argc, argv);
@@ -19,8 +19,11 @@ int main(int argc, char *argv[])
     CustomSettings::loadSettings(QApplication::applicationDirPath() + "/settings.ini");
     CustomSettings::setThemesList(Graphics::initThemesList());
 
-    //Graphics(nullptr, CustomSettings::getThemeIndex());
-    app.setStyleSheet(Graphics::getThemeInstance(CustomSettings::getThemeIndex())->getAppGlobalStyle());
+    // Set theme explicitly (replaces deprecated getThemeInstance(int) usage)
+    Graphics::setTheme(CustomSettings::getThemeIndex());
+    if (auto themePtr = Graphics::getThemeInstance()) {
+        app.setStyleSheet(themePtr->getAppGlobalStyle());
+    }
 
     MainWindow w;
     w.show();

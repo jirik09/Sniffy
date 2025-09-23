@@ -85,7 +85,7 @@ void PatternGeneratorPainter::recalculate(QList<quint8> *data)
 
 void PatternGeneratorPainter::configDefaultChart(){    
     if(PATTERNS_USE_QCUSTOM_PLOT){
-        plot->setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
+    plot->setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
         plot->setGridHorizontalDensity(PATT_DEFAULT_DATA_LENGTH+1);
         plot->setLabelsVisible(true, false);
         plot->setRange(0, 1 , 0.97, PATT_RANGE_CHAN1_LOG1 + 0.98);

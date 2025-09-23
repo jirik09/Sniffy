@@ -6,6 +6,12 @@ SerialLine::SerialLine(QObject *parent) : QObject(parent)
     message.reserve(1024);
 }
 
+SerialLine::~SerialLine()
+{
+    closeLine();
+    resetPort();
+}
+
 int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstIndex){
 
     const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
@@ -59,6 +65,7 @@ void SerialLine::openSerialLine(DeviceDescriptor desc){
 
     //qDebug()<< "serial line open"<<this->thread();
     bool success = false;
+    resetPort();
     serPort = new QSerialPort();
     serPort->setPortName(desc.port);
     serPort->setBaudRate(desc.speed);
@@ -77,8 +84,8 @@ void SerialLine::openSerialLine(DeviceDescriptor desc){
     }
     if(serPort->isOpen()){
         success=true;
-        serialReader = new SerialPortReader(serPort,this);
-        serialWriter = new SerialPortWriter(serPort,this);
+    serialReader = new SerialPortReader(serPort,this);
+    serialWriter = new SerialPortWriter(serPort,this);
 
         connect(serialReader,&SerialPortReader::newData, this, &SerialLine::receiveData);
         connect(serPort, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
@@ -106,17 +113,31 @@ void SerialLine::handleError(QSerialPort::SerialPortError error){
 
 void SerialLine::receiveData(QByteArray data){
     buffer.append(data);
-
-    //find delimiter
-    int i = buffer.indexOf(delimiter);
-    while(i>0){
-        message = buffer.left(i);
-        emit newMessage(message);
-
-        //remove message and delimiter from buffer
-        buffer.remove(0,i+4);
-        i = buffer.indexOf(delimiter);
+    // find delimiter(s); allow delimiter at start (should not happen normally) and handle consecutive messages
+    int idx = buffer.indexOf(delimiter);
+    while(idx >= 0){
+        if(idx > 0){
+            message = buffer.left(idx);
+            emit newMessage(message);
+        }
+        // remove processed part + delimiter
+        buffer.remove(0, idx + delimiter.size());
+        idx = buffer.indexOf(delimiter);
     }
+}
+
+void SerialLine::resetPort()
+{
+    if (serPort){
+        if(serPort->isOpen()){
+            serPort->flush();
+            serPort->close();
+        }
+        delete serPort;
+        serPort = nullptr;
+    }
+    serialReader = nullptr; // QObject children auto-deleted
+    serialWriter = nullptr;
 }
 
 bool SerialLine::getIsOpen() const

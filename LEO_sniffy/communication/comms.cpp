@@ -2,22 +2,20 @@
 
 Comms::Comms(QObject *parent) : QObject(parent)
 {
-    //qDebug()<< "thread comms"<<this->thread();
-    serial = new SerialLine();
+    serial = std::make_unique<SerialLine>();
     serialThread = new QThread(this);
 
     serial->moveToThread(serialThread);
-    connect(this,&Comms::dataWrite,serial,&SerialLine::write);
-    connect(serial,&SerialLine::newMessage,this,&Comms::parseMessage);
-    connect(serial,&SerialLine::serialLineError,this,&Comms::errorReceived);
-    connect(this,&Comms::openLine,serial,&SerialLine::openSerialLine);
-    connect(this,&Comms::closeLine,serial,&SerialLine::closeLine);
+    connect(this,&Comms::dataWrite,serial.get(),&SerialLine::write);
+    connect(serial.get(),&SerialLine::newMessage,this,&Comms::parseMessage);
+    connect(serial.get(),&SerialLine::serialLineError,this,&Comms::errorReceived);
+    connect(this,&Comms::openLine,serial.get(),&SerialLine::openSerialLine);
+    connect(this,&Comms::closeLine,serial.get(),&SerialLine::closeLine);
     serialThread->start();
 
     connect(&devScanner,&DeviceScanner::newDevicesScanned,this,&Comms::devicesScanned);
     devScanner.start();
     devScanner.searchForDevices(true);
-
 }
 
 Comms::~Comms()
@@ -27,13 +25,12 @@ Comms::~Comms()
     devScanner.wait();
 
     // stop serial worker thread and cleanup worker
-    serialThread->quit();
-    serialThread->wait();
-
-    if (serial) {
-        delete serial;
-        serial = nullptr;
+    if(serialThread){
+        serialThread->quit();
+        serialThread->wait();
     }
+    // serial (QObject) lives in serialThread; ensure it's moved back or destroyed after thread stopped.
+    serial.reset();
 }
 
 void Comms::open(DeviceDescriptor device){
@@ -127,6 +124,6 @@ void Comms::parseMessage(QByteArray message){
 
 bool Comms::getIsOpen() const
 {
-    return serial->getIsOpen();
+    return serial ? serial->getIsOpen() : false;
 }
 

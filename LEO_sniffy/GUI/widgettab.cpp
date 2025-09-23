@@ -1,5 +1,6 @@
 #include "widgettab.h"
 #include "ui_widgettab.h"
+#include "../statehelper.h"
 
 widgetTab::widgetTab(QWidget *parent, int num) :
     QWidget(parent),
@@ -22,22 +23,23 @@ widgetTab::widgetTab(QWidget *parent, int num) :
 }
 
 void widgetTab::setText(QString text, int index){
+    if(index < 0 || index >= ui->tabWidget->count())
+        return;
     ui->tabWidget->setTabText(index,text);
 }
 
 QVBoxLayout * widgetTab::getLayout (int index){
-    if(index==0)
-        return ui->verticalLayout_1;
-    if(index==1)
-        return ui->verticalLayout_2;
-    if(index==2)
-        return ui->verticalLayout_3;
-    if(index==3)
-        return ui->verticalLayout_4;
-    if(index==4)
-        return ui->verticalLayout_5;
-    if(index==5)
-        return ui->verticalLayout_6;
+    if(index < 0 || index >= ui->tabWidget->count())
+        return nullptr;
+    switch(index){
+        case 0: return ui->verticalLayout_1;
+        case 1: return ui->verticalLayout_2;
+        case 2: return ui->verticalLayout_3;
+        case 3: return ui->verticalLayout_4;
+        case 4: return ui->verticalLayout_5;
+        case 5: return ui->verticalLayout_6;
+        default: return nullptr;
+    }
     return nullptr;
 }
 
@@ -48,12 +50,12 @@ widgetTab::~widgetTab()
 
 QByteArray widgetTab::saveGeometry()
 {
-    return QByteArray::number(ui->tabWidget->currentIndex());
+    return StateHelper::pack(ui->tabWidget->currentIndex());
 }
 
 void widgetTab::restoreGeometry(QByteArray geom)
 {
-    ui->tabWidget->setCurrentIndex(geom.toInt());
+    int idx=0; if(StateHelper::unpack(geom, idx)) ui->tabWidget->setCurrentIndex(idx);
     //emit tabBarClicked(geom.toInt());
 }
 

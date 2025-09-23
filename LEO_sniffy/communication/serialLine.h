@@ -16,6 +16,7 @@
 #include "serialportwriter.h"
 
 #include <QDebug>
+#include <atomic>
 
 
 class SerialLine : public QObject
@@ -26,6 +27,13 @@ class SerialLine : public QObject
 
 public:
     explicit SerialLine(QObject *parent = nullptr);
+    ~SerialLine();
+
+    // Non-copyable (manages owning pointers / OS handle)
+    SerialLine(const SerialLine&) = delete;
+    SerialLine& operator=(const SerialLine&) = delete;
+    SerialLine(SerialLine&&) = delete;
+    SerialLine& operator=(SerialLine&&) = delete;
 
     static int getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstIndex);
     bool getIsOpen() const;
@@ -44,14 +52,16 @@ private slots:
         void receiveData(QByteArray data);
 
 private:
-    QSerialPort *serPort;
-    QByteArray buffer;
-    QByteArray message;
 
-   const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
+    void resetPort();
+    QSerialPort *serPort = nullptr;
+    QByteArray buffer;   // reused buffer to minimize allocs
+    QByteArray message;  // reused message container
 
-    SerialPortReader *serialReader;
-    SerialPortWriter *serialWriter;
+    const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
+
+    SerialPortReader *serialReader = nullptr; // owned via QObject parent
+    SerialPortWriter *serialWriter = nullptr; // owned via QObject parent
     bool isOpen = false;
 };
 

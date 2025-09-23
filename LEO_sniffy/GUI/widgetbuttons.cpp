@@ -57,7 +57,7 @@ WidgetButtons::WidgetButtons(QWidget *parent, int buttonCount, ButtonTypes butto
     }
 
     for(int i = 0; i < 8 ; i++){
-        setColor(Graphics::COLOR_CONTROLS,i);
+    setColor(Graphics::palette().controls,i);
     }
 
     connect(ui->pushButton_1,SIGNAL(clicked()),this,SLOT(button_1_Clicked()));
@@ -121,22 +121,26 @@ void WidgetButtons::restoreGeometry(QByteArray geom)
 }
 
 void WidgetButtons::setText(QString text, int index){
-    pushButtonsList.at(index)->setText(text);
+    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index))
+        pushButtonsList.at(index)->setText(text);
 }
 
 QString WidgetButtons::getText(int index){
-    return pushButtonsList.at(index)->text();
+    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index))
+        return pushButtonsList.at(index)->text();
+    return QString();
 }
 
 void WidgetButtons::setColor(QString text, int index){
     QString tempStyleSheet = "";
     if (index>=0 && index<8){
-        if(Graphics::STYLE_TRANSPARENCY_USED)
+        const auto &p = Graphics::palette();
+        if(p.styleTransparencyUsed)
             text = text.remove("#");
         if(type == ButtonTypes::CHECKABLE || type == ButtonTypes::RADIO){
-            tempStyleSheet = QString(Graphics::STYLE_CHECK_BUTTON).arg(text);
+            tempStyleSheet = QString(p.styleCheckButton).arg(text);
         }else{
-            tempStyleSheet = QString(Graphics::STYLE_PUSH_BUTTON).arg(text);
+            tempStyleSheet = QString(p.stylePushButton).arg(text);
         }
         pushButtonsList.at(index)->setStyleSheet(tempStyleSheet);
     }
@@ -159,7 +163,9 @@ void WidgetButtons::clickedInternal (int index){
 }
 
 bool WidgetButtons::isChecked (int index){
-    return pushButtonsList.at(index)->isChecked();
+    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index))
+        return pushButtonsList.at(index)->isChecked();
+    return false;
 }
 
 int WidgetButtons::getSelectedIndex(){
@@ -182,7 +188,8 @@ int WidgetButtons::getStatus(){
 }
 
 void WidgetButtons::setDisabledButton(bool disabled, int index){
-    pushButtonsList.at(index)->setDisabled(disabled);
+    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index))
+        pushButtonsList.at(index)->setDisabled(disabled);
 }
 void WidgetButtons::disableAll(){
     for (int i=0;i<8;i++) {
@@ -191,7 +198,8 @@ void WidgetButtons::disableAll(){
 }
 
 void WidgetButtons::setEnabledButton(bool enable, int index){
-    pushButtonsList.at(index)->setEnabled(enable);
+    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index))
+        pushButtonsList.at(index)->setEnabled(enable);
 }
 void WidgetButtons::enableAll(bool enable){
     for (int i=0;i<8;i++) {
@@ -234,7 +242,8 @@ void WidgetButtons::setChecked (bool checked, int index){
     if(type==ButtonTypes::RADIO){
         uncheckAll();
     }
-    pushButtonsList.at(index)->setChecked(checked);
+    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index))
+        pushButtonsList.at(index)->setChecked(checked);
 }
 
 void WidgetButtons::setButtonHidden(bool hidden, int index)
