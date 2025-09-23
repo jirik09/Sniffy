@@ -43,6 +43,7 @@ private:
 
     bool isConnected = false;
     int resourcesInUse = 0;
+    int currentDeviceIndex = -1;
 
 private slots:
     void parseData(QByteArray data);
@@ -57,6 +58,7 @@ private slots:
 public slots:
     void close();
     void closeApp();
+    void reopenDeviceAfterLogin();
 };
 
 #endif // DEVICE_H

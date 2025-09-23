@@ -110,6 +110,7 @@ void MainWindow::setupMainWindowComponents(){
     connect(footer,&WidgetFooter::settingsClicked,this,&MainWindow::openSettingDialog);
     connect(loginInfo,&WidgetLoginInfo::loginDialogClicked,this,&MainWindow::openLoginDialog);
     connect(logindial,&LoginDialog::loginInfoChanged,this,&MainWindow::updateLoginInfo);
+    connect(logindial,&LoginDialog::loginInfoChanged,deviceMediator,&DeviceMediator::reopenDeviceAfterLogin);
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();

@@ -1,4 +1,5 @@
 #include "devicemediator.h"
+#include <QTimer>
 
 DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 {
@@ -55,6 +56,8 @@ void DeviceMediator::newDeviceList(QList<DeviceDescriptor> deviceList)
 
 void DeviceMediator::open(int deviceIndex)
 {
+    // Remember which index is currently opened so we can reopen after login
+    currentDeviceIndex = deviceIndex;
     communication->open(deviceList.at(deviceIndex));
 
     QThread::msleep(50);
@@ -119,6 +122,26 @@ void DeviceMediator::open(int deviceIndex)
     }
 }
 
+void DeviceMediator::reopenDeviceAfterLogin()
+{
+    // Called when the login info changed. If we were connected to a device,
+    // briefly close and reopen so the MCU receives the new token handshake.
+    if (currentDeviceIndex < 0 || deviceList.isEmpty()) return;
+
+    // If not connected, nothing to do — open directly
+    if (!isConnected) {
+        open(currentDeviceIndex);
+        return;
+    }
+    close();
+
+    QTimer::singleShot(250, [this]() {
+        if (currentDeviceIndex >= 0 && currentDeviceIndex < deviceList.size()) {
+            open(currentDeviceIndex);
+        }
+    });
+}
+
 void DeviceMediator::disableModules()
 {
     if (isConnected)
@@ -159,17 +182,18 @@ void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int r
 
 void DeviceMediator::close()
 {
-    disableModules();
-    ShowDeviceModule();
     disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
     disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
+    disableModules();
+    ShowDeviceModule();
 }
 
 void DeviceMediator::closeApp()
 {
-    disableModules();
     disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
     disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
+    disableModules();
+
 }
 
 void DeviceMediator::handleError(QByteArray error)
