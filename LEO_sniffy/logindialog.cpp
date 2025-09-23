@@ -54,6 +54,13 @@ LoginDialog::LoginDialog(QWidget *parent) :
     WidgetSeparator *sep2 = new WidgetSeparator(this);
     layout->addWidget(sep2);
 
+    // Logout button group (single button) placed just before primary action buttons
+    logoutButton = new WidgetButtons(this,1);
+    logoutButton->setText(" Logout ",0);
+    // Enabled only when a valid login exists
+    logoutButton->setEnabledButton(CustomSettings::hasValidLogin(), 0);
+    layout->addWidget(logoutButton);
+
     buttonsDone = new WidgetButtons(this,2);
     buttonsDone->setText("  Login  ",0);
     buttonsDone->setText(" Close ",1);
@@ -86,6 +93,10 @@ LoginDialog::LoginDialog(QWidget *parent) :
     });
 
     connect(buttonsDone,&WidgetButtons::clicked,this,&LoginDialog::buttonAction);
+    connect(logoutButton,&WidgetButtons::clicked,this,[this](int idx, int){
+        Q_UNUSED(idx);
+        performLogout();
+    });
 }
 
 LoginDialog::~LoginDialog()
@@ -134,6 +145,8 @@ void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &t
     CustomSettings::setLastLoginFailure("");
     CustomSettings::saveSettings();
 
+    if (logoutButton) logoutButton->setEnabledButton(true, 0);
+
     info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy hh:mm"));
     info->setColor(Graphics::palette().textAll);
     emit loginInfoChanged();
@@ -148,6 +161,7 @@ void LoginDialog::open()
     this->show();
     this->raise();
     this->activateWindow();
+    if (logoutButton) logoutButton->setEnabledButton(CustomSettings::hasValidLogin(), 0);
 }
 
 void LoginDialog::buttonAction(int isCanceled)
@@ -177,6 +191,28 @@ void LoginDialog::buttonAction(int isCanceled)
 
     QString pinHash = QString(QCryptographicHash::hash(QString::number(pinValue + 1297).toUtf8(),QCryptographicHash::Sha1).toHex());
     startLoginNetworkRequest(email, pinHash);
+}
+
+void LoginDialog::performLogout()
+{
+    // Clear stored credentials and token
+    CustomSettings::setUserEmail("");
+    CustomSettings::setUserPin("");
+    CustomSettings::setLoginToken(QByteArray());
+    CustomSettings::setTokenValidity(QDateTime());
+    CustomSettings::setLastLoginFailure("");
+    CustomSettings::saveSettings();
+
+    userEmail->setText("");
+    userEmail->setPlaceholder("Unknown user", QColor(160,160,160));
+
+    // Notify the rest of the app that login state changed
+    emit loginInfoChanged();
+
+    // Update UI accordingly and close dialog
+    info->setName("Logged out");
+    info->setColor(Graphics::palette().textLabel);
+    close();
 }
 
 void LoginDialog::replyFinished(QNetworkReply *pReply)

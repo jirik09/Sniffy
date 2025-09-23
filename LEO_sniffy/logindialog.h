@@ -39,6 +39,7 @@ private:
     WidgetLabel *info;
 
     WidgetButtons *buttonsDone;
+    WidgetButtons *logoutButton{nullptr};
     QNetworkAccessManager *networkManager {nullptr};
     /*
     "In-flight reply" refers to a response that has been requested but has not yet been received.
@@ -54,6 +55,8 @@ private:
     void reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color = Graphics::palette().error);
     void startLoginNetworkRequest(const QString &email, const QString &pinHash);
     void finalizeSuccess(const QDateTime &validity, const QByteArray &token);
+
+    void performLogout();
 
 signals:
     void loginInfoChanged();
