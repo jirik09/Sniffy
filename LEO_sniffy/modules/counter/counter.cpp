@@ -1,5 +1,7 @@
 #include "counter.h"
 
+#include <limits>
+
 Counter::Counter(QObject *parent)
 {
     Q_UNUSED(parent);
@@ -76,31 +78,59 @@ void Counter::stopCounting(){
     setModuleStatus(ModuleStatus::PAUSE);
 }
 
-void Counter::parseData(QByteArray data){
-    QByteArray dataHeader = data.left(4);
-    QByteArray dataToPass = data.remove(0, 4);
+namespace {
+    struct CounterDispatchEntry {
+        QByteArray tag; // 4-byte header (not null-terminated necessarily)
+        void (Counter::*handler)(QByteArray);
+    };
 
-    if(dataHeader == cmd->CONFIG){
+    // NOTE: If new frame types are introduced for the counter module, simply append a
+    // new entry here. 'CONFIG' frames are intentionally excluded because they perform
+    // specification (re)initialisation and must short‑circuit normal data handling.
+    // A linear scan is trivial (4 entries). Only migrate to a hash if this list becomes large.
+    static const CounterDispatchEntry COUNTER_DISPATCH_TABLE[] = {
+        { QByteArrayLiteral("HF_D"), &Counter::parseHighFrequencyCounter },
+        { QByteArrayLiteral("LF_D"), &Counter::parseLowFrequencyCounter },
+        { QByteArrayLiteral("RF_D"), &Counter::parseRatioCounter },
+        { QByteArrayLiteral("TI_D"), &Counter::parseIntervalsCounter }
+    };
+}
+
+void Counter::parseData(QByteArray data){
+    // Contract: Accepts raw counter frames. Never throws. Unknown headers logged (debug only) and ignored.
+    static constexpr int HEADER_LEN = 4; // fixed protocol header length
+    if (data.size() < HEADER_LEN) {
+#ifdef QT_DEBUG
+        qWarning("Counter::parseData - frame too short (%lld bytes)", static_cast<long long>(data.size()));
+#endif
+        return;
+    }
+    const QByteArray header = data.left(HEADER_LEN);
+    const QByteArray payload = data.mid(HEADER_LEN); // non-destructive slicing
+
+    // CONFIG frames handled separately: they instantiate/refresh the specification
+    if(header == cmd->CONFIG){
         moduleSpecification = new CounterSpec(this);
-        moduleSpecification->parseSpecification(dataToPass);
+        moduleSpecification->parseSpecification(payload);
         cntWindow->setSpecification(static_cast<CounterSpec*>(moduleSpecification));
         showModuleControl();
         buildModuleDescription(static_cast<CounterSpec*>(moduleSpecification));
+        return;
+    }
 
-    }else {
-        if(config->isHeld)
+    if(config->isHeld) return; // ignore live data while held
+
+    // Linear scan over small static table (4 entries) - negligible cost; could be changed to QHash if list grows
+    for(const auto &entry : COUNTER_DISPATCH_TABLE){
+        if(entry.tag == header){
+            (this->*entry.handler)(payload);
             return;
-
-        if(dataHeader == "HF_D"){
-            parseHighFrequencyCounter(dataToPass);
-        }else if(dataHeader=="LF_D"){
-            parseLowFrequencyCounter(dataToPass);
-        }else if(dataHeader=="RF_D"){
-            parseRatioCounter(dataToPass);
-        }else if(dataHeader=="TI_D"){
-            parseIntervalsCounter(dataToPass);
         }
     }
+
+#ifdef QT_DEBUG
+    qWarning("Counter::parseData - unknown header '%s' (%lld bytes payload)", header.constData(), static_cast<long long>(payload.size()));
+#endif
 }
 
 void Counter::buildModuleDescription(CounterSpec *spec)
@@ -213,6 +243,12 @@ void Counter::write(QByteArray feature, int param){
 
 /************************************** HIGH FREQ FUNCTIONS ****************************************/
 void Counter::parseHighFrequencyCounter(QByteArray data){
+    if (data.size() < 4 + (int)sizeof(double)*3) {
+#ifdef QT_DEBUG
+        qWarning("Counter::parseHighFrequencyCounter - payload too short (%lld bytes)", static_cast<long long>(data.size()));
+#endif
+        return;
+    }
     QByteArray freqPer = data.left(4); data.remove(0, 4);
 
     double val, qerr, terr;
@@ -224,23 +260,41 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
 
     bool isFrequency = (freqPer == "QFRE") ? true : false;
 
-    uint countToGo = (isFrequency || val==0) ? movAvg->prepend(val) : movAvg->prepend(1/val);
+    auto safeInvert = [](double x)->double {
+        static const double EPS = 1e-15; // guard threshold
+        if(std::fabs(x) < EPS) return std::numeric_limits<double>::quiet_NaN();
+        return 1.0 / x;
+    };
+    uint countToGo = (isFrequency || val==0) ? movAvg->prepend(val) : movAvg->prepend(safeInvert(val));
     this->strQerr = strQerr = formatErrNumber(display, qerr);
     this->strTerr = strTerr = formatErrNumber(display, terr);
     cntWindow->showPMErrorSigns(display, true);
 
-    bool isAvgBuffFull = movAvg->isBufferFull();
+    bool isAvgBuffFull = movAvg->isBufferFull(); // IMPORTANT: MovingAverage::getAverage() valid ONLY if full (legacy API)
 
-    if(isAvgBuffFull){
+    if (isAvgBuffFull) {
         config->hfState.hold = HFState::HoldOnState::OFF;
         cntWindow->hfSetColorRemainSec(false);
-        avg = (isFrequency || movAvg->getAverage()==0) ? movAvg->getAverage() : 1 / movAvg->getAverage();
+
+        double windowAvg = movAvg->getAverage(); // safe: buffer full
+        avg = (isFrequency || windowAvg == 0.0) ? windowAvg : safeInvert(windowAvg);
         if (config->hfState.error == HFState::ErrorType::AVERAGE){
-            qerr = (isFrequency || avg<=0) ? qerr / movAvg->getBufferSize() : 1 / (1 / avg - movAvg->getBufferSize()) - avg;
+            if(isFrequency || avg<=0){
+                qerr = qerr / movAvg->getBufferSize();
+            } else {
+                double invAvg = safeInvert(avg);
+                if(std::isnan(invAvg)) {
+                    qerr = std::numeric_limits<double>::quiet_NaN();
+                } else {
+                    double denom = invAvg - movAvg->getBufferSize();
+                    double denomInv = safeInvert(denom);
+                    qerr = std::isnan(denomInv) ? std::numeric_limits<double>::quiet_NaN() : denomInv - avg;
+                }
+            }
             avgQerr = strQerr = formatErrNumber(display, qerr);
         }
         strAvg = formatNumber(display, avg, qerr+terr);
-    }else {
+    } else {
         if(config->hfState.error == HFState::ErrorType::AVERAGE){
             cntWindow->showPMErrorSigns(display, false);
             strQerr = " ";
@@ -264,8 +318,10 @@ void Counter::parseHighFrequencyCounter(QByteArray data){
     else
         cntWindow->associateToHistorySample(display, 3, ", avg unavailable ", -1);
 
-    if(!isFrequency && val>0)
-        val = 1 / val;
+    if(!isFrequency && val>0){
+        double inv = safeInvert(val);
+        if(!std::isnan(inv)) val = inv; // keep previous val if invalid
+    }
 
     display->setProgressValue(val);
     config->hfState.quantState = HFState::QuantitySwitched::NO;
@@ -357,7 +413,8 @@ void Counter::hfSwitchErrorAvgCallback(int index){
 }
 
 void Counter::hfDialAvgChangedCallback(float val){
-    movAvg->setBufferSize(val);
+    if(val < 2) val = 2; // enforce minimum size to avoid degenerative averaging artifacts
+    movAvg->setBufferSize(static_cast<int>(val));
     QString seconds = hfFormatRemainSec(movAvg->getSampleCountToFillBuff(), 0);
     cntWindow->displayHF->displayAvgString(seconds);
     hfDisplayErrors();
@@ -371,6 +428,13 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
     QByteArray channel = data.mid(4, 4);
     QByteArray quantity = data.mid(8, 4);
     data.remove(0, 12);
+
+    if (data.size() < static_cast<int>(sizeof(double)*4)) {
+#ifdef QT_DEBUG
+        qWarning("Counter::parseLowFrequencyCounter - payload too short (%lld bytes)", static_cast<long long>(data.size()));
+#endif
+        return;
+    }
 
     double val1, val2, qerr, terr;
     QString strVal, strVal2, strQerr, strTerr;
@@ -394,8 +458,8 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
         strTerr = formatErrNumber(display, terr);
 
         bool isFrequency = (quantity != "QPER");
-        if(!isFrequency)
-            val1 = 1 / val1;
+        if(!isFrequency && val1 != 0.0)
+            val1 = 1.0 / val1;
 
         if(isRangeExceeded(val1)){
             cntWindow->clearDisplay(display, false);
@@ -412,7 +476,7 @@ void Counter::parseLowFrequencyCounter(QByteArray data){
                 quant = " Hz";
             }else {
                 quant = " s";
-                val1 = 1 / val1;
+                if(val1 != 0.0) val1 = 1.0 / val1; // revert to frequency for history
             }
 
             /* History section */
@@ -562,6 +626,12 @@ void Counter::lfDialSampleCountCh2ChangedCallback(float val){
 
 /************************************** RATIO MEAS. FUNCTIONS ****************************************/
 void Counter::parseRatioCounter(QByteArray data){    
+    if (data.size() < 4 + (int)sizeof(double)) {
+#ifdef QT_DEBUG
+        qWarning("Counter::parseRatioCounter - payload too short (%lld bytes)", static_cast<long long>(data.size()));
+#endif
+        return;
+    }
     QByteArray inputString = data.left(4); data.remove(0, 4);
     WidgetDisplay *display = cntWindow->displayRat;    
 
@@ -603,6 +673,12 @@ void Counter::ratDialSampleCountChangedCallback(float val){
 
 /************************************** INTERVALS FUNCTIONS ****************************************/
 void Counter::parseIntervalsCounter(QByteArray data){
+    if (data.size() < 4 + (int)sizeof(double)*3) {
+#ifdef QT_DEBUG
+        qWarning("Counter::parseIntervalsCounter - payload too short (%lld bytes)", static_cast<long long>(data.size()));
+#endif
+        return;
+    }
     QByteArray inputString = data.left(4); data.remove(0, 4);
     WidgetDisplay *display = cntWindow->displayInt;
 

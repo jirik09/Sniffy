@@ -10,6 +10,32 @@ But it can be easily coppied so we can keep some template file.
 #include "scopewindow.h"
 #include "ui_scopewindow.h"
 
+// Includes moved from header to implementation to reduce coupling
+#include "panelsettings.h"
+#include "panelmeasurement.h"
+#include "panelcursors.h"
+#include "panelmath.h"
+#include "paneladvanced.h"
+#include "scopeconfig.h"
+#include "../labelformator.h"
+#include "../../GUI/widgetchart.h"
+#include "../../GUI/widgetlabelarea.h"
+#include "../../GUI/widgetdial.h"
+#include "../../GUI/widgetdialrange.h"
+#include "../../GUI/widgetbuttons.h"
+#include "../../GUI/widgettab.h"
+#include "../../GUI/widgettextinput.h"
+
+namespace {
+    inline void transformSeries(const QVector<QPointF> &src, QVector<QPointF> &dst, float offset, float invScale){
+        dst.clear();
+        dst.reserve(src.size());
+        for(const QPointF &pt : src){
+            dst.append(QPointF(pt.x(), (pt.y()+offset)*invScale));
+        }
+    }
+}
+
 ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ScopeWindow),
@@ -63,13 +89,15 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     panelSet = new PanelSettings(tabs->getLayout(0),tabs);
     panelSet->setObjectName("panelSet");
 
-    connect(panelSet->dialTimeBase,SIGNAL(valueChanged(float)),this,SLOT(timeBaseCallback(float)));
-    connect(panelSet->dialPretrigger,SIGNAL(valueChanged(float)),this,SLOT(pretriggerCallback(float)));
-    connect(panelSet->buttonsChannelEnable,SIGNAL(statusChanged(int)),this,SLOT(channelEnableCallback(int)));
-    connect(panelSet->buttonsTriggerMode,SIGNAL(clicked(int)),this,SLOT(triggerModeCallback(int)));
-    connect(panelSet->buttonsTriggerEdge,SIGNAL(clicked(int)),this,SLOT(triggerEdgeCallback(int)));
-    connect(panelSet->buttonsTriggerChannel,SIGNAL(clicked(int)),this,SLOT(triggerChannelCallback(int)));
-    connect(panelSet->dialTriggerValue,SIGNAL(valueChanged(float)),this,SLOT(triggerValueCallback(float)));
+    connect(panelSet->dialTimeBase, &WidgetDial::valueChanged, this, &ScopeWindow::timeBaseCallback);
+    // dialPretrigger is a WidgetDialRange emitting valueChanged(float,int)
+    connect(panelSet->dialPretrigger, &WidgetDialRange::valueChanged, this, &ScopeWindow::pretriggerCallback);
+    connect(panelSet->buttonsChannelEnable, &WidgetButtons::statusChanged, this, &ScopeWindow::channelEnableCallback);
+    connect(panelSet->buttonsTriggerMode, &WidgetButtons::clicked, this, &ScopeWindow::triggerModeCallback);
+    connect(panelSet->buttonsTriggerEdge, &WidgetButtons::clicked, this, &ScopeWindow::triggerEdgeCallback);
+    connect(panelSet->buttonsTriggerChannel, &WidgetButtons::clicked, this, &ScopeWindow::triggerChannelCallback);
+    // dialTriggerValue is a WidgetDialRange emitting valueChanged(float,int)
+    connect(panelSet->dialTriggerValue, &WidgetDialRange::valueChanged, this, &ScopeWindow::triggerValueCallback);
     connect(panelSet->buttonsMemorySet,&WidgetButtons::clicked,this,&ScopeWindow::memoryPolicyCallback);
 
     connect(panelSet->buttonsChannelVertical,&WidgetButtons::clicked,this, &ScopeWindow::channelVerticalCallback);
@@ -111,6 +139,9 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
     connect(chart,&widgetChart::localZoomChanged,this,&ScopeWindow::chartLocalZoomCallback);
+
+    initTransformCache();
+    Q_ASSERT(transformCache.size() == TOTAL_SCOPE_TRACES);
 }
 
 ScopeWindow::~ScopeWindow()
@@ -120,28 +151,36 @@ ScopeWindow::~ScopeWindow()
 
 void ScopeWindow::paintEvent(QPaintEvent *event){
     int handleW = ui->sliderSignal->size().width()/chart->getZoom()/chart->getLocalZoom();
-    // Build slider stylesheet:
-    // - Groove uses themed background + frame.
-    // - Handle color uses an 0xBA (~73% alpha) prefix plus the base button color without '#'.
-    //   We call QString(Graphics::palette().backgroundButton).remove("#") on a temporary copy so
-    //   the cached palette string is never mutated; only the formatted value is used here.
-    ui->sliderSignal->setStyleSheet("QSlider::groove:horizontal {background: url("+Graphics::getGraphicsPath()+"signalBackground.png) center;"
-                                        "background-color: "+Graphics::palette().windowWidget+";border: 1px solid "+Graphics::palette().textLabel+";margin-top: 3px;margin-bottom: 3px;}"
-                                                                                         "QSlider::handle:horizontal {background: #ba"+QString(Graphics::palette().backgroundButton).remove("#") + ";border: 2px solid "+Graphics::palette().textLabel+";margin-top: -3px;"
-                                                                                         "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+"px;}");
+    // Build slider stylesheet once per paint with cached backgroundButton stripped of '#'
+    static QString cachedHandleColor; // #baRRGGBB (alpha + rgb)
+    static QString lastBase;
+    const QString base = Graphics::palette().backgroundButton;
+    if (base != lastBase) {
+        QString rgb = base;
+        rgb.remove('#');
+        cachedHandleColor = "#ba" + rgb;
+        lastBase = base;
+    }
+    ui->sliderSignal->setStyleSheet(
+        "QSlider::groove:horizontal {background: url("+Graphics::getGraphicsPath()+"signalBackground.png) center;"
+        "background-color: "+Graphics::palette().windowWidget+";border: 1px solid "+Graphics::palette().textLabel+";margin-top: 3px;margin-bottom: 3px;}"
+        "QSlider::handle:horizontal {background: "+cachedHandleColor+";border: 2px solid "+Graphics::palette().textLabel+";margin-top: -3px;"
+        "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+"px;}"
+    );
     event->accept();
 }
 
 
-void ScopeWindow::showDataTraces(QVector<QVector<QPointF>> dataSeries, float timeBase, int triggerChannelIndex){
+void ScopeWindow::showDataTraces(const QVector<QVector<QPointF>> &dataSeries, float timeBase, int triggerChannelIndex){
     updateChartTimeScale(timeBase);
 
     this->triggerChannelIndex = triggerChannelIndex;
     ChartData = dataSeries;
+    invalidateAllTransforms();
     paintTraces(ChartData,ChartMathData);
 }
 
-void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPointF> mathSeries){
+void ScopeWindow::paintTraces(const QVector<QVector<QPointF>> &dataSeries, const QVector<QPointF> &mathSeries){
     chart->clearAll();
     labelInfoPanel->setTriggerLabelText("");
     labelInfoPanel->hideChannelLabels();
@@ -150,73 +189,88 @@ void ScopeWindow::paintTraces(QVector<QVector<QPointF>> dataSeries, QVector<QPoi
     paintMath(mathSeries);
 
     //paint data traces
-    for (int i = 0; i < dataSeries.length(); i++){
-        if(panelSet->buttonsChannelEnable->isChecked(i)){
+    for (int i = 0; i < dataSeries.length(); i++) {
+        if(!panelSet->buttonsChannelEnable->isChecked(i)) continue;
+        // Only real hardware channels here; math trace handled separately
+        if(i >= MAX_SCOPE_CHANNELS) continue;
+        Q_ASSERT(i < transformCache.size());
 
-            //put channel in scale
-            for (int j = 0; j < dataSeries[i].length(); j++){
-                dataSeries[i][j].setY((dataSeries[i][j].y()+config->channelOffset[i])/config->channelScale[i]);
-            }
+        float scale = config->channelScale[i];
+        if(std::fabs(scale) < 1e-15f) scale = 1.0f;
+        const float invScale = 1.0f / scale;
+        const float offset = config->channelOffset[i];
 
-            chart->updateTrace(&dataSeries[i], i);
+        const QVector<QPointF>& transformed = getTransformedChannel(i, dataSeries[i]);
+    chart->updateTrace(const_cast<QVector<QPointF>*>(&transformed), i);
 
-            float zeroMarkerPosition = config->channelOffset[i]/config->channelScale[i];
-            if(zeroMarkerPosition>=CHART_MAX_Y){
-                chart-> setHorizontalMarker(i,CHART_MAX_Y,MarkerType::ARROW_UP_SMALL);
-            }else if(zeroMarkerPosition<=CHART_MIN_Y){
-                chart-> setHorizontalMarker(i,CHART_MIN_Y,MarkerType::ARROW_DOWN_SMALL);
-            }else{
-                chart-> setHorizontalMarker(i,zeroMarkerPosition,MarkerType::TICK);
-            }
+        float zeroMarkerPosition = offset*invScale;
+        if(zeroMarkerPosition>=CHART_MAX_Y)        chart-> setHorizontalMarker(i,CHART_MAX_Y,MarkerType::ARROW_UP_SMALL);
+        else if(zeroMarkerPosition<=CHART_MIN_Y)   chart-> setHorizontalMarker(i,CHART_MIN_Y,MarkerType::ARROW_DOWN_SMALL);
+        else                                       chart-> setHorizontalMarker(i,zeroMarkerPosition,MarkerType::TICK);
 
-            float triggerMarkerPosition = (config->channelOffset[i]+(qreal(config->triggerLevel)/65535*(config->rangeMax-config->rangeMin)/1000))/config->channelScale[i];
-            if(panelSet->buttonsTriggerChannel->getSelectedIndex()==i){
-                chart-> setHorizontalMarker(i,triggerMarkerPosition,MarkerType::TRIGGER);
-            }
+        float triggerMarkerPosition = (config->channelOffset[i]+(qreal(config->triggerLevel)/65535*(config->rangeMax-config->rangeMin)/1000))/config->channelScale[i];
+        if(panelSet->buttonsTriggerChannel->getSelectedIndex()==i) {
+            chart-> setHorizontalMarker(i,triggerMarkerPosition,MarkerType::TRIGGER);
+        }
 
-            labelInfoPanel->setChannelLabelVisible(i,true);
-            labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/d"));
+        labelInfoPanel->setChannelLabelVisible(i,true);
+        labelInfoPanel->setChannelScale(i,LabelFormator::formatOutout(config->channelScale[i],"V/d"));
 
-            if(config->FFTenabled){
-                panelCursors->cursorFFTHorADial->updateRange(0,config->realSamplingRate/2);
-                panelCursors->cursorFFTHorBDial->updateRange(0,config->realSamplingRate/2);
-            }else{
-                panelCursors->cursorHorADial->updateRange(config->timeMin,config->timeMax);
-                panelCursors->cursorHorBDial->updateRange(config->timeMin,config->timeMax);
-                panelCursors->cursorVerADial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
-                panelCursors->cursorVerBDial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
-            }
-
-            if(config->cursorsActiveIndex == 2){
-               // setVerticalCursors(config->cursorChannelIndex);
-               // chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerADial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_A);
-               // chart->setVerticalCursor(config->cursorChannelIndex,(panelCursors->cursorVerBDial->getRealValue()+config->channelOffset[config->cursorChannelIndex])/config->channelScale[config->cursorChannelIndex],Cursor::CURSOR_B);
-            }
-            updateCursorReadings();
+        if(config->FFTenabled){
+            panelCursors->cursorFFTHorADial->updateRange(0,config->realSamplingRate/2);
+            panelCursors->cursorFFTHorBDial->updateRange(0,config->realSamplingRate/2);
+        } else {
+            panelCursors->cursorHorADial->updateRange(config->timeMin,config->timeMax);
+            panelCursors->cursorHorBDial->updateRange(config->timeMin,config->timeMax);
+            panelCursors->cursorVerADial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
+            panelCursors->cursorVerBDial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
         }
     }
+    // After plotting channels, plot math if present
+    paintMath(mathSeries);
     chart->setVerticalMarker(triggerChannelIndex,0);
 }
 
-void ScopeWindow::paintMath(QVector<QPointF> mathSeries){
-    if(mathSeries.length()<=1){
-        return;
+// Helper: ensure current trigger channel is valid; if not, select first enabled
+void ScopeWindow::validateAndApplyTriggerChannel(int buttonStatus){
+    int currentTrig = panelSet->buttonsTriggerChannel->getSelectedIndex();
+    if(currentTrig < 0 || currentTrig >= MAX_SCOPE_CHANNELS || !(buttonStatus & (1 << currentTrig))){
+        for(int i=0;i<MAX_SCOPE_CHANNELS;i++){
+            if(buttonStatus & (1<<i)){
+                panelSet->buttonsTriggerChannel->setChecked(true,i);
+                triggerChannelCallback(i);
+                return;
+            }
+        }
     }
-    for (int k = 0; k < ChartMathData.length(); k++){
-        mathSeries[k].setY((mathSeries[k].y()+config->channelOffset[4])/config->channelScale[4]);
-    }
-    chart->updateTrace(&mathSeries, 4);
-    float zeroMarkerPosition = config->channelOffset[4]/config->channelScale[4];
-    if(zeroMarkerPosition>=CHART_MAX_Y){
-        chart-> setHorizontalMarker(4,CHART_MAX_Y,MarkerType::ARROW_UP_SMALL);
-    }else if(zeroMarkerPosition<=CHART_MIN_Y){
-        chart-> setHorizontalMarker(4,CHART_MIN_Y,MarkerType::ARROW_DOWN_SMALL);
-    }else{
-        chart-> setHorizontalMarker(4,zeroMarkerPosition,MarkerType::TICK);
-    }
+}
 
-    labelInfoPanel->setChannelLabelVisible(4,true);
-    labelInfoPanel->setChannelScale(4,LabelFormator::formatOutout(config->channelScale[4],"V/d"));
+// Helper: enable/disable trigger channel buttons according to bit mask
+void ScopeWindow::updateTriggerChannelButtons(int buttonStatus){
+    for(int i=0;i<MAX_SCOPE_CHANNELS;i++){
+        bool enabled = (buttonStatus & (1<<i));
+        panelSet->buttonsTriggerChannel->setDisabledButton(!enabled,i);
+    }
+}
+
+
+void ScopeWindow::paintMath(const QVector<QPointF> &mathSeries){
+    if(mathSeries.isEmpty()) return;
+    // Math trace index defined centrally
+    const int MATH_INDEX = MATH_CHANNEL_INDEX;
+    if(MATH_INDEX >= TOTAL_SCOPE_TRACES) return; // safety
+    float scale = config->channelScale[MATH_INDEX];
+    if(std::fabs(scale) < 1e-15f) scale = 1.0f;
+    const float invScale = 1.0f / scale;
+    const float offset = config->channelOffset[MATH_INDEX];
+    const QVector<QPointF>& transformed = getTransformedChannel(MATH_INDEX, mathSeries);
+    chart->updateTrace(const_cast<QVector<QPointF>*>(&transformed), MATH_INDEX);
+    float zeroMarkerPosition = offset*invScale;
+    if(zeroMarkerPosition>=CHART_MAX_Y)        chart-> setHorizontalMarker(MATH_INDEX,CHART_MAX_Y,MarkerType::ARROW_UP_SMALL);
+    else if(zeroMarkerPosition<=CHART_MIN_Y)   chart-> setHorizontalMarker(MATH_INDEX,CHART_MIN_Y,MarkerType::ARROW_DOWN_SMALL);
+    else                                       chart-> setHorizontalMarker(MATH_INDEX,zeroMarkerPosition,MarkerType::TICK);
+    labelInfoPanel->setChannelLabelVisible(MATH_INDEX,true);
+    labelInfoPanel->setChannelScale(MATH_INDEX,LabelFormator::formatOutout(config->channelScale[MATH_INDEX],"V/d"));
 }
 
 void ScopeWindow::setDataMinMaxTimeAndZoom(qreal minX, qreal maxX, qreal zoom){
@@ -240,10 +294,12 @@ void ScopeWindow::channelVerticalCallback(int index){
 void ScopeWindow::channelVerticalScaleCallback(float value){
     config->channelScale[config->selectedChannelIndexVertical] = value;
     config->channelScaleIndex[config->selectedChannelIndexVertical] = panelSet->dialVerticalScale->getSelectedIndex();
+    invalidateChannelTransform(config->selectedChannelIndexVertical);
     paintTraces(ChartData,ChartMathData);
 }
 void ScopeWindow::channelVerticalShiftCallback(float value){
     config->channelOffset[config->selectedChannelIndexVertical] = value;
+    invalidateChannelTransform(config->selectedChannelIndexVertical);
     paintTraces(ChartData,ChartMathData);
     cursorValueVerCallback();
 }
@@ -323,29 +379,14 @@ void ScopeWindow::triggerModeCallback(int index){
 
 
 void ScopeWindow::channelEnableCallback(int buttonStatus){
-    panelSet->buttonsTriggerChannel->disableAll();
-
-    //if current trigger channel is disabled then select channel one for trigger
-    if(!(panelSet->buttonsTriggerChannel->getStatus() & buttonStatus)){
-        panelSet->buttonsTriggerChannel->setChecked(true,0);
-        triggerChannelCallback(0);
-    }
-
-    if(buttonStatus & 0x01){
-        panelSet->buttonsTriggerChannel->setDisabledButton(false,0);
-    }
-    if(buttonStatus & 0x02){
-        panelSet->buttonsTriggerChannel->setDisabledButton(false,1);
-    }
-    if(buttonStatus & 0x04){
-        panelSet->buttonsTriggerChannel->setDisabledButton(false,2);
-    }
-    if(buttonStatus & 0x08){
-        panelSet->buttonsTriggerChannel->setDisabledButton(false,3);
-    }
+    // buttonStatus bit mask expected: bit0..bit3 for channels 0..3
     emit channelEnableChanged(buttonStatus);
+    validateAndApplyTriggerChannel(buttonStatus);
+    updateTriggerChannelButtons(buttonStatus);
+    // Repaint traces to reflect hiding/showing channels
+    paintTraces(ChartData, ChartMathData);
+    updateCursorReadings();
 }
-
 
 void ScopeWindow::measurementAddedCallback(Measurement *m){
     emit measurementChanged (m);
@@ -514,7 +555,7 @@ void ScopeWindow::setHorizontalCursors(int channelIndex){
         value = panelCursors->cursorFFTHorBDial->getRealValue();
         chartFFT->setHorizontalCursor(channelIndex, value, Cursor::CURSOR_B);
         chart->clearAllCursors();
-    }else{
+    } else {
         value = panelCursors->cursorHorADial->getRealValue();
         chart->setHorizontalCursor(channelIndex, value, Cursor::CURSOR_A);
         value = panelCursors->cursorHorBDial->getRealValue();
@@ -543,6 +584,7 @@ void ScopeWindow::updateMeasurement(QList<Measurement*> m){
 void ScopeWindow::updateMath(QVector<QPointF> mathTrace)
 {
     ChartMathData = mathTrace;
+    invalidateChannelTransform(MATH_CHANNEL_INDEX);
     paintTraces(ChartData,ChartMathData);
 }
 
@@ -621,6 +663,45 @@ void ScopeWindow::updateChartTimeScale(float timeBase){
         labelInfoPanel->setStyleSheet("color:"+Graphics::palette().textAll+";");
     }
     labelInfoPanel->setScaleLabelText(LabelFormator::formatOutout(timeBase/chart->getLocalZoom(),"s/d"));
+}
+
+// ---------------- Transform cache helpers ----------------
+void ScopeWindow::initTransformCache(){
+    transformCache.resize(TOTAL_SCOPE_TRACES);
+    for(auto &c : transformCache){
+        c.dirty = true;
+        c.lastScale = std::numeric_limits<float>::quiet_NaN();
+        c.lastOffset = std::numeric_limits<float>::quiet_NaN();
+        c.transformed.clear();
+    }
+}
+
+void ScopeWindow::invalidateAllTransforms(){
+    for(auto &c : transformCache){
+        c.dirty = true;
+    }
+}
+
+void ScopeWindow::invalidateChannelTransform(int channelIndex){
+    if(channelIndex < 0 || channelIndex >= transformCache.size()) return;
+    transformCache[channelIndex].dirty = true;
+}
+
+const QVector<QPointF>& ScopeWindow::getTransformedChannel(int ch, const QVector<QPointF>& src){
+    if(ch < 0 || ch >= transformCache.size()) return src; // fallback
+    auto &cache = transformCache[ch];
+    float scale = config->channelScale[ch];
+    if(std::fabs(scale) < 1e-15f) scale = 1.0f;
+    float offset = config->channelOffset[ch];
+    // Recompute if dirty OR params changed OR source size differs
+    if(cache.dirty || cache.lastScale != scale || cache.lastOffset != offset || cache.transformed.size() != src.size()){
+        const float invScale = 1.0f/scale;
+        transformSeries(src, cache.transformed, offset, invScale);
+        cache.lastScale = scale;
+        cache.lastOffset = offset;
+        cache.dirty = false;
+    }
+    return cache.transformed;
 }
 
 

@@ -23,12 +23,22 @@ public:
     explicit Counter(QObject *parent = nullptr);
     ~Counter();
 
+    Q_DISABLE_COPY(Counter)
+
     QWidget* getWidget();
+
+    // Dispatch handlers (public solely so the static dispatch table in counter.cpp can take their addresses).
+    // They are not intended for external module consumption; consider wrapping in a private
+    // section plus a friend struct if broader encapsulation becomes important.
+    void parseHighFrequencyCounter(QByteArray data);
+    void parseLowFrequencyCounter(QByteArray data);
+    void parseRatioCounter(QByteArray data);
+    void parseIntervalsCounter(QByteArray data);
 
 private:
 
-    CounterWindow *cntWindow;
-    CounterConfig *config;
+    CounterWindow *cntWindow = nullptr; // QObject child (owned)
+    CounterConfig *config = nullptr;     // QObject child (owned)
 
     void startCounting();
     void stopCounting();
@@ -42,17 +52,14 @@ private:
     void write(QByteArray feature, int param);
 
     /* High Frequency Counter */
-    MovingAverage *movAvg;
+    MovingAverage *movAvg = nullptr; // QObject child
     QString strQerr, strTerr, avgQerr;
     float avg;    
-
-    void parseHighFrequencyCounter(QByteArray data);
     void hfReloadState();
     void hfDisplayErrors();    
     QString hfFormatRemainSec(uint countToGo, uint additionTime);
 
     /* Low Frequency Counter */
-    void parseLowFrequencyCounter(QByteArray data);
     void lfReloadState();
     void lfReloadStateQuantMeasurement();
     bool isRangeExceeded(double frequency);
@@ -60,11 +67,9 @@ private:
     void lfSwitchMultiplier(int actualLength, QByteArray channelMultiplier);
 
     /* Ratio Counter */
-    void parseRatioCounter(QByteArray data);
     void ratReloadState();
 
     /* Intervals Counter */
-    void parseIntervalsCounter(QByteArray data);
     void intReloadState();
 
 private slots:

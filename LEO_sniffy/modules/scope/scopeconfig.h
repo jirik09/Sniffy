@@ -54,6 +54,8 @@ public:
     float channelOffset[MAX_SCOPE_CHANNELS+1]={0,0,0,0,0};
     float channelScaleIndex[MAX_SCOPE_CHANNELS+1] = {-1,-1,-1,-1,-1};
     float channelOffsetIndex[MAX_SCOPE_CHANNELS+1] = {-1,-1,-1,-1,-1};
+    // Compile-time validation: arrays must accommodate real channels + math trace.
+    static_assert((MAX_SCOPE_CHANNELS + 1) == TOTAL_SCOPE_TRACES, "ScopeConfig channel arrays size mismatch TOTAL_SCOPE_TRACES");
     int cursorChannelIndex = 0;
     int cursorsActiveIndex = 0;
     float timeMin = -0.01;
