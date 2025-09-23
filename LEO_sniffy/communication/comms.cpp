@@ -22,8 +22,18 @@ Comms::Comms(QObject *parent) : QObject(parent)
 
 Comms::~Comms()
 {
+    // stop background scanner thread
+    devScanner.quit();
+    devScanner.wait();
+
+    // stop serial worker thread and cleanup worker
     serialThread->quit();
     serialThread->wait();
+
+    if (serial) {
+        delete serial;
+        serial = nullptr;
+    }
 }
 
 void Comms::open(DeviceDescriptor device){
@@ -38,7 +48,7 @@ void Comms::open(DeviceDescriptor device){
 }
 
 void Comms::scanForDevices(){
-    QList<DeviceDescriptor> listDevices = *new QList<DeviceDescriptor>;
+    QList<DeviceDescriptor> listDevices;
     SerialLine::getAvailableDevices(&listDevices,0);   //scan for available devices on serial port
     emit devicesScaned(listDevices);
 }
@@ -77,9 +87,8 @@ void Comms::write(QByteArray module, QByteArray feature, int param){
     QDateTime date = QDateTime::currentDateTime();
     qDebug() << "COMM_WRITE ("<< date.time()<<"):"<<module+":"+feature+":" << param <<";";
 #endif
-
-    QByteArray *qb = new QByteArray(tmp,4);
-    emit dataWrite(module+":"+feature+" "+qb->left(4)+";");
+    QByteArray qb(tmp,4);
+    emit dataWrite(module+":"+feature+" "+qb.left(4)+";");
 }
 
 void Comms::write(QByteArray data){

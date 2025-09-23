@@ -104,11 +104,13 @@ void DeviceMediator::open(int deviceIndex)
         }
 
         // send and valiadate token
-        communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
-        communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-        communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
-        communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-        communication->write("TKN_:DATA:" + CustomSettings::getLoginToken() + ";");
+        if (CustomSettings::getLoginToken()!="none"){
+            communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
+            communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+            communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
+            communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+            communication->write("TKN_:DATA:" + CustomSettings::getLoginToken() + ";");
+        }
         for (const QSharedPointer<AbstractModule> &mod : modules)
         {
             mod->setComms(communication);

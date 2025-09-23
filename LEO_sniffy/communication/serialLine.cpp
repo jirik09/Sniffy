@@ -2,26 +2,19 @@
 
 SerialLine::SerialLine(QObject *parent) : QObject(parent)
 {
-
+    buffer.reserve(8192);
+    message.reserve(1024);
 }
 
 int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstIndex){
 
-    QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
-    QSerialPortInfo *portInfo = new QSerialPortInfo();
+    const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
+
     QSerialPort *sPort;
+    const QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
 
-    QList<QSerialPortInfo> ports;
-
-    //  connect(serPort, SIGNAL(readyRead()), this, SLOT(receiveData()));
-    //  connect(serPort, &QSerialPort::errorOccurred, this, &SerialLine::handleError);
-
-    ports = portInfo->availablePorts();
-
-    QSerialPortInfo tmpPort;
     int numberOfDevices = 0;
     QByteArray received;
-    DeviceDescriptor desc;
 
     for (const QSerialPortInfo &tmpPortInfo : ports){
         QSerialPortInfo portIn (tmpPortInfo.portName());
@@ -42,21 +35,22 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
 
             received = sPort->readAll();
 
-            // qDebug() <<sPort->portName()<<received.length()<<received;
             if (received.length()>16 && received.left(4)=="SYST" && received.right(4)==delimiter){
                 sPort->write("RES!;");
                 sPort->waitForBytesWritten();
 
+                DeviceDescriptor desc;
                 desc.port = sPort->portName();
                 desc.speed = sPort->baudRate();
                 desc.connType = Connection::SERIAL;
                 desc.index = setFirstIndex + numberOfDevices;
-                desc.deviceName = received.right(received.length()-4).left(received.length()-8);
+                desc.deviceName = received.mid(4, received.length()-8);
                 list->append(desc);
                 numberOfDevices++;
             }
             sPort->close();
         }
+        delete sPort;
     }
     return numberOfDevices;
 }
@@ -69,8 +63,8 @@ void SerialLine::openSerialLine(DeviceDescriptor desc){
     serPort->setPortName(desc.port);
     serPort->setBaudRate(desc.speed);
 
-    buffer = new QByteArray();
-    message = new QByteArray();
+    buffer.clear();
+    message.clear();
 
     int i = 0;
     while(!serPort->open(QIODevice::ReadWrite)){
@@ -97,34 +91,31 @@ void SerialLine::openSerialLine(DeviceDescriptor desc){
 }
 
 void SerialLine::closeLine(){
-    serPort->flush();
-    serPort->close();
+    if (serPort){
+        serPort->flush();
+        serPort->close();
+    }
     isOpen = false;
 }
 
 void SerialLine::handleError(QSerialPort::SerialPortError error){
     qDebug()<<"FATAL ERROR occured on serial line" << error;
-
-    QByteArray errorString;
-    QDataStream out(&errorString, QIODevice::WriteOnly);
-
     emit serialLineError("SerialLine Error");
 }
 
 
 void SerialLine::receiveData(QByteArray data){
-    buffer->append(data);
+    buffer.append(data);
 
     //find delimiter
-    int i = buffer->indexOf(delimiter);
+    int i = buffer.indexOf(delimiter);
     while(i>0){
-        message = new QByteArray(buffer->left(i));
-        //  qDebug() << "Received:" << *message;
-        emit newMessage(*message);
-        //remove message and delimiter from buffer
-        buffer->remove(0,i+4);
+        message = buffer.left(i);
+        emit newMessage(message);
 
-        i = buffer->indexOf(delimiter);
+        //remove message and delimiter from buffer
+        buffer.remove(0,i+4);
+        i = buffer.indexOf(delimiter);
     }
 }
 
