@@ -52,6 +52,7 @@ private slots:
         void receiveData(QByteArray data);
 
 private:
+
     void resetPort();
     QSerialPort *serPort = nullptr;
     QByteArray buffer;   // reused buffer to minimize allocs

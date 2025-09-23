@@ -1,10 +1,4 @@
 #include "devicemediator.h"
-#include "communication/commands.h"
-#include <QApplication>
-#include <QDateTime>
-#include <QFile>
-#include <QThread>
-#include <QDebug>
 
 DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 {
@@ -83,11 +77,9 @@ void DeviceMediator::open(int deviceIndex)
         connect(communication, &Comms::newData, this, &DeviceMediator::parseData);
         connect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
 
-        // Determine if session exists; decide later when to load after SYSTEM is configured
         QString layoutFile;
         QString configFile;
         const QString devName = deviceList.at(deviceIndex).deviceName;
-        lastDeviceName = devName;
         if (devName.isEmpty())
         {
             CustomSettings::setNoSessionfound();
@@ -96,6 +88,7 @@ void DeviceMediator::open(int deviceIndex)
         {
             layoutFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".lay";
             configFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".cfg";
+            QSharedPointer<AbstractModule> module;
 
             QFile file(layoutFile);
             QFile fileMod(configFile);
@@ -110,19 +103,19 @@ void DeviceMediator::open(int deviceIndex)
             }
         }
 
-        // send and validate credentials/token first
-        communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
-        communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-        if (!CustomSettings::getUserPin().isEmpty())
+        // send and valiadate token
+        if (CustomSettings::getLoginToken()!="none"){
+            communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
+            communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
             communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
-        communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-        if (!CustomSettings::getLoginToken().isEmpty())
+            communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
             communication->write("TKN_:DATA:" + CustomSettings::getLoginToken() + ";");
-
-        // Two-phase init: only initialize Device first (triggers SYST:CFG?)
-        postLoginInitPending = true;
-        modulesInitializedAfterSystem = false;
-        initDeviceComms();
+        }
+        for (const QSharedPointer<AbstractModule> &mod : modules)
+        {
+            mod->setComms(communication);
+        }
+        emit loadLayout(deviceList.at(deviceIndex).deviceName);
     }
 }
 
@@ -168,19 +161,15 @@ void DeviceMediator::close()
 {
     disableModules();
     ShowDeviceModule();
-    if (communication) {
-        disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
-        disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
-    }
+    disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
+    disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
 }
 
 void DeviceMediator::closeApp()
 {
     disableModules();
-    if (communication) {
-        disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
-        disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
-    }
+    disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
+    disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
 }
 
 void DeviceMediator::handleError(QByteArray error)
@@ -193,14 +182,6 @@ void DeviceMediator::parseData(QByteArray data)
     bool isDataPassed = false;
     QByteArray dataHeader = data.left(4);
     QByteArray dataToPass = data.right(data.length() - 4);
-
-    // Gate other modules until SYSTEM confirms configuration (CFG_)
-    if (postLoginInitPending && dataHeader == Commands::SYSTEM && dataToPass.left(4) == "CFG_") {
-        qDebug() << "[Init] SYSTEM CFG_ received; initializing other modules and layout";
-        initOtherModulesAndLayout();
-        postLoginInitPending = false;
-        modulesInitializedAfterSystem = true;
-    }
 
     for (const QSharedPointer<AbstractModule> &module : modules)
     {
@@ -259,38 +240,4 @@ int DeviceMediator::getResourcesInUse() const
 void DeviceMediator::setResourcesInUse(int value)
 {
     resourcesInUse = value;
-}
-
-void DeviceMediator::initDeviceComms()
-{
-    // Initialize comms only for the Device module; other modules wait until SYSTEM CFG_
-    for (const QSharedPointer<AbstractModule> &mod : modules)
-    {
-        if (mod.data() == device) {
-            mod->setComms(communication);
-            break;
-        }
-    }
-}
-
-void DeviceMediator::initOtherModulesAndLayout()
-{
-    // Initialize comms for all modules except Device
-    for (const QSharedPointer<AbstractModule> &mod : modules)
-    {
-        if (mod.data() != device) {
-            mod->setComms(communication);
-        }
-    }
-
-    // Load layout if requested
-    const QString devName = !lastDeviceName.isEmpty() ? lastDeviceName : device->getName();
-    if (!devName.isEmpty() && CustomSettings::isSessionRestoreRequest()) {
-        emit loadLayout(devName);
-    } else {
-        // If not restoring, ensure controls are visible
-        for (const QSharedPointer<AbstractModule> &mod : modules) {
-            mod->showModuleControl();
-        }
-    }
 }

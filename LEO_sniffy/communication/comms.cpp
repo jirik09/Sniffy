@@ -84,7 +84,6 @@ void Comms::write(QByteArray module, QByteArray feature, int param){
     QDateTime date = QDateTime::currentDateTime();
     qDebug() << "COMM_WRITE ("<< date.time()<<"):"<<module+":"+feature+":" << param <<";";
 #endif
-
     QByteArray qb(tmp,4);
     emit dataWrite(module+":"+feature+" "+qb.left(4)+";");
 }

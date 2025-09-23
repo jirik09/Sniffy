@@ -13,15 +13,18 @@ SerialLine::~SerialLine()
 }
 
 int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstIndex){
-    const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
-    QSerialPort *sPort;
 
+    const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
+
+    QSerialPort *sPort;
     const QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+
     int numberOfDevices = 0;
     QByteArray received;
 
     for (const QSerialPortInfo &tmpPortInfo : ports){
         QSerialPortInfo portIn (tmpPortInfo.portName());
+
         sPort = new QSerialPort(portIn,nullptr);
 
         sPort->setBaudRate(921600);
@@ -110,7 +113,6 @@ void SerialLine::handleError(QSerialPort::SerialPortError error){
 
 void SerialLine::receiveData(QByteArray data){
     buffer.append(data);
-
     // find delimiter(s); allow delimiter at start (should not happen normally) and handle consecutive messages
     int idx = buffer.indexOf(delimiter);
     while(idx >= 0){
