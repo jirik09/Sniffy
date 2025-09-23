@@ -43,14 +43,6 @@ private:
 
     bool isConnected = false;
     int resourcesInUse = 0;
-    QString lastDeviceName;
-    // Two-phase init flags
-    bool postLoginInitPending = false;
-    bool modulesInitializedAfterSystem = false;
-
-    // Two-phase init helpers
-    void initDeviceComms();
-    void initOtherModulesAndLayout();
 
 private slots:
     void parseData(QByteArray data);

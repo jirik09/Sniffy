@@ -45,8 +45,9 @@ private slots:
 
 private:
     QSerialPort *serPort;
-    QByteArray buffer;   // avoid heap allocs; reused buffer
-    QByteArray message;  // avoid heap allocs; reused message
+    QByteArray *buffer;
+
+    QByteArray *message;
 
    const QByteArray delimiter = QByteArray::fromRawData(delimiterRaw,4);
 
