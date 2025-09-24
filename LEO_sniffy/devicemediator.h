@@ -14,6 +14,7 @@
 #include "modules/pwmgenerator/pwmgenerator.h"
 #include "modules/voltagesource/voltagesource.h"
 #include "modules/template/templatemodule.h"
+#include "resourcemanager.h"
 
 
 class DeviceMediator : public QObject
@@ -44,6 +45,9 @@ private:
     bool isConnected = false;
     int resourcesInUse = 0;
     int currentDeviceIndex = -1;
+
+    // Manager handling legacy resources + GPIO masks aggregation and conflicts
+    ResourceManager resourceManager;
 
 private slots:
     void parseData(QByteArray data);

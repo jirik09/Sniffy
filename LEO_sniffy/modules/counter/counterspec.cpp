@@ -20,4 +20,9 @@ void CounterSpec::parseSpecification(QByteArray spec){
     pins.rat_ch3 = pinsList.at(4);
     pins.int_ch1 = pinsList.at(5);
     pins.int_ch2 = pinsList.at(6);
+
+    // New: read 4x GPIO masks (A,B,C,D)
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
 }

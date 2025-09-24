@@ -243,8 +243,6 @@ void AbstractModule::closeModule(){
         if(moduleSpecification != nullptr)
             emit releaseConflictingModules(moduleName, moduleSpecification->getResources());
     }
-
-
 }
 
 void AbstractModule::disableModule(){

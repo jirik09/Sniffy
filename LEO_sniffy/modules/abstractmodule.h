@@ -68,6 +68,12 @@ public:
 
     int getResources();
 
+    // GPIO mask getters (delegated to specification)
+    quint32 getGpioMaskA() const { return moduleSpecification ? moduleSpecification->getGpioMaskA() : 0u; }
+    quint32 getGpioMaskB() const { return moduleSpecification ? moduleSpecification->getGpioMaskB() : 0u; }
+    quint32 getGpioMaskC() const { return moduleSpecification ? moduleSpecification->getGpioMaskC() : 0u; }
+    quint32 getGpioMaskD() const { return moduleSpecification ? moduleSpecification->getGpioMaskD() : 0u; }
+
     bool isModuleRestored() const;
     void setModuleRestored(bool value);
 

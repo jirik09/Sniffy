@@ -24,4 +24,9 @@ void VoltageSourceSpec::parseSpecification(QByteArray spec)
     VddDefault = (qreal)(tmp)/1000;
 
     SpecParsing::readPins4(stream, maxDACChannels, [&](int i, const QString &pin){ channelPins[i] = pin; });
+
+    // New: read 4x GPIO masks (A,B,C,D)
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
 }

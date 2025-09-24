@@ -22,6 +22,11 @@ void ArbGeneratorSpec::parseSpecification(QByteArray spec)
     AVddReal = (qreal)(tmp)/1000;
 
     SpecParsing::readPins4(stream, maxDACChannels, [&](int i, const QString &pin){ channelPins[i] = pin; });
+
+    // New: read 4x GPIO masks (A,B,C,D) appended by firmware
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
 }
 
 void ArbGeneratorSpec::parsePWMSpecification(QByteArray spec)
@@ -39,4 +44,9 @@ void ArbGeneratorSpec::parsePWMSpecification(QByteArray spec)
     rangeMax = (qreal)(tmp)/1000;
 
     SpecParsing::readPins4(stream, maxPWMChannels, [&](int i, const QString &pin){ channelPWMPins[i] = pin; });
+
+    // New: read 4x GPIO masks (A,B,C,D) appended by firmware
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
 }
