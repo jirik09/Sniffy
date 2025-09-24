@@ -2,6 +2,7 @@
 #define RESOURCEMANAGER_H
 
 #include <QtGlobal>
+#include "modules/abstractmodule.h"
 
 struct ResourceSet {
     int resources = 0;
@@ -33,6 +34,35 @@ struct ResourceSet {
         gpioB &= ~r.gpioB;
         gpioC &= ~r.gpioC;
         gpioD &= ~r.gpioD;
+    }
+
+    // Build ResourceSet from a module (optionally override resources)
+    static ResourceSet fromModule(const QSharedPointer<AbstractModule> &module, int resourcesOverride = -1) {
+        ResourceSet s;
+        if (!module.isNull()) {
+            s.resources = (resourcesOverride >= 0) ? resourcesOverride : module->getResources();
+            s.gpioA = module->getGpioMaskA();
+            s.gpioB = module->getGpioMaskB();
+            s.gpioC = module->getGpioMaskC();
+            s.gpioD = module->getGpioMaskD();
+        } else {
+            s.resources = (resourcesOverride >= 0) ? resourcesOverride : 0;
+        }
+        return s;
+    }
+
+    static ResourceSet fromModule(AbstractModule *module, int resourcesOverride = -1) {
+        ResourceSet s;
+        if (module) {
+            s.resources = (resourcesOverride >= 0) ? resourcesOverride : module->getResources();
+            s.gpioA = module->getGpioMaskA();
+            s.gpioB = module->getGpioMaskB();
+            s.gpioC = module->getGpioMaskC();
+            s.gpioD = module->getGpioMaskD();
+        } else {
+            s.resources = (resourcesOverride >= 0) ? resourcesOverride : 0;
+        }
+        return s;
     }
 };
 

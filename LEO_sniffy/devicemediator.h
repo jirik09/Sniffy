@@ -43,7 +43,6 @@ private:
     Comms *communication;
 
     bool isConnected = false;
-    int resourcesInUse = 0;
     int currentDeviceIndex = -1;
 
     // Manager handling legacy resources + GPIO masks aggregation and conflicts

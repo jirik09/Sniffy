@@ -1,4 +1,5 @@
 #include "devicemediator.h"
+#include "resourcemanager.h"
 #include <QTimer>
 
 DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
@@ -161,90 +162,50 @@ void DeviceMediator::disableModules()
 
 void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int resources)
 {
-    if (resourcesInUse & resources)
-    {
-        qDebug() << "FATAL ERROR - trying to open conflicting resources";
-    }
-
     // Find the module that is starting
     QSharedPointer<AbstractModule> starter;
-    for (const QSharedPointer<AbstractModule> &m : modules)
-    {
-        if (m->getModuleName() == moduleName)
-        {
+    for (const QSharedPointer<AbstractModule> &m : modules) {
+        if (m->getModuleName() == moduleName) {
             starter = m;
             break;
         }
     }
 
     // Prepare aggregate set including the starter's masks
-    ResourceSet starterSet;
-    if (starter) {
-        starterSet.resources = resources;
-        starterSet.gpioA = starter->getGpioMaskA();
-        starterSet.gpioB = starter->getGpioMaskB();
-        starterSet.gpioC = starter->getGpioMaskC();
-        starterSet.gpioD = starter->getGpioMaskD();
-    } else {
-        starterSet.resources = resources;
-    }
+    ResourceSet starterSet = ResourceSet::fromModule(starter, resources);
+    for (const QSharedPointer<AbstractModule> &mod : modules) {
+        if (mod->getModuleName() == moduleName)
+            continue;
 
-    for (const QSharedPointer<AbstractModule> &mod : modules)
-    {
-        if (mod->getModuleName() == moduleName) continue;
-
-        // ResourceSet for the examined module
-        ResourceSet set;
-        set.resources = mod->getResources();
-        set.gpioA = mod->getGpioMaskA();
-        set.gpioB = mod->getGpioMaskB();
-        set.gpioC = mod->getGpioMaskC();
-        set.gpioD = mod->getGpioMaskD();
-
+        ResourceSet set = ResourceSet::fromModule(mod);
         bool lock = ResourceSet::intersects(set, starterSet);
 
         if (lock)
             mod->setModuleStatus(ModuleStatus::LOCKED);
     }
-    // Reserve legacy resources and GPIO masks for the starting module
-    resourcesInUse = resourcesInUse | resources;
+
     resourceManager.reserve(starterSet);
 }
 
 void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int resources)
 {
-    resourcesInUse = (resourcesInUse ^ resources) & resourcesInUse;
-
     // release masks of the stopping module
     for (const QSharedPointer<AbstractModule> &m : modules) {
         if (m->getModuleName() == moduleName) {
-            ResourceSet set;
-            set.resources = resources;
-            set.gpioA = m->getGpioMaskA();
-            set.gpioB = m->getGpioMaskB();
-            set.gpioC = m->getGpioMaskC();
-            set.gpioD = m->getGpioMaskD();
+            ResourceSet set = ResourceSet::fromModule(m, resources);
             resourceManager.release(set);
             break;
         }
     }
 
-    for (const QSharedPointer<AbstractModule> &mod : modules)
-    {
-        if (mod->getModuleName() == moduleName) continue;
+    for (const QSharedPointer<AbstractModule> &mod : modules) {
+        if (mod->getModuleName() == moduleName)
+            continue;
 
-            // Legacy resources condition stays
-            bool canUnlock = (((mod->getResources() ^ resources) & resourcesInUse) == 0);
-
-            // Additionally ensure no GPIO conflict with any currently reserved mask
-            ResourceSet modRes = resourceManager.reserved();
-            ResourceSet modSet;
-            modSet.resources = mod->getResources();
-            modSet.gpioA = mod->getGpioMaskA();
-            modSet.gpioB = mod->getGpioMaskB();
-            modSet.gpioC = mod->getGpioMaskC();
-            modSet.gpioD = mod->getGpioMaskD();
-            canUnlock = canUnlock && !ResourceSet::intersects(modSet, modRes);
+        // Additionally ensure no GPIO conflict with any currently reserved mask
+        ResourceSet modRes = resourceManager.reserved();
+        ResourceSet modSet = ResourceSet::fromModule(mod, mod->getResources());
+        bool canUnlock = !ResourceSet::intersects(modSet, modRes);
 
         if (canUnlock)
             mod->setModuleStatus(ModuleStatus::STOP);
@@ -329,10 +290,10 @@ QString DeviceMediator::getDeviceName()
 
 int DeviceMediator::getResourcesInUse() const
 {
-    return resourcesInUse;
+    return resourceManager.reserved().resources;
 }
 
 void DeviceMediator::setResourcesInUse(int value)
 {
-    resourcesInUse = value;
+    Q_UNUSED(value);
 }
