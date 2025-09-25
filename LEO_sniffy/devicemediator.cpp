@@ -110,7 +110,10 @@ void DeviceMediator::open(int deviceIndex)
             }
         }
 
-        // send and valiadate token
+        // Clear previous right-side specifications before we start receiving CFG_/ACK_ again
+        device->clearAllModuleDescriptions();
+
+        // send and validate token
         if (CustomSettings::getLoginToken()!="none"){
             communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
             communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");

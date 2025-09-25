@@ -24,6 +24,9 @@ public:
 
     void errorHandler(QByteArray error);
 
+    // Clear all module descriptions from the right panel (specification area)
+    void clearAllModuleDescriptions();
+
 private:
     void connectDevice(int index);
     void disconnectDevice();
