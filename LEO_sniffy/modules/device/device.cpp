@@ -93,6 +93,13 @@ void Device::passSystemSpecificationToGUI()
     deviceWindow->addModuleDescription("System Info",labels,values);
 }
 
+void Device::clearAllModuleDescriptions()
+{
+    if (deviceWindow) {
+        deviceWindow->clearModuleDescriptions();
+    }
+}
+
 void Device::errorHandler(QByteArray error){
     QMessageBox messageBox;
     messageBox.critical(0,"Error","An error has occured:\n" + error + "\nPlease reconnect the device");
