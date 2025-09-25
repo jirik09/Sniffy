@@ -279,7 +279,7 @@ void MainWindow::enforceLeftMenuWidth()
  *  after QMainWindow finishes its own layout changes triggered by dock events. Dock 
  *  signals fire while QMainWindow is still rearranging docks and doing a layout pass. 
  *  If we lock the width immediately, the subsequent layout can override it.
- *  QTimer::singleShot(0, …) posts the enforce call to run right after the current event 
+ *  QTimer::singleShot(0, ...) posts the enforce call to run right after the current event 
  *  processing finishes, i.e., after the dock transition and layout settle.*/
 void MainWindow::enforceLeftMenuWidthSoon()
 {
