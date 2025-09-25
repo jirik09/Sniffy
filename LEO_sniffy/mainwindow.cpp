@@ -267,9 +267,7 @@ void MainWindow::enforceLeftMenuWidth()
     // Ensure the left panel width strictly matches the current mode
     const int target = isLeftMenuNarrow ? LeftMenuNarrowWidth : LeftMenuWideWidth;
     if (ui && ui->centralwidget) {
-        if (ui->centralwidget->width() != target) {
-            ui->centralwidget->setFixedWidth(target);
-        }
+        ui->centralwidget->setFixedWidth(target);
         // Keep horizontal policy fixed to prevent auto-resize
         ui->centralwidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     }
