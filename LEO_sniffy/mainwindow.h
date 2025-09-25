@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QSettings>
+#include <QTimer>
 
 #include "devicemediator.h"
 #include "settingsdialog.h"
@@ -49,6 +50,12 @@ private:
     void setMenuNarrow();
     void setMenuWide();
     void recoverLeftMenu(bool isWide);
+    void enforceLeftMenuWidth();
+    void enforceLeftMenuWidthSoon();
+
+    // Two fixed widths for the left panel (menu)
+    static constexpr int LeftMenuNarrowWidth = 90;   // collapsed
+    static constexpr int LeftMenuWideWidth   = 250;  // expanded
 
     void setupMainWindowComponents();
     void createModulesWidgets();
@@ -64,5 +71,8 @@ private slots:
     void openLoginDialog();
     void updateLoginInfo();
     void openSettingDialog();
+
+protected:
+    void resizeEvent(QResizeEvent *event) override;
 };
 #endif // MAINWINDOW_H
