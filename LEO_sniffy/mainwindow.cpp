@@ -25,6 +25,9 @@ MainWindow::MainWindow(QWidget *parent):
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/graphics/graphics/logo_color.png"));
 
+    // The left panel is the central widget; keep it from stretching horizontally
+    ui->centralwidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+
     ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_gray_full.png);");
     const auto &pal = Graphics::palette();
     ui->centralwidget->setStyleSheet("QWidget{background-color:"+pal.windowWidget+";}"
@@ -44,7 +47,9 @@ MainWindow::MainWindow(QWidget *parent):
     connect(deviceMediator,&DeviceMediator::loadLayout,this,&MainWindow::loadLayout,Qt::DirectConnection);
     connect(deviceMediator,&DeviceMediator::saveLayout,this,&MainWindow::saveLayout,Qt::DirectConnection);
 
-   // setMenuWide();
+    // Start in wide mode by default, then enforce the fixed width
+    setMenuWide();
+    enforceLeftMenuWidth();
 }
 
 void MainWindow::createModulesWidgets(){
@@ -86,7 +91,11 @@ void MainWindow::createModulesWidgets(){
 
     dockWidgets[index]->setWidget(module->getWidget());
 
-    addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgets[index]);
+        addDockWidget(static_cast<Qt::DockWidgetArea>(2), dockWidgets[index]);
+        // Whenever a dock changes state/visibility, re-enforce left menu width
+        connect(dockWidgets[index], &QDockWidget::visibilityChanged, this, [this](bool){ enforceLeftMenuWidthSoon(); });
+        connect(dockWidgets[index], &QDockWidget::topLevelChanged,  this, [this](bool){ enforceLeftMenuWidthSoon(); });
+        connect(dockWidgets[index], &QDockWidget::dockLocationChanged, this, [this](Qt::DockWidgetArea){ enforceLeftMenuWidthSoon(); });
         connect(module.data(),&AbstractModule::loadModuleLayoutAndConfig,this,&MainWindow::loadModuleLayoutAndConfigCallback);
     }
 
@@ -146,11 +155,14 @@ void MainWindow::openSettingDialog()
 }
 
 void MainWindow::setMenuWide(){
-    ui->centralwidget->setMinimumSize(250,200);
-    ui->centralwidget->setMaximumSize(250,20000);
+    ui->centralwidget->setFixedWidth(LeftMenuWideWidth);
+    ui->centralwidget->setMinimumHeight(200);
+    ui->centralwidget->setMaximumHeight(20000);
+    ui->centralwidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     isLeftMenuNarrow = false;
     updateLeftMenuCompact(false);
     if (loginInfo) loginInfo->setCompact(false);
+    enforceLeftMenuWidth();
 }
 
 void MainWindow::recoverLeftMenu(bool isWide)
@@ -160,11 +172,14 @@ void MainWindow::recoverLeftMenu(bool isWide)
 }
 
 void MainWindow::setMenuNarrow(){
-    ui->centralwidget->setMinimumSize(90,200);
-    ui->centralwidget->setMaximumSize(90,20000);
+    ui->centralwidget->setFixedWidth(LeftMenuNarrowWidth);
+    ui->centralwidget->setMinimumHeight(200);
+    ui->centralwidget->setMaximumHeight(20000);
+    ui->centralwidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     isLeftMenuNarrow = true;
     updateLeftMenuCompact(true);
     if (loginInfo) loginInfo->setCompact(true);
+    enforceLeftMenuWidth();
 }
 
 
@@ -243,7 +258,39 @@ void MainWindow::loadLayout(QString deviceName)
 
     deviceMediator->setResourcesInUse(settings.value("resourcesInUse").toInt());
     recoverLeftMenu(!settings.value("LeftMenuNarrow").toBool());
+    enforceLeftMenuWidthSoon();
 
+}
+
+void MainWindow::enforceLeftMenuWidth()
+{
+    // Ensure the left panel width strictly matches the current mode
+    const int target = isLeftMenuNarrow ? LeftMenuNarrowWidth : LeftMenuWideWidth;
+    if (ui && ui->centralwidget) {
+        if (ui->centralwidget->width() != target) {
+            ui->centralwidget->setFixedWidth(target);
+        }
+        // Keep horizontal policy fixed to prevent auto-resize
+        ui->centralwidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    }
+}
+
+/** The “soon” version defers the width lock to the next event loop tick so it runs
+ *  after QMainWindow finishes its own layout changes triggered by dock events. Dock 
+ *  signals fire while QMainWindow is still rearranging docks and doing a layout pass. 
+ *  If we lock the width immediately, the subsequent layout can override it.
+ *  QTimer::singleShot(0, …) posts the enforce call to run right after the current event 
+ *  processing finishes, i.e., after the dock transition and layout settle.*/
+void MainWindow::enforceLeftMenuWidthSoon()
+{
+    // Defer a tick to let QMainWindow finish its layout pass, then enforce
+    QTimer::singleShot(0, this, [this]{ enforceLeftMenuWidth(); });
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+    enforceLeftMenuWidth();
 }
 
 void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)

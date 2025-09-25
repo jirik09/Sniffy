@@ -2,7 +2,8 @@
 
 ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget(parent)
 {
-    setMinimumSize(QSize(250, 150));
+    // Keep minimum width modest to avoid squeezing the left menu
+    setMinimumSize(QSize(220, 130));
     setAllowedAreas(Qt::RightDockWidgetArea);
     setObjectName(title);
     hide();
