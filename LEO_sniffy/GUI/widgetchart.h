@@ -103,6 +103,10 @@ public:
     void setVerticalCursor(int channelIndex, qreal value, Cursor type);
     void clearAllCursors();
 
+    // Map a scene position to normalized coordinates within the plot area (0..1 each).
+    // Returns true if the point lies within the plot area; nx, ny are clamped to 0..1 regardless.
+    bool mapSceneToPlotNormalized(const QPointF &scenePos, qreal &nx, qreal &ny) const;
+
 private:
     const int NUM_SAMPLES_TO_SWITCH=450;
     Ui::widgetChart *ui; // forward-declared from generated ui file
