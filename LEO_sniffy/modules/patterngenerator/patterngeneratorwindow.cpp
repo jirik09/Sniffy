@@ -187,7 +187,8 @@ void PatternGeneratorWindow::chartEditDataOnLeftClickCallback(QGraphicsSceneMous
     painter->chart->mapSceneToPlotNormalized(event->scenePos(), nx, ny);
 
     int position = static_cast<int>(nx * dataNum);
-    if (position < 0) position = 0; else if (position >= dataNum) position = dataNum - 1;
+    if (position < 0) position = 0;
+    if (position >= dataNum) position = dataNum - 1;
 
     int channel = static_cast<int>(ny * PATT_MAX_CHANNELS_NUM);
     if (channel < 0) channel = 0; else if (channel >= PATT_MAX_CHANNELS_NUM) channel = PATT_MAX_CHANNELS_NUM - 1;
