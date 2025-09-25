@@ -183,16 +183,14 @@ void PatternGeneratorWindow::chartEditDataOnLeftClickCallback(QGraphicsSceneMous
     int dataLen = config->dataLen[config->pattIndex];
     int dataNum = (patterns->isExponencial()) ? qPow(2, dataLen) : dataLen;
 
-    qreal height = painter->chart->geometry().height();
-    qreal width = painter->chart->geometry().width();
+    qreal nx = 0.0, ny = 0.0;
+    painter->chart->mapSceneToPlotNormalized(event->scenePos(), nx, ny);
 
-    int position = ((event->pos().x() - 25) / (width - 44)) * dataNum;
-    int channel = ((event->pos().y() - 20) / (height - 30)) * PATT_MAX_CHANNELS_NUM;
+    int position = static_cast<int>(nx * dataNum);
+    if (position < 0) position = 0; else if (position >= dataNum) position = dataNum - 1;
 
-    if(position >= dataNum)
-        position = dataNum - 1;
-    else if(position < 0)
-        position = 0;
+    int channel = static_cast<int>(ny * PATT_MAX_CHANNELS_NUM);
+    if (channel < 0) channel = 0; else if (channel >= PATT_MAX_CHANNELS_NUM) channel = PATT_MAX_CHANNELS_NUM - 1;
 
     patternData = patterns->modifyPattern(channel, position);
 

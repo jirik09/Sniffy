@@ -1,5 +1,6 @@
 #include "widgetchart.h"
 #include "ui_widgetchart.h"
+#include <QTimer>
 
 widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QWidget(parent),
@@ -408,8 +409,18 @@ qreal widgetChart::getShiftPercent() const
 
 void widgetChart::enableLocalMouseEvents(EventSelection sel)
 {
-    chart->installEventFilter(this);
     eventSel = sel;
+    // Install on the scene to receive GraphicsScene* events reliably
+    if (chart->scene()) {
+        chart->scene()->installEventFilter(this);
+    } else {
+        // Defer until the scene exists (after QChartView creates it)
+        QTimer::singleShot(0, this, [this]() {
+            if (chart->scene()) {
+                chart->scene()->installEventFilter(this);
+            }
+        });
+    }
 }
 
 void widgetChart::setGridLinesVisible(bool gridVisibleX, bool gridVisibleY){
@@ -678,4 +689,22 @@ void widgetChart::handleCursorPress()
 void widgetChart::handleCursorRelease()
 {
     QApplication::restoreOverrideCursor();
+}
+
+bool widgetChart::mapSceneToPlotNormalized(const QPointF &scenePos, qreal &nx, qreal &ny) const
+{
+    if (!chart) return false;
+    // Convert scene position to chart-local coordinates, then normalize against plotArea
+    const QPointF chartPos = chart->mapFromScene(scenePos);
+    const QRectF plot = chart->plotArea();
+    const qreal w = plot.width();
+    const qreal h = plot.height();
+    if (w <= 0 || h <= 0) { nx = ny = 0; return false; }
+    nx = (chartPos.x() - plot.left()) / w;
+    ny = (chartPos.y() - plot.top()) / h;
+    // Clamp to 0..1 range
+    bool inside = (nx >= 0.0 && nx <= 1.0 && ny >= 0.0 && ny <= 1.0);
+    if (nx < 0.0) nx = 0.0; else if (nx > 1.0) nx = 1.0;
+    if (ny < 0.0) ny = 0.0; else if (ny > 1.0) ny = 1.0;
+    return inside;
 }
