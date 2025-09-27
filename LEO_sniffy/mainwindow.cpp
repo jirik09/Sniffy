@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent):
     setWindowTitle("LEO sniffy");
     sett = new SettingsDialog(this);
     connect(sett, &SettingsDialog::saveSessionRequested, this, &MainWindow::onSettingsSaveSessionRequested);
+    connect(sett, &SettingsDialog::loadSessionRequested, this, &MainWindow::onSettingsLoadSessionRequested);
     logindial = new LoginDialog(this);
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
@@ -411,5 +412,98 @@ void MainWindow::saveSessionToFile(const QString &filePath)
     QFile::remove(tmpFile);
 
     QMessageBox::information(this, "Save session", "Session saved successfully.");
+}
+
+void MainWindow::onSettingsLoadSessionRequested()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, "Load session", QDir::homePath(), "Session files (*.json)");
+    if(fileName.isEmpty()) return;
+    loadSessionFromFile(fileName);
+}
+
+void MainWindow::loadSessionFromFile(const QString &filePath)
+{
+    QFile in(filePath);
+    if(!in.open(QIODevice::ReadOnly)){
+        QMessageBox::warning(this, "Load session", "Cannot open file for reading");
+        return;
+    }
+    QJsonDocument doc = QJsonDocument::fromJson(in.readAll());
+    in.close();
+    if(!doc.isObject()){
+        QMessageBox::warning(this, "Load session", "Invalid session file");
+        return;
+    }
+    QJsonObject root = doc.object();
+
+    // Restore geometry and window state
+    if(root.contains("geometry")){
+        QByteArray geom = QByteArray::fromBase64(root.value("geometry").toString().toUtf8());
+        restoreGeometry(geom);
+    }
+    if(root.contains("windowState")){
+        QByteArray ws = QByteArray::fromBase64(root.value("windowState").toString().toUtf8());
+        restoreState(ws);
+    }
+
+    // Reconstruct layout QSettings from layout object
+    QString tmpFile = QDir::temp().filePath(QString("sniffy_session_load_%1.ini").arg(QUuid::createUuid().toString()));
+    QSettings tmpLayout(tmpFile, QSettings::IniFormat);
+    if(root.contains("layout") && root.value("layout").isObject()){
+        QJsonObject layoutObj = root.value("layout").toObject();
+        for (auto it = layoutObj.begin(); it != layoutObj.end(); ++it){
+            QByteArray b = QByteArray::fromBase64(it.value().toString().toUtf8());
+            tmpLayout.setValue(it.key(), b);
+        }
+    }
+
+    // Apply module configurations
+    if(root.contains("modules") && root.value("modules").isArray()){
+        QJsonArray modulesArr = root.value("modules").toArray();
+        for (const QJsonValue &mv : modulesArr){
+            if(!mv.isObject()) continue;
+            QJsonObject mo = mv.toObject();
+            QString name = mo.value("name").toString();
+            QByteArray cfg = QByteArray::fromBase64(mo.value("config").toString().toUtf8());
+            ModuleStatus status = (ModuleStatus)mo.value("status").toInt();
+
+
+
+            for (const QSharedPointer<AbstractModule>& module : modulesList) {
+                if(module->getModuleName() == name){
+                    // Apply configuration
+                    module->parseConfiguration(cfg);
+                    // Restore per-module geometry
+                    module->restoreGeometry(tmpLayout);
+                    // Set status
+                    module->setModuleStatus((ModuleStatus)status);
+                    module->setModuleRestored(true);
+                    // If module should be running, ensure it starts
+                    if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE || status == ModuleStatus::HIDDEN_PAUSE){
+                        module->writeConfiguration();
+                        module->startModule();
+                        if(status == ModuleStatus::HIDDEN_PAUSE || status == ModuleStatus::HIDDEN_PLAY){
+                            module->moduleRestoredHidden();
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    // Resources and left menu
+    if(root.contains("resourcesInUse")){
+        deviceMediator->setResourcesInUse(root.value("resourcesInUse").toInt());
+    }
+    if(root.contains("LeftMenuNarrow")){
+        bool leftN = root.value("LeftMenuNarrow").toBool();
+        recoverLeftMenu(!leftN);
+    }
+
+    // Clean up temp
+    QFile::remove(tmpFile);
+
+    QMessageBox::information(this, "Load session", "Session loaded successfully.");
 }
 
