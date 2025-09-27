@@ -113,19 +113,52 @@ void DeviceMediator::open(int deviceIndex)
         // Clear previous right-side specifications before we start receiving CFG_/ACK_ again
         device->clearAllModuleDescriptions();
 
-        // send and validate token
-        if (CustomSettings::getLoginToken()!="none"){
-            communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
-            communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-            communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
-            communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-            communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
-        }
-        for (const QSharedPointer<AbstractModule> &mod : modules)
-        {
-            mod->setComms(communication);
-        }
-        emit loadLayout(deviceList.at(deviceIndex).deviceName);
+        // Immediately request MCU reset so it starts in known state. While we wait 250ms
+        // the layout/config files can be opened and processed. After 250ms send the
+        // login token (if present), attach modules to the comms and load the layout.
+            communication->write(Commands::RESET_DEVICE+";");
+
+            // Wire modules to comms immediately and emit loadLayout so layout/config files
+            // are processed while we wait for the MCU to reset.
+            for (const QSharedPointer<AbstractModule> &mod : modules)
+            {
+                mod->setComms(communication);
+            }
+            if (deviceIndex >= 0 && deviceIndex < deviceList.size()) {
+                emit loadLayout(deviceList.at(deviceIndex).deviceName);
+            }
+
+            // Delay only the token handshake by 250ms so the MCU has time to reset
+            QTimer::singleShot(250, [this]() {
+                if (CustomSettings::getLoginToken() != "none"){
+                    communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
+                    communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+                    communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
+                    communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+                    communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
+                }
+            });
+
+        // Delay subsequent setup (token handshake, module wiring, layout load)
+        QTimer::singleShot(250, [this, deviceIndex]() {
+            // send and validate token
+            if (CustomSettings::getLoginToken() != "none"){
+                communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
+                communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+                communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
+                communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+                communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
+            }
+
+            for (const QSharedPointer<AbstractModule> &mod : modules)
+            {
+                mod->setComms(communication);
+            }
+
+            if (deviceIndex >= 0 && deviceIndex < deviceList.size()) {
+                emit loadLayout(deviceList.at(deviceIndex).deviceName);
+            }
+        });
     }
 }
 
