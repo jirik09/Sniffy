@@ -16,6 +16,12 @@ Right - area for dock widgets
 
 #include "GUI/widgetcontrolmodule.h"
 #include "GUI/widgetbuttons.h"
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QUuid>
+#include <QDir>
+#include <QFile>
 
 
 MainWindow::MainWindow(QWidget *parent):
@@ -35,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     setWindowTitle("LEO sniffy");
     sett = new SettingsDialog(this);
+    connect(sett, &SettingsDialog::saveSessionRequested, this, &MainWindow::onSettingsSaveSessionRequested);
     logindial = new LoginDialog(this);
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
@@ -335,5 +342,74 @@ void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
             }
         }
     }
+}
+
+void MainWindow::onSettingsSaveSessionRequested()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, "Save session", QDir::homePath(), "Session files (*.json)");
+    if(fileName.isEmpty()) return;
+    saveSessionToFile(fileName);
+}
+
+void MainWindow::saveSessionToFile(const QString &filePath)
+{
+    // Build JSON with layout (geometry, windowState, widget geometries) and config (module configs/status)
+    QJsonObject root;
+
+    // Geometry and window state as base64 strings
+    root["geometry"] = QString(saveGeometry().toBase64());
+    root["windowState"] = QString(saveState().toBase64());
+
+    // Create temporary QSettings to collect module layout keys
+    QString tmpFile = QDir::temp().filePath(QString("sniffy_session_%1.ini").arg(QUuid::createUuid().toString()));
+    QSettings tmpLayout(tmpFile, QSettings::IniFormat);
+
+    // Let each module write its geometry entries into tmpLayout
+    for (const QSharedPointer<AbstractModule>& module : modulesList) {
+        module->saveGeometry(tmpLayout);
+    }
+
+    // Collect layout entries
+    QJsonObject layoutObj;
+    const QStringList keys = tmpLayout.allKeys();
+    for (const QString &k : keys) {
+        QVariant v = tmpLayout.value(k);
+        QByteArray data = v.toByteArray();
+        layoutObj.insert(k, QString(data.toBase64()));
+    }
+    root["layout"] = layoutObj;
+
+    // Collect module configurations and status
+    QJsonArray modulesArr;
+    for (const QSharedPointer<AbstractModule>& module : modulesList) {
+        QJsonObject mo;
+        mo["name"] = module->getModuleName();
+        QByteArray cfg = module->getConfiguration();
+        mo["config"] = QString(cfg.toBase64());
+        mo["status"] = (int)module->getModuleStatus();
+        modulesArr.append(mo);
+    }
+    root["modules"] = modulesArr;
+
+    // Other app state
+    root["resourcesInUse"] = deviceMediator->getResourcesInUse();
+    root["LeftMenuNarrow"] = isLeftMenuNarrow;
+
+    // Write JSON to file
+    QJsonDocument doc(root);
+    QFile out(filePath);
+    if(!out.open(QIODevice::WriteOnly)){
+        QMessageBox::warning(this, "Save session", "Cannot open file for writing");
+        // clean up temp
+        QFile::remove(tmpFile);
+        return;
+    }
+    out.write(doc.toJson(QJsonDocument::Indented));
+    out.close();
+
+    // remove temporary file
+    QFile::remove(tmpFile);
+
+    QMessageBox::information(this, "Save session", "Session saved successfully.");
 }
 

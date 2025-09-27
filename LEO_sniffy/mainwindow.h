@@ -61,11 +61,13 @@ private:
     void createModulesWidgets();
 
     void saveLayout();
+    void saveSessionToFile(const QString &filePath);
     // Update left menu to compact (narrow) or expanded (wide): hide/show texts accordingly
     void updateLeftMenuCompact(bool compact);
 
 private slots:
     void loadLayout(QString deviceName);
+    void onSettingsSaveSessionRequested();
     void loadModuleLayoutAndConfigCallback(QString moduleName);
     void setMenuSize(bool isWide);
     void openLoginDialog();

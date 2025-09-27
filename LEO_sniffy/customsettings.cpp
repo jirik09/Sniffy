@@ -79,29 +79,9 @@ void CustomSettings::saveSettings()
 
 bool CustomSettings::askToSaveSession()
 {
-    if(restoreSession == 2) return true;
-    if(restoreSession == 0) return false;
-
-    QMessageBox msgBox;
-    msgBox.setWindowTitle("Save session");
-    msgBox.setWindowIcon(QIcon(":/graphics/graphics/logo_color.png"));
-    msgBox.setIcon(QMessageBox::Question);
-    msgBox.setStyleSheet("QPushButton{width:50px;}");
-    msgBox.setText("Do you want to save current session?");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Cancel);
-    int ret = msgBox.exec();
-
-    switch (ret) {
-    case QMessageBox::Yes:
-        return true;
-        break;
-    case QMessageBox::No:
-    case QMessageBox::Cancel:
-        return false;
-        break;
-    }
-    return false;
+    // Always save session — skip any interactive prompt.
+    Q_UNUSED(restoreSession);
+    return true;
 }
 
 void CustomSettings::setRestoreSession(int value)
