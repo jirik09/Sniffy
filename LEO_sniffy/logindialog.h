@@ -18,6 +18,7 @@
 #include "GUI/widgettextinput.h"
 #include "GUI/widgetlabel.h"
 #include "customsettings.h"
+#include "GUI/clickablelabel.h"
 
 namespace Ui {
 class LoginDialog;
@@ -39,7 +40,7 @@ private:
     WidgetLabel *info;
 
     WidgetButtons *buttonsDone;
-    WidgetButtons *logoutButton{nullptr};
+    ClickableLabel *logoutLabel{nullptr};
     QNetworkAccessManager *networkManager {nullptr};
     /*
     "In-flight reply" refers to a response that has been requested but has not yet been received.

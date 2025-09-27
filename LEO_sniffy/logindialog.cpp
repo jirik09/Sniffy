@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QLabel>
+#include "GUI/clickablelabel.h"
 
 LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent),
@@ -51,15 +52,18 @@ LoginDialog::LoginDialog(QWidget *parent) :
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     layout->addItem(verticalSpacer);
 
+    // Logout label (clickable) placed just before primary action buttons
+    logoutLabel = new ClickableLabel(this);
+    logoutLabel->setText("Logout");
+    logoutLabel->setStyleSheet("color: " + Graphics::palette().textLabel + "; text-decoration: underline; cursor: pointer;");
+    logoutLabel->setToolTip("Click to logout");
+    logoutLabel->setCursor(Qt::PointingHandCursor);
+    // Hide by default unless valid login exists
+    logoutLabel->setVisible(CustomSettings::hasValidLogin());
+    layout->addWidget(logoutLabel);
+
     WidgetSeparator *sep2 = new WidgetSeparator(this);
     layout->addWidget(sep2);
-
-    // Logout button group (single button) placed just before primary action buttons
-    logoutButton = new WidgetButtons(this,1);
-    logoutButton->setText(" Logout ",0);
-    // Enabled only when a valid login exists
-    logoutButton->setEnabledButton(CustomSettings::hasValidLogin(), 0);
-    layout->addWidget(logoutButton);
 
     buttonsDone = new WidgetButtons(this,2);
     buttonsDone->setText("  Login  ",0);
@@ -93,10 +97,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
     });
 
     connect(buttonsDone,&WidgetButtons::clicked,this,&LoginDialog::buttonAction);
-    connect(logoutButton,&WidgetButtons::clicked,this,[this](int idx, int){
-        Q_UNUSED(idx);
-        performLogout();
-    });
+    connect(logoutLabel, &ClickableLabel::clicked, this, &LoginDialog::performLogout);
 }
 
 LoginDialog::~LoginDialog()
@@ -145,7 +146,7 @@ void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &t
     CustomSettings::setLastLoginFailure("");
     CustomSettings::saveSettings();
 
-    if (logoutButton) logoutButton->setEnabledButton(true, 0);
+    if (logoutLabel) logoutLabel->setVisible(true);
 
     info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy hh:mm"));
     info->setColor(Graphics::palette().textAll);
@@ -161,7 +162,7 @@ void LoginDialog::open()
     this->show();
     this->raise();
     this->activateWindow();
-    if (logoutButton) logoutButton->setEnabledButton(CustomSettings::hasValidLogin(), 0);
+    if (logoutLabel) logoutLabel->setVisible(CustomSettings::hasValidLogin());
 }
 
 void LoginDialog::buttonAction(int isCanceled)
@@ -205,11 +206,13 @@ void LoginDialog::performLogout()
 
     userEmail->setText("");
     userEmail->setPlaceholder("Unknown user", QColor(160,160,160));
+    userPIN->setText("");
 
     // Notify the rest of the app that login state changed
     emit loginInfoChanged();
 
     // Update UI accordingly and close dialog
+    if (logoutLabel) logoutLabel->setVisible(false);
     info->setName("Logged out");
     info->setColor(Graphics::palette().textLabel);
     close();
