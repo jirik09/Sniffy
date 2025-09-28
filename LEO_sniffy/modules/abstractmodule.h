@@ -38,11 +38,11 @@ public:
     virtual QByteArray getConfiguration() = 0;
     virtual QWidget* getWidget() = 0; //return pointer to widget - need to be able to dock it
 
-    void saveGeometry(QSettings &layout);
+    //void saveGeometry(QSettings &layout);
     // Save geometry entries into an in-memory map (key -> QByteArray)
     // so callers can avoid creating temporary QSettings files when exporting sessions.
     void saveGeometry(QMap<QString, QByteArray> &layoutMap);
-    void restoreGeometry(QSettings &layout);
+    //void restoreGeometry(QSettings &layout);
     // Restore geometry from an in-memory map (key -> QByteArray) so callers
     // don't need to create a temporary QSettings file when loading JSON
     // sessions. Keys are the same as used for QSettings: moduleName+objectName.
