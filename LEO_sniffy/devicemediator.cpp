@@ -182,20 +182,16 @@ void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int res
             break;
         }
     }
-
     // Prepare aggregate set including the starter's masks
     ResourceSet starterSet = ResourceSet::fromModule(starter, resources);
     for (const QSharedPointer<AbstractModule> &mod : modules) {
         if (mod->getModuleName() == moduleName)
             continue;
-
         ResourceSet set = ResourceSet::fromModule(mod);
-        bool lock = ResourceSet::intersects(set, starterSet);
-
+        bool lock = ResourceSet::collide(set, starterSet);
         if (lock)
             mod->setModuleStatus(ModuleStatus::LOCKED);
     }
-
     resourceManager.reserve(starterSet);
 }
 
@@ -209,18 +205,20 @@ void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int r
             break;
         }
     }
-
+    // Check all other modules if they can be unlocked now
     for (const QSharedPointer<AbstractModule> &mod : modules) {
+        // Skip the module that is being released
         if (mod->getModuleName() == moduleName)
             continue;
-
-        // Additionally ensure no GPIO conflict with any currently reserved mask
-        ResourceSet modRes = resourceManager.reserved();
-        ResourceSet modSet = ResourceSet::fromModule(mod, mod->getResources());
-        bool canUnlock = !ResourceSet::intersects(modSet, modRes);
-
-        if (canUnlock)
-            mod->setModuleStatus(ModuleStatus::STOP);
+        if (mod->getModuleStatus() == ModuleStatus::LOCKED) {
+            ResourceSet reservedNow = resourceManager.reserved();
+            ResourceSet modSet = ResourceSet::fromModule(mod, mod->getResources());
+            const bool stillConflicts = ResourceSet::collide(modSet, reservedNow);
+            if (!stillConflicts) {
+                // Transition back to STOP to indicate "unlocked"; previous code used STOP for unlock state
+                mod->setModuleStatus(ModuleStatus::STOP);
+            }
+        }
     }
 }
 
