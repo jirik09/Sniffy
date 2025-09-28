@@ -118,16 +118,6 @@ void DeviceMediator::open(int deviceIndex)
         // login token (if present), attach modules to the comms and load the layout.
         communication->write(Commands::RESET_DEVICE+";");
 
-        // Wire modules to comms immediately and emit loadLayout so layout/config files
-        // are processed while we wait for the MCU to reset.
-        for (const QSharedPointer<AbstractModule> &mod : modules)
-        {
-            mod->setComms(communication);
-        }
-        if (deviceIndex >= 0 && deviceIndex < deviceList.size()) {
-            emit loadLayout(deviceList.at(deviceIndex).deviceName);
-        }
-
         // Delay subsequent setup (token handshake, module wiring, layout load)
         QTimer::singleShot(250, [this, deviceIndex]() {
             // send and validate token

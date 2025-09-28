@@ -77,13 +77,6 @@ void CustomSettings::saveSettings()
 
 }
 
-bool CustomSettings::askToSaveSession()
-{
-    // Always save session — skip any interactive prompt.
-    Q_UNUSED(restoreSession);
-    return true;
-}
-
 void CustomSettings::setRestoreSession(int value)
 {
     restoreSession = value;

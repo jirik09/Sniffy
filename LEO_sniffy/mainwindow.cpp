@@ -209,7 +209,6 @@ void MainWindow::saveLayout()
         // Prevent creating ".cfg" / ".lay" with empty device name
         const QString devName = deviceMediator->getDeviceName();
         if(devName.isEmpty()) return;
-        if(!CustomSettings::askToSaveSession())return;
         QSharedPointer<AbstractModule> module;
         layoutFile = QApplication::applicationDirPath() + "/sessions/"+devName+".lay";
         configFile = QApplication::applicationDirPath() + "/sessions/"+devName+".cfg";
