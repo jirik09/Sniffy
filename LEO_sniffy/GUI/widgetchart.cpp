@@ -609,7 +609,7 @@ void widgetChart::setVerticalMarker(int channelIndex, qreal value){
                 const qreal halfPx = markersVertical[markerVerticalIndex]->markerSize() * 0.5;
                 const qreal padPx = halfPx + 5.0;
                 ny = 1.0 - qMin<qreal>(0.5, padPx / plot.height()); // center inside top edge
-            }«
+            }
         }
         const QPointF pt(value, ny);
         triggerShift = value;
