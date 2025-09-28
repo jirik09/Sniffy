@@ -52,8 +52,8 @@ MainWindow::MainWindow(QWidget *parent):
     createModulesWidgets();
     setupMainWindowComponents();
 
-    connect(deviceMediator,&DeviceMediator::loadLayout,this,&MainWindow::loadLayout,Qt::DirectConnection);
-    connect(deviceMediator,&DeviceMediator::saveLayout,this,&MainWindow::saveLayout,Qt::DirectConnection);
+    connect(deviceMediator,&DeviceMediator::loadLayoutUponOpen,this,&MainWindow::onOpenLoadSessionRequested,Qt::DirectConnection);
+    connect(deviceMediator,&DeviceMediator::saveLayoutUponExit,this,&MainWindow::onExitSaveSessionRequested,Qt::DirectConnection);
 
     // Start in wide mode by default, then enforce the fixed width
     setMenuWide();
@@ -189,8 +189,6 @@ void MainWindow::setMenuNarrow(){
     enforceLeftMenuWidth();
 }
 
-
-
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -200,34 +198,6 @@ void MainWindow::closeEvent (QCloseEvent *event)
 {
     deviceMediator->closeApp();
     event->accept();
-}
-
-void MainWindow::saveLayout()
-{
-    if(deviceMediator->getIsConnected()){
-        // Prevent creating ".cfg" / ".lay" with empty device name
-        const QString devName = deviceMediator->getDeviceName();
-        if(devName.isEmpty()) return;
-        QSharedPointer<AbstractModule> module;
-        layoutFile = QApplication::applicationDirPath() + "/sessions/"+devName+".lay";
-        configFile = QApplication::applicationDirPath() + "/sessions/"+devName+".cfg";
-
-        QSettings layout(layoutFile, QSettings::IniFormat);
-        layout.setValue("geometry", saveGeometry());
-        layout.setValue("windowState", saveState());
-
-        for (const QSharedPointer<AbstractModule>& module : modulesList) {
-            module->saveGeometry(layout);
-        }
-
-        QSettings settings(configFile, QSettings::IniFormat);
-        for (const QSharedPointer<AbstractModule>& module : modulesList) {
-            settings.setValue(module->getModuleName()+"config",module->getConfiguration());
-            settings.setValue(module->getModuleName()+"status",(int)(module->getModuleStatus()));
-        }
-        settings.setValue("resourcesInUse",deviceMediator->getResourcesInUse());
-        settings.setValue("LeftMenuNarrow",isLeftMenuNarrow);
-    }
 }
 
 void MainWindow::updateLeftMenuCompact(bool compact)
@@ -244,40 +214,6 @@ void MainWindow::updateLeftMenuCompact(bool compact)
         // Minimal: do nothing; if needed we can extend WidgetLoginInfo with a compact mode API.
         loginInfo->updateInfo();
     }
-}
-
-void MainWindow::loadLayout(QString deviceName)
-{
-    if(!CustomSettings::isSessionRestoreRequest())return;
-    if(deviceName.isEmpty()) return;
-
-    layoutFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".lay";
-    configFile = QApplication::applicationDirPath() + "/sessions/"+deviceName+".cfg";
-    QFile file(layoutFile);
-
-    if(!file.exists()) return;
-
-    QSettings layout(layoutFile, QSettings::IniFormat);
-    QSettings settings(configFile, QSettings::IniFormat);
-    restoreGeometry(layout.value("geometry").toByteArray());
-    restoreState(layout.value("windowState").toByteArray());
-
-    deviceMediator->setResourcesInUse(settings.value("resourcesInUse").toInt());
-    recoverLeftMenu(!settings.value("LeftMenuNarrow").toBool());
-    enforceLeftMenuWidthSoon();
-
-    // Eagerly restore each module, but defer slightly so the MCU and comms
-    // handshake (reset/token) have time to settle. Calling
-    // writeConfiguration() too early can fail if the MCU isn't ready to
-    // accept commands yet. Use a short singleShot delay to avoid race
-    // conditions while keeping restore responsive.
-    QTimer::singleShot(350, this, [this]() {
-        if (!deviceMediator->getIsConnected()) return;
-        for (const QSharedPointer<AbstractModule>& module : modulesList) {
-            loadModuleLayoutAndConfigCallback(module->getModuleName());
-        }
-    });
-
 }
 
 void MainWindow::enforceLeftMenuWidth()
@@ -309,60 +245,37 @@ void MainWindow::resizeEvent(QResizeEvent *event)
     enforceLeftMenuWidth();
 }
 
-void MainWindow::loadModuleLayoutAndConfigCallback(QString moduleName)
-{
-    if(!CustomSettings::isSessionRestoreRequest())return;
-
-    QString layoutFile;
-    QString configFile;
-    const QString devName = deviceMediator->getDeviceName();
-    if(devName.isEmpty()) return;
-    layoutFile = QApplication::applicationDirPath() + "/sessions/"+devName+".lay";
-    configFile = QApplication::applicationDirPath() + "/sessions/"+devName+".cfg";
-    QSharedPointer<AbstractModule> module;
-
-    QFile file(layoutFile);
-    QFile fileMod(configFile);
-
-    if(!file.exists() || !fileMod.exists()) return;
-
-    QSettings settings(configFile, QSettings::IniFormat);
-    QSettings layout(layoutFile, QSettings::IniFormat);
-    ModuleStatus status;
-    QByteArray config;
-
-    for (const QSharedPointer<AbstractModule>& module : modulesList) {
-        if(module->getModuleName()==moduleName){
-            if(!module->isModuleRestored()){
-                status = (ModuleStatus)settings.value(module->getModuleName()+"status").toInt();
-                config = settings.value(module->getModuleName()+"config").toByteArray();
-                module->parseConfiguration(config);
-
-                module->restoreGeometry(layout);
-                module->setModuleStatus(status);
-                if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE || status == ModuleStatus::HIDDEN_PAUSE){
-                    /*if(status == ModuleStatus::PAUSE)
-                        status = ModuleStatus::PLAY;*/
-                    module->writeConfiguration();
-                    module->startModule();
-                    if(status == ModuleStatus::HIDDEN_PAUSE || status == ModuleStatus::HIDDEN_PLAY){
-                        module->moduleRestoredHidden();
-                    }
-                }
-                module->setModuleRestored(true);
-            }
-        }
-    }
-}
-
 void MainWindow::onSettingsSaveSessionRequested()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Save session", QDir::homePath(), "Session files (*.json)");
     if(fileName.isEmpty()) return;
-    saveSessionToFile(fileName);
+    saveSessionToFile(fileName, false);
 }
 
-void MainWindow::saveSessionToFile(const QString &filePath)
+void MainWindow::onExitSaveSessionRequested()
+{
+    if (deviceMediator->getIsConnected())
+    {
+        QString devName = deviceMediator->getDeviceName();
+        if (!devName.isEmpty())
+        {
+            // Ensure sessions directory exists before attempting to save
+            const QString sessionsPath = QApplication::applicationDirPath() + "/sessions";
+            QDir sessionsDir(sessionsPath);
+            if (!sessionsDir.exists()) {
+                // Try to create the sessions directory; if it fails, skip saving
+                if (!QDir().mkpath(sessionsPath)) {
+                    return;
+                }
+            }
+
+            const QString fileName = sessionsPath + "/" + devName + ".json";
+            saveSessionToFile(fileName,true);
+        }
+    }
+}
+
+void MainWindow::saveSessionToFile(const QString &filePath, bool silent = false)
 {
     // Build JSON with layout (geometry, windowState, widget geometries) and config (module configs/status)
     QJsonObject root;
@@ -404,23 +317,35 @@ void MainWindow::saveSessionToFile(const QString &filePath)
     QJsonDocument doc(root);
     QFile out(filePath);
     if(!out.open(QIODevice::WriteOnly)){
+        if(!silent){
         QMessageBox::warning(this, "Save session", "Cannot open file for writing");
+        }
         return;
     }
     out.write(doc.toJson(QJsonDocument::Indented));
     out.close();
-
-    QMessageBox::information(this, "Save session", "Session saved successfully.");
+    if(!silent){
+        QMessageBox::information(this, "Save session", "Session saved successfully.");
+    }
 }
 
 void MainWindow::onSettingsLoadSessionRequested()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Load session", QDir::homePath(), "Session files (*.json)");
     if(fileName.isEmpty()) return;
-    loadSessionFromFile(fileName);
+    loadSessionFromFile(fileName,false);
 }
 
-void MainWindow::loadSessionFromFile(const QString &filePath)
+void MainWindow::onOpenLoadSessionRequested(QString deviceName)
+{
+    if(deviceName.isEmpty()) return;
+    QString fileName = QApplication::applicationDirPath() + "/sessions/"+deviceName+".json";
+    QFile file(fileName);
+    if(!file.exists()) return;
+    loadSessionFromFile(fileName,true);
+}
+
+void MainWindow::loadSessionFromFile(const QString &filePath, bool silent = false)
 {
     QFile in(filePath);
     if(!in.open(QIODevice::ReadOnly)){
@@ -466,8 +391,6 @@ void MainWindow::loadSessionFromFile(const QString &filePath)
             QByteArray cfg = QByteArray::fromBase64(mo.value("config").toString().toUtf8());
             ModuleStatus status = (ModuleStatus)mo.value("status").toInt();
 
-
-
             for (const QSharedPointer<AbstractModule>& module : modulesList) {
                 if(module->getModuleName() == name){
                     // Apply configuration
@@ -499,7 +422,8 @@ void MainWindow::loadSessionFromFile(const QString &filePath)
         bool leftN = root.value("LeftMenuNarrow").toBool();
         recoverLeftMenu(!leftN);
     }
-
-    QMessageBox::information(this, "Load session", "Session loaded successfully.");
+    if(!silent){
+        QMessageBox::information(this, "Load session", "Session loaded successfully.");
+    }
 }
 

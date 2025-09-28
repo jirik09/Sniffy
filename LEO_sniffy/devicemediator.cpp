@@ -84,8 +84,6 @@ void DeviceMediator::open(int deviceIndex)
         connect(communication, &Comms::newData, this, &DeviceMediator::parseData);
         connect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
 
-        QString layoutFile;
-        QString configFile;
         const QString devName = deviceList.at(deviceIndex).deviceName;
         if (devName.isEmpty())
         {
@@ -93,14 +91,11 @@ void DeviceMediator::open(int deviceIndex)
         }
         else
         {
-            layoutFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".lay";
-            configFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".cfg";
+            QString sessionFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".json";
             QSharedPointer<AbstractModule> module;
+            QFile file(sessionFile);
 
-            QFile file(layoutFile);
-            QFile fileMod(configFile);
-
-            if (file.exists() && fileMod.exists())
+            if (file.exists() )
             {
                 CustomSettings::askForSessionRestore(devName);
             }
@@ -133,10 +128,12 @@ void DeviceMediator::open(int deviceIndex)
             {
                 mod->setComms(communication);
             }
-
-            if (deviceIndex >= 0 && deviceIndex < deviceList.size()) {
-                emit loadLayout(deviceList.at(deviceIndex).deviceName);
-            }
+            //This is bit dangerous... All modules must get their cfg from MCU and (spec) to be able to restore.
+            QTimer::singleShot(350, [this, deviceIndex]() {
+                if (CustomSettings::isSessionRestoreRequest() && deviceIndex >= 0 && deviceIndex < deviceList.size()) {
+                    emit loadLayoutUponOpen(deviceList.at(deviceIndex).deviceName);
+                }
+            });
         });
     }
 }
@@ -165,7 +162,7 @@ void DeviceMediator::disableModules()
 {
     if (isConnected)
     {
-        emit saveLayout();
+        emit saveLayoutUponExit();
         for (const QSharedPointer<AbstractModule> &mod : modules)
         {
             mod->disableModule();
