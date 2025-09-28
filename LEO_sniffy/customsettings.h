@@ -20,7 +20,6 @@ public:
     static void loadSettings(QString fileName);
     static void saveSettings();
 
-    static bool askToSaveSession();
     static bool askForSessionRestore(QString device);
     static bool isSessionRestoreRequest();
     static void setNoSessionfound();

@@ -32,8 +32,8 @@ public:
     void setResourcesInUse(int value);
 
 signals:
-    void loadLayout(QString Devicename);
-    void saveLayout(void);
+    void loadLayoutUponOpen(QString Devicename);
+    void saveLayoutUponExit(void);
 
 private:
     QList<DeviceDescriptor> deviceList;

@@ -31,6 +31,7 @@ private:
     Ui::SettingsDialog *ui;
 
     WidgetButtons *buttonsRestoreSession;
+    WidgetButtons *buttonsSession;
     WidgetSelection * selTheme;
 
     WidgetLabel *infoLabel;
@@ -41,6 +42,11 @@ private:
 private slots:
     void closeDialog(int isCanceled);
     void restartWarning();
+    void sessionButtonClicked(int index, int optionalEmitParam = 0);
+
+signals:
+    void saveSessionRequested();
+    void loadSessionRequested();
 };
 
 #endif // SETTINGSDIALOG_H

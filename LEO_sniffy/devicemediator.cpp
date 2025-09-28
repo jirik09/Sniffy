@@ -84,8 +84,6 @@ void DeviceMediator::open(int deviceIndex)
         connect(communication, &Comms::newData, this, &DeviceMediator::parseData);
         connect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
 
-        QString layoutFile;
-        QString configFile;
         const QString devName = deviceList.at(deviceIndex).deviceName;
         if (devName.isEmpty())
         {
@@ -93,14 +91,11 @@ void DeviceMediator::open(int deviceIndex)
         }
         else
         {
-            layoutFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".lay";
-            configFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".cfg";
+            QString sessionFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".json";
             QSharedPointer<AbstractModule> module;
+            QFile file(sessionFile);
 
-            QFile file(layoutFile);
-            QFile fileMod(configFile);
-
-            if (file.exists() && fileMod.exists())
+            if (file.exists() )
             {
                 CustomSettings::askForSessionRestore(devName);
             }
@@ -113,19 +108,33 @@ void DeviceMediator::open(int deviceIndex)
         // Clear previous right-side specifications before we start receiving CFG_/ACK_ again
         device->clearAllModuleDescriptions();
 
-        // send and validate token
-        if (CustomSettings::getLoginToken()!="none"){
-            communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
-            communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-            communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
-            communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-            communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
-        }
-        for (const QSharedPointer<AbstractModule> &mod : modules)
-        {
-            mod->setComms(communication);
-        }
-        emit loadLayout(deviceList.at(deviceIndex).deviceName);
+        // Immediately request MCU reset so it starts in known state. While we wait 250ms
+        // the layout/config files can be opened and processed. After 250ms send the
+        // login token (if present), attach modules to the comms and load the layout.
+        communication->write(Commands::RESET_DEVICE+";");
+
+        // Delay subsequent setup (token handshake, module wiring, layout load)
+        QTimer::singleShot(250, [this, deviceIndex]() {
+            // send and validate token
+            if (CustomSettings::getLoginToken() != "none"){
+                communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
+                communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+                communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
+                communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+                communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
+            }
+
+            for (const QSharedPointer<AbstractModule> &mod : modules)
+            {
+                mod->setComms(communication);
+            }
+            //This is bit dangerous... All modules must get their cfg from MCU and (spec) to be able to restore.
+            QTimer::singleShot(350, [this, deviceIndex]() {
+                if (CustomSettings::isSessionRestoreRequest() && deviceIndex >= 0 && deviceIndex < deviceList.size()) {
+                    emit loadLayoutUponOpen(deviceList.at(deviceIndex).deviceName);
+                }
+            });
+        });
     }
 }
 
@@ -153,7 +162,7 @@ void DeviceMediator::disableModules()
 {
     if (isConnected)
     {
-        emit saveLayout();
+        emit saveLayoutUponExit();
         for (const QSharedPointer<AbstractModule> &mod : modules)
         {
             mod->disableModule();
