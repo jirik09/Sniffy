@@ -104,7 +104,6 @@ void MainWindow::createModulesWidgets(){
         connect(dockWidgets[index], &QDockWidget::visibilityChanged, this, [this](bool){ enforceLeftMenuWidthSoon(); });
         connect(dockWidgets[index], &QDockWidget::topLevelChanged,  this, [this](bool){ enforceLeftMenuWidthSoon(); });
         connect(dockWidgets[index], &QDockWidget::dockLocationChanged, this, [this](Qt::DockWidgetArea){ enforceLeftMenuWidthSoon(); });
-        connect(module.data(),&AbstractModule::loadModuleLayoutAndConfig,this,&MainWindow::loadModuleLayoutAndConfigCallback);
     }
 
     deviceMediator->ShowDeviceModule();
@@ -267,6 +266,18 @@ void MainWindow::loadLayout(QString deviceName)
     recoverLeftMenu(!settings.value("LeftMenuNarrow").toBool());
     enforceLeftMenuWidthSoon();
 
+    // Eagerly restore each module, but defer slightly so the MCU and comms
+    // handshake (reset/token) have time to settle. Calling
+    // writeConfiguration() too early can fail if the MCU isn't ready to
+    // accept commands yet. Use a short singleShot delay to avoid race
+    // conditions while keeping restore responsive.
+    QTimer::singleShot(350, this, [this]() {
+        if (!deviceMediator->getIsConnected()) return;
+        for (const QSharedPointer<AbstractModule>& module : modulesList) {
+            loadModuleLayoutAndConfigCallback(module->getModuleName());
+        }
+    });
+
 }
 
 void MainWindow::enforceLeftMenuWidth()
@@ -360,22 +371,16 @@ void MainWindow::saveSessionToFile(const QString &filePath)
     root["geometry"] = QString(saveGeometry().toBase64());
     root["windowState"] = QString(saveState().toBase64());
 
-    // Create temporary QSettings to collect module layout keys
-    QString tmpFile = QDir::temp().filePath(QString("sniffy_session_%1.ini").arg(QUuid::createUuid().toString()));
-    QSettings tmpLayout(tmpFile, QSettings::IniFormat);
-
-    // Let each module write its geometry entries into tmpLayout
+    // Collect layout entries in-memory so we avoid temporary files
+    QMap<QString, QByteArray> layoutMap;
     for (const QSharedPointer<AbstractModule>& module : modulesList) {
-        module->saveGeometry(tmpLayout);
+        module->saveGeometry(layoutMap);
     }
 
-    // Collect layout entries
+    // Serialize layout map to JSON (base64 encoded values)
     QJsonObject layoutObj;
-    const QStringList keys = tmpLayout.allKeys();
-    for (const QString &k : keys) {
-        QVariant v = tmpLayout.value(k);
-        QByteArray data = v.toByteArray();
-        layoutObj.insert(k, QString(data.toBase64()));
+    for (auto it = layoutMap.constBegin(); it != layoutMap.constEnd(); ++it) {
+        layoutObj.insert(it.key(), QString(it.value().toBase64()));
     }
     root["layout"] = layoutObj;
 
@@ -400,15 +405,10 @@ void MainWindow::saveSessionToFile(const QString &filePath)
     QFile out(filePath);
     if(!out.open(QIODevice::WriteOnly)){
         QMessageBox::warning(this, "Save session", "Cannot open file for writing");
-        // clean up temp
-        QFile::remove(tmpFile);
         return;
     }
     out.write(doc.toJson(QJsonDocument::Indented));
     out.close();
-
-    // remove temporary file
-    QFile::remove(tmpFile);
 
     QMessageBox::information(this, "Save session", "Session saved successfully.");
 }
@@ -445,14 +445,14 @@ void MainWindow::loadSessionFromFile(const QString &filePath)
         restoreState(ws);
     }
 
-    // Reconstruct layout QSettings from layout object
-    QString tmpFile = QDir::temp().filePath(QString("sniffy_session_load_%1.ini").arg(QUuid::createUuid().toString()));
-    QSettings tmpLayout(tmpFile, QSettings::IniFormat);
+    // Reconstruct layout entries in-memory from layout object so we don't need
+    // to create a temporary INI file. Keys are moduleName+objectName -> QByteArray
+    QMap<QString, QByteArray> layoutMap;
     if(root.contains("layout") && root.value("layout").isObject()){
         QJsonObject layoutObj = root.value("layout").toObject();
         for (auto it = layoutObj.begin(); it != layoutObj.end(); ++it){
             QByteArray b = QByteArray::fromBase64(it.value().toString().toUtf8());
-            tmpLayout.setValue(it.key(), b);
+            layoutMap.insert(it.key(), b);
         }
     }
 
@@ -472,8 +472,8 @@ void MainWindow::loadSessionFromFile(const QString &filePath)
                 if(module->getModuleName() == name){
                     // Apply configuration
                     module->parseConfiguration(cfg);
-                    // Restore per-module geometry
-                    module->restoreGeometry(tmpLayout);
+                    // Restore per-module geometry from in-memory map
+                    module->restoreGeometry(layoutMap);
                     // Set status
                     module->setModuleStatus((ModuleStatus)status);
                     module->setModuleRestored(true);
@@ -499,9 +499,6 @@ void MainWindow::loadSessionFromFile(const QString &filePath)
         bool leftN = root.value("LeftMenuNarrow").toBool();
         recoverLeftMenu(!leftN);
     }
-
-    // Clean up temp
-    QFile::remove(tmpFile);
 
     QMessageBox::information(this, "Load session", "Session loaded successfully.");
 }
