@@ -7,7 +7,6 @@
 
 class ScopeSpec : public AbstractSpecification
 {
-    Q_OBJECT
 
 public:
     explicit ScopeSpec(QObject *parent = nullptr);

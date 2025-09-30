@@ -6,7 +6,6 @@
 
 class AbstractConfiguration : public QObject
 {
-    Q_OBJECT
 public:
     explicit AbstractConfiguration(QObject *parent = nullptr);
     virtual void parse (QByteArray config) = 0;

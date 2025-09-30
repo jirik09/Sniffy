@@ -179,7 +179,6 @@ QWidget{font: 9pt" DAWN_FONT "; color:" DAWN_TEXT_COMPONENT ";}"
 
 class Dawn : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit Dawn(QObject *parent = nullptr);
 

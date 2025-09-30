@@ -153,7 +153,6 @@ QWidget{font: 9pt" HUD_FONT "; color:" HUD_TEXT_COMP ";}"
 
 class HudCyan : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit HudCyan(QObject *parent = nullptr);
 

@@ -13,7 +13,6 @@
 
 class CustomSettings : public QObject
 {
-    Q_OBJECT
 public:
     explicit CustomSettings(QObject *parent = nullptr);
 

@@ -9,7 +9,6 @@
 
 class NumberParser : public QObject
 {
-    Q_OBJECT
 public:
     explicit NumberParser(QObject *parent = nullptr);
     static qreal parse(QString  text, bool &success);

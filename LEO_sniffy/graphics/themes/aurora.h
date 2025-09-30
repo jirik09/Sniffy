@@ -178,7 +178,6 @@ QWidget{font: 9pt" AURORA_FONT "; color:" AURORA_TEXT_COMPONENT ";}"
 
 class Aurora : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit Aurora(QObject *parent = nullptr);
 

@@ -8,7 +8,6 @@
 
 class DeviceSpec : public AbstractSpecification
 {
-    Q_OBJECT
 public:
     explicit DeviceSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);

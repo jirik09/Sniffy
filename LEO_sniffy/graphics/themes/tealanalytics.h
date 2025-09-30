@@ -150,7 +150,6 @@ QWidget{font: 9pt" TEAL_FONT "; color:" TEAL_TEXT_COMP ";}"
 
 class TealAnalytics : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit TealAnalytics(QObject *parent = nullptr);
 

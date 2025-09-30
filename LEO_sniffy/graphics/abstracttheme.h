@@ -7,7 +7,6 @@ struct ThemePalette;
 
 class AbstractTheme : public QObject
 {
-    Q_OBJECT
 public:
     explicit AbstractTheme(QObject *parent = nullptr);
 

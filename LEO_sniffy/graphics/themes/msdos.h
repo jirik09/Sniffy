@@ -158,7 +158,6 @@
 
 class MSDos : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit MSDos(QObject *parent = nullptr);
     QString getAppGlobalStyle() override;

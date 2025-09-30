@@ -9,7 +9,6 @@
 
 class VoltmeterSpec : public AbstractSpecification
 {
-    Q_OBJECT
 public:
     explicit VoltmeterSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);

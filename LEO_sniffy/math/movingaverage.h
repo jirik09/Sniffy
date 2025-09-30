@@ -6,7 +6,6 @@
 
 class MovingAverage : public QObject
 {
-    Q_OBJECT
 public:
     explicit MovingAverage(uint defaultBuffSize = 2, QObject *parent = nullptr);
     ~MovingAverage();

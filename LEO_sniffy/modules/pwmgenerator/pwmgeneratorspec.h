@@ -8,7 +8,6 @@
 
 class PWMGeneratorSpec : public AbstractSpecification
 {
-    Q_OBJECT
 public:
     explicit PWMGeneratorSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);
