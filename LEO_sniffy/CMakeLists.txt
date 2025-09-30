@@ -59,7 +59,7 @@ file(GLOB_RECURSE C_FILES CONFIGURE_DEPENDS
 file(GLOB_RECURSE UI_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.ui"
 )
-# Add headers to target sources so AUTMOC sees Q_OBJECT macros
+# Add headers to target sources for proper dependency tracking and IDE support
 file(GLOB_RECURSE HDR_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp"
