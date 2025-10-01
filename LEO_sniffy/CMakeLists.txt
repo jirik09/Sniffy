@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.21)
 
+
 project(LEO_sniffy LANGUAGES C CXX)
+
+# Use -O2 for release builds
+set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 
 # Prefer a modern standard (Qt 6 itself is built with >= C++17)
 set(CMAKE_CXX_STANDARD 17)
