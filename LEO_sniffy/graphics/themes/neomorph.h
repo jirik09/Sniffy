@@ -168,14 +168,13 @@ QWidget{font: 9pt" NEOMORPH_FONT "; color:" NEO_TEXT_COMPONENT ";}"
 
 class Neomorph : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit Neomorph(QObject *parent = nullptr);
 
-    QString getAppGlobalStyle();
-    QString getGraphicsPath();
+    QString getAppGlobalStyle() override;
+    QString getGraphicsPath() override;
 
-    QString getChannelColor(int channelIndex);
+    QString getChannelColor(int channelIndex) override;
     ThemePalette buildPalette() override; // new palette builder
 
 private:

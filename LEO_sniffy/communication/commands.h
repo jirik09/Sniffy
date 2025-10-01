@@ -6,7 +6,6 @@
 
 class Commands : public QObject
 {
-    Q_OBJECT
 public:
     explicit Commands(QObject *parent = nullptr);
 

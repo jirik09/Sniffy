@@ -1,14 +1,16 @@
 # user files
 *.user
 
-
-#C build files
+# C build files
 moc_*.*
 ui_*.*
 *.o
 
-#executables
+# executables
 *.exe
 
-#build folder
+# build folder
 build*
+
+# vscode folders
+**/.vscode/

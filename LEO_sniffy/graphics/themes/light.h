@@ -182,7 +182,6 @@ QWidget{font: 9pt" LIGHT_FONT "; color:" LIGHT_TEXT_COMPONENT ";}"
 
 class Light : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit Light(QObject *parent = nullptr);
 

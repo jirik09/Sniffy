@@ -181,7 +181,6 @@ QWidget{font: 9pt" DARK_FONT "; color:" DARK_TEXT_COMPONENT ";}"
 
 class Dark : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit Dark(QObject *parent = nullptr);
 

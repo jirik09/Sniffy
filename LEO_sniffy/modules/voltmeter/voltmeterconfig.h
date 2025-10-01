@@ -16,7 +16,6 @@ enum class VoltmeterMode
 
 class VoltmeterConfig : public AbstractConfiguration
 {
-    Q_OBJECT
 public:
     explicit VoltmeterConfig(QObject *parent = nullptr);
     void parse (QByteArray config);

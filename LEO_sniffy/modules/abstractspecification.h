@@ -6,7 +6,6 @@
 
 class AbstractSpecification : public QObject
 {
-    Q_OBJECT
 public:
     explicit AbstractSpecification(QObject *parent = nullptr);
 
