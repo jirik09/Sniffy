@@ -42,8 +42,14 @@ public:
     WidgetDialRange *dialQuadratureFreq = nullptr;
     WidgetSelection *comboQuadratureSeqAbba = nullptr;
 
+    // I2C controls (expanded later)
     WidgetSelection *comboI2cClockFreq = nullptr;
     WidgetSelection *comboI2cCommType = nullptr;
+    WidgetSelection *comboI2cAddrMode = nullptr;
+    WidgetDialRange *dialI2cAddress = nullptr;
+    WidgetSelection *comboI2cAck = nullptr;
+    WidgetSelection *comboI2cStretch = nullptr;
+    WidgetSelection *comboI2cRepStart = nullptr;
 
     // New pattern controls
     WidgetDialRange *dialPrbsFreq = nullptr;
@@ -67,6 +73,24 @@ public:
     WidgetDialRange *dialParBusFreq = nullptr;
     WidgetDialRange *dialParBusWidth = nullptr;
 
+    // UART controls
+    WidgetSelection *comboUartBaud = nullptr;
+    WidgetDialRange *dialUartDataBits = nullptr;
+    WidgetSelection *comboUartParity = nullptr;
+    WidgetSelection *comboUartStopBits = nullptr;
+    WidgetSelection *comboUartBitOrder = nullptr;
+    WidgetSelection *comboUartIdle = nullptr;
+    WidgetSelection *comboUartFramingErr = nullptr;
+    WidgetSelection *comboUartBreak = nullptr;
+
+    // SPI controls
+    WidgetDialRange *dialSpiClockFreq = nullptr;
+    WidgetSelection *comboSpiMode = nullptr;
+    WidgetDialRange *dialSpiWordSize = nullptr;
+    WidgetSelection *comboSpiBitOrder = nullptr;
+    WidgetSelection *comboSpiCsGating = nullptr;
+    WidgetDialRange *dialSpiPauseTicks = nullptr;
+
     void restoreSettingsAfterStartup(void);
     void setSpecification(PatternGeneratorSpec *spec);
     void enableGuiComponents(bool enable);
@@ -81,9 +105,6 @@ private:
         "Binary code",
         "Gray code",
         "Quadrature",
-        "UART",
-        "SPI",
-        "I2C",
         // New patterns
         "PRBS",
         "PWM",
@@ -91,7 +112,11 @@ private:
         "4B/5B",
         "Johnson N-phase",
         "PDM",
-        "Parallel bus"};
+        "Parallel bus",
+        // Protocols moved to end
+        "UART",
+        "SPI",
+        "I2C"};
 
     QWidget *patternArea[PATTERNS_NUM];
 
@@ -101,9 +126,6 @@ private:
         &PatternGeneratorSettings::createBinaryCodeComponents,
         &PatternGeneratorSettings::createGrayCodeComponents,
         &PatternGeneratorSettings::createQuadratureComponents,
-        &PatternGeneratorSettings::createUartComponents,
-        &PatternGeneratorSettings::createSpiComponents,
-        &PatternGeneratorSettings::createI2cComponents,
         &PatternGeneratorSettings::createPrbsComponents,
         &PatternGeneratorSettings::createPwmComponents,
         &PatternGeneratorSettings::createLineCodeComponents,
@@ -111,6 +133,9 @@ private:
         &PatternGeneratorSettings::createJohnsonComponents,
         &PatternGeneratorSettings::createPdmComponents,
         &PatternGeneratorSettings::createParBusComponents,
+        &PatternGeneratorSettings::createUartComponents,
+        &PatternGeneratorSettings::createSpiComponents,
+        &PatternGeneratorSettings::createI2cComponents,
     };
 
     void (PatternGeneratorSettings::*resetPatternComponents[PATTERNS_NUM])() = {
@@ -119,9 +144,6 @@ private:
         &PatternGeneratorSettings::resetBinaryCodeComponents,
         &PatternGeneratorSettings::resetGrayCodeComponents,
         &PatternGeneratorSettings::resetQuadratureComponents,
-        &PatternGeneratorSettings::resetUartComponents,
-        &PatternGeneratorSettings::resetSpiComponents,
-        &PatternGeneratorSettings::resetI2cComponents,
         &PatternGeneratorSettings::resetPrbsComponents,
         &PatternGeneratorSettings::resetPwmComponents,
         &PatternGeneratorSettings::resetLineCodeComponents,
@@ -129,6 +151,9 @@ private:
         &PatternGeneratorSettings::resetJohnsonComponents,
         &PatternGeneratorSettings::resetPdmComponents,
         &PatternGeneratorSettings::resetParBusComponents,
+        &PatternGeneratorSettings::resetUartComponents,
+        &PatternGeneratorSettings::resetSpiComponents,
+        &PatternGeneratorSettings::resetI2cComponents,
     };
 
     void createComponents(QWidget *parent, QVBoxLayout *destination);

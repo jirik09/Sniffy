@@ -48,7 +48,7 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     connect(settings->dialBinaryCodeFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::freqChangedDialsCallback);
     connect(settings->dialGrayCodeFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::freqChangedDialsCallback);
     connect(settings->dialQuadratureFreq, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::freqChangedDialsCallback);
-    connect(settings->comboI2cClockFreq, &WidgetSelection::selectedIndexChanged, this, &PatternGeneratorWindow::freqChangedCombosCallback);
+    // I2C combo wiring will be connected below after widgets exist
 
     // New patterns wiring
     if (settings->dialPrbsFreq)
@@ -86,6 +86,75 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     if (settings->dialParBusWidth)
         connect(settings->dialParBusWidth, &WidgetDialRange::valueChanged, this, [this](float val)
                 { patternData = patterns->setParBusWidth((int)val); painter->repaint(patternData); });
+
+    // UART wiring
+    if (settings->comboUartBaud)
+        connect(settings->comboUartBaud, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { this->config->freq[this->config->pattIndex] = real; patternData = patterns->setUartBaud((int)real); painter->repaint(patternData); });
+    if (settings->dialUartDataBits)
+        connect(settings->dialUartDataBits, &WidgetDialRange::valueChanged, this, [this](float v)
+                { patternData = patterns->setUartDataBits((int)v); painter->repaint(patternData); });
+    if (settings->comboUartParity)
+        connect(settings->comboUartParity, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setUartParity(static_cast<UartParity>((int)real)); painter->repaint(patternData); });
+    if (settings->comboUartStopBits)
+        connect(settings->comboUartStopBits, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setUartStopBits((int)real); painter->repaint(patternData); });
+    if (settings->comboUartBitOrder)
+        connect(settings->comboUartBitOrder, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setUartBitOrder(static_cast<BitOrder>((int)real)); painter->repaint(patternData); });
+    if (settings->comboUartIdle)
+        connect(settings->comboUartIdle, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setUartIdle(static_cast<UartIdleLevel>((int)real)); painter->repaint(patternData); });
+    if (settings->comboUartFramingErr)
+        connect(settings->comboUartFramingErr, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setUartFramingError(((int)real) != 0); painter->repaint(patternData); });
+    if (settings->comboUartBreak)
+        connect(settings->comboUartBreak, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setUartBreak(((int)real) != 0); painter->repaint(patternData); });
+
+    // SPI wiring
+    if (settings->dialSpiClockFreq)
+        connect(settings->dialSpiClockFreq, &WidgetDialRange::valueChanged, this, [this](float real)
+                { this->config->freq[this->config->pattIndex] = real; patternData = patterns->setSpiClockHz((int)real); painter->repaint(patternData); });
+    if (settings->comboSpiMode)
+        connect(settings->comboSpiMode, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setSpiMode(static_cast<SpiMode>((int)real)); painter->repaint(patternData); });
+    if (settings->dialSpiWordSize)
+        connect(settings->dialSpiWordSize, &WidgetDialRange::valueChanged, this, [this](float v)
+                { patternData = patterns->setSpiWordSize((int)v); painter->repaint(patternData); });
+    if (settings->comboSpiBitOrder)
+        connect(settings->comboSpiBitOrder, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setSpiBitOrder(static_cast<BitOrder>((int)real)); painter->repaint(patternData); });
+    if (settings->comboSpiCsGating)
+        connect(settings->comboSpiCsGating, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setSpiCsGating(((int)real) != 0); painter->repaint(patternData); });
+    if (settings->dialSpiPauseTicks)
+        connect(settings->dialSpiPauseTicks, &WidgetDialRange::valueChanged, this, [this](float v)
+                { patternData = patterns->setSpiPauseTicks((int)v); painter->repaint(patternData); });
+
+    // I2C wiring
+    if (settings->comboI2cClockFreq)
+        connect(settings->comboI2cClockFreq, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { this->config->freq[this->config->pattIndex] = real; patternData = patterns->setI2cSpeed((int)real); painter->repaint(patternData); });
+    if (settings->comboI2cCommType)
+        connect(settings->comboI2cCommType, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setI2cReadWrite((ModeRW)((int)real)); painter->repaint(patternData); });
+    if (settings->comboI2cAddrMode)
+        connect(settings->comboI2cAddrMode, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setI2cAddrMode(static_cast<I2cAddrMode>((int)real)); painter->repaint(patternData); });
+    if (settings->dialI2cAddress)
+        connect(settings->dialI2cAddress, &WidgetDialRange::valueChanged, this, [this](float v)
+                { patternData = patterns->setI2cAddress((int)v); painter->repaint(patternData); });
+    if (settings->comboI2cAck)
+        connect(settings->comboI2cAck, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setI2cAck(((int)real) != 0); painter->repaint(patternData); });
+    if (settings->comboI2cStretch)
+        connect(settings->comboI2cStretch, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setI2cStretch(((int)real) != 0); painter->repaint(patternData); });
+    if (settings->comboI2cRepStart)
+        connect(settings->comboI2cRepStart, &WidgetSelection::selectedIndexChanged, this, [this](int, float real)
+                { patternData = patterns->setI2cRepeatedStart(((int)real) != 0); painter->repaint(patternData); });
 
     connect(settings->dialUserDefLength, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
     connect(settings->dialCounterLength, &WidgetDialRange::valueChanged, this, &PatternGeneratorWindow::dataLenChangedDialsCallback);
@@ -226,7 +295,8 @@ void PatternGeneratorWindow::chartEditDataOnLeftClickCallback(QGraphicsSceneMous
 {
     // Use actual rendered data length to align edit with visualization
     int dataNum = (patternData != nullptr) ? patternData->length() : 0;
-    if (dataNum <= 0) return;
+    if (dataNum <= 0)
+        return;
 
     qreal nx = 0.0, ny = 0.0;
     painter->chart->mapSceneToPlotNormalized(event->scenePos(), nx, ny);

@@ -206,6 +206,97 @@ private:
     const bool exp = false;
 };
 
+// UART pattern
+class UARTPattern : public Pattern
+{
+    Q_OBJECT
+public:
+    explicit UARTPattern();
+    QList<patttype> *getData() override;
+    QList<patttype> *create(int dummy = 0) override; // uses internal params
+    bool isExponencial() override;
+
+    // parameter setters
+    QList<patttype> *setBaud(int baud);
+    QList<patttype> *setDataBits(int bits);
+    QList<patttype> *setParity(UartParity p);
+    QList<patttype> *setStopBits(int stop);
+    QList<patttype> *setBitOrder(BitOrder order);
+    QList<patttype> *setIdle(UartIdleLevel idle);
+    QList<patttype> *setFramingError(bool on);
+    QList<patttype> *setBreakCond(bool on);
+
+private:
+    QList<patttype> *data;
+    int baud;
+    int dataBits;
+    UartParity parity;
+    int stopBits;
+    BitOrder bitOrder;
+    UartIdleLevel idleLevel;
+    bool framingError;
+    bool breakCond;
+    const bool exp = false;
+};
+
+// SPI pattern
+class SPIPattern : public Pattern
+{
+    Q_OBJECT
+public:
+    explicit SPIPattern();
+    QList<patttype> *getData() override;
+    QList<patttype> *create(int dummy = 0) override;
+    bool isExponencial() override;
+
+    QList<patttype> *setClockHz(int hz);
+    QList<patttype> *setMode(SpiMode m);
+    QList<patttype> *setWordSize(int bits);
+    QList<patttype> *setBitOrder(BitOrder order);
+    QList<patttype> *setCsGating(bool on);
+    QList<patttype> *setPauseTicks(int ticks);
+
+private:
+    QList<patttype> *data;
+    int clockHz;
+    SpiMode mode;
+    int wordSize;
+    BitOrder bitOrder;
+    bool csGating;
+    int pauseTicks;
+    const bool exp = false;
+};
+
+// I2C pattern
+class I2CPattern : public Pattern
+{
+    Q_OBJECT
+public:
+    explicit I2CPattern();
+    QList<patttype> *getData() override;
+    QList<patttype> *create(int dummy = 0) override;
+    bool isExponencial() override;
+
+    QList<patttype> *setSpeed(int hz);
+    QList<patttype> *setAddrMode(I2cAddrMode m);
+    QList<patttype> *setAddress(int addr);
+    QList<patttype> *setReadWrite(ModeRW rw);
+    QList<patttype> *setAck(bool ack);
+    QList<patttype> *setClockStretch(bool on);
+    QList<patttype> *setRepeatedStart(bool on);
+
+private:
+    QList<patttype> *data;
+    int speed;
+    I2cAddrMode addrMode;
+    int address;
+    ModeRW rw;
+    bool ack;
+    bool stretch;
+    bool repstart;
+    const bool exp = false;
+};
+
 class PatternGeneratorPatterns : public QObject
 {
     Q_OBJECT
@@ -228,6 +319,33 @@ public:
     QList<patttype> *setPdmLevel(int level);
     QList<patttype> *setParBusWidth(int width);
 
+    // UART setters (index 12)
+    QList<patttype> *setUartBaud(int baud);
+    QList<patttype> *setUartDataBits(int bits);
+    QList<patttype> *setUartParity(UartParity p);
+    QList<patttype> *setUartStopBits(int stop);
+    QList<patttype> *setUartBitOrder(BitOrder order);
+    QList<patttype> *setUartIdle(UartIdleLevel idle);
+    QList<patttype> *setUartFramingError(bool on);
+    QList<patttype> *setUartBreak(bool on);
+
+    // SPI setters (index 13)
+    QList<patttype> *setSpiClockHz(int hz);
+    QList<patttype> *setSpiMode(SpiMode m);
+    QList<patttype> *setSpiWordSize(int bits);
+    QList<patttype> *setSpiBitOrder(BitOrder order);
+    QList<patttype> *setSpiCsGating(bool on);
+    QList<patttype> *setSpiPauseTicks(int ticks);
+
+    // I2C setters (index 14)
+    QList<patttype> *setI2cSpeed(int hz);
+    QList<patttype> *setI2cAddrMode(I2cAddrMode m);
+    QList<patttype> *setI2cAddress(int addr);
+    QList<patttype> *setI2cReadWrite(ModeRW rw);
+    QList<patttype> *setI2cAck(bool ack);
+    QList<patttype> *setI2cStretch(bool on);
+    QList<patttype> *setI2cRepeatedStart(bool on);
+
 private:
     int index;
     QSharedPointer<Pattern> pattern[PATTERNS_NUM];
@@ -248,27 +366,26 @@ private:
         { return QSharedPointer<Pattern>(new GrayCode); },
         []
         { return QSharedPointer<Pattern>(new Quadrature); },
-        // Protocol placeholders to keep indexes consistent
         []
-        { return QSharedPointer<Pattern>(new UserDefined); }, // UART placeholder
+        { return QSharedPointer<Pattern>(new PRBS); }, // index 5
         []
-        { return QSharedPointer<Pattern>(new UserDefined); }, // SPI placeholder
+        { return QSharedPointer<Pattern>(new PWM); }, // 6
         []
-        { return QSharedPointer<Pattern>(new UserDefined); }, // I2C placeholder
+        { return QSharedPointer<Pattern>(new LineCode); }, // 7
         []
-        { return QSharedPointer<Pattern>(new PRBS); },
+        { return QSharedPointer<Pattern>(new FourBFiveB); }, // 8
         []
-        { return QSharedPointer<Pattern>(new PWM); },
+        { return QSharedPointer<Pattern>(new JohnsonNPhase); }, // 9
         []
-        { return QSharedPointer<Pattern>(new LineCode); },
+        { return QSharedPointer<Pattern>(new PDM); }, // 10
         []
-        { return QSharedPointer<Pattern>(new FourBFiveB); },
+        { return QSharedPointer<Pattern>(new ParallelBus); }, // 11
         []
-        { return QSharedPointer<Pattern>(new JohnsonNPhase); },
+        { return QSharedPointer<Pattern>(new UARTPattern); }, // 12
         []
-        { return QSharedPointer<Pattern>(new PDM); },
+        { return QSharedPointer<Pattern>(new SPIPattern); }, // 13
         []
-        { return QSharedPointer<Pattern>(new ParallelBus); },
+        { return QSharedPointer<Pattern>(new I2CPattern); }, // 14
     };
 };
 

@@ -128,7 +128,7 @@ void PatternGeneratorSettings::createBinaryCodeComponents(QWidget *parent, QVBox
     dialBinaryChanNum->setObjectName("dialBinaryChanNum");
     destination->addWidget(dialBinaryChanNum);
 
-    config->freq[index] = dialBinaryCodeFreq->getRealValue();    
+    config->freq[index] = dialBinaryCodeFreq->getRealValue();
 }
 
 void PatternGeneratorSettings::createGrayCodeComponents(QWidget *parent, QVBoxLayout *destination, int index)
@@ -161,16 +161,92 @@ void PatternGeneratorSettings::createQuadratureComponents(QWidget *parent, QVBox
 
 void PatternGeneratorSettings::createUartComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-    Q_UNUSED(parent);
-    Q_UNUSED(destination);
-    Q_UNUSED(index);
+    comboUartBaud = new WidgetSelection(parent, "Baud rate");
+    const int baudRates[] = {9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600};
+    for (int b : baudRates)
+        comboUartBaud->addOption(QString::number(b), b);
+    destination->addWidget(comboUartBaud);
+
+    dialUartDataBits = new WidgetDialRange(parent, "");
+    dialUartDataBits->setName("Data bits");
+    dialUartDataBits->hideUnitSelection();
+    dialUartDataBits->setRange(5, 9, "bits", 1, 1, PATT_DEFAULT_UART_DATABITS, false, 0);
+    dialUartDataBits->setObjectName("dialUartDataBits");
+    destination->addWidget(dialUartDataBits);
+
+    comboUartParity = new WidgetSelection(parent, "Parity");
+    comboUartParity->addOption("None", (int)UartParity::None);
+    comboUartParity->addOption("Even", (int)UartParity::Even);
+    comboUartParity->addOption("Odd", (int)UartParity::Odd);
+    destination->addWidget(comboUartParity);
+
+    comboUartStopBits = new WidgetSelection(parent, "Stop bits");
+    comboUartStopBits->addOption("1", 1);
+    comboUartStopBits->addOption("2", 2);
+    destination->addWidget(comboUartStopBits);
+
+    comboUartBitOrder = new WidgetSelection(parent, "Bit order");
+    comboUartBitOrder->addOption("LSB first", (int)BitOrder::LSB_First);
+    comboUartBitOrder->addOption("MSB first", (int)BitOrder::MSB_First);
+    destination->addWidget(comboUartBitOrder);
+
+    comboUartIdle = new WidgetSelection(parent, "Idle level");
+    comboUartIdle->addOption("High", (int)UartIdleLevel::High);
+    comboUartIdle->addOption("Low", (int)UartIdleLevel::Low);
+    destination->addWidget(comboUartIdle);
+
+    comboUartFramingErr = new WidgetSelection(parent, "Framing error");
+    comboUartFramingErr->addOption("Off", 0);
+    comboUartFramingErr->addOption("On", 1);
+    destination->addWidget(comboUartFramingErr);
+
+    comboUartBreak = new WidgetSelection(parent, "Break");
+    comboUartBreak->addOption("Off", 0);
+    comboUartBreak->addOption("On", 1);
+    destination->addWidget(comboUartBreak);
+
+    // set freq for this pattern as baud
+    config->freq[index] = comboUartBaud->getSelectedValue();
 }
 
 void PatternGeneratorSettings::createSpiComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-    Q_UNUSED(parent);
-    Q_UNUSED(destination);
-    Q_UNUSED(index);
+    dialSpiClockFreq = createFrequencyDial(parent, "dialSpiClockFreq");
+    dialSpiClockFreq->setName("SPI clock");
+    destination->addWidget(dialSpiClockFreq);
+
+    comboSpiMode = new WidgetSelection(parent, "Mode (CPOL/CPHA)");
+    comboSpiMode->addOption("Mode 0", (int)SpiMode::Mode0);
+    comboSpiMode->addOption("Mode 1", (int)SpiMode::Mode1);
+    comboSpiMode->addOption("Mode 2", (int)SpiMode::Mode2);
+    comboSpiMode->addOption("Mode 3", (int)SpiMode::Mode3);
+    destination->addWidget(comboSpiMode);
+
+    dialSpiWordSize = new WidgetDialRange(parent, "");
+    dialSpiWordSize->setName("Word size");
+    dialSpiWordSize->hideUnitSelection();
+    dialSpiWordSize->setRange(4, 16, "bits", 1, 1, PATT_DEFAULT_SPI_WORDSIZE, false, 0);
+    dialSpiWordSize->setObjectName("dialSpiWordSize");
+    destination->addWidget(dialSpiWordSize);
+
+    comboSpiBitOrder = new WidgetSelection(parent, "Bit order");
+    comboSpiBitOrder->addOption("MSB first", (int)BitOrder::MSB_First);
+    comboSpiBitOrder->addOption("LSB first", (int)BitOrder::LSB_First);
+    destination->addWidget(comboSpiBitOrder);
+
+    comboSpiCsGating = new WidgetSelection(parent, "CS gating");
+    comboSpiCsGating->addOption("On (active low)", 1);
+    comboSpiCsGating->addOption("Off (always high)", 0);
+    destination->addWidget(comboSpiCsGating);
+
+    dialSpiPauseTicks = new WidgetDialRange(parent, "");
+    dialSpiPauseTicks->setName("Pause after frame");
+    dialSpiPauseTicks->hideUnitSelection();
+    dialSpiPauseTicks->setRange(0, 50, "ticks", 1, 1, PATT_DEFAULT_SPI_PAUSE_TICKS, false, 0);
+    dialSpiPauseTicks->setObjectName("dialSpiPauseTicks");
+    destination->addWidget(dialSpiPauseTicks);
+
+    config->freq[index] = dialSpiClockFreq->getRealValue();
 }
 
 void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout *destination, int index)
@@ -187,6 +263,33 @@ void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout 
     comboI2cCommType->addOption("Read", 0);
     comboI2cCommType->addOption("Write", 1);
     destination->addWidget(comboI2cCommType);
+
+    comboI2cAddrMode = new WidgetSelection(parent, "Address mode");
+    comboI2cAddrMode->addOption("7-bit", (int)I2cAddrMode::Addr7Bit);
+    comboI2cAddrMode->addOption("10-bit", (int)I2cAddrMode::Addr10Bit);
+    destination->addWidget(comboI2cAddrMode);
+
+    dialI2cAddress = new WidgetDialRange(parent, "");
+    dialI2cAddress->setName("Address");
+    dialI2cAddress->hideUnitSelection();
+    dialI2cAddress->setRange(0x00, 0x3FF, "val", 1, 1, PATT_DEFAULT_I2C_ADDRESS, false, 0);
+    dialI2cAddress->setObjectName("dialI2cAddress");
+    destination->addWidget(dialI2cAddress);
+
+    comboI2cAck = new WidgetSelection(parent, "ACK");
+    comboI2cAck->addOption("ACK", 1);
+    comboI2cAck->addOption("NACK", 0);
+    destination->addWidget(comboI2cAck);
+
+    comboI2cStretch = new WidgetSelection(parent, "Clock stretching");
+    comboI2cStretch->addOption("Off", 0);
+    comboI2cStretch->addOption("On", 1);
+    destination->addWidget(comboI2cStretch);
+
+    comboI2cRepStart = new WidgetSelection(parent, "Repeated start");
+    comboI2cRepStart->addOption("Off", 0);
+    comboI2cRepStart->addOption("On", 1);
+    destination->addWidget(comboI2cRepStart);
 
     config->freq[index] = comboI2cClockFreq->getSelectedValue();
 }
@@ -349,14 +452,42 @@ void PatternGeneratorSettings::resetQuadratureComponents()
 
 void PatternGeneratorSettings::resetUartComponents()
 {
+    // Baud options order: 9600,19200,38400,57600,115200,230400,460800,921600
+    comboUartBaud->setSelected(4, false); // 115200
+    dialUartDataBits->setRealValue(PATT_DEFAULT_UART_DATABITS, false);
+    comboUartParity->setSelected(0, false);   // None
+    comboUartStopBits->setSelected(0, false); // 1
+    comboUartBitOrder->setSelected(0, false); // LSB first
+    comboUartIdle->setSelected(0, false);     // High
+    comboUartFramingErr->setSelected(0, false);
+    comboUartBreak->setSelected(0, false);
+    config->freq[config->pattIndex] = comboUartBaud->getSelectedValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
 }
 
 void PatternGeneratorSettings::resetSpiComponents()
 {
+    dialSpiClockFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    comboSpiMode->setSelected(0, false); // Mode 0
+    dialSpiWordSize->setRealValue(PATT_DEFAULT_SPI_WORDSIZE, false);
+    comboSpiBitOrder->setSelected(0, false); // MSB first
+    comboSpiCsGating->setSelected(0, false); // On
+    dialSpiPauseTicks->setRealValue(PATT_DEFAULT_SPI_PAUSE_TICKS, false);
+    config->freq[config->pattIndex] = dialSpiClockFreq->getRealValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
 }
 
 void PatternGeneratorSettings::resetI2cComponents()
 {
+    comboI2cClockFreq->setSelected(1, false); // 100 kbit/s
+    comboI2cCommType->setSelected(1, false);  // Write
+    comboI2cAddrMode->setSelected(0, false);  // 7-bit
+    dialI2cAddress->setRealValue(PATT_DEFAULT_I2C_ADDRESS, false);
+    comboI2cAck->setSelected(0, false);      // ACK
+    comboI2cStretch->setSelected(0, false);  // Off
+    comboI2cRepStart->setSelected(0, false); // Off
+    config->freq[config->pattIndex] = comboI2cClockFreq->getSelectedValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
 }
 
 void PatternGeneratorSettings::resetPrbsComponents()
