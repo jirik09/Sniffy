@@ -1,8 +1,7 @@
 #include "patterngeneratorsettings.h"
 
-PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, PatternGeneratorConfig *config, QWidget *parent) :
-    QObject(parent),
-    config(config)
+PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, PatternGeneratorConfig *config, QWidget *parent) : QObject(parent),
+                                                                                                                                config(config)
 {
     WidgetSeparator *sepStartPattern = new WidgetSeparator(parent, "Start pattern generation");
     destination->addWidget(sepStartPattern);
@@ -16,7 +15,7 @@ PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, Pat
     destination->addWidget(sepPatternSelection);
 
     comboPatternSelection = new WidgetSelection(parent, "");
-    for (int i=0; i<pattList.length(); i++)
+    for (int i = 0; i < pattList.length(); i++)
         comboPatternSelection->addOption(pattList.at(i), i);
 
     destination->addWidget(comboPatternSelection);
@@ -49,11 +48,28 @@ void PatternGeneratorSettings::setSpecification(PatternGeneratorSpec *spec)
     dialBinaryCodeFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
     dialGrayCodeFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
     dialQuadratureFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+
+    // New patterns
+    if (dialPrbsFreq)
+        dialPrbsFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    if (dialPwmFreq)
+        dialPwmFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    if (dialLineCodeFreq)
+        dialLineCodeFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    if (dial4b5bFreq)
+        dial4b5bFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    if (dialJohnsonFreq)
+        dialJohnsonFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    if (dialPdmFreq)
+        dialPdmFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
+    if (dialParBusFreq)
+        dialParBusFreq->setRange(PATT_MIN_GEN_FREQ, maxSamplingFreq, "Hz", 1, 1, PATT_DEFAULT_GEN_FREQ, true, 2, true);
 }
 
 void PatternGeneratorSettings::createComponents(QWidget *parent, QVBoxLayout *destination)
 {
-    for (int i=0; i<pattList.length(); i++){
+    for (int i = 0; i < pattList.length(); i++)
+    {
         QVBoxLayout *layout = new QVBoxLayout();
         patternArea[i] = new QWidget(parent, Qt::Window);
         patternArea[i]->setLayout(layout);
@@ -103,7 +119,7 @@ void PatternGeneratorSettings::createCounterComponents(QWidget *parent, QVBoxLay
 void PatternGeneratorSettings::createBinaryCodeComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
     dialBinaryCodeFreq = createFrequencyDial(parent, "dialBinaryCodeFreq");
-    destination->addWidget(dialBinaryCodeFreq);    
+    destination->addWidget(dialBinaryCodeFreq);
 
     dialBinaryChanNum = new WidgetDialRange(parent, "");
     dialBinaryChanNum->setName("Channel no.");
@@ -112,7 +128,7 @@ void PatternGeneratorSettings::createBinaryCodeComponents(QWidget *parent, QVBox
     dialBinaryChanNum->setObjectName("dialBinaryChanNum");
     destination->addWidget(dialBinaryChanNum);
 
-    config->freq[index] = dialCounterFreq->getRealValue();    
+    config->freq[index] = dialBinaryCodeFreq->getRealValue();    
 }
 
 void PatternGeneratorSettings::createGrayCodeComponents(QWidget *parent, QVBoxLayout *destination, int index)
@@ -127,7 +143,7 @@ void PatternGeneratorSettings::createGrayCodeComponents(QWidget *parent, QVBoxLa
     dialGrayCodeChanNum->setObjectName("dialGrayCodeChanNum");
     destination->addWidget(dialGrayCodeChanNum);
 
-    config->freq[index] = dialGrayCodeFreq->getRealValue();    
+    config->freq[index] = dialGrayCodeFreq->getRealValue();
 }
 
 void PatternGeneratorSettings::createQuadratureComponents(QWidget *parent, QVBoxLayout *destination, int index)
@@ -140,17 +156,21 @@ void PatternGeneratorSettings::createQuadratureComponents(QWidget *parent, QVBox
     comboQuadratureSeqAbba->addOption("B/A", 1);
     destination->addWidget(comboQuadratureSeqAbba);
 
-    config->freq[index] = dialQuadratureFreq->getRealValue();    
+    config->freq[index] = dialQuadratureFreq->getRealValue();
 }
 
 void PatternGeneratorSettings::createUartComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-Q_UNUSED(parent);Q_UNUSED(destination);Q_UNUSED(index);
+    Q_UNUSED(parent);
+    Q_UNUSED(destination);
+    Q_UNUSED(index);
 }
 
 void PatternGeneratorSettings::createSpiComponents(QWidget *parent, QVBoxLayout *destination, int index)
 {
-Q_UNUSED(parent);Q_UNUSED(destination);Q_UNUSED(index);
+    Q_UNUSED(parent);
+    Q_UNUSED(destination);
+    Q_UNUSED(index);
 }
 
 void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout *destination, int index)
@@ -161,14 +181,123 @@ void PatternGeneratorSettings::createI2cComponents(QWidget *parent, QVBoxLayout 
     comboI2cClockFreq->addOption("400 kbit/s", 400000);
     comboI2cClockFreq->addOption("3.4 Mbit/s", 3400000);
     comboI2cClockFreq->addOption("5 Mbit/s", 5000000);
-    destination->addWidget(comboI2cClockFreq);    
+    destination->addWidget(comboI2cClockFreq);
 
     comboI2cCommType = new WidgetSelection(parent, "R/W");
     comboI2cCommType->addOption("Read", 0);
     comboI2cCommType->addOption("Write", 1);
-    destination->addWidget(comboI2cCommType);    
+    destination->addWidget(comboI2cCommType);
 
-    config->freq[index] = comboI2cClockFreq->getSelectedValue();    
+    config->freq[index] = comboI2cClockFreq->getSelectedValue();
+}
+
+void PatternGeneratorSettings::createPrbsComponents(QWidget *parent, QVBoxLayout *destination, int index)
+{
+    dialPrbsFreq = createFrequencyDial(parent, "dialPrbsFreq");
+    destination->addWidget(dialPrbsFreq);
+
+    comboPrbsOrder = new WidgetSelection(parent, "Order");
+    comboPrbsOrder->addOption("PRBS7", 7);
+    comboPrbsOrder->addOption("PRBS9", 9);
+    comboPrbsOrder->addOption("PRBS11", 11);
+    comboPrbsOrder->addOption("PRBS15", 15);
+    comboPrbsOrder->addOption("PRBS23", 23);
+    comboPrbsOrder->addOption("PRBS31", 31);
+    destination->addWidget(comboPrbsOrder);
+
+    config->freq[index] = dialPrbsFreq->getRealValue();
+}
+
+void PatternGeneratorSettings::createPwmComponents(QWidget *parent, QVBoxLayout *destination, int index)
+{
+    dialPwmFreq = createFrequencyDial(parent, "dialPwmFreq");
+    destination->addWidget(dialPwmFreq);
+
+    dialPwmDuty = new WidgetDialRange(parent, "");
+    dialPwmDuty->setName("Duty");
+    dialPwmDuty->hideUnitSelection();
+    dialPwmDuty->setRange(0, 100, "%", 1, 1, PATT_DEFAULT_PWM_DUTY, false, 0);
+    dialPwmDuty->setObjectName("dialPwmDuty");
+    destination->addWidget(dialPwmDuty);
+
+    config->freq[index] = dialPwmFreq->getRealValue();
+}
+
+void PatternGeneratorSettings::createLineCodeComponents(QWidget *parent, QVBoxLayout *destination, int index)
+{
+    dialLineCodeFreq = createFrequencyDial(parent, "dialLineCodeFreq");
+    destination->addWidget(dialLineCodeFreq);
+
+    comboLineCodeType = new WidgetSelection(parent, "Type");
+    comboLineCodeType->addOption("NRZ-L", (int)LineCodeType::NRZ_L);
+    comboLineCodeType->addOption("RZ", (int)LineCodeType::RZ);
+    comboLineCodeType->addOption("Manchester", (int)LineCodeType::Manchester);
+    comboLineCodeType->addOption("Miller", (int)LineCodeType::Miller);
+    comboLineCodeType->addOption("Bi-phase Mark", (int)LineCodeType::BiPhaseMark);
+    comboLineCodeType->addOption("Bi-phase Space", (int)LineCodeType::BiPhaseSpace);
+    destination->addWidget(comboLineCodeType);
+
+    config->freq[index] = dialLineCodeFreq->getRealValue();
+}
+
+void PatternGeneratorSettings::create4b5bComponents(QWidget *parent, QVBoxLayout *destination, int index)
+{
+    dial4b5bFreq = createFrequencyDial(parent, "dial4b5bFreq");
+    destination->addWidget(dial4b5bFreq);
+
+    dial4b5bGroups = new WidgetDialRange(parent, "");
+    dial4b5bGroups->setName("Groups");
+    dial4b5bGroups->hideUnitSelection();
+    dial4b5bGroups->setRange(1, 32, "#", 1, 1, 8, false, 0);
+    dial4b5bGroups->setObjectName("dial4b5bGroups");
+    destination->addWidget(dial4b5bGroups);
+
+    config->freq[index] = dial4b5bFreq->getRealValue();
+}
+
+void PatternGeneratorSettings::createJohnsonComponents(QWidget *parent, QVBoxLayout *destination, int index)
+{
+    dialJohnsonFreq = createFrequencyDial(parent, "dialJohnsonFreq");
+    destination->addWidget(dialJohnsonFreq);
+
+    dialJohnsonPhases = new WidgetDialRange(parent, "");
+    dialJohnsonPhases->setName("Phases");
+    dialJohnsonPhases->hideUnitSelection();
+    dialJohnsonPhases->setRange(2, PATT_MAX_CHANNELS_NUM, "#", 1, 1, PATT_DEFAULT_JOHNSON_PHASES, false, 0);
+    dialJohnsonPhases->setObjectName("dialJohnsonPhases");
+    destination->addWidget(dialJohnsonPhases);
+
+    config->freq[index] = dialJohnsonFreq->getRealValue();
+}
+
+void PatternGeneratorSettings::createPdmComponents(QWidget *parent, QVBoxLayout *destination, int index)
+{
+    dialPdmFreq = createFrequencyDial(parent, "dialPdmFreq");
+    destination->addWidget(dialPdmFreq);
+
+    dialPdmLevel = new WidgetDialRange(parent, "");
+    dialPdmLevel->setName("Level");
+    dialPdmLevel->hideUnitSelection();
+    dialPdmLevel->setRange(0, 100, "%", 1, 1, PATT_DEFAULT_PDM_LEVEL, false, 0);
+    dialPdmLevel->setObjectName("dialPdmLevel");
+    destination->addWidget(dialPdmLevel);
+
+    config->freq[index] = dialPdmFreq->getRealValue();
+}
+
+void PatternGeneratorSettings::createParBusComponents(QWidget *parent, QVBoxLayout *destination, int index)
+{
+    dialParBusFreq = createFrequencyDial(parent, "dialParBusFreq");
+    destination->addWidget(dialParBusFreq);
+
+    dialParBusWidth = new WidgetDialRange(parent, "");
+    dialParBusWidth->setName("Bus width");
+    dialParBusWidth->hideUnitSelection();
+    dialParBusWidth->setRange(1, PATT_MAX_CHANNELS_NUM, "bits", 1, 1, PATT_DEFAULT_PARBUS_WIDTH, false, 0);
+    dialParBusWidth->setObjectName("dialParBusWidth");
+    destination->addWidget(dialParBusWidth);
+
+    config->freq[index] = dialParBusFreq->getRealValue();
 }
 
 WidgetDialRange *PatternGeneratorSettings::createFrequencyDial(QWidget *parent, QString objName)
@@ -190,19 +319,23 @@ void PatternGeneratorSettings::resetPatternCallback(int index)
     (this->*resetPatternComponents[config->pattIndex])();
 }
 
-void PatternGeneratorSettings::resetUserDefinedComponents(){
+void PatternGeneratorSettings::resetUserDefinedComponents()
+{
     resetFreqAndDataLenDials(dialUserDefFreq, dialUserDefLength);
 }
 
-void PatternGeneratorSettings::resetCounterComponents(){
+void PatternGeneratorSettings::resetCounterComponents()
+{
     resetFreqAndDataLenDials(dialCounterFreq, dialCounterLength);
 }
 
-void PatternGeneratorSettings::resetBinaryCodeComponents(){
+void PatternGeneratorSettings::resetBinaryCodeComponents()
+{
     resetFreqAndDataLenDials(dialBinaryCodeFreq, dialBinaryChanNum);
 }
 
-void PatternGeneratorSettings::resetGrayCodeComponents(){
+void PatternGeneratorSettings::resetGrayCodeComponents()
+{
     resetFreqAndDataLenDials(dialGrayCodeFreq, dialGrayCodeChanNum);
 }
 
@@ -216,17 +349,71 @@ void PatternGeneratorSettings::resetQuadratureComponents()
 
 void PatternGeneratorSettings::resetUartComponents()
 {
-
 }
 
 void PatternGeneratorSettings::resetSpiComponents()
 {
-
 }
 
 void PatternGeneratorSettings::resetI2cComponents()
 {
+}
 
+void PatternGeneratorSettings::resetPrbsComponents()
+{
+    dialPrbsFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    // Default to the first option (PRBS7)
+    comboPrbsOrder->setSelected(0, false);
+    config->freq[config->pattIndex] = dialPrbsFreq->getRealValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
+}
+
+void PatternGeneratorSettings::resetPwmComponents()
+{
+    dialPwmFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    dialPwmDuty->setRealValue(PATT_DEFAULT_PWM_DUTY, true);
+    config->freq[config->pattIndex] = dialPwmFreq->getRealValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
+}
+
+void PatternGeneratorSettings::resetLineCodeComponents()
+{
+    dialLineCodeFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    comboLineCodeType->setSelected(0, false);
+    config->freq[config->pattIndex] = dialLineCodeFreq->getRealValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
+}
+
+void PatternGeneratorSettings::reset4b5bComponents()
+{
+    dial4b5bFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    dial4b5bGroups->setRealValue(8, true);
+    config->freq[config->pattIndex] = dial4b5bFreq->getRealValue();
+    config->dataLen[config->pattIndex] = 8;
+}
+
+void PatternGeneratorSettings::resetJohnsonComponents()
+{
+    dialJohnsonFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    dialJohnsonPhases->setRealValue(PATT_DEFAULT_JOHNSON_PHASES, true);
+    config->freq[config->pattIndex] = dialJohnsonFreq->getRealValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_JOHNSON_PHASES;
+}
+
+void PatternGeneratorSettings::resetPdmComponents()
+{
+    dialPdmFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    dialPdmLevel->setRealValue(PATT_DEFAULT_PDM_LEVEL, true);
+    config->freq[config->pattIndex] = dialPdmFreq->getRealValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
+}
+
+void PatternGeneratorSettings::resetParBusComponents()
+{
+    dialParBusFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
+    dialParBusWidth->setRealValue(PATT_DEFAULT_PARBUS_WIDTH, true);
+    config->freq[config->pattIndex] = dialParBusFreq->getRealValue();
+    config->dataLen[config->pattIndex] = PATT_DEFAULT_PARBUS_WIDTH;
 }
 
 void PatternGeneratorSettings::resetFreqAndDataLenDials(WidgetDialRange *freqDial, WidgetDialRange *dataLenDial)
@@ -245,7 +432,7 @@ void PatternGeneratorSettings::showComponents(int pattIndex, bool visible)
 }
 
 void PatternGeneratorSettings::enableGuiComponents(bool enable)
-{    
+{
     comboPatternSelection->setEnabled(enable);
     patternArea[config->pattIndex]->setEnabled(enable);
     buttonSetDefault->setEnabled(enable);

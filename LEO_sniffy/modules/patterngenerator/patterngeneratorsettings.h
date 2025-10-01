@@ -19,34 +19,56 @@ class PatternGeneratorSettings : public QObject
 {
     Q_OBJECT
 public:
-    explicit PatternGeneratorSettings(QVBoxLayout *destination, PatternGeneratorConfig *config, QWidget *parent = nullptr);    
+    explicit PatternGeneratorSettings(QVBoxLayout *destination, PatternGeneratorConfig *config, QWidget *parent = nullptr);
 
-    WidgetButtons *buttonStart;
-    WidgetButtons *buttonSetDefault;
+    WidgetButtons *buttonStart = nullptr;
+    WidgetButtons *buttonSetDefault = nullptr;
 
-    WidgetSelection *comboPatternSelection;
+    WidgetSelection *comboPatternSelection = nullptr;
 
-    WidgetButtons *buttonUserDefLoadPattern;
-    WidgetDialRange *dialUserDefFreq;
-    WidgetDialRange *dialUserDefLength;
+    WidgetButtons *buttonUserDefLoadPattern = nullptr;
+    WidgetDialRange *dialUserDefFreq = nullptr;
+    WidgetDialRange *dialUserDefLength = nullptr;
 
-    WidgetDialRange *dialCounterFreq;    
-    WidgetDialRange *dialCounterLength;
+    WidgetDialRange *dialCounterFreq = nullptr;
+    WidgetDialRange *dialCounterLength = nullptr;
 
-    WidgetDialRange *dialBinaryCodeFreq;    
-    WidgetDialRange *dialBinaryChanNum;
+    WidgetDialRange *dialBinaryCodeFreq = nullptr;
+    WidgetDialRange *dialBinaryChanNum = nullptr;
 
-    WidgetDialRange *dialGrayCodeFreq;
-    WidgetDialRange *dialGrayCodeChanNum;
+    WidgetDialRange *dialGrayCodeFreq = nullptr;
+    WidgetDialRange *dialGrayCodeChanNum = nullptr;
 
-    WidgetDialRange *dialQuadratureFreq;
-    WidgetSelection *comboQuadratureSeqAbba;
+    WidgetDialRange *dialQuadratureFreq = nullptr;
+    WidgetSelection *comboQuadratureSeqAbba = nullptr;
 
-    WidgetSelection *comboI2cClockFreq;
-    WidgetSelection *comboI2cCommType;        
+    WidgetSelection *comboI2cClockFreq = nullptr;
+    WidgetSelection *comboI2cCommType = nullptr;
+
+    // New pattern controls
+    WidgetDialRange *dialPrbsFreq = nullptr;
+    WidgetSelection *comboPrbsOrder = nullptr;
+
+    WidgetDialRange *dialPwmFreq = nullptr;
+    WidgetDialRange *dialPwmDuty = nullptr;
+
+    WidgetDialRange *dialLineCodeFreq = nullptr;
+    WidgetSelection *comboLineCodeType = nullptr;
+
+    WidgetDialRange *dial4b5bFreq = nullptr;
+    WidgetDialRange *dial4b5bGroups = nullptr;
+
+    WidgetDialRange *dialJohnsonFreq = nullptr;
+    WidgetDialRange *dialJohnsonPhases = nullptr;
+
+    WidgetDialRange *dialPdmFreq = nullptr;
+    WidgetDialRange *dialPdmLevel = nullptr;
+
+    WidgetDialRange *dialParBusFreq = nullptr;
+    WidgetDialRange *dialParBusWidth = nullptr;
 
     void restoreSettingsAfterStartup(void);
-    void setSpecification(PatternGeneratorSpec* spec);
+    void setSpecification(PatternGeneratorSpec *spec);
     void enableGuiComponents(bool enable);
     void showComponents(int pattIndex, bool visible);
 
@@ -61,30 +83,53 @@ private:
         "Quadrature",
         "UART",
         "SPI",
-        "I2C"
+        "I2C",
+        // New patterns
+        "PRBS",
+        "PWM",
+        "Line code",
+        "4B/5B",
+        "Johnson N-phase",
+        "PDM",
+        "Parallel bus"};
+
+    QWidget *patternArea[PATTERNS_NUM];
+
+    void (PatternGeneratorSettings::*createPatternComponents[PATTERNS_NUM])(QWidget *, QVBoxLayout *, int) = {
+        &PatternGeneratorSettings::createUserDefinedComponents,
+        &PatternGeneratorSettings::createCounterComponents,
+        &PatternGeneratorSettings::createBinaryCodeComponents,
+        &PatternGeneratorSettings::createGrayCodeComponents,
+        &PatternGeneratorSettings::createQuadratureComponents,
+        &PatternGeneratorSettings::createUartComponents,
+        &PatternGeneratorSettings::createSpiComponents,
+        &PatternGeneratorSettings::createI2cComponents,
+        &PatternGeneratorSettings::createPrbsComponents,
+        &PatternGeneratorSettings::createPwmComponents,
+        &PatternGeneratorSettings::createLineCodeComponents,
+        &PatternGeneratorSettings::create4b5bComponents,
+        &PatternGeneratorSettings::createJohnsonComponents,
+        &PatternGeneratorSettings::createPdmComponents,
+        &PatternGeneratorSettings::createParBusComponents,
     };
 
-    QWidget *patternArea[PATTERNS_NUM];    
-
-    void (PatternGeneratorSettings::*createPatternComponents[PATTERNS_NUM])(QWidget*,QVBoxLayout*,int) = {
-            &PatternGeneratorSettings::createUserDefinedComponents,
-            &PatternGeneratorSettings::createCounterComponents,
-            &PatternGeneratorSettings::createBinaryCodeComponents,
-            &PatternGeneratorSettings::createGrayCodeComponents,
-            &PatternGeneratorSettings::createQuadratureComponents,
-            &PatternGeneratorSettings::createUartComponents,
-            &PatternGeneratorSettings::createSpiComponents,
-            &PatternGeneratorSettings::createI2cComponents, };
-
     void (PatternGeneratorSettings::*resetPatternComponents[PATTERNS_NUM])() = {
-            &PatternGeneratorSettings::resetUserDefinedComponents,
-            &PatternGeneratorSettings::resetCounterComponents,
-            &PatternGeneratorSettings::resetBinaryCodeComponents,
-            &PatternGeneratorSettings::resetGrayCodeComponents,
-            &PatternGeneratorSettings::resetQuadratureComponents,
-            &PatternGeneratorSettings::resetUartComponents,
-            &PatternGeneratorSettings::resetSpiComponents,
-            &PatternGeneratorSettings::resetI2cComponents, };
+        &PatternGeneratorSettings::resetUserDefinedComponents,
+        &PatternGeneratorSettings::resetCounterComponents,
+        &PatternGeneratorSettings::resetBinaryCodeComponents,
+        &PatternGeneratorSettings::resetGrayCodeComponents,
+        &PatternGeneratorSettings::resetQuadratureComponents,
+        &PatternGeneratorSettings::resetUartComponents,
+        &PatternGeneratorSettings::resetSpiComponents,
+        &PatternGeneratorSettings::resetI2cComponents,
+        &PatternGeneratorSettings::resetPrbsComponents,
+        &PatternGeneratorSettings::resetPwmComponents,
+        &PatternGeneratorSettings::resetLineCodeComponents,
+        &PatternGeneratorSettings::reset4b5bComponents,
+        &PatternGeneratorSettings::resetJohnsonComponents,
+        &PatternGeneratorSettings::resetPdmComponents,
+        &PatternGeneratorSettings::resetParBusComponents,
+    };
 
     void createComponents(QWidget *parent, QVBoxLayout *destination);
 
@@ -96,6 +141,13 @@ private:
     void createUartComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createSpiComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createI2cComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createPrbsComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createPwmComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createLineCodeComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void create4b5bComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createJohnsonComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createPdmComponents(QWidget *parent, QVBoxLayout *destination, int index);
+    void createParBusComponents(QWidget *parent, QVBoxLayout *destination, int index);
 
     WidgetDialRange *createFrequencyDial(QWidget *parent, QString objName);
 
@@ -107,6 +159,13 @@ private:
     void resetUartComponents();
     void resetSpiComponents();
     void resetI2cComponents();
+    void resetPrbsComponents();
+    void resetPwmComponents();
+    void resetLineCodeComponents();
+    void reset4b5bComponents();
+    void resetJohnsonComponents();
+    void resetPdmComponents();
+    void resetParBusComponents();
 
     void resetFreqAndDataLenDials(WidgetDialRange *freqDial, WidgetDialRange *dataLenDial);
 
