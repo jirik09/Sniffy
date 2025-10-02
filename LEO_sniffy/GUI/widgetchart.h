@@ -99,6 +99,9 @@ public:
     void setHorizontalMarker(int channelIndex, qreal value, MarkerType type = MarkerType::TICK);
     void setVerticalMarker(int channelIndex, qreal value);
 
+    // Access to underlying QChart for advanced scenarios (read-only usage recommended)
+    QChart* getChart() const;
+
     void setHorizontalCursor(int channelIndex, qreal value, Cursor type);
     void setVerticalCursor(int channelIndex, qreal value, Cursor type);
     void clearAllCursors();

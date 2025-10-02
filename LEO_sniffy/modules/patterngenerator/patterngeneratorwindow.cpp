@@ -184,6 +184,9 @@ void PatternGeneratorWindow::setSpecification(PatternGeneratorSpec *spec)
 {
     this->spec = spec;
     settings->setSpecification(spec);
+    if (!PATTERNS_USE_QCUSTOM_PLOT && painter) {
+        painter->setSpecification(spec);
+    }
 }
 
 void PatternGeneratorWindow::setProgress(int percent)

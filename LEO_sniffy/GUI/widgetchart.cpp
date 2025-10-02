@@ -1,6 +1,7 @@
 #include "widgetchart.h"
 #include "ui_widgetchart.h"
 #include <QTimer>
+//#include <QGraphicsSimpleTextItem>
 
 widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QWidget(parent),
@@ -723,4 +724,9 @@ bool widgetChart::mapSceneToPlotNormalized(const QPointF &scenePos, qreal &nx, q
     if (nx < 0.0) nx = 0.0; else if (nx > 1.0) nx = 1.0;
     if (ny < 0.0) ny = 0.0; else if (ny > 1.0) ny = 1.0;
     return inside;
+}
+
+QChart* widgetChart::getChart() const 
+{ 
+    return chart;
 }
