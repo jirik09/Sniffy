@@ -105,7 +105,6 @@ private:
         "Binary code",
         "Gray code",
         "Quadrature",
-        // New patterns
         "PRBS",
         "PWM",
         "Line code",
@@ -113,7 +112,7 @@ private:
         "Johnson N-phase",
         "PDM",
         "Parallel bus",
-        // Protocols moved to end
+        // Protocols
         "UART",
         "SPI",
         "I2C"};

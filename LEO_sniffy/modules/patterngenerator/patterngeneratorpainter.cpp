@@ -54,25 +54,20 @@ void PatternGeneratorPainter::recalculate(QList<quint8> *data)
     points->clear();
 
     qreal dataLen = data->length();
-    qreal timScale = 1 / config->freq[config->pattIndex];
-    qreal step = timScale / dataLen;
+    // Normalize X to 0..1 so visual grid width is identical across all patterns
+    // regardless of the generator's frequency value.
+    qreal step = 1.0 / dataLen;
     qreal stepSum;
     int log0, log1;
 
     if(PATTERNS_USE_QCUSTOM_PLOT){
-        plot->setRangeX(0, timScale);
-
-        if(dataLen >= 32)
-            plot->setGridHorizontalDensity(33);
-        else
-            plot->setGridHorizontalDensity(dataLen+1);
+        plot->setRangeX(0, 1);
+        plot->setGridHorizontalDensity(PATT_DEFAULT_DATA_LENGTH + 1);
     }else {
-        chart->setRangeX(0, timScale);
-
-        if(dataLen >= 32)
-            chart->setGridHorizontalDensity(33);
-        else
-            chart->setGridHorizontalDensity(dataLen+1);
+        chart->setRangeX(0, 1);
+        chart->setGridHorizontalDensity(PATT_DEFAULT_DATA_LENGTH + 1);
+        // Use a consistent label format to avoid variable label widths affecting plot area
+        chart->formatLabels("%g", "%g");
     }        
 
     for(int ch = 0; ch < PATT_MAX_CHANNELS_NUM; ch++){
@@ -99,21 +94,38 @@ void PatternGeneratorPainter::recalculate(QList<quint8> *data)
     }
 }
 
-void PatternGeneratorPainter::configDefaultChart(){    
-    if(PATTERNS_USE_QCUSTOM_PLOT){
-    plot->setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
-        plot->setGridHorizontalDensity(PATT_DEFAULT_DATA_LENGTH+1);
-        plot->setLabelsVisible(true, false);
-        plot->setRange(0, 1 , 0.97, PATT_RANGE_CHAN1_LOG1 + 0.98);
-        for(int i = 0; i < PATT_MAX_CHANNELS_NUM; i++)
-            plot->setTraceColor(i, Graphics::getChannelColor(0));
-    }else {
-        chart->setGridHorizontalDensity(PATT_DEFAULT_DATA_LENGTH+1);
-        // Use unified small margins for consistency across modules
-        chart->setMargins(0,0,0,0);
-        chart->setLabelsVisible(true, false);
-        chart->setRange(0, 1, 0.97, PATT_RANGE_CHAN1_LOG1 + 0.98);
-        for(int i = 0; i < PATT_MAX_CHANNELS_NUM; i++)
-            chart->setTraceColor(i, Graphics::getChannelColor(0));
+void PatternGeneratorPainter::configDefaultChart(){
+    // Common configuration values
+    const int gridH = PATT_DEFAULT_DATA_LENGTH + 1;
+    const int gridV = PATT_MAX_CHANNELS_NUM + 1;
+    const bool labelsX = true;
+    const bool labelsY = false;
+    const int leftMargin = 0, topMargin = 0, rightMargin = 0, bottomMargin = 0;
+    const qreal xMin = 0, xMax = 1;
+    const qreal yMin = 0.97, yMax = PATT_RANGE_CHAN1_LOG1 + 0.98;
+
+    // Backend-specific setup
+    if (PATTERNS_USE_QCUSTOM_PLOT) {
+        plot->setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
+        plot->setGridDensity(gridH, gridV);
+        plot->setLabelsVisible(labelsX, labelsY);
+        plot->setContentsMargins(leftMargin, topMargin, rightMargin, bottomMargin);
+        plot->setRange(xMin, xMax, yMin, yMax);
+    } else {
+        chart->setGridDensity(gridH, gridV);
+        chart->setLabelsVisible(labelsX, labelsY);
+        chart->setMargins(leftMargin, topMargin, rightMargin, bottomMargin);
+        chart->setRange(xMin, xMax, yMin, yMax);
     }
+
+    // Set trace colors for all traces (single loop, backend-agnostic via lambda)
+    auto setTraceColor = [&](int idx){
+        if (PATTERNS_USE_QCUSTOM_PLOT)
+            plot->setTraceColor(idx, Graphics::getChannelColor(0));
+        else
+            chart->setTraceColor(idx, Graphics::getChannelColor(0));
+    };
+
+    for (int i = 0; i < PATT_MAX_CHANNELS_NUM; ++i)
+        setTraceColor(i);
 }

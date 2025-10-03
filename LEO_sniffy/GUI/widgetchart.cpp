@@ -88,8 +88,8 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->setBackgroundRoundness(0);
 
     setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
-    // Default grid transparency 60%
-    setGridTransparencyPercent(60);
+    // Default grid transparency 40%
+    setGridTransparencyPercent(40);
     // Create clickable grid alpha dot in top-right corner of plot
     gridAlphaDot = new QGraphicsEllipseItem(0,0, gridAlphaDotRadius*1.6, gridAlphaDotRadius*1.6);
     gridAlphaDot->setZValue(1000);

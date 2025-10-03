@@ -177,7 +177,7 @@ private:
     void applyGridTransparency();
     void layoutGridAlphaDot();
 
-    int gridTransparencyPercent = 20; // default 20%
+    int gridTransparencyPercent = 40; // default 40%
     QGraphicsEllipseItem* gridAlphaDot = nullptr;
     int gridAlphaDotRadius = 5; // px
     int gridAlphaDotMargin = 7; // px from top-right corner inside plot

@@ -26,8 +26,7 @@ private:
 
     static constexpr int kFontPt = 8;
     static constexpr int kZ = 10;
-    static constexpr qreal kVerticalFactor = 0.6; // keeps original visual placement
-    //static constexpr int kRightPadding = 10;      // right space for labels
+    static constexpr qreal kVerticalFactor = 0.5; // keeps original visual placement
 
     int m_maxTraces = 1;
     QStringList m_names;
@@ -105,11 +104,11 @@ inline void PatternChart::layoutNames()
         item->setText(label);
         const qreal yLocal = plot.top() + bandH * (ch + kVerticalFactor);
         QRectF b = item->boundingRect();
-        // Center the label horizontally between the rightmost grid line (plot.right)
-        // and the right edge of the chart (plot.right + right margin).
         const int marginRight = c->margins().right();
-        const qreal leftGap = qMax<qreal>(0.0, (marginRight * 1.1 - b.width()) * 1.1);
-        const QPointF scenePt = c->mapToScene(QPointF(plot.right() + leftGap, yLocal));
+        const qreal minGap = 4.0;
+        const qreal centeredOffset = (marginRight - b.width()) * 0.5;
+        const qreal offset = qMax<qreal>(minGap, centeredOffset);
+        const QPointF scenePt = c->mapToScene(QPointF(plot.right() + offset, yLocal));
         item->setPos(scenePt.x(), scenePt.y() - b.height() * 0.5);
     }
 }
@@ -119,21 +118,23 @@ inline void PatternChart::updateRightMargin()
     auto *c = getChart();
     if (!c)
         return;
-    // Use the same font as items to keep metrics consistent
-    QFontMetrics fm(QFont("", kFontPt));
-    int maxW = 0;
-    for (int ch = 0; ch < m_maxTraces; ++ch)
+    // Determine the right margin based on the widest label so names remain visible
+    constexpr int kFixedRightMargin = 5; // minimum
+    int maxLabelWidth = 0;
+    QFont f; f.setPointSize(kFontPt);
+    QFontMetrics fm(f);
+    for (const auto &name : m_names)
     {
-        const QString label = (ch < m_names.size() && !m_names[ch].isEmpty()) ? m_names[ch] : QString("CH%1").arg(ch + 1);
-        maxW = qMax(maxW, fm.horizontalAdvance(label));
+        if (name.isEmpty()) continue;
+        maxLabelWidth = qMax(maxLabelWidth, fm.horizontalAdvance(name));
     }
-    // Keep just enough space for the longest label plus a small padding
-    const int right = maxW * 0.88; // qMax(0, maxW + kRightPadding);
+    // Add small padding so text doesn't butt against the edge
+    const int padding = 5;
+    const int needed = maxLabelWidth + padding;
     QMargins m = c->margins();
-    if (m.right() != right)
-    {
-        m.setRight(right);
-    }
+    const int finalRight = qMax(kFixedRightMargin, needed);
+    if (m.right() != finalRight)
+        m.setRight(finalRight);
     c->setMargins(m);
 }
 
