@@ -642,7 +642,7 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
 
 void widgetChart::setHorizontalMarker(int channelIndex, qreal value, MarkerType type){
     if(markerHorizontalIndex < markersHorizontal.size()){
-        const QPointF pt(0.005,value);
+        const QPointF pt(HORIZONTAL_MARKER_X_OFFSET,value);
         QVector<QPointF> pts{pt};
         markersHorizontal[markerHorizontalIndex]->setBrush(getBrush(channelIndex,type));
         markersHorizontal[markerHorizontalIndex]->replace(pts);
@@ -652,7 +652,7 @@ void widgetChart::setHorizontalMarker(int channelIndex, qreal value, MarkerType 
 
 void widgetChart::setVerticalMarker(int channelIndex, qreal value){
     if(markerVerticalIndex < markersVertical.size()){
-        const QPointF pt(value,0.99);
+        const QPointF pt(value,VERTICAL_MARKER_Y_OFFSET);
         triggerShift = value;
         QVector<QPointF> pts{pt};
         markersVertical[markerVerticalIndex]->setBrush(getBrush(channelIndex,MarkerType::ARROW_DOWN_BIG));

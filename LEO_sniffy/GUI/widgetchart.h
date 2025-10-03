@@ -116,7 +116,7 @@ public:
     // Returns true if the point lies within the plot area; nx, ny are clamped to 0..1 regardless.
     bool mapSceneToPlotNormalized(const QPointF &scenePos, qreal &nx, qreal &ny) const;
 
-private:
+private:    
     const int NUM_SAMPLES_TO_SWITCH=450;
     Ui::widgetChart *ui; // forward-declared from generated ui file
     QList<QXYSeries *> seriesList;
@@ -165,6 +165,9 @@ private:
     QPainterPath MarkerPath_Cross;
     QPainterPath MarkerPath_Circle;
     QPainterPath MarkerPath_Trigger;
+
+    static constexpr qreal HORIZONTAL_MARKER_X_OFFSET = 0.005;
+    static constexpr qreal VERTICAL_MARKER_Y_OFFSET = 0.99;
 
     void initContextMenu();
     void createHorizontalMarkers();
