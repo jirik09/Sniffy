@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QPushButton>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"
@@ -39,6 +40,7 @@ public:
 
     PatternGeneratorSettings *settings;    
     PatternGeneratorPatterns *patterns;
+    QPushButton *buttonGridAlpha = nullptr; // top-right grid transparency stepper
 
     void restoreGUIAfterStartup();
     void setSpecification(PatternGeneratorSpec* spec);    

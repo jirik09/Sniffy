@@ -6,12 +6,22 @@ PatternGeneratorPainter::PatternGeneratorPainter(PatternGeneratorConfig *config,
     if(PATTERNS_USE_QCUSTOM_PLOT){
         plot = new WidgetCustomPlot(parent, PATT_MAX_CHANNELS_NUM);
     }else {
-        chart = new widgetChart(parent, PATT_MAX_CHANNELS_NUM);
+        chart = new PatternChart(parent, PATT_MAX_CHANNELS_NUM);
         chart->enableLocalMouseEvents(EventSelection::CLICKS_ONLY);
     }
 
     points = new QVector<QVector<QPointF>>;
     configDefaultChart();
+}
+
+void PatternGeneratorPainter::setSpecification(PatternGeneratorSpec *spec)
+{
+    this->spec = spec;
+    if (!PATTERNS_USE_QCUSTOM_PLOT && chart && spec) {
+        QStringList names;
+        for (int i = 0; i < PATT_MAX_CHANNELS_NUM; ++i) names << spec->chanPins[i];
+        chart->setChannelNames(names);
+    }
 }
 
 void PatternGeneratorPainter::repaint(QList<quint8> *data)
@@ -29,6 +39,12 @@ void PatternGeneratorPainter::repaint(QList<quint8> *data)
         for(int i = 0; i < PATT_MAX_CHANNELS_NUM; i++){
             QVector<QPointF> vector = points->at(i);
             chart->updateTrace(&vector, i);
+        }
+        // Ensure channel names are shown (spec may be set later)
+        if (spec) {
+            QStringList names;
+            for (int i = 0; i < PATT_MAX_CHANNELS_NUM; ++i) names << spec->chanPins[i];
+            chart->setChannelNames(names);
         }
     }
 }
