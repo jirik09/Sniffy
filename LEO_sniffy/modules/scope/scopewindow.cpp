@@ -50,7 +50,9 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart->setRange(-0.1, 0.1, CHART_MIN_Y, CHART_MAX_Y);
     chart->enableLocalMouseEvents(EventSelection::ALL);
     chart->hideAxislabels();
-    chart->setMargins(-29,-25,-25,-23);
+    // Unified safe margins (negative margins previously caused clipping of
+    // outer grid lines / top portions on some DPI & style combinations)
+    chart->setMargins(4,4,4,4);
     chart->setGridDensity(DEFAULT_CHART_DIV+1,9);
 
     chartFFT = new widgetChart(ui->widget_chart, 5);

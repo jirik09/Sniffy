@@ -105,7 +105,8 @@ qreal SyncPwmPainter::setTimeScale(){
 }
 
 void SyncPwmPainter::configDefaultChart(){
-    chart->setMargins(-34, -25, -17, -10);
+    // Standardized positive margins to avoid clipping of top/left grid lines
+    chart->setMargins(4,4,4,4);
     chart->setLabelsVisible(true, false);
     chart->setRange(0, 1, 0, RANGE_CHAN1_LOG1 + 1);
     for(int i = 0; i < CHANNELS_NUM; i++)

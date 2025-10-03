@@ -83,7 +83,11 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QChartView *chartView = new QChartView(chart);
 
     ui->horizontalLayout_chart->addWidget(chartView);
-    chart->setMargins(QMargins(0,-12,0,0));
+    // Previously large negative top margin caused the first horizontal grid line
+    // to be rendered outside of the visible area in some embedding layouts.
+    // Use a small, safe positive margin on all sides; QChart will internally
+    // allocate space for axis labels, so this just trims excess without clipping.
+    chart->setMargins(QMargins(2,2,2,2));
     chart->setBackgroundRoundness(0);
 
     setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
