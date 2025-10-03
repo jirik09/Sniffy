@@ -12,6 +12,7 @@
 #include <QtCharts/QLogValueAxis>
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QGraphicsEllipseItem>
 
 #include <QMenu>
 #include <QtMath>
@@ -90,6 +91,11 @@ public:
     void setGridDensity(int tickX, int tickY);
     void setGridHorizontalDensity(int tickX);
 
+    // Grid transparency control (0..100 %, default 20)
+    void setGridTransparencyPercent(int percent);
+    int getGridTransparencyPercent() const { return gridTransparencyPercent; }
+    void stepGridTransparency();
+
     void formatAxisLabelsForScope();
     void formatLabels(QString axisXLabelForm, QString axisYLabelForm);
     void setGraphColor(QColor qColor);
@@ -165,6 +171,15 @@ private:
     void createVerticalMarkers();
     void initBrushes();
     QBrush getBrush (int channelIndex, MarkerType type);
+    void applyGridTransparency();
+    void layoutGridAlphaDot();
+
+    int gridTransparencyPercent = 20; // default 20%
+    QGraphicsEllipseItem* gridAlphaDot = nullptr;
+    int gridAlphaDotRadius = 5; // px
+    int gridAlphaDotMargin = 6; // px from top-right corner inside plot
+    qreal gridAlphaDotClickableFactor = 4.0; // enlargement factor for clickable radius (vs. visual radius)
+    bool isPointInGridAlphaDot(const QPointF &scenePos) const; // hit test with enlarged radius
 
     void createSeries(QAbstractSeries *series);
 
@@ -197,5 +212,14 @@ private slots:
     void handleCursorPress();
     void handleCursorRelease();
 };
+
+// Internal: store current grid transparency percent
+// Note: declaration at end to minimize header churn
+inline void widgetChart::stepGridTransparency()
+{
+    int next = gridTransparencyPercent + 20;
+    if (next > 100) next = 0;
+    setGridTransparencyPercent(next);
+}
 
 #endif // WIDGETCHART_H
