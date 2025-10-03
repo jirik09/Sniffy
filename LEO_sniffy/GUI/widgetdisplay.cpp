@@ -429,7 +429,8 @@ void WidgetDisplay::createHistoryChart(int historyTracesNum){
     chart->formatLabels("%.1f", "%.2g");
     chart->setGridDensity(5, 5);
     chart->setLabelsVisible(true, true);
-    chart->setMargins(-12, -20, -16,-10);
+    // Standardized margins (previous negative values clipped outer grid lines)
+    chart->setMargins(0,0,0,0);
     chart->setRangeY(0, 3.3);
     chart->setDataMinMax(0, 10);
     ui->horizontalWidget_graph_2->addWidget(chart);

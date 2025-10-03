@@ -642,16 +642,7 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
 
 void widgetChart::setHorizontalMarker(int channelIndex, qreal value, MarkerType type){
     if(markerHorizontalIndex < markersHorizontal.size()){
-        qreal nx = 0.04; // fallback
-        if (chart) {
-            const QRectF plot = chart->plotArea();
-            if (plot.width() > 0) {
-                const qreal halfPx = markersHorizontal[markerHorizontalIndex]->markerSize() * 0.5;
-                const qreal padPx = halfPx + 18.0;
-                nx = qMin<qreal>(0.5, padPx / plot.width()); // center inside left edge (cap if too narrow)
-            }
-        }
-        const QPointF pt(nx, value);
+        const QPointF pt(HORIZONTAL_MARKER_X_OFFSET,value);
         QVector<QPointF> pts{pt};
         markersHorizontal[markerHorizontalIndex]->setBrush(getBrush(channelIndex,type));
         markersHorizontal[markerHorizontalIndex]->replace(pts);
@@ -661,16 +652,7 @@ void widgetChart::setHorizontalMarker(int channelIndex, qreal value, MarkerType 
 
 void widgetChart::setVerticalMarker(int channelIndex, qreal value){
     if(markerVerticalIndex < markersVertical.size()){
-        qreal ny = 0.94; // fallback
-        if (chart) {
-            const QRectF plot = chart->plotArea();
-            if (plot.height() > 0) {
-                const qreal halfPx = markersVertical[markerVerticalIndex]->markerSize() * 0.5;
-                const qreal padPx = halfPx + 5.0;
-                ny = 1.0 - qMin<qreal>(0.5, padPx / plot.height()); // center inside top edge
-            }
-        }
-        const QPointF pt(value, ny);
+        const QPointF pt(value,VERTICAL_MARKER_Y_OFFSET);
         triggerShift = value;
         QVector<QPointF> pts{pt};
         markersVertical[markerVerticalIndex]->setBrush(getBrush(channelIndex,MarkerType::ARROW_DOWN_BIG));

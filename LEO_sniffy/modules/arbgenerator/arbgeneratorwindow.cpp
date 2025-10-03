@@ -25,12 +25,13 @@ ArbGeneratorWindow::ArbGeneratorWindow(ArbGeneratorConfig *config, bool isPWMbas
 
     chart = new widgetChart(widget_chart, 4);
     chart->setRange(0, 1, 0, 1);
-    chart->setMargins(-10,-20,-13,-10);
+    // Standardized margins to avoid grid clipping
+    chart->setMargins(0,0,0,0);
     verticalLayout_chart->addWidget(chart);
 
     PWMchart = new widgetChart(widget_chart, 4);
     PWMchart->setRange(0, 1, 0, 1);
-    PWMchart->setMargins(-10,-20,-13,-10);
+    PWMchart->setMargins(0,0,0,0);
     verticalLayout_chart->addWidget(PWMchart);
     if(!isPWMbased){
         PWMchart->hide();
