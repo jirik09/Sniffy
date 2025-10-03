@@ -27,7 +27,7 @@ private:
     static constexpr int kFontPt = 8;
     static constexpr int kZ = 10;
     static constexpr qreal kVerticalFactor = 0.6; // keeps original visual placement
-    static constexpr int kRightPadding = -2;      // right space for labels
+    //static constexpr int kRightPadding = 10;      // right space for labels
 
     int m_maxTraces = 1;
     QStringList m_names;
@@ -42,7 +42,7 @@ inline PatternChart::PatternChart(QWidget *parent, int maxTraces)
     {
         connect(c, &QChart::plotAreaChanged, this, &PatternChart::onPlotAreaChanged);
         // Slight base margins to keep visuals consistent with original pattern generator look
-        c->setMargins(QMargins(0, -8, 0, 0));
+        c->setMargins(QMargins(0, 0, 0, 0));
     }
 }
 
@@ -108,7 +108,7 @@ inline void PatternChart::layoutNames()
         // Center the label horizontally between the rightmost grid line (plot.right)
         // and the right edge of the chart (plot.right + right margin).
         const int marginRight = c->margins().right();
-        const qreal leftGap = qMax<qreal>(0.0, (marginRight - b.width()) * 0.5);
+        const qreal leftGap = qMax<qreal>(0.0, (marginRight * 1.1 - b.width()) * 1.1);
         const QPointF scenePt = c->mapToScene(QPointF(plot.right() + leftGap, yLocal));
         item->setPos(scenePt.x(), scenePt.y() - b.height() * 0.5);
     }
@@ -128,7 +128,7 @@ inline void PatternChart::updateRightMargin()
         maxW = qMax(maxW, fm.horizontalAdvance(label));
     }
     // Keep just enough space for the longest label plus a small padding
-    const int right = qMax(0, maxW + kRightPadding);
+    const int right = maxW * 0.88; // qMax(0, maxW + kRightPadding);
     QMargins m = c->margins();
     if (m.right() != right)
     {
