@@ -52,7 +52,7 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     chart->hideAxislabels();
     // Unified safe margins (negative margins previously caused clipping of
     // outer grid lines / top portions on some DPI & style combinations)
-    chart->setMargins(4,4,4,4);
+    chart->setMargins(0,0,0,0);
     chart->setGridDensity(DEFAULT_CHART_DIV+1,9);
 
     chartFFT = new widgetChart(ui->widget_chart, 5);

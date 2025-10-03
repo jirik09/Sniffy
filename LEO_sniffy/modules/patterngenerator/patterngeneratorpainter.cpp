@@ -110,7 +110,7 @@ void PatternGeneratorPainter::configDefaultChart(){
     }else {
         chart->setGridHorizontalDensity(PATT_DEFAULT_DATA_LENGTH+1);
         // Use unified small margins for consistency across modules
-        chart->setMargins(4,4,4,4);
+        chart->setMargins(0,0,0,0);
         chart->setLabelsVisible(true, false);
         chart->setRange(0, 1, 0.97, PATT_RANGE_CHAN1_LOG1 + 0.98);
         for(int i = 0; i < PATT_MAX_CHANNELS_NUM; i++)
