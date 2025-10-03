@@ -1,6 +1,7 @@
 #include "widgetchart.h"
 #include "ui_widgetchart.h"
 #include <QTimer>
+//#include <QGraphicsSimpleTextItem>
 
 widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QWidget(parent),
@@ -83,10 +84,21 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QChartView *chartView = new QChartView(chart);
 
     ui->horizontalLayout_chart->addWidget(chartView);
-    chart->setMargins(QMargins(0,-12,0,0));
+    chart->setMargins(QMargins(0,0,0,0));
     chart->setBackgroundRoundness(0);
 
     setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
+    // Default grid transparency 60%
+    setGridTransparencyPercent(60);
+    // Create clickable grid alpha dot in top-right corner of plot
+    gridAlphaDot = new QGraphicsEllipseItem(0,0, gridAlphaDotRadius*1.6, gridAlphaDotRadius*1.6);
+    gridAlphaDot->setZValue(1000);
+    gridAlphaDot->setPen(Qt::NoPen);
+    gridAlphaDot->setBrush(axisX->gridLineColor());
+    if (chart->scene()) chart->scene()->addItem(gridAlphaDot);
+    else QTimer::singleShot(0, this, [this](){ if (chart->scene() && gridAlphaDot && !gridAlphaDot->scene()) chart->scene()->addItem(gridAlphaDot); layoutGridAlphaDot(); });
+    connect(chart, &QChart::plotAreaChanged, this, [this](const QRectF&){ layoutGridAlphaDot(); });
+    layoutGridAlphaDot();
     initContextMenu();
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -231,6 +243,12 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     if(event->type() == QEvent::GraphicsSceneMouseRelease){
         mousePressed = false;
         QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+        // If released inside (enlarged) dot area, consume and step transparency
+        if (isPointInGridAlphaDot(ev->scenePos())) {
+            stepGridTransparency();
+            QApplication::restoreOverrideCursor();
+            return true;
+        }
         emit mouseLeftClickEvent(ev);
         QApplication::restoreOverrideCursor();
     }
@@ -435,6 +453,14 @@ void widgetChart::setGridHorizontalDensity(int tickX){
     axisX->setTickCount(tickX);
 }
 
+void widgetChart::setGridTransparencyPercent(int percent)
+{
+    if (percent < 0) percent = 0;
+    if (percent > 100) percent = 100;
+    gridTransparencyPercent = percent;
+    applyGridTransparency();
+}
+
 void widgetChart::setGraphColor(QColor qColor){
     axisX->setLabelsBrush(QBrush(qColor));
     axisY->setLabelsBrush(QBrush(qColor));
@@ -444,6 +470,35 @@ void widgetChart::setGraphColor(QColor qColor){
     axisY->setGridLineColor(qColor);
     axisX->setLinePenColor(qColor);
     axisY->setLinePenColor(qColor);
+    applyGridTransparency(); // re-apply alpha to gridlines after color change
+}
+
+void widgetChart::applyGridTransparency()
+{
+    // Convert percent to alpha 0..255 and apply only to grid line colors of main axes
+    const int alpha = static_cast<int>(qRound(gridTransparencyPercent * 2.55));
+    QColor gridX = axisX->gridLineColor(); gridX.setAlpha(alpha); axisX->setGridLineColor(gridX);
+    QColor gridY = axisY->gridLineColor(); gridY.setAlpha(alpha); axisY->setGridLineColor(gridY);
+
+    // Apply alpha to axis line pens too (left/bottom borders), so border lines fade equally
+    QPen penX = axisX->linePen(); penX.setColor(QColor(penX.color().red(), penX.color().green(), penX.color().blue(), alpha)); axisX->setLinePen(penX);
+    QPen penY = axisY->linePen(); penY.setColor(QColor(penY.color().red(), penY.color().green(), penY.color().blue(), alpha)); axisY->setLinePen(penY);    
+
+    // Update the indicator dot to reflect current grid color
+    if (gridAlphaDot) gridAlphaDot->setBrush(gridX);
+    // Trigger a repaint
+    chart->update();
+}
+
+void widgetChart::layoutGridAlphaDot()
+{
+    if (!chart || !gridAlphaDot) return;
+    const QRectF plot = chart->plotArea();
+    if (plot.isEmpty()) return;
+    const qreal x = plot.right() - gridAlphaDotMargin - gridAlphaDotRadius*1.8;
+    const qreal y = plot.top() + gridAlphaDotMargin;
+    const QPointF scenePt = chart->mapToScene(QPointF(x, y));
+    gridAlphaDot->setPos(scenePt);
 }
 
 void widgetChart::setTraceColor(int index, QColor color){
@@ -489,6 +544,8 @@ void widgetChart::createHorizontalMarkers(){
     axisX_UnitRange->setRange(0, 1);
     axisX_UnitRange->setLabelsVisible(false);
     axisX_UnitRange->setTickCount(2);
+    axisX_UnitRange->setLineVisible(false); // avoid double-drawing along the top border
+    axisX_UnitRange->setGridLineVisible(false); // prevent extra edge grid lines from this helper axis
     chart->addAxis(axisX_UnitRange, Qt::AlignTop);
 }
 
@@ -498,6 +555,8 @@ void widgetChart::createVerticalMarkers(){
     axisY_UnitRange->setRange(0, 1);
     axisY_UnitRange->setLabelsVisible(false);
     axisY_UnitRange->setTickCount(2);
+    axisY_UnitRange->setLineVisible(false); // avoid double-drawing along the right border
+    axisY_UnitRange->setGridLineVisible(false); // prevent extra edge grid lines from this helper axis
     chart->addAxis(axisY_UnitRange, Qt::AlignRight);
 }
 
@@ -723,4 +782,20 @@ bool widgetChart::mapSceneToPlotNormalized(const QPointF &scenePos, qreal &nx, q
     if (nx < 0.0) nx = 0.0; else if (nx > 1.0) nx = 1.0;
     if (ny < 0.0) ny = 0.0; else if (ny > 1.0) ny = 1.0;
     return inside;
+}
+
+QChart* widgetChart::getChart() const 
+{ 
+    return chart;
+}
+
+bool widgetChart::isPointInGridAlphaDot(const QPointF &scenePos) const
+{
+    if (!gridAlphaDot) return false;
+    // Center of the visual ellipse in scene coordinates
+    QPointF center = gridAlphaDot->sceneBoundingRect().center();
+    const qreal visualRadius = (gridAlphaDot->rect().width() * gridAlphaDot->sceneTransform().m11()) / 2.0; // approximate scale (uniform expected)
+    const qreal effectiveRadius = visualRadius * gridAlphaDotClickableFactor; // enlarge clickable area
+    const qreal dist2 = QLineF(center, scenePos).length();
+    return dist2 <= effectiveRadius;
 }
