@@ -14,8 +14,8 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
     widget_settings->setLayout(verticalLayout_settings);
     widget_chart->setLayout(verticalLayout_chart);
 
-    verticalLayout_settings->setContentsMargins(4, 4, 4, 4);
-    verticalLayout_settings->setSpacing(2);
+    verticalLayout_settings->setContentsMargins(0, 0, 0, 0);
+    verticalLayout_settings->setSpacing(0);
 
     widget_chart->setContentsMargins(0, 0, 0, 0);
     verticalLayout_chart->setContentsMargins(0, 0, 0, 0);

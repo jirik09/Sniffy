@@ -84,14 +84,14 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QChartView *chartView = new QChartView(chart);
 
     ui->horizontalLayout_chart->addWidget(chartView);
-    chart->setMargins(QMargins(0,-12,0,0));
+    chart->setMargins(QMargins(0,0,0,0));
     chart->setBackgroundRoundness(0);
 
     setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
     // Default grid transparency 60%
     setGridTransparencyPercent(60);
     // Create clickable grid alpha dot in top-right corner of plot
-    gridAlphaDot = new QGraphicsEllipseItem(0,0, gridAlphaDotRadius*1.5, gridAlphaDotRadius*1.5);
+    gridAlphaDot = new QGraphicsEllipseItem(0,0, gridAlphaDotRadius*1.6, gridAlphaDotRadius*1.6);
     gridAlphaDot->setZValue(1000);
     gridAlphaDot->setPen(Qt::NoPen);
     gridAlphaDot->setBrush(axisX->gridLineColor());
@@ -495,7 +495,7 @@ void widgetChart::layoutGridAlphaDot()
     if (!chart || !gridAlphaDot) return;
     const QRectF plot = chart->plotArea();
     if (plot.isEmpty()) return;
-    const qreal x = plot.right() - gridAlphaDotMargin - gridAlphaDotRadius*2;
+    const qreal x = plot.right() - gridAlphaDotMargin - gridAlphaDotRadius*1.8;
     const qreal y = plot.top() + gridAlphaDotMargin;
     const QPointF scenePt = chart->mapToScene(QPointF(x, y));
     gridAlphaDot->setPos(scenePt);

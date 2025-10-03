@@ -177,7 +177,7 @@ private:
     int gridTransparencyPercent = 20; // default 20%
     QGraphicsEllipseItem* gridAlphaDot = nullptr;
     int gridAlphaDotRadius = 5; // px
-    int gridAlphaDotMargin = 6; // px from top-right corner inside plot
+    int gridAlphaDotMargin = 7; // px from top-right corner inside plot
     qreal gridAlphaDotClickableFactor = 4.0; // enlargement factor for clickable radius (vs. visual radius)
     bool isPointInGridAlphaDot(const QPointF &scenePos) const; // hit test with enlarged radius
 
