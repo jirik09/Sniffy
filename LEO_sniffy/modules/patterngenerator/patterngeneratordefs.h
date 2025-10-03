@@ -17,7 +17,7 @@
 
 enum class ModeRW
 {
-    RAED = 0,
+    READ = 0,
     WRITE
 };
 
