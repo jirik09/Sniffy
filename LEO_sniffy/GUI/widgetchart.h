@@ -108,6 +108,9 @@ public:
     // Access to underlying QChart for advanced scenarios (read-only usage recommended)
     QChart* getChart() const;
 
+    // Disable context menu entries for selecting series style (spline/line/points)
+    void setAllowStyleSelection(bool allow);
+
     void setHorizontalCursor(int channelIndex, qreal value, Cursor type);
     void setVerticalCursor(int channelIndex, qreal value, Cursor type);
     void clearAllCursors();
@@ -130,8 +133,10 @@ private:
 
     QMenu *menu;
     QAction *spline, *line, *scatter, *btnOpenGL;
+    QAction *placeholderAction = nullptr; // shown when style selection is disabled for a module
     enum enable {DISABLED, ENABLED} openGL = DISABLED;
     ChartMode chartMode = ChartMode::LINE;
+    bool allowStyleSelection = true; // when false, context menu won't offer spline/line/points
 
     int maxTraces;
 

@@ -163,6 +163,10 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
 
     if (!PATTERNS_USE_QCUSTOM_PLOT)
         connect(painter->chart, &widgetChart::mouseLeftClickEvent, this, &PatternGeneratorWindow::chartEditDataOnLeftClickCallback);
+
+    // Disable style selection (spline/line/points) in pattern generator charts
+    if (!PATTERNS_USE_QCUSTOM_PLOT && painter->chart)
+        painter->chart->setAllowStyleSelection(false);
 }
 
 PatternGeneratorWindow::~PatternGeneratorWindow()

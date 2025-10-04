@@ -735,7 +735,24 @@ void widgetChart::initContextMenu(){
 }
 
 void widgetChart::rightClickCallback(const QPoint &mousePos){
+    // If style selection is disabled for this chart, show a placeholder action
+    if (!allowStyleSelection) {
+        // Lazily create placeholder action so translations can be applied centrally
+        if (!placeholderAction) {
+            placeholderAction = new QAction(tr("Options..."), this);
+            placeholderAction->setEnabled(false); // currently just a placeholder
+        }
+        QMenu tmpMenu(this);
+        tmpMenu.addAction(placeholderAction);
+        tmpMenu.exec(mapToGlobal(mousePos));
+        return;
+    }
     menu->exec(mapToGlobal(mousePos));
+}
+
+void widgetChart::setAllowStyleSelection(bool allow)
+{
+    allowStyleSelection = allow;
 }
 
 void widgetChart::hovered(const QPointF &point){
