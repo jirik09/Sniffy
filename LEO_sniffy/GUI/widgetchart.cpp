@@ -249,7 +249,10 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
             QApplication::restoreOverrideCursor();
             return true;
         }
-        emit mouseLeftClickEvent(ev);
+        // Only treat left-button releases as a 'left click' event to avoid
+        // changing signal polarity or editing on right-click.
+        if (ev->button() == Qt::LeftButton)
+            emit mouseLeftClickEvent(ev);
         QApplication::restoreOverrideCursor();
     }
 
