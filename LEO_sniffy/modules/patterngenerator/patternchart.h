@@ -119,7 +119,7 @@ inline void PatternChart::updateRightMargin()
     if (!c)
         return;
     // Determine the right margin based on the widest label so names remain visible
-    constexpr int kFixedRightMargin = 5; // minimum
+    constexpr int kFixedRightMargin = 0; // minimum
     int maxLabelWidth = 0;
     QFont f; f.setPointSize(kFontPt);
     QFontMetrics fm(f);
@@ -129,7 +129,7 @@ inline void PatternChart::updateRightMargin()
         maxLabelWidth = qMax(maxLabelWidth, fm.horizontalAdvance(name));
     }
     // Add small padding so text doesn't butt against the edge
-    const int padding = 5;
+    const int padding = 0;
     const int needed = maxLabelWidth + padding;
     QMargins m = c->margins();
     const int finalRight = qMax(kFixedRightMargin, needed);

@@ -16,9 +16,7 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
 
     verticalLayout_settings->setContentsMargins(0, 0, 0, 0);
     verticalLayout_settings->setSpacing(0);
-
-    widget_chart->setContentsMargins(0, 0, 0, 0);
-    verticalLayout_chart->setContentsMargins(0, 0, 0, 0);
+    verticalLayout_chart->setContentsMargins(4, 4, 4, 4);
     verticalLayout_chart->setSpacing(0);
 
     painter = new PatternGeneratorPainter(config, this);
@@ -29,7 +27,7 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
         verticalLayout_chart->addWidget(painter->chart);
 
     ui->widget_settings->setLayout(verticalLayout_settings);
-    ui->widget_module->resize(500, 300);
+    //ui->widget_module->resize(600, 200);
     ui->widget_module->setLayout(verticalLayout_chart);
 
     patternData = new QList<patttype>;

@@ -57,10 +57,6 @@ private:
     PatternGeneratorSpec *spec;    
     PatternGeneratorPainter *painter;
 
-//    QCustomPlot *plot;
-//    QCPGraph *graph;
-//    widgetChart *chart;
-
     QList<patttype> *patternData;
 
 private slots:
