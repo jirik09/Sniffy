@@ -124,8 +124,9 @@ void widgetChart::switchToSplineSeriesCallback(){
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
-        series->clear();
     }
+    // Force immediate repaint after switching to line series.
+    updateAxis();
 }
 
 void widgetChart::switchToLineSeriesCallback(){
@@ -147,8 +148,9 @@ void widgetChart::switchToLineSeriesSeamless()
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
-        series->clear();
     }
+    // Force immediate repaint after switching to line series.
+    updateAxis();
 }
 
 void widgetChart::switchToScatterSeriesCallback(){
@@ -168,9 +170,10 @@ void widgetChart::switchToScatterSeriesCallback(){
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
-        series->clear();
         series->setUseOpenGL(false);
     }
+    // Force immediate repaint after switching to scatter; schedule deferred update
+    updateAxis();
 }
 
 void widgetChart::useOpenGLCallback(){
