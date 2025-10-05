@@ -50,6 +50,7 @@ private slots:
     void plusClicked();
     void minusClicked();
     void valChanged(int in);
+    void resetToDefault();
 
 signals:
     void valueChanged(float val, int optionalEmitParam = 0);
