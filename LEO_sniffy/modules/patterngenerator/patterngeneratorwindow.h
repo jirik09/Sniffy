@@ -58,6 +58,9 @@ private:
     PatternGeneratorPainter *painter;
 
     QList<patttype> *patternData;
+    // Track last edited cell to avoid toggling repeatedly while dragging over same point
+    int lastEditedChannel = -1;
+    int lastEditedPosition = -1;
 
 private slots:
     void patternSelectionChangedCallback(int index);

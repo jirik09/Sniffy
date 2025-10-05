@@ -221,17 +221,16 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         }
 
         if(event->type() == QEvent::GraphicsSceneMouseMove){ //move signal when dragged
-
-            QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
-            qreal distance = ((ev->pos().x()- mousePressedPoint.x())/chart->geometry().width())/(localZoom/invZoom);
-            shift = initMouseShift - distance;
-            if(shift>1){
-                shift = 1;
-            }else if(shift<0){
-                shift = 0;
-            }
-            emit localZoomChanged();
-            updateAxis();
+                QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+                qreal distance = ((ev->pos().x()- mousePressedPoint.x())/chart->geometry().width())/(localZoom/invZoom);
+                shift = initMouseShift - distance;
+                if(shift>1){
+                    shift = 1;
+                }else if(shift<0){
+                    shift = 0;
+                }
+                emit localZoomChanged();
+                updateAxis();
         }
     }
 
@@ -241,6 +240,12 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         mousePressedPoint = ev->pos();
         initMouseShift = shift;
         QApplication::setOverrideCursor(QCursor(Qt::ClosedHandCursor));
+        // Treat left-button press as immediate edit/click so click-drag will update continuously
+        if (ev->button() == Qt::LeftButton) {
+            // Don't step grid transparency here; that is handled on release to avoid accidental steps
+            if (!isPointInGridAlphaDot(ev->scenePos()))
+                emit mouseLeftClickEvent(ev);
+        }
     }
 
     if(event->type() == QEvent::GraphicsSceneMouseRelease){
@@ -257,6 +262,16 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         if (ev->button() == Qt::LeftButton)
             emit mouseLeftClickEvent(ev);
         QApplication::restoreOverrideCursor();
+    }
+
+    // Continuous editing while left button is held: emit click events on mouse move
+    if (event->type() == QEvent::GraphicsSceneMouseMove) {
+        QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+        if (mousePressed && (ev->buttons() & Qt::LeftButton)) {
+            // avoid interfering with the grid alpha dot interaction
+            if (!isPointInGridAlphaDot(ev->scenePos()))
+                emit mouseLeftClickEvent(ev);
+        }
     }
 
     if(event->type() == QEvent::GraphicsSceneHoverEnter){
