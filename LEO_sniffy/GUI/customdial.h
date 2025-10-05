@@ -32,7 +32,6 @@ public:
 private:
     std::function<void()> doubleClickCallback;
 
-private:
     void mouseMoveEvent(QMouseEvent *me) override;
     void mousePressEvent(QMouseEvent *me) override;
     void mouseReleaseEvent(QMouseEvent *me) override;
