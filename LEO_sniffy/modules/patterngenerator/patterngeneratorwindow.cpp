@@ -163,6 +163,10 @@ PatternGeneratorWindow::PatternGeneratorWindow(PatternGeneratorConfig *config, Q
 
     if (!PATTERNS_USE_QCUSTOM_PLOT)
         connect(painter->chart, &widgetChart::mouseLeftClickEvent, this, &PatternGeneratorWindow::chartEditDataOnLeftClickCallback);
+
+    // Disable style selection (spline/line/points) in pattern generator charts
+    if (!PATTERNS_USE_QCUSTOM_PLOT && painter->chart)
+        painter->chart->setAllowStyleSelection(false);
 }
 
 PatternGeneratorWindow::~PatternGeneratorWindow()
@@ -314,7 +318,19 @@ void PatternGeneratorWindow::chartEditDataOnLeftClickCallback(QGraphicsSceneMous
     if (channel >= PATT_MAX_CHANNELS_NUM)
         channel = PATT_MAX_CHANNELS_NUM - 1;
 
-    patternData = patterns->modifyPattern(channel, position);
+    // If this event is a fresh mouse press, reset last-edited so click toggles even if same cell
+    if (event->type() == QEvent::GraphicsSceneMousePress) {
+        lastEditedChannel = -1;
+        lastEditedPosition = -1;
+    }
 
-    painter->repaint(patternData);
+    // Avoid toggling repeatedly when mouse is moved but still over the same cell
+    if (channel != lastEditedChannel || position != lastEditedPosition) {
+        patternData = patterns->modifyPattern(channel, position);
+        painter->repaint(patternData);
+        lastEditedChannel = channel;
+        lastEditedPosition = position;
+    }
 }
+
+// Reset tracking when mouse is released - add handler connected to stopGenerator signal or reuse existing
