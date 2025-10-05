@@ -27,6 +27,12 @@ WidgetDial::WidgetDial(QWidget *parent, QString name, int optionalEmitParam) :
     connect(ui->pushButton_plus,SIGNAL(clicked()),this,SLOT(plusClicked()));
     connect(ui->pushButton_minus,SIGNAL(clicked()),this,SLOT(minusClicked()));
     connect(ui->dial,SIGNAL(valueChanged(int)),this,SLOT(valChanged(int)));
+    
+    // Set callback for double-click using direct function call instead of Qt signal/slot
+    ui->dial->setDoubleClickCallback([this]() {
+        resetToDefault();
+    });
+    
     connect(ui->comboBox,SIGNAL(currentIndexChanged(int)),ui->dial, SLOT(setValue(int)));
     // options container default constructed (value semantics)
     setColor(Graphics::palette().controls);
@@ -111,6 +117,8 @@ int WidgetDial::getDefaultIndex() const
 void WidgetDial::setDefaultIndex(int index)
 {
     defaultIndex = index;
+    // Tell the underlying CustomDial what its default value is
+    ui->dial->setDefaultValue(index);
     setSelectedIndex(index);
 }
 
@@ -136,6 +144,10 @@ void WidgetDial::valChanged(int in){
     }
 }
 
+void WidgetDial::resetToDefault()
+{
+    setSelectedIndex(defaultIndex);
+}
 
 
 
