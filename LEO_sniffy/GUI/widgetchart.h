@@ -61,7 +61,7 @@ public:
     explicit widgetChart(QWidget *parent = nullptr, int maxTraces = 1);
     ~widgetChart();
 
-    EventSelection eventSel = EventSelection::ALL;
+    EventSelection eventSel = EventSelection::CLICKS_ONLY;
 
     void clearAll();
     void clearPoints(int startIndex, int endIndex);

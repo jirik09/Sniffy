@@ -87,6 +87,11 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     chart->setMargins(QMargins(0,0,0,0));
     chart->setBackgroundRoundness(0);
 
+    // Ensure we always receive scene mouse events (for grid alpha dot clicks) even if
+    // a module forgets to call enableLocalMouseEvents(). Individual modules can still
+    // later call enableLocalMouseEvents(EventSelection::CLICKS_ONLY) to limit zoom/pan.
+    enableLocalMouseEvents(eventSel);
+
     setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
     // Default grid transparency 60%
     setGridTransparencyPercent(60);
@@ -196,6 +201,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
 {    
     Q_UNUSED(obj);
 
+    // Process zoom and pan for ALL mode (same structure as original)
     if(eventSel != EventSelection::CLICKS_ONLY){
         if(event->type() == QEvent::GraphicsSceneWheel){ //zoom by wheel
             QGraphicsSceneWheelEvent *ev = (QGraphicsSceneWheelEvent*) event;
@@ -212,17 +218,28 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         }
 
         if(event->type() == QEvent::GraphicsSceneMouseDoubleClick){ //restore zoom on double click
-            localZoom = 1;
-            shift = abs(minX)/(maxX-minX);
-            if(shift>1)shift = 1;
-            if(shift<0)shift = 0;
-            emit localZoomChanged();
-            updateAxis();
+            QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+            // If double-clicked on grid alpha dot, only step transparency (don't reset zoom)
+            if (isPointInGridAlphaDot(ev->scenePos())) {
+                stepGridTransparency();
+                return true; // consume the event
+            }
+            // Only reset zoom in ALL mode (oscilloscope/counter with dynamic redrawing)
+            // In CLICKS_ONLY mode (generators), double-click would corrupt static signal display
+            if (eventSel == EventSelection::ALL) {
+                localZoom = 1;
+                shift = abs(minX)/(maxX-minX);
+                if(shift>1)shift = 1;
+                if(shift<0)shift = 0;
+                emit localZoomChanged();
+                updateAxis();
+            }
         }
 
         if(event->type() == QEvent::GraphicsSceneMouseMove){ //move signal when dragged
-                QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
-                qreal distance = ((ev->pos().x()- mousePressedPoint.x())/chart->geometry().width())/(localZoom/invZoom);
+            QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+            if (mousePressed && (ev->buttons() & Qt::LeftButton)) {
+                qreal distance = ((ev->scenePos().x()- mousePressedPoint.x())/chart->geometry().width())/(localZoom/invZoom);
                 shift = initMouseShift - distance;
                 if(shift>1){
                     shift = 1;
@@ -231,18 +248,18 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
                 }
                 emit localZoomChanged();
                 updateAxis();
+            }
         }
     }
 
     if(event->type() == QEvent::GraphicsSceneMousePress){ //drag signal
         QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
         mousePressed = true;
-        mousePressedPoint = ev->pos();
+        mousePressedPoint = ev->scenePos();
         initMouseShift = shift;
         QApplication::setOverrideCursor(QCursor(Qt::ClosedHandCursor));
-        // Treat left-button press as immediate edit/click so click-drag will update continuously
-        if (ev->button() == Qt::LeftButton) {
-            // Don't step grid transparency here; that is handled on release to avoid accidental steps
+        // For CLICKS_ONLY mode: emit click event for data editing
+        if (eventSel == EventSelection::CLICKS_ONLY && ev->button() == Qt::LeftButton) {
             if (!isPointInGridAlphaDot(ev->scenePos()))
                 emit mouseLeftClickEvent(ev);
         }
@@ -257,18 +274,16 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
             QApplication::restoreOverrideCursor();
             return true;
         }
-        // Only treat left-button releases as a 'left click' event to avoid
-        // changing signal polarity or editing on right-click.
-        if (ev->button() == Qt::LeftButton)
+        // For CLICKS_ONLY mode: treat releases as clicks too
+        if (eventSel == EventSelection::CLICKS_ONLY && ev->button() == Qt::LeftButton)
             emit mouseLeftClickEvent(ev);
         QApplication::restoreOverrideCursor();
     }
 
-    // Continuous editing while left button is held: emit click events on mouse move
+    // Continuous editing while left button is held (CLICKS_ONLY mode only)
     if (event->type() == QEvent::GraphicsSceneMouseMove) {
         QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
-        if (mousePressed && (ev->buttons() & Qt::LeftButton)) {
-            // avoid interfering with the grid alpha dot interaction
+        if (eventSel == EventSelection::CLICKS_ONLY && mousePressed && (ev->buttons() & Qt::LeftButton)) {
             if (!isPointInGridAlphaDot(ev->scenePos()))
                 emit mouseLeftClickEvent(ev);
         }
@@ -282,9 +297,6 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         QApplication::restoreOverrideCursor();
     }
 
-    if(event->type() != QEvent::LayoutRequest && event->type()!=QEvent::GraphicsSceneHoverMove){
-        // qDebug() <<"Sereies event"<< event->type() << obj->objectName();
-    }
     return QObject::eventFilter(obj, event);
 }
 
