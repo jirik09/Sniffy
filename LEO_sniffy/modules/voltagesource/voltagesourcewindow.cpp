@@ -23,9 +23,14 @@ VoltageSourceWindow::VoltageSourceWindow(VoltageSourceConfig *config, QWidget *p
     rangeMaxs.fill(3.3, MAX_VOLTAGE_SOURCE_CHANNELS); // default full scale 0..3.3 V
     int index = 0;
     for (WidgetDisplay *dis : displays) {
-        dis->setContentsMargins(5, 5, 5, 5);
+        // Set contents margins for 1st 0,5,5,5 and others 0,0,5,5
+        if(index == 0) {
+            dis->setContentsMargins(0, 5, 5, 5);
+        } else {
+            dis->setContentsMargins(0, 0, 5, 5);
+        }
         dis->showAvgDisplay(false);
-    dis->configLabel(2,"Voltage Source",Graphics::palette().textLabel,true);
+        dis->configLabel(2,"Voltage Source",Graphics::palette().textLabel,true);
         // Use vertical progress bar like Voltmeter
         dis->useVerticalProgressBar(true);
         // Initial default range 0..100 (we will remap when real range set)

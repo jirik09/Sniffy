@@ -51,7 +51,7 @@ protected:
         // Full widget rect
         QRect outer = rect();
         // Frame rectangle (4px inset on right & bottom gives consistent lines)
-        QRect frameRect = outer.adjusted(+9,+4,0,-4);
+        QRect frameRect = outer.adjusted(+9,+4,0,-7);
         // background first
         p.fillRect(frameRect, m_background);
         // progress fill (bottom-up)

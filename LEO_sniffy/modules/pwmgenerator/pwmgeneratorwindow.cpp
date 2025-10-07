@@ -7,6 +7,9 @@ PWMGeneratorWindow::PWMGeneratorWindow(PWMGeneratorConfig *config, QWidget *pare
     config(config)
 {
     ui->setupUi(this);
+    
+    ui->widget_module->setContentsMargins(4,4,4,4);
+    
     //TODO setup the GUI here
 }
 
@@ -14,7 +17,6 @@ PWMGeneratorWindow::~PWMGeneratorWindow()
 {
     delete ui;
 }
-
 
 void PWMGeneratorWindow::restoreGUIAfterStartup()
 {

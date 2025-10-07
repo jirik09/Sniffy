@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>943</width>
-    <height>375</height>
+    <width>500</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
-    <number>5</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -41,11 +41,11 @@
       <number>5</number>
      </property>
      <widget class="QWidget" name="widget_module" native="true">
-      <property name="minimumSize">
-       <size>
-        <width>150</width>
-        <height>150</height>
-       </size>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="leftMargin">
@@ -63,22 +63,28 @@
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_display">
          <property name="spacing">
-          <number>5</number>
+          <number>0</number>
          </property>
         </layout>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="widget_settings" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="minimumSize">
        <size>
-        <width>150</width>
-        <height>150</height>
+        <width>220</width>
+        <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>350</width>
+        <width>280</width>
         <height>16777215</height>
        </size>
       </property>
