@@ -203,6 +203,11 @@ QByteArray AbstractModule::getCommandPrefix()
 void AbstractModule::setComms(Comms *communication){
     comm = communication;
     if (!cmd) cmd = new Commands();
+    
+    // Reset configuration flag when communication is re-established
+    // This ensures writeConfiguration() will work after device reconnection
+    isConfigurationWritten = false;
+    
     // Send CONFIG? request
     comm->write(moduleCommandPrefix+":"+Commands::CONFIG_REQUEST+";");
 }

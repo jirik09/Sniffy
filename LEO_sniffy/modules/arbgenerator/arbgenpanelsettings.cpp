@@ -260,8 +260,11 @@ void ArbGenPanelSettings::restoreGUI()
 
 void ArbGenPanelSettings::setMaxNumChannels(int numChannels)
 {
-    for(int i = numChannels ; i<MAX_ARB_CHANNELS_NUM ; i++){
-        buttonsEnable->setButtonHidden(true,i);
+    bool tmp;
+    for (int i = 0; i< MAX_ARB_CHANNELS_NUM; i++) {
+        if(numChannels <= i) tmp = true;
+        else tmp = false;
+        buttonsEnable->setButtonHidden(tmp,i);
     }
 }
 

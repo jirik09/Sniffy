@@ -8,7 +8,6 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     mathType->setObjectName("MathTypeBtnSelection");
     destination->addWidget(mathType);
     mathType->setText("None",0);
-    mathType->setColor(Graphics::palette().unused,0);
     mathType->setText("Basic",1);
     mathType->setDisabledButton(true,1);
     mathType->setText("Symbolic",2);
