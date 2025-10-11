@@ -646,12 +646,18 @@ void ScopeWindow::setRealSamplingRateAndLlength(int smpl, int len){
 }
 
 void ScopeWindow::setNumChannels(int channels){
-    panelMeas->setNumChannels(channels);
-    for (int i = channels;i<MAX_SCOPE_CHANNELS ;i++ ) {
-        panelSet->buttonsChannelEnable->setButtonHidden(true,i);
-        panelSet->buttonsChannelVertical->setButtonHidden(true,i);
-        panelCursors->channelButtons->setButtonHidden(true,i);
-        panelMath->btnChannelFFTSel->setButtonHidden(true,i);
+    bool tmp;
+    for (int i = 0; i< MAX_SCOPE_CHANNELS; i++) {
+        if(channels <= i) tmp = true;
+        else tmp = false;
+        panelSet->buttonsChannelEnable->setButtonHidden(tmp,i);
+        panelSet->buttonsChannelVertical->setButtonHidden(tmp,i);
+        panelSet->buttonsTriggerChannel->setButtonHidden(tmp,i);
+        panelCursors->channelButtons->setButtonHidden(tmp,i);
+        panelMath->btnChannelFFTSel->setButtonHidden(tmp,i);
+        panelMeas->channelButtons->setButtonHidden(tmp,i);
+        panelMeas->channelButtonPhaseA->setButtonHidden(tmp,i);
+        panelMeas->channelButtonPhaseB->setButtonHidden(tmp,i);
     }
 }
 

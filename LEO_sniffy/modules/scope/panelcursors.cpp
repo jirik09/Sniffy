@@ -8,7 +8,6 @@ PanelCursors::PanelCursors(QVBoxLayout *destination, QWidget *parent)
     cursorTypeButtons->setObjectName("cursortypeSel");
     destination->addWidget(cursorTypeButtons);
     cursorTypeButtons->setText("None",0);
-    cursorTypeButtons->setColor(Graphics::palette().unused,0);
     cursorTypeButtons->setText("Horizontal",1);
     cursorTypeButtons->setText("Vertical",2);
 

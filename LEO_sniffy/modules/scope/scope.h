@@ -81,8 +81,6 @@ private:
     FFTType FFTtype;
     int FFTChannelIndex = 0;
 
-    bool isConfigurationWritten = false;
-
     void buildModuleDescription(ScopeSpec *spec);
 
     //private functions - writing into device only - no logic

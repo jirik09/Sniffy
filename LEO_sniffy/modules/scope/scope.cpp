@@ -58,6 +58,7 @@ void Scope::parseData(QByteArray data){
         moduleSpecification->parseSpecification(data);
         showModuleControl();
         buildModuleDescription(specification);
+        
     }else if(dataHeader=="SMPL"){
         if(config->triggerMode!=ScopeTriggerMode::TRIG_STOP){
             scpWindow->samplingOngoing();
@@ -188,7 +189,7 @@ void Scope::parseData(QByteArray data){
 void Scope::writeConfiguration(){
     if(isConfigurationWritten)return;
 
-    isConfigurationWritten = true;
+    setConfigurationWritten();
     scpWindow->restoreGUIAfterStartup();
     scpWindow->setNumChannels(specification->maxADCChannels);
     scpWindow->setRealSamplingRateAndLlength(config->realSamplingRate,config->dataLength);
@@ -222,7 +223,6 @@ Scope::~Scope(){
 }
 
 void Scope::stopModule(){
-    isConfigurationWritten = false;
     stopSampling();
     measCalc->exit();
     mathCalc->exit();

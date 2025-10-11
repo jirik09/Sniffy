@@ -219,9 +219,15 @@ void VoltmeterWindow::showProgress(int current, int max){
 
 void VoltmeterWindow::setPinsAndNumChannels(QString pins[], int numOfCh)
 {
-    for(int i = 0;i<numOfCh;i++){
-    displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::palette().textAll,true);
-        buttonsChannelEnable->setButtonHidden(false,i);
+    bool tmp;
+    for (int i = 0; i< MAX_VOLTMETER_CHANNELS; i++) {
+        if(numOfCh <= i){
+            tmp = true;
+            displays.at(i)->configLabel(1,"pin "+pins[i],Graphics::palette().textAll,true);
+        }else {
+            tmp = false;
+        }
+        buttonsChannelEnable->setButtonHidden(tmp,i);
     }
 }
 
