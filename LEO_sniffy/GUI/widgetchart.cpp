@@ -406,6 +406,9 @@ qreal widgetChart::getSignalValue(int traceIndex, qreal time)
             closestSmallerIndex = i;
         }
     }
+    if (seriesList[traceIndex]->count()<closestSmallerIndex+2){
+        return 0;
+    }
     if (closestSmallerIndex == seriesList[traceIndex]->count()-1){
         return seriesList[traceIndex]->at(closestSmallerIndex).y();
     }
