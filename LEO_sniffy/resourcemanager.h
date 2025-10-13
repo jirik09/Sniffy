@@ -2,6 +2,7 @@
 #define RESOURCEMANAGER_H
 
 #include <QtGlobal>
+#include <QJsonObject>
 #include "modules/abstractmodule.h"
 
 struct ResourceSet {
@@ -28,16 +29,38 @@ struct ResourceSet {
         gpioB |= r.gpioB;
         gpioC |= r.gpioC;
         gpioD |= r.gpioD;
+        qDebug() << "resource merge " << QString::number(resources,16)<<" "<< QString::number(gpioA,16)<<" "<< QString::number(gpioB,16)<<" "<< QString::number(gpioC,16)<<" "<< QString::number(gpioD,16);
     }
 
     // Subtract (bitwise AND NOT) masks from this set using r
     void subtract(const ResourceSet &r) {
         resources &= ~r.resources;
+        qDebug() << "resource subtract " << QString::number(resources,16)<<" "<< QString::number(gpioA,16)<<" "<< QString::number(gpioB,16)<<" "<< QString::number(gpioC,16)<<" "<< QString::number(gpioD,16);
         gpioA &= ~r.gpioA;
         gpioB &= ~r.gpioB;
         gpioC &= ~r.gpioC;
         gpioD &= ~r.gpioD;
     }
+
+    // JSON serialization methods
+    QJsonObject toJson() const{
+        QJsonObject obj;
+        obj["resources"] = resources;
+        obj["gpioA"] = static_cast<qint64>(gpioA);
+        obj["gpioB"] = static_cast<qint64>(gpioB);
+        obj["gpioC"] = static_cast<qint64>(gpioC);
+        obj["gpioD"] = static_cast<qint64>(gpioD);
+        return obj;
+    }
+    static ResourceSet fromJson(const QJsonObject &obj){
+    ResourceSet s;
+    s.resources = obj["resources"].toInt();
+    s.gpioA = static_cast<quint32>(obj["gpioA"].toDouble());
+    s.gpioB = static_cast<quint32>(obj["gpioB"].toDouble());
+    s.gpioC = static_cast<quint32>(obj["gpioC"].toDouble());
+    s.gpioD = static_cast<quint32>(obj["gpioD"].toDouble());
+    return s;
+}
 
     // Build ResourceSet from a module (optionally override resources)
     static ResourceSet fromModule(const QSharedPointer<AbstractModule> &module, int resourcesOverride = -1) {

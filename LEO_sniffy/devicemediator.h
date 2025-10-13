@@ -28,8 +28,8 @@ public:
     bool getIsConnected() const;
     QString getDeviceName();
 
-    int getResourcesInUse() const;
-    void setResourcesInUse(int value);
+    ResourceSet getResourcesInUse() const;
+    void setResourcesInUse(ResourceSet res);
 
 signals:
     void loadLayoutUponOpen(QString Devicename);

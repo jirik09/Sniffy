@@ -310,7 +310,7 @@ void MainWindow::saveSessionToFile(const QString &filePath, bool silent = false)
     root["modules"] = modulesArr;
 
     // Other app state
-    root["resourcesInUse"] = deviceMediator->getResourcesInUse();
+    root["resourcesInUse"] = deviceMediator->getResourcesInUse().toJson();
     root["LeftMenuNarrow"] = isLeftMenuNarrow;
 
     // Write JSON to file
@@ -407,6 +407,8 @@ void MainWindow::loadSessionFromFile(const QString &filePath, bool silent = fals
                         if(status == ModuleStatus::HIDDEN_PAUSE || status == ModuleStatus::HIDDEN_PLAY){
                             module->moduleRestoredHidden();
                         }
+                        ResourceSet starterSet = ResourceSet::fromModule(module, module->getResources());
+                        deviceMediator->setResourcesInUse(starterSet);
                     }
                     break;
                 }
@@ -416,7 +418,7 @@ void MainWindow::loadSessionFromFile(const QString &filePath, bool silent = fals
 
     // Resources and left menu
     if(root.contains("resourcesInUse")){
-        deviceMediator->setResourcesInUse(root.value("resourcesInUse").toInt());
+        deviceMediator->setResourcesInUse(ResourceSet::fromJson(root.value("resourcesInUse").toObject()));
     }
     if(root.contains("LeftMenuNarrow")){
         bool leftN = root.value("LeftMenuNarrow").toBool();
