@@ -154,6 +154,11 @@ public:
     static const QByteArray CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH1;
     static const QByteArray CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH2;
 
+    // Pattern generator: protocol helpers
+    // I2C pin open-drain setup command
+    static const QByteArray CMD_GEN_PATT_I2C_PINS_OD_ENABLE;
+    static const QByteArray CMD_GEN_PATT_I2C_PINS_OD_DISABLE;
+
     /************************ COUNTER ***********************/
     // Counter complete deinit
     static const QByteArray COUNTER_DEINIT;
