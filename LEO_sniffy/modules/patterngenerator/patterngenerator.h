@@ -33,6 +33,7 @@ private:
     GenCommons *genComms;    
 
     bool dataBeingUploaded = false;
+    bool i2cPinsOdEnabled = false; // track current OD configuration for I2C pins
 
     void startGenerator();
     void stopGenerator();

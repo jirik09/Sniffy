@@ -95,6 +95,7 @@ public:
     void setSpecification(PatternGeneratorSpec *spec);
     void enableGuiComponents(bool enable);
     void showComponents(int pattIndex, bool visible);
+    bool isI2CPatternIndex(int index) const;
 
 private:
     PatternGeneratorConfig *config;

@@ -80,6 +80,10 @@ private slots:
 signals:
     void runGenerator();
     void stopGenerator();
+    // Emitted when user switches to I2C protocol pattern in the dropdown
+    void i2cSelected();
+    // Emitted when user leaves the I2C pattern (previous pattern was I2C, new is not)
+    void i2cDeselected();
 };
 
 #endif // PATTERNGENERATORWINDOW_H
