@@ -227,6 +227,7 @@ void ScopeWindow::paintTraces(const QVector<QVector<QPointF>> &dataSeries, const
             panelCursors->cursorVerADial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
             panelCursors->cursorVerBDial->updateRange((float)(config->rangeMin)/1000,(float)(config->rangeMax)/1000);
         }
+        updateCursorReadings();
     }
     // After plotting channels, plot math if present
     paintMath(mathSeries);

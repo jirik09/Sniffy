@@ -14,6 +14,19 @@ PatternGenerator::PatternGenerator(QObject *parent)
 
     connect(pattGenWindow, &PatternGeneratorWindow::runGenerator, this, &PatternGenerator::startGeneratorCallback);
     connect(pattGenWindow, &PatternGeneratorWindow::stopGenerator, this, &PatternGenerator::stopGeneratorCallback);
+    // Track OD configuration state to avoid redundant writes
+    connect(pattGenWindow, &PatternGeneratorWindow::i2cSelected, this, [this]() {
+        if (comm && !i2cPinsOdEnabled) {
+            comm->write(moduleCommandPrefix, Commands::CMD_GEN_PATT_I2C_PINS_OD_ENABLE);
+            i2cPinsOdEnabled = true;
+        }
+    });
+    connect(pattGenWindow, &PatternGeneratorWindow::i2cDeselected, this, [this]() {
+        if (comm && i2cPinsOdEnabled) {
+            comm->write(moduleCommandPrefix, Commands::CMD_GEN_PATT_I2C_PINS_OD_DISABLE);
+            i2cPinsOdEnabled = false;
+        }
+    });
 }
 
 QWidget *PatternGenerator::getWidget()
@@ -154,3 +167,4 @@ void PatternGenerator::stopGeneratorCallback()
     stopGenerator();
     dataBeingUploaded = false;
 }
+

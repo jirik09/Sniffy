@@ -298,12 +298,12 @@ QString DeviceMediator::getDeviceName()
     return device->getName();
 }
 
-int DeviceMediator::getResourcesInUse() const
+ResourceSet DeviceMediator::getResourcesInUse() const
 {
-    return resourceManager.reserved().resources;
+    return resourceManager.reserved();
 }
 
-void DeviceMediator::setResourcesInUse(int value)
+void DeviceMediator::setResourcesInUse(ResourceSet resources)
 {
-    Q_UNUSED(value);
+    resourceManager.reserve(resources);
 }

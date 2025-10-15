@@ -261,6 +261,8 @@ void PatternGeneratorWindow::resetPatternCallback()
 
 void PatternGeneratorWindow::patternSelectionChangedCallback(int index)
 {
+    // Track whether previous pattern was I2C before changing
+    bool prevWasI2C = settings && settings->isI2CPatternIndex(config->pattIndex);
     patternData = patterns->createPatternOrJustGetData(index, config->dataLen[index]);
 
     settings->showComponents(config->pattIndex, false);
@@ -268,6 +270,12 @@ void PatternGeneratorWindow::patternSelectionChangedCallback(int index)
 
     config->pattIndex = index;
     painter->repaint(patternData);
+
+    bool nowIsI2C = settings && settings->isI2CPatternIndex(index);
+    if (prevWasI2C && !nowIsI2C)
+        emit i2cDeselected();
+    else if (!prevWasI2C && nowIsI2C)
+        emit i2cSelected();
 }
 
 void PatternGeneratorWindow::freqChangedDialsCallback(float val)

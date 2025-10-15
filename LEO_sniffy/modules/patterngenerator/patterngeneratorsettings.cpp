@@ -499,6 +499,13 @@ void PatternGeneratorSettings::resetPrbsComponents()
     config->dataLen[config->pattIndex] = PATT_DEFAULT_DATA_LENGTH;
 }
 
+bool PatternGeneratorSettings::isI2CPatternIndex(int index) const
+{
+    if (index < 0 || index >= pattList.size())
+        return false;
+    return pattList.at(index).compare("I2C", Qt::CaseInsensitive) == 0;
+}
+
 void PatternGeneratorSettings::resetPwmComponents()
 {
     dialPwmFreq->setRealValue(PATT_DEFAULT_GEN_FREQ, true);
