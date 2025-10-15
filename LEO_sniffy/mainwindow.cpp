@@ -448,7 +448,6 @@ void MainWindow::loadModulesSessionFromFile(const QString &moduleName)
                             module->moduleRestoredHidden();
                         }
                         ResourceSet starterSet = ResourceSet::fromModule(module, module->getResources());
-                        qDebug() << "Loading session, reserving resources for " << name << " res=" << QString::number(starterSet.resources,16)<<" gpioA="<<QString::number(starterSet.gpioA,16)<<" gpioB="<<QString::number(starterSet.gpioB,16)<<" gpioC="<<QString::number(starterSet.gpioC,16)<<" gpioD="<<QString::number(starterSet.gpioD,16);
                         deviceMediator->setResourcesInUse(starterSet);
                     }
                     break;

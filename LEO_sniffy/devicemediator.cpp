@@ -94,7 +94,6 @@ void DeviceMediator::openDevice(int deviceIndex)
         // the layout/config files can be opened and processed. After 250ms send the
         // login token (if present), attach modules to the comms and load the layout.
         communication->write(Commands::RESET_DEVICE+";");
-        qDebug() << "Device reset sent";
 
         // Delay subsequent setup (token handshake, module wiring, layout load)
         QTimer::singleShot(250, [this, deviceIndex, devName]() {
@@ -106,8 +105,6 @@ void DeviceMediator::openDevice(int deviceIndex)
                 communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
                 communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
             }
-
-            qDebug() << "token sent";
 
             // Check for session file before setting comms, so layout can be loaded
             // and modules can access JSON data when they show their controls
@@ -128,14 +125,11 @@ void DeviceMediator::openDevice(int deviceIndex)
                     CustomSettings::setNoSessionfound();
                 }
             }
-            qDebug() << "session check done";
 
             // Emit loadLayoutUponOpen BEFORE setComms so MainWindow can load the session
             // data (pendingSessionData) before modules start showing their controls
             if (CustomSettings::isSessionRestoreRequest() && deviceIndex >= 0 && deviceIndex < deviceList.size()) {
-                qDebug() << "emit load layout";
                 emit loadLayoutUponOpen(deviceList.at(deviceIndex).deviceName);
-                qDebug() << "done";
             }
 
             // Now attach modules to comms - they will call showModuleControl which triggers
@@ -144,7 +138,6 @@ void DeviceMediator::openDevice(int deviceIndex)
             {
                 mod->setComms(communication);
             }
-            qDebug() << "comms set";
         });
     }
 }
@@ -218,7 +211,6 @@ void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int res
         if (lock)
             mod->setModuleStatus(ModuleStatus::LOCKED);
     }
-    qDebug() << "Reserving resources for " << moduleName << " res=" << QString::number(resources,16)<<" gpioA="<<QString::number(starterSet.gpioA,16)<<" gpioB="<<QString::number(starterSet.gpioB,16)<<" gpioC="<<QString::number(starterSet.gpioC,16)<<" gpioD="<<QString::number(starterSet.gpioD,16);
     resourceManager.reserve(starterSet);
 }
 
@@ -332,6 +324,5 @@ ResourceSet DeviceMediator::getResourcesInUse() const
 
 void DeviceMediator::setResourcesInUse(ResourceSet resources)
 {
-    qDebug() << "Setting resources in use to res=" << QString::number(resources.resources,16)<<" gpioA="<<QString::number(resources.gpioA,16)<<" gpioB="<<QString::number(resources.gpioB,16)<<" gpioC="<<QString::number(resources.gpioC,16)<<" gpioD="<<QString::number(resources.gpioD,16);
     resourceManager.reserve(resources);
 }
