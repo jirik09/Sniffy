@@ -10,7 +10,7 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
     modules = createModulesList();
 
     connect(device, &Device::ScanDevices, this, &DeviceMediator::ScanDevices);
-    connect(device, &Device::openDevice, this, &DeviceMediator::open);
+    connect(device, &Device::openDevice, this, &DeviceMediator::openDevice);
     connect(device, &Device::closeDevice, this, &DeviceMediator::close);
 
     // initialize ResourceManager aggregates
@@ -58,7 +58,7 @@ void DeviceMediator::newDeviceList(QList<DeviceDescriptor> deviceList)
     device->updateGUIDeviceList(deviceList);
 }
 
-void DeviceMediator::open(int deviceIndex)
+void DeviceMediator::openDevice(int deviceIndex)
 {
     // Remember which index is currently opened so we can reopen after login
     currentDeviceIndex = deviceIndex;
@@ -109,14 +109,8 @@ void DeviceMediator::open(int deviceIndex)
 
             qDebug() << "token sent";
 
-            for (const QSharedPointer<AbstractModule> &mod : modules)
-            {
-                mod->setComms(communication);
-            }
-            qDebug() << "comms set";
-
-            int timerInterval = 350;
-
+            // Check for session file before setting comms, so layout can be loaded
+            // and modules can access JSON data when they show their controls
             if (devName.isEmpty())
             {
                 CustomSettings::setNoSessionfound();
@@ -124,12 +118,10 @@ void DeviceMediator::open(int deviceIndex)
             else
             {
                 QString sessionFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".json";
-                QSharedPointer<AbstractModule> module;
                 QFile file(sessionFile);
-                if (file.exists() )
+                if (file.exists())
                 {
                     CustomSettings::askForSessionRestore(devName);
-                    timerInterval = 100;
                 }
                 else
                 {
@@ -137,14 +129,22 @@ void DeviceMediator::open(int deviceIndex)
                 }
             }
             qDebug() << "session check done";
-            //This is bit dangerous... All modules must get their cfg from MCU and (spec) to be able to restore.
-            QTimer::singleShot(timerInterval, [this, deviceIndex]() {
-                if (CustomSettings::isSessionRestoreRequest() && deviceIndex >= 0 && deviceIndex < deviceList.size()) {
-                    qDebug() << "emit load layout";
-                    emit loadLayoutUponOpen(deviceList.at(deviceIndex).deviceName);
-                    qDebug() << "done";
-                }
-            });
+
+            // Emit loadLayoutUponOpen BEFORE setComms so MainWindow can load the session
+            // data (pendingSessionData) before modules start showing their controls
+            if (CustomSettings::isSessionRestoreRequest() && deviceIndex >= 0 && deviceIndex < deviceList.size()) {
+                qDebug() << "emit load layout";
+                emit loadLayoutUponOpen(deviceList.at(deviceIndex).deviceName);
+                qDebug() << "done";
+            }
+
+            // Now attach modules to comms - they will call showModuleControl which triggers
+            // deferred configuration restoration from the already-loaded session data
+            for (const QSharedPointer<AbstractModule> &mod : modules)
+            {
+                mod->setComms(communication);
+            }
+            qDebug() << "comms set";
         });
     }
 }
@@ -157,27 +157,42 @@ void DeviceMediator::reopenDeviceAfterLogin()
 
     // If not connected, nothing to do — open directly
     if (!isConnected) {
-        open(currentDeviceIndex);
+        openDevice(currentDeviceIndex);
         return;
     }
     close();
 
     QTimer::singleShot(250, [this]() {
         if (currentDeviceIndex >= 0 && currentDeviceIndex < deviceList.size()) {
-            open(currentDeviceIndex);
+            openDevice(currentDeviceIndex);
         }
     });
 }
 
 void DeviceMediator::disableModules()
 {
+    for (const QSharedPointer<AbstractModule> &mod : modules)
+    {
+        mod->disableModule();
+    }
+}
+
+void DeviceMediator::closeModules()
+{
+    for (const QSharedPointer<AbstractModule> &mod : modules)
+    {
+        mod->closeModule();
+    }
+}
+
+
+
+void DeviceMediator::disconnectDevice()
+{
     if (isConnected)
     {
         emit saveLayoutUponExit();
-        for (const QSharedPointer<AbstractModule> &mod : modules)
-        {
-            mod->disableModule();
-        }
+        disableModules();
         communication->close();
         isConnected = false;
     }
@@ -238,7 +253,7 @@ void DeviceMediator::close()
 {
     disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
     disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
-    disableModules();
+    disconnectDevice();
     ShowDeviceModule();
 }
 
@@ -246,7 +261,7 @@ void DeviceMediator::closeApp()
 {
     disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
     disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
-    disableModules();
+    disconnectDevice();
 
 }
 

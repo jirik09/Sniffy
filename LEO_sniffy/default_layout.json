@@ -1,6 +1,6 @@
 {
     "LeftMenuNarrow": false,
-    "geometry": "AdnQywADAAAAAABtAAAAnAAABmwAAAPdAAAAbQAAALoAAAZsAAAD3QAAAAAAAAAACAAAAABtAAAAugAABmwAAAPd",
+    "geometry": "AdnQywADAAAAAABvAAAAnAAABmkAAAPWAAAAbwAAALoAAAZpAAAD1gAAAAAAAAAACAAAAABvAAAAugAABmkAAAPW",
     "layout": {
         "Arbitrary generatorSwFreqSynch2": "TA==",
         "Arbitrary generatorSwFreqSynch3": "TA==",
@@ -42,7 +42,7 @@
         "Arbitrary generatorarbGenpwmfreq3": "QMOIAAAAAAAAAAK8P/AAAAAAAABBYxLQAAAAAA==",
         "Arbitrary generatorarbGenpwmfreq4": "QMOIAAAAAAAAAAK8P/AAAAAAAABBYxLQAAAAAA==",
         "Arbitrary generatorarbgenbtnen": "MA==",
-        "Arbitrary generatorarbgenbtnmem": "MQ==",
+        "Arbitrary generatorarbgenbtnmem": "NA==",
         "Arbitrary generatorarbgenmemleng": "MjAw",
         "Arbitrary generatorbuttonselectfileArbGen": "MA==",
         "CounterbtnStart": "MA==",
@@ -66,7 +66,7 @@
         "Nucleo-F303REconnectbutton": "MA==",
         "Oscilloscope1st channel": "MQ==",
         "Oscilloscope2nd channel": "Mg==",
-        "OscilloscopeChannelEnable": "MQ==",
+        "OscilloscopeChannelEnable": "NQ==",
         "OscilloscopeChannelVertival": "MQ==",
         "OscilloscopeDuty": "MA==",
         "OscilloscopeFFTTypeSelection": "MQ==",
@@ -95,18 +95,18 @@
         "OscilloscopePretrigger": "QEkAAAAAAAAAAAK8AAAAAAAAAABAWQAAAAAAAA==",
         "OscilloscopeRMS": "MA==",
         "OscilloscopeSampling": "MTAwaw==",
-        "OscilloscopeTimeBase": "MTI=",
+        "OscilloscopeTimeBase": "MTQ=",
         "OscilloscopeTriggerChannel": "MQ==",
         "OscilloscopeTriggerEdge": "MQ==",
         "OscilloscopeTriggerMode": "NA==",
-        "OscilloscopeTriggerValue": "P/pmZmAAAAAAAAK8AAAAAAAAAABACmZmYAAAAA==",
+        "OscilloscopeTriggerValue": "P/oUeuAAAAAAAAK8AAAAAAAAAABACmZmYAAAAA==",
         "OscilloscopeVerticalScale": "Mw==",
         "OscilloscopeVerticalShift": "AAAAAAAAAAAAAAK8wApmZmAAAABAGmZmYAAAAA==",
         "OscilloscopeWidgetSelection": "MA==",
         "OscilloscopecursorChannSelection": "MQ==",
         "OscilloscopecursortypeSel": "MQ==",
-        "OscilloscopehorCurA": "AAAAAAAAAAAAAAnEv3iTdMAAAAA/eIj4YAAAAA==",
-        "OscilloscopehorCurB": "AAAAAAAAAAAAAAnEv3iTdMAAAAA/eIj4YAAAAA==",
+        "OscilloscopehorCurA": "AAAAAAAAAAAAAAnEv7R64UAAAAA/tG3F4AAAAA==",
+        "OscilloscopehorCurB": "AAAAAAAAAAAAAAnEv7R64UAAAAA/tG3F4AAAAA==",
         "OscilloscopemeasChannSelection": "MQ==",
         "OscilloscopemeasClearButton": "MA==",
         "Oscilloscopescoperesolution": "Mg==",
@@ -230,7 +230,7 @@
             "status": 0
         },
         {
-            "config": "AAGGoAAAAAwAAASwAAAAAAAADOQAAAABAAB//wAAf/9ASQAAAAAAAEBJAAAAAAAAAAAAAAABhqAAAAACAAAAAAAAAAA/UGJN4AAAAAAAAAA/8AAAAAAAAD/wAAAAAAAAP/AAAAAAAAA/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv/AAAAAAAAC/8AAAAAAAAL/wAAAAAAAAv/AAAAAAAAC/8AAAAAAAAL/wAAAAAAAAv/AAAAAAAAC/8AAAAAAAAAAAAAAAAAAAAL94k3TAAAAAP3iI+GAAAAAAAAAA",
+            "config": "AAATiAAAAAwAAASwAAAAAAAADOQAAAABAAB+cgAAf/9ASLJsoAAAAEBJAAAAAAAAAAAAAAAHoSEAAAACAAAAAAAAAAA/Kjbi4AAAAAAAAAA/8AAAAAAAAD/wAAAAAAAAP/AAAAAAAAA/8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAv/AAAAAAAAC/8AAAAAAAAL/wAAAAAAAAv/AAAAAAAAC/8AAAAAAAAL/wAAAAAAAAv/AAAAAAAAC/8AAAAAAAAAAAAAAAAAAAAL+0euFAAAAAP7RtxeAAAAAAAAAA",
             "name": "Oscilloscope",
             "status": 0
         },
@@ -277,5 +277,5 @@
         "gpioD": 0,
         "resources": 0
     },
-    "windowState": "AAAA/wAAAAD9AAAAAQAAAAEAAAUCAAADJPwCAAAABvwAAAAAAAADJAAAAOEA/////AEAAAAC+wAAAAwARABlAHYAaQBjAGUBAAAA/gAABQIAAAExAP////sAAAAOAEMAbwB1AG4AdABlAHIAAAADTQAAArMAAADcAP////wAAAFxAAABswAAAAAA/////AEAAAAD+wAAABgATwBzAGMAaQBsAGwAbwBzAGMAbwBwAGUAAAAA/gAAAtYAAADcAP////sAAAAcAFYAbwBsAHQAYQBnAGUAIABzAG8AdQByAGMAZQAAAAD+AAAFAgAAAZMA////+wAAACYAQQByAGIAaQB0AHIAYQByAHkAIABnAGUAbgBlAHIAYQB0AG8AcgAAAAM7AAACGwAAAN4A////+wAAABIAVgBvAGwAdABtAGUAdABlAHIAAAAAAP////8AAACbAP////sAAAAQAFMAeQBuAGMAIABQAFcATQAAAAHyAAABZgAAAWYA////+wAAABoAUABXAE0AIABnAGUAbgBhAHIAYQB0AG8AcgAAAAJhAAAA4QAAAOEA////+wAAACIAUABhAHQAdABlAHIAbgAgAGcAZQBuAGUAcgBhAHQAbwByAAAAAncAAAC3AAAAmwD///8AAAD6AAADJAAAAAQAAAAEAAAACAAAAAj8AAAAAA=="
+    "windowState": "AAAA/wAAAAD9AAAAAQAAAAEAAAT9AAADHfwCAAAABfwAAAAAAAADHQAAAOEA/////AEAAAAC+wAAAAwARABlAHYAaQBjAGUBAAAA/gAABP0AAAExAP////sAAAAOAEMAbwB1AG4AdABlAHIAAAADzgAAAi0AAADcAP////wAAAGZAAABoQAAAAAA/////AEAAAAE+wAAABIAVgBvAGwAdABtAGUAdABlAHIAAAAA/gAABTIAAADcAP////sAAAAYAE8AcwBjAGkAbABsAG8AcwBjAG8AcABlAAAAAP4AAAT9AAAA4gD////7AAAAJgBBAHIAYgBpAHQAcgBhAHIAeQAgAGcAZQBuAGUAcgBhAHQAbwByAAAAA1QAAAKnAAAA5AD////7AAAAHABWAG8AbAB0AGEAZwBlACAAcwBvAHUAcgBjAGUAAAADsgAAAkkAAAGZAP////sAAAAQAFMAeQBuAGMAIABQAFcATQAAAAHTAAABZwAAAWYA////+wAAABoAUABXAE0AIABnAGUAbgBhAHIAYQB0AG8AcgAAAAJlAAAA4QAAAOEA////+wAAACIAUABhAHQAdABlAHIAbgAgAGcAZQBuAGUAcgBhAHQAbwByAAAAAfoAAAFMAAAAmwD///8AAAD6AAADHQAAAAQAAAAEAAAACAAAAAj8AAAAAA=="
 }

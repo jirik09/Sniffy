@@ -231,6 +231,7 @@ ModuleStatus AbstractModule::getModuleStatus()
 }
 
 void AbstractModule::showModuleControl(){
+    emit moduleControlShown(moduleName);
     moduleControlWidget->show();
 }
 

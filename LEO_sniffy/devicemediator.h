@@ -30,6 +30,8 @@ public:
 
     ResourceSet getResourcesInUse() const;
     void setResourcesInUse(ResourceSet res);
+    void disableModules();
+    void closeModules();
 
 signals:
     void loadLayoutUponOpen(QString Devicename);
@@ -53,8 +55,8 @@ private slots:
     void newDeviceList(QList<DeviceDescriptor> deviceList);
     void handleError(QByteArray error);
     void ScanDevices();
-    void open(int deviceIndex);
-    void disableModules();
+    void openDevice(int deviceIndex);
+    void disconnectDevice();
     void blockConflictingModulesCallback(QString moduleName, int resources);
     void releaseConflictingModulesCallback(QString moduleName, int resources);
 

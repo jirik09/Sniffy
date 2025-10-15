@@ -55,6 +55,8 @@ MainWindow::MainWindow(QWidget *parent):
     connect(deviceMediator,&DeviceMediator::loadLayoutUponOpen,this,&MainWindow::onOpenLoadSessionRequested,Qt::DirectConnection);
     connect(deviceMediator,&DeviceMediator::saveLayoutUponExit,this,&MainWindow::onExitSaveSessionRequested,Qt::DirectConnection);
 
+
+
     // Start in wide mode by default, then enforce the fixed width
     setMenuWide();
     enforceLeftMenuWidth();
@@ -96,6 +98,11 @@ void MainWindow::createModulesWidgets(){
 
     module->setDockWidgetWindow(dockWidgets[index]);
     module->setModuleControlWidget(widgetModules[index]);
+
+        // Connect signal for deferred session restoration when module shows its control
+    connect(module.data(), &AbstractModule::moduleControlShown, this, &MainWindow::loadModulesSessionFromFile);
+
+
 
     dockWidgets[index]->setWidget(module->getWidget());
 
@@ -329,11 +336,40 @@ void MainWindow::saveSessionToFile(const QString &filePath, bool silent = false)
     }
 }
 
+bool MainWindow::loadSessionJSONFile(const QString &filePath)
+{
+    QFile in(filePath);
+    if(!in.open(QIODevice::ReadOnly)){
+        QMessageBox::warning(this, "Load session", "Cannot open file for reading");
+        return false;
+    }
+    QJsonDocument doc = QJsonDocument::fromJson(in.readAll());
+    in.close();
+    if(!doc.isObject()){
+        QMessageBox::warning(this, "Load session", "Invalid session file");
+        return false;
+    }
+    
+    sessionRestoreData = doc.object();
+    return true;
+}
+
 void MainWindow::onSettingsLoadSessionRequested()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Load session", QDir::homePath(), "Session files (*.json)");
     if(fileName.isEmpty()) return;
-    loadSessionFromFile(fileName,true);
+    
+    // Close all modules before loading new session
+    deviceMediator->closeModules();
+    
+    if(!loadSessionJSONFile(fileName)) return;
+    
+    loadLayoutSessionFromFile();
+    for (const QSharedPointer<AbstractModule>& module : modulesList) {
+        loadModulesSessionFromFile(module->getModuleName());
+    }
+    
+    //QMessageBox::information(this, "Load session", "Session loaded successfully.");
 }
 
 void MainWindow::onOpenLoadSessionRequested(QString deviceName)
@@ -342,52 +378,58 @@ void MainWindow::onOpenLoadSessionRequested(QString deviceName)
     QString fileName = QApplication::applicationDirPath() + "/sessions/"+deviceName+".json";
     QFile file(fileName);
     if(!file.exists()) return;
-    loadSessionFromFile(fileName,true);
+    
+    if(!loadSessionJSONFile(fileName)) return;
+    
+    loadLayoutSessionFromFile();
 }
 
-void MainWindow::loadSessionFromFile(const QString &filePath, bool silent = false)
+void MainWindow::loadLayoutSessionFromFile()
 {
-    QFile in(filePath);
-    if(!in.open(QIODevice::ReadOnly)){
-        QMessageBox::warning(this, "Load session", "Cannot open file for reading");
-        return;
-    }
-    QJsonDocument doc = QJsonDocument::fromJson(in.readAll());
-    in.close();
-    if(!doc.isObject()){
-        QMessageBox::warning(this, "Load session", "Invalid session file");
-        return;
-    }
-    QJsonObject root = doc.object();
-
     // Restore geometry and window state
-    if(root.contains("geometry")){
-        QByteArray geom = QByteArray::fromBase64(root.value("geometry").toString().toUtf8());
+    if(sessionRestoreData.contains("geometry")){
+        QByteArray geom = QByteArray::fromBase64(sessionRestoreData.value("geometry").toString().toUtf8());
         restoreGeometry(geom);
     }
-    if(root.contains("windowState")){
-        QByteArray ws = QByteArray::fromBase64(root.value("windowState").toString().toUtf8());
+    if(sessionRestoreData.contains("windowState")){
+        QByteArray ws = QByteArray::fromBase64(sessionRestoreData.value("windowState").toString().toUtf8());
         restoreState(ws);
     }
 
-    // Reconstruct layout entries in-memory from layout object so we don't need
-    // to create a temporary INI file. Keys are moduleName+objectName -> QByteArray
+    // Load layout map from JSON
     QMap<QString, QByteArray> layoutMap;
-    if(root.contains("layout") && root.value("layout").isObject()){
-        QJsonObject layoutObj = root.value("layout").toObject();
+    if(sessionRestoreData.contains("layout") && sessionRestoreData.value("layout").isObject()){
+        QJsonObject layoutObj = sessionRestoreData.value("layout").toObject();
         for (auto it = layoutObj.begin(); it != layoutObj.end(); ++it){
             QByteArray b = QByteArray::fromBase64(it.value().toString().toUtf8());
             layoutMap.insert(it.key(), b);
         }
     }
 
-    // Apply module configurations
-    if(root.contains("modules") && root.value("modules").isArray()){
-        QJsonArray modulesArr = root.value("modules").toArray();
+    // Restore per-module geometry from in-memory map (but not config yet)
+    for (const QSharedPointer<AbstractModule>& module : modulesList) {
+        module->restoreGeometry(layoutMap);
+    }
+
+    if(sessionRestoreData.contains("LeftMenuNarrow")){
+        bool leftN = sessionRestoreData.value("LeftMenuNarrow").toBool();
+        recoverLeftMenu(!leftN);
+    }
+}
+
+void MainWindow::loadModulesSessionFromFile(const QString &moduleName)
+{
+    // Apply module configurations for the specified module
+    if(sessionRestoreData.contains("modules") && sessionRestoreData.value("modules").isArray()){
+        QJsonArray modulesArr = sessionRestoreData.value("modules").toArray();
         for (const QJsonValue &mv : modulesArr){
             if(!mv.isObject()) continue;
             QJsonObject mo = mv.toObject();
             QString name = mo.value("name").toString();
+            
+            // Only process the module that just showed its control
+            if(name != moduleName) continue;
+            
             QByteArray cfg = QByteArray::fromBase64(mo.value("config").toString().toUtf8());
             ModuleStatus status = (ModuleStatus)mo.value("status").toInt();
 
@@ -395,8 +437,6 @@ void MainWindow::loadSessionFromFile(const QString &filePath, bool silent = fals
                 if(module->getModuleName() == name){
                     // Apply configuration
                     module->parseConfiguration(cfg);
-                    // Restore per-module geometry from in-memory map
-                    module->restoreGeometry(layoutMap);
                     // Set status
                     module->setModuleStatus((ModuleStatus)status);
                     module->setModuleRestored(true);
@@ -414,20 +454,8 @@ void MainWindow::loadSessionFromFile(const QString &filePath, bool silent = fals
                     break;
                 }
             }
+            break; // Found and processed the module, exit loop
         }
-    }
-
-    // Resources and left menu
-    if(root.contains("resourcesInUse")){
-        qDebug() << "Restoring resources in use from session";
-        deviceMediator->setResourcesInUse(ResourceSet::fromJson(root.value("resourcesInUse").toObject()));
-    }
-    if(root.contains("LeftMenuNarrow")){
-        bool leftN = root.value("LeftMenuNarrow").toBool();
-        recoverLeftMenu(!leftN);
-    }
-    if(!silent){
-        QMessageBox::information(this, "Load session", "Session loaded successfully.");
     }
 }
 
