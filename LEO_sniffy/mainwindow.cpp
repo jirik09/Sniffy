@@ -378,8 +378,8 @@ void MainWindow::onOpenLoadSessionRequested(QString deviceName)
     
     QString fileName;
     if(deviceName == "layoutOnly") {
-        // Load default layout from project directory
-        fileName = QApplication::applicationDirPath() + "/default_layout.json";
+        // Load default layout from embedded resource
+        fileName = ":/default_layout.json";
     } else {
         // Load device-specific session
         fileName = QApplication::applicationDirPath() + "/sessions/" + deviceName + ".json";
