@@ -333,7 +333,7 @@ void MainWindow::onSettingsLoadSessionRequested()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Load session", QDir::homePath(), "Session files (*.json)");
     if(fileName.isEmpty()) return;
-    loadSessionFromFile(fileName,false);
+    loadSessionFromFile(fileName,true);
 }
 
 void MainWindow::onOpenLoadSessionRequested(QString deviceName)
@@ -408,6 +408,7 @@ void MainWindow::loadSessionFromFile(const QString &filePath, bool silent = fals
                             module->moduleRestoredHidden();
                         }
                         ResourceSet starterSet = ResourceSet::fromModule(module, module->getResources());
+                        qDebug() << "Loading session, reserving resources for " << name << " res=" << QString::number(starterSet.resources,16)<<" gpioA="<<QString::number(starterSet.gpioA,16)<<" gpioB="<<QString::number(starterSet.gpioB,16)<<" gpioC="<<QString::number(starterSet.gpioC,16)<<" gpioD="<<QString::number(starterSet.gpioD,16);
                         deviceMediator->setResourcesInUse(starterSet);
                     }
                     break;
@@ -418,6 +419,7 @@ void MainWindow::loadSessionFromFile(const QString &filePath, bool silent = fals
 
     // Resources and left menu
     if(root.contains("resourcesInUse")){
+        qDebug() << "Restoring resources in use from session";
         deviceMediator->setResourcesInUse(ResourceSet::fromJson(root.value("resourcesInUse").toObject()));
     }
     if(root.contains("LeftMenuNarrow")){

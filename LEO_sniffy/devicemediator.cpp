@@ -85,25 +85,7 @@ void DeviceMediator::open(int deviceIndex)
         connect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
 
         const QString devName = deviceList.at(deviceIndex).deviceName;
-        if (devName.isEmpty())
-        {
-            CustomSettings::setNoSessionfound();
-        }
-        else
-        {
-            QString sessionFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".json";
-            QSharedPointer<AbstractModule> module;
-            QFile file(sessionFile);
 
-            if (file.exists() )
-            {
-                CustomSettings::askForSessionRestore(devName);
-            }
-            else
-            {
-                CustomSettings::setNoSessionfound();
-            }
-        }
 
         // Clear previous right-side specifications before we start receiving CFG_/ACK_ again
         device->clearAllModuleDescriptions();
@@ -112,9 +94,10 @@ void DeviceMediator::open(int deviceIndex)
         // the layout/config files can be opened and processed. After 250ms send the
         // login token (if present), attach modules to the comms and load the layout.
         communication->write(Commands::RESET_DEVICE+";");
+        qDebug() << "Device reset sent";
 
         // Delay subsequent setup (token handshake, module wiring, layout load)
-        QTimer::singleShot(250, [this, deviceIndex]() {
+        QTimer::singleShot(250, [this, deviceIndex, devName]() {
             // send and validate token
             if (CustomSettings::getLoginToken() != "none"){
                 communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
@@ -124,14 +107,42 @@ void DeviceMediator::open(int deviceIndex)
                 communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
             }
 
+            qDebug() << "token sent";
+
             for (const QSharedPointer<AbstractModule> &mod : modules)
             {
                 mod->setComms(communication);
             }
+            qDebug() << "comms set";
+
+            int timerInterval = 350;
+
+            if (devName.isEmpty())
+            {
+                CustomSettings::setNoSessionfound();
+            }
+            else
+            {
+                QString sessionFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".json";
+                QSharedPointer<AbstractModule> module;
+                QFile file(sessionFile);
+                if (file.exists() )
+                {
+                    CustomSettings::askForSessionRestore(devName);
+                    timerInterval = 100;
+                }
+                else
+                {
+                    CustomSettings::setNoSessionfound();
+                }
+            }
+            qDebug() << "session check done";
             //This is bit dangerous... All modules must get their cfg from MCU and (spec) to be able to restore.
-            QTimer::singleShot(350, [this, deviceIndex]() {
+            QTimer::singleShot(timerInterval, [this, deviceIndex]() {
                 if (CustomSettings::isSessionRestoreRequest() && deviceIndex >= 0 && deviceIndex < deviceList.size()) {
+                    qDebug() << "emit load layout";
                     emit loadLayoutUponOpen(deviceList.at(deviceIndex).deviceName);
+                    qDebug() << "done";
                 }
             });
         });
@@ -192,6 +203,7 @@ void DeviceMediator::blockConflictingModulesCallback(QString moduleName, int res
         if (lock)
             mod->setModuleStatus(ModuleStatus::LOCKED);
     }
+    qDebug() << "Reserving resources for " << moduleName << " res=" << QString::number(resources,16)<<" gpioA="<<QString::number(starterSet.gpioA,16)<<" gpioB="<<QString::number(starterSet.gpioB,16)<<" gpioC="<<QString::number(starterSet.gpioC,16)<<" gpioD="<<QString::number(starterSet.gpioD,16);
     resourceManager.reserve(starterSet);
 }
 
@@ -305,5 +317,6 @@ ResourceSet DeviceMediator::getResourcesInUse() const
 
 void DeviceMediator::setResourcesInUse(ResourceSet resources)
 {
+    qDebug() << "Setting resources in use to res=" << QString::number(resources.resources,16)<<" gpioA="<<QString::number(resources.gpioA,16)<<" gpioB="<<QString::number(resources.gpioB,16)<<" gpioC="<<QString::number(resources.gpioC,16)<<" gpioD="<<QString::number(resources.gpioD,16);
     resourceManager.reserve(resources);
 }
