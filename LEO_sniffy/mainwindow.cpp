@@ -375,13 +375,34 @@ void MainWindow::onSettingsLoadSessionRequested()
 void MainWindow::onOpenLoadSessionRequested(QString deviceName)
 {
     if(deviceName.isEmpty()) return;
-    QString fileName = QApplication::applicationDirPath() + "/sessions/"+deviceName+".json";
+    
+    QString fileName;
+    if(deviceName == "layoutOnly") {
+        // Load default layout from project directory
+        fileName = QApplication::applicationDirPath() + "/default_layout.json";
+    } else {
+        // Load device-specific session
+        fileName = QApplication::applicationDirPath() + "/sessions/" + deviceName + ".json";
+    }
+    
     QFile file(fileName);
-    if(!file.exists()) return;
+    if(!file.exists()) {
+        return;
+    }
     
-    if(!loadSessionJSONFile(fileName)) return;
+    if(!loadSessionJSONFile(fileName)) {
+        return;
+    }
     
-    loadLayoutSessionFromFile();
+    if(deviceName == "layoutOnly") {
+        if(sessionRestoreData.contains("windowState")){
+            QByteArray ws = QByteArray::fromBase64(sessionRestoreData.value("windowState").toString().toUtf8());
+            restoreState(ws);
+        }   
+        sessionRestoreData = QJsonObject();
+    }else{
+        loadLayoutSessionFromFile();
+    }
 }
 
 void MainWindow::loadLayoutSessionFromFile()

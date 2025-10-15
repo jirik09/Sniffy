@@ -130,6 +130,9 @@ void DeviceMediator::openDevice(int deviceIndex)
             // data (pendingSessionData) before modules start showing their controls
             if (CustomSettings::isSessionRestoreRequest() && deviceIndex >= 0 && deviceIndex < deviceList.size()) {
                 emit loadLayoutUponOpen(deviceList.at(deviceIndex).deviceName);
+            } else {
+                // No session to restore, load default layout instead
+                emit loadLayoutUponOpen("layoutOnly");
             }
 
             // Now attach modules to comms - they will call showModuleControl which triggers
