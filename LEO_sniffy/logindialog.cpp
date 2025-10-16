@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QLabel>
+#include <QSysInfo>
 #include "GUI/clickablelabel.h"
 
 LoginDialog::LoginDialog(QWidget *parent) :
@@ -127,7 +128,13 @@ void LoginDialog::startLoginNetworkRequest(const QString &email, const QString &
     auth.setQuery(query);
 
     QNetworkRequest req(auth);
-    req.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("LEO_sniffy/1.0"));
+    // Build detailed User-Agent string with system information
+    QString userAgent = QString("LEO_sniffy/1.0 (%1; %2; %3; %4)")
+        .arg(QSysInfo::machineHostName())
+        .arg(QSysInfo::productType())
+        .arg(QSysInfo::productVersion())
+        .arg(QSysInfo::currentCpuArchitecture());
+    req.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
     req.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
     info->setName("Verifying...");
