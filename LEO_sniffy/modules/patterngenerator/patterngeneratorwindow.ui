@@ -46,7 +46,7 @@
      <property name="handleWidth">
       <number>5</number>
      </property>
-     <widget class="QWidget" name="widget_module" native="true">
+     <widget class="QWidget" name="widget_module" native="true"> 
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
         <horstretch>0</horstretch>

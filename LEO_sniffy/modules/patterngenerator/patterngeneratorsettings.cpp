@@ -3,7 +3,7 @@
 PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, PatternGeneratorConfig *config, QWidget *parent) : QObject(parent),
                                                                                                                                 config(config)
 {
-    WidgetSeparator *sepStartPattern = new WidgetSeparator(parent, "Start pattern generation");
+    WidgetSeparator *sepStartPattern = new WidgetSeparator(parent, "Start pattern generation");    
     destination->addWidget(sepStartPattern);
 
     buttonStart = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
@@ -11,7 +11,7 @@ PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, Pat
     buttonStart->setObjectName("buttonPattGenStart");
     destination->addWidget(buttonStart);
 
-    WidgetSeparator *sepPatternSelection = new WidgetSeparator(parent, "Pattern selection");
+    WidgetSeparator *sepPatternSelection = new WidgetSeparator(parent, "Pattern selection");    
     destination->addWidget(sepPatternSelection);
 
     comboPatternSelection = new WidgetSelection(parent, "");
@@ -22,13 +22,13 @@ PatternGeneratorSettings::PatternGeneratorSettings(QVBoxLayout *destination, Pat
 
     createComponents(parent, destination);
 
-    QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    destination->addItem(verticalSpacer);
-
     buttonSetDefault = new WidgetButtons(parent, 1, ButtonTypes::NORMAL, "", 0);
     buttonSetDefault->setText("Reset");
-    buttonSetDefault->setObjectName("buttonPattGenSetDefault");
+    buttonSetDefault->setObjectName("buttonPattGenSetDefault");    
     destination->addWidget(buttonSetDefault);
+
+    QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    destination->addItem(verticalSpacer);    
 
     connect(buttonSetDefault, &WidgetButtons::clicked, this, &PatternGeneratorSettings::resetPatternCallback);
 }
@@ -71,11 +71,10 @@ void PatternGeneratorSettings::createComponents(QWidget *parent, QVBoxLayout *de
     for (int i = 0; i < pattList.length(); i++)
     {
         QVBoxLayout *layout = new QVBoxLayout();
-        patternArea[i] = new QWidget(parent, Qt::Window);
+        patternArea[i] = new QWidget(parent);
+        patternArea[i]->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
         patternArea[i]->setLayout(layout);
         (this->*createPatternComponents[i])(parent, layout, i);
-        QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-        layout->addItem(verticalSpacer);
         destination->addWidget(patternArea[i]);
         patternArea[i]->hide();
     }
