@@ -1,6 +1,8 @@
 #include "devicemediator.h"
 #include "resourcemanager.h"
 #include <QTimer>
+#include <QThread>
+#include "authenticator.h"
 
 DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 {
@@ -15,7 +17,12 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
 
     // initialize ResourceManager aggregates
     resourceManager.reset();
+
+    // Shared authenticator in GUI thread (async by nature)
+    authenticator = new Authenticator(this);
 }
+
+DeviceMediator::~DeviceMediator() {}
 
 QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList()
 {
@@ -85,6 +92,9 @@ void DeviceMediator::openDevice(int deviceIndex)
         connect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
 
         const QString devName = deviceList.at(deviceIndex).deviceName;
+
+    // Trigger async re-auth with Device_name after successful connection
+    if (authenticator) authenticator->refresh(devName);
 
 
         // Clear previous right-side specifications before we start receiving CFG_/ACK_ again

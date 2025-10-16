@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QSysInfo>
 #include "GUI/clickablelabel.h"
+#include "authenticator.h"
 
 LoginDialog::LoginDialog(QWidget *parent) :
     QDialog(parent),
@@ -77,24 +78,21 @@ LoginDialog::LoginDialog(QWidget *parent) :
         userEmail->setText(CustomSettings::getUserEmail());
     } // else leave empty so placeholder shows
 
-    // Persistent network manager
-    networkManager = new QNetworkAccessManager(this);
-    connect(networkManager,&QNetworkAccessManager::finished,this,&LoginDialog::replyFinished);
-
-    // Timeout timer setup (single-shot 15s)
-    timeoutTimer.setSingleShot(true);
-    timeoutTimer.setInterval(15000);
-    connect(&timeoutTimer,&QTimer::timeout,this,[this](){
-        if(!requestInFlight || !currentReply) return;
-        qInfo() << "[Login] Timeout after 15s";
-        CustomSettings::setLastLoginFailure("timeout");
-        CustomSettings::saveSettings();
-        info->setName("Login timeout");
-    info->setColor(Graphics::palette().error);
-        currentReply->abort();
-        requestInFlight = false;
+    // Shared authenticator
+    auth = new Authenticator(this);
+    connect(auth, &Authenticator::requestStarted, this, [this]() {
+        info->setName("Verifying...");
+        info->setColor(Graphics::palette().textLabel);
+        buttonsDone->setEnabled(false);
+    });
+    connect(auth, &Authenticator::requestFinished, this, [this]() {
         buttonsDone->setEnabled(true);
-        emit loginFailed("timeout");
+    });
+    connect(auth, &Authenticator::authenticationFailed, this, [this](const QString &code, const QString &uiMsg){
+        reportFailure(uiMsg, code);
+    });
+    connect(auth, &Authenticator::authenticationSucceeded, this, [this](const QDateTime &validity, const QByteArray &token){
+        finalizeSuccess(validity, token);
     });
 
     connect(buttonsDone,&WidgetButtons::clicked,this,&LoginDialog::buttonAction);
@@ -121,29 +119,9 @@ void LoginDialog::startLoginNetworkRequest(const QString &email, const QString &
     CustomSettings::setUserPin(pinHash);
     CustomSettings::saveSettings();
 
-    QUrl auth = QUrl(QStringLiteral("https://sniffy.cz/sniffy_auth.php"));
-    QUrlQuery query;
-    query.addQueryItem("email", CustomSettings::getUserEmail());
-    query.addQueryItem("pin", CustomSettings::getUserPin());
-    auth.setQuery(query);
-
-    QNetworkRequest req(auth);
-    // Build detailed User-Agent string with system information
-    QString userAgent = QString("LEO_sniffy/1.0 (%1; %2; %3; %4)")
-        .arg(QSysInfo::machineHostName())
-        .arg(QSysInfo::productType())
-        .arg(QSysInfo::productVersion())
-        .arg(QSysInfo::currentCpuArchitecture());
-    req.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
-    req.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
-
-    info->setName("Verifying...");
-    info->setColor(Graphics::palette().textLabel);
-    requestInFlight = true;
-    buttonsDone->setEnabled(false);
     qInfo() << "[Login] Sending request for" << email;
-    currentReply = networkManager->get(req);
-    timeoutTimer.start();
+    // Delegate to shared authenticator (no Device_name at explicit login)
+    auth->authenticate(email, pinHash);
 }
 
 // Helper: finalize successful login
@@ -179,9 +157,8 @@ void LoginDialog::buttonAction(int isCanceled)
         return;
     }
 
-    if(requestInFlight){
-        return; // still processing previous attempt
-    }
+    // Re-entrancy guard via disabled button; no extra flag needed
+    if(!buttonsDone->isEnabled()) return;
 
     const QString email = userEmail->getText().trimmed();
     if(email.isEmpty()){
@@ -225,59 +202,4 @@ void LoginDialog::performLogout()
     close();
 }
 
-void LoginDialog::replyFinished(QNetworkReply *pReply)
-{
-    requestInFlight = false;
-    buttonsDone->setEnabled(true);
-    timeoutTimer.stop();
-    if(currentReply != pReply){
-        // Different reply than expected (e.g., aborted). Just ignore if no error.
-        qInfo() << "[Login] Received unexpected reply pointer";
-    }
-    currentReply = nullptr;
-
-    if(pReply->error() != QNetworkReply::NoError){
-        reportFailure("Network error: " + pReply->errorString(), "network-error:"+pReply->errorString());
-        qInfo() << "[Login] Network error" << pReply->errorString();
-        pReply->deleteLater();
-        return;
-    }
-
-    int httpStatus = pReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if(httpStatus != 200){
-        reportFailure(QString("HTTP %1").arg(httpStatus), QStringLiteral("http-%1").arg(httpStatus));
-        qInfo() << "[Login] HTTP error" << httpStatus;
-        pReply->deleteLater();
-        return;
-    }
-
-    QByteArray data = pReply->readAll();
-    pReply->deleteLater();
-
-    if(data == "Expired"){
-    reportFailure("Token expired – login on www.sniffy.cz","expired", Graphics::palette().warning);
-        qInfo() << "[Login] Token expired";
-        return;
-    }else if(data == "wrongPin"){
-        reportFailure("Wrong pin or email","wrong-pin");
-        qInfo() << "[Login] Wrong pin";
-        return;
-    }
-
-    if(data.size() < 20){
-        reportFailure("Invalid server response","invalid-response-too-short");
-        qInfo() << "[Login] Response too short";
-        return;
-    }
-
-    QString validityString = QString::fromLatin1(data.left(19));
-    QDateTime validity = QDateTime::fromString(validityString, "yyyy-MM-dd hh:mm:ss");
-    QByteArray token = data.mid(19);
-    if(!validity.isValid() || token.isEmpty()){
-        reportFailure("Invalid response format","invalid-response-format");
-        qInfo() << "[Login] Invalid response format";
-        return;
-    }
-    finalizeSuccess(validity, token);
-
-}
+// legacy slot not used anymore
