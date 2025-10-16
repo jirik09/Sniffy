@@ -19,7 +19,12 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
 
     int index = 0;
     for (WidgetDisplay *dis : displays) {
-        dis->setContentsMargins(5, 5, 5, 5);
+        // Set contents margins for 1st 0,5,5,5 and others 0,0,5,5
+        if(index == 0) {
+            dis->setContentsMargins(5, 5, 5, 5);
+        } else {
+            dis->setContentsMargins(5, 0, 5, 5);
+        }
         dis->showAvgDisplay(false);
     dis->configLabel(2,"Voltage",Graphics::palette().textLabel,true);
         ui->verticalLayout_display->addWidget(dis);
