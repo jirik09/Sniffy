@@ -8,8 +8,6 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QCryptographicHash>
-#include <QNetworkAccessManager>
-#include <QtNetwork>
 #include <QTimer>
 
 #include "GUI/widgetbuttons.h"
@@ -19,6 +17,9 @@
 #include "GUI/widgetlabel.h"
 #include "customsettings.h"
 #include "GUI/clickablelabel.h"
+
+// Forward declaration at namespace scope
+class Authenticator;
 
 namespace Ui {
 class LoginDialog;
@@ -41,16 +42,9 @@ private:
 
     WidgetButtons *buttonsDone;
     ClickableLabel *logoutLabel{nullptr};
-    QNetworkAccessManager *networkManager {nullptr};
-    /*
-    "In-flight reply" refers to a response that has been requested but has not yet been received.
-    The request is currently "in-flight", and the reply is pending. Purpose:
-    - Timeout and retry logic: The system may wait for an in-flight reply, and if it doesn't arrive in time, it can retry.
-    - Asynchronous architectures: In GUI or async RPC calls, some replies may not have arrived yet, while the program continues execution.
-    */    
-    bool requestInFlight {false};
-    QNetworkReply *currentReply {nullptr};
-    QTimer timeoutTimer; // 15s timeout for login requests
+    
+    // Shared authenticator for login
+    Authenticator *auth {nullptr};
 
     // Helper methods to reduce duplication
     void reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color = Graphics::palette().error);
@@ -67,7 +61,7 @@ private slots:
     void buttonAction(int isCanceled);
 
 public slots:
-    void replyFinished(QNetworkReply*);
+    // No direct network reply handling; moved to Authenticator
 
 };
 

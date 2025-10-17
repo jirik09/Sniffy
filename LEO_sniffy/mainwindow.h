@@ -46,6 +46,8 @@ private:
     bool isLeftMenuNarrow = false; // default to wide menu
     WidgetFooter *footer;
     WidgetLoginInfo *loginInfo;
+    QJsonObject sessionRestoreData;
+
 
     void setMenuNarrow();
     void setMenuWide();
@@ -61,9 +63,12 @@ private:
     void createModulesWidgets();
 
     void saveSessionToFile(const QString &filePath, bool silent);
-    void loadSessionFromFile(const QString &filePath, bool silent);
+    bool loadSessionJSONFile(const QString &filePath);
+    void loadLayoutSessionFromFile();
+    void loadModulesSessionFromFile(const QString &moduleName);
     // Update left menu to compact (narrow) or expanded (wide): hide/show texts accordingly
     void updateLeftMenuCompact(bool compact);
+
 
 private slots:
     void onSettingsSaveSessionRequested();
@@ -74,6 +79,7 @@ private slots:
     void openLoginDialog();
     void updateLoginInfo();
     void openSettingDialog();
+    //void onModuleControlShown();
 
 protected:
     void resizeEvent(QResizeEvent *event) override;

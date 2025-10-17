@@ -121,6 +121,8 @@ signals:
     void moduleDescription(QString name, QList<QString> labels, QList<QString> values);
     // Emitted when the module's display name changes (e.g., Device renamed after handshake)
     void moduleNameChanged(const QString &name);
+    // Emitted when showModuleControl is called, used to trigger delayed session restoration
+    void moduleControlShown(const QString &name);
 
 };
 

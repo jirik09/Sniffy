@@ -29,13 +29,11 @@ struct ResourceSet {
         gpioB |= r.gpioB;
         gpioC |= r.gpioC;
         gpioD |= r.gpioD;
-        qDebug() << "resource merge " << QString::number(resources,16)<<" "<< QString::number(gpioA,16)<<" "<< QString::number(gpioB,16)<<" "<< QString::number(gpioC,16)<<" "<< QString::number(gpioD,16);
-    }
+       }
 
     // Subtract (bitwise AND NOT) masks from this set using r
     void subtract(const ResourceSet &r) {
         resources &= ~r.resources;
-        qDebug() << "resource subtract " << QString::number(resources,16)<<" "<< QString::number(gpioA,16)<<" "<< QString::number(gpioB,16)<<" "<< QString::number(gpioC,16)<<" "<< QString::number(gpioD,16);
         gpioA &= ~r.gpioA;
         gpioB &= ~r.gpioB;
         gpioC &= ~r.gpioC;

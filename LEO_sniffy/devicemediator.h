@@ -16,12 +16,16 @@
 #include "modules/template/templatemodule.h"
 #include "resourcemanager.h"
 
+// Forward declaration to avoid including the header here
+class Authenticator;
+
 
 class DeviceMediator : public QObject
 {
     Q_OBJECT
 public:
     explicit DeviceMediator(QObject *parent = nullptr);
+    ~DeviceMediator();
     QList<QSharedPointer<AbstractModule>> createModulesList();
     QList<QSharedPointer<AbstractModule>> getModulesList();   
     void ShowDeviceModule();
@@ -30,6 +34,8 @@ public:
 
     ResourceSet getResourcesInUse() const;
     void setResourcesInUse(ResourceSet res);
+    void disableModules();
+    void closeModules();
 
 signals:
     void loadLayoutUponOpen(QString Devicename);
@@ -48,13 +54,16 @@ private:
     // Manager handling legacy resources + GPIO masks aggregation and conflicts
     ResourceManager resourceManager;
 
+    // Shared async authenticator (runs in GUI thread, non-blocking)
+    Authenticator *authenticator = nullptr;
+
 private slots:
     void parseData(QByteArray data);
     void newDeviceList(QList<DeviceDescriptor> deviceList);
     void handleError(QByteArray error);
     void ScanDevices();
-    void open(int deviceIndex);
-    void disableModules();
+    void openDevice(int deviceIndex);
+    void disconnectDevice();
     void blockConflictingModulesCallback(QString moduleName, int resources);
     void releaseConflictingModulesCallback(QString moduleName, int resources);
 

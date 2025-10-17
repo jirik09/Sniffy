@@ -197,5 +197,7 @@
         <file>graphics/themes/light/user_error.png</file>
         <file>graphics/themes/light/user_ok.png</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>default_layout.json</file>
+    </qresource>
 </RCC>
