@@ -127,9 +127,6 @@ void Voltmeter::parseData(QByteArray data)
 
 void Voltmeter::writeConfiguration()
 {
-    if(isConfigurationWritten)return;
-
-    setConfigurationWritten();
     //workaround first data was corrupted on channels > 1
     numChannelsEnabled = static_cast<VoltmeterSpec*>(moduleSpecification)->maxADCChannels;
     comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");

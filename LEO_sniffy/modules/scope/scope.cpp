@@ -187,9 +187,6 @@ void Scope::parseData(QByteArray data){
 }
 
 void Scope::writeConfiguration(){
-    if(isConfigurationWritten)return;
-
-    setConfigurationWritten();
     scpWindow->restoreGUIAfterStartup();
     scpWindow->setNumChannels(specification->maxADCChannels);
     scpWindow->setRealSamplingRateAndLlength(config->realSamplingRate,config->dataLength);
