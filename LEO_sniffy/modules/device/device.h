@@ -19,6 +19,7 @@ public:
 
     QWidget* getWidget();
     QString getName();
+    QString getMcuId();
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
 
@@ -39,6 +40,7 @@ signals:
     void ScanDevices();
     void openDevice(int deviceIndex);
     void closeDevice();
+    void deviceSpecificationReady();
 
 public slots:
     void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);

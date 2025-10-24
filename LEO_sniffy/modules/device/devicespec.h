@@ -16,10 +16,6 @@ public:
     QString MCU;
     uint32_t CoreClock;
 
-    uint32_t UID1;
-    uint32_t UID2;
-    uint32_t UID3;
-
     QString MCU_ID;
     QString Build_Date;
     QString FW_Version;

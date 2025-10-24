@@ -32,7 +32,6 @@ void CustomSettings::loadSettings(QString fileName)
             // Treat legacy sentinel as empty so UI shows placeholder instead of editable text
             userEmail.clear();
         }
-        userPin = settings.value("pin").toString();
         loginToken = settings.value("token").toByteArray();
 
         tokenValidity = settings.value("validity").toDateTime();
@@ -42,7 +41,6 @@ void CustomSettings::loadSettings(QString fileName)
         // Default theme: Dawn
         themeIndex = 2;
         userEmail = "Unknown user";
-        userPin = "0000";
         loginToken = "none";
         tokenValidity = QDateTime(QDate(2000,1,1),QTime(0,0));
         lastLoginFailureReason = "";
@@ -63,7 +61,6 @@ void CustomSettings::saveSettings()
     }else{
         settings.setValue("email", userEmail);
     }
-    settings.setValue("pin", userPin);
     // Safeguard: do not overwrite an existing valid token with an empty placeholder inadvertently
     if(loginToken.isEmpty()){
         QByteArray existing = settings.value("token").toByteArray();

@@ -24,13 +24,14 @@ class DeviceMediator : public QObject
 {
     Q_OBJECT
 public:
-    explicit DeviceMediator(QObject *parent = nullptr);
+    explicit DeviceMediator(Authenticator *authenticator, QObject *parent = nullptr);
     ~DeviceMediator();
     QList<QSharedPointer<AbstractModule>> createModulesList();
     QList<QSharedPointer<AbstractModule>> getModulesList();   
     void ShowDeviceModule();
     bool getIsConnected() const;
     QString getDeviceName();
+    QString getMcuId();
 
     ResourceSet getResourcesInUse() const;
     void setResourcesInUse(ResourceSet res);
@@ -66,6 +67,7 @@ private slots:
     void disconnectDevice();
     void blockConflictingModulesCallback(QString moduleName, int resources);
     void releaseConflictingModulesCallback(QString moduleName, int resources);
+    void onDeviceSpecificationReady();
 
 public slots:
     void close();

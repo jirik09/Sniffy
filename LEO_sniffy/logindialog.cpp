@@ -7,9 +7,10 @@
 #include "GUI/clickablelabel.h"
 #include "authenticator.h"
 
-LoginDialog::LoginDialog(QWidget *parent) :
+LoginDialog::LoginDialog(Authenticator *authenticator, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::LoginDialog)
+    ui(new Ui::LoginDialog),
+    auth(authenticator)
 {
     ui->setupUi(this);
     this->setWindowTitle("Login");
@@ -78,8 +79,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
         userEmail->setText(CustomSettings::getUserEmail());
     } // else leave empty so placeholder shows
 
-    // Shared authenticator
-    auth = new Authenticator(this);
+    // Connect to shared authenticator
     connect(auth, &Authenticator::requestStarted, this, [this]() {
         info->setName("Verifying...");
         info->setColor(Graphics::palette().textLabel);
@@ -109,6 +109,10 @@ void LoginDialog::reportFailure(const QString &uiMessage, const QString &failure
     info->setName(uiMessage);
     info->setColor(color);
     emit loginFailed(failureCode);
+    
+    // Clear token on authentication failure
+    CustomSettings::setLoginToken("none");
+    CustomSettings::setTokenValidity(QDateTime());
     CustomSettings::setLastLoginFailure(failureCode);
     CustomSettings::saveSettings();
 }
@@ -116,7 +120,6 @@ void LoginDialog::reportFailure(const QString &uiMessage, const QString &failure
 // Helper: start the network request after inputs validated
 void LoginDialog::startLoginNetworkRequest(const QString &email, const QString &pinHash){
     CustomSettings::setUserEmail(email);
-    CustomSettings::setUserPin(pinHash);
     CustomSettings::saveSettings();
 
     qInfo() << "[Login] Sending request for" << email;
@@ -133,7 +136,7 @@ void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &t
 
     if (logoutLabel) logoutLabel->setVisible(true);
 
-    info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy hh:mm"));
+    info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy"));
     info->setColor(Graphics::palette().textAll);
     emit loginInfoChanged();
     qInfo() << "[Login] Success valid till" << CustomSettings::getTokenValidity();
@@ -180,10 +183,8 @@ void LoginDialog::buttonAction(int isCanceled)
 
 void LoginDialog::performLogout()
 {
-    // Clear stored credentials and token
     CustomSettings::setUserEmail("");
-    CustomSettings::setUserPin("");
-    CustomSettings::setLoginToken(QByteArray());
+    CustomSettings::setLoginToken("none");
     CustomSettings::setTokenValidity(QDateTime());
     CustomSettings::setLastLoginFailure("");
     CustomSettings::saveSettings();
