@@ -109,6 +109,10 @@ void LoginDialog::reportFailure(const QString &uiMessage, const QString &failure
     info->setName(uiMessage);
     info->setColor(color);
     emit loginFailed(failureCode);
+    
+    // Clear token on authentication failure
+    CustomSettings::setLoginToken("none");
+    CustomSettings::setTokenValidity(QDateTime());
     CustomSettings::setLastLoginFailure(failureCode);
     CustomSettings::saveSettings();
 }
@@ -132,7 +136,7 @@ void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &t
 
     if (logoutLabel) logoutLabel->setVisible(true);
 
-    info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy hh:mm"));
+    info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy"));
     info->setColor(Graphics::palette().textAll);
     emit loginInfoChanged();
     qInfo() << "[Login] Success valid till" << CustomSettings::getTokenValidity();
@@ -180,7 +184,7 @@ void LoginDialog::buttonAction(int isCanceled)
 void LoginDialog::performLogout()
 {
     CustomSettings::setUserEmail("");
-    CustomSettings::setLoginToken(QByteArray());
+    CustomSettings::setLoginToken("none");
     CustomSettings::setTokenValidity(QDateTime());
     CustomSettings::setLastLoginFailure("");
     CustomSettings::saveSettings();

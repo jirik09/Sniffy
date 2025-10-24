@@ -5,6 +5,8 @@
 #include <QUrlQuery>
 #include <QSysInfo>
 #include <QDateTime>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 #include "customsettings.h"
 
@@ -43,7 +45,7 @@ void Authenticator::tokenRefresh(const QString &deviceName, const QString &mcuId
 
 void Authenticator::startRequest(const QString &email, const QString &pinHash, const QString &deviceName, const QString &mcuId)
 {
-    QUrl auth(QStringLiteral("https://sniffy.cz/sniffy_auth2.php"));
+    QUrl auth(QStringLiteral("https://sniffy.cz/sniffy_auth_new.php"));
     QUrlQuery query;
     query.addQueryItem("email", email);
     if (!pinHash.isEmpty()) query.addQueryItem("pin", pinHash);
@@ -60,7 +62,10 @@ void Authenticator::startRequest(const QString &email, const QString &pinHash, c
     req.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
     req.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
-    emit requestStarted();
+    if(authenticationSent == true){
+        emit requestStarted();
+    }
+
     currentReply = networkManager->get(req);
     if (timeoutTimer) timeoutTimer->start();
 }
@@ -93,23 +98,68 @@ void Authenticator::onFinished(QNetworkReply *reply)
     const QByteArray data = reply->readAll();
     reply->deleteLater();
 
-    if (data == "Expired") {
-        emit authenticationFailed("expired", QObject::tr("Token expired – login on www.sniffy.cz first"));
-        return;
-    } else if (data == "wrongPin") {
-        emit authenticationFailed("wrong-pin", QObject::tr("Wrong pin or email"));
-        return;
-    }
-    if (data.size() < 20) {
-        //emit authenticationFailed("invalid-response-too-short", QObject::tr("Invalid server response"));
-        qDebug() << "[Auth] Invalid server response, too short" << data;
+    // Parse JSON response
+    QJsonParseError parseError;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(data, &parseError);
+    
+    if (parseError.error != QJsonParseError::NoError) {
+        emit authenticationFailed("invalid-json", QObject::tr("Invalid JSON response: %1").arg(parseError.errorString()));
+        qDebug() << "[Auth] JSON parse error:" << parseError.errorString() << "Data:" << data;
         return;
     }
-    const QString validityString = QString::fromLatin1(data.left(19));
-    const QDateTime validity = QDateTime::fromString(validityString, "yyyy-MM-dd hh:mm:ss");
-    const QByteArray token = data.mid(19);
+
+    if (!jsonDoc.isObject()) {
+        emit authenticationFailed("invalid-response-format", QObject::tr("Invalid response format"));
+        qDebug() << "[Auth] Response is not a JSON object";
+        return;
+    }
+
+    QJsonObject jsonObj = jsonDoc.object();
+    
+    // Check for error responses
+    if (jsonObj.contains("error")) {
+        QString errorType = jsonObj["error"].toString();
+        if (errorType == "Expired") {
+            emit authenticationFailed("expired", QObject::tr("Token expired – login on www.sniffy.cz first"));
+            return;
+        } else if (errorType == "wrongPin") {
+            emit authenticationFailed("wrong-pin", QObject::tr("Wrong pin or email"));
+            return;
+        } else {
+            emit authenticationFailed(errorType, QObject::tr("Authentication error: %1").arg(errorType));
+            return;
+        }
+    }
+
+    // Extract valid_till and token from JSON
+    if (!jsonObj.contains("valid_till") || !jsonObj.contains("token")) {
+        emit authenticationFailed("missing-fields", QObject::tr("Response missing required fields"));
+        qDebug() << "[Auth] Missing valid_till or token in response";
+        return;
+    }
+
+    const QString validityString = jsonObj["valid_till"].toString();
+    const QString tokenString = jsonObj["token"].toString();
+    
+    if (validityString.isEmpty() || tokenString.isEmpty()) {
+        emit authenticationFailed("empty-fields", QObject::tr("Empty validity or token"));
+        return;
+    }
+
+    // Parse the validity date - try ISO format first, then fallback to original format
+    QDateTime validity = QDateTime::fromString(validityString, Qt::ISODate);
+    if (!validity.isValid()) {
+        validity = QDateTime::fromString(validityString, "yyyy-MM-dd hh:mm:ss");
+    }
+    if (!validity.isValid()) {
+        validity = QDateTime::fromString(validityString, "yyyy-MM-dd");
+    }
+    
+    const QByteArray token = tokenString.toLatin1();
+    
     if (!validity.isValid() || token.isEmpty()) {
         emit authenticationFailed("invalid-response-format", QObject::tr("Invalid response format"));
+        qDebug() << "[Auth] Invalid validity date or empty token";
         return;
     }
 
@@ -121,7 +171,6 @@ void Authenticator::onFinished(QNetworkReply *reply)
 
     qDebug() << "[Auth] Token refreshed, valid till:" << validity;
     if(authenticationSent == true){
-        qDebug() << "[Auth] Emitting success signal after token refresh";
         emit authenticationSucceeded(validity, token); //this reconnect the device. should not be called on automatic token refresh;
     }
 }
