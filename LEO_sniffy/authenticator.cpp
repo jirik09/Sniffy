@@ -17,30 +17,38 @@ Authenticator::Authenticator(QObject *parent)
     timeoutTimer->setSingleShot(true);
     timeoutTimer->setInterval(15000);
     connect(timeoutTimer, &QTimer::timeout, this, &Authenticator::onTimeout);
+    qDebug() << "[Auth] Authenticator initialized";
+    authenticationSent = false;
 }
 
-void Authenticator::authenticate(const QString &email, const QString &pinHash, const QString &deviceName)
+void Authenticator::authenticate(const QString &email, const QString &pinHash)
 {
+    authenticationSent = true;
     if (currentReply)
         return; // already running
-    startRequest(email, pinHash, deviceName);
+    startRequest(email, pinHash, QString(), QString());
+    qDebug() << "[Auth] Authentication requested for" << email;
 }
 
-void Authenticator::refresh(const QString &deviceName)
+void Authenticator::tokenRefresh(const QString &deviceName, const QString &mcuId)
 {
+    if(currentReply) return; // Request already in progress
+    if(authenticationSent == true) return; // Manual authentication already done this session
     const QString email = CustomSettings::getUserEmail();
-    const QString pin = CustomSettings::getUserPin();
-    if (email.isEmpty() || pin.isEmpty()) return;
-    authenticate(email, pin, deviceName);
+    if (email.isEmpty() || email == "Unknown user") return;
+    qDebug() << "[Auth] Token refresh requested for" << email << "Device:" << deviceName << "MCU_ID:" << mcuId;
+    // For refresh, use empty PIN - startRequest will handle it
+    startRequest(email, QString(), deviceName, mcuId);
 }
 
-void Authenticator::startRequest(const QString &email, const QString &pinHash, const QString &deviceName)
+void Authenticator::startRequest(const QString &email, const QString &pinHash, const QString &deviceName, const QString &mcuId)
 {
-    QUrl auth(QStringLiteral("https://sniffy.cz/sniffy_auth.php"));
+    QUrl auth(QStringLiteral("https://sniffy.cz/sniffy_auth2.php"));
     QUrlQuery query;
     query.addQueryItem("email", email);
-    query.addQueryItem("pin", pinHash);
+    if (!pinHash.isEmpty()) query.addQueryItem("pin", pinHash);
     if (!deviceName.isEmpty()) query.addQueryItem("Device_name", deviceName);
+    if (!mcuId.isEmpty()) query.addQueryItem("MCU_ID", mcuId);
     auth.setQuery(query);
 
     QNetworkRequest req(auth);
@@ -86,14 +94,15 @@ void Authenticator::onFinished(QNetworkReply *reply)
     reply->deleteLater();
 
     if (data == "Expired") {
-        emit authenticationFailed("expired", QObject::tr("Token expired – login on www.sniffy.cz"));
+        emit authenticationFailed("expired", QObject::tr("Token expired – login on www.sniffy.cz first"));
         return;
     } else if (data == "wrongPin") {
         emit authenticationFailed("wrong-pin", QObject::tr("Wrong pin or email"));
         return;
     }
     if (data.size() < 20) {
-        emit authenticationFailed("invalid-response-too-short", QObject::tr("Invalid server response"));
+        //emit authenticationFailed("invalid-response-too-short", QObject::tr("Invalid server response"));
+        qDebug() << "[Auth] Invalid server response, too short" << data;
         return;
     }
     const QString validityString = QString::fromLatin1(data.left(19));
@@ -110,5 +119,9 @@ void Authenticator::onFinished(QNetworkReply *reply)
     CustomSettings::setLastLoginFailure("");
     CustomSettings::saveSettings();
 
-    emit authenticationSucceeded(validity, token);
+    qDebug() << "[Auth] Token refreshed, valid till:" << validity;
+    if(authenticationSent == true){
+        qDebug() << "[Auth] Emitting success signal after token refresh";
+        emit authenticationSucceeded(validity, token); //this reconnect the device. should not be called on automatic token refresh;
+    }
 }

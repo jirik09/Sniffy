@@ -30,7 +30,7 @@ class LoginDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit LoginDialog(QWidget *parent = nullptr);
+    explicit LoginDialog(Authenticator *authenticator, QWidget *parent = nullptr);
     ~LoginDialog();
     void open();
 

@@ -16,6 +16,7 @@
 #include "GUI/widgetfooter.h"
 #include "logindialog.h"
 #include "GUI/widgetlogininfo.h"
+#include "authenticator.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -42,6 +43,7 @@ private:
 
     SettingsDialog *sett;
     LoginDialog *logindial;
+    Authenticator *authenticator; // Shared authenticator for login and token refresh
 
     bool isLeftMenuNarrow = false; // default to wide menu
     WidgetFooter *footer;

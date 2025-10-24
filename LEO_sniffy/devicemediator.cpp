@@ -4,7 +4,8 @@
 #include <QThread>
 #include "authenticator.h"
 
-DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
+DeviceMediator::DeviceMediator(Authenticator *auth, QObject *parent) 
+    : QObject(parent), authenticator(auth)
 {
     communication = new Comms();
 
@@ -14,12 +15,10 @@ DeviceMediator::DeviceMediator(QObject *parent) : QObject(parent)
     connect(device, &Device::ScanDevices, this, &DeviceMediator::ScanDevices);
     connect(device, &Device::openDevice, this, &DeviceMediator::openDevice);
     connect(device, &Device::closeDevice, this, &DeviceMediator::close);
+    connect(device, &Device::deviceSpecificationReady, this, &DeviceMediator::onDeviceSpecificationReady);
 
     // initialize ResourceManager aggregates
     resourceManager.reset();
-
-    // Shared authenticator in GUI thread (async by nature)
-    authenticator = new Authenticator(this);
 }
 
 DeviceMediator::~DeviceMediator() {}
@@ -92,10 +91,6 @@ void DeviceMediator::openDevice(int deviceIndex)
         connect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
 
         const QString devName = deviceList.at(deviceIndex).deviceName;
-
-    // Trigger async re-auth with Device_name after successful connection
-    if (authenticator) authenticator->refresh(devName);
-
 
         // Clear previous right-side specifications before we start receiving CFG_/ACK_ again
         device->clearAllModuleDescriptions();
@@ -330,6 +325,11 @@ QString DeviceMediator::getDeviceName()
     return device->getName();
 }
 
+QString DeviceMediator::getMcuId()
+{
+    return device->getMcuId();
+}
+
 ResourceSet DeviceMediator::getResourcesInUse() const
 {
     return resourceManager.reserved();
@@ -338,4 +338,12 @@ ResourceSet DeviceMediator::getResourcesInUse() const
 void DeviceMediator::setResourcesInUse(ResourceSet resources)
 {
     resourceManager.reserve(resources);
+}
+
+void DeviceMediator::onDeviceSpecificationReady()
+{
+    // Trigger async re-auth with Device_name and MCU_ID after device specifications are parsed
+    if (authenticator) {
+        authenticator->tokenRefresh(device->getName(), device->getMcuId());
+    }
 }

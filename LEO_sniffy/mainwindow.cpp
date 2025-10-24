@@ -43,7 +43,11 @@ MainWindow::MainWindow(QWidget *parent):
     sett = new SettingsDialog(this);
     connect(sett, &SettingsDialog::saveSessionRequested, this, &MainWindow::onSettingsSaveSessionRequested);
     connect(sett, &SettingsDialog::loadSessionRequested, this, &MainWindow::onSettingsLoadSessionRequested);
-    logindial = new LoginDialog(this);
+    
+    // Create shared authenticator
+    authenticator = new Authenticator(this);
+    
+    logindial = new LoginDialog(authenticator, this);
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     //ui->widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -63,7 +67,7 @@ MainWindow::MainWindow(QWidget *parent):
 }
 
 void MainWindow::createModulesWidgets(){
-    deviceMediator = new DeviceMediator(this);
+    deviceMediator = new DeviceMediator(authenticator, this);
 
     modulesList = deviceMediator->getModulesList();
     QSharedPointer<AbstractModule> module;

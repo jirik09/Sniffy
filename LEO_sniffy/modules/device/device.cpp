@@ -122,6 +122,7 @@ void Device::parseData(QByteArray data){
         deviceWindow->showSpecification(deviceSpec);
         setIcon(Graphics::getGraphicsPath()+"icon_connected.png");
         setModuleName(static_cast<DeviceSpec*>(moduleSpecification)->device);
+        emit deviceSpecificationReady(); //try to refresh authentication
     }else if(feature=="ACK_"){
         //  qDebug() << "ACK";
     }else{
@@ -144,4 +145,9 @@ QWidget* Device::getWidget(){
 QString Device::getName()
 {
     return static_cast<DeviceSpec*>(moduleSpecification)->device;
+}
+
+QString Device::getMcuId()
+{
+    return static_cast<DeviceSpec*>(moduleSpecification)->MCU_ID;
 }
