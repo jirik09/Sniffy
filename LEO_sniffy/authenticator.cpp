@@ -46,13 +46,13 @@ void Authenticator::tokenRefresh(const QString &deviceName, const QString &mcuId
 void Authenticator::startRequest(const QString &email, const QString &pinHash, const QString &deviceName, const QString &mcuId)
 {
     QUrl auth(QStringLiteral("https://sniffy.cz/sniffy_auth_new.php"));
+    
     QUrlQuery query;
     query.addQueryItem("email", email);
     if (!pinHash.isEmpty()) query.addQueryItem("pin", pinHash);
     if (!deviceName.isEmpty()) query.addQueryItem("Device_name", deviceName);
     if (!mcuId.isEmpty()) query.addQueryItem("MCU_ID", mcuId);
-    auth.setQuery(query);
-
+    
     QNetworkRequest req(auth);
     const QString userAgent = QString("LEO_sniffy/1.0 (%1; %2; %3; %4)")
             .arg(QSysInfo::machineHostName())
@@ -60,13 +60,15 @@ void Authenticator::startRequest(const QString &email, const QString &pinHash, c
             .arg(QSysInfo::productVersion())
             .arg(QSysInfo::currentCpuArchitecture());
     req.setHeader(QNetworkRequest::UserAgentHeader, userAgent);
+    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     req.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
     if(authenticationSent == true){
         emit requestStarted();
     }
 
-    currentReply = networkManager->get(req);
+    QByteArray postData = query.toString(QUrl::FullyEncoded).toUtf8();
+    currentReply = networkManager->post(req, postData);
     if (timeoutTimer) timeoutTimer->start();
 }
 
