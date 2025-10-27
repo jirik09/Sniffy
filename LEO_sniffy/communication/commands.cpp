@@ -13,6 +13,8 @@ const QByteArray Commands::VERSION_REQUEST = "VER?";
 const QByteArray Commands::CONFIG_REQUEST = "CFG?";
 const QByteArray Commands::IS_SHIELD_CONNECTED = "SH_?";
 const QByteArray Commands::RESET_DEVICE = "RES!";
+const QByteArray Commands::ERROR = "ERR_";
+const QByteArray Commands::DEBUG = "DBG_";
 
 const QByteArray Commands::SIGNAL_GENERATOR = "GENS";
 const QByteArray Commands::VOLTAGE_SOURCE = "VOUT";
@@ -33,6 +35,7 @@ const QByteArray Commands::UNPAUSE = "UPAU";
 const QByteArray Commands::NEXT = "NEXT";
 const QByteArray Commands::DEINIT =	"DINI";
 const QByteArray Commands::CONFIG = "CFG_";
+const QByteArray Commands::ACK = "ACK_";
 
 const QByteArray Commands::GET_REAL_SMP_FREQ = "FRQ?";
 const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";

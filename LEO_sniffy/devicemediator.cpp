@@ -278,11 +278,19 @@ void DeviceMediator::parseData(QByteArray data)
 
     for (const QSharedPointer<AbstractModule> &module : modules)
     {
-        if (dataHeader == module->getCommandPrefix() && (module->isActive() || dataToPass.left(4) == "CFG_" || dataToPass.left(4) == "ACK_"))
+        if (dataHeader == module->getCommandPrefix() && (module->isActive() || dataToPass.left(4) == Commands::CONFIG || dataToPass.left(4) == Commands::ACK))
         {
             module->parseData(dataToPass);
             isDataPassed = true;
         }
+    }
+    if(dataHeader == Commands::ERROR){
+        qDebug() << "DEVICE ERROR " << dataToPass.toHex();
+        isDataPassed = true;
+    }
+    if(dataHeader == Commands::DEBUG){
+        qDebug() << "DEVICE DEBUG " << dataToPass;
+        isDataPassed = true;
     }
     if (!isDataPassed)
     {

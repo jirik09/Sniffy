@@ -115,7 +115,7 @@ void Device::parseData(QByteArray data){
     QByteArray feature = data.left(4);
     data.remove(0,4);
 
-    if(feature=="CFG_"){
+    if(feature==Commands::CONFIG){
         deviceSpec = static_cast<DeviceSpec*>(moduleSpecification);
         deviceSpec->parseSpecification(data);
         passSystemSpecificationToGUI();
@@ -123,7 +123,7 @@ void Device::parseData(QByteArray data){
         setIcon(Graphics::getGraphicsPath()+"icon_connected.png");
         setModuleName(static_cast<DeviceSpec*>(moduleSpecification)->device);
         emit deviceSpecificationReady(); //try to refresh authentication
-    }else if(feature=="ACK_"){
+    }else if(feature==Commands::ACK){
         //  qDebug() << "ACK";
     }else{
         qDebug() << "WARNING: Device error message received: " <<ErrorList::GetErrMessage((uint8_t)(feature.at(2)));//<< feature << " "<< data;

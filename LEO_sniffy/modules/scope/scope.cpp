@@ -53,20 +53,20 @@ void Scope::parseData(QByteArray data){
     // Malformed frames are logged and ignored. Side-effects: may update GUI and internal buffers.
     QByteArray dataHeader = data.left(4);
 
-    if(dataHeader=="CFG_"){
+    if(dataHeader==Commands::CONFIG){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
         showModuleControl();
         buildModuleDescription(specification);
-        
-    }else if(dataHeader=="SMPL"){
+
+    }else if(dataHeader==Commands::SAMPLING){
         if(config->triggerMode!=ScopeTriggerMode::TRIG_STOP){
             scpWindow->samplingOngoing();
         }
-    }else if(dataHeader=="TRIG"){
+    }else if(dataHeader==Commands::TRIGGERED){
         scpWindow->triggerCaptured();
 
-    }else if(dataHeader=="OSC_"){
+    }else if(dataHeader==Commands::SCOPE_INCOME){
         quint8 tmpByte;
         quint16 tmpShort;
         qreal minX = 0;
