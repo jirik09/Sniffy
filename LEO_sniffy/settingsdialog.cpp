@@ -8,7 +8,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Settings");
 
-    setStyleSheet("QWidget{background-color:"+Graphics::COLOR_WINDOW_WIDGET+";}");
+    setStyleSheet("QWidget{background-color:"+Graphics::palette().windowWidget+";}");
 
     QVBoxLayout *buttons = new QVBoxLayout();
     buttons->setSpacing(2);
@@ -28,6 +28,14 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
         selTheme->addOption(themesList->at(i),i);
     }
     buttons->addWidget(selTheme);
+
+    // Session save/load buttons
+    WidgetSeparator *sepSession = new WidgetSeparator(this,"");
+    buttons->addWidget(sepSession);
+    buttonsSession = new WidgetButtons(this,2,ButtonTypes::NORMAL,"Session");
+    buttonsSession->setText("   Save   ",0);
+    buttonsSession->setText("   Load   ",1);
+    buttons->addWidget(buttonsSession);
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     buttons->addItem(verticalSpacer);
@@ -50,6 +58,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     connect(buttonsDone,&WidgetButtons::clicked,this,&SettingsDialog::closeDialog);
     connect(selTheme,&WidgetSelection::selectedIndexChanged,this,&SettingsDialog::restartWarning);
+    connect(buttonsSession,&WidgetButtons::clicked,this,&SettingsDialog::sessionButtonClicked);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -60,7 +69,7 @@ SettingsDialog::~SettingsDialog()
 void SettingsDialog::open()
 {
     infoLabel->setValue("");
-    infoLabel->setColor(Graphics::COLOR_TEXT_ALL);
+    infoLabel->setColor(Graphics::palette().textAll);
     this->show();
     this->raise();
     this->activateWindow();
@@ -86,5 +95,17 @@ void SettingsDialog::closeDialog(int isCanceled)
 void SettingsDialog::restartWarning()
 {
     infoLabel->setValue("Restart needed to take effect");
-    infoLabel->setColor(Graphics::COLOR_WARNING);
+    infoLabel->setColor(Graphics::palette().warning);
+}
+
+void SettingsDialog::sessionButtonClicked(int index, int optionalEmitParam)
+{
+    Q_UNUSED(optionalEmitParam);
+    if(index == 0){
+        // Save
+        emit saveSessionRequested();
+    }else if(index == 1){
+        // Load
+        emit loadSessionRequested();
+    }
 }

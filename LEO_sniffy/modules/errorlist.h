@@ -5,8 +5,6 @@
 
 class ErrorList : public QObject
 {
-
-    Q_OBJECT
 public:
     explicit ErrorList(QObject *parent = nullptr);
     static QString GetErrMessage(uint value);

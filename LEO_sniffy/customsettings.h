@@ -6,19 +6,19 @@
 #include <QIcon>
 #include <QSettings>
 #include <QMessageBox>
+#include <QDateTime>
 
 #include "graphics/graphics.h"
 
+
 class CustomSettings : public QObject
 {
-    Q_OBJECT
 public:
     explicit CustomSettings(QObject *parent = nullptr);
 
     static void loadSettings(QString fileName);
     static void saveSettings();
 
-    static bool askToSaveSession();
     static bool askForSessionRestore(QString device);
     static bool isSessionRestoreRequest();
     static void setNoSessionfound();
@@ -32,8 +32,23 @@ public:
     static void setThemesList(QList<QString> *list);
     static QList<QString> *getThemesList();
 
+    static QString getUserEmail();
+    static void setUserEmail(const QString &value);
 
+    static QString getUserPin();
+    static void setUserPin(const QString &value);
 
+    static QByteArray getLoginToken();
+    static void setLoginToken(const QByteArray &value);
+
+    static QDateTime getTokenValidity();
+    static void setTokenValidity(const QDateTime &value);
+
+    static QString getLastLoginFailure();
+    static void setLastLoginFailure(const QString &value);
+
+    // Authentication helpers
+    static bool hasValidLogin();
 
 private:
     static QString settingFile;
@@ -42,6 +57,12 @@ private:
     static int sessionRestoreAnswer; //-1 not answered
     static int themeIndex;    
     static QList<QString> *themesList;
+
+    static QString userEmail;
+    static QString userPin;
+    static QByteArray loginToken;
+    static QDateTime tokenValidity;
+    static QString lastLoginFailureReason;
 
 signals:
 

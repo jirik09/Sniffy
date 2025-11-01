@@ -1,5 +1,7 @@
 #include "widgetchart.h"
 #include "ui_widgetchart.h"
+#include <QTimer>
+//#include <QGraphicsSimpleTextItem>
 
 widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QWidget(parent),
@@ -7,18 +9,15 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     maxTraces(maxTraces)
 {
     ui->setupUi(this);
-    setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    setStyleSheet("background-color:" + Graphics::palette().dataInputArea);
 
     chart = new QChart();
     chart->legend()->hide();
     chart->setObjectName("chart");
 
-    chart->setBackgroundBrush(QColor(Graphics::COLOR_CHART));
+    chart->setBackgroundBrush(QColor(Graphics::palette().chart));
     chart->setAcceptHoverEvents(true);
     this->setMouseTracking(true);
-
-    QMargins *chrtMargin = new QMargins(0,0,0,0);
-    chart->setMargins(*chrtMargin);
 
     axisX = new QValueAxis;
     axisY = new QValueAxis;
@@ -85,10 +84,26 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     QChartView *chartView = new QChartView(chart);
 
     ui->horizontalLayout_chart->addWidget(chartView);
-    chart->setMargins(QMargins(0,-12,0,0));
+    chart->setMargins(QMargins(0,0,0,0));
     chart->setBackgroundRoundness(0);
 
-    setGraphColor(QColor(Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST));
+    // Ensure we always receive scene mouse events (for grid alpha dot clicks) even if
+    // a module forgets to call enableLocalMouseEvents(). Individual modules can still
+    // later call enableLocalMouseEvents(EventSelection::CLICKS_ONLY) to limit zoom/pan.
+    enableLocalMouseEvents(eventSel);
+
+    setGraphColor(QColor(Graphics::palette().chartGridlegLowContrast));
+    // Default grid transparency 60%
+    setGridTransparencyPercent(60);
+    // Create clickable grid alpha dot in top-right corner of plot
+    gridAlphaDot = new QGraphicsEllipseItem(0,0, gridAlphaDotRadius*1.6, gridAlphaDotRadius*1.6);
+    gridAlphaDot->setZValue(1000);
+    gridAlphaDot->setPen(Qt::NoPen);
+    gridAlphaDot->setBrush(axisX->gridLineColor());
+    if (chart->scene()) chart->scene()->addItem(gridAlphaDot);
+    else QTimer::singleShot(0, this, [this](){ if (chart->scene() && gridAlphaDot && !gridAlphaDot->scene()) chart->scene()->addItem(gridAlphaDot); layoutGridAlphaDot(); });
+    connect(chart, &QChart::plotAreaChanged, this, [this](const QRectF&){ layoutGridAlphaDot(); });
+    layoutGridAlphaDot();
     initContextMenu();
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -114,8 +129,9 @@ void widgetChart::switchToSplineSeriesCallback(){
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
-        series->clear();
     }
+    // Force immediate repaint after switching to line series.
+    updateAxis();
 }
 
 void widgetChart::switchToLineSeriesCallback(){
@@ -137,8 +153,9 @@ void widgetChart::switchToLineSeriesSeamless()
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
-        series->clear();
     }
+    // Force immediate repaint after switching to line series.
+    updateAxis();
 }
 
 void widgetChart::switchToScatterSeriesCallback(){
@@ -158,9 +175,10 @@ void widgetChart::switchToScatterSeriesCallback(){
         seriesList[i]->clear();
         seriesList.replace(i, series);
         createSeries(series);
-        series->clear();
         series->setUseOpenGL(false);
     }
+    // Force immediate repaint after switching to scatter; schedule deferred update
+    updateAxis();
 }
 
 void widgetChart::useOpenGLCallback(){
@@ -183,6 +201,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
 {    
     Q_UNUSED(obj);
 
+    // Process zoom and pan for ALL mode (same structure as original)
     if(eventSel != EventSelection::CLICKS_ONLY){
         if(event->type() == QEvent::GraphicsSceneWheel){ //zoom by wheel
             QGraphicsSceneWheelEvent *ev = (QGraphicsSceneWheelEvent*) event;
@@ -199,46 +218,75 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         }
 
         if(event->type() == QEvent::GraphicsSceneMouseDoubleClick){ //restore zoom on double click
-            localZoom = 1;
-            shift = abs(minX)/(maxX-minX);
-            if(shift>1)shift = 1;
-            if(shift<0)shift = 0;
-            emit localZoomChanged();
-            updateAxis();
+            QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+            // If double-clicked on grid alpha dot, only step transparency (don't reset zoom)
+            if (isPointInGridAlphaDot(ev->scenePos())) {
+                stepGridTransparency();
+                return true; // consume the event
+            }
+            // Only reset zoom in ALL mode (oscilloscope/counter with dynamic redrawing)
+            // In CLICKS_ONLY mode (generators), double-click would corrupt static signal display
+            if (eventSel == EventSelection::ALL) {
+                localZoom = 1;
+                shift = abs(minX)/(maxX-minX);
+                if(shift>1)shift = 1;
+                if(shift<0)shift = 0;
+                emit localZoomChanged();
+                updateAxis();
+            }
         }
 
         if(event->type() == QEvent::GraphicsSceneMouseMove){ //move signal when dragged
-
             QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
-            qreal distance = ((ev->pos().x()- mousePressedPoint.x())/chart->geometry().width())/(localZoom/invZoom);
-            shift = initMouseShift - distance;
-            if(shift>1){
-                shift = 1;
-            }else if(shift<0){
-                shift = 0;
+            if (mousePressed && (ev->buttons() & Qt::LeftButton)) {
+                qreal distance = ((ev->scenePos().x()- mousePressedPoint.x())/chart->geometry().width())/(localZoom/invZoom);
+                shift = initMouseShift - distance;
+                if(shift>1){
+                    shift = 1;
+                }else if(shift<0){
+                    shift = 0;
+                }
+                emit localZoomChanged();
+                updateAxis();
             }
-            emit localZoomChanged();
-            updateAxis();
         }
     }
 
     if(event->type() == QEvent::GraphicsSceneMousePress){ //drag signal
         QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
         mousePressed = true;
-        mousePressedPoint = ev->pos();
+        mousePressedPoint = ev->scenePos();
         initMouseShift = shift;
         QApplication::setOverrideCursor(QCursor(Qt::ClosedHandCursor));
-        while (mousePressed) {
-            Timing *timer = new Timing();
-            timer->sleep(100);
+        // For CLICKS_ONLY mode: emit click event for data editing
+        if (eventSel == EventSelection::CLICKS_ONLY && ev->button() == Qt::LeftButton) {
+            if (!isPointInGridAlphaDot(ev->scenePos()))
+                emit mouseLeftClickEvent(ev);
         }
     }
 
     if(event->type() == QEvent::GraphicsSceneMouseRelease){
         mousePressed = false;
         QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
-        emit mouseLeftClickEvent(ev);
+        // If released inside (enlarged) dot area, consume and step transparency
+        if (isPointInGridAlphaDot(ev->scenePos())) {
+            stepGridTransparency();
+            QApplication::restoreOverrideCursor();
+            return true;
+        }
+        // For CLICKS_ONLY mode: treat releases as clicks too
+        if (eventSel == EventSelection::CLICKS_ONLY && ev->button() == Qt::LeftButton)
+            emit mouseLeftClickEvent(ev);
         QApplication::restoreOverrideCursor();
+    }
+
+    // Continuous editing while left button is held (CLICKS_ONLY mode only)
+    if (event->type() == QEvent::GraphicsSceneMouseMove) {
+        QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
+        if (eventSel == EventSelection::CLICKS_ONLY && mousePressed && (ev->buttons() & Qt::LeftButton)) {
+            if (!isPointInGridAlphaDot(ev->scenePos()))
+                emit mouseLeftClickEvent(ev);
+        }
     }
 
     if(event->type() == QEvent::GraphicsSceneHoverEnter){
@@ -249,9 +297,6 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         QApplication::restoreOverrideCursor();
     }
 
-    if(event->type() != QEvent::LayoutRequest && event->type()!=QEvent::GraphicsSceneHoverMove){
-        // qDebug() <<"Sereies event"<< event->type() << obj->objectName();
-    }
     return QObject::eventFilter(obj, event);
 }
 
@@ -279,8 +324,11 @@ void widgetChart::clearPoint(int traceIndex, int index){
 }
 
 void widgetChart::updateTrace(QVector<QPointF> *points, int index){
-    const QVector<QPointF> &seriesData = *points;
-    seriesList[index]->replace(seriesData);
+    if(!points || index < 0 || index >= seriesList.size()) {
+        qWarning() << "widgetChart::updateTrace invalid index or null points" << index;
+        return;
+    }
+    seriesList[index]->replace(*points);
 }
 
 void widgetChart::appendToTrace(int index, QVector<QPointF> *points){
@@ -358,6 +406,9 @@ qreal widgetChart::getSignalValue(int traceIndex, qreal time)
             closestSmallerIndex = i;
         }
     }
+    if (seriesList[traceIndex]->count()<closestSmallerIndex+2){
+        return 0;
+    }
     if (closestSmallerIndex == seriesList[traceIndex]->count()-1){
         return seriesList[traceIndex]->at(closestSmallerIndex).y();
     }
@@ -368,8 +419,7 @@ qreal widgetChart::getSignalValue(int traceIndex, qreal time)
 }
 
 void widgetChart::setMargins(int left, int top, int right, int bottom){
-    QMargins *chrtMargin = new QMargins(left, top, right, bottom);
-    chart->setMargins(*chrtMargin);
+    chart->setMargins(QMargins(left, top, right, bottom));
 }
 
 void widgetChart::setZoom(float zoom){
@@ -395,7 +445,7 @@ void widgetChart::setLocalZoom(const qreal &value)
 
 /* range -100 to 100 (represents percent value) */
 void widgetChart::setShift (float shift){
-    this->shift = (shift/2+50)/100;
+    this->shift = percentToInternalShift(shift);
     updateAxis();
 }
 
@@ -404,10 +454,25 @@ qreal widgetChart::getShift()
     return shift;
 }
 
+qreal widgetChart::getShiftPercent() const
+{
+    return internalShiftToPercent(shift);
+}
+
 void widgetChart::enableLocalMouseEvents(EventSelection sel)
 {
-    chart->installEventFilter(this);
     eventSel = sel;
+    // Install on the scene to receive GraphicsScene* events reliably
+    if (chart->scene()) {
+        chart->scene()->installEventFilter(this);
+    } else {
+        // Defer until the scene exists (after QChartView creates it)
+        QTimer::singleShot(0, this, [this]() {
+            if (chart->scene()) {
+                chart->scene()->installEventFilter(this);
+            }
+        });
+    }
 }
 
 void widgetChart::setGridLinesVisible(bool gridVisibleX, bool gridVisibleY){
@@ -424,6 +489,14 @@ void widgetChart::setGridHorizontalDensity(int tickX){
     axisX->setTickCount(tickX);
 }
 
+void widgetChart::setGridTransparencyPercent(int percent)
+{
+    if (percent < 0) percent = 0;
+    if (percent > 100) percent = 100;
+    gridTransparencyPercent = percent;
+    applyGridTransparency();
+}
+
 void widgetChart::setGraphColor(QColor qColor){
     axisX->setLabelsBrush(QBrush(qColor));
     axisY->setLabelsBrush(QBrush(qColor));
@@ -433,9 +506,42 @@ void widgetChart::setGraphColor(QColor qColor){
     axisY->setGridLineColor(qColor);
     axisX->setLinePenColor(qColor);
     axisY->setLinePenColor(qColor);
+    applyGridTransparency(); // re-apply alpha to gridlines after color change
+}
+
+void widgetChart::applyGridTransparency()
+{
+    // Convert percent to alpha 0..255 and apply only to grid line colors of main axes
+    const int alpha = static_cast<int>(qRound(gridTransparencyPercent * 2.55));
+    QColor gridX = axisX->gridLineColor(); gridX.setAlpha(alpha); axisX->setGridLineColor(gridX);
+    QColor gridY = axisY->gridLineColor(); gridY.setAlpha(alpha); axisY->setGridLineColor(gridY);
+
+    // Apply alpha to axis line pens too (left/bottom borders), so border lines fade equally
+    QPen penX = axisX->linePen(); penX.setColor(QColor(penX.color().red(), penX.color().green(), penX.color().blue(), alpha)); axisX->setLinePen(penX);
+    QPen penY = axisY->linePen(); penY.setColor(QColor(penY.color().red(), penY.color().green(), penY.color().blue(), alpha)); axisY->setLinePen(penY);    
+
+    // Update the indicator dot to reflect current grid color
+    if (gridAlphaDot) gridAlphaDot->setBrush(gridX);
+    // Trigger a repaint
+    chart->update();
+}
+
+void widgetChart::layoutGridAlphaDot()
+{
+    if (!chart || !gridAlphaDot) return;
+    const QRectF plot = chart->plotArea();
+    if (plot.isEmpty()) return;
+    const qreal x = plot.right() - gridAlphaDotMargin - gridAlphaDotRadius*1.8;
+    const qreal y = plot.top() + gridAlphaDotMargin;
+    const QPointF scenePt = chart->mapToScene(QPointF(x, y));
+    gridAlphaDot->setPos(scenePt);
 }
 
 void widgetChart::setTraceColor(int index, QColor color){
+    if(index < 0 || index >= seriesList.size()) {
+        qWarning() << "widgetChart::setTraceColor invalid index" << index;
+        return;
+    }
     seriesList.at(index)->setColor(color);
 }
 
@@ -474,6 +580,8 @@ void widgetChart::createHorizontalMarkers(){
     axisX_UnitRange->setRange(0, 1);
     axisX_UnitRange->setLabelsVisible(false);
     axisX_UnitRange->setTickCount(2);
+    axisX_UnitRange->setLineVisible(false); // avoid double-drawing along the top border
+    axisX_UnitRange->setGridLineVisible(false); // prevent extra edge grid lines from this helper axis
     chart->addAxis(axisX_UnitRange, Qt::AlignTop);
 }
 
@@ -483,53 +591,52 @@ void widgetChart::createVerticalMarkers(){
     axisY_UnitRange->setRange(0, 1);
     axisY_UnitRange->setLabelsVisible(false);
     axisY_UnitRange->setTickCount(2);
+    axisY_UnitRange->setLineVisible(false); // avoid double-drawing along the right border
+    axisY_UnitRange->setGridLineVisible(false); // prevent extra edge grid lines from this helper axis
     chart->addAxis(axisY_UnitRange, Qt::AlignRight);
 }
 
 void widgetChart::initBrushes()
 {
-    MarkerPath_ArrowDownBig = new QPainterPath();
-    MarkerPath_ArrowDownBig->lineTo(10,20);
-    MarkerPath_ArrowDownBig->lineTo(20,0);
+    MarkerPath_ArrowDownBig = QPainterPath();
+    MarkerPath_ArrowDownBig.lineTo(10,20);
+    MarkerPath_ArrowDownBig.lineTo(20,0);
 
-    MarkerPath_Tick = new QPainterPath(QPoint(0,7));
-    MarkerPath_Tick->lineTo(14,7);
-    MarkerPath_Tick->lineTo(19,10);
-    MarkerPath_Tick->lineTo(14,13);
-    MarkerPath_Tick->lineTo(0,13);
+    MarkerPath_Tick = QPainterPath(QPoint(0,7));
+    MarkerPath_Tick.lineTo(14,7);
+    MarkerPath_Tick.lineTo(19,10);
+    MarkerPath_Tick.lineTo(14,13);
+    MarkerPath_Tick.lineTo(0,13);
 
-    MarkerPath_ArrowDownSmall = new QPainterPath(QPointF(5,0));
-    MarkerPath_ArrowDownSmall->lineTo(10,10);
-    MarkerPath_ArrowDownSmall->lineTo(15,0);
+    MarkerPath_ArrowDownSmall = QPainterPath(QPointF(5,0));
+    MarkerPath_ArrowDownSmall.lineTo(10,10);
+    MarkerPath_ArrowDownSmall.lineTo(15,0);
 
-    MarkerPath_ArrowUpSmall = new QPainterPath(QPointF(5,20));
-    MarkerPath_ArrowUpSmall->lineTo(10,10);
-    MarkerPath_ArrowUpSmall->lineTo(15,20);
+    MarkerPath_ArrowUpSmall = QPainterPath(QPointF(5,20));
+    MarkerPath_ArrowUpSmall.lineTo(10,10);
+    MarkerPath_ArrowUpSmall.lineTo(15,20);
 
+    MarkerPath_Cross = QPainterPath(QPointF(7,7));
+    MarkerPath_Cross.lineTo(13,13);
+    MarkerPath_Cross.moveTo(7,13);
+    MarkerPath_Cross.lineTo(13,7);
 
-    MarkerPath_Cross = new QPainterPath(QPointF(7,7));
-    MarkerPath_Cross->lineTo(13,13);
-    MarkerPath_Cross->moveTo(7,13);
-    MarkerPath_Cross->lineTo(13,7);
+    MarkerPath_Circle = QPainterPath(QPointF(10,10));
+    MarkerPath_Circle.arcTo(QRectF(8,8,4,4),0,360*16);
 
-    MarkerPath_Circle = new QPainterPath(QPointF(10,10));
-    MarkerPath_Circle->arcTo(QRectF(8,8,4,4),0,360*16);
-
-    MarkerPath_Trigger = new QPainterPath(QPointF(0,5));
-    MarkerPath_Trigger->lineTo(15,5);
-    MarkerPath_Trigger->lineTo(20,10);
-    MarkerPath_Trigger->lineTo(15,15);
-
-    MarkerPath_Trigger->lineTo(13,15);
-    MarkerPath_Trigger->lineTo(13,10);
-    MarkerPath_Trigger->lineTo(16,10);
-    MarkerPath_Trigger->lineTo(16,7);
-    MarkerPath_Trigger->lineTo(7,7);
-    MarkerPath_Trigger->lineTo(7,10);
-    MarkerPath_Trigger->lineTo(10,10);
-    MarkerPath_Trigger->lineTo(10,15);
-
-    MarkerPath_Trigger->lineTo(0,15);
+    MarkerPath_Trigger = QPainterPath(QPointF(0,5));
+    MarkerPath_Trigger.lineTo(15,5);
+    MarkerPath_Trigger.lineTo(20,10);
+    MarkerPath_Trigger.lineTo(15,15);
+    MarkerPath_Trigger.lineTo(13,15);
+    MarkerPath_Trigger.lineTo(13,10);
+    MarkerPath_Trigger.lineTo(16,10);
+    MarkerPath_Trigger.lineTo(16,7);
+    MarkerPath_Trigger.lineTo(7,7);
+    MarkerPath_Trigger.lineTo(7,10);
+    MarkerPath_Trigger.lineTo(10,10);
+    MarkerPath_Trigger.lineTo(10,15);
+    MarkerPath_Trigger.lineTo(0,15);
 
 }
 
@@ -544,92 +651,81 @@ QBrush widgetChart::getBrush(int channelIndex, MarkerType type)
     painter.setBrush(painter.pen().color());
     switch (type) {
     case MarkerType::ARROW_DOWN_BIG:
-        painter.drawPath(*MarkerPath_ArrowDownBig);
+    painter.drawPath(MarkerPath_ArrowDownBig);
         break;
     case MarkerType::ARROW_UP_SMALL:
-        painter.drawPath(*MarkerPath_ArrowUpSmall);
+    painter.drawPath(MarkerPath_ArrowUpSmall);
         break;
     case MarkerType::ARROW_DOWN_SMALL:
-        painter.drawPath(*MarkerPath_ArrowDownSmall);
+    painter.drawPath(MarkerPath_ArrowDownSmall);
         break;
     case MarkerType::TICK:
-        painter.drawPath(*MarkerPath_Tick);
+    painter.drawPath(MarkerPath_Tick);
         break;
     case MarkerType::CROSS:
         painter.setPen(QPen(QBrush(QColor(Graphics::getChannelColor(channelIndex))), 2.0));
-        painter.drawPath(*MarkerPath_Cross);
+    painter.drawPath(MarkerPath_Cross);
         break;
     case MarkerType::CIRCLE:
-        painter.drawPath(*MarkerPath_Circle);
+    painter.drawPath(MarkerPath_Circle);
         break;
     case MarkerType::TRIGGER:
-        painter.drawPath(*MarkerPath_Trigger);
+    painter.drawPath(MarkerPath_Trigger);
         break;
     }
     return marker;
 }
 
 void widgetChart::setHorizontalMarker(int channelIndex, qreal value, MarkerType type){
-    QPointF pt = QPointF(0.005,value);
-    QList<QPointF> *lst = new QList<QPointF>;
-    lst->append(pt);
-    markersHorizontal[markerHorizontalIndex]->setBrush(getBrush(channelIndex,type));
-    markersHorizontal[markerHorizontalIndex]->replace(*lst);
-    markerHorizontalIndex++;
+    if(markerHorizontalIndex < markersHorizontal.size()){
+        const QPointF pt(HORIZONTAL_MARKER_X_OFFSET,value);
+        QVector<QPointF> pts{pt};
+        markersHorizontal[markerHorizontalIndex]->setBrush(getBrush(channelIndex,type));
+        markersHorizontal[markerHorizontalIndex]->replace(pts);
+        ++markerHorizontalIndex;
+    }
 }
 
 void widgetChart::setVerticalMarker(int channelIndex, qreal value){
-    QPointF pt = QPointF(value,0.99);
-    triggerShift = value;
-    QList<QPointF> *lst = new QList<QPointF>;
-    lst->append(pt);
-    markersVertical[markerVerticalIndex]->setBrush(getBrush(channelIndex,MarkerType::ARROW_DOWN_BIG));
-    markersVertical[markerVerticalIndex]->replace(*lst);
-    markerVerticalIndex++;
+    if(markerVerticalIndex < markersVertical.size()){
+        const QPointF pt(value,VERTICAL_MARKER_Y_OFFSET);
+        triggerShift = value;
+        QVector<QPointF> pts{pt};
+        markersVertical[markerVerticalIndex]->setBrush(getBrush(channelIndex,MarkerType::ARROW_DOWN_BIG));
+        markersVertical[markerVerticalIndex]->replace(pts);
+        ++markerVerticalIndex;
+    }
 }
 
 void widgetChart::setHorizontalCursor(int channelIndex, qreal value, Cursor type)
 {
-    QPointF start = QPointF(value,0.0);
-    QPointF end = QPointF(value,1.0);
-    QList<QPointF> *lst = new QList<QPointF>;
-    lst->append(start);
-    lst->append(end);
-
-    QPen *pen = new QPen();
-    pen->setColor(Graphics::getChannelColor(channelIndex));
-    pen->setWidth(2);
+    const QVector<QPointF> pts{QPointF(value,0.0), QPointF(value,1.0)};
+    QPen pen(Graphics::getChannelColor(channelIndex));
+    pen.setWidth(2);
     if(type == Cursor::CURSOR_A){
-        pen->setStyle(Qt::DashLine);
-        cursorsHorizontal[0]->setPen(*pen);
-        cursorsHorizontal[0]->replace(*lst);
+        pen.setStyle(Qt::DashLine);
+        cursorsHorizontal[0]->setPen(pen);
+        cursorsHorizontal[0]->replace(pts);
     }else{
-        pen->setStyle(Qt::DashDotLine);
-        cursorsHorizontal[1]->setPen(*pen);
-        cursorsHorizontal[1]->replace(*lst);
+        pen.setStyle(Qt::DashDotLine);
+        cursorsHorizontal[1]->setPen(pen);
+        cursorsHorizontal[1]->replace(pts);
     }
 }
 
 void widgetChart::setVerticalCursor(int channelIndex, qreal value, Cursor type)
 {
-    QPointF start = QPointF(0.0,value);
-    QPointF end = QPointF(1.0,value);
-    QList<QPointF> *lst = new QList<QPointF>;
-    lst->append(start);
-    lst->append(end);
-
-    QPen *pen = new QPen();
-    pen->setColor(Graphics::getChannelColor(channelIndex));
-    pen->setWidth(2);
-
+    const QVector<QPointF> pts{QPointF(0.0,value), QPointF(1.0,value)};
+    QPen pen(Graphics::getChannelColor(channelIndex));
+    pen.setWidth(2);
     if(type == Cursor::CURSOR_A){
-        pen->setStyle(Qt::DashLine);
-        cursorsVertical[0]->setPen(*pen);
-        cursorsVertical[0]->replace(*lst);
+        pen.setStyle(Qt::DashLine);
+        cursorsVertical[0]->setPen(pen);
+        cursorsVertical[0]->replace(pts);
     }else{
-        pen->setStyle(Qt::DashDotLine);
-        cursorsVertical[1]->setPen(*pen);
-        cursorsVertical[1]->replace(*lst);
+        pen.setStyle(Qt::DashDotLine);
+        cursorsVertical[1]->setPen(pen);
+        cursorsVertical[1]->replace(pts);
     }
 }
 
@@ -669,7 +765,24 @@ void widgetChart::initContextMenu(){
 }
 
 void widgetChart::rightClickCallback(const QPoint &mousePos){
+    // If style selection is disabled for this chart, show a placeholder action
+    if (!allowStyleSelection) {
+        // Lazily create placeholder action so translations can be applied centrally
+        if (!placeholderAction) {
+            placeholderAction = new QAction(tr("Options..."), this);
+            placeholderAction->setEnabled(false); // currently just a placeholder
+        }
+        QMenu tmpMenu(this);
+        tmpMenu.addAction(placeholderAction);
+        tmpMenu.exec(mapToGlobal(mousePos));
+        return;
+    }
     menu->exec(mapToGlobal(mousePos));
+}
+
+void widgetChart::setAllowStyleSelection(bool allow)
+{
+    allowStyleSelection = allow;
 }
 
 void widgetChart::hovered(const QPointF &point){
@@ -686,4 +799,38 @@ void widgetChart::handleCursorPress()
 void widgetChart::handleCursorRelease()
 {
     QApplication::restoreOverrideCursor();
+}
+
+bool widgetChart::mapSceneToPlotNormalized(const QPointF &scenePos, qreal &nx, qreal &ny) const
+{
+    if (!chart) return false;
+    // Convert scene position to chart-local coordinates, then normalize against plotArea
+    const QPointF chartPos = chart->mapFromScene(scenePos);
+    const QRectF plot = chart->plotArea();
+    const qreal w = plot.width();
+    const qreal h = plot.height();
+    if (w <= 0 || h <= 0) { nx = ny = 0; return false; }
+    nx = (chartPos.x() - plot.left()) / w;
+    ny = (chartPos.y() - plot.top()) / h;
+    // Clamp to 0..1 range
+    bool inside = (nx >= 0.0 && nx <= 1.0 && ny >= 0.0 && ny <= 1.0);
+    if (nx < 0.0) nx = 0.0; else if (nx > 1.0) nx = 1.0;
+    if (ny < 0.0) ny = 0.0; else if (ny > 1.0) ny = 1.0;
+    return inside;
+}
+
+QChart* widgetChart::getChart() const 
+{ 
+    return chart;
+}
+
+bool widgetChart::isPointInGridAlphaDot(const QPointF &scenePos) const
+{
+    if (!gridAlphaDot) return false;
+    // Center of the visual ellipse in scene coordinates
+    QPointF center = gridAlphaDot->sceneBoundingRect().center();
+    const qreal visualRadius = (gridAlphaDot->rect().width() * gridAlphaDot->sceneTransform().m11()) / 2.0; // approximate scale (uniform expected)
+    const qreal effectiveRadius = visualRadius * gridAlphaDotClickableFactor; // enlarge clickable area
+    const qreal dist2 = QLineF(center, scenePos).length();
+    return dist2 <= effectiveRadius;
 }

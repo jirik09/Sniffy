@@ -5,7 +5,6 @@
 #include <QColor>
 
 #include "../abstracttheme.h"
-#include "../graphics.h"
 
 #define LIGHT_GRAPHICS_PATH  ":/graphics/graphics/themes/light/"
 #define LIGHT_FONT           "'MS Shell Dlg 2'"
@@ -183,7 +182,6 @@ QWidget{font: 9pt" LIGHT_FONT "; color:" LIGHT_TEXT_COMPONENT ";}"
 
 class Light : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit Light(QObject *parent = nullptr);
 
@@ -191,6 +189,7 @@ public:
     QString getGraphicsPath();
 
     QString getChannelColor(int channelIndex);
+    ThemePalette buildPalette() override;
 
 private:
     QList<QColor> chanColor =

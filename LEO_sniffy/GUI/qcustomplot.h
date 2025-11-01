@@ -26,6 +26,12 @@
 #ifndef QCUSTOMPLOT_H
 #define QCUSTOMPLOT_H
 
+// Suppress -Wshadow warnings for third-party library code (QCustomPlot)
+#if defined(__GNUC__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wshadow"
+#endif
+
 #include <QtCore/qglobal.h>
 
 // some Qt version/configuration dependent macros to include or exclude certain code paths:
@@ -38,6 +44,10 @@
 #  if QT_VERSION >= QT_VERSION_CHECK(5, 3, 0)
 #    define QCP_OPENGL_OFFSCREENSURFACE
 #  endif
+#endif
+
+#if defined(__GNUC__)
+#  pragma GCC diagnostic pop
 #endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 4, 0)
@@ -156,25 +166,11 @@ class QCPPolarGraph;
   
   It provides QMetaObject-based reflection of its enums and flags via \a QCP::staticMetaObject.
 */
-#ifndef Q_MOC_RUN
 namespace QCP {
-#else
-class QCP { // when in moc-run, make it look like a class, so we get Q_GADGET, Q_ENUMS/Q_FLAGS features in namespace
-  Q_GADGET
-  Q_ENUMS(ExportPen)
-  Q_ENUMS(ResolutionUnit)
-  Q_ENUMS(SignDomain)
-  Q_ENUMS(MarginSide)
-  Q_FLAGS(MarginSides)
-  Q_ENUMS(AntialiasedElement)
-  Q_FLAGS(AntialiasedElements)
-  Q_ENUMS(PlottingHint)
-  Q_FLAGS(PlottingHints)
-  Q_ENUMS(Interaction)
-  Q_FLAGS(Interactions)
-  Q_ENUMS(SelectionRectMode)
-  Q_ENUMS(SelectionType)
-public:
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+// Enable Qt6 namespace meta object generation so that moc generated
+// qt_create_metaobjectdata<> specialization compiles.
+Q_NAMESPACE
 #endif
 
 /*!
@@ -4047,7 +4043,7 @@ PlottableType *QCustomPlot::plottableAt(const QPointF &pos, bool onlySelectable,
   QVariant resultDetails;
   double resultDistance = mSelectionTolerance; // only regard clicks with distances smaller than mSelectionTolerance as selections, so initialize with that value
   
-  foreach (QCPAbstractPlottable *plottable, mPlottables)
+  for (QCPAbstractPlottable *plottable : mPlottables)
   {
     PlottableType *currentPlottable = qobject_cast<PlottableType*>(plottable);
     if (!currentPlottable || (onlySelectable && !currentPlottable->selectable())) // we could have also passed onlySelectable to the selectTest function, but checking here is faster, because we have access to QCPAbstractPlottable::selectable
@@ -4093,7 +4089,7 @@ ItemType *QCustomPlot::itemAt(const QPointF &pos, bool onlySelectable) const
   ItemType *resultItem = 0;
   double resultDistance = mSelectionTolerance; // only regard clicks with distances smaller than mSelectionTolerance as selections, so initialize with that value
   
-  foreach (QCPAbstractItem *item, mItems)
+  for (QCPAbstractItem *item : mItems)
   {
     ItemType *currentItem = qobject_cast<ItemType*>(item);
     if (!currentItem || (onlySelectable && !currentItem->selectable())) // we could have also passed onlySelectable to the selectTest function, but checking here is faster, because we have access to QCPAbstractItem::selectable

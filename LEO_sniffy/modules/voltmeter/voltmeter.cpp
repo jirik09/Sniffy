@@ -46,12 +46,13 @@ void Voltmeter::parseData(QByteArray data)
 {
     QByteArray dataHeader = data.left(4);
 
-    if(dataHeader=="CFG_"){
+    if(dataHeader==Commands::CONFIG){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
         showModuleControl();
         //TODO parse message from MCU
-    }else if(dataHeader=="OSC_"){
+        
+    }else if(dataHeader==Commands::SCOPE_INCOME){
         quint8 tmpByte;
         quint16 tmpShort;
         qreal x(0);
@@ -126,9 +127,6 @@ void Voltmeter::parseData(QByteArray data)
 
 void Voltmeter::writeConfiguration()
 {
-    if(isConfigurationWritten)return;
-
-    isConfigurationWritten = true;
     //workaround first data was corrupted on channels > 1
     numChannelsEnabled = static_cast<VoltmeterSpec*>(moduleSpecification)->maxADCChannels;
     comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");
@@ -167,7 +165,6 @@ void Voltmeter::startModule()
 
 void Voltmeter::stopModule()
 {
-    isConfigurationWritten = false;
     voltWindow->stopDatalog();
     stopSampling();
 }
@@ -214,7 +211,7 @@ void Voltmeter::updateMeasurement(QList<Measurement *> m)
     }else{
         samplesTaken++;
         voltWindow->showProgress(samplesTaken,samplesToTakeTotal);
-        foreach(Measurement* meas, m){
+        for (Measurement* meas : m) {
             if(meas->getType() == MeasurementType::MEAN){
                 dataRawVoltage[meas->getChannelIndex()].append(meas->getValue()*(realVdd/static_cast<VoltmeterSpec*>(moduleSpecification)->Vref));
             }
@@ -226,7 +223,12 @@ void Voltmeter::updateMeasurement(QList<Measurement *> m)
             isStartup = false;
             for(int i=0;i<MAX_VOLTMETER_CHANNELS;i++){
                 data[i].voltage =  getAverage(&dataRawVoltage[i]);
-                data[i].percent = (data[i].voltage*1000+config->rangeMin)*100/(config->rangeMax-config->rangeMin);
+                // Map voltage (in V) to percentage of configured input range.
+                // rangeMin / rangeMax are in mV, voltage*1000 converts to mV.
+                // Old (incorrect) formula used +rangeMin which produced negative values when rangeMin < 0.
+                data[i].percent = (data[i].voltage*1000 - config->rangeMin) * 100.0 / (config->rangeMax - config->rangeMin);
+                if(data[i].percent < 0) data[i].percent = 0;
+                if(data[i].percent > 100) data[i].percent = 100;
                 if(data[i].voltage>data[i].max){
                     data[i].max = data[i].voltage;
                 }
@@ -234,7 +236,7 @@ void Voltmeter::updateMeasurement(QList<Measurement *> m)
                     data[i].min = data[i].voltage;
                 }
             }
-            foreach(Measurement* meas, m){
+            for (Measurement* meas : m) {
                 if(meas->getType() == MeasurementType::PKPK){
                     data[meas->getChannelIndex()].ripple = meas->getValue();
                 }
@@ -259,7 +261,7 @@ qreal Voltmeter::getAverage(QList<qreal> *list)
 {
     qreal out = 0;
     if (list->length()>=1){
-        foreach(qreal num, *list){
+        for (qreal num : *list) {
             out += num;
         }
         out = out/list->length();

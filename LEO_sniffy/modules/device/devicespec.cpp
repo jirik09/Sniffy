@@ -21,12 +21,8 @@ void DeviceSpec::parseSpecification(QByteArray spec){
         QDataStream streamCLK(specParams[3]);
         streamCLK>>CoreClock;
 
-        QDataStream streamUID(specParams[4]);
-        streamUID>>UID1;
-        streamUID>>UID2;
-        streamUID>>UID3;
-
-        MCU_ID = "0x"+QString::number(UID2 + (UID3>>16),16);
+        // Convert the raw MCU_ID data to hex string
+        MCU_ID = specParams[4].toHex().toUpper();
 
         Build_Date = specParams[5];
 

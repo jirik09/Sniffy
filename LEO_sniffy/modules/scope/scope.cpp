@@ -1,14 +1,13 @@
 #include "scope.h"
 
-Scope::Scope(QObject *parent)
+Scope::Scope(QObject *parent) : AbstractModule(parent)
 {
-    Q_UNUSED(parent);
-    config = new ScopeConfig();
-    moduleSpecification = new ScopeSpec();
+    config = new ScopeConfig(this);
+    moduleSpecification = new ScopeSpec(); // not parented (inherits non-QObject?) ensure deletion upstream
     specification = static_cast<ScopeSpec*>(moduleSpecification);
-    measCalc = new MeasCalculations();
-    mathCalc = new MathCalculations();
-    FFTCalc = new FFTengine();
+    measCalc = new MeasCalculations(this);
+    mathCalc = new MathCalculations(this);
+    FFTCalc = new FFTengine(this);
     scpWindow = new ScopeWindow(config);
     scpWindow->setObjectName("scpWindow");
 
@@ -17,7 +16,7 @@ Scope::Scope(QObject *parent)
     moduleName = "Oscilloscope";
     moduleIconURI = Graphics::getGraphicsPath()+"icon_scope.png";
 
-    scopeData = new QVector<QVector<QPointF>>;
+    scopeData.clear();
     timeAndMemoryHandle = new TimeBaseAndMemory(config,this);
 
     //connect signals from GUI into scope
@@ -50,21 +49,24 @@ Scope::Scope(QObject *parent)
 }
 
 void Scope::parseData(QByteArray data){
+    // Contract: Accepts raw module data frames. Never throws exceptions (Qt style).
+    // Malformed frames are logged and ignored. Side-effects: may update GUI and internal buffers.
     QByteArray dataHeader = data.left(4);
 
-    if(dataHeader=="CFG_"){
+    if(dataHeader==Commands::CONFIG){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
         showModuleControl();
         buildModuleDescription(specification);
-    }else if(dataHeader=="SMPL"){
+
+    }else if(dataHeader==Commands::SAMPLING){
         if(config->triggerMode!=ScopeTriggerMode::TRIG_STOP){
             scpWindow->samplingOngoing();
         }
-    }else if(dataHeader=="TRIG"){
+    }else if(dataHeader==Commands::TRIGGERED){
         scpWindow->triggerCaptured();
 
-    }else if(dataHeader=="OSC_"){
+    }else if(dataHeader==Commands::SCOPE_INCOME){
         quint8 tmpByte;
         quint16 tmpShort;
         qreal minX = 0;
@@ -78,6 +80,12 @@ void Scope::parseData(QByteArray data){
         int numChannels=1;
 
         QDataStream streamBuffLeng(data);
+
+        // Basic sanity: ensure we have at least header + minimal payload for one channel
+        if (data.size() < 32) {
+            qWarning() << "OSC_ frame too short" << data.size();
+            return;
+        }
 
         while (numChannels>currentChannel){
             streamBuffLeng>>samplingFreq;
@@ -102,16 +110,21 @@ void Scope::parseData(QByteArray data){
             config->numberOfChannelsReceived = numChannels;
 
             QVector<QPointF> points;
-            if(length<500000){
-                points.reserve(length);
-            }else{
-                qDebug() << "ERROR Too long signal to be alocated" << length;
+            if(length <= 0){
+                qWarning() << "Invalid length in OSC_ frame" << length;
+                return; // abort parsing whole frame
             }
+            if(length > 500000){
+                qWarning() << "Too long signal length rejected" << length;
+                return;
+            }
+            points.reserve(length);
 
             if(resolution>8){
                 minX = float(samples)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
                 config->timeMin = minX;
                 for (int j(0); j < length/2; j++){
+                    if(streamBuffLeng.atEnd()) { qWarning() << "Unexpected end of data (16-bit path)"; break; }
                     streamBuffLeng>>tmpByte;
                     tmpShort = tmpByte;
                     streamBuffLeng>>tmpByte;
@@ -126,6 +139,7 @@ void Scope::parseData(QByteArray data){
                 minX = float(samples)*1.0/samplingFreq * ((100.0-config->pretriggerPercent)/100.0 - 1);
                 config->timeMin = minX;
                 for (int j(0); j < length; j++){
+                    if(streamBuffLeng.atEnd()) { qWarning() << "Unexpected end of data (8-bit path)"; break; }
                     streamBuffLeng>>tmpByte;
                     tmpShort = tmpByte;
                     x=j*1.0/samplingFreq + minX;
@@ -136,24 +150,23 @@ void Scope::parseData(QByteArray data){
                 config->timeMax = maxX;
             }
 
-            while(numChannels<scopeData->length()){ //remove signals which will not be filled
-                scopeData->removeAt(scopeData->length()-1);
+            while(numChannels<scopeData.length()){ //remove signals which will not be filled
+                scopeData.removeAt(scopeData.length()-1);
             }
-
-            if(scopeData->length()>=currentChannel){
-                scopeData->replace(currentChannel-1,points);
+            if(scopeData.length()>=currentChannel){
+                scopeData.replace(currentChannel-1,points);
             }else{
-                scopeData->append(points);
+                scopeData.append(points);
             }
         }
 
         if(currentChannel==numChannels){
-            measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
-            mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
+            measCalc->calculate(scopeData,config->scopeMeasList,config->realSamplingRate);
+            mathCalc->calculate(scopeData,config->realSamplingRate,mathExpression);
             if(FFTlength !=0 && numChannels>FFTChannelIndex){
-                FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
+                FFTCalc->calculate(scopeData.at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
             }
-            scpWindow->showDataTraces(*scopeData,config->timeBase, config->triggerChannelIndex);
+            scpWindow->showDataTraces(scopeData,config->timeBase, config->triggerChannelIndex);
 
             qreal zoomMultSampling = float(config->requestedSamplingRate)/config->realSamplingRate;//signal sometimes need to be zoomed to show correct value V/div
             qreal zoomMultLength = (float)samples/config->dataLength;
@@ -169,14 +182,11 @@ void Scope::parseData(QByteArray data){
             }
         }
     }else{
-        qDebug() << "ERROR such data cannot be parsed in Scope";
+        qWarning() << "[Scope][parseData] Unknown data header" << dataHeader;
     }
 }
 
 void Scope::writeConfiguration(){
-    if(isConfigurationWritten)return;
-
-    isConfigurationWritten = true;
     scpWindow->restoreGUIAfterStartup();
     scpWindow->setNumChannels(specification->maxADCChannels);
     scpWindow->setRealSamplingRateAndLlength(config->realSamplingRate,config->dataLength);
@@ -205,8 +215,11 @@ QByteArray Scope::getConfiguration(){
     return config->serialize();
 }
 
+Scope::~Scope(){
+    stopModule();
+}
+
 void Scope::stopModule(){
-    isConfigurationWritten = false;
     stopSampling();
     measCalc->exit();
     mathCalc->exit();
@@ -277,7 +290,7 @@ void Scope::updateResolution(int resolution)
 }
 
 void Scope::updateChannelsEnable(int buttonStatus){
-    scpWindow->showDataTraces(*scopeData,config->timeBase,config->triggerChannelIndex);
+    scpWindow->showDataTraces(scopeData,config->timeBase,config->triggerChannelIndex);
     timeAndMemoryHandle->setNumOfChannels(fmax(log2(buttonStatus),0)+1);
 }
 
@@ -287,7 +300,7 @@ void Scope::addMeasurement(Measurement *m){
         config->scopeMeasList.removeFirst();
     }
     config->measCount= config->scopeMeasList.length();
-    measCalc->calculate(*scopeData,config->scopeMeasList,config->realSamplingRate);
+    measCalc->calculate(scopeData,config->scopeMeasList,config->realSamplingRate);
 }
 
 void Scope::clearMeasurement(){
@@ -333,7 +346,7 @@ void Scope::updateMath(int errorPosition)
 void Scope::updateMathExpression(QString exp)
 {
     mathExpression = exp;
-    mathCalc->calculate(*scopeData,config->realSamplingRate,mathExpression);
+    mathCalc->calculate(scopeData,config->realSamplingRate,mathExpression);
 }
 
 void Scope::updateFFTConfig(int length, FFTWindow window, FFTType type, int channelIndex)
@@ -344,7 +357,7 @@ void Scope::updateFFTConfig(int length, FFTWindow window, FFTType type, int chan
     FFTChannelIndex = channelIndex;
 
     if(FFTlength !=0 && config->numberOfChannelsReceived>FFTChannelIndex){
-        FFTCalc->calculate(scopeData->at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
+    FFTCalc->calculate(scopeData.at(FFTChannelIndex),FFTwindow,FFTtype,FFTlength,true,config->realSamplingRate);
     }
 }
 

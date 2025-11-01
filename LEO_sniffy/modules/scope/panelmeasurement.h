@@ -19,7 +19,6 @@ class PanelMeasurement: public QObject
     Q_OBJECT
 public:
     explicit PanelMeasurement(QVBoxLayout *destination, QWidget *parent = nullptr);
-    void setNumChannels(int chann);
 
 signals:
     void measurementAdded(Measurement *m);
@@ -44,10 +43,9 @@ public slots:
 
 public:
     WidgetButtons *channelButtons;
-
-private:
     WidgetButtons *channelButtonPhaseA;
     WidgetButtons *channelButtonPhaseB;
+private:   
     QList<WidgetButtons*> measButtons;
 };
 

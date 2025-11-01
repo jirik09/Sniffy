@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <QPushButton>
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/widgetseparator.h"
@@ -39,6 +40,7 @@ public:
 
     PatternGeneratorSettings *settings;    
     PatternGeneratorPatterns *patterns;
+    QPushButton *buttonGridAlpha = nullptr; // top-right grid transparency stepper
 
     void restoreGUIAfterStartup();
     void setSpecification(PatternGeneratorSpec* spec);    
@@ -55,11 +57,10 @@ private:
     PatternGeneratorSpec *spec;    
     PatternGeneratorPainter *painter;
 
-//    QCustomPlot *plot;
-//    QCPGraph *graph;
-//    widgetChart *chart;
-
     QList<patttype> *patternData;
+    // Track last edited cell to avoid toggling repeatedly while dragging over same point
+    int lastEditedChannel = -1;
+    int lastEditedPosition = -1;
 
 private slots:
     void patternSelectionChangedCallback(int index);
@@ -79,6 +80,10 @@ private slots:
 signals:
     void runGenerator();
     void stopGenerator();
+    // Emitted when user switches to I2C protocol pattern in the dropdown
+    void i2cSelected();
+    // Emitted when user leaves the I2C pattern (previous pattern was I2C, new is not)
+    void i2cDeselected();
 };
 
 #endif // PATTERNGENERATORWINDOW_H

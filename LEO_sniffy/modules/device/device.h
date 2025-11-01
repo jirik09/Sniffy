@@ -19,10 +19,14 @@ public:
 
     QWidget* getWidget();
     QString getName();
+    QString getMcuId();
 
     void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
 
     void errorHandler(QByteArray error);
+
+    // Clear all module descriptions from the right panel (specification area)
+    void clearAllModuleDescriptions();
 
 private:
     void connectDevice(int index);
@@ -36,6 +40,7 @@ signals:
     void ScanDevices();
     void openDevice(int deviceIndex);
     void closeDevice();
+    void deviceSpecificationReady();
 
 public slots:
     void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);

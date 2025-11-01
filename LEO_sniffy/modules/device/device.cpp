@@ -40,9 +40,9 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
     int i = 0;
 
     deviceWindow->deviceSelection->clear();
-    foreach(devStr, list){
-        deviceWindow->deviceSelection->addOption(devStr.deviceName + " (" + devStr.port + ")",i);
-        i++;
+    for (const DeviceDescriptor &devStr : list) {
+        deviceWindow->deviceSelection->addOption(devStr.deviceName + " (" + devStr.port + ")", i);
+        ++i;
     }
     if(deviceWindow->deviceSelection->count()==0){
         deviceWindow->deviceSelection->addOption("No devices were found",0);
@@ -93,6 +93,13 @@ void Device::passSystemSpecificationToGUI()
     deviceWindow->addModuleDescription("System Info",labels,values);
 }
 
+void Device::clearAllModuleDescriptions()
+{
+    if (deviceWindow) {
+        deviceWindow->clearModuleDescriptions();
+    }
+}
+
 void Device::errorHandler(QByteArray error){
     QMessageBox messageBox;
     messageBox.critical(0,"Error","An error has occured:\n" + error + "\nPlease reconnect the device");
@@ -108,14 +115,15 @@ void Device::parseData(QByteArray data){
     QByteArray feature = data.left(4);
     data.remove(0,4);
 
-    if(feature=="CFG_"){
+    if(feature==Commands::CONFIG){
         deviceSpec = static_cast<DeviceSpec*>(moduleSpecification);
         deviceSpec->parseSpecification(data);
         passSystemSpecificationToGUI();
         deviceWindow->showSpecification(deviceSpec);
         setIcon(Graphics::getGraphicsPath()+"icon_connected.png");
         setModuleName(static_cast<DeviceSpec*>(moduleSpecification)->device);
-    }else if(feature=="ACK_"){
+        emit deviceSpecificationReady(); //try to refresh authentication
+    }else if(feature==Commands::ACK){
         //  qDebug() << "ACK";
     }else{
         qDebug() << "WARNING: Device error message received: " <<ErrorList::GetErrMessage((uint8_t)(feature.at(2)));//<< feature << " "<< data;
@@ -137,4 +145,9 @@ QWidget* Device::getWidget(){
 QString Device::getName()
 {
     return static_cast<DeviceSpec*>(moduleSpecification)->device;
+}
+
+QString Device::getMcuId()
+{
+    return static_cast<DeviceSpec*>(moduleSpecification)->MCU_ID;
 }

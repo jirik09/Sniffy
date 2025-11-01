@@ -15,16 +15,18 @@ FFTengine::~FFTengine()
     wait();
 }
 
-void FFTengine::calculate(QVector<QPointF> data,FFTWindow window,FFTType type, int minNFFT, bool removeDC, qreal samplingFreq)
+// Contract: Thread-safe entry. Copies (moves) input data under mutex, signals fftCalculated() after processing.
+// No exceptions expected; errors would manifest only via invalid sizes (guarded upstream).
+void FFTengine::calculate(QVector<QPointF> data, FFTWindow window, FFTType type, int minNFFT, bool removeDC, qreal samplingFreq)
 {
-    dataIn = data;
-    //dataIn.resize(2048);
+    // Lock first to ensure no race with the worker thread reading shared members.
+    QMutexLocker locker(&mutex);
+    dataIn = std::move(data);
     this->window = window;
     this->lengthNFFT = minNFFT;
     this->type = type;
     this->removeDC = removeDC;
     this->samplingFreq = samplingFreq;
-    QMutexLocker locker(&mutex);
 
     if (!isRunning()) {
         start(NormalPriority);
@@ -50,11 +52,13 @@ void FFTengine::run()
     QVector<std::complex<float>> tmpData;
     QVector<QPointF> tmpIn;
     forever {
-        mutex.lock();
-        tmpIn = dataIn;
+        {
+            QMutexLocker locker(&mutex);
+            tmpIn = dataIn; // snapshot input under lock
+            // flags handled after processing
+        }
         tmpOutput.clear();
         tmpData.clear();
-        mutex.unlock();
 
         if (removeDC) {
             qreal dc = 0;
@@ -79,11 +83,12 @@ void FFTengine::run()
         outputSpectrum = tmpOutput;
         emit fftCalculated();
         // }
-        mutex.lock();
-        if (!restart)
-            condition.wait(&mutex);
-        restart = false;
-        mutex.unlock();
+        {
+            QMutexLocker locker(&mutex);
+            if (!restart)
+                condition.wait(&mutex);
+            restart = false;
+        }
     }
 }
 
@@ -91,27 +96,39 @@ QVector<std::complex<float>> FFTengine::calculateSpectrum(QVector<std::complex<f
     if(data.length()>minNFFT){
         data.resize(minNFFT);
     }
+    // Normalization multipliers (document origin or TODO to derive analytically):
+    static constexpr float HAMMING_NORM   = 2.44f;
+    static constexpr float HANN_NORM      = 2.67f;
+    static constexpr float BLACKMAN_NORM  = 3.125f;
+    static constexpr float FLATTOP_NORM   = 1.33f;
+    // Rectangular window normalization intentionally left at 1.0f (unity pass-through)
 
-    if (window == FFTWindow::hamming) {
-        resizeHamming(data.length());
-        for (int i = 0; i < data.size(); i++)
-            data[i] *= hamming.at(i)*2.44;
-    } else if (window == FFTWindow::hann) {
-        resizeHann(data.length());
-        for (int i = 0; i < data.size(); i++)
-            data[i] *= hann.at(i)*2.67;
-    } else if (window == FFTWindow::blackman) {
-        resizeBlackman(data.length());
-        for (int i = 0; i < data.size(); i++)
-            data[i] *= blackman.at(i)*3.125;
-    } else if (window == FFTWindow::flatTop) {
-        resizeFlatTop(data.length());
-        for (int i = 0; i < data.size(); i++)
-            data[i] *= flatTop.at(i)*1.33;
-    } else if (window == FFTWindow::rectangular) {
-        resizeFlatTop(data.length());
-        for (int i = 0; i < data.size(); i++)
-            data[i] *= 1.33;
+    const int N = data.size();
+    switch(window){
+    case FFTWindow::hamming: {
+        resizeHamming(N);
+        for(int i=0;i<N;++i) data[i] *= hamming.at(i)*HAMMING_NORM;
+        break;
+    }
+    case FFTWindow::hann: {
+        resizeHann(N);
+        for(int i=0;i<N;++i) data[i] *= hann.at(i)*HANN_NORM;
+        break;
+    }
+    case FFTWindow::blackman: {
+        resizeBlackman(N);
+        for(int i=0;i<N;++i) data[i] *= blackman.at(i)*BLACKMAN_NORM;
+        break;
+    }
+    case FFTWindow::flatTop: {
+        resizeFlatTop(N);
+        for(int i=0;i<N;++i) data[i] *= flatTop.at(i)*FLATTOP_NORM;
+        break;
+    }
+    case FFTWindow::rectangular:
+    default:
+        // Rectangular window = pass-through with unity normalization
+        break;
     }
 
     int nfft = nextPow2(data.size());
@@ -124,21 +141,26 @@ QVector<std::complex<float>> FFTengine::calculateSpectrum(QVector<std::complex<f
     return fft(data);
 }
 
+// Contract: Takes complex FFT bins (size power-of-two). Returns half-spectrum (Nyquist inclusive).
+// Scaling logic matches historical behavior; TODO normalize via explicit window energy.
 QVector<QPointF> FFTengine::processOutput(QVector<std::complex<float>> data, FFTType type) {
     QVector<QPointF> result;
     int nfft = data.length();
-    float freq = 0;
-    double freqStep = samplingFreq / nfft;
+    result.reserve(nfft/2 + 1);
+    float lastFreq = 0.f;
+    const double freqStep = samplingFreq / nfft;
     for (int i = 0; i <= nfft / 2; i++) {
-        freq = i * freqStep;
+        float freq = float(i * freqStep);
+        lastFreq = freq;
         if (type == FFTType::periodogram) {
-            // |x|^2 calculatd as  x * complex conjugate x;
-            float absSquared = (data.at(i) * std::complex<float>(data.at(i).real(), - data.at(i).imag())).real()/1000;
-            result.append(QPointF(freq, 10 * log10(absSquared/ nfft*lengthRatio)));
-        } else
+            const std::complex<float> &c = data.at(i);
+            const float absSquared = (c * std::complex<float>(c.real(), -c.imag())).real()/1000.0f; // |c|^2 / 1000 scaling (TODO: explain divisor)
+            result.append(QPointF(freq, 10.f * log10f(absSquared/ nfft*lengthRatio)));
+        } else {
             result.append(QPointF(freq, std::abs(data.at(i))/nfft*lengthRatio));
+        }
     }
-    maxFrequency = freq;
+    maxFrequency = lastFreq;
     return result;
 }
 
@@ -206,9 +228,11 @@ void FFTengine::resizeBlackman(int length) {
 }
 
 int FFTengine::nextPow2(int number) {
-    for (int i = 1;; i++)
-        if (pow(2, i) >= number)
-            return (pow(2, i));
+    if (number <= 1) return 1;
+    // Use bit shifting for speed; handle up to 2^30 safely for typical FFT sizes.
+    int p = 1;
+    while (p < number && p > 0) p <<= 1;
+    return p > 0 ? p : number; // fallback in pathological overflow case
 }
 
 

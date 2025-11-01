@@ -6,7 +6,6 @@
 
 class Commands : public QObject
 {
-    Q_OBJECT
 public:
     explicit Commands(QObject *parent = nullptr);
 
@@ -19,7 +18,8 @@ public:
     static const QByteArray CONFIG_REQUEST;
     static const QByteArray IS_SHIELD_CONNECTED;
     static const QByteArray RESET_DEVICE;
-
+    static const QByteArray ERROR;
+    static const QByteArray DEBUG;
 
     static const QByteArray SIGNAL_GENERATOR;
     static const QByteArray VOLTAGE_SOURCE;
@@ -39,6 +39,7 @@ public:
     static const QByteArray UNPAUSE;
     static const QByteArray NEXT;
     static const QByteArray CONFIG;
+    static const QByteArray ACK;
 
     static const QByteArray GET_REAL_SMP_FREQ;
     static const QByteArray GET_SCOPE_INPUTS;
@@ -154,6 +155,11 @@ public:
     static const QByteArray CMD_GEN_PWM_REAL_FREQ_CH2;
     static const QByteArray CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH1;
     static const QByteArray CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH2;
+
+    // Pattern generator: protocol helpers
+    // I2C pin open-drain setup command
+    static const QByteArray CMD_GEN_PATT_I2C_PINS_OD_ENABLE;
+    static const QByteArray CMD_GEN_PATT_I2C_PINS_OD_DISABLE;
 
     /************************ COUNTER ***********************/
     // Counter complete deinit

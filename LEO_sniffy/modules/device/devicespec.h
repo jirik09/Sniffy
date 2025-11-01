@@ -8,7 +8,6 @@
 
 class DeviceSpec : public AbstractSpecification
 {
-    Q_OBJECT
 public:
     explicit DeviceSpec(QObject *parent = nullptr);
     void parseSpecification(QByteArray spec);
@@ -16,10 +15,6 @@ public:
     QString device;
     QString MCU;
     uint32_t CoreClock;
-
-    uint32_t UID1;
-    uint32_t UID2;
-    uint32_t UID3;
 
     QString MCU_ID;
     QString Build_Date;

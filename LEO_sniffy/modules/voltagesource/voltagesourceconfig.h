@@ -9,7 +9,6 @@
 
 class VoltageSourceConfig : public AbstractConfiguration
 {
-    Q_OBJECT
 public:
     explicit VoltageSourceConfig(QObject *parent = nullptr);
     void parse (QByteArray config);

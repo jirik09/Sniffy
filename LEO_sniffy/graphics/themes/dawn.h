@@ -5,7 +5,6 @@
 #include <QColor>
 
 #include "../abstracttheme.h"
-#include "../graphics.h"
 
 #define DAWN_GRAPHICS_PATH  ":/graphics/graphics/themes/dawn/"
 #define DAWN_FONT           "'MS Shell Dlg 2'"
@@ -180,7 +179,6 @@ QWidget{font: 9pt" DAWN_FONT "; color:" DAWN_TEXT_COMPONENT ";}"
 
 class Dawn : public AbstractTheme
 {
-    Q_OBJECT
 public:
     explicit Dawn(QObject *parent = nullptr);
 
@@ -188,6 +186,7 @@ public:
     QString getGraphicsPath();
 
     QString getChannelColor(int channelIndex);
+    ThemePalette buildPalette() override;
 
 private:
     QList<QColor> chanColor =

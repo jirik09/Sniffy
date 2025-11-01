@@ -50,7 +50,7 @@ private slots:
 private:
     Ui::WidgetFeature *ui;
     ModuleStatus status;    
-    QIcon *icon;
+    QIcon icon; // store by value to avoid manual heap allocation
 };
 
 

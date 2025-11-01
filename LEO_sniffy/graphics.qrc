@@ -21,6 +21,7 @@
         <file>graphics/themes/dark/settings_vertical.png</file>
         <file>graphics/themes/dark/no_device.png</file>
         <file>graphics/themes/dark/Nucleo-F303RE.png</file>
+        <file>graphics/themes/dark/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/dark/Nucleo-G474RE.png</file>
         <file>graphics/themes/dark/unknown_device.png</file>
         <file>graphics/themes/dark/icon_counter.png</file>
@@ -97,6 +98,7 @@
         <file>graphics/themes/light/menu_burger_button_backw.gif</file>
         <file>graphics/themes/light/no_device.png</file>
         <file>graphics/themes/light/Nucleo-F303RE.png</file>
+        <file>graphics/themes/light/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/light/Nucleo-G474RE.png</file>
         <file>graphics/themes/light/separator.png</file>
         <file>graphics/themes/light/settings_gear.png</file>
@@ -143,6 +145,7 @@
         <file>graphics/themes/dawn/settings_vertical.png</file>
         <file>graphics/themes/dawn/no_device.png</file>
         <file>graphics/themes/dawn/Nucleo-F303RE.png</file>
+        <file>graphics/themes/dawn/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/dawn/Nucleo-G474RE.png</file>
         <file>graphics/themes/dawn/unknown_device.png</file>
         <file>graphics/themes/dawn/icon_counter.png</file>
@@ -184,6 +187,17 @@
         <file>graphics/themes/dark/logo_gray_full.png</file>
         <file>graphics/themes/light/logo_gray_full.png</file>
         <file>graphics/themes/dawn/logo_gray_full.png</file>
+        <file>graphics/themes/dark/user.png</file>
+        <file>graphics/themes/dark/user_error.png</file>
+        <file>graphics/themes/dark/user_ok.png</file>
+        <file>graphics/themes/dawn/user.png</file>
+        <file>graphics/themes/dawn/user_error.png</file>
+        <file>graphics/themes/dawn/user_ok.png</file>
+        <file>graphics/themes/light/user.png</file>
+        <file>graphics/themes/light/user_error.png</file>
+        <file>graphics/themes/light/user_ok.png</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>default_layout.json</file>
+    </qresource>
 </RCC>

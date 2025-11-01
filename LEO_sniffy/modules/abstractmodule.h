@@ -38,8 +38,15 @@ public:
     virtual QByteArray getConfiguration() = 0;
     virtual QWidget* getWidget() = 0; //return pointer to widget - need to be able to dock it
 
-    void saveGeometry(QSettings &layout);
-    void restoreGeometry(QSettings &layout);
+    //void saveGeometry(QSettings &layout);
+    // Save geometry entries into an in-memory map (key -> QByteArray)
+    // so callers can avoid creating temporary QSettings files when exporting sessions.
+    void saveGeometry(QMap<QString, QByteArray> &layoutMap);
+    //void restoreGeometry(QSettings &layout);
+    // Restore geometry from an in-memory map (key -> QByteArray) so callers
+    // don't need to create a temporary QSettings file when loading JSON
+    // sessions. Keys are the same as used for QSettings: moduleName+objectName.
+    void restoreGeometry(const QMap<QString, QByteArray> &layoutMap);
 
     void setDockWidgetWindow(ModuleDockWidget *dockWidget);
     void setModuleControlWidget(WidgetControlModule *scpWidget);
@@ -68,8 +75,17 @@ public:
 
     int getResources();
 
+    // GPIO mask getters (delegated to specification)
+    quint32 getGpioMaskA() const { return moduleSpecification ? moduleSpecification->getGpioMaskA() : 0u; }
+    quint32 getGpioMaskB() const { return moduleSpecification ? moduleSpecification->getGpioMaskB() : 0u; }
+    quint32 getGpioMaskC() const { return moduleSpecification ? moduleSpecification->getGpioMaskC() : 0u; }
+    quint32 getGpioMaskD() const { return moduleSpecification ? moduleSpecification->getGpioMaskD() : 0u; }
+
     bool isModuleRestored() const;
     void setModuleRestored(bool value);
+
+    // Accessor for the module control widget (used by MainWindow for UI tweaks)
+    WidgetControlModule* getModuleControlWidget() const { return moduleControlWidget; }
 
 protected:
     QString moduleName;
@@ -79,7 +95,6 @@ protected:
     QByteArray moduleCommandPrefix;
 
     AbstractSpecification* moduleSpecification = nullptr;
-    Graphics *theme;
 
 private:
     ModuleDockWidget *dockWidgetWindow;
@@ -97,10 +112,13 @@ public slots:
 signals:
     void moduleCreated();
     void holdClicked(bool held);
-    void loadModuleLayoutAndConfig(QString moduleName);
     void blockConflictingModules(QString moduleName, int resources);
     void releaseConflictingModules(QString moduleName, int resources);
     void moduleDescription(QString name, QList<QString> labels, QList<QString> values);
+    // Emitted when the module's display name changes (e.g., Device renamed after handshake)
+    void moduleNameChanged(const QString &name);
+    // Emitted when showModuleControl is called, used to trigger delayed session restoration
+    void moduleControlShown(const QString &name);
 
 };
 

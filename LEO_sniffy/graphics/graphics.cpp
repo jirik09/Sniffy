@@ -1,73 +1,132 @@
 #include "graphics.h"
+#include <functional>
+#include <QFileInfo>
 
-QSharedPointer<AbstractTheme> Graphics::theme = nullptr;
-QList<QString> *Graphics::themeList = nullptr;
+namespace Graphics {
+
+static QSharedPointer<AbstractTheme> theme = nullptr;
+static QList<QString> *themeList = nullptr;
+static ThemePalette cachedPalette; // updated when setTheme called
+static bool paletteInitialized = false;
 
 QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {  
-        [] { return QSharedPointer<AbstractTheme>(new Dark); },
-        [] { return QSharedPointer<AbstractTheme>(new Light); },
-        [] { return QSharedPointer<AbstractTheme>(new Dawn); },
+    [] { return QSharedPointer<AbstractTheme>(new Dark); },
+    [] { return QSharedPointer<AbstractTheme>(new Light); },
+    [] { return QSharedPointer<AbstractTheme>(new Dawn); },
+    [] { return QSharedPointer<AbstractTheme>(new Aurora); },
+    [] { return QSharedPointer<AbstractTheme>(new Neomorph); },
+    [] { return QSharedPointer<AbstractTheme>(new TealAnalytics); },
+    [] { return QSharedPointer<AbstractTheme>(new HudCyan); },
+    [] { return QSharedPointer<AbstractTheme>(new MSDos); },
 };
 
-QList<QString> *Graphics::initThemesList(){
-    themeList = new QList<QString>;
-    themeList->append(((QString)(typeid(Dark).name())).remove(0,1));
-    themeList->append(((QString)(typeid(Light).name())).remove(0,1));
-    themeList->append(((QString)(typeid(Dawn).name())).remove(0,1));
+QList<QString> *initThemesList(){
+    if(!themeList){
+        themeList = new QList<QString>;
+        themeList->reserve(createTheme.size());
+        themeList->append(((QString)(typeid(Dark).name())).remove(0,1));
+        themeList->append(((QString)(typeid(Light).name())).remove(0,1));
+        themeList->append(((QString)(typeid(Dawn).name())).remove(0,1));
+        themeList->append(((QString)(typeid(Aurora).name())).remove(0,1));
+        themeList->append(((QString)(typeid(Neomorph).name())).remove(0,1));
+        themeList->append(((QString)(typeid(TealAnalytics).name())).remove(0,1));
+        themeList->append(((QString)(typeid(HudCyan).name())).remove(0,1));
+        themeList->append(((QString)(typeid(MSDos).name())).remove(0,1));
+    }
     return themeList;
 }
 
-QString Graphics::getGraphicsPath(){
-    return theme->getGraphicsPath();
+QString getGraphicsPath(){
+    if(!theme){
+        qWarning("Graphics::getGraphicsPath called before theme initialization");
+        Q_ASSERT(false && "Theme not initialized");
+        return QString();
+    }
+    const QString base = theme->getGraphicsPath();
+    return applyPathFallback(base, "logo_sniffy.png");
 }
 
-QString Graphics::getChannelColor(int channelIndex){
+QString getBoardImage(const QString &boardBaseName){
+    const QString basePath = getGraphicsPath();
+    if(basePath.isEmpty()) return QString();
+    if(boardBaseName.isEmpty())
+        return basePath + "unknown_device.png";
+    const QString candidate = basePath + boardBaseName + ".png";
+    if(QFileInfo::exists(candidate)) return candidate;
+    // applyPathFallback already contains generic fallback; re-run with board asset
+    const QString fallbackPath = applyPathFallback(basePath, boardBaseName + ".png");
+    const QString fallbackCandidate = fallbackPath + boardBaseName + ".png";
+    if(QFileInfo::exists(fallbackCandidate)) return fallbackCandidate;
+    return fallbackPath + "unknown_device.png";
+}
+
+QString getBoardPinoutImage(const QString &boardBaseName){
+    if(boardBaseName.isEmpty()) return QString();
+    const QString basePath = getGraphicsPath();
+    if(basePath.isEmpty()) return QString();
+    const QString pinout = basePath + boardBaseName + "-pinout.png";
+    if(QFileInfo::exists(pinout)) return pinout;
+    const QString fallbackPath = applyPathFallback(basePath, boardBaseName + "-pinout.png");
+    const QString fallbackCandidate = fallbackPath + boardBaseName + "-pinout.png";
+    if(QFileInfo::exists(fallbackCandidate)) return fallbackCandidate;
+    return QString();
+}
+
+QString getChannelColor(int channelIndex){
+    if(!theme){
+        qWarning("Graphics::getChannelColor called before theme initialization");
+        Q_ASSERT(false && "Theme not initialized");
+        return QString();
+    }
+    if(channelIndex < 0) channelIndex = 0;
     if(channelIndex > TOP_CHANNEL_COLOR_INDEX)
         return theme->getChannelColor(TOP_CHANNEL_COLOR_INDEX);
-    else
-        return theme->getChannelColor(channelIndex);
+    return theme->getChannelColor(channelIndex);
 }
 
-QSharedPointer<AbstractTheme> Graphics::getThemeInstance(int themeIndex){
+QSharedPointer<AbstractTheme> setTheme(int themeIndex){
+    if(themeIndex < 0 || themeIndex >= createTheme.size()){
+        return nullptr;
+    }
     theme = createTheme[themeIndex]();
+    if(theme){
+        cachedPalette = theme->buildPalette();
+        paletteInitialized = true;
+    }
     return theme;
 }
 
-QString Graphics::COLOR_WINDOW_APP;
-QString Graphics::COLOR_WINDOW_WIDGET;
-QString Graphics::COLOR_BACKGROUND_FOCUS_IN;
-QString Graphics::COLOR_COMPONENT_DISABLED;
-QString Graphics::COLOR_BACKGROUND_BUTTON;
-QString Graphics::COLOR_DATA_INPUT_AREA;
-QString Graphics::COLOR_CONTROLS;
-QString Graphics::COLOR_DISPLAY;
-QString Graphics::COLOR_CHART;
-QString Graphics::COLOR_CHART_GRIDLEG_DEFAULT;
-QString Graphics::COLOR_CHART_GRIDLEG_LOW_CONTRAST;
-QString Graphics::COLOR_TEXT_ALL;
-QString Graphics::COLOR_TEXT_LABEL;
-QString Graphics::COLOR_TEXT_COMPONENT;
-QString Graphics::COLOR_WINDOW_CONTROL_HOVER;
-QString Graphics::COLOR_WINDOW_EXIT_HOVER;
-QString Graphics::COLOR_WARNING;
-QString Graphics::COLOR_ERROR;
-QString Graphics::COLOR_RUNNING;
-QString Graphics::COLOR_UNUSED;
+QSharedPointer<AbstractTheme> getThemeInstance(){
+    return theme;
+}
 
-QString Graphics::STYLE_PUSH_BUTTON;
-QString Graphics::STYLE_CHECK_BUTTON;
-QString Graphics::STYLE_PROGRESS_BAR;
-QString Graphics::STYLE_COMBO_BOX;
+const ThemePalette &palette(){
+    return cachedPalette;
+}
 
-QString Graphics::STYLE_CONTROL_BUTTON;
-QString Graphics::STYLE_MODULE_BUTTON;
-QString Graphics::STYLE_HOLD_BUTTON;
-QString Graphics::STYLE_DIAL;
-QString Graphics::STYLE_TEXTINPUT;
-QString Graphics::STYLE_DOCK_WIDGET;
-QString Graphics::STYLE_DOCK_WINDOW;
+QString applyPathFallback(const QString &base, const QString &testFileName){
+    const QString full = base + testFileName;
+    if(QFileInfo::exists(full)) return base; // no change
 
-bool    Graphics::STYLE_CUSTOM_DIALS_USED = false;
-bool    Graphics::STYLE_TRANSPARENCY_USED = false;
+    struct PatternFallback { const char* pattern; const char* replacement; };
+    static const PatternFallback orderedFallbacks[] = {
+        {"/msdos/", "/dark/"}, // MSDOS theme currently reuses dark assets if not provided
+        {"/aurora/", "/dawn/"},
+        {"/neomorph/", "/light/"},
+        {"/tealanalytics/", "/dark/"},
+        {"/hudcyan/", "/dark/"}
+    };
+    for(const auto &pf : orderedFallbacks){
+        if(base.contains(pf.pattern)){
+            QString repl = QString(base).replace(pf.pattern, pf.replacement);
+            if(QFileInfo::exists(repl + testFileName)){
+                return repl;
+            }
+        }
+    }
+    return base; // last resort return original even if file missing
+}
 
-QString Graphics::STYLE_GLOBAL;
+// Legacy globals removed after palette migration.
+
+} // namespace Graphics

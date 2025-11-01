@@ -8,7 +8,6 @@ PanelMath::PanelMath(QVBoxLayout *destination, QWidget *parent ) : QObject(paren
     mathType->setObjectName("MathTypeBtnSelection");
     destination->addWidget(mathType);
     mathType->setText("None",0);
-    mathType->setColor(Graphics::COLOR_UNUSED,0);
     mathType->setText("Basic",1);
     mathType->setDisabledButton(true,1);
     mathType->setText("Symbolic",2);
@@ -145,8 +144,19 @@ void PanelMath::symbolicError(int errorPosition)
         symbolicDesc->setValue(errorExp);
         symbolicExample->setStyleSheet("font: 10pt \"Courier New\";");
         symbolicExample->setName("here ");
-        QString out;// = QString("^%*s").arg(symbolicExpression->getText().length()-errorPosition).arg("");
-        out = QString::asprintf("^%*s", errorExp.length()-errorPosition, "");
+        // Build a caret line pointing to the error position. The previous implementation
+        // used QString::asprintf with a dynamic field width ("^%*s") which can trigger
+        // warnings when the width becomes negative (e.g. if bounds aren't validated) and
+        // is harder to read. We now create a string of spaces and place a caret at the
+        // appropriate index (1-based errorPosition coming from the parser).
+        int caretIndex = errorPosition - 1; // convert to 0-based
+        if (caretIndex < 0)
+            caretIndex = 0;
+        if (caretIndex >= errorExp.length())
+            caretIndex = errorExp.length() - 1; // clamp to last character
+
+        QString out(caretIndex, QChar(' ')); // spaces before the caret
+        out.append('^');
         symbolicExample->setValue(out);
     }
 }

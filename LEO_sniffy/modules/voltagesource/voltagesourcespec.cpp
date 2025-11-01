@@ -1,4 +1,5 @@
 #include "voltagesourcespec.h"
+#include "modules/specutils.h"
 
 VoltageSourceSpec::VoltageSourceSpec(QObject *parent)
 {
@@ -22,10 +23,10 @@ void VoltageSourceSpec::parseSpecification(QByteArray spec)
     stream >> tmp;
     VddDefault = (qreal)(tmp)/1000;
 
-    char chars[4] = "";
-    for(int i = 0; i < maxDACChannels; i++){
-        stream.readRawData(chars, 4);
-        channelPins[i] = QString::fromUtf8(chars,4);
-        channelPins[i].remove('_');
-    }
+    SpecParsing::readPins4(stream, maxDACChannels, [&](int i, const QString &pin){ channelPins[i] = pin; });
+
+    // New: read 4x GPIO masks (A,B,C,D)
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
 }

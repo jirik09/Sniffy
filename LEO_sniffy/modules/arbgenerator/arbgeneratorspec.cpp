@@ -1,4 +1,5 @@
 #include "arbgeneratorspec.h"
+#include "modules/specutils.h"
 
 ArbGeneratorSpec::ArbGeneratorSpec(QObject *parent)
 {
@@ -20,12 +21,12 @@ void ArbGeneratorSpec::parseSpecification(QByteArray spec)
     stream >> tmp;
     AVddReal = (qreal)(tmp)/1000;
 
-    char chars[4] = "";
-    for(int i = 0; i < maxDACChannels; i++){
-        stream.readRawData(chars, 4);
-        channelPins[i] = QString::fromUtf8(chars,4);
-        channelPins[i].remove('_');
-    }
+    SpecParsing::readPins4(stream, maxDACChannels, [&](int i, const QString &pin){ channelPins[i] = pin; });
+
+    // New: read 4x GPIO masks (A,B,C,D) appended by firmware
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
 }
 
 void ArbGeneratorSpec::parsePWMSpecification(QByteArray spec)
@@ -42,10 +43,10 @@ void ArbGeneratorSpec::parsePWMSpecification(QByteArray spec)
     stream >> tmp;
     rangeMax = (qreal)(tmp)/1000;
 
-    char chars[4] = "";
-    for(int i = 0; i < maxPWMChannels; i++){
-        stream.readRawData(chars, 4);
-        channelPWMPins[i] = QString::fromUtf8(chars,4);
-        channelPWMPins[i].remove('_');
-    }
+    SpecParsing::readPins4(stream, maxPWMChannels, [&](int i, const QString &pin){ channelPWMPins[i] = pin; });
+
+    // New: read 4x GPIO masks (A,B,C,D) appended by firmware
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
 }

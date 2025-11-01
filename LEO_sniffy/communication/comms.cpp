@@ -2,28 +2,35 @@
 
 Comms::Comms(QObject *parent) : QObject(parent)
 {
-    //qDebug()<< "thread comms"<<this->thread();
-    serial = new SerialLine();
+    serial = std::make_unique<SerialLine>();
     serialThread = new QThread(this);
 
     serial->moveToThread(serialThread);
-    connect(this,&Comms::dataWrite,serial,&SerialLine::write);
-    connect(serial,&SerialLine::newMessage,this,&Comms::parseMessage);
-    connect(serial,&SerialLine::serialLineError,this,&Comms::errorReceived);
-    connect(this,&Comms::openLine,serial,&SerialLine::openSerialLine);
-    connect(this,&Comms::closeLine,serial,&SerialLine::closeLine);
+    connect(this,&Comms::dataWrite,serial.get(),&SerialLine::write);
+    connect(serial.get(),&SerialLine::newMessage,this,&Comms::parseMessage);
+    connect(serial.get(),&SerialLine::serialLineError,this,&Comms::errorReceived);
+    connect(this,&Comms::openLine,serial.get(),&SerialLine::openSerialLine);
+    connect(this,&Comms::closeLine,serial.get(),&SerialLine::closeLine);
     serialThread->start();
 
     connect(&devScanner,&DeviceScanner::newDevicesScanned,this,&Comms::devicesScanned);
     devScanner.start();
     devScanner.searchForDevices(true);
-
 }
 
 Comms::~Comms()
 {
-    serialThread->quit();
-    serialThread->wait();
+    // stop background scanner thread
+    devScanner.quit();
+    devScanner.wait();
+
+    // stop serial worker thread and cleanup worker
+    if(serialThread){
+        serialThread->quit();
+        serialThread->wait();
+    }
+    // serial (QObject) lives in serialThread; ensure it's moved back or destroyed after thread stopped.
+    serial.reset();
 }
 
 void Comms::open(DeviceDescriptor device){
@@ -38,7 +45,7 @@ void Comms::open(DeviceDescriptor device){
 }
 
 void Comms::scanForDevices(){
-    QList<DeviceDescriptor> listDevices = *new QList<DeviceDescriptor>;
+    QList<DeviceDescriptor> listDevices;
     SerialLine::getAvailableDevices(&listDevices,0);   //scan for available devices on serial port
     emit devicesScaned(listDevices);
 }
@@ -77,9 +84,8 @@ void Comms::write(QByteArray module, QByteArray feature, int param){
     QDateTime date = QDateTime::currentDateTime();
     qDebug() << "COMM_WRITE ("<< date.time()<<"):"<<module+":"+feature+":" << param <<";";
 #endif
-
-    QByteArray *qb = new QByteArray(tmp,4);
-    emit dataWrite(module+":"+feature+" "+qb->left(4)+";");
+    QByteArray qb(tmp,4);
+    emit dataWrite(module+":"+feature+" "+qb.left(4)+";");
 }
 
 void Comms::write(QByteArray data){
@@ -118,6 +124,6 @@ void Comms::parseMessage(QByteArray message){
 
 bool Comms::getIsOpen() const
 {
-    return serial->getIsOpen();
+    return serial ? serial->getIsOpen() : false;
 }
 

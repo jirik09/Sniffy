@@ -1,18 +1,19 @@
 #include "widgetcustomplot.h"
 #include "ui_widgetcustomplot.h"
 
-WidgetCustomPlot::WidgetCustomPlot(QWidget *parent, int maxTraces) :
+WidgetCustomPlot::WidgetCustomPlot(QWidget *parent, int traceCapacity) :
     QWidget(parent),
     ui(new Ui::WidgetCustomPlot),
-    maxTraces(maxTraces)
+    maxTraces(traceCapacity)
 {
     ui->setupUi(this);
-    setStyleSheet("background-color:" + Graphics::COLOR_DATA_INPUT_AREA);
+    setStyleSheet("background-color:" + Graphics::palette().dataInputArea);
 
-    plot = new QCustomPlot(parent);
+    // Parent plot to this widget (not the external parent) to ensure proper ownership
+    plot = new QCustomPlot(this);
     plot->setObjectName("plot");
 
-    plot->setBackground(QColor(Graphics::COLOR_CHART));
+    plot->setBackground(QColor(Graphics::palette().chart));
     plot->setMouseTracking(true);
     plot->setInteractions(QCP::iNone);
 
@@ -50,6 +51,7 @@ void WidgetCustomPlot::clearAll()
 
 void WidgetCustomPlot::updateTrace(QVector<QPointF> *points, int index)
 {    
+    if(!points || index < 0 || index >= maxTraces) return;
     QVector<qreal> x, y;
     for(int i = 0; i < points->size(); i++){
         x.append(points->at(i).x());
@@ -81,7 +83,9 @@ void WidgetCustomPlot::setRange(qreal minX, qreal maxX, qreal minY, qreal maxY)
 
 void WidgetCustomPlot::setTraceColor(int index, QColor color)
 {
-    plot->graph(index)->setPen(QPen(QBrush(color), 2));
+    if(index>=0 && index < plot->graphCount()){
+        plot->graph(index)->setPen(QPen(QBrush(color), 2));
+    }
 }
 
 void WidgetCustomPlot::setGridLinesVisible(bool gridVisibleX, bool gridVisibleY)

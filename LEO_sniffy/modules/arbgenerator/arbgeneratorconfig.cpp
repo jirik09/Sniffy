@@ -1,4 +1,6 @@
 #include "arbgeneratorconfig.h"
+#include <QDataStream>
+#include <QIODevice>
 
 ArbGeneratorConfig::ArbGeneratorConfig(QObject *parent)
 {
@@ -20,14 +22,13 @@ void ArbGeneratorConfig::parse(QByteArray config)
 
 QByteArray ArbGeneratorConfig::serialize()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocated
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     //TODO put data into stream
     //example:
     //stream << realSamplingRate;
     //stream << ADCresolution;
 
-    return *data;
+    return data; // return by value (NRVO / move)
 }

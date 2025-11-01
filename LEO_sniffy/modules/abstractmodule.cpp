@@ -1,139 +1,133 @@
 #include "abstractmodule.h"
+#include "qstyle.h"
 
 AbstractModule::AbstractModule(QObject *parent) : QObject(parent)
 {
 }
 
-void AbstractModule::saveGeometry(QSettings &layout)
+void AbstractModule::saveGeometry(QMap<QString, QByteArray> &layoutMap)
 {
     QList<WidgetButtons*> listBtn = getWidget()->findChildren<WidgetButtons*>();
-    WidgetButtons *btn;
     QList<WidgetDial*> listDial = getWidget()->findChildren<WidgetDial*>();
-    WidgetDial *dial;
     QList<WidgetDialRange*> listDialRange = getWidget()->findChildren<WidgetDialRange*>();
-    WidgetDialRange *dialRange;
     QList<WidgetSwitch*> listSw = getWidget()->findChildren<WidgetSwitch*>();
-    WidgetSwitch *sw;
     QList<widgetTab*> listTab = getWidget()->findChildren<widgetTab*>();
-    widgetTab *tab;
     QList<WidgetSelection*> listSel = getWidget()->findChildren<WidgetSelection*>();
-    WidgetSelection *sel;
     QList<WidgetTextInput*> listText = getWidget()->findChildren<WidgetTextInput*>();
-    WidgetTextInput *text;
 
-    foreach(tab, listTab){
+    for (widgetTab* tab : listTab){
         if (!tab->objectName().isEmpty()){
-            layout.setValue(moduleName+tab->objectName(),tab->saveGeometry());
+            layoutMap.insert(moduleName + tab->objectName(), tab->saveGeometry());
         }else{
             qDebug () << "WARNING attempting to save layout of object without name: Tab in "<<moduleName;
         }
     }
-    foreach(btn, listBtn){
+    for (WidgetButtons* btn : listBtn){
         if (!btn->objectName().isEmpty()){
-            layout.setValue(moduleName+btn->objectName(),btn->saveGeometry());
+            layoutMap.insert(moduleName + btn->objectName(), btn->saveGeometry());
         }else{
             qDebug () << "WARNING attempting to save layout of object without name: Button in "<<moduleName;
         }
     }
-    foreach(sw, listSw){
+    for (WidgetSwitch* sw : listSw){
         if (!sw->objectName().isEmpty()){
-            layout.setValue(moduleName+sw->objectName(),sw->saveGeometry());
+            layoutMap.insert(moduleName + sw->objectName(), sw->saveGeometry());
         }else{
             qDebug () << "WARNING attempting to save layout of object without name: Switch in "<<moduleName;
         }
     }
-    foreach(dial, listDial){
+    for (WidgetDial* dial : listDial){
         if (!dial->objectName().isEmpty()){
-            layout.setValue(moduleName+dial->objectName(),dial->saveGeometry());
+            layoutMap.insert(moduleName + dial->objectName(), dial->saveGeometry());
         }else{
             qDebug () << "WARNING attempting to save layout of object without name: Dial in "<<moduleName;
         }
     }
-    foreach(dialRange, listDialRange){
+    for (WidgetDialRange* dialRange : listDialRange){
         if (!dialRange->objectName().isEmpty()){
-            layout.setValue(moduleName+dialRange->objectName(),dialRange->saveGeometry());
+            layoutMap.insert(moduleName + dialRange->objectName(), dialRange->saveGeometry());
         }else{
             qDebug () << "WARNING attempting to save layout of object without name: Dial range in "<<moduleName;
         }
     }
-    foreach(sel, listSel){
+    for (WidgetSelection* sel : listSel){
         if (!sel->objectName().isEmpty()){
-            layout.setValue(moduleName+sel->objectName(),sel->saveGeometry());
+            layoutMap.insert(moduleName + sel->objectName(), sel->saveGeometry());
         }else{
             qDebug () << "WARNING attempting to save layout of object without name: selection in "<<moduleName;
         }
     }
-    foreach(text, listText){
+    for (WidgetTextInput* text : listText){
         if (!text->objectName().isEmpty()){
-            layout.setValue(moduleName+text->objectName(),text->saveGeometry());
+            layoutMap.insert(moduleName + text->objectName(), text->saveGeometry());
         }else{
             qDebug () << "WARNING attempting to save layout of object without name: Tect input in "<<moduleName;
         }
     }
 }
 
-void AbstractModule::restoreGeometry(QSettings &layout)
+void AbstractModule::restoreGeometry(const QMap<QString, QByteArray> &layoutMap)
 {
     QList<WidgetButtons*> listBtn = getWidget()->findChildren<WidgetButtons*>();
-    WidgetButtons *btn;
     QList<WidgetDial*> listDial = getWidget()->findChildren<WidgetDial*>();
-    WidgetDial *dial;
     QList<WidgetDialRange*> listDialRange = getWidget()->findChildren<WidgetDialRange*>();
-    WidgetDialRange *dialRange;
     QList<WidgetSwitch*> listSw = getWidget()->findChildren<WidgetSwitch*>();
-    WidgetSwitch *sw;
     QList<widgetTab*> listTab = getWidget()->findChildren<widgetTab*>();
-    widgetTab *tab;
     QList<WidgetSelection*> listSel = getWidget()->findChildren<WidgetSelection*>();
-    WidgetSelection *sel;
     QList<WidgetTextInput*> listText = getWidget()->findChildren<WidgetTextInput*>();
-    WidgetTextInput *text;
 
-    foreach(tab, listTab){
-        if (!tab->objectName().isEmpty() && !layout.value(moduleName+tab->objectName()).isNull()){
-            tab->restoreGeometry(layout.value(moduleName+tab->objectName()).toByteArray());
+    for (widgetTab* tab : listTab){
+        QString key = moduleName + tab->objectName();
+        if (!tab->objectName().isEmpty() && layoutMap.contains(key)){
+            tab->restoreGeometry(layoutMap.value(key));
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: tab in "<<moduleName;
         }
     }
-    foreach(btn, listBtn){
-        if (!btn->objectName().isEmpty() && !layout.value(moduleName+btn->objectName()).isNull()){
-            btn->restoreGeometry(layout.value(moduleName+btn->objectName()).toByteArray());
+    for (WidgetButtons* btn : listBtn){
+        QString key = moduleName + btn->objectName();
+        if (!btn->objectName().isEmpty() && layoutMap.contains(key)){
+            btn->restoreGeometry(layoutMap.value(key));
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: button in "<<moduleName;
         }
     }
-    foreach(sw, listSw){
-        if (!sw->objectName().isEmpty() && !layout.value(moduleName+sw->objectName()).isNull()){
-            sw->restoreGeometry(layout.value(moduleName+sw->objectName()).toByteArray());
+    for (WidgetSwitch* sw : listSw){
+        QString key = moduleName + sw->objectName();
+        if (!sw->objectName().isEmpty() && layoutMap.contains(key)){
+            sw->restoreGeometry(layoutMap.value(key));
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: switch in "<<moduleName;
         }
     }
-    foreach(dial, listDial){
-        if (!dial->objectName().isEmpty() && !layout.value(moduleName+dial->objectName()).isNull()){
-            dial->restoreGeometry(layout.value(moduleName+dial->objectName()).toByteArray());
+    for (WidgetDial* dial : listDial){
+        QString key = moduleName + dial->objectName();
+        if (!dial->objectName().isEmpty() && layoutMap.contains(key)){
+            dial->restoreGeometry(layoutMap.value(key));
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: dial in "<<moduleName;
         }
     }
-    foreach(dialRange, listDialRange){
-        if (!dialRange->objectName().isEmpty() && !layout.value(moduleName+dialRange->objectName()).isNull()){
-            dialRange->restoreGeometry(layout.value(moduleName+dialRange->objectName()).toByteArray());
+    for (WidgetDialRange* dialRange : listDialRange){
+        QString key = moduleName + dialRange->objectName();
+        if (!dialRange->objectName().isEmpty() && layoutMap.contains(key)){
+            dialRange->restoreGeometry(layoutMap.value(key));
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: dialRange in "<<moduleName;
         }
     }
-    foreach(sel, listSel){
-        if (!sel->objectName().isEmpty() && !layout.value(moduleName+sel->objectName()).isNull()){
-            sel->restoreGeometry(layout.value(moduleName+sel->objectName()).toByteArray());
+    for (WidgetSelection* sel : listSel){
+        QString key = moduleName + sel->objectName();
+        if (!sel->objectName().isEmpty() && layoutMap.contains(key)){
+            sel->restoreGeometry(layoutMap.value(key));
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: selection in "<<moduleName;
         }
     }
-    foreach(text, listText){
-        if (!text->objectName().isEmpty() && !layout.value(moduleName+text->objectName()).isNull()){
-            text->restoreGeometry(layout.value(moduleName+text->objectName()).toByteArray());
+    for (WidgetTextInput* text : listText){
+        QString key = moduleName + text->objectName();
+        if (!text->objectName().isEmpty() && layoutMap.contains(key)){
+            text->restoreGeometry(layoutMap.value(key));
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: textInput in "<<moduleName;
         }
@@ -208,7 +202,9 @@ QByteArray AbstractModule::getCommandPrefix()
 
 void AbstractModule::setComms(Comms *communication){
     comm = communication;
-    cmd = new Commands();
+    if (!cmd) cmd = new Commands();
+    
+    // Send CONFIG? request
     comm->write(moduleCommandPrefix+":"+Commands::CONFIG_REQUEST+";");
 }
 
@@ -231,7 +227,7 @@ ModuleStatus AbstractModule::getModuleStatus()
 }
 
 void AbstractModule::showModuleControl(){
-    emit loadModuleLayoutAndConfig(moduleName);
+    emit moduleControlShown(moduleName);
     moduleControlWidget->show();
 }
 
@@ -256,8 +252,6 @@ void AbstractModule::closeModule(){
         if(moduleSpecification != nullptr)
             emit releaseConflictingModules(moduleName, moduleSpecification->getResources());
     }
-
-
 }
 
 void AbstractModule::disableModule(){
@@ -287,6 +281,7 @@ QString AbstractModule::getModuleName()
 void AbstractModule::setModuleName(QString value){
     moduleName = value;
     moduleControlWidget->setName(moduleName);
+    emit moduleNameChanged(moduleName);
 }
 
 /* This function must be called after dockWidget is created.

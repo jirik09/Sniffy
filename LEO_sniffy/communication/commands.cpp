@@ -13,6 +13,8 @@ const QByteArray Commands::VERSION_REQUEST = "VER?";
 const QByteArray Commands::CONFIG_REQUEST = "CFG?";
 const QByteArray Commands::IS_SHIELD_CONNECTED = "SH_?";
 const QByteArray Commands::RESET_DEVICE = "RES!";
+const QByteArray Commands::ERROR = "ERR_";
+const QByteArray Commands::DEBUG = "DBG_";
 
 const QByteArray Commands::SIGNAL_GENERATOR = "GENS";
 const QByteArray Commands::VOLTAGE_SOURCE = "VOUT";
@@ -33,6 +35,7 @@ const QByteArray Commands::UNPAUSE = "UPAU";
 const QByteArray Commands::NEXT = "NEXT";
 const QByteArray Commands::DEINIT =	"DINI";
 const QByteArray Commands::CONFIG = "CFG_";
+const QByteArray Commands::ACK = "ACK_";
 
 const QByteArray Commands::GET_REAL_SMP_FREQ = "FRQ?";
 const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";
@@ -133,7 +136,7 @@ const QByteArray Commands::CMD_GEN_START = "STRT";
 const QByteArray Commands::CMD_GEN_STOP = "STOP";
 const QByteArray Commands::CMD_GEN_RESET = "RSET";
 const QByteArray Commands::CMD_GET_PWM_CONFIG = "PCF?";
-//onst QByteArray Commands::CMD_GEN_PWM_FREQ_PSC = "FPWP";
+//const QByteArray Commands::CMD_GEN_PWM_FREQ_PSC = "FPWP";
 //const QByteArray Commands::CMD_GEN_PWM_FREQ_ARR =	"FPWA";
 const QByteArray Commands::CMD_GEN_PWM_FREQ_CH1 = "GFR1";
 const QByteArray Commands::CMD_GEN_PWM_FREQ_CH2	= "GFR2";
@@ -147,7 +150,11 @@ const QByteArray Commands::CMD_GEN_SIGNAL_REAL_SAMPLING_FREQ_CH2 = "GSR2";
 // Counter complete deinit
 const QByteArray Commands::COUNTER_DEINIT = "DEIN";
 
-// Coutner common
+// Pattern generator protocol helpers
+// NOTE: Firmware expects 'I2CP' to enable (Put pins to Open-Drain) and 'I2CD' to disable (restore default)
+const QByteArray Commands::CMD_GEN_PATT_I2C_PINS_OD_ENABLE = "I2CE"; // enable OD
+const QByteArray Commands::CMD_GEN_PATT_I2C_PINS_OD_DISABLE = "I2CD"; // disable OD
+// Counter common
 const QByteArray Commands::QUANT_FREQUENCY = "QFRE";
 const QByteArray Commands::QUANT_PERIOD = "QPER";
 

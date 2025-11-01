@@ -45,8 +45,6 @@ private:
     VoltmeterConfig *config;
     VoltmeterWindow *voltWindow;
 
-    bool isConfigurationWritten = false;
-
     double realVdd = 1;
     bool isReferenceMeasured = false;
     bool isStartup = true;

@@ -14,25 +14,33 @@
 #include "modules/pwmgenerator/pwmgenerator.h"
 #include "modules/voltagesource/voltagesource.h"
 #include "modules/template/templatemodule.h"
+#include "resourcemanager.h"
+
+// Forward declaration to avoid including the header here
+class Authenticator;
 
 
 class DeviceMediator : public QObject
 {
     Q_OBJECT
 public:
-    explicit DeviceMediator(QObject *parent = nullptr);
+    explicit DeviceMediator(Authenticator *authenticator, QObject *parent = nullptr);
+    ~DeviceMediator();
     QList<QSharedPointer<AbstractModule>> createModulesList();
     QList<QSharedPointer<AbstractModule>> getModulesList();   
     void ShowDeviceModule();
     bool getIsConnected() const;
     QString getDeviceName();
+    QString getMcuId();
 
-    int getResourcesInUse() const;
-    void setResourcesInUse(int value);
+    ResourceSet getResourcesInUse() const;
+    void setResourcesInUse(ResourceSet res);
+    void disableModules();
+    void closeModules();
 
 signals:
-    void loadLayout(QString Devicename);
-    void saveLayout(void);
+    void loadLayoutUponOpen(QString Devicename);
+    void saveLayoutUponExit(void);
 
 private:
     QList<DeviceDescriptor> deviceList;
@@ -42,21 +50,29 @@ private:
     Comms *communication;
 
     bool isConnected = false;
-    int resourcesInUse = 0;
+    int currentDeviceIndex = -1;
+
+    // Manager handling legacy resources + GPIO masks aggregation and conflicts
+    ResourceManager resourceManager;
+
+    // Shared async authenticator (runs in GUI thread, non-blocking)
+    Authenticator *authenticator = nullptr;
 
 private slots:
     void parseData(QByteArray data);
     void newDeviceList(QList<DeviceDescriptor> deviceList);
     void handleError(QByteArray error);
     void ScanDevices();
-    void open(int deviceIndex);
-    void disableModules();
+    void openDevice(int deviceIndex);
+    void disconnectDevice();
     void blockConflictingModulesCallback(QString moduleName, int resources);
     void releaseConflictingModulesCallback(QString moduleName, int resources);
+    void onDeviceSpecificationReady();
 
 public slots:
     void close();
     void closeApp();
+    void reopenDeviceAfterLogin();
 };
 
 #endif // DEVICE_H

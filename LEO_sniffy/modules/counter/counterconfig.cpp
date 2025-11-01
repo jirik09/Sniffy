@@ -1,4 +1,6 @@
 #include "counterconfig.h"
+#include <QDataStream>
+#include <QIODevice>
 
 CounterConfig::CounterConfig(QObject *parent)
 {
@@ -59,9 +61,8 @@ void CounterConfig::parse(QByteArray config)
 
 QByteArray CounterConfig::serialize()
 {
-    QByteArray *data;
-    data = new QByteArray();
-    QDataStream stream(data,QIODevice::WriteOnly);
+    QByteArray data; // stack allocated
+    QDataStream stream(&data, QIODevice::WriteOnly);
 
     /* General settings */
     stream << mode << modePrevIndex;
@@ -83,5 +84,5 @@ QByteArray CounterConfig::serialize()
     /* Intervals meas. settings */
     stream << intState.seqAB << intState.eventA << intState.eventB << intState.timeout;
 
-    return *data;
+    return data; // return by value
 }

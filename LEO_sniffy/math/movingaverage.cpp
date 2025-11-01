@@ -1,7 +1,9 @@
 #include "movingaverage.h"
 
 MovingAverage::MovingAverage(uint defaultBuffSize, QObject *parent) :
-    QObject(parent), buffSize(defaultBuffSize) {}
+    QObject(parent), buffSize(defaultBuffSize) {
+    if(buffSize < 1) buffSize = 1; // enforce minimum window size
+}
 
 /*
  * @param newValue A new element to be added at the beginning of the list
@@ -9,11 +11,14 @@ MovingAverage::MovingAverage(uint defaultBuffSize, QObject *parent) :
  */
 uint MovingAverage::prepend(double newValue){
     uint count = buffer.count();
-    if (count == buffSize)
+    if (count == buffSize){
+        runningSum -= buffer.last();
         buffer.removeLast();
+    }
     buffer.prepend(newValue);
-    count+= 1;
-    return (buffSize - count);
+    runningSum += newValue;
+    count = buffer.count();
+    return (buffSize > count) ? (buffSize - count) : 0;
 }
 
 /*
@@ -22,10 +27,8 @@ uint MovingAverage::prepend(double newValue){
  * @retval Returns average. If buffer not full -100 is returned.
  */
 double MovingAverage::getAverage(){
-    double sum = 0;
-    for (uint i = 0; i < buffSize; i++)
-        sum += buffer.at(i);
-    return (sum / buffSize);
+    // Contract: only call when buffer is full.
+    return runningSum / static_cast<double>(buffSize);
 }
 
 /*
@@ -33,11 +36,14 @@ double MovingAverage::getAverage(){
  * @retval Remaining sample count to fill the buffer
  */
 uint MovingAverage::setBufferSize(int newBuffSize){
+    if(newBuffSize < 1) newBuffSize = 1;
     int count = buffer.count();
-    if(newBuffSize < count)
-        removeItems(count - newBuffSize);
-    buffSize = newBuffSize;
-    return (newBuffSize - count);
+    if(newBuffSize < count){
+        removeItems(static_cast<uint>(count - newBuffSize));
+        count = buffer.count();
+    }
+    buffSize = static_cast<uint>(newBuffSize);
+    return (buffSize > static_cast<uint>(count)) ? (buffSize - static_cast<uint>(count)) : 0;
 }
 
 /*
@@ -70,6 +76,7 @@ uint MovingAverage::getSampleCountToFillBuff(){
 void MovingAverage::clear(){
     if(!buffer.isEmpty())
         buffer.clear();
+    runningSum = 0.0;
 }
 
 /*
@@ -78,9 +85,10 @@ void MovingAverage::clear(){
  * @retval None
  */
 void MovingAverage::removeItems(uint sampleCount){
-    while(sampleCount != 0){
+    while(sampleCount != 0 && !buffer.isEmpty()){
+        runningSum -= buffer.last();
         buffer.removeLast();
-        sampleCount--;
+        --sampleCount;
     }
 }
 

@@ -5,8 +5,8 @@
 #include <QMutex>
 #include "connectiontype.h"
 #include "serialline.h"
-
 #include "devicescanner.h"
+#include <memory>
 
 
 
@@ -14,7 +14,7 @@ class Comms : public QObject
 {
     Q_OBJECT
 
-//#define DEBUG_COMMS
+#define DEBUG_COMMS
 
 public:
     explicit Comms(QObject *parent = nullptr);
@@ -43,10 +43,9 @@ private slots:
     void devicesScanned(QList<DeviceDescriptor> deviceList);
 
 private:
-    SerialLine *serial;
-    //bool isOpen = false;
-    QThread *serialThread;
-    DeviceScanner devScanner;
+    std::unique_ptr<SerialLine> serial; // owned resource
+    QThread *serialThread;              // Qt parented (this)
+    DeviceScanner devScanner;           // QThread subclass member
 };
 
 #endif // COMMS_H

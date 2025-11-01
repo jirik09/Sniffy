@@ -1,4 +1,5 @@
 #include "patterngeneratorspec.h"
+#include "modules/specutils.h"
 
 PatternGeneratorSpec::PatternGeneratorSpec(QObject *parent)
 {
@@ -11,10 +12,10 @@ void PatternGeneratorSpec::parseSpecification(QByteArray spec)
 
     stream >> resources >> maxSamplingRate;
 
-    char chars[4] = "";
-    for(int i = 0; i < PATT_MAX_CHANNELS_NUM; i++){
-        stream.readRawData(chars, 4);
-        chanPins[i] = QString(chars);
-        chanPins[i].remove('_');
-    }
+    SpecParsing::readPins4(stream, PATT_MAX_CHANNELS_NUM, [&](int i, const QString &pin){ chanPins[i] = pin; });
+
+    // New: read 4x GPIO masks (A,B,C,D)
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
 }

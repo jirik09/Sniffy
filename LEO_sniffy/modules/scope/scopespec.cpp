@@ -1,4 +1,5 @@
 #include "scopespec.h"
+#include "modules/specutils.h"
 
 #include <QDebug>
 #include <QDataStream>
@@ -21,11 +22,11 @@ void ScopeSpec::parseSpecification(QByteArray spec){
     Vref = tmpVref;
     VrefInt = tmpVrefInt;
 
-    char chars[4] = "";
-    for(int i = 0; i < maxADCChannels; i++){
-        stream.readRawData(chars, 4);
-        channelPins[i] = QString(chars).left(4);
-        channelPins[i].remove('_');
-    }
+    SpecParsing::readPins4(stream, maxADCChannels, [&](int i, const QString &pin){ channelPins[i] = pin; });
+
+    // New: read 4x GPIO masks (A,B,C,D)
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
 }
 

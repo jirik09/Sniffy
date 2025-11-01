@@ -23,4 +23,9 @@ void PWMGeneratorSpec::parseSpecification(QByteArray spec)
     }
     */
 
+    // New: read 4x GPIO masks (A,B,C,D) appended by firmware
+    quint32 gpioA = 0, gpioB = 0, gpioC = 0, gpioD = 0;
+    stream >> gpioA >> gpioB >> gpioC >> gpioD;
+    setGpioMasks(gpioA, gpioB, gpioC, gpioD);
+
 }

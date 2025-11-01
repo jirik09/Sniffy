@@ -53,6 +53,9 @@ SyncPwmWindow::SyncPwmWindow(SyncPwmConfig *config, QWidget *parent) :
     chart = new widgetChart(widget_chart, CHANNELS_NUM);
     verticalLayout_chart->addWidget(chart);
 
+    // For Sync PWM we don't allow switching between spline/line/points via right-click
+    chart->setAllowStyleSelection(false);
+
     settings = new SyncPwmSettings(verticalLayout_settings, config, this);
     painter = new SyncPwmPainter(chart, config, this);
 }
@@ -90,12 +93,12 @@ void SyncPwmWindow::restoreGUIAfterStartup(){
 
 void SyncPwmWindow::setStartTxt(){
     settings->buttonStart->setText("Start");
-    settings->buttonStart->setColor(Graphics::COLOR_CONTROLS,0);
+    settings->buttonStart->setColor(Graphics::palette().controls,0);
 }
 
 void SyncPwmWindow::setStopTxt(){
     settings->buttonStart->setText("Stop");
-    settings->buttonStart->setColor(Graphics::COLOR_RUNNING,0);
+    settings->buttonStart->setColor(Graphics::palette().running,0);
 }
 
 void SyncPwmWindow::uncheckStartButton(){

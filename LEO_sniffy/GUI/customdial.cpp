@@ -8,7 +8,7 @@ Extends standard dial and just override the paint function
 #include <QPainter>
 #include <QColor>
 #include <QMouseEvent>
-#include <QDebug>
+#include <QTimer>
 
 #include <cmath>
 
@@ -19,6 +19,11 @@ CustomDial::CustomDial(QWidget* parent)
     QDial::setRange(0,100);
     QDial::setPageStep(5);
     QDial::setSingleStep(2);
+    // Don't set defaultValue here - it will be set later when the dial gets its actual value
+}
+
+CustomDial::~CustomDial()
+{
 }
 
 void CustomDial::setCustomGraphics(bool enable)
@@ -31,45 +36,107 @@ void CustomDial::drawMarker(bool draw)
     drawMark = draw;
 }
 
+void CustomDial::setValue(int value)
+{
+    // If this is the first time setValue is called, store as default
+    if (!defaultValueInitialized) {
+        defaultValue = value;
+        defaultValueInitialized = true;
+    }
+    // Call parent implementation
+    QDial::setValue(value);
+}
+
+void CustomDial::setDefaultValue(int value)
+{
+    defaultValue = value;
+    defaultValueInitialized = true;  // Mark as explicitly set
+}
+
+void CustomDial::setDoubleClickCallback(std::function<void()> callback)
+{
+    doubleClickCallback = callback;
+}
+
 void CustomDial::mouseMoveEvent(QMouseEvent *me) {
-    double relativeX = me->x() - mousePressX+0.01;
-    double relativeY = me->y() - mousePressY+0.01;
+    // Ignore mouse movement if we're in the middle of processing a double-click
+    if (doubleClickInProgress) {
+        return;
+    }
+    
+    // Qt6: x()/y() deprecated -> use position()
+    const QPointF pos = me->position();
+    double relativeX = pos.x() - mousePressX + 0.01;
+    double relativeY = pos.y() - mousePressY + 0.01;
 
-    //double distance = sqrt(relativeX*relativeX + relativeY*relativeY); //distance from initial point
-    double distance = abs(relativeX - relativeY) /sqrt(2); //distance from -xy axis
+    // Calculate distance from -xy axis
+    double distance = abs(relativeX - relativeY) / sqrt(2);
 
-    double phi = atan(relativeX/relativeY)*180/3.14159;
+    double phi = atan(relativeX/relativeY) * 180 / 3.14159;
 
     double angle = 0;
-    if (relativeY>0){
-        angle = 90-phi;
-    }else {
-        angle = 270-phi;
+    if (relativeY > 0) {
+        angle = 90 - phi;
+    } else {
+        angle = 270 - phi;
     }
 
-    //qDebug() << "dist"<<distance <<"angle" <<angle<<"(X" << relativeX << " Y" << relativeY << ")";
-    if (angle>225 || angle<45){
-        QDial::setValue(initialDialValue + distance/QDial::size().width()*QDial::maximum()*MOUSE_DRAG_DISTANCE);
-    }else {
-        QDial::setValue(initialDialValue - distance/QDial::size().width()*QDial::maximum()*MOUSE_DRAG_DISTANCE);
+    if (angle > 225 || angle < 45) {
+        QDial::setValue(initialDialValue + distance / QDial::size().width() * QDial::maximum() * MOUSE_DRAG_DISTANCE);
+    } else {
+        QDial::setValue(initialDialValue - distance / QDial::size().width() * QDial::maximum() * MOUSE_DRAG_DISTANCE);
     }
 }
 
 void CustomDial::mousePressEvent(QMouseEvent *me) {
+    // Ignore mouse press if we're in the middle of processing a double-click
+    if (doubleClickInProgress) {
+        me->accept();
+        return;
+    }
+    
     emit dialPressed(me);
-    mousePressX = me->x();
-    mousePressY = me->y();
+    const QPointF pos = me->position();
+    mousePressX = pos.x();
+    mousePressY = pos.y();
     initialDialValue = QDial::value();
 }
 
 void CustomDial::mouseReleaseEvent(QMouseEvent *me){
     emit dialReleased(me);
-    if(initialDialValue==QDial::value()){
-        QDial::mouseReleaseEvent(me);
-    }
+    
+    // Never call QDial::mouseReleaseEvent - it causes problems with value changes
+    // Our custom drag implementation handles value changes in mouseMoveEvent
+    
     mousePressX = 0;
     mousePressY = 0;
+    
+    // Reset flag after a delay if it's set
+    // This allows double-click event to be processed first
+    if (doubleClickInProgress) {
+        QTimer::singleShot(100, this, [this]() {
+            doubleClickInProgress = false;
+        });
+    }
+    
     QDial::update();
+}
+
+void CustomDial::mouseDoubleClickEvent(QMouseEvent *me)
+{
+    // Set flag to prevent subsequent mouse events from changing value
+    doubleClickInProgress = true;
+    
+    // Reset to default value directly
+    QDial::setValue(defaultValue);
+    
+    // Call callback if set (for WidgetDial to update its display)
+    if (doubleClickCallback) {
+        doubleClickCallback();
+    }
+    
+    // Accept the event to prevent further propagation
+    me->accept();
 }
 
 void CustomDial::paintEvent(QPaintEvent* evt)
@@ -119,10 +186,10 @@ void CustomDial::paintEvent(QPaintEvent* evt)
     //draw background arc
     if(drawMark){
         bs = (Qt::BrushStyle)(size/30+3); //5 for static size
-        painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_DATA_INPUT_AREA)),bs));
+    painter.setPen(QPen(QBrush(QColor(Graphics::palette().dataInputArea)),bs));
     }else {
         bs = (Qt::BrushStyle)2;
-        painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_TEXT_LABEL)),bs));
+    painter.setPen(QPen(QBrush(QColor(Graphics::palette().textLabel)),bs));
     }
 
     painter.drawArc(rect,0,360*16);
@@ -133,11 +200,11 @@ void CustomDial::paintEvent(QPaintEvent* evt)
 
     if(drawMark){
         //draw marker
-        painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_TEXT_ALL)),size/15+4)); //8 for static size
+    painter.setPen(QPen(QBrush(QColor(Graphics::palette().textAll)),size/15+4)); //8 for static size
         painter.drawArc(rect,225*16-ratio*16*270-5*16,10*16);
         //draw click pointer
         if(mousePressX!=0){
-            painter.setPen(QPen(QBrush(QColor(Graphics::COLOR_TEXT_LABEL)),4));
+            painter.setPen(QPen(QBrush(QColor(Graphics::palette().textLabel)),4));
             painter.drawArc(mousePressX-2,mousePressY-2,4,4,0,360*16);
         }
     }
