@@ -46,13 +46,13 @@ void Voltmeter::parseData(QByteArray data)
 {
     QByteArray dataHeader = data.left(4);
 
-    if(dataHeader=="CFG_"){
+    if(dataHeader==Commands::CONFIG){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
         showModuleControl();
         //TODO parse message from MCU
         
-    }else if(dataHeader=="OSC_"){
+    }else if(dataHeader==Commands::SCOPE_INCOME){
         quint8 tmpByte;
         quint16 tmpShort;
         qreal x(0);
@@ -127,9 +127,6 @@ void Voltmeter::parseData(QByteArray data)
 
 void Voltmeter::writeConfiguration()
 {
-    if(isConfigurationWritten)return;
-
-    setConfigurationWritten();
     //workaround first data was corrupted on channels > 1
     numChannelsEnabled = static_cast<VoltmeterSpec*>(moduleSpecification)->maxADCChannels;
     comm->write(cmd->SCOPE+":"+cmd->SCOPE_TRIG_CHANNEL+":"+cmd->CHANNELS_1+";");

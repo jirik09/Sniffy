@@ -18,7 +18,8 @@ public:
     static const QByteArray CONFIG_REQUEST;
     static const QByteArray IS_SHIELD_CONNECTED;
     static const QByteArray RESET_DEVICE;
-
+    static const QByteArray ERROR;
+    static const QByteArray DEBUG;
 
     static const QByteArray SIGNAL_GENERATOR;
     static const QByteArray VOLTAGE_SOURCE;
@@ -38,6 +39,7 @@ public:
     static const QByteArray UNPAUSE;
     static const QByteArray NEXT;
     static const QByteArray CONFIG;
+    static const QByteArray ACK;
 
     static const QByteArray GET_REAL_SMP_FREQ;
     static const QByteArray GET_SCOPE_INPUTS;

@@ -95,10 +95,6 @@ protected:
     QByteArray moduleCommandPrefix;
 
     AbstractSpecification* moduleSpecification = nullptr;
-    
-    bool isConfigurationWritten = false;
-    void setConfigurationWritten(bool written = true) { isConfigurationWritten = written; }
-    void resetConfigurationWritten() { isConfigurationWritten = false; }
 
 private:
     ModuleDockWidget *dockWidgetWindow;

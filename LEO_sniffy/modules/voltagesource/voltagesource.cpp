@@ -27,7 +27,7 @@ void VoltageSource::parseData(QByteArray data)
 {
     QByteArray dataHeader = data.left(4);
 
-    if(dataHeader=="CFG_"){
+    if(dataHeader==Commands::CONFIG){
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
         spec = static_cast<VoltageSourceSpec*>(moduleSpecification);
