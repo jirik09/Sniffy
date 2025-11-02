@@ -81,6 +81,8 @@ private slots:
     void openLoginDialog();
     void updateLoginInfo();
     void openSettingDialog();
+    // Show a small popup/toast in the bottom-left corner of the app window
+    void showBottomLeftPopup(const QString &text);
     //void onModuleControlShown();
 
 protected:

@@ -172,7 +172,12 @@ void Authenticator::onFinished(QNetworkReply *reply)
     CustomSettings::saveSettings();
 
     qDebug() << "[Auth] Token refreshed, valid till:" << validity;
-    if(authenticationSent == true){
-        emit authenticationSucceeded(validity, token); //this reconnect the device. should not be called on automatic token refresh;
+    emit authenticationSucceeded(validity, token); //this reconnect the device. should not be called on automatic token refresh;
+    if(authenticationSent == false){
+        // request small popup only on automatic prolongation
+        const QString tip = QObject::tr("Session extended. Valid till: %1")
+                                .arg(validity.date().toString("dd.MM.yyyy"));
+        emit popupMessageRequested(tip);
     }
+
 }

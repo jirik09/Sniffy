@@ -285,7 +285,7 @@ void DeviceMediator::parseData(QByteArray data)
         }
     }
     if(dataHeader == Commands::ERROR){
-        qDebug() << "DEVICE ERROR " << dataToPass.toHex();
+        qDebug() << "ERROR " << dataToPass.toHex();
         isDataPassed = true;
     }
     if(dataHeader == Commands::DEBUG){
@@ -294,25 +294,14 @@ void DeviceMediator::parseData(QByteArray data)
     }
     if (!isDataPassed)
     {
-        if (data.right(1) == "E")
+        if (data.length() < 30)
         {
-            qDebug() << "DEVICE ERROR " << QString::number((uint8_t)((data.right(2)).at(0)));
-        }
-        else if (data.left(3) == "DBG")
-        {
-            qDebug() << "DEBUG MCU: " << data.right(data.length() - 4);
+            qDebug() << "ERROR: this data was not passed to any module" << data;
         }
         else
         {
-            if (data.length() < 30)
-            {
-                qDebug() << "ERROR: this data was not passed to any module" << data;
-            }
-            else
-            {
-                qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
-            }
-        }
+            qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
+        }       
     }
 }
 

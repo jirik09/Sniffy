@@ -39,8 +39,10 @@ private:
 
     bool restartNeededWarning = false;
 
-private slots:
+public slots:
     void closeDialog(int isCanceled);
+
+private slots:
     void restartWarning();
     void sessionButtonClicked(int index, int optionalEmitParam = 0);
 

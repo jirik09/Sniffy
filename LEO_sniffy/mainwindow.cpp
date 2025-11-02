@@ -22,6 +22,7 @@ Right - area for dock widgets
 #include <QUuid>
 #include <QDir>
 #include <QFile>
+#include <QToolTip>
 
 
 MainWindow::MainWindow(QWidget *parent):
@@ -136,8 +137,9 @@ void MainWindow::setupMainWindowComponents(){
     connect(footer,&WidgetFooter::sizeClicked,this,&MainWindow::setMenuSize);
     connect(footer,&WidgetFooter::settingsClicked,this,&MainWindow::openSettingDialog);
     connect(loginInfo,&WidgetLoginInfo::loginDialogClicked,this,&MainWindow::openLoginDialog);
-    connect(logindial,&LoginDialog::loginInfoChanged,this,&MainWindow::updateLoginInfo);
-    connect(logindial,&LoginDialog::loginInfoChanged,deviceMediator,&DeviceMediator::reopenDeviceAfterLogin);
+    connect(logindial,&LoginDialog::loginInfoChangedReopen,deviceMediator,&DeviceMediator::reopenDeviceAfterLogin);
+    connect(authenticator, &Authenticator::authenticationSucceeded, this, &MainWindow::updateLoginInfo);
+    connect(authenticator, &Authenticator::popupMessageRequested, this, &MainWindow::showBottomLeftPopup);
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
@@ -170,6 +172,20 @@ void MainWindow::updateLoginInfo()
 void MainWindow::openSettingDialog()
 {
     sett->open();
+}
+
+void MainWindow::showBottomLeftPopup(const QString &text)
+{
+    QTimer::singleShot(0, this, [this, text] {
+        const int margin = 14;   // distance from edges
+        const int lift   = 36;   // raise a bit so it doesn't clip at the bottom
+        QPoint local(margin, this->height() - margin - lift);
+        QPoint global = this->mapToGlobal(local);
+        QFont tipFont = QApplication::font();
+        tipFont.setPointSize(10);
+        QToolTip::setFont(tipFont);
+        QToolTip::showText(global, text, this, QRect(), 10000);
+    });
 }
 
 void MainWindow::setMenuWide(){
@@ -336,7 +352,8 @@ void MainWindow::saveSessionToFile(const QString &filePath, bool silent = false)
     out.write(doc.toJson(QJsonDocument::Indented));
     out.close();
     if(!silent){
-        QMessageBox::information(this, "Save session", "Session saved successfully.");
+        if (sett) sett->closeDialog(true);
+        showBottomLeftPopup("Session saved successfully");
     }
 }
 
@@ -372,7 +389,8 @@ void MainWindow::onSettingsLoadSessionRequested()
     for (const QSharedPointer<AbstractModule>& module : modulesList) {
         loadModulesSessionFromFile(module->getModuleName());
     }
-    
+    if (sett) sett->closeDialog(true);
+    showBottomLeftPopup("Session loaded successfully");
     //QMessageBox::information(this, "Load session", "Session loaded successfully.");
 }
 
