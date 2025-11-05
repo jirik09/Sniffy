@@ -66,11 +66,17 @@ private:
 
     void saveSessionToFile(const QString &filePath, bool silent);
     bool loadSessionJSONFile(const QString &filePath);
-    void loadLayoutSessionFromFile();
+    // Restores layout; optionally skip main window geometry (position/size)
+    void loadLayoutSessionFromFile(bool restoreMainGeometry = true);
     void loadModulesSessionFromFile(const QString &moduleName);
     // Update left menu to compact (narrow) or expanded (wide): hide/show texts accordingly
     void updateLeftMenuCompact(bool compact);
 
+    // On startup: restore only main window geometry from the newest session (if any)
+    void restoreInitialGeometryFromNewestSession();
+
+    // Smart session: keep position but update size from session, expanding symmetrically and fitting screen
+    void applySmartSessionSizeOnly();
 
 private slots:
     void onSettingsSaveSessionRequested();

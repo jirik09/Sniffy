@@ -1,5 +1,7 @@
 #include "customsettings.h"
 #include "qdebug.h"
+#include <QApplication>
+#include <QWidget>
 
 CustomSettings::CustomSettings(QObject *parent) : QObject(parent)
 {
@@ -10,6 +12,7 @@ int CustomSettings::restoreSession;
 int CustomSettings::sessionRestoreAnswer;
 int CustomSettings::themeIndex;
 QList<QString> *CustomSettings::themesList = nullptr;
+bool CustomSettings::smartSessionLayoutGeometry = true;
 QString CustomSettings::userEmail;
 QString CustomSettings::userPin;
 QByteArray CustomSettings::loginToken;
@@ -27,7 +30,10 @@ void CustomSettings::loadSettings(QString fileName)
         // Prefer Dawn as default if key is missing
         themeIndex = settings.contains("theme") ? settings.value("theme").toInt() : 2;
 
-        userEmail = settings.value("email").toString();
+    userEmail = settings.value("email").toString();
+    // Default ON if key missing
+    smartSessionLayoutGeometry = settings.contains("smartSessionLayoutGeometry") ?
+                     settings.value("smartSessionLayoutGeometry").toBool() : true;
         if(userEmail == "Unknown user"){
             // Treat legacy sentinel as empty so UI shows placeholder instead of editable text
             userEmail.clear();
@@ -40,6 +46,7 @@ void CustomSettings::loadSettings(QString fileName)
         restoreSession = 0; // default: No session restore
         // Default theme: Dawn
         themeIndex = 2;
+        smartSessionLayoutGeometry = true;
         userEmail = "Unknown user";
         loginToken = "none";
         tokenValidity = QDateTime(QDate(2000,1,1),QTime(0,0));
@@ -54,6 +61,7 @@ void CustomSettings::saveSettings()
 
     settings.setValue("restoreSession", restoreSession);
     settings.setValue("theme", themeIndex);
+    settings.setValue("smartSessionLayoutGeometry", smartSessionLayoutGeometry);
 
     // Never persist legacy sentinel; store empty instead
     if(userEmail == "Unknown user"){
@@ -98,6 +106,16 @@ void CustomSettings::setThemeIndex(int value)
 int CustomSettings::getThemeIndex()
 {
     return themeIndex;
+}
+
+bool CustomSettings::getSmartSessionLayoutGeometry()
+{
+    return smartSessionLayoutGeometry;
+}
+
+void CustomSettings::setSmartSessionLayoutGeometry(bool value)
+{
+    smartSessionLayoutGeometry = value;
 }
 
 void CustomSettings::addTheme(QString name)
@@ -179,7 +197,7 @@ int CustomSettings::getRestoreSession()
     return restoreSession;
 }
 
-bool CustomSettings::askForSessionRestore(QString device)
+bool CustomSettings::askForSessionRestore(QString device, QWidget *parent)
 {
     if(restoreSession == 0){
         sessionRestoreAnswer = 0;
@@ -189,7 +207,8 @@ bool CustomSettings::askForSessionRestore(QString device)
         return true;
     }
 
-    QMessageBox msgBox;
+    QWidget *dlgParent = parent ? parent : QApplication::activeWindow();
+    QMessageBox msgBox(dlgParent);
 
     msgBox.setWindowTitle("Session restore");
     msgBox.setWindowIcon(QIcon(":/graphics/graphics/logo_color.png"));

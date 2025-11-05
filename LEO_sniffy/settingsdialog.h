@@ -31,6 +31,7 @@ private:
     Ui::SettingsDialog *ui;
 
     WidgetButtons *buttonsRestoreSession;
+    WidgetButtons *buttonsSmartSessionGeometry;
     WidgetButtons *buttonsSession;
     WidgetSelection * selTheme;
 

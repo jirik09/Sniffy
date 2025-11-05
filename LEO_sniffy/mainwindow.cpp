@@ -22,7 +22,10 @@ Right - area for dock widgets
 #include <QUuid>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QToolTip>
+#include <QScreen>
+#include <QGuiApplication>
 
 
 MainWindow::MainWindow(QWidget *parent):
@@ -31,6 +34,11 @@ MainWindow::MainWindow(QWidget *parent):
 {
     ui->setupUi(this);
     this->setWindowIcon(QIcon(":/graphics/graphics/logo_color.png"));
+
+    // Before anything shows, optionally restore only position/size from the newest session
+    if (CustomSettings::getSmartSessionLayoutGeometry()) {
+        restoreInitialGeometryFromNewestSession();
+    }
 
     // The left panel is the central widget; keep it from stretching horizontally
     ui->centralwidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -65,6 +73,85 @@ MainWindow::MainWindow(QWidget *parent):
     // Start in wide mode by default, then enforce the fixed width
     setMenuWide();
     enforceLeftMenuWidth();
+}
+
+void MainWindow::restoreInitialGeometryFromNewestSession()
+{
+    const QString sessionsPath = QApplication::applicationDirPath() + "/sessions";
+    QDir dir(sessionsPath);
+    if (!dir.exists()) return;
+
+    // Find newest *.json by modification time (descending)
+    const QFileInfoList files = dir.entryInfoList({"*.json"}, QDir::Files, QDir::Time);
+    if (files.isEmpty()) return;
+
+    const QString newest = files.first().absoluteFilePath();
+    QFile in(newest);
+    if (!in.open(QIODevice::ReadOnly)) return;
+    const QJsonDocument doc = QJsonDocument::fromJson(in.readAll());
+    in.close();
+    if (!doc.isObject()) return;
+
+    const QJsonObject obj = doc.object();
+    const auto geomVal = obj.value("geometry");
+    if (geomVal.isString()){
+        const QByteArray geom = QByteArray::fromBase64(geomVal.toString().toUtf8());
+        if (!geom.isEmpty()){
+            restoreGeometry(geom);
+        }
+    }
+}
+
+void MainWindow::applySmartSessionSizeOnly()
+{
+    if (!CustomSettings::getSmartSessionLayoutGeometry()) return;
+    if (isMaximized() || isFullScreen()) return;
+    if (!sessionRestoreData.contains("geometry")) return;
+
+    const QByteArray geomBytes = QByteArray::fromBase64(sessionRestoreData.value("geometry").toString().toUtf8());
+    if (geomBytes.isEmpty()) return;
+
+    // Use a temporary window to decode saved size without moving this window
+    QMainWindow tmp;
+    tmp.restoreGeometry(geomBytes);
+    QSize target = tmp.size();
+    if (!target.isValid() || target.isEmpty()) return;
+
+    // Fit to available screen while expanding symmetrically around current frame center
+    QScreen *scr = this->screen();
+    if (!scr) scr = QGuiApplication::primaryScreen();
+    if (!scr) return;
+    const QRect avail = scr->availableGeometry();
+
+    const QRect fr = frameGeometry();
+    QPoint center = fr.center();
+
+    // Desired frame rect centered on current center
+    QRect desiredFR(QPoint(0,0), target);
+    desiredFR.moveCenter(center);
+
+    // Clamp size if larger than available area
+    if (desiredFR.width() > avail.width()) desiredFR.setWidth(avail.width());
+    if (desiredFR.height() > avail.height()) desiredFR.setHeight(avail.height());
+
+    // Re-center after size clamp
+    desiredFR.moveCenter(center);
+
+    // Shift inside available area (minimal movement)
+    if (desiredFR.left() < avail.left()) desiredFR.moveLeft(avail.left());
+    if (desiredFR.right() > avail.right()) desiredFR.moveRight(avail.right());
+    if (desiredFR.top() < avail.top()) desiredFR.moveTop(avail.top());
+    if (desiredFR.bottom() > avail.bottom()) desiredFR.moveBottom(avail.bottom());
+
+    // Convert frame rect to widget geometry rect
+    const QPoint frameToWidgetOffset = fr.topLeft() - geometry().topLeft();
+    const QSize frameToWidgetDelta = fr.size() - geometry().size();
+    const QPoint widgetTopLeft = desiredFR.topLeft() - frameToWidgetOffset;
+    const QSize widgetSize = desiredFR.size() - frameToWidgetDelta;
+
+    // Guard: ensure non-negative size
+    QSize finalSize(qMax(widgetSize.width(), minimumSize().width()), qMax(widgetSize.height(), minimumSize().height()));
+    setGeometry(QRect(widgetTopLeft, finalSize));
 }
 
 void MainWindow::createModulesWidgets(){
@@ -385,7 +472,15 @@ void MainWindow::onSettingsLoadSessionRequested()
     
     if(!loadSessionJSONFile(fileName)) return;
     
-    loadLayoutSessionFromFile();
+    // If smart session is enabled, don't move the main window when user loads a session
+    {
+        const bool smart = CustomSettings::getSmartSessionLayoutGeometry();
+        loadLayoutSessionFromFile(!smart ? true : false);
+        if (smart) {
+            // Keep position, update size only (symmetrically, clamped to screen)
+            applySmartSessionSizeOnly();
+        }
+    }
     for (const QSharedPointer<AbstractModule>& module : modulesList) {
         loadModulesSessionFromFile(module->getModuleName());
     }
@@ -423,16 +518,22 @@ void MainWindow::onOpenLoadSessionRequested(QString deviceName)
         }   
         sessionRestoreData = QJsonObject();
     }else{
-        loadLayoutSessionFromFile();
+        // If smart session is enabled, we already restored initial geometry on startup; avoid moving the window again
+        const bool smart = CustomSettings::getSmartSessionLayoutGeometry();
+        loadLayoutSessionFromFile(!smart ? true : false);
+        if (smart) {
+            // Keep position, update size only (symmetrically, clamped to screen)
+            applySmartSessionSizeOnly();
+        }
     }
 }
 
-void MainWindow::loadLayoutSessionFromFile()
+void MainWindow::loadLayoutSessionFromFile(bool restoreMainGeometry)
 {
     // Restore geometry and window state
-    if(sessionRestoreData.contains("geometry")){
+    if(restoreMainGeometry && sessionRestoreData.contains("geometry")){
         QByteArray geom = QByteArray::fromBase64(sessionRestoreData.value("geometry").toString().toUtf8());
-        restoreGeometry(geom);
+    restoreGeometry(geom);
     }
     if(sessionRestoreData.contains("windowState")){
         QByteArray ws = QByteArray::fromBase64(sessionRestoreData.value("windowState").toString().toUtf8());

@@ -123,7 +123,7 @@ void DeviceMediator::openDevice(int deviceIndex)
                 QFile file(sessionFile);
                 if (file.exists())
                 {
-                    CustomSettings::askForSessionRestore(devName);
+                    CustomSettings::askForSessionRestore(devName, qobject_cast<QWidget*>(this->parent()));
                 }
                 else
                 {
