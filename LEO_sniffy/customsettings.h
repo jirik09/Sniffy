@@ -10,6 +10,8 @@
 
 #include "graphics/graphics.h"
 
+class QWidget;
+
 
 class CustomSettings : public QObject
 {
@@ -19,7 +21,7 @@ public:
     static void loadSettings(QString fileName);
     static void saveSettings();
 
-    static bool askForSessionRestore(QString device);
+    static bool askForSessionRestore(QString device, QWidget *parent = nullptr);
     static bool isSessionRestoreRequest();
     static void setNoSessionfound();
 
@@ -27,6 +29,10 @@ public:
     static int getRestoreSession();
     static void setThemeIndex(int value);
     static int getThemeIndex();
+
+    // Smart session: pre-show geometry restore and skip-geometry on auto-load
+    static bool getSmartSessionLayoutGeometry();
+    static void setSmartSessionLayoutGeometry(bool value);
 
     static void addTheme(QString name);
     static void setThemesList(QList<QString> *list);
@@ -57,6 +63,7 @@ private:
     static int sessionRestoreAnswer; //-1 not answered
     static int themeIndex;    
     static QList<QString> *themesList;
+    static bool smartSessionLayoutGeometry; // default true
 
     static QString userEmail;
     static QString userPin;
