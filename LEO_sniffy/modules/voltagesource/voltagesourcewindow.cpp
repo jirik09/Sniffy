@@ -64,7 +64,7 @@ VoltageSourceWindow::VoltageSourceWindow(VoltageSourceConfig *config, QWidget *p
         dial = new WidgetDialRange(this,"Voltage CH"+QString::number(i+1),i);
         dial->setObjectName("voltSourceDialCH"+QString::number(i+1));
         // Set initial dial range to 0..3.3 V
-        dial->setRange(0,3.3,"V",0.05,0.01,1000,false,3);
+        dial->setRange(0,3.3,"V",0.05,0.01,1,false,3);
         dial->setColor(Graphics::getChannelColor(i));
         dial->hideUnitSelection();
         dials.append(dial);
