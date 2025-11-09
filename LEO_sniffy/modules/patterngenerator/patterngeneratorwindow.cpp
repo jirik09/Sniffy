@@ -277,10 +277,11 @@ void PatternGeneratorWindow::patternSelectionChangedCallback(int index)
         emit i2cSelected();
 }
 
-void PatternGeneratorWindow::freqChangedDialsCallback(float val)
+void PatternGeneratorWindow::freqChangedDialsCallback(float val, int patternIndex)
 {
-    config->freq[config->pattIndex] = val;
-    painter->repaint(patternData);
+    config->freq[patternIndex] = val;
+    if (patternIndex == config->pattIndex)
+        painter->repaint(patternData);
 }
 
 void PatternGeneratorWindow::freqChangedCombosCallback(int index, float realVal)
