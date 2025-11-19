@@ -78,11 +78,15 @@ void CounterWindow::createAllDisplays(void){
     displayRat = createRatioDisplay();
     displayRat->setContentsMargins(5, 5, 5, 5);
     displayRat->setIndicationFlagColor(chan1);
+    displayRat->useVerticalProgressBar(false);
+    displayRat->showProgressBar(false);
     ui->verticalLayout_display->addWidget(displayRat);
 
     displayInt = createIntervalsDisplay();
     displayInt->setContentsMargins(5, 5, 5, 5);
     displayInt->setIndicationFlagColor(chan1);
+    displayInt->useVerticalProgressBar(false);
+    displayInt->showProgressBar(false);
     ui->verticalLayout_display->addWidget(displayInt);
 }
 

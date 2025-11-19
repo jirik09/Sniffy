@@ -174,7 +174,7 @@ private:
     void createPdmComponents(QWidget *parent, QVBoxLayout *destination, int index);
     void createParBusComponents(QWidget *parent, QVBoxLayout *destination, int index);
 
-    WidgetDialRange *createFrequencyDial(QWidget *parent, QString objName);
+    WidgetDialRange *createFrequencyDial(QWidget *parent, QString objName, int patternIndex);
 
     void resetUserDefinedComponents();
     void resetCounterComponents();
