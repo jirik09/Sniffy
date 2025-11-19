@@ -91,8 +91,8 @@ LoginDialog::LoginDialog(Authenticator *authenticator, QWidget *parent) :
     connect(auth, &Authenticator::authenticationFailed, this, [this](const QString &code, const QString &uiMsg){
         reportFailure(uiMsg, code);
     });
-    connect(auth, &Authenticator::authenticationSucceeded, this, [this](const QDateTime &validity, const QByteArray &token){
-        finalizeSuccess(validity, token);
+    connect(auth, &Authenticator::authenticationSucceeded, this, [this](const QDateTime &validity, const QByteArray &token, bool forceReconnect){
+        finalizeSuccess(validity, token, forceReconnect);
     });
 
     connect(buttonsDone,&WidgetButtons::clicked,this,&LoginDialog::buttonAction);
@@ -128,7 +128,7 @@ void LoginDialog::startLoginNetworkRequest(const QString &email, const QString &
 }
 
 // Helper: finalize successful login
-void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &token){
+void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &token, bool authenticationSentManual){
     CustomSettings::setLoginToken(token);
     CustomSettings::setTokenValidity(validity);
     CustomSettings::setLastLoginFailure("");
@@ -138,8 +138,10 @@ void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &t
 
     info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy"));
     info->setColor(Graphics::palette().textAll);
-    if(this->isVisible()){
+    if(authenticationSentManual){
         emit loginInfoChangedReopen();
+    }
+    if(this->isVisible()){
         close();
     }
     qInfo() << "[Login] Success valid till" << CustomSettings::getTokenValidity();

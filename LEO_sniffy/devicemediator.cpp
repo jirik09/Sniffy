@@ -162,12 +162,15 @@ void DeviceMediator::reopenDeviceAfterLogin()
         return;
     }
     close();
+    if (currentDeviceIndex >= 0 && currentDeviceIndex < deviceList.size()) {
+            openDevice(currentDeviceIndex);
+        }
 
-    QTimer::singleShot(250, [this]() {
+    /*QTimer::singleShot(250, [this]() {
         if (currentDeviceIndex >= 0 && currentDeviceIndex < deviceList.size()) {
             openDevice(currentDeviceIndex);
         }
-    });
+    });*/
 }
 
 void DeviceMediator::disableModules()
@@ -283,6 +286,10 @@ void DeviceMediator::parseData(QByteArray data)
             module->parseData(dataToPass);
             isDataPassed = true;
         }
+    }
+    if(dataHeader == Commands::TOKEN && dataToPass.left(4) == Commands::ACK){
+        qDebug() << "Authentication SUCCESS ";
+        isDataPassed = true;
     }
     if(dataHeader == Commands::ERROR){
         qDebug() << "ERROR " << dataToPass.toHex();

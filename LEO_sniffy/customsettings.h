@@ -50,6 +50,9 @@ public:
     static QDateTime getTokenValidity();
     static void setTokenValidity(const QDateTime &value);
 
+    static QDate getTokenGeneratedDate();
+    static void setTokenGeneratedDate(const QDate &value);
+
     static QString getLastLoginFailure();
     static void setLastLoginFailure(const QString &value);
 
@@ -69,6 +72,7 @@ private:
     static QString userPin;
     static QByteArray loginToken;
     static QDateTime tokenValidity;
+    static QDate tokenGeneratedDate;
     static QString lastLoginFailureReason;
 
 signals:

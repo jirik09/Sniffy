@@ -49,7 +49,7 @@ private:
     // Helper methods to reduce duplication
     void reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color = Graphics::palette().error);
     void startLoginNetworkRequest(const QString &email, const QString &pinHash);
-    void finalizeSuccess(const QDateTime &validity, const QByteArray &token);
+    void finalizeSuccess(const QDateTime &validity, const QByteArray &token, bool authenticationSentManual);
 
     void performLogout();
 

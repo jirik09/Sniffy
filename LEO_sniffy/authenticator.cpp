@@ -20,12 +20,12 @@ Authenticator::Authenticator(QObject *parent)
     timeoutTimer->setInterval(15000);
     connect(timeoutTimer, &QTimer::timeout, this, &Authenticator::onTimeout);
     qDebug() << "[Auth] Authenticator initialized";
-    authenticationSent = false;
+    authenticationSentManual = false;
 }
 
 void Authenticator::authenticate(const QString &email, const QString &pinHash)
 {
-    authenticationSent = true;
+    authenticationSentManual = true;
     if (currentReply)
         return; // already running
     startRequest(email, pinHash, QString(), QString());
@@ -35,9 +35,17 @@ void Authenticator::authenticate(const QString &email, const QString &pinHash)
 void Authenticator::tokenRefresh(const QString &deviceName, const QString &mcuId)
 {
     if(currentReply) return; // Request already in progress
-    if(authenticationSent == true) return; // Manual authentication already done this session
+    if(authenticationSentManual == true) return; // Manual authentication already done this session
     const QString email = CustomSettings::getUserEmail();
     if (email.isEmpty() || email == "Unknown user") return;
+    
+    // Check if token was generated today - if so, skip refresh
+    QDate tokenGenDate = CustomSettings::getTokenGeneratedDate();
+    if (tokenGenDate.isValid() && tokenGenDate == QDate::currentDate()) {
+        qDebug() << "[Auth] Token refresh skipped - token was generated today";
+        return;
+    }
+    
     qDebug() << "[Auth] Token refresh requested for" << email << "Device:" << deviceName << "MCU_ID:" << mcuId;
     // For refresh, use empty PIN - startRequest will handle it
     startRequest(email, QString(), deviceName, mcuId);
@@ -63,7 +71,7 @@ void Authenticator::startRequest(const QString &email, const QString &pinHash, c
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
     req.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 
-    if(authenticationSent == true){
+    if(authenticationSentManual == true){
         emit requestStarted();
     }
 
@@ -165,19 +173,26 @@ void Authenticator::onFinished(QNetworkReply *reply)
         return;
     }
 
-    // Update settings on success
+    QDateTime previousValidity = CustomSettings::getTokenValidity();
+    bool forceReconnect = authenticationSentManual;
+    if (authenticationSentManual || QDateTime::currentDateTime() > previousValidity) {
+        forceReconnect = true;
+        qDebug() << "[Auth] New Token generated - forcing device reconnection";
+    }
+    
     CustomSettings::setLoginToken(token);
     CustomSettings::setTokenValidity(validity);
+    CustomSettings::setTokenGeneratedDate(QDate::currentDate());
     CustomSettings::setLastLoginFailure("");
     CustomSettings::saveSettings();
 
     qDebug() << "[Auth] Token refreshed, valid till:" << validity;
-    emit authenticationSucceeded(validity, token); //this reconnect the device. should not be called on automatic token refresh;
-    if(authenticationSent == false){
+    
+    emit authenticationSucceeded(validity, token, forceReconnect); //if forceReconnect is true this reconnect the device. 
+    if(!forceReconnect){
         // request small popup only on automatic prolongation
         const QString tip = QObject::tr("Session extended. Valid till: %1")
                                 .arg(validity.date().toString("dd.MM.yyyy"));
         emit popupMessageRequested(tip);
     }
-
 }

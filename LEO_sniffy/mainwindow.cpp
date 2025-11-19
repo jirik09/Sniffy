@@ -251,8 +251,11 @@ void MainWindow::openLoginDialog()
     logindial->open();
 }
 
-void MainWindow::updateLoginInfo()
+void MainWindow::updateLoginInfo(const QDateTime &validity, const QByteArray &token, bool forceReconnect)
 {
+    Q_UNUSED(validity);
+    Q_UNUSED(token);
+    Q_UNUSED(forceReconnect);
     loginInfo->updateInfo();
 }
 

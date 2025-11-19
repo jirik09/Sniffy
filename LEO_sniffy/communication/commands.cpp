@@ -15,6 +15,7 @@ const QByteArray Commands::IS_SHIELD_CONNECTED = "SH_?";
 const QByteArray Commands::RESET_DEVICE = "RES!";
 const QByteArray Commands::ERROR = "ERR_";
 const QByteArray Commands::DEBUG = "DBG_";
+const QByteArray Commands::TOKEN = "TKN_";
 
 const QByteArray Commands::SIGNAL_GENERATOR = "GENS";
 const QByteArray Commands::VOLTAGE_SOURCE = "VOUT";

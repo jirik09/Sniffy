@@ -20,6 +20,7 @@ public:
     static const QByteArray RESET_DEVICE;
     static const QByteArray ERROR;
     static const QByteArray DEBUG;
+    static const QByteArray TOKEN;
 
     static const QByteArray SIGNAL_GENERATOR;
     static const QByteArray VOLTAGE_SOURCE;

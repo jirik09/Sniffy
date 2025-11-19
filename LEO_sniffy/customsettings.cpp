@@ -17,6 +17,7 @@ QString CustomSettings::userEmail;
 QString CustomSettings::userPin;
 QByteArray CustomSettings::loginToken;
 QDateTime CustomSettings::tokenValidity;
+QDate CustomSettings::tokenGeneratedDate;
 QString CustomSettings::lastLoginFailureReason;
 
 void CustomSettings::loadSettings(QString fileName)
@@ -41,6 +42,7 @@ void CustomSettings::loadSettings(QString fileName)
         loginToken = settings.value("token").toByteArray();
 
         tokenValidity = settings.value("validity").toDateTime();
+        tokenGeneratedDate = settings.value("tokenGeneratedDate").toDate();
         lastLoginFailureReason = settings.value("last_login_failure").toString();
     }else{ // set default values if settings file doesnt exist
         restoreSession = 0; // default: No session restore
@@ -50,6 +52,7 @@ void CustomSettings::loadSettings(QString fileName)
         userEmail = "Unknown user";
         loginToken = "none";
         tokenValidity = QDateTime(QDate(2000,1,1),QTime(0,0));
+        tokenGeneratedDate = QDate();
         lastLoginFailureReason = "";
     }
     sessionRestoreAnswer = -1;
@@ -78,6 +81,7 @@ void CustomSettings::saveSettings()
     }
     settings.setValue("token", loginToken);
     settings.setValue("validity", tokenValidity);
+    settings.setValue("tokenGeneratedDate", tokenGeneratedDate);
     settings.setValue("last_login_failure", lastLoginFailureReason);
 
 }
@@ -171,6 +175,16 @@ QDateTime CustomSettings::getTokenValidity()
 void CustomSettings::setTokenValidity(const QDateTime &value)
 {
     tokenValidity = value;
+}
+
+QDate CustomSettings::getTokenGeneratedDate()
+{
+    return tokenGeneratedDate;
+}
+
+void CustomSettings::setTokenGeneratedDate(const QDate &value)
+{
+    tokenGeneratedDate = value;
 }
 
 QString CustomSettings::getLastLoginFailure()

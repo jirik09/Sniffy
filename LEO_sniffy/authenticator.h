@@ -23,7 +23,7 @@ public slots:
 signals:
     void requestStarted();
     void requestFinished();
-    void authenticationSucceeded(const QDateTime &validity, const QByteArray &token);
+    void authenticationSucceeded(const QDateTime &validity, const QByteArray &token, bool forceReconnect);
     void authenticationFailed(const QString &code, const QString &uiMessage);
     // Generic UI notification request; MainWindow can show a small popup/toast
     void popupMessageRequested(const QString &message);
@@ -37,7 +37,7 @@ private:
 
     QNetworkAccessManager *networkManager {nullptr};
     QPointer<QNetworkReply> currentReply;
-    bool authenticationSent {false};
+    bool authenticationSentManual {false};
     QTimer *timeoutTimer {nullptr};
 };
 
