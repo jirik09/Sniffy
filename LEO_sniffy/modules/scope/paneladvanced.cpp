@@ -10,6 +10,18 @@ PanelAdvanced::PanelAdvanced(QVBoxLayout *destination, QWidget *parent)
     resolutionButtons->setText("8 bit",0);
     resolutionButtons->setText("12 bit",1);
 
+    destination->addWidget(new WidgetSeparator(parent,"Mode"));
+    modeButtons = new WidgetButtons(parent, 2, ButtonTypes::RADIO, "", 0);
+    modeButtons->setText("Normal", 0);
+    modeButtons->setText("XY", 1);
+    destination->addWidget(modeButtons);
+
+    channelXSelection = new WidgetSelection(parent, "Ch X");
+    destination->addWidget(channelXSelection);
+
+    channelYSelection = new WidgetSelection(parent, "Ch Y");
+    destination->addWidget(channelYSelection);
+
     destination->addWidget(new WidgetSeparator(parent,"Sampling"));
 
     samplingFrequencyInput = new WidgetTextInput(parent,"Sampling","100k",InputTextType::NUMBER);

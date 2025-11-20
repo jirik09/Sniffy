@@ -138,6 +138,10 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::SamplingFreqCustomInputCallback);
     connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::memoryCustomLengthCallback);
 
+    connect(panelAdvanced->modeButtons, &WidgetButtons::clicked, this, &ScopeWindow::modeChangedCallback);
+    connect(panelAdvanced->channelXSelection, &WidgetSelection::selectedIndexChanged, this, &ScopeWindow::channelXChangedCallback);
+    connect(panelAdvanced->channelYSelection, &WidgetSelection::selectedIndexChanged, this, &ScopeWindow::channelYChangedCallback);
+
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
     connect(chart,&widgetChart::localZoomChanged,this,&ScopeWindow::chartLocalZoomCallback);
@@ -186,6 +190,38 @@ void ScopeWindow::paintTraces(const QVector<QVector<QPointF>> &dataSeries, const
     chart->clearAll();
     labelInfoPanel->setTriggerLabelText("");
     labelInfoPanel->hideChannelLabels();
+
+    if (xyMode && numChannels >= 2) {
+        if (xyChannelX < dataSeries.size() && xyChannelY < dataSeries.size() &&
+            !dataSeries[xyChannelX].isEmpty() && !dataSeries[xyChannelY].isEmpty()) {
+
+            const QVector<QPointF>& xData = dataSeries[xyChannelX];
+            const QVector<QPointF>& yData = dataSeries[xyChannelY];
+            
+            int len = qMin(xData.size(), yData.size());
+            QVector<QPointF> xyPoints;
+            xyPoints.reserve(len);
+
+            float scaleX = config->channelScale[xyChannelX];
+            if(std::fabs(scaleX) < 1e-15f) scaleX = 1.0f;
+            float offsetX = config->channelOffset[xyChannelX];
+
+            float scaleY = config->channelScale[xyChannelY];
+            if(std::fabs(scaleY) < 1e-15f) scaleY = 1.0f;
+            float offsetY = config->channelOffset[xyChannelY];
+
+            for(int i=0; i<len; ++i) {
+                float valX = (xData[i].y() + offsetX) / scaleX;
+                float valY = (yData[i].y() + offsetY) / scaleY;
+                xyPoints.append(QPointF(valX, valY));
+            }
+            
+            chart->updateTrace(&xyPoints, 0);
+            chart->setRangeX(CHART_MIN_Y, CHART_MAX_Y);
+            chart->setRangeY(CHART_MIN_Y, CHART_MAX_Y);
+        }
+        return;
+    }
 
     //paint math
     paintMath(mathSeries);
@@ -387,7 +423,7 @@ void ScopeWindow::channelEnableCallback(int buttonStatus){
     validateAndApplyTriggerChannel(buttonStatus);
     updateTriggerChannelButtons(buttonStatus);
     // Repaint traces to reflect hiding/showing channels
-    paintTraces(ChartData, ChartMathData);
+    paintTraces(ChartData,ChartMathData);
     updateCursorReadings();
 }
 
@@ -660,6 +696,27 @@ void ScopeWindow::setNumChannels(int channels){
         panelMeas->channelButtonPhaseA->setButtonHidden(tmp,i);
         panelMeas->channelButtonPhaseB->setButtonHidden(tmp,i);
     }
+
+    numChannels = channels;
+    panelAdvanced->channelXSelection->clear();
+    panelAdvanced->channelYSelection->clear();
+    for (int i = 0; i < channels; i++) {
+        QString name = QString("Ch %1").arg(i + 1);
+        panelAdvanced->channelXSelection->addOption(name, i);
+        panelAdvanced->channelYSelection->addOption(name, i);
+    }
+    if (channels > 0) panelAdvanced->channelXSelection->setSelected(0, true);
+    if (channels > 1) panelAdvanced->channelYSelection->setSelected(1, true);
+    
+    if (channels < 2) {
+        panelAdvanced->modeButtons->setEnabled(false);
+        if (xyMode) {
+             panelAdvanced->modeButtons->setChecked(true, 0);
+             modeChangedCallback(0);
+        }
+    } else {
+        panelAdvanced->modeButtons->setEnabled(true);
+    }
 }
 
 void ScopeWindow::updateChartTimeScale(float timeBase){
@@ -711,6 +768,38 @@ const QVector<QPointF>& ScopeWindow::getTransformedChannel(int ch, const QVector
         cache.dirty = false;
     }
     return cache.transformed;
+}
+
+void ScopeWindow::modeChangedCallback(int index) {
+    bool newMode = (index == 1);
+    if (newMode != xyMode) {
+        if (newMode) {
+            // Entering XY mode
+            QList<QAbstractAxis*> axes = chart->getChart()->axes(Qt::Horizontal);
+            if (!axes.isEmpty()) {
+                QValueAxis *axis = qobject_cast<QValueAxis*>(axes.first());
+                if (axis) {
+                    savedMinX = axis->min();
+                    savedMaxX = axis->max();
+                }
+            }
+        } else {
+            // Leaving XY mode
+            chart->setRangeX(savedMinX, savedMaxX);
+        }
+        xyMode = newMode;
+    }
+    paintTraces(ChartData, ChartMathData);
+}
+
+void ScopeWindow::channelXChangedCallback(int index) {
+    xyChannelX = index;
+    if (xyMode) paintTraces(ChartData, ChartMathData);
+}
+
+void ScopeWindow::channelYChangedCallback(int index) {
+    xyChannelY = index;
+    if (xyMode) paintTraces(ChartData, ChartMathData);
 }
 
 
