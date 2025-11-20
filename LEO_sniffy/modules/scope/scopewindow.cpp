@@ -139,8 +139,8 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::memoryCustomLengthCallback);
 
     connect(panelAdvanced->modeButtons, &WidgetButtons::clicked, this, &ScopeWindow::modeChangedCallback);
-    connect(panelAdvanced->channelXSelection, &WidgetSelection::selectedIndexChanged, this, &ScopeWindow::channelXChangedCallback);
-    connect(panelAdvanced->channelYSelection, &WidgetSelection::selectedIndexChanged, this, &ScopeWindow::channelYChangedCallback);
+    connect(panelAdvanced->channelXButtons, &WidgetButtons::clicked, this, &ScopeWindow::channelXChangedCallback);
+    connect(panelAdvanced->channelYButtons, &WidgetButtons::clicked, this, &ScopeWindow::channelYChangedCallback);
 
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
@@ -422,6 +422,13 @@ void ScopeWindow::channelEnableCallback(int buttonStatus){
     emit channelEnableChanged(buttonStatus);
     validateAndApplyTriggerChannel(buttonStatus);
     updateTriggerChannelButtons(buttonStatus);
+    
+    for(int i=0; i<MAX_SCOPE_CHANNELS; i++) {
+        bool enabled = (buttonStatus & (1 << i));
+        panelAdvanced->channelXButtons->setEnabledButton(enabled, i);
+        panelAdvanced->channelYButtons->setEnabledButton(enabled, i);
+    }
+
     // Repaint traces to reflect hiding/showing channels
     paintTraces(ChartData,ChartMathData);
     updateCursorReadings();
@@ -695,18 +702,15 @@ void ScopeWindow::setNumChannels(int channels){
         panelMeas->channelButtons->setButtonHidden(tmp,i);
         panelMeas->channelButtonPhaseA->setButtonHidden(tmp,i);
         panelMeas->channelButtonPhaseB->setButtonHidden(tmp,i);
+        
+        panelAdvanced->channelXButtons->setButtonHidden(tmp, i);
+        panelAdvanced->channelYButtons->setButtonHidden(tmp, i);
     }
 
     numChannels = channels;
-    panelAdvanced->channelXSelection->clear();
-    panelAdvanced->channelYSelection->clear();
-    for (int i = 0; i < channels; i++) {
-        QString name = QString("Ch %1").arg(i + 1);
-        panelAdvanced->channelXSelection->addOption(name, i);
-        panelAdvanced->channelYSelection->addOption(name, i);
-    }
-    if (channels > 0) panelAdvanced->channelXSelection->setSelected(0, true);
-    if (channels > 1) panelAdvanced->channelYSelection->setSelected(1, true);
+    
+    if (channels > 0) panelAdvanced->channelXButtons->setChecked(true, 0);
+    if (channels > 1) panelAdvanced->channelYButtons->setChecked(true, 1);
     
     if (channels < 2) {
         panelAdvanced->modeButtons->setEnabled(false);

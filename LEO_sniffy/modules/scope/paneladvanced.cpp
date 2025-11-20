@@ -1,4 +1,5 @@
 #include "paneladvanced.h"
+#include "scopedefs.h"
 
 PanelAdvanced::PanelAdvanced(QVBoxLayout *destination, QWidget *parent)
 {
@@ -16,11 +17,19 @@ PanelAdvanced::PanelAdvanced(QVBoxLayout *destination, QWidget *parent)
     modeButtons->setText("XY", 1);
     destination->addWidget(modeButtons);
 
-    channelXSelection = new WidgetSelection(parent, "Ch X");
-    destination->addWidget(channelXSelection);
+    channelXButtons = new WidgetButtons(parent, MAX_SCOPE_CHANNELS, ButtonTypes::RADIO, "Ch X", 0);
+    for(int i=0; i<MAX_SCOPE_CHANNELS; i++) {
+        channelXButtons->setText(QString("CH%1").arg(i+1), i);
+        channelXButtons->setColor(Graphics::getChannelColor(i), i);
+    }
+    destination->addWidget(channelXButtons);
 
-    channelYSelection = new WidgetSelection(parent, "Ch Y");
-    destination->addWidget(channelYSelection);
+    channelYButtons = new WidgetButtons(parent, MAX_SCOPE_CHANNELS, ButtonTypes::RADIO, "Ch Y", 1);
+    for(int i=0; i<MAX_SCOPE_CHANNELS; i++) {
+        channelYButtons->setText(QString("CH%1").arg(i+1), i);
+        channelYButtons->setColor(Graphics::getChannelColor(i), i);
+    }
+    destination->addWidget(channelYButtons);
 
     destination->addWidget(new WidgetSeparator(parent,"Sampling"));
 

@@ -19,8 +19,8 @@ public:
 
     WidgetButtons *resolutionButtons;
     WidgetButtons *modeButtons;
-    WidgetSelection *channelXSelection;
-    WidgetSelection *channelYSelection;
+    WidgetButtons *channelXButtons;
+    WidgetButtons *channelYButtons;
     WidgetTextInput *samplingFrequencyInput;
     WidgetLabel *samplingFrequencyReal;
     WidgetTextInput *dataLengthInput;
