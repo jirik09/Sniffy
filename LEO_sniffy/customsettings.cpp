@@ -12,9 +12,9 @@ int CustomSettings::restoreSession;
 int CustomSettings::sessionRestoreAnswer;
 int CustomSettings::themeIndex;
 QList<QString> *CustomSettings::themesList = nullptr;
-bool CustomSettings::smartSessionLayoutGeometry = true;
+bool CustomSettings::smartSessionLayoutGeometry = false;
 QString CustomSettings::userEmail;
-QString CustomSettings::userPin;
+
 QByteArray CustomSettings::loginToken;
 QDateTime CustomSettings::tokenValidity;
 QDate CustomSettings::tokenGeneratedDate;
@@ -32,9 +32,9 @@ void CustomSettings::loadSettings(QString fileName)
         themeIndex = settings.contains("theme") ? settings.value("theme").toInt() : 2;
 
     userEmail = settings.value("email").toString();
-    // Default ON if key missing
+    // Default OFF if key missing
     smartSessionLayoutGeometry = settings.contains("smartSessionLayoutGeometry") ?
-                     settings.value("smartSessionLayoutGeometry").toBool() : true;
+                     settings.value("smartSessionLayoutGeometry").toBool() : false;
         if(userEmail == "Unknown user"){
             // Treat legacy sentinel as empty so UI shows placeholder instead of editable text
             userEmail.clear();
@@ -48,7 +48,7 @@ void CustomSettings::loadSettings(QString fileName)
         restoreSession = 0; // default: No session restore
         // Default theme: Dawn
         themeIndex = 2;
-        smartSessionLayoutGeometry = true;
+        smartSessionLayoutGeometry = false;
         userEmail = "Unknown user";
         loginToken = "none";
         tokenValidity = QDateTime(QDate(2000,1,1),QTime(0,0));
@@ -145,16 +145,6 @@ QString CustomSettings::getUserEmail()
 void CustomSettings::setUserEmail(const QString &value)
 {
     userEmail = value;
-}
-
-QString CustomSettings::getUserPin()
-{
-    return userPin;
-}
-
-void CustomSettings::setUserPin(const QString &value)
-{
-    userPin = value;
 }
 
 QByteArray CustomSettings::getLoginToken()

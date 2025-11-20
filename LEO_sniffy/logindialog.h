@@ -33,11 +33,11 @@ public:
     explicit LoginDialog(Authenticator *authenticator, QWidget *parent = nullptr);
     ~LoginDialog();
     void open();
+    void reject() override;
 
 private:
     Ui::LoginDialog *ui;
     WidgetTextInput  *userEmail;
-    WidgetTextInput  *userPIN;
     WidgetLabel *info;
 
     WidgetButtons *buttonsDone;
@@ -45,10 +45,14 @@ private:
     
     // Shared authenticator for login
     Authenticator *auth {nullptr};
+    
+    // Flag to track if we are currently polling (to distinguish from initial check)
+    bool isPolling = false;
 
     // Helper methods to reduce duplication
     void reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color = Graphics::palette().error);
-    void startLoginNetworkRequest(const QString &email, const QString &pinHash);
+    void checkLoginStatus(const QString &email);
+    void openBrowserForAuth(const QString &email);
     void finalizeSuccess(const QDateTime &validity, const QByteArray &token, bool authenticationSentManual);
 
     void performLogout();

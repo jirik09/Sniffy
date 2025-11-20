@@ -4,6 +4,10 @@
 #include <QDebug>
 #include <QLabel>
 #include <QSysInfo>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QUrlQuery>
+#include <QDateTime>
 #include "GUI/clickablelabel.h"
 #include "authenticator.h"
 
@@ -24,10 +28,7 @@ LoginDialog::LoginDialog(Authenticator *authenticator, QWidget *parent) :
     userEmail= new WidgetTextInput(this,"User email  ");
     // Use placeholder instead of editable sentinel
     userEmail->setPlaceholder("Unknown user", QColor(160,160,160));
-    userPIN = new WidgetTextInput(this, "PIN  ", "", InputTextType::NUMBER);
-    userPIN->setAsPassword();
     layout->addWidget(userEmail);
-    layout->addWidget(userPIN);
     WidgetSeparator *sep1 = new WidgetSeparator(this,"");
     layout->addWidget(sep1);
 
@@ -69,7 +70,7 @@ LoginDialog::LoginDialog(Authenticator *authenticator, QWidget *parent) :
     layout->addWidget(sep2);
 
     buttonsDone = new WidgetButtons(this,2);
-    buttonsDone->setText("  Login  ",0);
+    buttonsDone->setText("Check Login",0);
     buttonsDone->setText(" Close ",1);
     layout->addWidget(buttonsDone);
 
@@ -89,6 +90,26 @@ LoginDialog::LoginDialog(Authenticator *authenticator, QWidget *parent) :
         buttonsDone->setEnabled(true);
     });
     connect(auth, &Authenticator::authenticationFailed, this, [this](const QString &code, const QString &uiMsg){
+        qInfo() << "[Login] Authentication failed with code:" << code;
+        
+        // Check if this is a network/protocol error
+        bool isNetworkError = code.startsWith("network-") || code.startsWith("http-") || code.startsWith("invalid-") || code.startsWith("empty-");
+        
+        // If we are NOT polling (initial check) and it's an auth error (like 'expired', 'error', etc.)
+        // then open the browser to start the login flow.
+        // Only open browser if this was a user-initiated check (not a background refresh)
+        if (auth->isManualAuth() && !isPolling && !isNetworkError) {
+            const QString email = userEmail->getText().trimmed();
+            if (!email.isEmpty()) {
+                qInfo() << "[Login] Auth check failed (" << code << "), opening browser for:" << email;
+                info->setName("Opening browser for login...");
+                info->setColor(Graphics::palette().textLabel);
+                openBrowserForAuth(email);
+                return;
+            } else {
+                qWarning() << "[Login] Auth failed but email is empty!";
+            }
+        }
         reportFailure(uiMsg, code);
     });
     connect(auth, &Authenticator::authenticationSucceeded, this, [this](const QDateTime &validity, const QByteArray &token, bool forceReconnect){
@@ -103,13 +124,15 @@ LoginDialog::~LoginDialog()
 {
     delete ui;
 }
-
 // Helper: central failure handling to eliminate repetitive code blocks
 void LoginDialog::reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color){
     info->setName(uiMessage);
     info->setColor(color);
     emit loginFailed(failureCode);
-    
+
+    // Reset flags on failure
+    isPolling = false;
+
     // Clear token on authentication failure
     CustomSettings::setLoginToken("none");
     CustomSettings::setTokenValidity(QDateTime());
@@ -117,18 +140,54 @@ void LoginDialog::reportFailure(const QString &uiMessage, const QString &failure
     CustomSettings::saveSettings();
 }
 
-// Helper: start the network request after inputs validated
-void LoginDialog::startLoginNetworkRequest(const QString &email, const QString &pinHash){
+// Helper: check login status first
+void LoginDialog::checkLoginStatus(const QString &email){
     CustomSettings::setUserEmail(email);
     CustomSettings::saveSettings();
 
-    qInfo() << "[Login] Sending request for" << email;
-    // Delegate to shared authenticator (no Device_name at explicit login)
-    auth->authenticate(email, pinHash);
+    // Reset polling flag for initial check
+    isPolling = false;
+
+    qInfo() << "[Login] Checking login status for" << email;
+    // Check status - session ID is managed by Authenticator
+    auth->checkLogin(email);
+}
+
+// Helper: open browser for authentication and start polling
+void LoginDialog::openBrowserForAuth(const QString &email){
+    qInfo() << "[Login] Opening browser for authentication for" << email;
+
+    // Get the persistent session ID from authenticator
+    QString sessionId = auth->getSessionId();
+
+    // Build URL to start authentication directly (no POST, no user_agent)
+    QUrl startUrl("https://sniffy.cz/sniffy_auth_start.php");
+    QUrlQuery query;
+    query.addQueryItem("email", email);
+    query.addQueryItem("session_id", sessionId);
+    startUrl.setQuery(query);
+
+    qInfo() << "[Login] Opening browser with URL:" << startUrl.toString();
+    if (!QDesktopServices::openUrl(startUrl)) {
+        reportFailure("Failed to open browser", "browser-error");
+        return;
+    }
+
+    qInfo() << "[Login] Browser opened, starting polling for session" << sessionId;
+    
+    // Set polling flag
+    isPolling = true;
+    
+    // Start polling - session ID is managed by Authenticator
+    // Wait for the first interval (5s) to give browser time to load and user to interact
+    auth->startPolling(false);
 }
 
 // Helper: finalize successful login
 void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &token, bool authenticationSentManual){
+    // Reset flags
+    isPolling = false;
+
     CustomSettings::setLoginToken(token);
     CustomSettings::setTokenValidity(validity);
     CustomSettings::setLastLoginFailure("");
@@ -145,13 +204,10 @@ void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &t
         close();
     }
     qInfo() << "[Login] Success valid till" << CustomSettings::getTokenValidity();
-    
 }
 
 void LoginDialog::open()
 {
-    //  infoLabel->setValue("");
-    //  (legacy) infoLabel color line removed after palette migration
     this->show();
     this->raise();
     this->activateWindow();
@@ -160,13 +216,19 @@ void LoginDialog::open()
 
 void LoginDialog::buttonAction(int isCanceled)
 {
+    qInfo() << "[Login] Button action triggered. Canceled:" << isCanceled;
     if(isCanceled){
+        // Cancel button
+        auth->stopPolling();
+        isPolling = false;
         this->close();
         return;
     }
 
-    // Re-entrancy guard via disabled button; no extra flag needed
-    if(!buttonsDone->isEnabled()) return;
+    if(!buttonsDone->isEnabled()) {
+        qInfo() << "[Login] Buttons disabled, ignoring click";
+        return; // Guard
+    }
 
     const QString email = userEmail->getText().trimmed();
     if(email.isEmpty()){
@@ -174,20 +236,16 @@ void LoginDialog::buttonAction(int isCanceled)
         return;
     }
 
-    // PIN numeric extraction (defensive)
-    bool ok=false;
-    int pinValue = userPIN->getText().trimmed().toInt(&ok);
-    if(!ok){
-        reportFailure("PIN must be number","pin-not-numeric");
-        return;
-    }
-
-    QString pinHash = QString(QCryptographicHash::hash(QString::number(pinValue + 1297).toUtf8(),QCryptographicHash::Sha1).toHex());
-    startLoginNetworkRequest(email, pinHash);
+    // First check login status
+    checkLoginStatus(email);
 }
 
 void LoginDialog::performLogout()
 {
+    // Stop any active polling
+    auth->stopPolling();
+    isPolling = false;
+
     CustomSettings::setUserEmail("");
     CustomSettings::setLoginToken("none");
     CustomSettings::setTokenValidity(QDateTime());
@@ -196,16 +254,20 @@ void LoginDialog::performLogout()
 
     userEmail->setText("");
     userEmail->setPlaceholder("Unknown user", QColor(160,160,160));
-    userPIN->setText("");
 
-    // Notify the rest of the app that login state changed
     emit loginInfoChangedReopen();
 
-    // Update UI accordingly and close dialog
     if (logoutLabel) logoutLabel->setVisible(false);
     info->setName("Logged out");
     info->setColor(Graphics::palette().textLabel);
     close();
 }
 
-// legacy slot not used anymore
+void LoginDialog::reject()
+{
+    // Stop polling if dialog is closed via Esc or X
+    auth->stopPolling();
+    isPolling = false;
+    QDialog::reject();
+}
+

@@ -41,9 +41,6 @@ public:
     static QString getUserEmail();
     static void setUserEmail(const QString &value);
 
-    static QString getUserPin();
-    static void setUserPin(const QString &value);
-
     static QByteArray getLoginToken();
     static void setLoginToken(const QByteArray &value);
 
@@ -66,10 +63,9 @@ private:
     static int sessionRestoreAnswer; //-1 not answered
     static int themeIndex;    
     static QList<QString> *themesList;
-    static bool smartSessionLayoutGeometry; // default true
+    static bool smartSessionLayoutGeometry; // default false
 
     static QString userEmail;
-    static QString userPin;
     static QByteArray loginToken;
     static QDateTime tokenValidity;
     static QDate tokenGeneratedDate;

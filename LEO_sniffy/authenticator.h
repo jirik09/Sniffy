@@ -15,30 +15,45 @@ public:
     explicit Authenticator(QObject *parent = nullptr);
 
 public slots:
-    // General login using provided email/pin hash
-    void authenticate(const QString &email, const QString &pinHash);
+    // Check login status once (no polling) - used for initial check
+    void checkLogin(const QString &email);
+    // Start polling for authentication status. If immediate is true, checks immediately.
+    void startPolling(bool immediate = true);
+    // Stop polling
+    void stopPolling();
     // Convenience token refresh using values from settings; optional device name and MCU ID
     void tokenRefresh(const QString &deviceName = QString(), const QString &mcuId = QString());
+
+    // Get the persistent session ID
+    QString getSessionId() const { return currentSessionId; }
+    
+    // Check if authentication was initiated manually by user
+    bool isManualAuth() const { return authenticationSentManual; }
 
 signals:
     void requestStarted();
     void requestFinished();
     void authenticationSucceeded(const QDateTime &validity, const QByteArray &token, bool forceReconnect);
     void authenticationFailed(const QString &code, const QString &uiMessage);
+    void sessionStarted(const QString &sessionId); // Emitted when browser auth session is created
     // Generic UI notification request; MainWindow can show a small popup/toast
     void popupMessageRequested(const QString &message);
 
 private slots:
     void onFinished(QNetworkReply *reply);
     void onTimeout();
+    void checkAuthStatus(); // Polling slot for checking auth status
 
 private:
-    void startRequest(const QString &email, const QString &pinHash, const QString &deviceName, const QString &mcuId);
+    void startRequest(const QString &email, const QString &deviceName, const QString &mcuId, bool isRenewal);
 
     QNetworkAccessManager *networkManager {nullptr};
     QPointer<QNetworkReply> currentReply;
     bool authenticationSentManual {false};
+    bool isRenewalRequest {false}; // Track if current request is a background renewal
     QTimer *timeoutTimer {nullptr};
+    QTimer *pollTimer {nullptr}; // Timer for polling auth status
+    QString currentSessionId; // Session ID for polling
 };
 
 #endif // AUTHENTICATOR_H

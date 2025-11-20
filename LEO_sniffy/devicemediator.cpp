@@ -106,7 +106,6 @@ void DeviceMediator::openDevice(int deviceIndex)
             if (CustomSettings::getLoginToken() != "none"){
                 communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
                 communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-                communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
                 communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
                 communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
             }
