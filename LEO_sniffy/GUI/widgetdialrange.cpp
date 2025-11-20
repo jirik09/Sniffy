@@ -136,6 +136,7 @@ void WidgetDialRange::updateBaseUnit(QString unit)
         tmpUnit.unit = units.at(i).mult==1?unit:units.at(i).unit.at(0)+unit;
         units.replace(i,tmpUnit);
     }
+    updateControls(0, true);
 }
 
 void WidgetDialRange::hideUnitSelection(void){

@@ -119,6 +119,15 @@ void WidgetLabelArea::setCursorVoltageReadings(qreal curA, qreal curB)
     ui->widget_Vcursors->show();
 }
 
+void WidgetLabelArea::setCursorVoltageReadingsX(qreal curA, qreal curB)
+{
+    ui->label_Hcursor_title->setText("A: "+ LabelFormator::formatOutout(curA,"V"));
+    ui->label_Hcursor1->setText("B: "+ LabelFormator::formatOutout(curB,"V"));
+    ui->label_Hcursor2->setText("Diff: "+ LabelFormator::formatOutout(curA-curB,"V"));
+    ui->label_Hcursor3->setText("");
+    ui->widget_Hcursors->show();
+}
+
 void WidgetLabelArea::setCursorTimeReadings(qreal curA, qreal curB)
 {
     ui->label_Hcursor_title->setText("A: "+ LabelFormator::formatOutout(curA,"s"));
