@@ -21,6 +21,10 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     measLabelList.append(ui->label_meas7);
     measLabelList.append(ui->label_meas8);
     measLabelList.append(ui->label_meas9);
+    measLabelList.append(ui->label_meas10);
+    measLabelList.append(ui->label_meas11);
+    measLabelList.append(ui->label_meas12);
+    // End of 4th row
 
     for (QLabel *label : measLabelList) {
         if(label) label->hide();
@@ -105,6 +109,10 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
         measLabelList.at(fillIndex)->show();
         measLabelList.at(fillIndex)->setStyleSheet("color:"+Graphics::getChannelColor(m->getChannelIndex()));
         fillIndex++;
+    }
+
+    for(int i=fillIndex;i<measLabelList.length();i++){
+        measLabelList.at(i)->hide();
     }
 }
 
