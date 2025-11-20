@@ -68,8 +68,7 @@ private slots:
     void runGeneratorCallback();
     void openFileCallback();
     void resetPatternCallback();   
-
-    void freqChangedDialsCallback(float val);
+    void freqChangedDialsCallback(float val, int patternIndex);
     void freqChangedCombosCallback(int index, float realVal);
     void dataLenChangedDialsCallback(float val);
 

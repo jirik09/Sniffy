@@ -4,6 +4,13 @@ ArbGenPanelSettings::ArbGenPanelSettings(QVBoxLayout *destination, bool isPWMbas
     QObject(parent),
     isPWMbased(isPWMbased)
 {
+    // Ensure all channel state flags are initialized deterministically
+    for (int i = 0; i < MAX_ARB_CHANNELS_NUM; ++i) {
+        channelEnabled[i] = false;
+        channelSyncWithCH1[i] = false;
+        channelSyncPWMWithCH1[i] = false; // Important for CH1 where no sync switch exists
+    }
+
     WidgetSeparator *separatorCommon = new WidgetSeparator(parent, "Common");
     destination->addWidget(separatorCommon);
 

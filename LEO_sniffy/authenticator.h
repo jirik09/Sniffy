@@ -2,6 +2,8 @@
 #define AUTHENTICATOR_H
 
 #include <QObject>
+#include <QDateTime>
+#include <QString>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QTimer>
@@ -23,6 +25,8 @@ signals:
     void requestFinished();
     void authenticationSucceeded(const QDateTime &validity, const QByteArray &token);
     void authenticationFailed(const QString &code, const QString &uiMessage);
+    // Generic UI notification request; MainWindow can show a small popup/toast
+    void popupMessageRequested(const QString &message);
 
 private slots:
     void onFinished(QNetworkReply *reply);

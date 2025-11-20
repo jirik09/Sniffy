@@ -138,9 +138,12 @@ void LoginDialog::finalizeSuccess(const QDateTime &validity, const QByteArray &t
 
     info->setName("Login valid till: " + CustomSettings::getTokenValidity().toString("dd.MM.yyyy"));
     info->setColor(Graphics::palette().textAll);
-    emit loginInfoChanged();
+    if(this->isVisible()){
+        emit loginInfoChangedReopen();
+        close();
+    }
     qInfo() << "[Login] Success valid till" << CustomSettings::getTokenValidity();
-    close();
+    
 }
 
 void LoginDialog::open()
@@ -194,7 +197,7 @@ void LoginDialog::performLogout()
     userPIN->setText("");
 
     // Notify the rest of the app that login state changed
-    emit loginInfoChanged();
+    emit loginInfoChangedReopen();
 
     // Update UI accordingly and close dialog
     if (logoutLabel) logoutLabel->setVisible(false);

@@ -54,7 +54,7 @@ private:
     void performLogout();
 
 signals:
-    void loginInfoChanged();
+    void loginInfoChangedReopen();
     void loginFailed(const QString &message);
 
 private slots:

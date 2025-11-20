@@ -22,6 +22,12 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     buttonsRestoreSession->setText("   Yes   ",2);
     buttons->addWidget(buttonsRestoreSession);
 
+    // Smart session layout and geometry
+    buttonsSmartSessionGeometry = new WidgetButtons(this,2,ButtonTypes::RADIO,"Smart session layout and geometry",0);
+    buttonsSmartSessionGeometry->setText(" Off ",0);
+    buttonsSmartSessionGeometry->setText("  On ",1);
+    buttons->addWidget(buttonsSmartSessionGeometry);
+
     selTheme = new WidgetSelection(this,"Color scheme");
     QList<QString> *themesList = CustomSettings::getThemesList();
     for (int i =0; i<themesList->length(); i++) {
@@ -54,6 +60,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->widget->setLayout(buttons);
 
     buttonsRestoreSession->setChecked(true,CustomSettings::getRestoreSession());
+    buttonsSmartSessionGeometry->setChecked(true, CustomSettings::getSmartSessionLayoutGeometry() ? 1 : 0);
     selTheme->setSelected(CustomSettings::getThemeIndex());
 
     connect(buttonsDone,&WidgetButtons::clicked,this,&SettingsDialog::closeDialog);
@@ -79,6 +86,7 @@ void SettingsDialog::closeDialog(int isCanceled)
 {
     if(!isCanceled){
         CustomSettings::setRestoreSession(buttonsRestoreSession->getSelectedIndex());
+        CustomSettings::setSmartSessionLayoutGeometry(buttonsSmartSessionGeometry->getSelectedIndex() == 1);
         CustomSettings::setThemeIndex(selTheme->getSelectedIndex());
         CustomSettings::saveSettings();
 
