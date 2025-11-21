@@ -105,6 +105,25 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     QT_NO_FOREACH
 )
 
+# --- ST-Link & LibUSB Integration ---
+set(LIBUSB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/libusb")
+set(STLINK_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/stlink")
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    "${LIBUSB_ROOT}/include"
+    "${STLINK_ROOT}/include"
+)
+
+# Link libraries
+if(MSVC)
+    set(LIBUSB_LIB "${LIBUSB_ROOT}/lib/libusb-1.0.lib")
+    # stlink provided is MinGW compiled. Linking .dll.a with MSVC might work.
+    set(STLINK_LIB "${STLINK_ROOT}/lib/libstlink.dll.a") 
+else()
+    set(LIBUSB_LIB "${LIBUSB_ROOT}/lib/libusb-1.0.lib") # Adjust if using MinGW libusb
+    set(STLINK_LIB "${STLINK_ROOT}/lib/libstlink.dll.a")
+endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core
     Qt6::Gui
@@ -114,6 +133,18 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Charts
     Qt6::OpenGLWidgets
     Qt6::Network
+    ${LIBUSB_LIB}
+    ${STLINK_LIB}
+)
+
+# Copy DLLs to output directory
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${LIBUSB_ROOT}/bin/libusb-1.0.dll"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${STLINK_ROOT}/bin/libstlink.dll"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
 )
 
 # Windows GUI app (no console window)
