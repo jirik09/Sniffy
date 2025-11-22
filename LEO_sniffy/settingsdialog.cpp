@@ -105,9 +105,17 @@ SettingsDialog::~SettingsDialog()
     if (m_flasher) {
         // Invoke cleanup in the flasher's thread
         QMetaObject::invokeMethod(m_flasher, "stopAndCleanup");
+    } else {
+        m_flasherThread->quit();
     }
-    // Wait for the thread to finish (stopAndCleanup calls quit())
-    m_flasherThread->wait();
+    
+    // Wait for the thread to finish with timeout
+    if (!m_flasherThread->wait(5000)) {
+        m_flasherThread->terminate();
+        m_flasherThread->wait();
+    }
+    
+    delete m_flasher;
     delete ui;
 }
 
@@ -168,6 +176,7 @@ void SettingsDialog::onFlashButtonClicked(int index, int optionalEmitParam)
 
     flashProgressBar->setVisible(true);
     flashStatusLabel->setVisible(true);
+    flashStatusLabel->setColor(Graphics::palette().textAll); // Reset color
     flashStatusLabel->setValue("Connecting to ST-Link...");
     flashProgressBar->setValue(0);
 
@@ -190,7 +199,7 @@ void SettingsDialog::onDeviceConnected(const QString &info)
     if (!f.exists())
     {
         flashStatusLabel->setValue("Error: Firmware file not found on Desktop.");
-        flashStatusLabel->setColor("#ff0000");
+        flashStatusLabel->setColor(Graphics::palette().error);
         return;
     }
 

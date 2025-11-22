@@ -65,7 +65,6 @@ void StLinkFlasher::disconnectDevice()
 void StLinkFlasher::stopAndCleanup()
 {
     disconnectDevice();
-    this->deleteLater();
     QThread::currentThread()->quit();
 }
 
