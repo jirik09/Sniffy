@@ -35,6 +35,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList()
     tmpModules.append(QSharedPointer<AbstractModule>(new ArbGenerator(this, true)));
     tmpModules.append(QSharedPointer<AbstractModule>(new PatternGenerator(this)));
     tmpModules.append(QSharedPointer<AbstractModule>(new VoltageSource(this)));
+    tmpModules.append(QSharedPointer<AbstractModule>(new LogicAnalyzer(this)));
     //   tmpModules.append(QSharedPointer<AbstractModule> (new TemplateModule(this)));
 
     for (const QSharedPointer<AbstractModule> &mod : tmpModules)

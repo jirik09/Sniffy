@@ -27,6 +27,13 @@ public:
     static const QByteArray PATTERN_GENERATOR;
     static const QByteArray SYNC_PWM_GEN;    
     static const QByteArray LOG_ANLYS;
+    static const QByteArray LOG_ANLYS_TRIGGER_POINTER;
+    static const QByteArray LOG_ANLYS_DATA_LENGTH;
+    static const QByteArray LOG_ANLYS_DATA;
+    static const QByteArray LOG_ANLYS_SAMPLING_FREQ;
+    static const QByteArray LOG_ANLYS_TRIGGER_EVENT;
+    static const QByteArray LOG_ANLYS_TRIGGER_CHANNEL;
+    static const QByteArray INIT;
     static const QByteArray COUNTER;
     static const QByteArray SCOPE;
     static const QByteArray SCOPE_INCOME;

@@ -21,12 +21,20 @@ const QByteArray Commands::VOLTAGE_SOURCE = "VOUT";
 const QByteArray Commands::PWM_GENERATOR = "GENP";
 const QByteArray Commands::PATTERN_GENERATOR = "GENT";
 const QByteArray Commands::SYNC_PWM_GEN = "SPWM";
-const QByteArray Commands::LOG_ANLYS = "LOGA";
+const QByteArray Commands::LOG_ANLYS = "LAN_";
 const QByteArray Commands::COUNTER = "CNT_";
 const QByteArray Commands::SCOPE = "OSCP";
 const QByteArray Commands::SCOPE_INCOME = "OSC_";
 const QByteArray Commands::COMMS = "COMS";
 const QByteArray Commands::SYSTEM = "SYST";
+
+const QByteArray Commands::LOG_ANLYS_TRIGGER_POINTER = "LATP";
+const QByteArray Commands::LOG_ANLYS_DATA_LENGTH = "LADL";
+const QByteArray Commands::LOG_ANLYS_DATA = "LADT";
+const QByteArray Commands::LOG_ANLYS_SAMPLING_FREQ = "SMPF";
+const QByteArray Commands::LOG_ANLYS_TRIGGER_EVENT = "TRGE";
+const QByteArray Commands::LOG_ANLYS_TRIGGER_CHANNEL = "TRGC";
+const QByteArray Commands::INIT = "INIT";
 
 const QByteArray Commands::STOP = "STOP";
 const QByteArray Commands::START = "STRT";

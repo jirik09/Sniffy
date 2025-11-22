@@ -13,6 +13,7 @@
 #include "modules/patterngenerator/patterngenerator.h"
 #include "modules/voltagesource/voltagesource.h"
 #include "modules/template/templatemodule.h"
+#include "modules/logicanalyzer/logicanalyzer.h"
 #include "resourcemanager.h"
 
 // Forward declaration to avoid including the header here
