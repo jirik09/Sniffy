@@ -66,7 +66,6 @@ MainWindow::MainWindow(QWidget *parent):
     setupMainWindowComponents();
 
     connect(sett, &SettingsDialog::firmwareFlashed, deviceMediator, &DeviceMediator::reopenDeviceAfterLogin);
-    
     connect(deviceMediator,&DeviceMediator::loadLayoutUponOpen,this,&MainWindow::onOpenLoadSessionRequested,Qt::DirectConnection);
     connect(deviceMediator,&DeviceMediator::saveLayoutUponExit,this,&MainWindow::onExitSaveSessionRequested,Qt::DirectConnection);
 
