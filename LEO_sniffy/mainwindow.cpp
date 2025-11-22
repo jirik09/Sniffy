@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent):
     ui->verticalLayout_modules->addWidget(sep);
 
     createModulesWidgets();
-    setupMainWindowComponents();    
+    setupMainWindowComponents();
 
     connect(sett, &SettingsDialog::firmwareFlashed, deviceMediator, &DeviceMediator::reopenDeviceAfterLogin);
     
