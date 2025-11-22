@@ -65,10 +65,9 @@ MainWindow::MainWindow(QWidget *parent):
     createModulesWidgets();
     setupMainWindowComponents();
 
+    connect(sett, &SettingsDialog::firmwareFlashed, deviceMediator, &DeviceMediator::reopenDeviceAfterLogin);
     connect(deviceMediator,&DeviceMediator::loadLayoutUponOpen,this,&MainWindow::onOpenLoadSessionRequested,Qt::DirectConnection);
     connect(deviceMediator,&DeviceMediator::saveLayoutUponExit,this,&MainWindow::onExitSaveSessionRequested,Qt::DirectConnection);
-
-
 
     // Start in wide mode by default, then enforce the fixed width
     setMenuWide();

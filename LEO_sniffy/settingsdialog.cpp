@@ -238,6 +238,7 @@ void SettingsDialog::onFlashFinished(bool success, const QString &msg)
     {
         flashStatusLabel->setColor(Graphics::palette().running);
         flashProgressBar->setValue(100);
+        emit firmwareFlashed();
     }
     else
     {

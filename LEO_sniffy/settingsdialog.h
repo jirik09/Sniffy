@@ -65,6 +65,7 @@ private slots:
 signals:
     void saveSessionRequested();
     void loadSessionRequested();
+    void firmwareFlashed();
 };
 
 #endif // SETTINGSDIALOG_H
