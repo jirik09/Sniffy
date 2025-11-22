@@ -52,6 +52,7 @@ MainWindow::MainWindow(QWidget *parent):
     sett = new SettingsDialog(this);
     connect(sett, &SettingsDialog::saveSessionRequested, this, &MainWindow::onSettingsSaveSessionRequested);
     connect(sett, &SettingsDialog::loadSessionRequested, this, &MainWindow::onSettingsLoadSessionRequested);
+    connect(sett, &SettingsDialog::firmwareFlashed, deviceMediator, &DeviceMediator::reopenDeviceAfterLogin);
     
     // Create shared authenticator
     authenticator = new Authenticator(this);
@@ -63,12 +64,10 @@ MainWindow::MainWindow(QWidget *parent):
     ui->verticalLayout_modules->addWidget(sep);
 
     createModulesWidgets();
-    setupMainWindowComponents();
+    setupMainWindowComponents();    
 
     connect(deviceMediator,&DeviceMediator::loadLayoutUponOpen,this,&MainWindow::onOpenLoadSessionRequested,Qt::DirectConnection);
     connect(deviceMediator,&DeviceMediator::saveLayoutUponExit,this,&MainWindow::onExitSaveSessionRequested,Qt::DirectConnection);
-
-
 
     // Start in wide mode by default, then enforce the fixed width
     setMenuWide();
