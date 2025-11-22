@@ -8,8 +8,9 @@
 
 // Include stlink headers
 #include "stlink.h"
-extern "C" {
-    #include "common_flash.h"
+extern "C"
+{
+#include "common_flash.h"
 }
 
 StLinkFlasher::StLinkFlasher(QObject *parent)
@@ -30,22 +31,26 @@ bool StLinkFlasher::isConnected() const
 void StLinkFlasher::connectDevice()
 {
     QMutexLocker locker(&m_mutex);
-    if (m_connected) {
+    if (m_connected)
+    {
         emit deviceConnected("Already connected");
         return;
     }
 
-    if (initStLink()) {
+    if (initStLink())
+    {
         m_connected = true;
-        
+
         // Get device info
         QString info = QString("Core ID: 0x%1, Chip ID: 0x%2")
                            .arg(m_stlink->core_id, 0, 16)
                            .arg(m_stlink->chip_id, 0, 16);
-        
+
         emit deviceConnected(info);
         emit logMessage("Connected to ST-Link. " + info);
-    } else {
+    }
+    else
+    {
         emit operationFinished(false, "Failed to connect to ST-Link");
     }
 }
@@ -63,11 +68,14 @@ bool StLinkFlasher::initStLink()
     // Set STLINK_CHIPS_DIR to help libstlink find chip definitions
     QString appDir = QCoreApplication::applicationDirPath();
     QString chipsDir = QDir::toNativeSeparators(appDir + "/config/chips");
-    
-    if (QDir(chipsDir).exists()) {
+
+    if (QDir(chipsDir).exists())
+    {
         qputenv("STLINK_CHIPS_DIR", chipsDir.toLocal8Bit());
         emit logMessage("Set STLINK_CHIPS_DIR to: " + chipsDir);
-    } else {
+    }
+    else
+    {
         emit logMessage("Warning: Chips config dir not found at: " + chipsDir);
     }
 
@@ -75,68 +83,78 @@ bool StLinkFlasher::initStLink()
     stlink_t **stdevs;
     size_t count = stlink_probe_usb(&stdevs, CONNECT_NORMAL, 0); // 0 for default freq
 
-    if (count == 0) {
+    if (count == 0)
+    {
         emit logMessage("No ST-Link devices found.");
         return false;
     }
 
     // Open the first device
     m_stlink = stdevs[0];
-    
+
     // Free the array but keep the first device (which we are using)
-    // Note: stlink_probe_usb allocates an array of pointers. 
+    // Note: stlink_probe_usb allocates an array of pointers.
     // We need to free the array and other devices if we were not using them.
     // Since we take the first one, we should free others if count > 1.
-    if (count > 1) {
-        for (size_t i = 1; i < count; i++) {
+    if (count > 1)
+    {
+        for (size_t i = 1; i < count; i++)
+        {
             stlink_close(stdevs[i]);
         }
     }
     free(stdevs);
 
-    if (!m_stlink) {
+    if (!m_stlink)
+    {
         emit logMessage("Failed to open ST-Link device.");
         return false;
     }
 
     // Enter SWD mode
-    if (stlink_enter_swd_mode(m_stlink)) {
+    if (stlink_enter_swd_mode(m_stlink))
+    {
         emit logMessage("Failed to enter SWD mode.");
         cleanupStLink();
         return false;
     }
 
     // Force debug
-    if (stlink_force_debug(m_stlink)) {
+    if (stlink_force_debug(m_stlink))
+    {
         emit logMessage("Failed to force debug mode.");
         cleanupStLink();
         return false;
     }
 
     // Reset - Use RESET_AUTO or avoid RESET_HARD immediately before params if it causes issues
-    // stlink_reset(m_stlink, RESET_HARD); 
+    // stlink_reset(m_stlink, RESET_HARD);
     // Try to read core ID first to verify connection
     stlink_core_id(m_stlink);
     emit logMessage(QString("Core ID: 0x%1").arg(m_stlink->core_id, 0, 16));
 
     // Load device params (flash size, page size, etc.)
-    if (stlink_load_device_params(m_stlink)) {
+    if (stlink_load_device_params(m_stlink))
+    {
         emit logMessage(QString("Failed to load device parameters. Chip ID: 0x%1").arg(m_stlink->chip_id, 0, 16));
-        
+
         // Fallback: If chip ID is 0x446 (STM32F303RE), we can try to manually set params if config fails
-        if (m_stlink->chip_id == 0x446) {
-             emit logMessage("Attempting manual parameter fallback for STM32F303RE...");
-             m_stlink->flash_size = 512 * 1024; // 512KB
-             m_stlink->flash_pgsz = 2048;       // 2KB page
-             m_stlink->flash_base = 0x08000000;
-             m_stlink->sram_size = 64 * 1024;   // 64KB
-             m_stlink->sram_base = 0x20000000;
-             m_stlink->sys_base = 0x1FFFD800;
-             m_stlink->sys_size = 0x2000;
-             m_stlink->flash_type = STM32_FLASH_TYPE_F0_F1_F3; // Set correct flash type
-             m_stlink->chip_flags = 0; // Initialize flags
-             // If we manually set params, we can proceed
-        } else {
+        if (m_stlink->chip_id == 0x446)
+        {
+            emit logMessage("Attempting manual parameter fallback for STM32F303RE...");
+            m_stlink->flash_size = 512 * 1024; // 512KB
+            m_stlink->flash_pgsz = 2048;       // 2KB page
+            m_stlink->flash_base = 0x08000000;
+            m_stlink->sram_size = 64 * 1024; // 64KB
+            m_stlink->sram_base = 0x20000000;
+            m_stlink->sys_base = 0x1FFFD800;
+            m_stlink->sys_size = 0x2000;
+            m_stlink->flash_type = STM32_FLASH_TYPE_F0_F1_F3; // Set correct flash type
+            m_stlink->chip_flags = 0;                         // Initialize flags
+                                                              // If we manually set params, we can proceed
+        }
+        else
+        {
             cleanupStLink();
             return false;
         }
@@ -150,7 +168,8 @@ bool StLinkFlasher::initStLink()
 
 void StLinkFlasher::cleanupStLink()
 {
-    if (m_stlink) {
+    if (m_stlink)
+    {
         stlink_exit_debug_mode(m_stlink);
         stlink_close(m_stlink);
         m_stlink = nullptr;
@@ -160,8 +179,9 @@ void StLinkFlasher::cleanupStLink()
 void StLinkFlasher::flashFirmware(const QString &filePath)
 {
     QMutexLocker locker(&m_mutex);
-    
-    if (!m_connected) {
+
+    if (!m_connected)
+    {
         emit operationFinished(false, "Device not connected");
         return;
     }
@@ -170,7 +190,8 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
     emit logMessage("Starting flash process for: " + filePath);
 
     QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (!file.open(QIODevice::ReadOnly))
+    {
         emit operationFinished(false, "Could not open firmware file");
         return;
     }
@@ -178,7 +199,8 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
     QByteArray data = file.readAll();
     file.close();
 
-    if (data.isEmpty()) {
+    if (data.isEmpty())
+    {
         emit operationFinished(false, "Firmware file is empty");
         return;
     }
@@ -193,33 +215,36 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
 
     stm32_addr_t flash_base = m_stlink->flash_base;
     uint32_t size = data.size();
-    
+
     emit logMessage("Erasing flash...");
     emit progressChanged(0, 100);
 
     // Use page erase instead of mass erase to avoid timeouts and provide progress
     uint32_t page_size = m_stlink->flash_pgsz;
-    if (page_size == 0) page_size = 2048; // Safety fallback
+    if (page_size == 0)
+        page_size = 2048; // Safety fallback
 
     uint32_t addr = flash_base;
     uint32_t end_addr = flash_base + size;
-    
+
     int total_pages = (size + page_size - 1) / page_size;
     int erased_pages = 0;
 
-    while (addr < end_addr) {
+    while (addr < end_addr)
+    {
         int res = stlink_erase_flash_page(m_stlink, addr);
-        if (res != 0) {
-             emit operationFinished(false, QString("Failed to erase page at 0x%1").arg(addr, 0, 16));
-             return;
+        if (res != 0)
+        {
+            emit operationFinished(false, QString("Failed to erase page at 0x%1").arg(addr, 0, 16));
+            return;
         }
         addr += page_size;
         erased_pages++;
-        
+
         // Progress 0-50%
         int percent = (int)((double)erased_pages / total_pages * 50.0);
         emit progressChanged(percent, 100);
-        
+
         // Keep GUI responsive
         QThread::msleep(10);
     }
@@ -227,15 +252,46 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
     emit logMessage("Flash erased. Writing firmware...");
     emit progressChanged(50, 100);
 
-    // Use stlink_fwrite_flash for stability. It handles the write loop internally.
-    // Note: This will block until writing is done, so progress will jump to 100%.
-    // We convert QString path to local 8-bit string for C API.
-    QByteArray pathBytes = filePath.toLocal8Bit();
-    int res = stlink_fwrite_flash(m_stlink, pathBytes.constData(), flash_base);
+    // Ensure flash is unlocked before writing
+    unlock_flash_if(m_stlink);
 
-    if (res != 0) {
-        emit operationFinished(false, QString("Failed to write firmware. Error code: %1").arg(res));
-        return;
+    const uint8_t *content = (const uint8_t *)data.constData();
+    uint32_t write_addr = flash_base;
+    uint32_t remaining = size;
+
+    // Use page size for chunks if possible, or default to 2KB
+    uint32_t chunk_size = m_stlink->flash_pgsz;
+    if (chunk_size == 0 || chunk_size > 4096)
+        chunk_size = 2048;
+
+    int total_chunks = (size + chunk_size - 1) / chunk_size;
+    int written_chunks = 0;
+
+    while (remaining > 0)
+    {
+        uint32_t len = (remaining > chunk_size) ? chunk_size : remaining;
+
+        // Use stlink_write_flash (higher level) instead of mwrite.
+        // 0 for eraseonly means write.
+        int res = stlink_write_flash(m_stlink, write_addr, (uint8_t *)content, len, 0);
+
+        if (res != 0)
+        {
+            emit operationFinished(false, QString("Failed to write at address 0x%1. Error: %2").arg(write_addr, 0, 16).arg(res));
+            return;
+        }
+
+        write_addr += len;
+        content += len;
+        remaining -= len;
+        written_chunks++;
+
+        // Progress 50-100%
+        int percent = 50 + (int)((double)written_chunks / total_chunks * 50.0);
+        emit progressChanged(percent, 100);
+
+        // Small delay to keep UI responsive and not flood USB
+        QThread::msleep(5);
     }
 
     emit progressChanged(100, 100);
