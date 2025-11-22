@@ -15,7 +15,7 @@ extern "C"
 }
 
 StLinkFlasher::StLinkFlasher(QObject *parent)
-    : QObject(parent), m_stlink(nullptr), m_connected(false)
+    : QObject(parent), m_stlink(nullptr), m_connected(false), m_flashing(false)
 {
 }
 
@@ -32,6 +32,10 @@ bool StLinkFlasher::isConnected() const
 void StLinkFlasher::connectDevice()
 {
     QMutexLocker locker(&m_mutex);
+    if (m_flashing) {
+        emit logMessage("Flash in progress; ignoring connect request");
+        return;
+    }
     if (m_connected)
     {
         emit deviceConnected("Already connected");
@@ -169,6 +173,8 @@ void StLinkFlasher::cleanupStLink()
         m_stlink = nullptr;
     }
     m_connected = false;
+    // Ensure flashing flag cleared if cleanup happens mid-operation
+    m_flashing = false;
 }
 
 void StLinkFlasher::flashFirmware(const QString &filePath)
@@ -200,6 +206,9 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
         return;
     }
 
+    // Mark flashing in progress now that validation passed
+    m_flashing = true;
+
     // Ensure we are in the right mode
     stlink_reset(m_stlink, RESET_HARD);
     stlink_force_debug(m_stlink);
@@ -230,6 +239,7 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
         int res = stlink_erase_flash_page(m_stlink, addr);
         if (res != 0)
         {
+            m_flashing = false;
             emit operationFinished(false, QString("Failed to erase page at 0x%1").arg(addr, 0, 16));
             return;
         }
@@ -272,6 +282,7 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
 
         if (res != 0)
         {
+            m_flashing = false;
             emit operationFinished(false, QString("Failed to write at address 0x%1. Error: %2").arg(write_addr, 0, 16).arg(res));
             return;
         }
@@ -295,6 +306,7 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
     stlink_reset(m_stlink, RESET_HARD);
     stlink_run(m_stlink, RUN_NORMAL);
 
+    m_flashing = false;
     emit operationFinished(true, "Firmware flashed successfully");
 }
 

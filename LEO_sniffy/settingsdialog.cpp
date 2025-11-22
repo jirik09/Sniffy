@@ -74,6 +74,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     connect(m_flasher, &StLinkFlasher::logMessage, this, &SettingsDialog::onFlashLog);
     connect(m_flasher, &StLinkFlasher::operationFinished, this, &SettingsDialog::onFlashFinished);
     connect(m_flasher, &StLinkFlasher::deviceConnected, this, &SettingsDialog::onDeviceConnected);
+    connect(m_flasher, &StLinkFlasher::operationStarted, this, &SettingsDialog::onOperationStarted);
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     buttons->addItem(verticalSpacer);
@@ -174,6 +175,13 @@ void SettingsDialog::onFlashButtonClicked(int index, int optionalEmitParam)
     Q_UNUSED(index);
     Q_UNUSED(optionalEmitParam);
 
+    if (m_flashInProgress) {
+        flashStatusLabel->setVisible(true);
+        flashStatusLabel->setColor(Graphics::palette().warning);
+        flashStatusLabel->setValue("Flash already in progress...");
+        return;
+    }
+
     flashProgressBar->setVisible(true);
     flashStatusLabel->setVisible(true);
     flashStatusLabel->setColor(Graphics::palette().textAll); // Reset color
@@ -236,6 +244,17 @@ void SettingsDialog::onFlashFinished(bool success, const QString &msg)
         flashStatusLabel->setColor(Graphics::palette().error);
     }
 
+    // Re-enable button
+    m_flashInProgress = false;
+    buttonsFlash->setEnabled(true);
+
     // Disconnect after operation
     QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+}
+
+void SettingsDialog::onOperationStarted(const QString &operation)
+{
+    Q_UNUSED(operation);
+    m_flashInProgress = true;
+    buttonsFlash->setEnabled(false);
 }

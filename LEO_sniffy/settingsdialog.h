@@ -42,6 +42,7 @@ private:
     WidgetLabel *flashStatusLabel;
     StLinkFlasher *m_flasher;
     QThread *m_flasherThread;
+    bool m_flashInProgress = false; // guards repeated flashing
 
     WidgetLabel *infoLabel;
     WidgetButtons *buttonsDone;
@@ -59,6 +60,7 @@ private slots:
     void onFlashLog(const QString &msg);
     void onFlashFinished(bool success, const QString &msg);
     void onDeviceConnected(const QString &info);
+    void onOperationStarted(const QString &operation);
 
 signals:
     void saveSessionRequested();

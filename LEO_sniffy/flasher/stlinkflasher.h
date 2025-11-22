@@ -35,11 +35,15 @@ signals:
 private:
     stlink_t *m_stlink;
     bool m_connected;
+    bool m_flashing; // true while a flash operation is in progress
     QMutex m_mutex;
 
     bool initStLink();
     void cleanupStLink();
     bool loadDeviceParamsFallback();
+    // Non-copyable
+    StLinkFlasher(const StLinkFlasher&) = delete;
+    StLinkFlasher& operator=(const StLinkFlasher&) = delete;
 };
 
 #endif // STLINKFLASHER_H
