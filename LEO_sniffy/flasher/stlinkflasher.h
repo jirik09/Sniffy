@@ -38,6 +38,7 @@ private:
 
     bool initStLink();
     void cleanupStLink();
+    bool loadDeviceParamsFallback();
 };
 
 #endif // STLINKFLASHER_H
