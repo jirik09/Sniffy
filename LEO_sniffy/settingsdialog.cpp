@@ -75,22 +75,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     connect(m_flasher, &StLinkFlasher::operationFinished, this, &SettingsDialog::onFlashFinished);
     connect(m_flasher, &StLinkFlasher::deviceConnected, this, &SettingsDialog::onDeviceConnected);
 
-    // Connect flasher signals to Comms to pause/resume scanning
-    // We need to find the Comms instance. It is usually in DeviceMediator, but SettingsDialog doesn't have direct access.
-    // However, DeviceScanner is a singleton-like or we can access it if we make it accessible.
-    // Or simpler: We can just emit a signal from SettingsDialog that MainWindow or DeviceMediator listens to.
-    // But for now, let's try to find DeviceScanner if possible or just accept that we might need to stop it.
-
-    // Actually, Comms has a DeviceScanner member 'devScanner'.
-    // If we can't access it easily, we might need to rely on the user not having the device connected via Serial while flashing.
-    // But the user says: "aplikace obcas posle pres com port zarizeni IDN dotaz".
-    // This implies the device IS connected via Serial AND ST-Link at the same time (Nucleo boards have both).
-    // If the app holds the COM port open, it might interfere if the ST-Link reset toggles USB lines or if the app sends data that confuses the chip during reset.
-
-    // Ideally, we should close the serial connection before flashing.
-
-    // Let's add a signal to SettingsDialog that requests closing the connection.
-
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     buttons->addItem(verticalSpacer);
 
@@ -118,12 +102,9 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
 
 SettingsDialog::~SettingsDialog()
 {
-    if (m_flasher)
-    {
-        QMetaObject::invokeMethod(m_flasher, "deleteLater");
-    }
     m_flasherThread->quit();
     m_flasherThread->wait();
+    delete m_flasher;
     delete ui;
 }
 

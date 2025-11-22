@@ -63,7 +63,6 @@ private slots:
 signals:
     void saveSessionRequested();
     void loadSessionRequested();
-    void requestPauseCommunication(bool pause);
 };
 
 #endif // SETTINGSDIALOG_H
