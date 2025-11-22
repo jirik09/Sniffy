@@ -57,6 +57,7 @@ endif()
 # Collect sources (cpp + c), UI files, and resources
 file(GLOB_RECURSE CPP_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/flasher/*.cpp"
 )
 file(GLOB_RECURSE C_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.c"
@@ -68,6 +69,7 @@ file(GLOB_RECURSE UI_FILES CONFIGURE_DEPENDS
 file(GLOB_RECURSE HDR_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/flasher/*.h"
 )
 
 set(QRC_FILES)
@@ -105,6 +107,26 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     QT_NO_FOREACH
 )
 
+# --- ST-Link & LibUSB Integration ---
+set(LIBUSB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/libusb")
+set(STLINK_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/stlink")
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    "${LIBUSB_ROOT}/include"
+    "${LIBUSB_ROOT}/include/libusb-1.0"
+    "${STLINK_ROOT}/include"
+)
+
+# Link libraries
+if(MSVC)
+    set(LIBUSB_LIB "${LIBUSB_ROOT}/lib/libusb-1.0.lib")
+    set(STLINK_LIB "${STLINK_ROOT}/lib/libstlink.a") 
+else()
+    # MinGW: Link directly against the DLL if .a is missing or incompatible
+    set(LIBUSB_LIB "${LIBUSB_ROOT}/bin/libusb-1.0.dll") 
+    set(STLINK_LIB "${STLINK_ROOT}/lib/libstlink.a")
+endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core
     Qt6::Gui
@@ -114,6 +136,21 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Charts
     Qt6::OpenGLWidgets
     Qt6::Network
+    ${LIBUSB_LIB}
+    ${STLINK_LIB}
+)
+
+# Copy DLLs to output directory
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${LIBUSB_ROOT}/bin/libusb-1.0.dll"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${STLINK_ROOT}/bin/libstlink.dll"
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${STLINK_ROOT}/config/chips"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/config/chips"
 )
 
 # Windows GUI app (no console window)
