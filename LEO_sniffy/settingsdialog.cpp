@@ -102,9 +102,12 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
 
 SettingsDialog::~SettingsDialog()
 {
-    m_flasherThread->quit();
+    if (m_flasher) {
+        // Invoke cleanup in the flasher's thread
+        QMetaObject::invokeMethod(m_flasher, "stopAndCleanup");
+    }
+    // Wait for the thread to finish (stopAndCleanup calls quit())
     m_flasherThread->wait();
-    delete m_flasher;
     delete ui;
 }
 
@@ -216,12 +219,12 @@ void SettingsDialog::onFlashFinished(bool success, const QString &msg)
     flashStatusLabel->setValue(msg);
     if (success)
     {
-        flashStatusLabel->setColor("#00ff00");
+        flashStatusLabel->setColor(Graphics::palette().running);
         flashProgressBar->setValue(100);
     }
     else
     {
-        flashStatusLabel->setColor("#ff0000");
+        flashStatusLabel->setColor(Graphics::palette().error);
     }
 
     // Disconnect after operation

@@ -60,8 +60,13 @@ void StLinkFlasher::disconnectDevice()
 {
     QMutexLocker locker(&m_mutex);
     cleanupStLink();
-    m_connected = false;
-    emit deviceDisconnected();
+}
+
+void StLinkFlasher::stopAndCleanup()
+{
+    disconnectDevice();
+    this->deleteLater();
+    QThread::currentThread()->quit();
 }
 
 bool StLinkFlasher::initStLink()
@@ -164,13 +169,14 @@ void StLinkFlasher::cleanupStLink()
         stlink_close(m_stlink);
         m_stlink = nullptr;
     }
+    m_connected = false;
 }
 
 void StLinkFlasher::flashFirmware(const QString &filePath)
 {
     QMutexLocker locker(&m_mutex);
 
-    if (!m_connected)
+    if (!m_connected || !m_stlink)
     {
         emit operationFinished(false, "Device not connected");
         return;
@@ -261,9 +267,9 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
     {
         uint32_t len = (remaining > chunk_size) ? chunk_size : remaining;
 
-        // Use stlink_write_flash (higher level) instead of mwrite.
-        // 0 for eraseonly means write.
-        int res = stlink_write_flash(m_stlink, write_addr, (uint8_t *)content, len, 0);
+        // Create a mutable copy of the current chunk to avoid casting away constness.
+        QByteArray chunkCopy((const char*)content, len);
+        int res = stlink_write_flash(m_stlink, write_addr, reinterpret_cast<uint8_t *>(chunkCopy.data()), len, 0);
 
         if (res != 0)
         {

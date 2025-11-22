@@ -22,6 +22,7 @@ public slots:
     void connectDevice();
     void flashFirmware(const QString &filePath);
     void disconnectDevice();
+    void stopAndCleanup(); // New slot for thread-safe cleanup
 
 signals:
     void logMessage(const QString &msg);
