@@ -19,9 +19,10 @@ public:
     int triggerChannel = 1;
     int triggerEdge = 0; // 0: Rising, 1: Falling
     int dataLength = 1000;
-    
+
     // Channel settings
-    struct Channel {
+    struct Channel
+    {
         QString name;
         bool enabled;
         int color;

@@ -31,6 +31,14 @@ const QByteArray Commands::SYSTEM = "SYST";
 const QByteArray Commands::LOG_ANLYS_TRIGGER_POINTER = "LATP";
 const QByteArray Commands::LOG_ANLYS_DATA_LENGTH = "LADL";
 const QByteArray Commands::LOG_ANLYS_DATA = "LADT";
+// Streaming extensions
+const QByteArray Commands::LOG_ANLYS_SEQ = "LASE";      // sequence counter frame
+const QByteArray Commands::LOG_ANLYS_MODE = "LAMO";     // mode control (CONT/BATC)
+const QByteArray Commands::LOG_ANLYS_STREAM_CONT = "CONT"; // continuous mode token
+const QByteArray Commands::LOG_ANLYS_STREAM_BATCH = "BATC"; // batch mode token
+const QByteArray Commands::LOG_ANLYS_REQ_NEXT = "LANX"; // request next batch (PC->FW)
+const QByteArray Commands::LOG_ANLYS_PACKING = "LAPF"; // packing format frame (0=raw16,1=packed8)
+const QByteArray Commands::LOG_ANLYS_COMPLETE = "LACM"; // completion frame after STOP flush
 const QByteArray Commands::LOG_ANLYS_SAMPLING_FREQ = "SMPF";
 const QByteArray Commands::LOG_ANLYS_TRIGGER_EVENT = "TRGE";
 const QByteArray Commands::LOG_ANLYS_TRIGGER_CHANNEL = "TRGC";

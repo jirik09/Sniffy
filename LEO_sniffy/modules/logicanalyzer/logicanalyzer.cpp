@@ -1,41 +1,31 @@
 #include <QTimer>
 #include <QDebug>
+#include <QtEndian>
+#include "../labelformator.h"
 #include "logicanalyzer.h"
 #include "communication/commands.h"
 #include "communication/comms.h"
 
 LogicAnalyzer::LogicAnalyzer(QObject *parent) : AbstractModule(parent)
 {
-    qDebug() << "LogicAnalyzer::LogicAnalyzer() - Start";
     moduleName = "Logic Analyzer";
     moduleCommandPrefix = Commands::LOG_ANLYS;
     // moduleIconURI = ":/icons/logicanalyzer.png"; // Placeholder
-    
+
     config = new LogicAnalyzerConfig(this);
-    qDebug() << "LogicAnalyzer::LogicAnalyzer() - Config created";
     spec = new LogicAnalyzerSpec();
-    qDebug() << "LogicAnalyzer::LogicAnalyzer() - Spec created";
     // Register spec with base so generic helpers (GPIO masks, resource gating) work
     moduleSpecification = spec;
     window = new LogicAnalyzerWindow(config);
-    qDebug() << "LogicAnalyzer::LogicAnalyzer() - Window created";
-    
-    // Connect config signals to module slots if needed
-    // connect(config, &LogicAnalyzerConfig::someSignal, this, &LogicAnalyzer::someSlot);
 
-    // Temporary: Emit description immediately to ensure it shows up during development
-    // Ideally, this should happen after receiving config from MCU
-    /*
-    QTimer::singleShot(1000, this, [this](){
-        qDebug() << "LogicAnalyzer::LogicAnalyzer() - Emitting description";
-        QList<QString> labels;
-        QList<QString> values;
-        labels << "Channels" << "Max Freq";
-        values << "8" << "Unknown"; 
-        emit moduleDescription(moduleName, labels, values);
-        // showModuleControl(); // Don't show control automatically, let user open it
-    });
-    */
+    // Connect config signals to module slots
+    connect(window, &LogicAnalyzerWindow::startCapture, this, &LogicAnalyzer::startCapture);
+    connect(window, &LogicAnalyzerWindow::stopCapture, this, &LogicAnalyzer::stopCapture);
+    connect(window, &LogicAnalyzerWindow::sampleRateChanged, this, &LogicAnalyzer::updateSampleRate);
+    connect(window, &LogicAnalyzerWindow::triggerChannelChanged, this, &LogicAnalyzer::updateTriggerChannel);
+    connect(window, &LogicAnalyzerWindow::triggerEdgeChanged, this, &LogicAnalyzer::updateTriggerEdge);
+    connect(window, &LogicAnalyzerWindow::streamModeChanged, this, &LogicAnalyzer::updateStreamMode);
+
     qDebug() << "LogicAnalyzer::LogicAnalyzer() - End";
 }
 
@@ -47,7 +37,7 @@ LogicAnalyzer::~LogicAnalyzer()
     // config is child of this, so it will be deleted automatically
 }
 
-QWidget* LogicAnalyzer::getWidget()
+QWidget *LogicAnalyzer::getWidget()
 {
     return window;
 }
@@ -56,7 +46,8 @@ void LogicAnalyzer::parseData(QByteArray data)
 {
     QByteArray dataHeader = data.left(4);
     // DeviceMediator strips the module prefix (LAN_), so we receive CFG_<payload>
-    if (dataHeader == Commands::CONFIG) {
+    if (dataHeader == Commands::CONFIG)
+    {
         qDebug() << "LogicAnalyzer::parseData() - Received CONFIG";
         parseConfiguration(data.mid(4));
         return;
@@ -65,36 +56,84 @@ void LogicAnalyzer::parseData(QByteArray data)
     QDataStream stream(data);
     stream.setByteOrder(QDataStream::BigEndian);
 
-    while (!stream.atEnd()) {
+    while (!stream.atEnd())
+    {
         char header[5];
-        if (stream.readRawData(header, 4) < 4) break;
+        if (stream.readRawData(header, 4) < 4)
+            break;
         header[4] = '\0';
         QByteArray cmd(header);
 
-        if (cmd == Commands::LOG_ANLYS_TRIGGER_POINTER) {
+        if (cmd == Commands::LOG_ANLYS_SEQ)
+        {
+            quint32 seq;
+            stream >> seq;
+            if (lastSequence != 0 && seq != lastSequence + 1)
+            {
+                qDebug() << "[LogicAnalyzer] Sequence gap detected. Expected" << (lastSequence + 1) << "got" << seq;
+            }
+            lastSequence = seq;
+        }
+        else if (cmd == Commands::LOG_ANLYS_PACKING)
+        {
+            quint32 fmt;
+            stream >> fmt;
+            currentSegmentBitPacked = (fmt == 1);
+            qDebug() << "[LogicAnalyzer] Packing format:" << (currentSegmentBitPacked ? "packed8" : "raw16");
+        }
+        else if (cmd == Commands::LOG_ANLYS_COMPLETE)
+        {
+            qDebug() << "[LogicAnalyzer] Capture complete received.";
+            // No payload expected; could trigger UI finalize if needed
+        }
+        else if (cmd == Commands::LOG_ANLYS_TRIGGER_POINTER)
+        {
             quint32 ptr;
             stream >> ptr;
             // TODO: Use trigger pointer
-        } else if (cmd == Commands::LOG_ANLYS_DATA_LENGTH) {
+        }
+        else if (cmd == Commands::LOG_ANLYS_DATA_LENGTH)
+        {
             quint32 len;
             stream >> len;
-            // TODO: Use data length
-        } else if (cmd == Commands::LOG_ANLYS_DATA) {
+            pendingDataLengthBytes = len;
+        }
+        else if (cmd == Commands::LOG_ANLYS_DATA)
+        {
             QByteArray rawData = stream.device()->readAll();
-            
             QVector<QVector<int>> channelData(8);
-            const quint16 *samples = reinterpret_cast<const quint16*>(rawData.constData());
-            int sampleCount = rawData.size() / 2;
-            
-            for (int i = 0; i < sampleCount; ++i) {
-                quint16 val = samples[i];
-                for (int ch = 0; ch < 8; ++ch) {
-                    channelData[ch].append((val >> (6 + ch)) & 1);
+
+            if (currentSegmentBitPacked)
+            {
+                // Each byte encodes 8 channel bits (bit0=CH1 .. bit7=CH8)
+                int sampleCount = rawData.size();
+                for (int i = 0; i < sampleCount; ++i)
+                {
+                    uchar b = static_cast<uchar>(rawData[i]);
+                    for (int ch = 0; ch < 8; ++ch)
+                    {
+                        channelData[ch].append((b >> ch) & 0x1);
+                    }
                 }
             }
-            
-            // TODO: Get actual sample rate
-            window->showData(channelData, 10000); 
+            else
+            {
+                // Raw 16-bit IDR samples
+                int sampleCount = rawData.size() / 2;
+                const uchar *rawBytes = reinterpret_cast<const uchar *>(rawData.constData());
+                for (int i = 0; i < sampleCount; ++i)
+                {
+                    quint16 val = qFromLittleEndian<quint16>(rawBytes + (i * 2));
+                    for (int ch = 0; ch < 8; ++ch)
+                    {
+                        channelData[ch].append((val >> (6 + ch)) & 1);
+                    }
+                }
+            }
+            window->showData(channelData, config->sampleRate);
+            // Reset per-segment state
+            pendingDataLengthBytes = 0;
+            currentSegmentBitPacked = false;
             break;
         }
     }
@@ -102,26 +141,43 @@ void LogicAnalyzer::parseData(QByteArray data)
 
 void LogicAnalyzer::writeConfiguration()
 {
-    // TODO: Send configuration to MCU
+    // Scope based example:
+
+    // scpWindow->restoreGUIAfterStartup();
+    // scpWindow->setNumChannels(specification->maxADCChannels);
+    // scpWindow->setRealSamplingRateAndLlength(config->realSamplingRate,config->dataLength);
+
+    // comm->write(moduleCommandPrefix+":"+cmd->SCOPE_ADC_CHANNEL_DEAFULT+";");
+
+    // timeAndMemoryHandle->setMaxParams(specification->memorySize,specification->maxADCChannels);
+
+    // setResolution(config->ADCresolution);
+    // setDataLength(config->dataLength);
+    // setSamplingFrequency(config->requestedSamplingRate);
+    // updateTriggerLevel(config->triggerLevelPercent);
+    // updatePretrigger(config->pretriggerPercent);
+    // updateTriggerEdge(config->triggerEdge);
+    // setNumberOfChannels(config->numberOfChannels);
+    // updateTriggerChannel(config->triggerChannelIndex);
+    // if(config->triggerMode==ScopeTriggerMode::TRIG_STOP)
+    //     config->triggerMode=ScopeTriggerMode::TRIG_SINGLE;
+    // setTriggerMode(config->triggerMode);
 }
 
 void LogicAnalyzer::parseConfiguration(QByteArray config)
 {
     qDebug() << "LogicAnalyzer::parseConfiguration() - Payload size:" << config.size();
     spec->parseSpecification(config);
-    if (!spec->isLoaded()) {
+    if (!spec->isLoaded())
+    {
         qDebug() << "LogicAnalyzer::parseConfiguration() - Specification invalid or not loaded";
         return;
     }
-    
-    // Update UI with spec
-    QList<QString> labels;
-    QList<QString> values;
-    labels << "Channels" << "Max Freq";
-    values << QString::number(spec->numChannels) << QString::number(spec->maxSamplingFreq);
-    
-    emit moduleDescription(moduleName, labels, values);
+    // Pass specification to window for potential channel label usage
+    window->setSpecification(spec->channelNames);
+    // Ensure control is shown before emitting description
     showModuleControl();
+    buildModuleDescription();
 }
 
 QByteArray LogicAnalyzer::getConfiguration()
@@ -131,12 +187,9 @@ QByteArray LogicAnalyzer::getConfiguration()
 
 void LogicAnalyzer::startModule()
 {
-    if (comm) {
-        qDebug() << "LogicAnalyzer::startModule() - Requesting configuration (LAN_:CFG?)";
-        comm->write(Commands::LOG_ANLYS, Commands::CONFIG_REQUEST);
-    }
+    // CONFIG? already sent in AbstractModule::setComms
     comm->write(Commands::LOG_ANLYS, Commands::INIT);
-    comm->write(Commands::LOG_ANLYS, Commands::START);
+    // comm->write(Commands::LOG_ANLYS, Commands::START); // Don't start immediately, let user start
 }
 
 void LogicAnalyzer::stopModule()
@@ -163,4 +216,50 @@ void LogicAnalyzer::updateTriggerEdge(int edge)
     // 0: Rising, 1: Falling
     QByteArray edgeCmd = (edge == 0) ? Commands::EDGE_RISING : Commands::EDGE_FALLING;
     comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_TRIGGER_EVENT, edgeCmd);
+}
+
+void LogicAnalyzer::updateStreamMode(bool continuous)
+{
+    continuousMode = continuous;
+    if (!comm)
+        return;
+    QByteArray modeToken = continuous ? Commands::LOG_ANLYS_STREAM_CONT : Commands::LOG_ANLYS_STREAM_BATCH;
+    comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_MODE, modeToken);
+}
+
+void LogicAnalyzer::startCapture()
+{
+    isRunning = true;
+    lastSequence = 0;
+    if (window)
+        window->resetStream();
+    comm->write(Commands::LOG_ANLYS, Commands::START);
+}
+
+void LogicAnalyzer::stopCapture()
+{
+    isRunning = false;
+    lastSequence = 0; // reset sequence tracking for next run
+    if (window)
+        window->resetStream();
+    comm->write(Commands::LOG_ANLYS, Commands::STOP);
+}
+
+void LogicAnalyzer::buildModuleDescription()
+{
+    if (!spec || !spec->isLoaded())
+        return;
+    QList<QString> labels, values;
+    // Reordered: Channels, Memory size, Max sampling rate, Pins
+    labels << "Channels" << "Memory size" << "Max sampling rate" << "Pins";
+    values << QString::number(spec->numChannels)
+           << LabelFormator::formatOutout(spec->bufferLength, "B", 1)
+           << LabelFormator::formatOutout(spec->maxSamplingFreq, "sps", 2);
+    QString pins;
+    for (const QString &p : spec->channelNames)
+        pins += p + ", ";
+    if (!pins.isEmpty())
+        pins.chop(2);
+    values << pins;
+    showModuleDescription(moduleName, labels, values);
 }

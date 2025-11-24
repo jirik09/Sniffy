@@ -30,6 +30,14 @@ public:
     static const QByteArray LOG_ANLYS_TRIGGER_POINTER;
     static const QByteArray LOG_ANLYS_DATA_LENGTH;
     static const QByteArray LOG_ANLYS_DATA;
+    // Streaming extensions
+    static const QByteArray LOG_ANLYS_SEQ;
+    static const QByteArray LOG_ANLYS_MODE;
+    static const QByteArray LOG_ANLYS_STREAM_CONT;
+    static const QByteArray LOG_ANLYS_STREAM_BATCH;
+    static const QByteArray LOG_ANLYS_REQ_NEXT;
+    static const QByteArray LOG_ANLYS_PACKING; // per-segment packing format frame
+    static const QByteArray LOG_ANLYS_COMPLETE; // completion frame after STOP flush
     static const QByteArray LOG_ANLYS_SAMPLING_FREQ;
     static const QByteArray LOG_ANLYS_TRIGGER_EVENT;
     static const QByteArray LOG_ANLYS_TRIGGER_CHANNEL;

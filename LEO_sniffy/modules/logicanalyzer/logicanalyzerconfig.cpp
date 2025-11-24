@@ -6,8 +6,9 @@ LogicAnalyzerConfig::LogicAnalyzerConfig(QObject *parent) : AbstractConfiguratio
 {
     qDebug() << "LogicAnalyzerConfig::LogicAnalyzerConfig()";
     channels.resize(8);
-    for(int i=0; i<8; ++i) {
-        channels[i].name = QString("CH%1").arg(i+1);
+    for (int i = 0; i < 8; ++i)
+    {
+        channels[i].name = QString("CH%1").arg(i + 1);
         channels[i].enabled = true;
         channels[i].color = i; // Placeholder for color index
     }

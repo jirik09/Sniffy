@@ -1,6 +1,7 @@
 #include "logicanalyzerspec.h"
 #include <QDataStream>
 #include <QDebug>
+#include "modules/specutils.h"
 
 LogicAnalyzerSpec::LogicAnalyzerSpec()
 {
@@ -22,20 +23,9 @@ void LogicAnalyzerSpec::parseSpecification(QByteArray data)
     QDataStream stream(data);
     stream.setByteOrder(QDataStream::BigEndian);
 
-    // Skip "LOGA" or "CFG_" header if present (handled by caller usually, but let's be safe)
-    // Actually caller removes header.
-    
-    // MCU sends:
-    // Comms_SendUint32(LOG_ANLYS_POSTTRIG_PERIPH_CLOCK);
-    // Comms_SendUint32(LOG_ANLYS_TIMEBASE_PERIPH_CLOCK);
-    // Comms_SendUint32(LOG_ANLYS_SAMPLING_FREQ);
-    // Comms_SendUint32(LOG_ANLYS_BUFFER_LENGTH);
-    // Comms_SendUint32(LOG_ANLYS_CHANNELS_NUM);
-    // Channels names...
-    // GPIO masks...
-
     // Minimum payload: 5 uint32 + 4 masks = 9 * 4 = 36 bytes (without channel names)
-    if (data.size() < 20) { // at least first five uint32s
+    if (data.size() < 20)
+    { // at least first five uint32s
         qDebug() << "LogicAnalyzerSpec::parseSpecification() - ERROR: Payload too small";
         isSpecificationLoaded = false;
         return;
@@ -46,7 +36,7 @@ void LogicAnalyzerSpec::parseSpecification(QByteArray data)
     stream >> maxSamplingFreq;
     stream >> bufferLength;
     stream >> numChannels;
-    
+
     qDebug() << "LogicAnalyzerSpec::parseSpecification() - Parsed header: postTrigClock=" << postTriggerClock
              << " timeBaseClock=" << timeBaseClock
              << " maxSamplingFreq=" << maxSamplingFreq
@@ -54,7 +44,8 @@ void LogicAnalyzerSpec::parseSpecification(QByteArray data)
              << " numChannels=" << numChannels;
 
     // Sanity checks to prevent freezes/crashes on corrupt data
-    if (numChannels == 0 || numChannels > 64) {
+    if (numChannels == 0 || numChannels > 64)
+    {
         qDebug() << "LogicAnalyzerSpec::parseSpecification() - WARNING: numChannels invalid ->" << numChannels;
         numChannels = 0; // neutralize
         isSpecificationLoaded = false;
@@ -62,31 +53,49 @@ void LogicAnalyzerSpec::parseSpecification(QByteArray data)
     }
 
     const int expectedMinSize = 20 + (int)numChannels * 4 + 16; // header + names + 4 masks
-    if (data.size() < expectedMinSize) {
+    if (data.size() < expectedMinSize)
+    {
         qDebug() << "LogicAnalyzerSpec::parseSpecification() - WARNING: Payload smaller than expected (" << data.size() << "/" << expectedMinSize << ")";
         // We'll still try but guard reads.
     }
 
     channelNames.clear();
-    for(quint32 i=0; i<numChannels; ++i) {
-        char buffer[5];
-        if (stream.readRawData(buffer, 4) < 4) {
+    channelNames.reserve((int)numChannels);
+    for (quint32 i = 0; i < numChannels; ++i)
+    {
+        QString pin;
+        if (!SpecParsing::readOnePin4(stream, pin))
+        {
             qDebug() << "LogicAnalyzerSpec::parseSpecification() - WARNING: truncated channel name at index" << i;
             break;
         }
-        buffer[4] = '\0';
-        channelNames.append(QString(buffer));
+        channelNames.append(pin);
     }
 
-    if (!stream.atEnd()) stream >> gpioMaskA; else gpioMaskA = 0;
-    if (!stream.atEnd()) stream >> gpioMaskB; else gpioMaskB = 0;
-    if (!stream.atEnd()) stream >> gpioMaskC; else gpioMaskC = 0;
-    if (!stream.atEnd()) stream >> gpioMaskD; else gpioMaskD = 0;
+    quint32 a = 0, b = 0, c = 0, d = 0;
+    if (!stream.atEnd())
+        stream >> a;
+    else
+        a = 0;
+    if (!stream.atEnd())
+        stream >> b;
+    else
+        b = 0;
+    if (!stream.atEnd())
+        stream >> c;
+    else
+        c = 0;
+    if (!stream.atEnd())
+        stream >> d;
+    else
+        d = 0;
+
+    setGpioMasks(a, b, c, d);
 
     isSpecificationLoaded = true;
     qDebug() << "LogicAnalyzerSpec::parseSpecification() - Completed. Channels=" << channelNames
-             << " GPIO masks A:" << QString::number(gpioMaskA,16)
-             << " B:" << QString::number(gpioMaskB,16)
-             << " C:" << QString::number(gpioMaskC,16)
-             << " D:" << QString::number(gpioMaskD,16);
+             << " GPIO masks A:" << QString::number(getGpioMaskA(), 16)
+             << " B:" << QString::number(getGpioMaskB(), 16)
+             << " C:" << QString::number(getGpioMaskC(), 16)
+             << " D:" << QString::number(getGpioMaskD(), 16);
 }
