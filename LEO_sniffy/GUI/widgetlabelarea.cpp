@@ -21,6 +21,10 @@ WidgetLabelArea::WidgetLabelArea(QWidget *parent) :
     measLabelList.append(ui->label_meas7);
     measLabelList.append(ui->label_meas8);
     measLabelList.append(ui->label_meas9);
+    measLabelList.append(ui->label_meas10);
+    measLabelList.append(ui->label_meas11);
+    measLabelList.append(ui->label_meas12);
+    // End of 4th row
 
     for (QLabel *label : measLabelList) {
         if(label) label->hide();
@@ -106,6 +110,10 @@ void WidgetLabelArea::setMeasurements(QList<Measurement*> meas){
         measLabelList.at(fillIndex)->setStyleSheet("color:"+Graphics::getChannelColor(m->getChannelIndex()));
         fillIndex++;
     }
+
+    for(int i=fillIndex;i<measLabelList.length();i++){
+        measLabelList.at(i)->hide();
+    }
 }
 
 
@@ -117,6 +125,15 @@ void WidgetLabelArea::setCursorVoltageReadings(qreal curA, qreal curB)
     ui->label_Vcursor2->setText("B: "+ LabelFormator::formatOutout(curB,"V"));
     ui->label_Vcursor3->setText("Diff: "+ LabelFormator::formatOutout(curA-curB,"V"));
     ui->widget_Vcursors->show();
+}
+
+void WidgetLabelArea::setCursorVoltageReadingsX(qreal curA, qreal curB)
+{
+    ui->label_Hcursor_title->setText("A: "+ LabelFormator::formatOutout(curA,"V"));
+    ui->label_Hcursor1->setText("B: "+ LabelFormator::formatOutout(curB,"V"));
+    ui->label_Hcursor2->setText("Diff: "+ LabelFormator::formatOutout(curA-curB,"V"));
+    ui->label_Hcursor3->setText("");
+    ui->widget_Hcursors->show();
 }
 
 void WidgetLabelArea::setCursorTimeReadings(qreal curA, qreal curB)

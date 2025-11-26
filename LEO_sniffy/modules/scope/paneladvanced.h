@@ -18,6 +18,9 @@ public:
     PanelAdvanced(QVBoxLayout *destination, QWidget *parent = nullptr);
 
     WidgetButtons *resolutionButtons;
+    WidgetButtons *modeButtons;
+    WidgetButtons *channelXButtons;
+    WidgetButtons *channelYButtons;
     WidgetTextInput *samplingFrequencyInput;
     WidgetLabel *samplingFrequencyReal;
     WidgetTextInput *dataLengthInput;

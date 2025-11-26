@@ -138,6 +138,10 @@ ScopeWindow::ScopeWindow(ScopeConfig *config, QWidget *parent) :
     connect(panelAdvanced->samplingFrequencyInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::SamplingFreqCustomInputCallback);
     connect(panelAdvanced->dataLengthInput,&WidgetTextInput::numberChanged,this,&ScopeWindow::memoryCustomLengthCallback);
 
+    connect(panelAdvanced->modeButtons, &WidgetButtons::clicked, this, &ScopeWindow::modeChangedCallback);
+    connect(panelAdvanced->channelXButtons, &WidgetButtons::clicked, this, &ScopeWindow::channelXChangedCallback);
+    connect(panelAdvanced->channelYButtons, &WidgetButtons::clicked, this, &ScopeWindow::channelYChangedCallback);
+
     //connect top slider and chart and other stuff
     connect(ui->sliderSignal, &QSlider::valueChanged, this, &ScopeWindow::sliderShiftCallback);
     connect(chart,&widgetChart::localZoomChanged,this,&ScopeWindow::chartLocalZoomCallback);
@@ -186,6 +190,38 @@ void ScopeWindow::paintTraces(const QVector<QVector<QPointF>> &dataSeries, const
     chart->clearAll();
     labelInfoPanel->setTriggerLabelText("");
     labelInfoPanel->hideChannelLabels();
+
+    if (xyMode && numChannels >= 2) {
+        if (xyChannelX < dataSeries.size() && xyChannelY < dataSeries.size() &&
+            !dataSeries[xyChannelX].isEmpty() && !dataSeries[xyChannelY].isEmpty()) {
+
+            const QVector<QPointF>& xData = dataSeries[xyChannelX];
+            const QVector<QPointF>& yData = dataSeries[xyChannelY];
+            
+            int len = qMin(xData.size(), yData.size());
+            QVector<QPointF> xyPoints;
+            xyPoints.reserve(len);
+
+            float scaleX = config->channelScale[xyChannelX];
+            if(std::fabs(scaleX) < 1e-15f) scaleX = 1.0f;
+            float offsetX = config->channelOffset[xyChannelX];
+
+            float scaleY = config->channelScale[xyChannelY];
+            if(std::fabs(scaleY) < 1e-15f) scaleY = 1.0f;
+            float offsetY = config->channelOffset[xyChannelY];
+
+            for(int i=0; i<len; ++i) {
+                float valX = (xData[i].y() + offsetX) / scaleX;
+                float valY = (yData[i].y() + offsetY) / scaleY;
+                xyPoints.append(QPointF(valX, valY));
+            }
+            
+            chart->updateTrace(&xyPoints, 0);
+            chart->setRangeX(CHART_MIN_Y, CHART_MAX_Y);
+            chart->setRangeY(CHART_MIN_Y, CHART_MAX_Y);
+        }
+        return;
+    }
 
     //paint math
     paintMath(mathSeries);
@@ -386,8 +422,15 @@ void ScopeWindow::channelEnableCallback(int buttonStatus){
     emit channelEnableChanged(buttonStatus);
     validateAndApplyTriggerChannel(buttonStatus);
     updateTriggerChannelButtons(buttonStatus);
+    
+    for(int i=0; i<MAX_SCOPE_CHANNELS; i++) {
+        bool enabled = (buttonStatus & (1 << i));
+        panelAdvanced->channelXButtons->setEnabledButton(enabled, i);
+        panelAdvanced->channelYButtons->setEnabledButton(enabled, i);
+    }
+
     // Repaint traces to reflect hiding/showing channels
-    paintTraces(ChartData, ChartMathData);
+    paintTraces(ChartData,ChartMathData);
     updateCursorReadings();
 }
 
@@ -527,6 +570,21 @@ void ScopeWindow::updateCursorReadings()
             QString unit = config->FFTisLog?"dB":"Vrms";
             labelInfoPanel->setCursorFFTAmplitudeReadings(curA,curB,unit);
         }else{
+            if (xyMode) {
+                // In XY mode, vertical cursors measure Y-axis (Voltage Y)
+                // They are already set up for voltage, but we should ensure they use Y channel scale/offset?
+                // Actually, vertical cursors are attached to Y-axis.
+                // In XY mode, Y-axis is divisions.
+                // cursorVerADial returns Volts.
+                // setVerticalCursors converts Volts to Divisions using config->channelScale[channelIndex].
+                // If channelIndex is not xyChannelY, it might be confusing.
+                // But usually cursors are attached to a specific channel selected in Cursors panel.
+                // If user selects a channel in Cursors panel, we use that channel's scale.
+                // In XY mode, we are plotting Channel Y vs Channel X.
+                // So we should probably force cursors to use xyChannelY?
+                // Or just let the user select the channel they want to measure (which should be xyChannelY).
+                // For now, let's assume standard behavior (user selects channel).
+            }
             curA = panelCursors->cursorVerADial->getRealValue();
             curB = panelCursors->cursorVerBDial->getRealValue();
             labelInfoPanel->setCursorVoltageReadings(curA,curB);
@@ -540,12 +598,22 @@ void ScopeWindow::updateCursorReadings()
             QString unit = config->FFTisLog?"dB":"Vrms";
             labelInfoPanel->setCursorFFTAmplitudeReadings(curA,curB,unit);
         }else{
-            curA = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorADial->getRealValue());
-            curB = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorBDial->getRealValue());
-            curA = (curA * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
-            curB = (curB * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
-            labelInfoPanel->setCursorVoltageReadings(curA,curB);
-            labelInfoPanel->setCursorTimeReadings(panelCursors->cursorHorADial->getRealValue(),panelCursors->cursorHorBDial->getRealValue());
+            if (xyMode) {
+                // In XY mode, horizontal cursors measure X-axis (Voltage X)
+                curA = panelCursors->cursorHorADial->getRealValue();
+                curB = panelCursors->cursorHorBDial->getRealValue();
+                labelInfoPanel->setCursorVoltageReadingsX(curA, curB);
+                
+                // We could also show Y value at this X, but that requires finding the point.
+                // For now, just showing X voltage is what was requested.
+            } else {
+                curA = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorADial->getRealValue());
+                curB = chart->getSignalValue(config->cursorChannelIndex,panelCursors->cursorHorBDial->getRealValue());
+                curA = (curA * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
+                curB = (curB * config->channelScale[config->cursorChannelIndex])-config->channelOffset[config->cursorChannelIndex];
+                labelInfoPanel->setCursorVoltageReadings(curA,curB);
+                labelInfoPanel->setCursorTimeReadings(panelCursors->cursorHorADial->getRealValue(),panelCursors->cursorHorBDial->getRealValue());
+            }
         }
     }
 }
@@ -560,8 +628,23 @@ void ScopeWindow::setHorizontalCursors(int channelIndex){
         chart->clearAllCursors();
     } else {
         value = panelCursors->cursorHorADial->getRealValue();
+        if (xyMode) {
+            // Convert Voltage to Divisions for X-axis
+            float scaleX = config->channelScale[xyChannelX];
+            if(std::fabs(scaleX) < 1e-15f) scaleX = 1.0f;
+            float offsetX = config->channelOffset[xyChannelX];
+            value = (value + offsetX) / scaleX;
+        }
         chart->setHorizontalCursor(channelIndex, value, Cursor::CURSOR_A);
+        
         value = panelCursors->cursorHorBDial->getRealValue();
+        if (xyMode) {
+            // Convert Voltage to Divisions for X-axis
+            float scaleX = config->channelScale[xyChannelX];
+            if(std::fabs(scaleX) < 1e-15f) scaleX = 1.0f;
+            float offsetX = config->channelOffset[xyChannelX];
+            value = (value + offsetX) / scaleX;
+        }
         chart->setHorizontalCursor(channelIndex, value, Cursor::CURSOR_B);
         chartFFT->clearAllCursors();
     }
@@ -659,6 +742,24 @@ void ScopeWindow::setNumChannels(int channels){
         panelMeas->channelButtons->setButtonHidden(tmp,i);
         panelMeas->channelButtonPhaseA->setButtonHidden(tmp,i);
         panelMeas->channelButtonPhaseB->setButtonHidden(tmp,i);
+        
+        panelAdvanced->channelXButtons->setButtonHidden(tmp, i);
+        panelAdvanced->channelYButtons->setButtonHidden(tmp, i);
+    }
+
+    numChannels = channels;
+    
+    if (channels > 0) panelAdvanced->channelXButtons->setChecked(true, 0);
+    if (channels > 1) panelAdvanced->channelYButtons->setChecked(true, 1);
+    
+    if (channels < 2) {
+        panelAdvanced->modeButtons->setEnabled(false);
+        if (xyMode) {
+             panelAdvanced->modeButtons->setChecked(true, 0);
+             modeChangedCallback(0);
+        }
+    } else {
+        panelAdvanced->modeButtons->setEnabled(true);
     }
 }
 
@@ -711,6 +812,73 @@ const QVector<QPointF>& ScopeWindow::getTransformedChannel(int ch, const QVector
         cache.dirty = false;
     }
     return cache.transformed;
+}
+
+void ScopeWindow::modeChangedCallback(int index) {
+    bool newMode = (index == 1);
+    if (newMode != xyMode) {
+        if (newMode) {
+            // Entering XY mode
+            QList<QAbstractAxis*> axes = chart->getChart()->axes(Qt::Horizontal);
+            if (!axes.isEmpty()) {
+                QValueAxis *axis = qobject_cast<QValueAxis*>(axes.first());
+                if (axis) {
+                    savedMinX = axis->min();
+                    savedMaxX = axis->max();
+                }
+            }
+            
+            // Update horizontal cursors (X-axis) to Voltage mode
+            float scaleX = config->channelScale[xyChannelX];
+            if(std::fabs(scaleX) < 1e-15f) scaleX = 1.0f;
+            float offsetX = config->channelOffset[xyChannelX];
+            
+            float minV = (CHART_MIN_Y * scaleX) - offsetX;
+            float maxV = (CHART_MAX_Y * scaleX) - offsetX;
+            
+            panelCursors->cursorHorADial->updateBaseUnit("V");
+            panelCursors->cursorHorBDial->updateBaseUnit("V");
+            panelCursors->cursorHorADial->updateRange(minV, maxV);
+            panelCursors->cursorHorBDial->updateRange(minV, maxV);
+            
+        } else {
+            // Leaving XY mode
+            chart->setRangeX(savedMinX, savedMaxX);
+            
+            // Restore horizontal cursors to Time mode
+            panelCursors->cursorHorADial->updateBaseUnit("s");
+            panelCursors->cursorHorBDial->updateBaseUnit("s");
+            panelCursors->cursorHorADial->updateRange(config->timeMin, config->timeMax);
+            panelCursors->cursorHorBDial->updateRange(config->timeMin, config->timeMax);
+        }
+        xyMode = newMode;
+    }
+    paintTraces(ChartData, ChartMathData);
+    updateCursorReadings();
+}
+
+void ScopeWindow::channelXChangedCallback(int index) {
+    xyChannelX = index;
+    if (xyMode) {
+        // Update cursor ranges for new channel scale
+        float scaleX = config->channelScale[xyChannelX];
+        if(std::fabs(scaleX) < 1e-15f) scaleX = 1.0f;
+        float offsetX = config->channelOffset[xyChannelX];
+        
+        float minV = (CHART_MIN_Y * scaleX) - offsetX;
+        float maxV = (CHART_MAX_Y * scaleX) - offsetX;
+        
+        panelCursors->cursorHorADial->updateRange(minV, maxV);
+        panelCursors->cursorHorBDial->updateRange(minV, maxV);
+        
+        paintTraces(ChartData, ChartMathData);
+        updateCursorReadings();
+    }
+}
+
+void ScopeWindow::channelYChangedCallback(int index) {
+    xyChannelY = index;
+    if (xyMode) paintTraces(ChartData, ChartMathData);
 }
 
 

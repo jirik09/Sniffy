@@ -296,7 +296,7 @@ void Scope::updateChannelsEnable(int buttonStatus){
 
 void Scope::addMeasurement(Measurement *m){
     config->scopeMeasList.append(m);
-    if(config->scopeMeasList.length()>9){
+    if(config->scopeMeasList.length()>12){
         config->scopeMeasList.removeFirst();
     }
     config->measCount= config->scopeMeasList.length();
