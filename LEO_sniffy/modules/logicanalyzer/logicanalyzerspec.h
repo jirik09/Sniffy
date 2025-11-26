@@ -6,14 +6,14 @@
 class LogicAnalyzerSpec : public AbstractSpecification
 {
 public:
-    LogicAnalyzerSpec();
-    void parseSpecification(QByteArray data) override;
+    explicit LogicAnalyzerSpec();
+    void parseSpecification(QByteArray spec) override;
 
-    quint32 postTriggerClock;
-    quint32 timeBaseClock;
-    quint32 maxSamplingFreq;
-    quint32 bufferLength;
-    quint32 numChannels;
+    int postTriggerClock;
+    int timeBaseClock;
+    int maxSamplingFreq;
+    int bufferLength;
+    int numChannels;
     QList<QString> channelNames;
 };
 

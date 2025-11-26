@@ -168,11 +168,6 @@ void LogicAnalyzer::parseConfiguration(QByteArray config)
 {
     qDebug() << "LogicAnalyzer::parseConfiguration() - Payload size:" << config.size();
     spec->parseSpecification(config);
-    if (!spec->isLoaded())
-    {
-        qDebug() << "LogicAnalyzer::parseConfiguration() - Specification invalid or not loaded";
-        return;
-    }
     // Pass specification to window for potential channel label usage
     window->setSpecification(spec->channelNames);
     // Ensure control is shown before emitting description
@@ -247,19 +242,27 @@ void LogicAnalyzer::stopCapture()
 
 void LogicAnalyzer::buildModuleDescription()
 {
-    if (!spec || !spec->isLoaded())
-        return;
+    QString name = moduleName;
     QList<QString> labels, values;
-    // Reordered: Channels, Memory size, Max sampling rate, Pins
-    labels << "Channels" << "Memory size" << "Max sampling rate" << "Pins";
-    values << QString::number(spec->numChannels)
-           << LabelFormator::formatOutout(spec->bufferLength, "B", 1)
-           << LabelFormator::formatOutout(spec->maxSamplingFreq, "sps", 2);
+
+    labels.append("Channels");
+    values.append(QString::number(spec->numChannels));
+
+    labels.append("Memory size");
+    values.append(LabelFormator::formatOutout(spec->bufferLength, "B", 1));
+
+    labels.append("Max sampling rate");
+    values.append(LabelFormator::formatOutout(spec->maxSamplingFreq, "sps", 2));
+
+    labels.append("Pins");
     QString pins;
-    for (const QString &p : spec->channelNames)
-        pins += p + ", ";
+    for (int i = 0; i < spec->numChannels; ++i) {
+        if (i < spec->channelNames.size())
+            pins += spec->channelNames[i] + ", ";
+    }
     if (!pins.isEmpty())
         pins.chop(2);
-    values << pins;
-    showModuleDescription(moduleName, labels, values);
+    values.append(pins);
+
+    showModuleDescription(name, labels, values);
 }
