@@ -45,6 +45,7 @@ private:
 
     #define MAX_ZERO_CROSS 128
     int ZeroCrossingTimes[8][MAX_ZERO_CROSS] = {{0,0}};
+    int ZeroCrossingCount[8] = {0};
 
     QMutex mutex;
     QWaitCondition condition;

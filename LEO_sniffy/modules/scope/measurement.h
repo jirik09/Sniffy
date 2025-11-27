@@ -5,7 +5,7 @@
 
 enum class MeasurementType
 {
-FREQUENCY, PERIOD, PHASE, DUTY, LOW, HIGH, RMS, MEAN, PKPK, MAX, MIN
+FREQUENCY, PERIOD, PHASE, DUTY, LOW, HIGH, RMS, RMS_AC, MEAN, PKPK, MAX, MIN
 };
 
 class Measurement : public QObject

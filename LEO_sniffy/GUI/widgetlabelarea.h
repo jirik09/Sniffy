@@ -27,6 +27,7 @@ public:
     void setScaleLabelText(QString text);
     void setMeasurements(QList<Measurement *> meas);
     void setCursorVoltageReadings(qreal curA, qreal curB);
+    void setCursorVoltageReadingsX(qreal curA, qreal curB);
     void setCursorTimeReadings(qreal curA, qreal curB);
     void setCursorFFTFreqReadings(qreal curA, qreal curB);
     void setCursorFFTAmplitudeReadings(qreal curA, qreal curB, QString unit);

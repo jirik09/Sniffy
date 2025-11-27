@@ -26,6 +26,7 @@ signals:
 
 private slots:
     void RMSClicked();
+    void rmsAcClicked();
     void meanClicked();
     void minClicked();
     void maxClicked();

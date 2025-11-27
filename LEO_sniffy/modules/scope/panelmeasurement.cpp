@@ -23,6 +23,11 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
     measButtons.append(butRMS);
     butRMS->setText("  Add  ",0);
 
+    WidgetButtons *butRMSAc = new WidgetButtons(parent,1,ButtonTypes::NORMAL,"RMS (AC)");
+    destination->addWidget(butRMSAc);
+    measButtons.append(butRMSAc);
+    butRMSAc->setText("  Add  ",0);
+
     WidgetButtons *butMean = new WidgetButtons(parent,1,ButtonTypes::NORMAL,"Mean");
     destination->addWidget(butMean);
     measButtons.append(butMean);
@@ -119,6 +124,7 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
     connect(channelButtons, &WidgetButtons::clicked, this, &PanelMeasurement::setMeasButtonsColor);
 
     connect(butRMS, &WidgetButtons::clicked, this, &PanelMeasurement::RMSClicked);
+    connect(butRMSAc, &WidgetButtons::clicked, this, &PanelMeasurement::rmsAcClicked);
     connect(butMean, &WidgetButtons::clicked, this, &PanelMeasurement::meanClicked);
     connect(butMax, &WidgetButtons::clicked, this, &PanelMeasurement::maxClicked);
     connect(butMin, &WidgetButtons::clicked, this, &PanelMeasurement::minClicked);
@@ -138,6 +144,11 @@ PanelMeasurement::PanelMeasurement(QVBoxLayout *destination, QWidget *parent)
 
 void PanelMeasurement::RMSClicked(){
     Measurement *m = new Measurement(MeasurementType::RMS,channelButtons->getSelectedIndex());
+    emit measurementAdded(m);
+}
+
+void PanelMeasurement::rmsAcClicked(){
+    Measurement *m = new Measurement(MeasurementType::RMS_AC,channelButtons->getSelectedIndex());
     emit measurementAdded(m);
 }
 

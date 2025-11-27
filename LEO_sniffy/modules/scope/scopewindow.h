@@ -132,6 +132,10 @@ private slots:
     void cursorValueHorCallback();
     void cursorValueVerCallback();
     void resolutionChangedCallback(int index);
+    void modeChangedCallback(int index);
+    void channelXChangedCallback(int index);
+    void channelYChangedCallback(int index);
+
 
     void updateCursorReadings();
     void setHorizontalCursors(int channelIndex);
@@ -155,29 +159,36 @@ private:
     widgetChart *chartFFT;
     QSplitter *splitter;
 
-    QVector<QVector<QPointF>> ChartData;
-    QVector<QPointF> ChartMathData;
-    QVector<QPointF> ChartFFTData;
-    int fftChannelIndex = 0;
-    int triggerChannelIndex = 0;
-
     WidgetLabelArea *labelInfoPanel;
     PanelMeasurement *panelMeas;
     PanelCursors *panelCursors;
     PanelMath *panelMath;
     PanelAdvanced *panelAdvanced;
 
+    int triggerChannelIndex = 0;
+    int fftChannelIndex = 0;
+    QVector<QPointF> ChartFFTData;
+
     void updateChartTimeScale(float timeBase);
-    void fillTimeBase();
+    void initTransformCache();
+    void invalidateAllTransforms();
+    void invalidateChannelTransform(int channelIndex);
+    const QVector<QPointF>& getTransformedChannel(int ch, const QVector<QPointF>& src);
     void paintTraces(const QVector<QVector<QPointF>> &dataSeries, const QVector<QPointF> &mathSeries);
     void paintMath(const QVector<QPointF> &mathSeries);
     void validateAndApplyTriggerChannel(int buttonStatus);
     void updateTriggerChannelButtons(int buttonStatus);
-    // Transform cache helpers
-    void initTransformCache();
-    void invalidateAllTransforms();
-    void invalidateChannelTransform(int channelIndex);
-    const QVector<QPointF>& getTransformedChannel(int ch, const QVector<QPointF>& src) ;
+
+    QVector<QVector<QPointF>> ChartData;
+    QVector<QPointF> ChartMathData;
+
+    bool xyMode = false;
+    int xyChannelX = 0;
+    int xyChannelY = 1;
+    int numChannels = 0;
+    
+    qreal savedMinX = -0.1;
+    qreal savedMaxX = 0.1;
 
     QVector<ChannelTransformCache> transformCache; // size TOTAL_SCOPE_TRACES
 };

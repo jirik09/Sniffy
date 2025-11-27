@@ -91,6 +91,17 @@ void MeasCalculations::run()
                 m->setValueString(LabelFormator::formatOutout(RMS[channelIndex],"V"));
                 m->setValue(RMS[channelIndex]);
                 break;
+            case MeasurementType::RMS_AC:
+                calculateVolt(data[channelIndex],channelIndex);
+                m->setLabel("RMS (AC)");
+                {
+                    qreal val = 0;
+                    if(RMS[channelIndex]*RMS[channelIndex] - Mean[channelIndex]*Mean[channelIndex] > 0)
+                        val = qSqrt(RMS[channelIndex]*RMS[channelIndex] - Mean[channelIndex]*Mean[channelIndex]);
+                    m->setValueString(LabelFormator::formatOutout(val,"V"));
+                    m->setValue(val);
+                }
+                break;
             case MeasurementType::MEAN:
                 calculateVolt(data[channelIndex],channelIndex);
                 m->setLabel("Mean");
@@ -111,7 +122,51 @@ void MeasCalculations::run()
                     break;
                 }else{
                     m->setLabel("Phase ("+QString::number(channA+1)+"->"+QString::number(channB+1)+")");
-                    m->setValueString("TODO");
+                    
+                    calculateTime(data[channA],channA,samplingFreq);
+                    calculateTime(data[channB],channB,samplingFreq);
+
+                    if (Freq[channA] == std::numeric_limits<qreal>::infinity() || Freq[channB] == std::numeric_limits<qreal>::infinity() || ZeroCrossingCount[channA] == 0 || ZeroCrossingCount[channB] == 0) {
+                         m->setValueString("N/A");
+                         m->setValue(0);
+                    } else {
+                        double totalPhaseDiff = 0;
+                        int count = 0;
+                        double periodSamples = samplingFreq / Freq[channA];
+
+                        for (int i = 0; i < ZeroCrossingCount[channA]; i++) {
+                            int tA = ZeroCrossingTimes[channA][i];
+                            int bestTB = -1;
+                            int minDiff = 1000000;
+                            
+                            for (int j = 0; j < ZeroCrossingCount[channB]; j++) {
+                                int tB = ZeroCrossingTimes[channB][j];
+                                int diff = tB - tA;
+                                if (abs(diff) < minDiff) {
+                                    minDiff = abs(diff);
+                                    bestTB = tB;
+                                }
+                            }
+                            
+                            if (bestTB != -1) {
+                                double diff = bestTB - tA;
+                                double phase = (diff / periodSamples) * 360.0;
+                                while (phase > 180) phase -= 360;
+                                while (phase < -180) phase += 360;
+                                totalPhaseDiff += phase;
+                                count++;
+                            }
+                        }
+                        
+                        if (count > 0) {
+                            double avgPhase = totalPhaseDiff / count;
+                            m->setValueString(LabelFormator::formatOutout(avgPhase, "°"));
+                            m->setValue(avgPhase);
+                        } else {
+                            m->setValueString("N/A");
+                            m->setValue(0);
+                        }
+                    }
                 }
                 break;
             case MeasurementType::PERIOD:
@@ -246,12 +301,13 @@ void MeasCalculations::calculateTime(QVector<QPointF> data, qint32 ch, qint32 sa
         if (periods >= 1){
             Freq[ch] = frq / periods;
             Period[ch] = 1 / Freq[ch];
-            High[ch] = qRound((double)totalUp*1000 / (totalUp + totalDown))/1000;
+            High[ch] = qRound((double)totalUp*1000 / (totalUp + totalDown))/1000.0;
         }else{
             Freq[ch] = std::numeric_limits<qreal>::infinity();
             Period[ch] = std::numeric_limits<qreal>::infinity();
-            High[ch] = qRound((double)totalUp*1000 / (totalUp + totalDown))/1000;
+            High[ch] = qRound((double)totalUp*1000 / (totalUp + totalDown))/1000.0;
         }
+        ZeroCrossingCount[ch] = zerocrossindex;
         isTimeCalculated[ch] = true;
     }
 }
