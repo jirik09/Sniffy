@@ -39,8 +39,12 @@ public:
     static const QByteArray LOG_ANLYS_PACKING; // per-segment packing format frame
     static const QByteArray LOG_ANLYS_COMPLETE; // completion frame after STOP flush
     static const QByteArray LOG_ANLYS_SAMPLING_FREQ;
+    static const QByteArray LOG_ANLYS_SAMPLES_NUM;
     static const QByteArray LOG_ANLYS_TRIGGER_EVENT;
+    static const QByteArray LOG_ANLYS_TRIGGER_MODE;
     static const QByteArray LOG_ANLYS_TRIGGER_CHANNEL;
+    static const QByteArray LOG_ANLYS_POSTTRIG;
+    static const QByteArray LOG_ANLYS_PRETRIG;
     static const QByteArray INIT;
     static const QByteArray COUNTER;
     static const QByteArray SCOPE;

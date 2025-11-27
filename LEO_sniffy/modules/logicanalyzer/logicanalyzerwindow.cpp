@@ -31,17 +31,28 @@ LogicAnalyzerWindow::LogicAnalyzerWindow(LogicAnalyzerConfig *conf, QWidget *par
         qDebug() << "LogicAnalyzerWindow::LogicAnalyzerWindow() - Creating controls";
         QHBoxLayout *controlsLayout = new QHBoxLayout(ui->controlsArea);
 
-        WidgetButtons *btnsControl = new WidgetButtons(this, 2, ButtonTypes::NORMAL);
-        btnsControl->setText("Start", 0);
-        btnsControl->setText("Stop", 1);
+        // Trigger Mode Buttons (Scope-style: Stop/Single, Normal, Auto)
+        buttonsTriggerMode = new WidgetButtons(this, 3, ButtonTypes::RADIO, "", 2);
+        buttonsTriggerMode->setText("Single", 0); // Default state when stopped
+        buttonsTriggerMode->setText("Normal", 1);
+        buttonsTriggerMode->setText("Auto", 2);
+        buttonsTriggerMode->setColor(Graphics::palette().warning, 0); // Orange for Stop/Single state
+        controlsLayout->addWidget(buttonsTriggerMode);
 
         QComboBox *cbSampleRate = new QComboBox(this);
         cbSampleRate->addItem("10 kHz", 10000);
         cbSampleRate->addItem("100 kHz", 100000);
         cbSampleRate->addItem("1 MHz", 1000000);
+        cbSampleRate->addItem("2 MHz", 2000000);
+        cbSampleRate->addItem("3 MHz", 3000000);
+        cbSampleRate->addItem("5 MHz", 5000000);
+        cbSampleRate->addItem("7 MHz", 7000000);
         cbSampleRate->addItem("10 MHz", 10000000);
 
-        controlsLayout->addWidget(btnsControl);
+        // Set default to 1 MHz (index 2)
+        cbSampleRate->setCurrentIndex(2);
+        activeSampleRate = 1000000.0;
+
         controlsLayout->addWidget(cbSampleRate);
 
         // Trigger Controls
@@ -60,36 +71,14 @@ LogicAnalyzerWindow::LogicAnalyzerWindow(LogicAnalyzerConfig *conf, QWidget *par
         controlsLayout->addWidget(lblTrigEdge);
         controlsLayout->addWidget(cbTrigEdge);
 
-        connect(btnsControl, &WidgetButtons::clicked, [this](int index)
-                {
-            if (index == 0) emit startCapture();
-            else emit stopCapture(); });
+        connect(buttonsTriggerMode, &WidgetButtons::clicked, this, &LogicAnalyzerWindow::triggerModeCallback);
+
         connect(cbSampleRate, QOverload<int>::of(&QComboBox::currentIndexChanged), [this, cbSampleRate](int index)
                 { emit sampleRateChanged(cbSampleRate->itemData(index).toInt()); });
         connect(cbTrigCh, QOverload<int>::of(&QComboBox::currentIndexChanged), [this, cbTrigCh](int index)
                 { emit triggerChannelChanged(cbTrigCh->itemData(index).toInt()); });
         connect(cbTrigEdge, QOverload<int>::of(&QComboBox::currentIndexChanged), [this, cbTrigEdge](int index)
                 { emit triggerEdgeChanged(cbTrigEdge->itemData(index).toInt()); });
-
-        // Stream mode toggle (Batch / Continuous)
-        QLabel *lblMode = new QLabel("Mode:", this);
-        QComboBox *cbMode = new QComboBox(this);
-        cbMode->addItem("Batch", 0);
-        cbMode->addItem("Continuous", 1);
-        controlsLayout->addWidget(lblMode);
-        controlsLayout->addWidget(cbMode);
-        connect(cbMode, QOverload<int>::of(&QComboBox::currentIndexChanged), [this, cbMode](int index)
-                {
-            bool cont = cbMode->itemData(index).toInt() == 1;
-            continuousMode = cont;
-            emit streamModeChanged(cont); });
-
-        // Auto-scroll enable
-        QCheckBox *chkAutoScroll = new QCheckBox("AutoScroll", this);
-        chkAutoScroll->setChecked(true);
-        controlsLayout->addWidget(chkAutoScroll);
-        connect(chkAutoScroll, &QCheckBox::toggled, [this](bool on)
-                { autoScrollEnabled = on; });
 
         // Pause streaming display (does not send STOP to device)
         QCheckBox *chkPause = new QCheckBox("Pause", this);
@@ -106,16 +95,6 @@ LogicAnalyzerWindow::LogicAnalyzerWindow(LogicAnalyzerConfig *conf, QWidget *par
         controlsLayout->addWidget(spDecim);
         connect(spDecim, QOverload<int>::of(&QSpinBox::valueChanged), [this](int v)
                 { decimationFactor = (v < 1 ? 1 : v); });
-
-        // View window (ms) for auto-scroll; 0 => full
-        QLabel *lblWindow = new QLabel("Window(ms):", this);
-        QSpinBox *spWindow = new QSpinBox(this);
-        spWindow->setRange(0, 60000);
-        spWindow->setValue(0);
-        controlsLayout->addWidget(lblWindow);
-        controlsLayout->addWidget(spWindow);
-        connect(spWindow, QOverload<int>::of(&QSpinBox::valueChanged), [this](int v)
-                { viewWindowSeconds = v / 1000.0; });
     }
     qDebug() << "LogicAnalyzerWindow::LogicAnalyzerWindow() - End";
 }
@@ -171,17 +150,7 @@ void LogicAnalyzerWindow::showData(const QVector<QVector<int>> &data, double sam
 
     totalSamples += blockSamples;
     double endT = totalSamples * timeStep;
-    if (autoScrollEnabled && viewWindowSeconds > 0.0)
-    {
-        double startT = endT - viewWindowSeconds;
-        if (startT < 0)
-            startT = 0;
-        chart->setRangeX(startT, endT);
-    }
-    else
-    {
-        chart->setRangeX(0, endT);
-    }
+    chart->setRangeX(0, endT);
     qDebug() << "LogicAnalyzerWindow::showData() - End. Total samples:" << totalSamples;
 }
 
@@ -201,7 +170,45 @@ void LogicAnalyzerWindow::setSpecification(const QList<QString> &channelNames)
 void LogicAnalyzerWindow::resetStream()
 {
     totalSamples = 0;
-    activeSampleRate = 0.0;
     if (chart)
         chart->clearAll();
+}
+
+void LogicAnalyzerWindow::triggerModeCallback(int index)
+{
+    // 0: Stop/Single, 1: Normal, 2: Auto
+    // Mapped to ScopeTriggerMode: 0=Stop, 1=Normal, 2=Auto, 4=Single
+    // But we use a simplified int mapping for the signal: 0=Auto, 1=Normal, 2=Single, 3=Stop
+
+    if (index == 0)
+    {
+        if (buttonsTriggerMode->getText(0) == "Stop")
+        {
+            // User clicked Stop -> Stop capture
+            buttonsTriggerMode->setColor(Graphics::palette().warning, 0);
+            emit triggerModeChanged(3); // Stop
+            buttonsTriggerMode->setText("Single", 0);
+        }
+        else if (buttonsTriggerMode->getText(0) == "Single")
+        {
+            // User clicked Single -> Start Single Shot
+            emit triggerModeChanged(2); // Single
+            buttonsTriggerMode->setColor(Graphics::palette().running, 0);
+            buttonsTriggerMode->setText("Stop", 0);
+        }
+    }
+    else if (index == 1)
+    {
+        // Normal
+        emit triggerModeChanged(1); // Normal
+        buttonsTriggerMode->setColor(Graphics::palette().warning, 0);
+        buttonsTriggerMode->setText("Stop", 0);
+    }
+    else if (index == 2)
+    {
+        // Auto
+        emit triggerModeChanged(0); // Auto
+        buttonsTriggerMode->setColor(Graphics::palette().warning, 0);
+        buttonsTriggerMode->setText("Stop", 0);
+    }
 }

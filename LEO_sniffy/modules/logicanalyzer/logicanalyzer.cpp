@@ -24,7 +24,7 @@ LogicAnalyzer::LogicAnalyzer(QObject *parent) : AbstractModule(parent)
     connect(window, &LogicAnalyzerWindow::sampleRateChanged, this, &LogicAnalyzer::updateSampleRate);
     connect(window, &LogicAnalyzerWindow::triggerChannelChanged, this, &LogicAnalyzer::updateTriggerChannel);
     connect(window, &LogicAnalyzerWindow::triggerEdgeChanged, this, &LogicAnalyzer::updateTriggerEdge);
-    connect(window, &LogicAnalyzerWindow::streamModeChanged, this, &LogicAnalyzer::updateStreamMode);
+    connect(window, &LogicAnalyzerWindow::triggerModeChanged, this, &LogicAnalyzer::updateTriggerMode);
 
     qDebug() << "LogicAnalyzer::LogicAnalyzer() - End";
 }
@@ -72,6 +72,11 @@ void LogicAnalyzer::parseData(QByteArray data)
             {
                 qDebug() << "[LogicAnalyzer] Sequence gap detected. Expected" << (lastSequence + 1) << "got" << seq;
             }
+            // If this is the first sequence of a new batch (seq == 1), clear the chart
+            // Note: We already clear in startCapture/REQ_NEXT, but this is a safety net
+            // if (seq == 1) {
+            //    window->resetStream();
+            // }
             lastSequence = seq;
         }
         else if (cmd == Commands::LOG_ANLYS_PACKING)
@@ -134,6 +139,20 @@ void LogicAnalyzer::parseData(QByteArray data)
             // Reset per-segment state
             pendingDataLengthBytes = 0;
             currentSegmentBitPacked = false;
+
+            // Handle Continuous vs Single (Batch) mode loop
+            if (isRunning) {
+                if (continuousMode) {
+                    // Request next batch
+                    // Reset stream for next capture to avoid appending
+                    window->resetStream();
+                    comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_REQ_NEXT);
+                } else {
+                    // Single shot finished
+                    isRunning = false;
+                    // Optional: notify window if needed, e.g. to reset UI state
+                }
+            }
             break;
         }
     }
@@ -170,6 +189,12 @@ void LogicAnalyzer::parseConfiguration(QByteArray config)
     spec->parseSpecification(config);
     // Pass specification to window for potential channel label usage
     window->setSpecification(spec->channelNames);
+
+    // Set the sample number to the maximum buffer length reported by the device
+    if (spec->bufferLength > 0) {
+        comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_SAMPLES_NUM, spec->bufferLength);
+    }
+
     // Ensure control is shown before emitting description
     showModuleControl();
     buildModuleDescription();
@@ -197,6 +222,36 @@ void LogicAnalyzer::updateSampleRate(int rate)
 {
     config->sampleRate = rate;
     comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_SAMPLING_FREQ, rate);
+
+    // Also update post-trigger time as it depends on sample rate
+    double postTriggerSec = (double)spec->bufferLength / config->sampleRate;
+    
+    uint32_t words[2];
+    memcpy(words, &postTriggerSec, sizeof(double));
+    
+    QByteArray payload;
+    payload.append(Commands::LOG_ANLYS);
+    payload.append(':');
+    payload.append(Commands::LOG_ANLYS_POSTTRIG);
+    payload.append(' ');
+    
+    char highBytes[4];
+    highBytes[0] = (words[1] >> 0) & 0xFF;
+    highBytes[1] = (words[1] >> 8) & 0xFF;
+    highBytes[2] = (words[1] >> 16) & 0xFF;
+    highBytes[3] = (words[1] >> 24) & 0xFF;
+    payload.append(highBytes, 4);
+    payload.append(' ');
+    
+    char lowBytes[4];
+    lowBytes[0] = (words[0] >> 0) & 0xFF;
+    lowBytes[1] = (words[0] >> 8) & 0xFF;
+    lowBytes[2] = (words[0] >> 16) & 0xFF;
+    lowBytes[3] = (words[0] >> 24) & 0xFF;
+    payload.append(lowBytes, 4);
+    payload.append(';');
+    
+    comm->write(payload);
 }
 
 void LogicAnalyzer::updateTriggerChannel(int channel)
@@ -213,13 +268,34 @@ void LogicAnalyzer::updateTriggerEdge(int edge)
     comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_TRIGGER_EVENT, edgeCmd);
 }
 
-void LogicAnalyzer::updateStreamMode(bool continuous)
+void LogicAnalyzer::updateTriggerMode(int mode)
 {
-    continuousMode = continuous;
-    if (!comm)
+    // 0: Auto, 1: Normal, 2: Single, 3: Stop
+    if (mode == 3)
+    {
+        stopCapture();
         return;
-    QByteArray modeToken = continuous ? Commands::LOG_ANLYS_STREAM_CONT : Commands::LOG_ANLYS_STREAM_BATCH;
-    comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_MODE, modeToken);
+    }
+
+    // Map to firmware trigger modes if needed, or just handle continuous flag
+    // FW modes: LOGA_MODE_AUTO=0, LOGA_MODE_NORMAL=1, LOGA_MODE_SINGLE=2
+    // These match our internal mapping perfectly!
+
+    // Set continuous mode flag
+    continuousMode = (mode == 0 || mode == 1);
+
+    // Send mode to FW
+    // Note: FW expects CMD_TRIG_MODE_... which are defined in commands.h
+    // We need to send the specific command for the mode.
+    QByteArray modeCmd;
+    if (mode == 0) modeCmd = Commands::MODE_AUTO;
+    else if (mode == 1) modeCmd = Commands::MODE_NORMAL;
+    else if (mode == 2) modeCmd = Commands::MODE_SINGLE;
+
+    comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_TRIGGER_MODE, modeCmd);
+
+    // Start capture
+    startCapture();
 }
 
 void LogicAnalyzer::startCapture()
@@ -228,6 +304,53 @@ void LogicAnalyzer::startCapture()
     lastSequence = 0;
     if (window)
         window->resetStream();
+    
+    // Send configuration to ensure FW is synced
+    comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_SAMPLES_NUM, spec->bufferLength);
+    comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_SAMPLING_FREQ, config->sampleRate);
+
+    // Calculate and send post-trigger time
+    // Post-trigger = BufferLength / SampleRate
+    // We send it as two 32-bit words (High, Low)
+    double postTriggerSec = (double)spec->bufferLength / config->sampleRate;
+    
+    // Construct payload for POST command: LAN_:POST <High32> <Low32>;
+    // Note: We use raw write to ensure correct 5-byte alignment for giveNextCmd()
+    // High32 and Low32 are sent as 4 bytes followed by a delimiter (space or ;)
+    
+    uint32_t words[2];
+    memcpy(words, &postTriggerSec, sizeof(double));
+    // words[0] is Low32, words[1] is High32 (Little Endian)
+    
+    QByteArray payload;
+    payload.append(Commands::LOG_ANLYS);
+    payload.append(':');
+    payload.append(Commands::LOG_ANLYS_POSTTRIG); // POST
+    payload.append(' ');
+    
+    // Append High32 (words[1])
+    char highBytes[4];
+    highBytes[0] = (words[1] >> 0) & 0xFF;
+    highBytes[1] = (words[1] >> 8) & 0xFF;
+    highBytes[2] = (words[1] >> 16) & 0xFF;
+    highBytes[3] = (words[1] >> 24) & 0xFF;
+    payload.append(highBytes, 4);
+    payload.append(' ');
+    
+    // Append Low32 (words[0])
+    char lowBytes[4];
+    lowBytes[0] = (words[0] >> 0) & 0xFF;
+    lowBytes[1] = (words[0] >> 8) & 0xFF;
+    lowBytes[2] = (words[0] >> 16) & 0xFF;
+    lowBytes[3] = (words[0] >> 24) & 0xFF;
+    payload.append(lowBytes, 4);
+    payload.append(';');
+    
+    comm->write(payload);
+
+    // Always ensure we are in BATCH mode for PC-controlled loop
+    comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_MODE, Commands::LOG_ANLYS_STREAM_BATCH);
+    
     comm->write(Commands::LOG_ANLYS, Commands::START);
 }
 

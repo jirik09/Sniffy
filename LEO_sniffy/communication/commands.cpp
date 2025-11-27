@@ -40,8 +40,12 @@ const QByteArray Commands::LOG_ANLYS_REQ_NEXT = "LANX"; // request next batch (P
 const QByteArray Commands::LOG_ANLYS_PACKING = "LAPF"; // packing format frame (0=raw16,1=packed8)
 const QByteArray Commands::LOG_ANLYS_COMPLETE = "LACM"; // completion frame after STOP flush
 const QByteArray Commands::LOG_ANLYS_SAMPLING_FREQ = "SMPF";
+const QByteArray Commands::LOG_ANLYS_SAMPLES_NUM = "SMPN";
 const QByteArray Commands::LOG_ANLYS_TRIGGER_EVENT = "TRGE";
+const QByteArray Commands::LOG_ANLYS_TRIGGER_MODE = "TRGM";
 const QByteArray Commands::LOG_ANLYS_TRIGGER_CHANNEL = "TRGC";
+const QByteArray Commands::LOG_ANLYS_POSTTRIG = "POST";
+const QByteArray Commands::LOG_ANLYS_PRETRIG = "PRET";
 const QByteArray Commands::INIT = "INIT";
 
 const QByteArray Commands::STOP = "STOP";

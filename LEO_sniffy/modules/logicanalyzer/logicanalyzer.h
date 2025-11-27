@@ -28,7 +28,7 @@ public slots:
     void updateSampleRate(int rate);
     void updateTriggerChannel(int channel);
     void updateTriggerEdge(int edge);
-    void updateStreamMode(bool continuous);
+    void updateTriggerMode(int mode);
 
     void startCapture();
     void stopCapture();
