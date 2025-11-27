@@ -25,6 +25,7 @@ public:
     void showData(const QVector<QVector<int>> &data, double sampleRate);
     void setSpecification(const QList<QString> &channelNames);
     void resetStream();
+    void singleSamplingDone();
 
 signals:
     void startCapture();

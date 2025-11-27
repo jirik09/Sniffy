@@ -14,11 +14,11 @@ public:
     QByteArray serialize() override;
 
     // Configuration properties
-    int sampleRate = 10000;
+    int sampleRate = 1000000; // Default 1 MHz for immediate responsiveness
     int preTrigger = 0;
     int triggerChannel = 1;
     int triggerEdge = 0; // 0: Rising, 1: Falling
-    int dataLength = 1000;
+    int dataLength = 20000; // Match LA default buffer size
 
     // Channel settings
     struct Channel

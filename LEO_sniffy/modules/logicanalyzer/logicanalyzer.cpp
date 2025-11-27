@@ -143,14 +143,15 @@ void LogicAnalyzer::parseData(QByteArray data)
             // Handle Continuous vs Single (Batch) mode loop
             if (isRunning) {
                 if (continuousMode) {
-                    // Request next batch
-                    // Reset stream for next capture to avoid appending
+                    // Request next batch; FW will restart only when in WAIT_FOR_RESTART
                     window->resetStream();
                     comm->write(Commands::LOG_ANLYS, Commands::LOG_ANLYS_REQ_NEXT);
                 } else {
-                    // Single shot finished
+                    // Single shot finished: stop requesting and revert UI
                     isRunning = false;
-                    // Optional: notify window if needed, e.g. to reset UI state
+                    if (window) {
+                        window->singleSamplingDone();
+                    }
                 }
             }
             break;
@@ -225,24 +226,22 @@ void LogicAnalyzer::updateSampleRate(int rate)
 
     // Also update post-trigger time as it depends on sample rate
     double postTriggerSec = (double)spec->bufferLength / config->sampleRate;
-    
+
     uint32_t words[2];
     memcpy(words, &postTriggerSec, sizeof(double));
-    
+
     QByteArray payload;
     payload.append(Commands::LOG_ANLYS);
     payload.append(':');
     payload.append(Commands::LOG_ANLYS_POSTTRIG);
-    payload.append(' ');
-    
+
     char highBytes[4];
     highBytes[0] = (words[1] >> 0) & 0xFF;
     highBytes[1] = (words[1] >> 8) & 0xFF;
     highBytes[2] = (words[1] >> 16) & 0xFF;
     highBytes[3] = (words[1] >> 24) & 0xFF;
     payload.append(highBytes, 4);
-    payload.append(' ');
-    
+
     char lowBytes[4];
     lowBytes[0] = (words[0] >> 0) & 0xFF;
     lowBytes[1] = (words[0] >> 8) & 0xFF;
@@ -250,7 +249,7 @@ void LogicAnalyzer::updateSampleRate(int rate)
     lowBytes[3] = (words[0] >> 24) & 0xFF;
     payload.append(lowBytes, 4);
     payload.append(';');
-    
+
     comm->write(payload);
 }
 
@@ -314,10 +313,10 @@ void LogicAnalyzer::startCapture()
     // We send it as two 32-bit words (High, Low)
     double postTriggerSec = (double)spec->bufferLength / config->sampleRate;
     
-    // Construct payload for POST command: LAN_:POST <High32> <Low32>;
-    // Note: We use raw write to ensure correct 5-byte alignment for giveNextCmd()
-    // High32 and Low32 are sent as 4 bytes followed by a delimiter (space or ;)
-    
+    // Construct payload for POST command: LAN_:POST<High32><Low32>;
+    // Important: Do NOT insert spaces between POST and the first 4 bytes.
+    // The FW reads first 4 bytes with giveNextCmd() and the second 4 bytes with Comms_BufferReadUInt32().
+
     uint32_t words[2];
     memcpy(words, &postTriggerSec, sizeof(double));
     // words[0] is Low32, words[1] is High32 (Little Endian)
@@ -326,7 +325,6 @@ void LogicAnalyzer::startCapture()
     payload.append(Commands::LOG_ANLYS);
     payload.append(':');
     payload.append(Commands::LOG_ANLYS_POSTTRIG); // POST
-    payload.append(' ');
     
     // Append High32 (words[1])
     char highBytes[4];
@@ -335,7 +333,6 @@ void LogicAnalyzer::startCapture()
     highBytes[2] = (words[1] >> 16) & 0xFF;
     highBytes[3] = (words[1] >> 24) & 0xFF;
     payload.append(highBytes, 4);
-    payload.append(' ');
     
     // Append Low32 (words[0])
     char lowBytes[4];

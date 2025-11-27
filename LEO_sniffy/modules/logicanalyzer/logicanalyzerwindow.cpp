@@ -48,6 +48,8 @@ LogicAnalyzerWindow::LogicAnalyzerWindow(LogicAnalyzerConfig *conf, QWidget *par
         cbSampleRate->addItem("5 MHz", 5000000);
         cbSampleRate->addItem("7 MHz", 7000000);
         cbSampleRate->addItem("10 MHz", 10000000);
+        cbSampleRate->addItem("15 MHz", 15000000);
+        cbSampleRate->addItem("20 MHz", 20000000);
 
         // Set default to 1 MHz (index 2)
         cbSampleRate->setCurrentIndex(2);
@@ -74,11 +76,16 @@ LogicAnalyzerWindow::LogicAnalyzerWindow(LogicAnalyzerConfig *conf, QWidget *par
         connect(buttonsTriggerMode, &WidgetButtons::clicked, this, &LogicAnalyzerWindow::triggerModeCallback);
 
         connect(cbSampleRate, QOverload<int>::of(&QComboBox::currentIndexChanged), [this, cbSampleRate](int index)
-                { emit sampleRateChanged(cbSampleRate->itemData(index).toInt()); });
+            { emit sampleRateChanged(cbSampleRate->itemData(index).toInt()); });
         connect(cbTrigCh, QOverload<int>::of(&QComboBox::currentIndexChanged), [this, cbTrigCh](int index)
-                { emit triggerChannelChanged(cbTrigCh->itemData(index).toInt()); });
+            { emit triggerChannelChanged(cbTrigCh->itemData(index).toInt()); });
         connect(cbTrigEdge, QOverload<int>::of(&QComboBox::currentIndexChanged), [this, cbTrigEdge](int index)
-                { emit triggerEdgeChanged(cbTrigEdge->itemData(index).toInt()); });
+            { emit triggerEdgeChanged(cbTrigEdge->itemData(index).toInt()); });
+
+        // Push initial values to FW so first Start works without user changes
+        emit sampleRateChanged(cbSampleRate->currentData().toInt());
+        emit triggerChannelChanged(cbTrigCh->currentData().toInt());
+        emit triggerEdgeChanged(cbTrigEdge->currentData().toInt());
 
         // Pause streaming display (does not send STOP to device)
         QCheckBox *chkPause = new QCheckBox("Pause", this);
@@ -172,6 +179,16 @@ void LogicAnalyzerWindow::resetStream()
     totalSamples = 0;
     if (chart)
         chart->clearAll();
+}
+
+void LogicAnalyzerWindow::singleSamplingDone()
+{
+    // Mirror Scope behavior: after a single batch, revert button 0 to "Single"
+    if (buttonsTriggerMode)
+    {
+        buttonsTriggerMode->setColor(Graphics::palette().warning, 0);
+        buttonsTriggerMode->setText("Single", 0);
+    }
 }
 
 void LogicAnalyzerWindow::triggerModeCallback(int index)
