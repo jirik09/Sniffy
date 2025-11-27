@@ -110,14 +110,16 @@ void LogicAnalyzer::parseData(QByteArray data)
 
             if (currentSegmentBitPacked)
             {
-                // Each byte encodes 8 channel bits (bit0=CH1 .. bit7=CH8)
+                // Each byte encodes 8 channel bits. Device packs GPIO channels
+                // such that the first channel corresponds to the MSB of the byte.
+                // Map bits accordingly so UI channel 0 receives the correct bit.
                 int sampleCount = rawData.size();
                 for (int i = 0; i < sampleCount; ++i)
                 {
                     uchar b = static_cast<uchar>(rawData[i]);
                     for (int ch = 0; ch < 8; ++ch)
                     {
-                        channelData[ch].append((b >> ch) & 0x1);
+                        channelData[ch].append((b >> (7 - ch)) & 0x1);
                     }
                 }
             }
@@ -131,7 +133,10 @@ void LogicAnalyzer::parseData(QByteArray data)
                     quint16 val = qFromLittleEndian<quint16>(rawBytes + (i * 2));
                     for (int ch = 0; ch < 8; ++ch)
                     {
-                        channelData[ch].append((val >> (6 + ch)) & 1);
+                        /* Device encodes GPIO bits into IDR such that channel 1
+                           maps to bit 13 and channel 8 to bit 6 (reverse order).
+                           Reverse the channel index so UI receives correct ordering. */
+                        channelData[ch].append((val >> (13 - ch)) & 1);
                     }
                 }
             }
