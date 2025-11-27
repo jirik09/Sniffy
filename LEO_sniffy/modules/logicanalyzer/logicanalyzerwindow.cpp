@@ -40,17 +40,16 @@ LogicAnalyzerWindow::LogicAnalyzerWindow(LogicAnalyzerConfig *conf, QWidget *par
         controlsLayout->addWidget(buttonsTriggerMode);
 
         QComboBox *cbSampleRate = new QComboBox(this);
-        cbSampleRate->addItem("10 kHz", 10000);
-        cbSampleRate->addItem("100 kHz", 100000);
-        cbSampleRate->addItem("1 MHz", 1000000);
-        cbSampleRate->addItem("2 MHz", 2000000);
-        cbSampleRate->addItem("3 MHz", 3000000);
-        cbSampleRate->addItem("5 MHz", 5000000);
-        cbSampleRate->addItem("7 MHz", 7000000);
-        cbSampleRate->addItem("10 MHz", 10000000);
-        cbSampleRate->addItem("15 MHz", 15000000);
-        cbSampleRate->addItem("20 MHz", 20000000);
-
+        cbSampleRate->addItem("10 kSPS", 10000);
+        cbSampleRate->addItem("100 kSPS", 100000);
+        cbSampleRate->addItem("1 MSPS", 1000000);
+        cbSampleRate->addItem("2 MSPS", 2000000);
+        cbSampleRate->addItem("3 MSPS", 3000000);
+        cbSampleRate->addItem("5 MSPS", 5000000);
+        cbSampleRate->addItem("7 MSPS", 7000000);
+        cbSampleRate->addItem("10 MSPS", 10000000);
+        cbSampleRate->addItem("15 MSPS", 15000000);
+        cbSampleRate->addItem("20 MSPS", 20000000);
         // Set default to 1 MHz (index 2)
         cbSampleRate->setCurrentIndex(2);
         activeSampleRate = 1000000.0;
