@@ -48,7 +48,9 @@ LogicAnalyzerWindow::LogicAnalyzerWindow(LogicAnalyzerConfig *conf, QWidget *par
         cbSampleRate->addItem("5 MSPS", 5000000);
         cbSampleRate->addItem("7 MSPS", 7000000);
         cbSampleRate->addItem("10 MSPS", 10000000);
+        cbSampleRate->addItem("13.3 MSPS", 13300000);
         cbSampleRate->addItem("15 MSPS", 15000000);
+        cbSampleRate->addItem("17.3 MSPS", 17300000);
         cbSampleRate->addItem("20 MSPS", 20000000);
         // Set default to 1 MHz (index 2)
         cbSampleRate->setCurrentIndex(2);

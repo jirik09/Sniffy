@@ -141,6 +141,34 @@ void LogicAnalyzer::parseData(QByteArray data)
                 }
             }
             window->showData(channelData, config->sampleRate);
+
+            // Debug: compute rising-edge frequency per channel using actual segment length
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // JUST DEBUG, DELETE LATER
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            int sr = config->sampleRate > 0 ? config->sampleRate : 1;
+            int chCount = channelData.size();
+            // Map raw samples to logical channels for debug only (do not change chart data)
+            // source index (src) is reversed so logical channel 0 (PB6) uses samples from src
+            for (int ch = 0; ch < chCount; ++ch)
+            {
+                int src = chCount - 1 - ch;
+                int edges = 0;
+                const QVector<int> &samples = channelData[src];
+                int sampleCount = samples.size();
+                if (sampleCount <= 0) continue;
+                for (int s = 1; s < sampleCount; ++s)
+                {
+                    if (samples[s-1] == 0 && samples[s] == 1) ++edges;
+                }
+                double freq = (double)edges * (double)sr / (double)sampleCount; // Hz
+                // qDebug() << "Edges: " << (double)edges << " Sample count: " << sampleCount << " Sample rate: " << sr;
+                QString pinName;
+                if (spec && ch < spec->channelNames.size()) pinName = spec->channelNames[ch];
+                qDebug().nospace() << "LA Freq - Channel " << (ch+1) << " (" << (pinName.isEmpty() ? QString("pin?") : pinName) << "): " << freq << " Hz";
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////
             // Reset per-segment state
             pendingDataLengthBytes = 0;
             currentSegmentBitPacked = false;
