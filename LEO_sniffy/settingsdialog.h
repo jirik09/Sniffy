@@ -6,8 +6,6 @@
 #include <QFile>
 #include <QDebug>
 #include <QMessageBox>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 
 #include "GUI/widgetbuttons.h"
 #include "GUI/widgetselection.h"
@@ -15,8 +13,7 @@
 #include "GUI/widgetlabel.h"
 #include "customsettings.h"
 #include "GUI/simplehprogressbar.h"
-#include "flasher/stlinkflasher.h"
-#include "authenticator.h"
+#include "firmwaremanager.h"
 
 namespace Ui {
 class SettingsDialog;
@@ -44,15 +41,8 @@ private:
     WidgetButtons *buttonsFlash;
     SimpleHProgressBar *flashProgressBar;
     WidgetLabel *flashStatusLabel;
-    StLinkFlasher *m_flasher;
-    QThread *m_flasherThread;
-    bool m_flashInProgress = false; // guards repeated flashing
-    bool m_useRemote = false;       // selected flash source
-    QString m_lastReadUidHex;       // caches last UID
-
-    // Remote authentication helper
-    Authenticator *m_auth {nullptr};
-    QNetworkAccessManager *m_networkManager {nullptr};
+    
+    FirmwareManager *m_firmwareManager;
 
     WidgetLabel *infoLabel;
     WidgetButtons *buttonsDone;
@@ -66,20 +56,13 @@ private slots:
     void restartWarning();
     void sessionButtonClicked(int index, int optionalEmitParam = 0);
     void onFlashButtonClicked(int index, int optionalEmitParam = 0);
-    void onFlashProgress(int value, int total);
-    void onFlashLog(const QString &msg);
-    void onFlashFinished(bool success, const QString &msg);
-    void onDeviceConnected(const QString &info);
-    void onOperationStarted(const QString &operation);
-    void onDeviceUIDAvailable(const QString &uidHex);
-    void onDeviceUIDError(const QString &message);
-
-    // Authenticator callbacks for remote flow
-    void onAuthStarted();
-    void onAuthFinished();
-    void onAuthFailed(const QString &code, const QString &uiMessage);
-    void onAuthSucceeded(const QDateTime &validity, const QByteArray &token);
-    void onFirmwareDownloadFinished(QNetworkReply *reply);
+    
+    // Firmware Manager slots
+    void onFirmwareProgress(int value, int total);
+    void onFirmwareStatusMessage(const QString &msg, const QColor &color);
+    void onFirmwareOperationStarted();
+    void onFirmwareOperationFinished(bool success);
+    void onFirmwareFlashed();
 
 signals:
     void saveSessionRequested();

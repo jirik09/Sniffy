@@ -71,30 +71,16 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     flashStatusLabel->setVisible(false);
     buttons->addWidget(flashStatusLabel);
 
-    // Initialize Flasher
-    m_flasher = new StLinkFlasher();
-    m_flasherThread = new QThread(this);
-    m_flasher->moveToThread(m_flasherThread);
-    m_flasherThread->start();
-
+    // Initialize Firmware Manager
+    m_firmwareManager = new FirmwareManager(this);
+    
     connect(buttonsFlash, &WidgetButtons::clicked, this, &SettingsDialog::onFlashButtonClicked);
-    connect(m_flasher, &StLinkFlasher::progressChanged, this, &SettingsDialog::onFlashProgress);
-    connect(m_flasher, &StLinkFlasher::logMessage, this, &SettingsDialog::onFlashLog);
-    connect(m_flasher, &StLinkFlasher::operationFinished, this, &SettingsDialog::onFlashFinished);
-    connect(m_flasher, &StLinkFlasher::deviceConnected, this, &SettingsDialog::onDeviceConnected);
-    connect(m_flasher, &StLinkFlasher::operationStarted, this, &SettingsDialog::onOperationStarted);
-    connect(m_flasher, &StLinkFlasher::deviceUIDAvailable, this, &SettingsDialog::onDeviceUIDAvailable);
-    connect(m_flasher, &StLinkFlasher::deviceUIDError, this, &SettingsDialog::onDeviceUIDError);
-
-    // Authenticator for remote flow
-    m_auth = new Authenticator(this);
-    connect(m_auth, &Authenticator::requestStarted, this, &SettingsDialog::onAuthStarted);
-    connect(m_auth, &Authenticator::requestFinished, this, &SettingsDialog::onAuthFinished);
-    connect(m_auth, &Authenticator::authenticationFailed, this, &SettingsDialog::onAuthFailed);
-    connect(m_auth, &Authenticator::authenticationSucceeded, this, &SettingsDialog::onAuthSucceeded);
-
-    m_networkManager = new QNetworkAccessManager(this);
-    connect(m_networkManager, &QNetworkAccessManager::finished, this, &SettingsDialog::onFirmwareDownloadFinished);
+    
+    connect(m_firmwareManager, &FirmwareManager::progressChanged, this, &SettingsDialog::onFirmwareProgress);
+    connect(m_firmwareManager, &FirmwareManager::statusMessage, this, &SettingsDialog::onFirmwareStatusMessage);
+    connect(m_firmwareManager, &FirmwareManager::operationStarted, this, &SettingsDialog::onFirmwareOperationStarted);
+    connect(m_firmwareManager, &FirmwareManager::operationFinished, this, &SettingsDialog::onFirmwareOperationFinished);
+    connect(m_firmwareManager, &FirmwareManager::firmwareFlashed, this, &SettingsDialog::onFirmwareFlashed);
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     buttons->addItem(verticalSpacer);
@@ -123,22 +109,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
 
 SettingsDialog::~SettingsDialog()
 {
-    if (m_flasher) {
-        // Invoke cleanup in the flasher's thread
-        QMetaObject::invokeMethod(m_flasher, "stopAndCleanup");
-    } else {
-        m_flasherThread->quit();
-    }
-    
-    // Wait for the thread to finish with timeout
-    if (!m_flasherThread->wait(5000)) {
-        m_flasherThread->terminate();
-        m_flasherThread->wait();
-    }
-    
-    delete m_flasher;
-    m_flasher = nullptr;
-    // m_auth is childed to this via ctor parent, no manual delete needed
+    // m_firmwareManager is a child of this, so it will be deleted automatically.
     delete ui;
 }
 
@@ -197,219 +168,43 @@ void SettingsDialog::onFlashButtonClicked(int index, int optionalEmitParam)
     Q_UNUSED(index);
     Q_UNUSED(optionalEmitParam);
 
-    if (m_flashInProgress) {
+    if (m_firmwareManager->isFlashInProgress()) {
         flashStatusLabel->setVisible(true);
         flashStatusLabel->setColor(Graphics::palette().warning);
         flashStatusLabel->setValue("Flash already in progress...");
         return;
     }
+    
     flashProgressBar->setVisible(true);
     flashStatusLabel->setVisible(true);
-    flashStatusLabel->setColor(Graphics::palette().textAll); // Reset color
-    flashStatusLabel->setValue("Connecting to ST-Link...");
-    flashProgressBar->setValue(0);
-
-    // Trigger connection in the thread
-    QMetaObject::invokeMethod(m_flasher, "connectDevice");
+    
+    m_firmwareManager->startUpdateProcess();
 }
 
-void SettingsDialog::onDeviceConnected(const QString &info)
-{
-    flashStatusLabel->setValue("Connected: " + info + ". Reading MCU ID...");
-    QMetaObject::invokeMethod(m_flasher, "readDeviceUID");
-}
-
-void SettingsDialog::onFlashProgress(int value, int total)
+void SettingsDialog::onFirmwareProgress(int value, int total)
 {
     flashProgressBar->setRange(0, total);
     flashProgressBar->setValue(value);
 }
 
-void SettingsDialog::onFlashLog(const QString &msg)
-{
-    qDebug() << "Flasher:" << msg;
-    // Optionally update label with short status
-    if (msg.length() < 50)
-        flashStatusLabel->setValue(msg);
-}
-
-void SettingsDialog::onFlashFinished(bool success, const QString &msg)
+void SettingsDialog::onFirmwareStatusMessage(const QString &msg, const QColor &color)
 {
     flashStatusLabel->setValue(msg);
-    if (success)
-    {
-        flashStatusLabel->setColor(Graphics::palette().running);
-        flashProgressBar->setValue(100);
-        emit firmwareFlashed();
-    }
-    else
-    {
-        flashStatusLabel->setColor(Graphics::palette().error);
-    }
-
-    // Re-enable button
-    m_flashInProgress = false;
-    buttonsFlash->setEnabled(true);
-
-    // Disconnect after operation
-    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+    flashStatusLabel->setColor(color.name());
 }
 
-void SettingsDialog::onOperationStarted(const QString &operation)
+void SettingsDialog::onFirmwareOperationStarted()
 {
-    Q_UNUSED(operation);
-    m_flashInProgress = true;
     buttonsFlash->setEnabled(false);
 }
 
-void SettingsDialog::onDeviceUIDAvailable(const QString &uidHex)
+void SettingsDialog::onFirmwareOperationFinished(bool success)
 {
-    m_lastReadUidHex = uidHex;
-    
-    // Check local
-    QString appDir = QCoreApplication::applicationDirPath();
-    QString localBinPath = appDir + "/" + uidHex + ".bin";
-    
-    if (QFile::exists(localBinPath)) {
-        flashStatusLabel->setValue("Local firmware found (" + uidHex + ".bin). Flashing...");
-        flashStatusLabel->setColor(Graphics::palette().running);
-        QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, localBinPath));
-        return;
-    }
-
-    flashStatusLabel->setValue("Local firmware not found. Requesting remote...");
-    
-    // Temporary URL -> fix later with real endpoint
-    QString urlStr = "https://sniffy.cz/here_goes_your_firmware_endpoint/" + uidHex + ".bin";
-    
-    QNetworkRequest request((QUrl(urlStr)));
-    m_networkManager->get(request);
-}
-
-void SettingsDialog::onDeviceUIDError(const QString &message)
-{
-    flashStatusLabel->setValue("Failed to read MCU ID: " + message);
-    flashStatusLabel->setColor(Graphics::palette().error);
-    // Re-enable UI and disconnect
-    m_flashInProgress = false;
+    Q_UNUSED(success);
     buttonsFlash->setEnabled(true);
-    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
 }
 
-void SettingsDialog::onAuthStarted()
+void SettingsDialog::onFirmwareFlashed()
 {
-    // Keep UI busy; already disabled by onOperationStarted
-}
-
-void SettingsDialog::onAuthFinished()
-{
-    // No-op; wait for success/fail signals
-}
-
-void SettingsDialog::onAuthFailed(const QString &code, const QString &uiMessage)
-{
-    Q_UNUSED(code);
-    flashStatusLabel->setValue(uiMessage);
-    flashStatusLabel->setColor(Graphics::palette().error);
-    m_flashInProgress = false;
-    buttonsFlash->setEnabled(true);
-    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
-}
-
-void SettingsDialog::onAuthSucceeded(const QDateTime &validity, const QByteArray &token)
-{
-    Q_UNUSED(validity);
-    Q_UNUSED(token);
-    // Placeholder: we need the remote firmware download endpoint and how to authorize
-    flashStatusLabel->setColor(Graphics::palette().running);
-    // flashStatusLabel->setValue(
-    //     "Remote auth OK. TODO: download firmware and flash.\n"
-    //     "Required: remote firmware URL/route, auth method (use token?),\n"
-    //     "binary selection (device/variant), and checksum/size expectations.");
-
-    // End operation cleanly for now
-    m_flashInProgress = false;
-    buttonsFlash->setEnabled(true);
-    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
-}
-
-void SettingsDialog::onFirmwareDownloadFinished(QNetworkReply *reply)
-{
-    if (reply->error() != QNetworkReply::NoError) {
-        flashStatusLabel->setValue("Download Error: " + reply->errorString());
-        flashStatusLabel->setColor(Graphics::palette().error);
-        reply->deleteLater();
-        m_flashInProgress = false;
-        buttonsFlash->setEnabled(true);
-        QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
-        return;
-    }
-
-    // Extract filename from Content-Disposition
-    QString filename;
-    QVariant contentDisp = reply->header(QNetworkRequest::ContentDispositionHeader);
-    QString contentDispStr = contentDisp.toString();
-    if (!contentDispStr.isEmpty()) {
-        int nameIdx = contentDispStr.indexOf("filename=");
-        if (nameIdx != -1) {
-            filename = contentDispStr.mid(nameIdx + 9);
-            // Remove quotes and semicolons if present
-            filename = filename.split(';').first();
-            filename = filename.replace("\"", "").trimmed();
-        }
-    }
-
-    // Fallback to URL filename if header is missing
-    if (filename.isEmpty()) {
-        filename = reply->url().fileName();
-    }
-    
-    // Fallback if still empty
-    if (filename.isEmpty()) {
-        filename = "unknown_firmware.bin";
-    }
-
-    QByteArray data = reply->readAll();
-    reply->deleteLater();
-
-    if (data.isEmpty()) {
-        flashStatusLabel->setValue("Error: Empty response from server.");
-        flashStatusLabel->setColor(Graphics::palette().error);
-        m_flashInProgress = false;
-        buttonsFlash->setEnabled(true);
-        QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
-        return;
-    }
-
-    // Save to file with the ORIGINAL filename
-    QString appDir = QCoreApplication::applicationDirPath();
-    QString filePath = appDir + "/" + filename;
-
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly)) {
-        flashStatusLabel->setValue("Error: Could not save firmware file: " + filename);
-        flashStatusLabel->setColor(Graphics::palette().error);
-        m_flashInProgress = false;
-        buttonsFlash->setEnabled(true);
-        QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
-        return;
-    }
-    file.write(data);
-    file.close();
-
-    // Check if filename matches UID
-    QString expectedName = m_lastReadUidHex + ".bin";
-    if (filename.compare(expectedName, Qt::CaseInsensitive) != 0) {
-        flashStatusLabel->setValue("Error: Downloaded file (" + filename + ") does not match MCU UID.");
-        flashStatusLabel->setColor(Graphics::palette().error);
-        m_flashInProgress = false;
-        buttonsFlash->setEnabled(true);
-        QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
-        return;
-    }
-
-    flashStatusLabel->setValue("Downloaded " + filename + ". Flashing...");
-    
-    // Now flash it
-    QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, filePath));
+    emit firmwareFlashed();
 }
