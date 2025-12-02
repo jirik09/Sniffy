@@ -14,6 +14,7 @@
 #include "customsettings.h"
 #include "GUI/simplehprogressbar.h"
 #include "flasher/stlinkflasher.h"
+#include "authenticator.h"
 
 namespace Ui {
 class SettingsDialog;
@@ -35,6 +36,7 @@ private:
     WidgetButtons *buttonsSmartSessionGeometry;
     WidgetButtons *buttonsSession;
     WidgetSelection * selTheme;
+    WidgetSelection * selFlashSource; // Local vs Remote firmware source
 
     // Flasher widgets
     WidgetButtons *buttonsFlash;
@@ -43,6 +45,11 @@ private:
     StLinkFlasher *m_flasher;
     QThread *m_flasherThread;
     bool m_flashInProgress = false; // guards repeated flashing
+    bool m_useRemote = false;       // selected flash source
+    QString m_lastReadUidHex;       // caches last UID
+
+    // Remote authentication helper
+    Authenticator *m_auth {nullptr};
 
     WidgetLabel *infoLabel;
     WidgetButtons *buttonsDone;
@@ -61,6 +68,14 @@ private slots:
     void onFlashFinished(bool success, const QString &msg);
     void onDeviceConnected(const QString &info);
     void onOperationStarted(const QString &operation);
+    void onDeviceUIDAvailable(const QString &uidHex);
+    void onDeviceUIDError(const QString &message);
+
+    // Authenticator callbacks for remote flow
+    void onAuthStarted();
+    void onAuthFinished();
+    void onAuthFailed(const QString &code, const QString &uiMessage);
+    void onAuthSucceeded(const QDateTime &validity, const QByteArray &token);
 
 signals:
     void saveSessionRequested();

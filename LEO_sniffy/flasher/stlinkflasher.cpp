@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QCoreApplication>
 #include <QDir>
+#include <algorithm>
 
 // Include stlink headers
 #include "stlink.h"
@@ -32,7 +33,8 @@ bool StLinkFlasher::isConnected() const
 void StLinkFlasher::connectDevice()
 {
     QMutexLocker locker(&m_mutex);
-    if (m_flashing) {
+    if (m_flashing)
+    {
         emit logMessage("Flash in progress; ignoring connect request");
         return;
     }
@@ -146,8 +148,9 @@ bool StLinkFlasher::initStLink()
     if (stlink_load_device_params(m_stlink))
     {
         emit logMessage(QString("Failed to load device parameters automatically. Chip ID: 0x%1").arg(m_stlink->chip_id, 0, 16));
-        
-        if (!loadDeviceParamsFallback()) {
+
+        if (!loadDeviceParamsFallback())
+        {
             cleanupStLink();
             return false;
         }
@@ -277,7 +280,7 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
         uint32_t len = (remaining > chunk_size) ? chunk_size : remaining;
 
         // Create a mutable copy of the current chunk to avoid casting away constness.
-        QByteArray chunkCopy((const char*)content, len);
+        QByteArray chunkCopy((const char *)content, len);
         int res = stlink_write_flash(m_stlink, write_addr, reinterpret_cast<uint8_t *>(chunkCopy.data()), len, 0);
 
         if (res != 0)
@@ -313,7 +316,7 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
 bool StLinkFlasher::loadDeviceParamsFallback()
 {
     emit logMessage("Attempting manual parameter fallback...");
-    
+
     QString chipsDir = qgetenv("STLINK_CHIPS_DIR");
     if (chipsDir.isEmpty())
     {
@@ -475,4 +478,57 @@ bool StLinkFlasher::loadDeviceParamsFallback()
 
     emit logMessage("No matching config file found for this chip.");
     return false;
+}
+
+void StLinkFlasher::readDeviceUID()
+{
+    QMutexLocker locker(&m_mutex);
+    if (!m_connected || !m_stlink)
+    {
+        emit deviceUIDError("Device not connected");
+        return;
+    }
+
+    // Ensure target is responsive
+    stlink_force_debug(m_stlink);
+
+    // Select family-specific UID base from loaded device parameters
+    uint32_t uidBase = 0;
+    switch (m_stlink->flash_type)
+    {
+    case STM32_FLASH_TYPE_F2_F4:
+        uidBase = 0x1FFF7A10u; // STM32F4x UID base
+        break;
+    case STM32_FLASH_TYPE_F0_F1_F3:
+        uidBase = 0x1FFFF7ACu; // STM32F3x UID base
+        break;
+    case STM32_FLASH_TYPE_G4:
+        uidBase = 0x1FFF7590u; // STM32G4x UID base
+        break;
+    default:
+        emit deviceUIDError("Unsupported MCU family for UID read");
+        return;
+    }
+
+    int res = stlink_read_mem32(m_stlink, uidBase, 12);
+    if (res != 0)
+    {
+        emit deviceUIDError(QString("UID read failed at 0x%1").arg(uidBase, 0, 16));
+        return;
+    }
+
+    QByteArray uid(reinterpret_cast<const char *>(m_stlink->q_buf), 12);
+    bool allZero = std::all_of(uid.begin(), uid.end(), [](char c)
+                               { return static_cast<unsigned char>(c) == 0x00; });
+    bool allFF = std::all_of(uid.begin(), uid.end(), [](char c)
+                             { return static_cast<unsigned char>(c) == 0xFF; });
+    if (allZero || allFF)
+    {
+        emit deviceUIDError("UID appears invalid (all 00/FF)");
+        return;
+    }
+
+    QString uidHex = uid.toHex().toUpper();
+    emit logMessage(QString("UID read @0x%1: %2").arg(uidBase, 0, 16).arg(uidHex));
+    emit deviceUIDAvailable(uidHex);
 }

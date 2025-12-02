@@ -48,6 +48,13 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     WidgetSeparator *sepFlash = new WidgetSeparator(this, "Firmware Update");
     buttons->addWidget(sepFlash);
 
+    // Flash source selection (Local vs Remote)
+    selFlashSource = new WidgetSelection(this, "Source");
+    selFlashSource->addOption("Local (Desktop)", 0);    
+    selFlashSource->addOption("Remote (Web)", 1);
+    selFlashSource->setSelected(0);
+    buttons->addWidget(selFlashSource);
+
     buttonsFlash = new WidgetButtons(this, 1, ButtonTypes::NORMAL, "STM32 Firmware");
     buttonsFlash->setText("Install / Flash", 0);
     buttons->addWidget(buttonsFlash);
@@ -75,6 +82,15 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     connect(m_flasher, &StLinkFlasher::operationFinished, this, &SettingsDialog::onFlashFinished);
     connect(m_flasher, &StLinkFlasher::deviceConnected, this, &SettingsDialog::onDeviceConnected);
     connect(m_flasher, &StLinkFlasher::operationStarted, this, &SettingsDialog::onOperationStarted);
+    connect(m_flasher, &StLinkFlasher::deviceUIDAvailable, this, &SettingsDialog::onDeviceUIDAvailable);
+    connect(m_flasher, &StLinkFlasher::deviceUIDError, this, &SettingsDialog::onDeviceUIDError);
+
+    // Authenticator for remote flow
+    m_auth = new Authenticator(this);
+    connect(m_auth, &Authenticator::requestStarted, this, &SettingsDialog::onAuthStarted);
+    connect(m_auth, &Authenticator::requestFinished, this, &SettingsDialog::onAuthFinished);
+    connect(m_auth, &Authenticator::authenticationFailed, this, &SettingsDialog::onAuthFailed);
+    connect(m_auth, &Authenticator::authenticationSucceeded, this, &SettingsDialog::onAuthSucceeded);
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     buttons->addItem(verticalSpacer);
@@ -117,6 +133,8 @@ SettingsDialog::~SettingsDialog()
     }
     
     delete m_flasher;
+    m_flasher = nullptr;
+    // m_auth is childed to this via ctor parent, no manual delete needed
     delete ui;
 }
 
@@ -182,6 +200,9 @@ void SettingsDialog::onFlashButtonClicked(int index, int optionalEmitParam)
         return;
     }
 
+    // Determine source selection
+    m_useRemote = (selFlashSource && selFlashSource->getSelectedIndex() == 1);
+
     flashProgressBar->setVisible(true);
     flashStatusLabel->setVisible(true);
     flashStatusLabel->setColor(Graphics::palette().textAll); // Reset color
@@ -194,27 +215,28 @@ void SettingsDialog::onFlashButtonClicked(int index, int optionalEmitParam)
 
 void SettingsDialog::onDeviceConnected(const QString &info)
 {
-    flashStatusLabel->setValue("Connected: " + info + ". Sending ID to server...");
-
-    // Placeholder: "Send" ID to server and "Receive" binary
-    // In reality, we just check if file exists on Desktop or use a dummy path for now as requested.
-    // User said: "zde proved jen vycteni z disku pro ucel otestovani, z plochy - nazev F303RE_LEO_cube.bin"
-
-    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    QString firmwarePath = desktopPath + "/F303RE_LEO_cube.bin";
-
-    QFile f(firmwarePath);
-    if (!f.exists())
+    if (m_useRemote)
     {
-        flashStatusLabel->setValue("Error: Firmware file not found on Desktop.");
-        flashStatusLabel->setColor(Graphics::palette().error);
-        return;
+        flashStatusLabel->setValue("Connected: " + info + ". Reading MCU ID...");
+        QMetaObject::invokeMethod(m_flasher, "readDeviceUID");
     }
+    else
+    {
+        // Local: Desktop/sniffy.bin
+        QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+        QString firmwarePath = desktopPath + "/sniffy.bin";
 
-    flashStatusLabel->setValue("Firmware found. Flashing...");
+        QFile f(firmwarePath);
+        if (!f.exists())
+        {
+            flashStatusLabel->setValue("Error: Firmware file not found on Desktop.");
+            flashStatusLabel->setColor(Graphics::palette().error);
+            return;
+        }
 
-    // Trigger flashing
-    QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, firmwarePath));
+        flashStatusLabel->setValue("Firmware found. Flashing...");
+        QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, firmwarePath));
+    }
 }
 
 void SettingsDialog::onFlashProgress(int value, int total)
@@ -258,4 +280,71 @@ void SettingsDialog::onOperationStarted(const QString &operation)
     Q_UNUSED(operation);
     m_flashInProgress = true;
     buttonsFlash->setEnabled(false);
+}
+
+void SettingsDialog::onDeviceUIDAvailable(const QString &uidHex)
+{
+    m_lastReadUidHex = uidHex;
+    flashStatusLabel->setValue("Contacting server...");
+    if (m_auth)
+    {
+        const QString email = CustomSettings::getUserEmail();
+        if (email.isEmpty() || email == "Unknown user")
+        {
+            flashStatusLabel->setColor(Graphics::palette().warning);
+            flashStatusLabel->setValue("Please login first (email required) to request remote firmware.");
+            m_flashInProgress = false;
+            buttonsFlash->setEnabled(true);
+            QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+            return;
+        }
+        m_auth->tokenRefresh("LEO_sniffy", uidHex);
+    }
+}
+
+void SettingsDialog::onDeviceUIDError(const QString &message)
+{
+    flashStatusLabel->setValue("Failed to read MCU ID: " + message);
+    flashStatusLabel->setColor(Graphics::palette().error);
+    // Re-enable UI and disconnect
+    m_flashInProgress = false;
+    buttonsFlash->setEnabled(true);
+    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+}
+
+void SettingsDialog::onAuthStarted()
+{
+    // Keep UI busy; already disabled by onOperationStarted
+}
+
+void SettingsDialog::onAuthFinished()
+{
+    // No-op; wait for success/fail signals
+}
+
+void SettingsDialog::onAuthFailed(const QString &code, const QString &uiMessage)
+{
+    Q_UNUSED(code);
+    flashStatusLabel->setValue(uiMessage);
+    flashStatusLabel->setColor(Graphics::palette().error);
+    m_flashInProgress = false;
+    buttonsFlash->setEnabled(true);
+    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+}
+
+void SettingsDialog::onAuthSucceeded(const QDateTime &validity, const QByteArray &token)
+{
+    Q_UNUSED(validity);
+    Q_UNUSED(token);
+    // Placeholder: we need the remote firmware download endpoint and how to authorize
+    flashStatusLabel->setColor(Graphics::palette().running);
+    // flashStatusLabel->setValue(
+    //     "Remote auth OK. TODO: download firmware and flash.\n"
+    //     "Required: remote firmware URL/route, auth method (use token?),\n"
+    //     "binary selection (device/variant), and checksum/size expectations.");
+
+    // End operation cleanly for now
+    m_flashInProgress = false;
+    buttonsFlash->setEnabled(true);
+    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
 }
