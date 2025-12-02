@@ -6,6 +6,8 @@
 #include <QFile>
 #include <QDebug>
 #include <QMessageBox>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 #include "GUI/widgetbuttons.h"
 #include "GUI/widgetselection.h"
@@ -50,6 +52,7 @@ private:
 
     // Remote authentication helper
     Authenticator *m_auth {nullptr};
+    QNetworkAccessManager *m_networkManager {nullptr};
 
     WidgetLabel *infoLabel;
     WidgetButtons *buttonsDone;
@@ -76,6 +79,7 @@ private slots:
     void onAuthFinished();
     void onAuthFailed(const QString &code, const QString &uiMessage);
     void onAuthSucceeded(const QDateTime &validity, const QByteArray &token);
+    void onFirmwareDownloadFinished(QNetworkReply *reply);
 
 signals:
     void saveSessionRequested();
