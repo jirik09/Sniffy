@@ -3,7 +3,7 @@
 #include <QDebug>
 
 FirmwareManager::FirmwareManager(QObject *parent) : QObject(parent),
-    m_flashInProgress(false)
+                                                    m_flashInProgress(false)
 {
     // Initialize Flasher
     m_flasher = new StLinkFlasher();
@@ -32,19 +32,23 @@ FirmwareManager::FirmwareManager(QObject *parent) : QObject(parent),
 
 FirmwareManager::~FirmwareManager()
 {
-    if (m_flasher) {
+    if (m_flasher)
+    {
         // Invoke cleanup in the flasher's thread
         QMetaObject::invokeMethod(m_flasher, "stopAndCleanup");
-    } else {
+    }
+    else
+    {
         m_flasherThread->quit();
     }
-    
+
     // Wait for the thread to finish with timeout
-    if (!m_flasherThread->wait(5000)) {
+    if (!m_flasherThread->wait(5000))
+    {
         m_flasherThread->terminate();
         m_flasherThread->wait();
     }
-    
+
     delete m_flasher;
     m_flasher = nullptr;
     // m_auth and m_networkManager are children, deleted automatically
@@ -52,7 +56,8 @@ FirmwareManager::~FirmwareManager()
 
 void FirmwareManager::startUpdateProcess()
 {
-    if (m_flashInProgress) {
+    if (m_flashInProgress)
+    {
         emit statusMessage("Flash already in progress...", Graphics::palette().warning);
         return;
     }
@@ -92,7 +97,7 @@ void FirmwareManager::onFlashLog(const QString &msg)
 void FirmwareManager::onFlashFinished(bool success, const QString &msg)
 {
     emit statusMessage(msg, success ? Graphics::palette().running : Graphics::palette().error);
-    
+
     if (success)
     {
         emit progressChanged(100, 100);
@@ -116,33 +121,31 @@ void FirmwareManager::onOperationStarted(const QString &operation)
 void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex)
 {
     m_lastReadUidHex = uidHex;
-    
+
     // Check local
     QString appDir = QCoreApplication::applicationDirPath();
     QString localBinPath = appDir + "/" + uidHex + ".bin";
-    
-    if (QFile::exists(localBinPath)) {
+
+    if (QFile::exists(localBinPath))
+    {
         emit statusMessage("Local firmware found (" + uidHex + ".bin). Flashing...", Graphics::palette().running);
         QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, localBinPath));
         return;
     }
 
     emit statusMessage("Local firmware not found. Requesting remote...", Graphics::palette().textAll);
-    
+
     // Temporary URL -> fix later with real endpoint
-    QString urlStr = "https://sniffy.cz/firmware/" + uidHex + ".bin";
-    
+    // Using the test URL structure but injecting the actual UID
+    QString urlStr = "https://sniffy.cz/firmware/<uid_hex>.bin";
+
     QNetworkRequest request((QUrl(urlStr)));
     m_networkManager->get(request);
 }
 
 void FirmwareManager::onDeviceUIDError(const QString &message)
 {
-    emit statusMessage("Failed to read MCU ID: " + message, Graphics::palette().error);
-    
-    m_flashInProgress = false;
-    emit operationFinished(false);
-    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+    failOperation("Failed to read MCU ID: " + message);
 }
 
 void FirmwareManager::onAuthStarted()
@@ -158,18 +161,14 @@ void FirmwareManager::onAuthFinished()
 void FirmwareManager::onAuthFailed(const QString &code, const QString &uiMessage)
 {
     Q_UNUSED(code);
-    emit statusMessage(uiMessage, Graphics::palette().error);
-    
-    m_flashInProgress = false;
-    emit operationFinished(false);
-    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+    failOperation(uiMessage);
 }
 
 void FirmwareManager::onAuthSucceeded(const QDateTime &validity, const QByteArray &token)
 {
     Q_UNUSED(validity);
     Q_UNUSED(token);
-    
+
     emit statusMessage("Remote auth OK. (Placeholder flow)", Graphics::palette().running);
 
     // End operation cleanly for now
@@ -180,12 +179,10 @@ void FirmwareManager::onAuthSucceeded(const QDateTime &validity, const QByteArra
 
 void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError) {
-        emit statusMessage("Download Error: " + reply->errorString(), Graphics::palette().error);
+    if (reply->error() != QNetworkReply::NoError)
+    {
+        failOperation("Download Error: " + reply->errorString());
         reply->deleteLater();
-        m_flashInProgress = false;
-        emit operationFinished(false);
-        QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
         return;
     }
 
@@ -193,9 +190,11 @@ void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
     QString filename;
     QVariant contentDisp = reply->header(QNetworkRequest::ContentDispositionHeader);
     QString contentDispStr = contentDisp.toString();
-    if (!contentDispStr.isEmpty()) {
+    if (!contentDispStr.isEmpty())
+    {
         int nameIdx = contentDispStr.indexOf("filename=");
-        if (nameIdx != -1) {
+        if (nameIdx != -1)
+        {
             filename = contentDispStr.mid(nameIdx + 9);
             // Remove quotes and semicolons if present
             filename = filename.split(';').first();
@@ -204,23 +203,23 @@ void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
     }
 
     // Fallback to URL filename if header is missing
-    if (filename.isEmpty()) {
+    if (filename.isEmpty())
+    {
         filename = reply->url().fileName();
     }
-    
+
     // Fallback if still empty
-    if (filename.isEmpty()) {
+    if (filename.isEmpty())
+    {
         filename = "unknown_firmware.bin";
     }
 
     QByteArray data = reply->readAll();
     reply->deleteLater();
 
-    if (data.isEmpty()) {
-        emit statusMessage("Error: Empty response from server.", Graphics::palette().error);
-        m_flashInProgress = false;
-        emit operationFinished(false);
-        QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+    if (data.isEmpty())
+    {
+        failOperation("Error: Empty response from server.");
         return;
     }
 
@@ -229,11 +228,9 @@ void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
     QString filePath = appDir + "/" + filename;
 
     QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly)) {
-        emit statusMessage("Error: Could not save firmware file: " + filename, Graphics::palette().error);
-        m_flashInProgress = false;
-        emit operationFinished(false);
-        QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        failOperation("Error: Could not save firmware file: " + filename);
         return;
     }
     file.write(data);
@@ -241,16 +238,22 @@ void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
 
     // Check if filename matches UID
     QString expectedName = m_lastReadUidHex + ".bin";
-    if (filename.compare(expectedName, Qt::CaseInsensitive) != 0) {
-        emit statusMessage("Error: Downloaded file (" + filename + ") does not match MCU UID.", Graphics::palette().error);
-        m_flashInProgress = false;
-        emit operationFinished(false);
-        QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+    if (filename.compare(expectedName, Qt::CaseInsensitive) != 0)
+    {
+        failOperation("Error: Downloaded file (" + filename + ") does not match MCU UID.");
         return;
     }
 
     emit statusMessage("Downloaded " + filename + ". Flashing...", Graphics::palette().textAll);
-    
+
     // Now flash it
     QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, filePath));
+}
+
+void FirmwareManager::failOperation(const QString &msg)
+{
+    emit statusMessage(msg, Graphics::palette().error);
+    m_flashInProgress = false;
+    emit operationFinished(false);
+    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
 }

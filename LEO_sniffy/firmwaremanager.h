@@ -52,6 +52,8 @@ private slots:
     void onFirmwareDownloadFinished(QNetworkReply *reply);
 
 private:
+    void failOperation(const QString &msg);
+
     StLinkFlasher *m_flasher;
     QThread *m_flasherThread;
     Authenticator *m_auth;
