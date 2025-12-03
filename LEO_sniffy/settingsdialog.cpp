@@ -1,6 +1,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include <QStandardPaths>
+#include <QScrollBar>
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
                                                   ui(new Ui::SettingsDialog)
@@ -67,10 +68,21 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     flashProgressBar->setVisible(false); // Hide initially
     buttons->addWidget(flashProgressBar);
 
-    flashStatusLabel = new WidgetLabel(this, "", "");
-    flashStatusLabel->setVisible(false);
-    flashStatusLabel->setWordWrap(true);
-    buttons->addWidget(flashStatusLabel);
+    flashLogWindow = new QPlainTextEdit(this);
+    flashLogWindow->setReadOnly(true);
+    flashLogWindow->setMinimumHeight(150);
+    flashLogWindow->setVisible(false);
+    // set background of the log window
+    auto getFlashLogStyleSheet = []() -> QString {
+        return QString(
+            "QPlainTextEdit {\n"
+            "    background-color: %1;\n"
+            "    color: %2;\n"
+            "}"
+        ).arg(Graphics::palette().backgroundFocusIn, Graphics::palette().textAll);
+    };
+    flashLogWindow->setStyleSheet(getFlashLogStyleSheet());
+    buttons->addWidget(flashLogWindow);
 
     // Initialize Firmware Manager
     m_firmwareManager = new FirmwareManager(this);
@@ -79,6 +91,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     
     connect(m_firmwareManager, &FirmwareManager::progressChanged, this, &SettingsDialog::onFirmwareProgress);
     connect(m_firmwareManager, &FirmwareManager::statusMessage, this, &SettingsDialog::onFirmwareStatusMessage);
+    connect(m_firmwareManager, &FirmwareManager::logMessage, this, &SettingsDialog::onFirmwareLogMessage);
     connect(m_firmwareManager, &FirmwareManager::operationStarted, this, &SettingsDialog::onFirmwareOperationStarted);
     connect(m_firmwareManager, &FirmwareManager::operationFinished, this, &SettingsDialog::onFirmwareOperationFinished);
     connect(m_firmwareManager, &FirmwareManager::firmwareFlashed, this, &SettingsDialog::onFirmwareFlashed);
@@ -122,8 +135,8 @@ void SettingsDialog::open()
     // Clear flash status if it was a login error and we are now logged in
     if (m_lastStatusType == FirmwareManager::MsgLoginRequired && CustomSettings::hasValidLogin())
     {
-        flashStatusLabel->setValue("");
-        flashStatusLabel->setVisible(false);
+        flashLogWindow->clear();
+        flashLogWindow->setVisible(false);
         m_lastStatusType = FirmwareManager::MsgInfo;
     }
     
@@ -179,14 +192,14 @@ void SettingsDialog::onFlashButtonClicked(int index, int optionalEmitParam)
     Q_UNUSED(optionalEmitParam);
 
     if (m_firmwareManager->isFlashInProgress()) {
-        flashStatusLabel->setVisible(true);
-        flashStatusLabel->setColor(Graphics::palette().warning);
-        flashStatusLabel->setValue("Flash already in progress...");
+        flashLogWindow->setVisible(true);
+        flashLogWindow->appendHtml(QString("<font color=\"%1\">%2</font>").arg(Graphics::palette().warning, "Flash already in progress..."));
         return;
     }
     
     flashProgressBar->setVisible(true);
-    flashStatusLabel->setVisible(true);
+    flashLogWindow->setVisible(true);
+    flashLogWindow->clear();
     
     m_firmwareManager->startUpdateProcess();
 }
@@ -200,8 +213,20 @@ void SettingsDialog::onFirmwareProgress(int value, int total)
 void SettingsDialog::onFirmwareStatusMessage(const QString &msg, const QColor &color, int msgType)
 {
     m_lastStatusType = msgType;
-    flashStatusLabel->setValue(msg);
-    flashStatusLabel->setColor(color.name());
+    flashLogWindow->setVisible(true);
+    flashLogWindow->appendHtml(QString("<font color=\"%1\">%2</font>").arg(color.name(), msg));
+    // Auto-scroll to bottom
+    QScrollBar *sb = flashLogWindow->verticalScrollBar();
+    sb->setValue(sb->maximum());
+}
+
+void SettingsDialog::onFirmwareLogMessage(const QString &message)
+{
+    flashLogWindow->setVisible(true);
+    flashLogWindow->appendPlainText(message);
+    // Auto-scroll to bottom
+    QScrollBar *sb = flashLogWindow->verticalScrollBar();
+    sb->setValue(sb->maximum());
 }
 
 void SettingsDialog::onUserLoginChanged()
@@ -209,8 +234,8 @@ void SettingsDialog::onUserLoginChanged()
     // If the last error was about login, and now we have a valid login, clear the error
     if (m_lastStatusType == FirmwareManager::MsgLoginRequired && CustomSettings::hasValidLogin())
     {
-        flashStatusLabel->setValue("");
-        flashStatusLabel->setVisible(false);
+        flashLogWindow->clear();
+        flashLogWindow->setVisible(false);
         m_lastStatusType = FirmwareManager::MsgInfo; // Reset status
     }
 }

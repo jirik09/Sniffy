@@ -81,7 +81,7 @@ bool FirmwareManager::isFlashInProgress() const
 
 void FirmwareManager::onDeviceConnected(const QString &info)
 {
-    emit statusMessage("Connected: " + info + ". Reading MCU ID...", Graphics::palette().textAll, MsgInfo);
+    emit statusMessage("Reading MCU ID...", Graphics::palette().textAll, MsgInfo);
     QMetaObject::invokeMethod(m_flasher, "readDeviceUID");
 }
 
@@ -130,7 +130,7 @@ void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex, const QString 
 
     if (QFile::exists(localBinPath))
     {
-        emit statusMessage("Local firmware found (" + uidHex + ".bin). Flashing...", Graphics::palette().running, MsgInfo);
+        emit statusMessage("Local firmware found. Flashing...", Graphics::palette().running, MsgInfo);
         QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, localBinPath));
         return;
     }
@@ -146,7 +146,7 @@ void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex, const QString 
         return;
     }
 
-    emit statusMessage("Local firmware not found. Requesting remote...", Graphics::palette().textAll, MsgInfo);
+    emit statusMessage("Requesting remote firmware...", Graphics::palette().running, MsgInfo);
 
     QUrl url("https://sniffy.cz/sniffy_bin_req.php?");
     QUrlQuery query;
@@ -281,7 +281,7 @@ void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
         return;
     }
 
-    emit statusMessage("Downloaded " + filename + ". Flashing...", Graphics::palette().textAll, MsgInfo);
+    emit statusMessage("Download complete. Flashing...", Graphics::palette().textAll, MsgInfo);
 
     // Now flash it
     QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, filePath));
