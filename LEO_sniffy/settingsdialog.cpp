@@ -215,6 +215,9 @@ void SettingsDialog::onFirmwareStatusMessage(const QString &msg, const QColor &c
     m_lastStatusType = msgType;
     flashLogWindow->setVisible(true);
     flashLogWindow->appendHtml(QString("<font color=\"%1\">%2</font>").arg(color.name(), msg));
+    // Auto-scroll to bottom
+    QScrollBar *sb = flashLogWindow->verticalScrollBar();
+    sb->setValue(sb->maximum());
 }
 
 void SettingsDialog::onFirmwareLogMessage(const QString &message)
