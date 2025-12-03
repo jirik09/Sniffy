@@ -56,7 +56,7 @@ void StLinkFlasher::connectDevice()
                            .arg(m_stlink->chip_id, 0, 16);
 
         emit deviceConnected(info);
-        emit logMessage("Connected to ST-Link. " + info);
+        // emit logMessage("Connected to ST-Link. " + info); // Redundant
     }
     else
     {
@@ -89,7 +89,7 @@ bool StLinkFlasher::initStLink()
     if (QDir(chipsDir).exists())
     {
         qputenv("STLINK_CHIPS_DIR", chipsDir.toLocal8Bit());
-        emit logMessage("Set STLINK_CHIPS_DIR to: " + chipsDir);
+        // emit logMessage("Set STLINK_CHIPS_DIR to: " + chipsDir);
     }
     else
     {
@@ -143,7 +143,18 @@ bool StLinkFlasher::initStLink()
 
     // Try to read core ID first to verify connection
     stlink_core_id(m_stlink);
-    emit logMessage(QString("Core ID: 0x%1").arg(m_stlink->core_id, 0, 16));
+    // Confirm an MCU is connected
+    if (m_stlink->core_id == 0 || m_stlink->core_id == 0xFFFFFFFF)
+    {
+        emit logMessage("No MCU detected on target.");
+        cleanupStLink();
+        return false;
+    }
+    else
+    {
+        emit logMessage("MCU detected. Core ID: 0x" + QString::number(m_stlink->core_id, 16));
+        // emit logMessage(QString("Core ID: 0x%1").arg(m_stlink->core_id, 0, 16));
+    }
 
     // Load device params (flash size, page size, etc.)
     // This relies on STLINK_CHIPS_DIR being set correctly to find chip definitions.
@@ -193,7 +204,7 @@ void StLinkFlasher::flashFirmware(const QString &filePath)
     }
 
     emit operationStarted("Flashing");
-    emit logMessage("Starting flash process for: " + filePath);
+    emit logMessage("Flashing file: " + QFileInfo(filePath).fileName());
 
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))

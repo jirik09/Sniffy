@@ -11,8 +11,9 @@
 #include "GUI/widgetselection.h"
 #include "GUI/widgetseparator.h"
 #include "GUI/widgetlabel.h"
-#include "customsettings.h"
 #include "GUI/simplehprogressbar.h"
+#include <QPlainTextEdit>
+#include "customsettings.h"
 #include "firmwaremanager.h"
 
 namespace Ui {
@@ -40,7 +41,7 @@ private:
     // Flasher widgets
     WidgetButtons *buttonsFlash;
     SimpleHProgressBar *flashProgressBar;
-    WidgetLabel *flashStatusLabel;
+    QPlainTextEdit *flashLogWindow;
     
     FirmwareManager *m_firmwareManager;
 
@@ -64,6 +65,7 @@ private slots:
     // Firmware Manager slots
     void onFirmwareProgress(int value, int total);
     void onFirmwareStatusMessage(const QString &msg, const QColor &color, int msgType);
+    void onFirmwareLogMessage(const QString &message);
     void onFirmwareOperationStarted();
     void onFirmwareOperationFinished(bool success);
     void onFirmwareFlashed();
