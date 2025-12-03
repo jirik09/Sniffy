@@ -56,7 +56,6 @@ void StLinkFlasher::connectDevice()
                            .arg(m_stlink->chip_id, 0, 16);
 
         emit deviceConnected(info);
-        // emit logMessage("Connected to ST-Link. " + info); // Redundant
     }
     else
     {
