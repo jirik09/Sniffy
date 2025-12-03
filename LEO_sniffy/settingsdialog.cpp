@@ -73,7 +73,15 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     flashLogWindow->setMinimumHeight(150);
     flashLogWindow->setVisible(false);
     // set background of the log window
-    flashLogWindow->setStyleSheet("QPlainTextEdit { background-color: " + Graphics::palette().backgroundFocusIn + "; color: " + Graphics::palette().textAll + "; }");
+    auto getFlashLogStyleSheet = []() -> QString {
+        return QString(
+            "QPlainTextEdit {\n"
+            "    background-color: %1;\n"
+            "    color: %2;\n"
+            "}"
+        ).arg(Graphics::palette().backgroundFocusIn, Graphics::palette().textAll);
+    };
+    flashLogWindow->setStyleSheet(getFlashLogStyleSheet());
     buttons->addWidget(flashLogWindow);
 
     // Initialize Firmware Manager
