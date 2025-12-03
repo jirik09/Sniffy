@@ -153,7 +153,6 @@ bool StLinkFlasher::initStLink()
     else
     {
         emit logMessage("MCU detected. Core ID: 0x" + QString::number(m_stlink->core_id, 16));
-        // emit logMessage(QString("Core ID: 0x%1").arg(m_stlink->core_id, 0, 16));
     }
 
     // Load device params (flash size, page size, etc.)
