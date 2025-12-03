@@ -69,6 +69,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
 
     flashStatusLabel = new WidgetLabel(this, "", "");
     flashStatusLabel->setVisible(false);
+    flashStatusLabel->setWordWrap(true);
     buttons->addWidget(flashStatusLabel);
 
     // Initialize Firmware Manager
@@ -117,6 +118,15 @@ void SettingsDialog::open()
 {
     infoLabel->setValue("");
     infoLabel->setColor(Graphics::palette().textAll);
+    
+    // Clear flash status if it was a login error and we are now logged in
+    if (m_lastStatusType == FirmwareManager::MsgLoginRequired && CustomSettings::hasValidLogin())
+    {
+        flashStatusLabel->setValue("");
+        flashStatusLabel->setVisible(false);
+        m_lastStatusType = FirmwareManager::MsgInfo;
+    }
+    
     this->show();
     this->raise();
     this->activateWindow();
@@ -187,10 +197,22 @@ void SettingsDialog::onFirmwareProgress(int value, int total)
     flashProgressBar->setValue(value);
 }
 
-void SettingsDialog::onFirmwareStatusMessage(const QString &msg, const QColor &color)
+void SettingsDialog::onFirmwareStatusMessage(const QString &msg, const QColor &color, int msgType)
 {
+    m_lastStatusType = msgType;
     flashStatusLabel->setValue(msg);
     flashStatusLabel->setColor(color.name());
+}
+
+void SettingsDialog::onUserLoginChanged()
+{
+    // If the last error was about login, and now we have a valid login, clear the error
+    if (m_lastStatusType == FirmwareManager::MsgLoginRequired && CustomSettings::hasValidLogin())
+    {
+        flashStatusLabel->setValue("");
+        flashStatusLabel->setVisible(false);
+        m_lastStatusType = FirmwareManager::MsgInfo; // Reset status
+    }
 }
 
 void SettingsDialog::onFirmwareOperationStarted()

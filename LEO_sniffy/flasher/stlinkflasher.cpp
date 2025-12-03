@@ -5,12 +5,14 @@
 #include <QThread>
 #include <QCoreApplication>
 #include <QDir>
+#include <QRegularExpression>
 #include <algorithm>
 
 // Include stlink headers
 #include "stlink.h"
 extern "C"
 {
+#include "chipid.h"
 #include "common_flash.h"
 #include "read_write.h"
 }
@@ -480,6 +482,78 @@ bool StLinkFlasher::loadDeviceParamsFallback()
     return false;
 }
 
+QString StLinkFlasher::getDetectedMcu()
+{
+    if (!m_stlink)
+    {
+        return "Unknown";
+    }
+
+    // 1. Determine Family (e.g. F303)
+    QString family = "Unknown";
+    struct stlink_chipid_params *params = stlink_chipid_get_params(m_stlink->chip_id);
+    if (params && params->dev_type)
+    {
+        QString devType = QString::fromLatin1(params->dev_type);
+        // Expected format: STM32F303_High_Density or STM32F446 etc.
+        // We want to extract "F303" or "F446"
+        // Remove "STM32" prefix if present
+        if (devType.startsWith("STM32"))
+        {
+            devType = devType.mid(5);
+        }
+        
+        // Extract the Fxxx part. 
+        // Sometimes dev_type is "F303_High_Density" or just "F446"
+        // We take characters until we hit a non-alphanumeric or underscore
+        int end = 0;
+        while (end < devType.length() && (devType[end].isLetterOrNumber()))
+        {
+            end++;
+        }
+        family = devType.left(end);
+    }
+    else
+    {
+        // Fallback based on Chip ID if params not found
+        // This is a partial list, can be expanded
+        switch (m_stlink->chip_id)
+        {
+        case 0x446: family = "F303"; break; // F303xD/E
+        case 0x422: family = "F303"; break; // F303xB/C
+        case 0x438: family = "F303"; break; // F303x6/8
+        case 0x413: family = "F405"; break; // F405/407
+        case 0x419: family = "F427"; break; // F427/437
+        case 0x421: family = "F446"; break;
+        case 0x463: family = "G474"; break; // G47x/G48x
+        default: family = QString("UnknownID_%1").arg(m_stlink->chip_id, 0, 16); break;
+        }
+    }
+
+    // 2. Determine Flash Size Character
+    QChar flashChar = '?';
+    uint32_t flashKb = m_stlink->flash_size / 1024;
+    
+    if (flashKb <= 16) flashChar = '4';
+    else if (flashKb <= 32) flashChar = '6';
+    else if (flashKb <= 64) flashChar = '8';
+    else if (flashKb <= 128) flashChar = 'B';
+    else if (flashKb <= 256) flashChar = 'C';
+    else if (flashKb <= 384) flashChar = 'D';
+    else if (flashKb <= 512) flashChar = 'E';
+    else if (flashKb <= 768) flashChar = 'F';
+    else if (flashKb <= 1024) flashChar = 'G';
+    else if (flashKb <= 1536) flashChar = 'H';
+    else if (flashKb >= 2048) flashChar = 'I';
+    
+    // 3. Determine Package (Pin count)
+    // This is hard to detect via SWD without specific registers.
+    // Default to 'R' (64 pins) as it is most common for Nucleo boards used in this project.
+    QChar packageChar = 'R'; 
+
+    return QString("%1%2%3").arg(family).arg(packageChar).arg(flashChar);
+}
+
 void StLinkFlasher::readDeviceUID()
 {
     QMutexLocker locker(&m_mutex);
@@ -529,6 +603,7 @@ void StLinkFlasher::readDeviceUID()
     }
 
     QString uidHex = uid.toHex().toUpper();
-    emit logMessage(QString("UID read @0x%1: %2").arg(uidBase, 0, 16).arg(uidHex));
-    emit deviceUIDAvailable(uidHex);
+    QString mcu = getDetectedMcu();
+    emit logMessage(QString("UID read @0x%1: %2, MCU: %3").arg(uidBase, 0, 16).arg(uidHex).arg(mcu));
+    emit deviceUIDAvailable(uidHex, mcu);
 }

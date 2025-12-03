@@ -1,6 +1,10 @@
 #include "firmwaremanager.h"
 #include "graphics/graphics.h"
+#include "customsettings.h"
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QUrlQuery>
 
 FirmwareManager::FirmwareManager(QObject *parent) : QObject(parent),
                                                     m_flashInProgress(false)
@@ -58,12 +62,12 @@ void FirmwareManager::startUpdateProcess()
 {
     if (m_flashInProgress)
     {
-        emit statusMessage("Flash already in progress...", Graphics::palette().warning);
+        emit statusMessage("Flash already in progress...", Graphics::palette().warning, MsgError);
         return;
     }
 
     emit operationStarted();
-    emit statusMessage("Connecting to ST-Link...", Graphics::palette().textAll);
+    emit statusMessage("Connecting to ST-Link...", Graphics::palette().textAll, MsgInfo);
     emit progressChanged(0, 100);
 
     // Trigger connection in the thread
@@ -77,7 +81,7 @@ bool FirmwareManager::isFlashInProgress() const
 
 void FirmwareManager::onDeviceConnected(const QString &info)
 {
-    emit statusMessage("Connected: " + info + ". Reading MCU ID...", Graphics::palette().textAll);
+    emit statusMessage("Connected: " + info + ". Reading MCU ID...", Graphics::palette().textAll, MsgInfo);
     QMetaObject::invokeMethod(m_flasher, "readDeviceUID");
 }
 
@@ -88,15 +92,13 @@ void FirmwareManager::onFlashProgress(int value, int total)
 
 void FirmwareManager::onFlashLog(const QString &msg)
 {
-    emit logMessage(msg);
-    // Optionally update label with short status
-    if (msg.length() < 50)
-        emit statusMessage(msg, Graphics::palette().textAll);
+    // Only update if operation is in progress to prevent overwriting final result/error
+    emit statusMessage(msg, Graphics::palette().textAll, MsgInfo);
 }
 
 void FirmwareManager::onFlashFinished(bool success, const QString &msg)
 {
-    emit statusMessage(msg, success ? Graphics::palette().running : Graphics::palette().error);
+    emit statusMessage(msg, success ? Graphics::palette().running : Graphics::palette().error, success ? MsgSuccess : MsgError);
 
     if (success)
     {
@@ -118,7 +120,7 @@ void FirmwareManager::onOperationStarted(const QString &operation)
     emit operationStarted();
 }
 
-void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex)
+void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex, const QString &mcu)
 {
     m_lastReadUidHex = uidHex;
 
@@ -128,18 +130,33 @@ void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex)
 
     if (QFile::exists(localBinPath))
     {
-        emit statusMessage("Local firmware found (" + uidHex + ".bin). Flashing...", Graphics::palette().running);
+        emit statusMessage("Local firmware found (" + uidHex + ".bin). Flashing...", Graphics::palette().running, MsgInfo);
         QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, localBinPath));
         return;
     }
 
-    emit statusMessage("Local firmware not found. Requesting remote...", Graphics::palette().textAll);
+    // Construct URL dynamically
+    QString email = CustomSettings::getUserEmail();
+    // Use validity timestamp as session ID (e.g. 1733227200)
+    QString sessionId = QString::number(CustomSettings::getTokenValidity().toSecsSinceEpoch());
 
-    // Temporary URL -> fix later with real endpoint
-    // Using the test URL structure but injecting the actual UID
-    QString urlStr = "https://sniffy.cz/firmware/<uid_hex>.bin";
+    if (email.isEmpty() || !CustomSettings::hasValidLogin())
+    {
+        failOperation("Unknown user or invalid session. Please log in.", MsgLoginRequired);
+        return;
+    }
 
-    QNetworkRequest request((QUrl(urlStr)));
+    emit statusMessage("Local firmware not found. Requesting remote...", Graphics::palette().textAll, MsgInfo);
+
+    QUrl url("https://sniffy.cz/sniffy_bin_req.php?");
+    QUrlQuery query;
+    query.addQueryItem("email", email);
+    query.addQueryItem("session_ID", sessionId);
+    query.addQueryItem("MCU_UID", uidHex);
+    query.addQueryItem("MCU", mcu);
+    url.setQuery(query);
+
+    QNetworkRequest request(url);
     m_networkManager->get(request);
 }
 
@@ -169,7 +186,7 @@ void FirmwareManager::onAuthSucceeded(const QDateTime &validity, const QByteArra
     Q_UNUSED(validity);
     Q_UNUSED(token);
 
-    emit statusMessage("Remote auth OK. (Placeholder flow)", Graphics::palette().running);
+    emit statusMessage("Remote auth OK. (Placeholder flow)", Graphics::palette().running, MsgSuccess);
 
     // End operation cleanly for now
     m_flashInProgress = false;
@@ -181,7 +198,7 @@ void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError)
     {
-        failOperation("Download Error: " + reply->errorString());
+        failOperation("Download Error");
         reply->deleteLater();
         return;
     }
@@ -223,6 +240,26 @@ void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
         return;
     }
 
+    // Check for JSON error response
+    // Simple check: if it starts with { and contains "error"
+    if (data.trimmed().startsWith('{'))
+    {
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        if (!doc.isNull() && doc.isObject())
+        {
+            QJsonObject obj = doc.object();
+            if (obj.contains("error"))
+            {
+                QString errorMsg = obj["error"].toString();
+                if (errorMsg.length() > 150) {
+                    errorMsg = errorMsg.left(150) + "...";
+                }
+                failOperation("Server reply: " + errorMsg);
+                return;
+            }
+        }
+    }
+
     // Save to file with the ORIGINAL filename
     QString appDir = QCoreApplication::applicationDirPath();
     QString filePath = appDir + "/" + filename;
@@ -244,15 +281,15 @@ void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
         return;
     }
 
-    emit statusMessage("Downloaded " + filename + ". Flashing...", Graphics::palette().textAll);
+    emit statusMessage("Downloaded " + filename + ". Flashing...", Graphics::palette().textAll, MsgInfo);
 
     // Now flash it
     QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, filePath));
 }
 
-void FirmwareManager::failOperation(const QString &msg)
+void FirmwareManager::failOperation(const QString &msg, int msgType)
 {
-    emit statusMessage(msg, Graphics::palette().error);
+    emit statusMessage(msg, Graphics::palette().error, msgType);
     m_flashInProgress = false;
     emit operationFinished(false);
     QMetaObject::invokeMethod(m_flasher, "disconnectDevice");

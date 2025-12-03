@@ -19,6 +19,7 @@ public:
     void setValue(QString value);
     void setValueAlignment(Qt::AlignmentFlag align);
     void setColor(QString color);
+    void setWordWrap(bool on);
 
 private:
     Ui::WidgetLabel *ui;

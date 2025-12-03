@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent):
     authenticator = new Authenticator(this);
     
     logindial = new LoginDialog(authenticator, this);
+    connect(logindial, &LoginDialog::loginInfoChangedReopen, sett, &SettingsDialog::onUserLoginChanged);
 
     WidgetSeparator *sep = new WidgetSeparator(ui->centralwidget);
     //ui->widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

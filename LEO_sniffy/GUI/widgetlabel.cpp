@@ -36,3 +36,8 @@ void WidgetLabel::setColor(QString color)
     ui->label_name->setStyleSheet(style);
     ui->label_value->setStyleSheet(style);
 }
+
+void WidgetLabel::setWordWrap(bool on)
+{
+    ui->label_value->setWordWrap(on);
+}

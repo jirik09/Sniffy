@@ -51,6 +51,10 @@ private:
 
 public slots:
     void closeDialog(int isCanceled);
+    void onUserLoginChanged();
+
+private:
+    int m_lastStatusType = 0;
 
 private slots:
     void restartWarning();
@@ -59,7 +63,7 @@ private slots:
     
     // Firmware Manager slots
     void onFirmwareProgress(int value, int total);
-    void onFirmwareStatusMessage(const QString &msg, const QColor &color);
+    void onFirmwareStatusMessage(const QString &msg, const QColor &color, int msgType);
     void onFirmwareOperationStarted();
     void onFirmwareOperationFinished(bool success);
     void onFirmwareFlashed();

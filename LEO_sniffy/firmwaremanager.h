@@ -21,12 +21,20 @@ public:
     explicit FirmwareManager(QObject *parent = nullptr);
     ~FirmwareManager();
 
+    enum StatusMessageType {
+        MsgInfo = 0,
+        MsgError,
+        MsgSuccess,
+        MsgLoginRequired
+    };
+    Q_ENUM(StatusMessageType)
+
     void startUpdateProcess();
     bool isFlashInProgress() const;
 
 signals:
     void progressChanged(int value, int total);
-    void statusMessage(const QString &msg, const QColor &color);
+    void statusMessage(const QString &msg, const QColor &color, int msgType = MsgInfo);
     void logMessage(const QString &msg);
     void operationStarted();
     void operationFinished(bool success);
@@ -39,7 +47,7 @@ private slots:
     void onFlashLog(const QString &msg);
     void onFlashFinished(bool success, const QString &msg);
     void onOperationStarted(const QString &operation);
-    void onDeviceUIDAvailable(const QString &uidHex);
+    void onDeviceUIDAvailable(const QString &uidHex, const QString &mcu);
     void onDeviceUIDError(const QString &message);
 
     // Auth slots
@@ -52,7 +60,7 @@ private slots:
     void onFirmwareDownloadFinished(QNetworkReply *reply);
 
 private:
-    void failOperation(const QString &msg);
+    void failOperation(const QString &msg, int msgType = MsgError);
 
     StLinkFlasher *m_flasher;
     QThread *m_flasherThread;
