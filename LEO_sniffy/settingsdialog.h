@@ -11,9 +11,10 @@
 #include "GUI/widgetselection.h"
 #include "GUI/widgetseparator.h"
 #include "GUI/widgetlabel.h"
-#include "customsettings.h"
 #include "GUI/simplehprogressbar.h"
-#include "flasher/stlinkflasher.h"
+#include <QPlainTextEdit>
+#include "customsettings.h"
+#include "firmwaremanager.h"
 
 namespace Ui {
 class SettingsDialog;
@@ -35,14 +36,14 @@ private:
     WidgetButtons *buttonsSmartSessionGeometry;
     WidgetButtons *buttonsSession;
     WidgetSelection * selTheme;
+    WidgetSelection * selFlashSource; // Local vs Remote firmware source
 
     // Flasher widgets
     WidgetButtons *buttonsFlash;
     SimpleHProgressBar *flashProgressBar;
-    WidgetLabel *flashStatusLabel;
-    StLinkFlasher *m_flasher;
-    QThread *m_flasherThread;
-    bool m_flashInProgress = false; // guards repeated flashing
+    QPlainTextEdit *flashLogWindow;
+    
+    FirmwareManager *m_firmwareManager;
 
     WidgetLabel *infoLabel;
     WidgetButtons *buttonsDone;
@@ -51,16 +52,23 @@ private:
 
 public slots:
     void closeDialog(int isCanceled);
+    void onUserLoginChanged();
+
+private:
+    int m_lastStatusType = 0;
 
 private slots:
     void restartWarning();
     void sessionButtonClicked(int index, int optionalEmitParam = 0);
     void onFlashButtonClicked(int index, int optionalEmitParam = 0);
-    void onFlashProgress(int value, int total);
-    void onFlashLog(const QString &msg);
-    void onFlashFinished(bool success, const QString &msg);
-    void onDeviceConnected(const QString &info);
-    void onOperationStarted(const QString &operation);
+    
+    // Firmware Manager slots
+    void onFirmwareProgress(int value, int total);
+    void onFirmwareStatusMessage(const QString &msg, const QColor &color, int msgType);
+    void onFirmwareLogMessage(const QString &message);
+    void onFirmwareOperationStarted();
+    void onFirmwareOperationFinished(bool success);
+    void onFirmwareFlashed();
 
 signals:
     void saveSessionRequested();

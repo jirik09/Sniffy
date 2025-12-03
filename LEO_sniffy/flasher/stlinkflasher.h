@@ -23,6 +23,8 @@ public slots:
     void flashFirmware(const QString &filePath);
     void disconnectDevice();
     void stopAndCleanup(); // New slot for thread-safe cleanup
+    void readDeviceUID();  // Read 96-bit UID and emit signal
+    QString getDetectedMcu(); // Get detected MCU string (e.g. F303RE)
 
 signals:
     void logMessage(const QString &msg);
@@ -31,6 +33,8 @@ signals:
     void operationFinished(bool success, const QString &message);
     void deviceConnected(const QString &info);
     void deviceDisconnected();
+    void deviceUIDAvailable(const QString &uidHex, const QString &mcu);
+    void deviceUIDError(const QString &message);
 
 private:
     stlink_t *m_stlink;

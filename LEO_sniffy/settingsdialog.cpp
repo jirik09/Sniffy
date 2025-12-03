@@ -1,6 +1,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include <QStandardPaths>
+#include <QScrollBar>
 
 SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
                                                   ui(new Ui::SettingsDialog)
@@ -48,6 +49,14 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     WidgetSeparator *sepFlash = new WidgetSeparator(this, "Firmware Update");
     buttons->addWidget(sepFlash);
 
+    // Flash source selection (Local vs Remote)
+    selFlashSource = new WidgetSelection(this, "Source");
+    selFlashSource->addOption("Local", 0);    
+    selFlashSource->addOption("Remote", 1);
+    selFlashSource->setSelected(0);
+    selFlashSource->setVisible(false);
+    buttons->addWidget(selFlashSource); // Hidden as per new requirements
+
     buttonsFlash = new WidgetButtons(this, 1, ButtonTypes::NORMAL, "STM32 Firmware");
     buttonsFlash->setText("Install / Flash", 0);
     buttons->addWidget(buttonsFlash);
@@ -59,22 +68,33 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     flashProgressBar->setVisible(false); // Hide initially
     buttons->addWidget(flashProgressBar);
 
-    flashStatusLabel = new WidgetLabel(this, "", "");
-    flashStatusLabel->setVisible(false);
-    buttons->addWidget(flashStatusLabel);
+    flashLogWindow = new QPlainTextEdit(this);
+    flashLogWindow->setReadOnly(true);
+    flashLogWindow->setMinimumHeight(150);
+    flashLogWindow->setVisible(false);
+    // set background of the log window
+    auto getFlashLogStyleSheet = []() -> QString {
+        return QString(
+            "QPlainTextEdit {\n"
+            "    background-color: %1;\n"
+            "    color: %2;\n"
+            "}"
+        ).arg(Graphics::palette().backgroundFocusIn, Graphics::palette().textAll);
+    };
+    flashLogWindow->setStyleSheet(getFlashLogStyleSheet());
+    buttons->addWidget(flashLogWindow);
 
-    // Initialize Flasher
-    m_flasher = new StLinkFlasher();
-    m_flasherThread = new QThread(this);
-    m_flasher->moveToThread(m_flasherThread);
-    m_flasherThread->start();
-
+    // Initialize Firmware Manager
+    m_firmwareManager = new FirmwareManager(this);
+    
     connect(buttonsFlash, &WidgetButtons::clicked, this, &SettingsDialog::onFlashButtonClicked);
-    connect(m_flasher, &StLinkFlasher::progressChanged, this, &SettingsDialog::onFlashProgress);
-    connect(m_flasher, &StLinkFlasher::logMessage, this, &SettingsDialog::onFlashLog);
-    connect(m_flasher, &StLinkFlasher::operationFinished, this, &SettingsDialog::onFlashFinished);
-    connect(m_flasher, &StLinkFlasher::deviceConnected, this, &SettingsDialog::onDeviceConnected);
-    connect(m_flasher, &StLinkFlasher::operationStarted, this, &SettingsDialog::onOperationStarted);
+    
+    connect(m_firmwareManager, &FirmwareManager::progressChanged, this, &SettingsDialog::onFirmwareProgress);
+    connect(m_firmwareManager, &FirmwareManager::statusMessage, this, &SettingsDialog::onFirmwareStatusMessage);
+    connect(m_firmwareManager, &FirmwareManager::logMessage, this, &SettingsDialog::onFirmwareLogMessage);
+    connect(m_firmwareManager, &FirmwareManager::operationStarted, this, &SettingsDialog::onFirmwareOperationStarted);
+    connect(m_firmwareManager, &FirmwareManager::operationFinished, this, &SettingsDialog::onFirmwareOperationFinished);
+    connect(m_firmwareManager, &FirmwareManager::firmwareFlashed, this, &SettingsDialog::onFirmwareFlashed);
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     buttons->addItem(verticalSpacer);
@@ -103,20 +123,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
 
 SettingsDialog::~SettingsDialog()
 {
-    if (m_flasher) {
-        // Invoke cleanup in the flasher's thread
-        QMetaObject::invokeMethod(m_flasher, "stopAndCleanup");
-    } else {
-        m_flasherThread->quit();
-    }
-    
-    // Wait for the thread to finish with timeout
-    if (!m_flasherThread->wait(5000)) {
-        m_flasherThread->terminate();
-        m_flasherThread->wait();
-    }
-    
-    delete m_flasher;
+    // m_firmwareManager is a child of this, so it will be deleted automatically.
     delete ui;
 }
 
@@ -124,6 +131,15 @@ void SettingsDialog::open()
 {
     infoLabel->setValue("");
     infoLabel->setColor(Graphics::palette().textAll);
+    
+    // Clear flash status if it was a login error and we are now logged in
+    if (m_lastStatusType == FirmwareManager::MsgLoginRequired && CustomSettings::hasValidLogin())
+    {
+        flashLogWindow->clear();
+        flashLogWindow->setVisible(false);
+        m_lastStatusType = FirmwareManager::MsgInfo;
+    }
+    
     this->show();
     this->raise();
     this->activateWindow();
@@ -175,87 +191,67 @@ void SettingsDialog::onFlashButtonClicked(int index, int optionalEmitParam)
     Q_UNUSED(index);
     Q_UNUSED(optionalEmitParam);
 
-    if (m_flashInProgress) {
-        flashStatusLabel->setVisible(true);
-        flashStatusLabel->setColor(Graphics::palette().warning);
-        flashStatusLabel->setValue("Flash already in progress...");
+    if (m_firmwareManager->isFlashInProgress()) {
+        flashLogWindow->setVisible(true);
+        flashLogWindow->appendHtml(QString("<font color=\"%1\">%2</font>").arg(Graphics::palette().warning, "Flash already in progress..."));
         return;
     }
-
+    
     flashProgressBar->setVisible(true);
-    flashStatusLabel->setVisible(true);
-    flashStatusLabel->setColor(Graphics::palette().textAll); // Reset color
-    flashStatusLabel->setValue("Connecting to ST-Link...");
-    flashProgressBar->setValue(0);
-
-    // Trigger connection in the thread
-    QMetaObject::invokeMethod(m_flasher, "connectDevice");
+    flashLogWindow->setVisible(true);
+    flashLogWindow->clear();
+    
+    m_firmwareManager->startUpdateProcess();
 }
 
-void SettingsDialog::onDeviceConnected(const QString &info)
-{
-    flashStatusLabel->setValue("Connected: " + info + ". Sending ID to server...");
-
-    // Placeholder: "Send" ID to server and "Receive" binary
-    // In reality, we just check if file exists on Desktop or use a dummy path for now as requested.
-    // User said: "zde proved jen vycteni z disku pro ucel otestovani, z plochy - nazev F303RE_LEO_cube.bin"
-
-    QString desktopPath = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
-    QString firmwarePath = desktopPath + "/F303RE_LEO_cube.bin";
-
-    QFile f(firmwarePath);
-    if (!f.exists())
-    {
-        flashStatusLabel->setValue("Error: Firmware file not found on Desktop.");
-        flashStatusLabel->setColor(Graphics::palette().error);
-        return;
-    }
-
-    flashStatusLabel->setValue("Firmware found. Flashing...");
-
-    // Trigger flashing
-    QMetaObject::invokeMethod(m_flasher, "flashFirmware", Q_ARG(QString, firmwarePath));
-}
-
-void SettingsDialog::onFlashProgress(int value, int total)
+void SettingsDialog::onFirmwareProgress(int value, int total)
 {
     flashProgressBar->setRange(0, total);
     flashProgressBar->setValue(value);
 }
 
-void SettingsDialog::onFlashLog(const QString &msg)
+void SettingsDialog::onFirmwareStatusMessage(const QString &msg, const QColor &color, int msgType)
 {
-    qDebug() << "Flasher:" << msg;
-    // Optionally update label with short status
-    if (msg.length() < 50)
-        flashStatusLabel->setValue(msg);
+    m_lastStatusType = msgType;
+    flashLogWindow->setVisible(true);
+    flashLogWindow->appendHtml(QString("<font color=\"%1\">%2</font>").arg(color.name(), msg));
+    // Auto-scroll to bottom
+    QScrollBar *sb = flashLogWindow->verticalScrollBar();
+    sb->setValue(sb->maximum());
 }
 
-void SettingsDialog::onFlashFinished(bool success, const QString &msg)
+void SettingsDialog::onFirmwareLogMessage(const QString &message)
 {
-    flashStatusLabel->setValue(msg);
-    if (success)
-    {
-        flashStatusLabel->setColor(Graphics::palette().running);
-        flashProgressBar->setValue(100);
-        emit firmwareFlashed();
-    }
-    else
-    {
-        flashStatusLabel->setColor(Graphics::palette().error);
-    }
-
-    // Re-enable button
-    m_flashInProgress = false;
-    buttonsFlash->setEnabled(true);
-
-    // Disconnect after operation
-    QMetaObject::invokeMethod(m_flasher, "disconnectDevice");
+    flashLogWindow->setVisible(true);
+    flashLogWindow->appendPlainText(message);
+    // Auto-scroll to bottom
+    QScrollBar *sb = flashLogWindow->verticalScrollBar();
+    sb->setValue(sb->maximum());
 }
 
-void SettingsDialog::onOperationStarted(const QString &operation)
+void SettingsDialog::onUserLoginChanged()
 {
-    Q_UNUSED(operation);
-    m_flashInProgress = true;
+    // If the last error was about login, and now we have a valid login, clear the error
+    if (m_lastStatusType == FirmwareManager::MsgLoginRequired && CustomSettings::hasValidLogin())
+    {
+        flashLogWindow->clear();
+        flashLogWindow->setVisible(false);
+        m_lastStatusType = FirmwareManager::MsgInfo; // Reset status
+    }
+}
+
+void SettingsDialog::onFirmwareOperationStarted()
+{
     buttonsFlash->setEnabled(false);
+}
+
+void SettingsDialog::onFirmwareOperationFinished(bool success)
+{
+    Q_UNUSED(success);
+    buttonsFlash->setEnabled(true);
+}
+
+void SettingsDialog::onFirmwareFlashed()
+{
+    emit firmwareFlashed();
 }
