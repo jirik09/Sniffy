@@ -88,7 +88,6 @@ bool StLinkFlasher::initStLink()
     if (QDir(chipsDir).exists())
     {
         qputenv("STLINK_CHIPS_DIR", chipsDir.toLocal8Bit());
-        // emit logMessage("Set STLINK_CHIPS_DIR to: " + chipsDir);
     }
     else
     {
