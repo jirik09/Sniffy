@@ -86,8 +86,8 @@ void Device::passSystemSpecificationToGUI()
     values.append(QString::number(deviceSpec->CoreClock/1000000) + "MHz");
     labels.append("FW");
     values.append(deviceSpec->FW_Version + " ("+deviceSpec->Build_Date+")");
-    labels.append("Free RTOS");
-    values.append(deviceSpec->FREE_RTOS_Version);
+    //labels.append("Free RTOS");
+    //values.append(deviceSpec->OS_Version);
     labels.append("HAL");
     values.append(deviceSpec->HAL_Version);
     deviceWindow->addModuleDescription("System Info",labels,values);

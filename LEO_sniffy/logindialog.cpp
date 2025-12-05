@@ -161,7 +161,7 @@ void LoginDialog::openBrowserForAuth(const QString &email){
     QString sessionId = auth->getSessionId();
 
     // Build URL to start authentication directly (no POST, no user_agent)
-    QUrl startUrl("https://sniffy.cz/sniffy_auth_start.php");
+    QUrl startUrl("https://sniffy.cz/scripts/sniffy_auth_start.php");
     QUrlQuery query;
     query.addQueryItem("email", email);
     query.addQueryItem("session_id", sessionId);
