@@ -225,6 +225,7 @@ void MainWindow::setupMainWindowComponents(){
     connect(footer,&WidgetFooter::settingsClicked,this,&MainWindow::openSettingDialog);
     connect(loginInfo,&WidgetLoginInfo::loginDialogClicked,this,&MainWindow::openLoginDialog);
     connect(logindial,&LoginDialog::loginInfoChangedReopen,deviceMediator,&DeviceMediator::reopenDeviceAfterLogin);
+    connect(logindial,&LoginDialog::loginInfoChangedReopen,this,&MainWindow::onLoginInfoChanged);
     connect(authenticator, &Authenticator::authenticationSucceeded, this, &MainWindow::updateLoginInfo);
     connect(authenticator, &Authenticator::popupMessageRequested, this, &MainWindow::showBottomLeftPopup);
 
@@ -251,7 +252,15 @@ void MainWindow::openLoginDialog()
     logindial->open();
 }
 
-void MainWindow::updateLoginInfo()
+void MainWindow::updateLoginInfo(const QDateTime &validity, const QByteArray &token, bool forceReconnect)
+{
+    Q_UNUSED(validity);
+    Q_UNUSED(token);
+    Q_UNUSED(forceReconnect);
+    loginInfo->updateInfo();
+}
+
+void MainWindow::onLoginInfoChanged()
 {
     loginInfo->updateInfo();
 }

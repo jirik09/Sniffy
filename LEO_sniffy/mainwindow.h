@@ -85,7 +85,8 @@ private slots:
     void onOpenLoadSessionRequested(QString deviceName);
     void setMenuSize(bool isWide);
     void openLoginDialog();
-    void updateLoginInfo();
+    void updateLoginInfo(const QDateTime &validity, const QByteArray &token, bool authenticationSentManual);
+    void onLoginInfoChanged(); // Update login info widget when logged out
     void openSettingDialog();
     // Show a small popup/toast in the bottom-left corner of the app window
     void showBottomLeftPopup(const QString &text);

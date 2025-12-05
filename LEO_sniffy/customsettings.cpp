@@ -12,11 +12,12 @@ int CustomSettings::restoreSession;
 int CustomSettings::sessionRestoreAnswer;
 int CustomSettings::themeIndex;
 QList<QString> *CustomSettings::themesList = nullptr;
-bool CustomSettings::smartSessionLayoutGeometry = true;
+bool CustomSettings::smartSessionLayoutGeometry = false;
 QString CustomSettings::userEmail;
-QString CustomSettings::userPin;
+
 QByteArray CustomSettings::loginToken;
 QDateTime CustomSettings::tokenValidity;
+QDate CustomSettings::tokenGeneratedDate;
 QString CustomSettings::lastLoginFailureReason;
 
 void CustomSettings::loadSettings(QString fileName)
@@ -31,9 +32,9 @@ void CustomSettings::loadSettings(QString fileName)
         themeIndex = settings.contains("theme") ? settings.value("theme").toInt() : 2;
 
     userEmail = settings.value("email").toString();
-    // Default ON if key missing
+    // Default OFF if key missing
     smartSessionLayoutGeometry = settings.contains("smartSessionLayoutGeometry") ?
-                     settings.value("smartSessionLayoutGeometry").toBool() : true;
+                     settings.value("smartSessionLayoutGeometry").toBool() : false;
         if(userEmail == "Unknown user"){
             // Treat legacy sentinel as empty so UI shows placeholder instead of editable text
             userEmail.clear();
@@ -41,15 +42,17 @@ void CustomSettings::loadSettings(QString fileName)
         loginToken = settings.value("token").toByteArray();
 
         tokenValidity = settings.value("validity").toDateTime();
+        tokenGeneratedDate = settings.value("tokenGeneratedDate").toDate();
         lastLoginFailureReason = settings.value("last_login_failure").toString();
     }else{ // set default values if settings file doesnt exist
         restoreSession = 0; // default: No session restore
         // Default theme: Dawn
         themeIndex = 2;
-        smartSessionLayoutGeometry = true;
+        smartSessionLayoutGeometry = false;
         userEmail = "Unknown user";
         loginToken = "none";
         tokenValidity = QDateTime(QDate(2000,1,1),QTime(0,0));
+        tokenGeneratedDate = QDate();
         lastLoginFailureReason = "";
     }
     sessionRestoreAnswer = -1;
@@ -78,6 +81,7 @@ void CustomSettings::saveSettings()
     }
     settings.setValue("token", loginToken);
     settings.setValue("validity", tokenValidity);
+    settings.setValue("tokenGeneratedDate", tokenGeneratedDate);
     settings.setValue("last_login_failure", lastLoginFailureReason);
 
 }
@@ -143,16 +147,6 @@ void CustomSettings::setUserEmail(const QString &value)
     userEmail = value;
 }
 
-QString CustomSettings::getUserPin()
-{
-    return userPin;
-}
-
-void CustomSettings::setUserPin(const QString &value)
-{
-    userPin = value;
-}
-
 QByteArray CustomSettings::getLoginToken()
 {
     return loginToken;
@@ -171,6 +165,16 @@ QDateTime CustomSettings::getTokenValidity()
 void CustomSettings::setTokenValidity(const QDateTime &value)
 {
     tokenValidity = value;
+}
+
+QDate CustomSettings::getTokenGeneratedDate()
+{
+    return tokenGeneratedDate;
+}
+
+void CustomSettings::setTokenGeneratedDate(const QDate &value)
+{
+    tokenGeneratedDate = value;
 }
 
 QString CustomSettings::getLastLoginFailure()

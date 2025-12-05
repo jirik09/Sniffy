@@ -106,7 +106,6 @@ void DeviceMediator::openDevice(int deviceIndex)
             if (CustomSettings::getLoginToken() != "none"){
                 communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
                 communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-                communication->write("SYST:PIN_:" + CustomSettings::getUserPin().toUtf8() + ";");
                 communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
                 communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
             }
@@ -162,12 +161,15 @@ void DeviceMediator::reopenDeviceAfterLogin()
         return;
     }
     close();
+    if (currentDeviceIndex >= 0 && currentDeviceIndex < deviceList.size()) {
+            openDevice(currentDeviceIndex);
+        }
 
-    QTimer::singleShot(250, [this]() {
+    /*QTimer::singleShot(250, [this]() {
         if (currentDeviceIndex >= 0 && currentDeviceIndex < deviceList.size()) {
             openDevice(currentDeviceIndex);
         }
-    });
+    });*/
 }
 
 void DeviceMediator::disableModules()
@@ -283,6 +285,10 @@ void DeviceMediator::parseData(QByteArray data)
             module->parseData(dataToPass);
             isDataPassed = true;
         }
+    }
+    if(dataHeader == Commands::TOKEN && dataToPass.left(4) == Commands::ACK){
+        qDebug() << "Authentication SUCCESS ";
+        isDataPassed = true;
     }
     if(dataHeader == Commands::ERROR){
         qDebug() << "ERROR " << dataToPass.toHex();
