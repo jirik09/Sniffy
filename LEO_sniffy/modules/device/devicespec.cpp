@@ -27,7 +27,7 @@ void DeviceSpec::parseSpecification(QByteArray spec){
         Build_Date = specParams[5];
 
         FW_Version = specParams[7];
-        FREE_RTOS_Version = specParams[9];
+        OS_Version = specParams[9];
         HAL_Version = specParams[11];
 
         QDataStream streamBuffLeng(specParams[13]);

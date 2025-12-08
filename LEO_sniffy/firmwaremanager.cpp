@@ -148,7 +148,7 @@ void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex, const QString 
 
     emit statusMessage("Requesting remote firmware...", Graphics::palette().running, MsgInfo);
 
-    QUrl url("https://sniffy.cz/sniffy_bin_req.php?");
+    QUrl url("https://sniffy.cz/scripts/sniffy_bin_req.php?");
     QUrlQuery query;
     query.addQueryItem("email", email);
     query.addQueryItem("session_ID", sessionId);

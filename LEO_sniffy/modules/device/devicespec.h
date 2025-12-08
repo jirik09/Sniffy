@@ -19,7 +19,7 @@ public:
     QString MCU_ID;
     QString Build_Date;
     QString FW_Version;
-    QString FREE_RTOS_Version;
+    QString OS_Version;
     QString HAL_Version;
 
     bool isShield = false;

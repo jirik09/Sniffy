@@ -85,7 +85,7 @@ void Authenticator::startRequest(const QString &email, const QString &deviceName
     isRenewalRequest = isRenewal;
     
     // Use auth_check for renewal or polling, auth_start is only used from browser
-    QUrl authUrl(QStringLiteral("https://sniffy.cz/sniffy_auth_check.php"));
+    QUrl authUrl(QStringLiteral("https://sniffy.cz/scripts/sniffy_auth_check.php"));
     
     QUrlQuery query;
     query.addQueryItem("email", email);
