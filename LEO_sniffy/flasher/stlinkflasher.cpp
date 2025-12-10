@@ -15,6 +15,7 @@ extern "C"
 #include "chipid.h"
 #include "common_flash.h"
 #include "read_write.h"
+#include "option_bytes.h"
 }
 
 StLinkFlasher::StLinkFlasher(QObject *parent)
@@ -560,6 +561,144 @@ QString StLinkFlasher::getDetectedMcu()
     QChar packageChar = 'R'; 
 
     return QString("%1%2%3").arg(family).arg(packageChar).arg(flashChar);
+}
+
+void StLinkFlasher::performMassErase()
+{
+    QMutexLocker locker(&m_mutex);
+
+    if (!m_connected || !m_stlink)
+    {
+        emit operationFinished(false, "Device not connected");
+        return;
+    }
+
+    emit operationStarted("Mass Erase");
+    emit logMessage("Starting Mass Erase...");
+    m_flashing = true;
+
+    // Ensure we are in debug mode
+    if (stlink_current_mode(m_stlink) != STLINK_DEV_DEBUG_MODE) {
+        stlink_force_debug(m_stlink);
+    }
+    stlink_status(m_stlink);
+
+    bool rdpRegressionNeeded = false;
+    uint32_t option_byte = 0;
+
+    // Check RDP level
+    switch (m_stlink->flash_type) {
+        case STM32_FLASH_TYPE_F2_F4:
+        case STM32_FLASH_TYPE_F7:
+            if (stlink_read_option_control_register_f4(m_stlink, &option_byte) == 0) {
+                // RDP is bits 8-15. Level 0 is 0xAA.
+                uint8_t rdp = (option_byte >> 8) & 0xFF;
+                if (rdp != 0xAA && rdp != 0x00) {
+                    rdpRegressionNeeded = true;
+                    emit logMessage(QString("RDP Level detected: 0x%1. Regression needed.").arg(rdp, 2, 16, QChar('0')));
+                } else if (rdp == 0x00) {
+                    emit logMessage("RDP Level 0x00 detected. Treating as unprotected (Mass Erase).");
+                }
+            }
+            break;
+        case STM32_FLASH_TYPE_G4:
+        case STM32_FLASH_TYPE_L4:
+        case STM32_FLASH_TYPE_WB_WL:
+             if (stlink_read_option_control_register_gx(m_stlink, &option_byte) == 0) {
+                // RDP is bits 0-7. Level 0 is 0xAA.
+                uint8_t rdp = option_byte & 0xFF;
+                if (rdp != 0xAA && rdp != 0x00) {
+                    rdpRegressionNeeded = true;
+                    emit logMessage(QString("RDP Level detected: 0x%1. Regression needed.").arg(rdp, 2, 16, QChar('0')));
+                } else if (rdp == 0x00) {
+                    emit logMessage("RDP Level 0x00 detected. Treating as unprotected (Mass Erase).");
+                }
+            }
+            break;
+        case STM32_FLASH_TYPE_F0_F1_F3:
+             if (stlink_read_option_bytes32(m_stlink, &option_byte) == 0) {
+                 // F1 RDP Level 0 is 0xA5.
+                 // F0/F3 RDP Level 0 is 0xAA.
+                 uint8_t rdp = option_byte & 0xFF;
+                 
+                 bool isF1 = (m_stlink->chip_id == 0x410 || m_stlink->chip_id == 0x412 || 
+                              m_stlink->chip_id == 0x414 || m_stlink->chip_id == 0x418 || 
+                              m_stlink->chip_id == 0x420 || m_stlink->chip_id == 0x428 || 
+                              m_stlink->chip_id == 0x430);
+                 
+                 uint8_t targetRdp = isF1 ? 0xA5 : 0xAA;
+
+                 if (rdp != targetRdp && rdp != 0x00) {
+                      rdpRegressionNeeded = true;
+                      emit logMessage(QString("RDP Level detected: 0x%1. Regression needed (Target: 0x%2).").arg(rdp, 2, 16, QChar('0')).arg(targetRdp, 2, 16, QChar('0')));
+                 } else if (rdp == 0x00) {
+                    emit logMessage("RDP Level 0x00 detected. Treating as unprotected (Mass Erase).");
+                }
+             }
+             break;
+        default:
+            emit logMessage("Unknown flash type for RDP check. Proceeding with standard Mass Erase.");
+            break;
+    }
+
+    if (rdpRegressionNeeded) {
+        emit logMessage("Performing RDP regression...");
+        int res = -1;
+        
+        if (m_stlink->flash_type == STM32_FLASH_TYPE_F2_F4 || m_stlink->flash_type == STM32_FLASH_TYPE_F7) {
+             uint32_t optcr = option_byte;
+             optcr &= ~0xFF00; // Clear RDP
+             optcr |= (0xAA << 8); // Set Level 0
+             optcr |= 2; // Set OPTSTRT (bit 1)
+             
+             unlock_flash_option_if(m_stlink);
+             stlink_write_debug32(m_stlink, 0x40023C14, optcr);
+             wait_flash_busy(m_stlink);
+             res = 0;
+        } else if (m_stlink->flash_type == STM32_FLASH_TYPE_G4) {
+             uint32_t optr = option_byte;
+             optr &= ~0xFF; // Clear RDP
+             optr |= 0xAA; // Set Level 0
+             optr |= 2; // Set OPTSTRT (bit 1)
+             
+             unlock_flash_option_if(m_stlink);
+             stlink_write_debug32(m_stlink, 0x40022020, optr);
+             wait_flash_busy(m_stlink);
+             res = 0;
+        } else {
+             // F0/F1/F3
+             bool isF1 = (m_stlink->chip_id == 0x410 || m_stlink->chip_id == 0x412 || 
+                          m_stlink->chip_id == 0x414 || m_stlink->chip_id == 0x418 || 
+                          m_stlink->chip_id == 0x420 || m_stlink->chip_id == 0x428 || 
+                          m_stlink->chip_id == 0x430);
+             uint8_t rdp_val = isF1 ? 0xA5 : 0xAA; // Level 0
+             
+             unlock_flash_option_if(m_stlink);
+             res = stlink_write_option_bytes(m_stlink, m_stlink->option_base, &rdp_val, 1);
+        }
+        
+        if (res == 0) {
+             emit logMessage("RDP regression command sent. Waiting for erase...");
+             QThread::sleep(2); // Wait for erase to complete
+             stlink_reset(m_stlink, RESET_HARD);
+             emit operationFinished(true, "RDP Regression / Mass Erase successful.");
+        } else {
+             //emit logMessage("RDP regression failed.");
+             emit operationFinished(false, "RDP regression failed.");
+        }
+        
+    } else {
+        emit logMessage("Performing standard Mass Erase...");
+        if (stlink_erase_flash_mass(m_stlink) == 0) {
+             //emit logMessage("Mass Erase successful.");
+             emit operationFinished(true, "Mass Erase successful.");
+        } else {
+             //emit logMessage("Mass Erase failed.");
+             emit operationFinished(false, "Mass Erase failed.");
+        }
+    }
+    
+    m_flashing = false;
 }
 
 void StLinkFlasher::readDeviceUID()

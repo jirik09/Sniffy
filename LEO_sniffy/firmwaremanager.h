@@ -30,6 +30,7 @@ public:
     Q_ENUM(StatusMessageType)
 
     void startUpdateProcess();
+    void startMassErase();
     bool isFlashInProgress() const;
 
 signals:
@@ -69,6 +70,13 @@ private:
 
     bool m_flashInProgress;
     QString m_lastReadUidHex;
+
+    enum OperationType {
+        OpNone,
+        OpFlash,
+        OpErase
+    };
+    OperationType m_currentOperation = OpNone;
 };
 
 #endif // FIRMWAREMANAGER_H

@@ -84,6 +84,11 @@ SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(p
     flashLogWindow->setStyleSheet(getFlashLogStyleSheet());
     buttons->addWidget(flashLogWindow);
 
+    buttonsErase = new WidgetButtons(this, 1, ButtonTypes::NORMAL, "Erase firmware");
+    buttonsErase->setText("Mass Erase", 0);
+    buttons->addWidget(buttonsErase);
+    connect(buttonsErase, &WidgetButtons::clicked, this, &SettingsDialog::onEraseButtonClicked);
+
     // Initialize Firmware Manager
     m_firmwareManager = new FirmwareManager(auth, this);
     
@@ -204,6 +209,22 @@ void SettingsDialog::onFlashButtonClicked(int index, int optionalEmitParam)
     m_firmwareManager->startUpdateProcess();
 }
 
+void SettingsDialog::onEraseButtonClicked(int index, int optionalEmitParam)
+{
+    Q_UNUSED(index);
+    Q_UNUSED(optionalEmitParam);
+
+    if (m_firmwareManager->isFlashInProgress()) {
+        flashLogWindow->setVisible(true);
+        flashLogWindow->appendHtml(QString("<font color=\"%1\">%2</font>").arg(Graphics::palette().warning, "Operation already in progress..."));
+        return;
+    }
+    flashProgressBar->setVisible(true);
+    flashLogWindow->setVisible(true);
+    flashLogWindow->clear(); 
+    m_firmwareManager->startMassErase();
+}
+
 void SettingsDialog::onFirmwareProgress(int value, int total)
 {
     flashProgressBar->setRange(0, total);
@@ -243,12 +264,14 @@ void SettingsDialog::onUserLoginChanged()
 void SettingsDialog::onFirmwareOperationStarted()
 {
     buttonsFlash->setEnabled(false);
+    buttonsErase->setEnabled(false);
 }
 
 void SettingsDialog::onFirmwareOperationFinished(bool success)
 {
     Q_UNUSED(success);
     buttonsFlash->setEnabled(true);
+    buttonsErase->setEnabled(true);
 }
 
 void SettingsDialog::onFirmwareFlashed()

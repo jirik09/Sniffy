@@ -24,6 +24,7 @@ public slots:
     void disconnectDevice();
     void stopAndCleanup(); // New slot for thread-safe cleanup
     void readDeviceUID();  // Read 96-bit UID and emit signal
+    void performMassErase(); // Perform mass erase (with RDP regression if needed)
     QString getDetectedMcu(); // Get detected MCU string (e.g. F303RE)
 
 signals:

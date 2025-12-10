@@ -62,13 +62,31 @@ void FirmwareManager::startUpdateProcess()
 {
     if (m_flashInProgress)
     {
-        emit statusMessage("Flash already in progress...", Graphics::palette().warning, MsgError);
+        emit statusMessage("Operation already in progress", Graphics::palette().error, MsgError);
         return;
     }
 
+    m_currentOperation = OpFlash;
     emit operationStarted();
     emit statusMessage("Connecting to ST-Link...", Graphics::palette().textAll, MsgInfo);
     emit progressChanged(0, 100);
+
+    // Trigger connection in the thread
+    QMetaObject::invokeMethod(m_flasher, "connectDevice");
+}
+
+void FirmwareManager::startMassErase()
+{
+    if (m_flashInProgress)
+    {
+        emit statusMessage("Operation already in progress", Graphics::palette().error, MsgError);
+        return;
+    }
+
+    m_currentOperation = OpErase;
+    emit operationStarted();
+    emit statusMessage("Connecting to ST-Link...", Graphics::palette().textAll, MsgInfo);
+    emit progressChanged(0, 0);
 
     // Trigger connection in the thread
     QMetaObject::invokeMethod(m_flasher, "connectDevice");
@@ -82,7 +100,11 @@ bool FirmwareManager::isFlashInProgress() const
 void FirmwareManager::onDeviceConnected(const QString &info)
 {
     // emit statusMessage("Reading MCU ID...", Graphics::palette().textAll, MsgInfo);
-    QMetaObject::invokeMethod(m_flasher, "readDeviceUID");
+    if (m_currentOperation == OpErase) {
+        QMetaObject::invokeMethod(m_flasher, "performMassErase");
+    } else {
+        QMetaObject::invokeMethod(m_flasher, "readDeviceUID");
+    }
 }
 
 void FirmwareManager::onFlashProgress(int value, int total)
