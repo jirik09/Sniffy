@@ -49,12 +49,13 @@ MainWindow::MainWindow(QWidget *parent):
                                      "QWidget#centralwidget{border-right: 1px solid"+pal.textLabel+";}");
 
     setWindowTitle("LEO sniffy");
-    sett = new SettingsDialog(this);
-    connect(sett, &SettingsDialog::saveSessionRequested, this, &MainWindow::onSettingsSaveSessionRequested);
-    connect(sett, &SettingsDialog::loadSessionRequested, this, &MainWindow::onSettingsLoadSessionRequested);
     
     // Create shared authenticator
     authenticator = new Authenticator(this);
+
+    sett = new SettingsDialog(authenticator, this);
+    connect(sett, &SettingsDialog::saveSessionRequested, this, &MainWindow::onSettingsSaveSessionRequested);
+    connect(sett, &SettingsDialog::loadSessionRequested, this, &MainWindow::onSettingsLoadSessionRequested);
     
     logindial = new LoginDialog(authenticator, this);
     connect(logindial, &LoginDialog::loginInfoChangedReopen, sett, &SettingsDialog::onUserLoginChanged);

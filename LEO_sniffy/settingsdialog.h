@@ -25,7 +25,7 @@ class SettingsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SettingsDialog(QWidget *parent = nullptr);
+    explicit SettingsDialog(Authenticator *auth, QWidget *parent = nullptr);
     ~SettingsDialog();
     void open();
 

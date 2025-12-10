@@ -6,7 +6,7 @@
 #include <QJsonObject>
 #include <QUrlQuery>
 
-FirmwareManager::FirmwareManager(QObject *parent) : QObject(parent),
+FirmwareManager::FirmwareManager(Authenticator *auth, QObject *parent) : QObject(parent),
                                                     m_flashInProgress(false)
 {
     // Initialize Flasher
@@ -24,7 +24,7 @@ FirmwareManager::FirmwareManager(QObject *parent) : QObject(parent),
     connect(m_flasher, &StLinkFlasher::deviceUIDError, this, &FirmwareManager::onDeviceUIDError);
 
     // Authenticator for remote flow
-    m_auth = new Authenticator(this);
+    m_auth = auth;
     connect(m_auth, &Authenticator::requestStarted, this, &FirmwareManager::onAuthStarted);
     connect(m_auth, &Authenticator::requestFinished, this, &FirmwareManager::onAuthFinished);
     connect(m_auth, &Authenticator::authenticationFailed, this, &FirmwareManager::onAuthFailed);
