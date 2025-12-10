@@ -18,7 +18,7 @@ class FirmwareManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit FirmwareManager(QObject *parent = nullptr);
+    explicit FirmwareManager(Authenticator *auth, QObject *parent = nullptr);
     ~FirmwareManager();
 
     enum StatusMessageType {

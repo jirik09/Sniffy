@@ -3,7 +3,7 @@
 #include <QStandardPaths>
 #include <QScrollBar>
 
-SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
+SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(parent),
                                                   ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
@@ -85,7 +85,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) : QDialog(parent),
     buttons->addWidget(flashLogWindow);
 
     // Initialize Firmware Manager
-    m_firmwareManager = new FirmwareManager(this);
+    m_firmwareManager = new FirmwareManager(auth, this);
     
     connect(buttonsFlash, &WidgetButtons::clicked, this, &SettingsDialog::onFlashButtonClicked);
     
