@@ -511,8 +511,8 @@ QString StLinkFlasher::getDetectedMcu()
         {
             devType = devType.mid(5);
         }
-        
-        // Extract the Fxxx part. 
+
+        // Extract the Fxxx part.
         // Sometimes dev_type is "F303_High_Density" or just "F446"
         // We take characters until we hit a non-alphanumeric or underscore
         int end = 0;
@@ -528,37 +528,64 @@ QString StLinkFlasher::getDetectedMcu()
         // This is a partial list, can be expanded
         switch (m_stlink->chip_id)
         {
-        case 0x446: family = "F303"; break; // F303xD/E
-        case 0x422: family = "F303"; break; // F303xB/C
-        case 0x438: family = "F303"; break; // F303x6/8
-        case 0x413: family = "F405"; break; // F405/407
-        case 0x419: family = "F427"; break; // F427/437
-        case 0x421: family = "F446"; break;
-        case 0x463: family = "G474"; break; // G47x/G48x
-        default: family = QString("UnknownID_%1").arg(m_stlink->chip_id, 0, 16); break;
+        case 0x446:
+            family = "F303";
+            break; // F303xD/E
+        case 0x422:
+            family = "F303";
+            break; // F303xB/C
+        case 0x438:
+            family = "F303";
+            break; // F303x6/8
+        case 0x413:
+            family = "F405";
+            break; // F405/407
+        case 0x419:
+            family = "F427";
+            break; // F427/437
+        case 0x421:
+            family = "F446";
+            break;
+        case 0x463:
+            family = "G474";
+            break; // G47x/G48x
+        default:
+            family = QString("UnknownID_%1").arg(m_stlink->chip_id, 0, 16);
+            break;
         }
     }
 
     // 2. Determine Flash Size Character
     QChar flashChar = '?';
     uint32_t flashKb = m_stlink->flash_size / 1024;
-    
-    if (flashKb <= 16) flashChar = '4';
-    else if (flashKb <= 32) flashChar = '6';
-    else if (flashKb <= 64) flashChar = '8';
-    else if (flashKb <= 128) flashChar = 'B';
-    else if (flashKb <= 256) flashChar = 'C';
-    else if (flashKb <= 384) flashChar = 'D';
-    else if (flashKb <= 512) flashChar = 'E';
-    else if (flashKb <= 768) flashChar = 'F';
-    else if (flashKb <= 1024) flashChar = 'G';
-    else if (flashKb <= 1536) flashChar = 'H';
-    else if (flashKb >= 2048) flashChar = 'I';
-    
+
+    if (flashKb <= 16)
+        flashChar = '4';
+    else if (flashKb <= 32)
+        flashChar = '6';
+    else if (flashKb <= 64)
+        flashChar = '8';
+    else if (flashKb <= 128)
+        flashChar = 'B';
+    else if (flashKb <= 256)
+        flashChar = 'C';
+    else if (flashKb <= 384)
+        flashChar = 'D';
+    else if (flashKb <= 512)
+        flashChar = 'E';
+    else if (flashKb <= 768)
+        flashChar = 'F';
+    else if (flashKb <= 1024)
+        flashChar = 'G';
+    else if (flashKb <= 1536)
+        flashChar = 'H';
+    else if (flashKb >= 2048)
+        flashChar = 'I';
+
     // 3. Determine Package (Pin count)
     // This is hard to detect via SWD without specific registers.
     // Default to 'R' (64 pins) as it is most common for Nucleo boards used in this project.
-    QChar packageChar = 'R'; 
+    QChar packageChar = 'R';
 
     return QString("%1%2%3").arg(family).arg(packageChar).arg(flashChar);
 }
@@ -578,126 +605,212 @@ void StLinkFlasher::performMassErase()
     m_flashing = true;
 
     // Ensure we are in debug mode
-    if (stlink_current_mode(m_stlink) != STLINK_DEV_DEBUG_MODE) {
+    if (stlink_current_mode(m_stlink) != STLINK_DEV_DEBUG_MODE)
+    {
         stlink_force_debug(m_stlink);
     }
     stlink_status(m_stlink);
 
-    bool rdpRegressionNeeded = false;
-    uint32_t option_byte = 0;
+    // Helper: detect F1 family by chip id (affects RDP Level 0 value)
+    auto isF1Chip = [this]() -> bool
+    {
+        const uint32_t id = m_stlink->chip_id;
+        switch (id)
+        {
+        case 0x410:
+        case 0x412:
+        case 0x414:
+        case 0x418:
+        case 0x420:
+        case 0x428:
+        case 0x430:
+            return true;
+        default:
+            return false;
+        }
+    };
 
-    // Check RDP level
-    switch (m_stlink->flash_type) {
+    struct RdpInfo
+    {
+        bool valid = false;
+        uint8_t rdp = 0x00;
+        uint8_t level0 = 0xAA;
+    };
+
+    // Helper: read RDP info (current level and level-0 value per family)
+    auto readRdpInfo = [this, &isF1Chip]() -> RdpInfo
+    {
+        RdpInfo info{};
+        uint32_t ob = 0;
+        switch (m_stlink->flash_type)
+        {
         case STM32_FLASH_TYPE_F2_F4:
         case STM32_FLASH_TYPE_F7:
-            if (stlink_read_option_control_register_f4(m_stlink, &option_byte) == 0) {
-                // RDP is bits 8-15. Level 0 is 0xAA.
-                uint8_t rdp = (option_byte >> 8) & 0xFF;
-                if (rdp != 0xAA && rdp != 0x00) {
-                    rdpRegressionNeeded = true;
-                    emit logMessage(QString("RDP Level detected: 0x%1. Regression needed.").arg(rdp, 2, 16, QChar('0')));
-                } else if (rdp == 0x00) {
-                    emit logMessage("RDP Level 0x00 detected. Treating as unprotected (Mass Erase).");
-                }
+        {
+            if (stlink_read_option_control_register_f4(m_stlink, &ob) == 0)
+            {
+                info.valid = true;
+                info.rdp = static_cast<uint8_t>((ob >> 8) & 0xFF);
+                info.level0 = 0xAA;
             }
+            break;
+        }
+        case STM32_FLASH_TYPE_G4:
+        case STM32_FLASH_TYPE_L4:
+        case STM32_FLASH_TYPE_WB_WL:
+        {
+            if (stlink_read_option_control_register_gx(m_stlink, &ob) == 0)
+            {
+                info.valid = true;
+                info.rdp = static_cast<uint8_t>(ob & 0xFF);
+                info.level0 = 0xAA;
+            }
+            break;
+        }
+        case STM32_FLASH_TYPE_F0_F1_F3:
+        {
+            if (stlink_read_option_bytes32(m_stlink, &ob) == 0)
+            {
+                info.valid = true;
+                info.rdp = static_cast<uint8_t>(ob & 0xFF);
+                info.level0 = isF1Chip() ? 0xA5 : 0xAA;
+            }
+            break;
+        }
+        default:
+            // Unknown/unsupported: treat as not valid, do mass erase
+            break;
+        }
+        return info;
+    };
+
+    // Helper: perform RDP regression to Level 0; returns true on success
+    auto performRdpRegression = [this](uint32_t rawOption, uint8_t level0) -> bool
+    {
+        int res = -1;
+        switch (m_stlink->flash_type)
+        {
+        case STM32_FLASH_TYPE_F2_F4:
+        case STM32_FLASH_TYPE_F7:
+        {
+            uint32_t optcr = rawOption;
+            optcr &= ~0xFF00u; // Clear RDP
+            optcr |= (uint32_t(level0) << 8);
+            optcr |= 2u; // OPTSTRT
+            unlock_flash_option_if(m_stlink);
+            res = stlink_write_debug32(m_stlink, 0x40023C14u, optcr);
+            wait_flash_busy(m_stlink);
+            break;
+        }
+        case STM32_FLASH_TYPE_G4:
+        case STM32_FLASH_TYPE_L4:
+        {
+            uint32_t optr = rawOption;
+            optr &= ~0xFFu;
+            optr |= level0;
+            optr |= 2u; // OPTSTRT
+            unlock_flash_option_if(m_stlink);
+            res = stlink_write_debug32(m_stlink, 0x40022020u, optr);
+            wait_flash_busy(m_stlink);
+            break;
+        }
+        case STM32_FLASH_TYPE_WB_WL:
+        {
+            uint32_t optr = rawOption;
+            optr &= ~0xFFu;
+            optr |= level0;
+            optr |= 2u; // OPTSTRT
+            unlock_flash_option_if(m_stlink);
+            res = stlink_write_debug32(m_stlink, 0x58004020u, optr);
+            wait_flash_busy(m_stlink);
+            break;
+        }
+        case STM32_FLASH_TYPE_F0_F1_F3:
+        {
+            uint8_t rdp_val = level0;
+            unlock_flash_option_if(m_stlink);
+            res = stlink_write_option_bytes(m_stlink, m_stlink->option_base, &rdp_val, 1);
+            break;
+        }
+        default:
+            return false;
+        }
+        return (res == 0);
+    };
+
+    // Read current RDP state
+    uint32_t rawOptionBytes = 0;
+    RdpInfo rdp = readRdpInfo();
+    bool needsRegression = false;
+
+    if (rdp.valid)
+    {
+        if (rdp.rdp == 0x00)
+        {
+            emit logMessage("RDP Level 0x00 detected. Treating as unprotected (Mass Erase).");
+        }
+        else if (rdp.rdp != rdp.level0)
+        {
+            needsRegression = true;
+            emit logMessage(QString("RDP Level detected: 0x%1. Regression needed.").arg(rdp.rdp, 2, 16, QChar('0')));
+        }
+
+        // Preserve raw option word for regression writes where needed
+        // For families using control registers, we need the original to modify.
+        // Re-read using the appropriate accessor to get the raw value.
+        switch (m_stlink->flash_type)
+        {
+        case STM32_FLASH_TYPE_F2_F4:
+        case STM32_FLASH_TYPE_F7:
+            stlink_read_option_control_register_f4(m_stlink, &rawOptionBytes);
             break;
         case STM32_FLASH_TYPE_G4:
         case STM32_FLASH_TYPE_L4:
         case STM32_FLASH_TYPE_WB_WL:
-             if (stlink_read_option_control_register_gx(m_stlink, &option_byte) == 0) {
-                // RDP is bits 0-7. Level 0 is 0xAA.
-                uint8_t rdp = option_byte & 0xFF;
-                if (rdp != 0xAA && rdp != 0x00) {
-                    rdpRegressionNeeded = true;
-                    emit logMessage(QString("RDP Level detected: 0x%1. Regression needed.").arg(rdp, 2, 16, QChar('0')));
-                } else if (rdp == 0x00) {
-                    emit logMessage("RDP Level 0x00 detected. Treating as unprotected (Mass Erase).");
-                }
-            }
+            stlink_read_option_control_register_gx(m_stlink, &rawOptionBytes);
             break;
         case STM32_FLASH_TYPE_F0_F1_F3:
-             if (stlink_read_option_bytes32(m_stlink, &option_byte) == 0) {
-                 // F1 RDP Level 0 is 0xA5.
-                 // F0/F3 RDP Level 0 is 0xAA.
-                 uint8_t rdp = option_byte & 0xFF;
-                 
-                 bool isF1 = (m_stlink->chip_id == 0x410 || m_stlink->chip_id == 0x412 || 
-                              m_stlink->chip_id == 0x414 || m_stlink->chip_id == 0x418 || 
-                              m_stlink->chip_id == 0x420 || m_stlink->chip_id == 0x428 || 
-                              m_stlink->chip_id == 0x430);
-                 
-                 uint8_t targetRdp = isF1 ? 0xA5 : 0xAA;
-
-                 if (rdp != targetRdp && rdp != 0x00) {
-                      rdpRegressionNeeded = true;
-                      emit logMessage(QString("RDP Level detected: 0x%1. Regression needed (Target: 0x%2).").arg(rdp, 2, 16, QChar('0')).arg(targetRdp, 2, 16, QChar('0')));
-                 } else if (rdp == 0x00) {
-                    emit logMessage("RDP Level 0x00 detected. Treating as unprotected (Mass Erase).");
-                }
-             }
-             break;
-        default:
-            emit logMessage("Unknown flash type for RDP check. Proceeding with standard Mass Erase.");
+            stlink_read_option_bytes32(m_stlink, &rawOptionBytes);
             break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        emit logMessage("Unknown flash type for RDP check. Proceeding with standard Mass Erase.");
     }
 
-    if (rdpRegressionNeeded) {
+    // Execute
+    if (needsRegression)
+    {
         emit logMessage("Performing RDP regression...");
-        int res = -1;
-        
-        if (m_stlink->flash_type == STM32_FLASH_TYPE_F2_F4 || m_stlink->flash_type == STM32_FLASH_TYPE_F7) {
-             uint32_t optcr = option_byte;
-             optcr &= ~0xFF00; // Clear RDP
-             optcr |= (0xAA << 8); // Set Level 0
-             optcr |= 2; // Set OPTSTRT (bit 1)
-             
-             unlock_flash_option_if(m_stlink);
-             stlink_write_debug32(m_stlink, 0x40023C14, optcr);
-             wait_flash_busy(m_stlink);
-             res = 0;
-        } else if (m_stlink->flash_type == STM32_FLASH_TYPE_G4) {
-             uint32_t optr = option_byte;
-             optr &= ~0xFF; // Clear RDP
-             optr |= 0xAA; // Set Level 0
-             optr |= 2; // Set OPTSTRT (bit 1)
-             
-             unlock_flash_option_if(m_stlink);
-             stlink_write_debug32(m_stlink, 0x40022020, optr);
-             wait_flash_busy(m_stlink);
-             res = 0;
-        } else {
-             // F0/F1/F3
-             bool isF1 = (m_stlink->chip_id == 0x410 || m_stlink->chip_id == 0x412 || 
-                          m_stlink->chip_id == 0x414 || m_stlink->chip_id == 0x418 || 
-                          m_stlink->chip_id == 0x420 || m_stlink->chip_id == 0x428 || 
-                          m_stlink->chip_id == 0x430);
-             uint8_t rdp_val = isF1 ? 0xA5 : 0xAA; // Level 0
-             
-             unlock_flash_option_if(m_stlink);
-             res = stlink_write_option_bytes(m_stlink, m_stlink->option_base, &rdp_val, 1);
+        const bool ok = performRdpRegression(rawOptionBytes, rdp.level0);
+        if (ok)
+        {
+            emit logMessage("RDP regression command sent. Waiting for erase...");
+            QThread::sleep(2);
+            stlink_reset(m_stlink, RESET_HARD);
+            emit operationFinished(true, "RDP Regression / Mass Erase successful.");
         }
-        
-        if (res == 0) {
-             emit logMessage("RDP regression command sent. Waiting for erase...");
-             QThread::sleep(2); // Wait for erase to complete
-             stlink_reset(m_stlink, RESET_HARD);
-             emit operationFinished(true, "RDP Regression / Mass Erase successful.");
-        } else {
-             //emit logMessage("RDP regression failed.");
-             emit operationFinished(false, "RDP regression failed.");
-        }
-        
-    } else {
-        emit logMessage("Performing standard Mass Erase...");
-        if (stlink_erase_flash_mass(m_stlink) == 0) {
-             //emit logMessage("Mass Erase successful.");
-             emit operationFinished(true, "Mass Erase successful.");
-        } else {
-             //emit logMessage("Mass Erase failed.");
-             emit operationFinished(false, "Mass Erase failed.");
+        else
+        {
+            emit operationFinished(false, "RDP regression failed.");
         }
     }
-    
+    else
+    {
+        emit logMessage("Performing standard Mass Erase...");
+        if (stlink_erase_flash_mass(m_stlink) == 0)
+        {
+            emit operationFinished(true, "Mass Erase successful.");
+        }
+        else
+        {
+            emit operationFinished(false, "Mass Erase failed.");
+        }
+    }
+
     m_flashing = false;
 }
 
