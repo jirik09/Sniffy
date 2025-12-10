@@ -612,6 +612,7 @@ void StLinkFlasher::readDeviceUID()
 
     QString uidHex = uid.toHex().toUpper();
     QString mcu = getDetectedMcu();
-    emit logMessage(QString("UID read @0x%1: %2, MCU: %3").arg(uidBase, 0, 16).arg(uidHex).arg(mcu));
+    // emit logMessage(QString("UID read @0x%1: %2, MCU: %3").arg(uidBase, 0, 16).arg(uidHex).arg(mcu));
+    emit logMessage(QString("MCU: %1").arg(mcu));
     emit deviceUIDAvailable(uidHex, mcu);
 }

@@ -81,7 +81,7 @@ bool FirmwareManager::isFlashInProgress() const
 
 void FirmwareManager::onDeviceConnected(const QString &info)
 {
-    emit statusMessage("Reading MCU ID...", Graphics::palette().textAll, MsgInfo);
+    // emit statusMessage("Reading MCU ID...", Graphics::palette().textAll, MsgInfo);
     QMetaObject::invokeMethod(m_flasher, "readDeviceUID");
 }
 
