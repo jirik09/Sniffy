@@ -40,6 +40,7 @@ private:
 
     // Flasher widgets
     WidgetButtons *buttonsFlash;
+    WidgetButtons *buttonsErase;
     SimpleHProgressBar *flashProgressBar;
     QPlainTextEdit *flashLogWindow;
     
@@ -61,6 +62,7 @@ private slots:
     void restartWarning();
     void sessionButtonClicked(int index, int optionalEmitParam = 0);
     void onFlashButtonClicked(int index, int optionalEmitParam = 0);
+    void onEraseButtonClicked(int index, int optionalEmitParam = 0);
     
     // Firmware Manager slots
     void onFirmwareProgress(int value, int total);
