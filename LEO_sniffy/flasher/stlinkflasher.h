@@ -6,8 +6,10 @@
 #include <QThread>
 #include <QMutex>
 
-// Forward declaration of stlink structure to avoid including stlink headers in header file
-typedef struct _stlink stlink_t;
+#include "stlinkconnector.h"
+#include "stlinkwriter.h"
+#include "stlinkeraser.h"
+#include "stlinkinspector.h"
 
 class StLinkFlasher : public QObject
 {
@@ -38,14 +40,14 @@ signals:
     void deviceUIDError(const QString &message);
 
 private:
-    stlink_t *m_stlink;
-    bool m_connected;
+    StLinkConnector m_connector;
+    StLinkWriter m_writer;
+    StLinkEraser m_eraser;
+    StLinkInspector m_inspector;
+
     bool m_flashing; // true while a flash operation is in progress
     QMutex m_mutex;
 
-    bool initStLink();
-    void cleanupStLink();
-    bool loadDeviceParamsFallback();
     // Non-copyable
     StLinkFlasher(const StLinkFlasher&) = delete;
     StLinkFlasher& operator=(const StLinkFlasher&) = delete;
