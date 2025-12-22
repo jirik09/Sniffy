@@ -144,11 +144,12 @@ void FirmwareManager::onOperationStarted(const QString &operation)
 
 void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex, const QString &mcu)
 {
-    m_lastReadUidHex = uidHex;
+    QString uidHexUpper = uidHex.toUpper();
+    m_lastReadUidHex = uidHexUpper;
 
     // Check local
     QString appDir = QCoreApplication::applicationDirPath();
-    QString localBinPath = appDir + "/" + uidHex + ".bin";
+    QString localBinPath = appDir + "/" + uidHexUpper + ".bin";
 
     if (QFile::exists(localBinPath))
     {
@@ -174,7 +175,7 @@ void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex, const QString 
     QUrlQuery query;
     query.addQueryItem("email", email);
     query.addQueryItem("session_ID", sessionId);
-    query.addQueryItem("MCU_UID", uidHex);
+    query.addQueryItem("MCU_UID", uidHexUpper);
     query.addQueryItem("MCU", mcu);
     url.setQuery(query);
 
