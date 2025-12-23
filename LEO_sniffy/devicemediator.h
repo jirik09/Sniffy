@@ -68,6 +68,7 @@ private slots:
     void releaseConflictingModulesCallback(QString moduleName, int resources);
     void onDeviceSpecificationReady();
     void finalizeDeviceOpen(int deviceIndex, QString devName);
+    void onConnectionOpened(bool success);
 
 public slots:
     void close();

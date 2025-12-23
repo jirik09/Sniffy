@@ -36,6 +36,7 @@ signals:
     void newData(QByteArray message);
     void devicesScaned(QList<DeviceDescriptor> deviceList);
     void communicationError(QByteArray);
+    void connectionOpened(bool success);
 
 private slots:
     void parseMessage(QByteArray message);

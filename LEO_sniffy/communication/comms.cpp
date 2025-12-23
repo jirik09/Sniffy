@@ -9,6 +9,7 @@ Comms::Comms(QObject *parent) : QObject(parent)
     connect(this,&Comms::dataWrite,serial.get(),&SerialLine::write);
     connect(serial.get(),&SerialLine::newMessage,this,&Comms::parseMessage);
     connect(serial.get(),&SerialLine::serialLineError,this,&Comms::errorReceived);
+    connect(serial.get(),&SerialLine::connectionOpened,this,&Comms::connectionOpened);
     connect(this,&Comms::openLine,serial.get(),&SerialLine::openSerialLine);
     connect(this,&Comms::closeLine,serial.get(),&SerialLine::closeLine);
     serialThread->start();

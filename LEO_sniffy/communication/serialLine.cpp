@@ -75,9 +75,9 @@ void SerialLine::openSerialLine(DeviceDescriptor desc){
 
     int i = 0;
     while(!serPort->open(QIODevice::ReadWrite)){
-        QThread::msleep(1000);
+        QThread::msleep(200);
         i++;
-        if(i>5){
+        if(i>25){
             break;
         }
          qDebug() << "ERROR wait for serport to be opened";
@@ -95,6 +95,7 @@ void SerialLine::openSerialLine(DeviceDescriptor desc){
     }
 
     isOpen=success;
+    emit connectionOpened(success);
 }
 
 void SerialLine::closeLine(){

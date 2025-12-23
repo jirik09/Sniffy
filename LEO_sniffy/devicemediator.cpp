@@ -10,6 +10,7 @@ DeviceMediator::DeviceMediator(Authenticator *auth, QObject *parent)
     communication = new Comms();
 
     connect(communication, SIGNAL(devicesScaned(QList<DeviceDescriptor>)), this, SLOT(newDeviceList(QList<DeviceDescriptor>)), Qt::QueuedConnection);
+    connect(communication, &Comms::connectionOpened, this, &DeviceMediator::onConnectionOpened);
     modules = createModulesList();
 
     connect(device, &Device::ScanDevices, this, &DeviceMediator::ScanDevices);
@@ -69,66 +70,59 @@ void DeviceMediator::openDevice(int deviceIndex)
     // Remember which index is currently opened so we can reopen after login
     currentDeviceIndex = deviceIndex;
     communication->open(deviceList.at(deviceIndex));
+}
 
-    QThread::msleep(50);
-    int i = 0;
-    while (communication->getIsOpen() == false)
+void DeviceMediator::onConnectionOpened(bool success)
+{
+    isConnected = success;
+    if (!isConnected)
     {
-        QThread::msleep(500);
-        i++;
-        if (i > 5)
-        {
-            device->errorHandler("Device cannot be opened");
-            break;
-        }
+        device->errorHandler("Device cannot be opened");
         qDebug() << "ERROR wait for comm to be opened";
+        return;
     }
-    isConnected = communication->getIsOpen();
 
-    if (isConnected)
-    {
-        connect(communication, &Comms::newData, this, &DeviceMediator::parseData);
-        connect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
+    connect(communication, &Comms::newData, this, &DeviceMediator::parseData);
+    connect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
 
-        const QString devName = deviceList.at(deviceIndex).deviceName;
+    const QString devName = deviceList.at(currentDeviceIndex).deviceName;
 
-        // Clear previous right-side specifications before we start receiving CFG_/ACK_ again
-        device->clearAllModuleDescriptions();
+    // Clear previous right-side specifications before we start receiving CFG_/ACK_ again
+    device->clearAllModuleDescriptions();
 
-        // Immediately request MCU reset so it starts in known state. While we wait 250ms
-        // the layout/config files can be opened and processed. After 250ms send the
-        // login token (if present), attach modules to the comms and load the layout.
-        communication->write(Commands::RESET_DEVICE+";");
+    // Immediately request MCU reset so it starts in known state. While we wait 250ms
+    // the layout/config files can be opened and processed. After 250ms send the
+    // login token (if present), attach modules to the comms and load the layout.
+    communication->write(Commands::RESET_DEVICE+";");
 
-        // Delay subsequent setup (token handshake, module wiring, layout load)
-        QTimer::singleShot(250, [this, deviceIndex, devName]() {
-            // send and validate token
-            if (CustomSettings::getLoginToken() != "none"){
-                communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
+    // Delay subsequent setup (token handshake, module wiring, layout load)
+    QTimer::singleShot(250, [this, devName]() {
+        // send and validate token
+        if (CustomSettings::getLoginToken() != "none"){
+            communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
+            
+            // Delay SYST:TIME to allow SYST:MAIL (Flash Hash Check) to complete
+            QTimer::singleShot(50, [this, devName]() {
+                communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
                 
-                // Delay SYST:TIME to allow SYST:MAIL (Flash Hash Check) to complete
-                QTimer::singleShot(50, [this, deviceIndex, devName]() {
-                    communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-                    
-                    // Delay sending the token to allow MCU to process SYST:TIME (Flash Erase/Write)
-                    QTimer::singleShot(100, [this, deviceIndex, devName]() {
-                         QByteArray token = CustomSettings::getLoginToken();
-                         // If token is hex string (256 chars), convert to bytes. 
-                         // If it's already bytes (128 chars from @ByteArray), use as is.
-                         if (token.size() == 256) {
-                             token = QByteArray::fromHex(token);
-                         }
-                         
-                         communication->write("TKN_:DATA:" + token + ";");
-                         
-                         finalizeDeviceOpen(deviceIndex, devName);
-                    });
+                // Delay sending the token to allow MCU to process SYST:TIME (Flash Erase/Write)
+                QTimer::singleShot(100, [this, devName]() {
+                        QByteArray token = CustomSettings::getLoginToken();
+                        // If token is hex string (256 chars), convert to bytes. 
+                        // If it's already bytes (128 chars from @ByteArray), use as is.
+                        if (token.size() == 256) {
+                            token = QByteArray::fromHex(token);
+                        }
+                        
+                        communication->write("TKN_:DATA:" + token + ";");
+                        
+                        finalizeDeviceOpen(currentDeviceIndex, devName);
                 });
-            } else {
-                finalizeDeviceOpen(deviceIndex, devName);
-            }
-        });
-    }
+            });
+        } else {
+            finalizeDeviceOpen(currentDeviceIndex, devName);
+        }
+    });
 }
 
 void DeviceMediator::reopenDeviceAfterLogin()

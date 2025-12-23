@@ -46,6 +46,7 @@ public slots:
 signals:
         void newMessage(QByteArray message);
         void serialLineError(QByteArray error);
+        void connectionOpened(bool success);
 
 private slots:
         void handleError(QSerialPort::SerialPortError error);
