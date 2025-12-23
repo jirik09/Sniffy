@@ -105,45 +105,27 @@ void DeviceMediator::openDevice(int deviceIndex)
             // send and validate token
             if (CustomSettings::getLoginToken() != "none"){
                 communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
-                communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-                communication->write("TKN_:TIME:" + CustomSettings::getTokenValidity().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-                communication->write("TKN_:DATA:" + QByteArray::fromHex(CustomSettings::getLoginToken()) + ";");
-            }
-
-            // Check for session file before setting comms, so layout can be loaded
-            // and modules can access JSON data when they show their controls
-            if (devName.isEmpty())
-            {
-                CustomSettings::setNoSessionfound();
-            }
-            else
-            {
-                QString sessionFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".json";
-                QFile file(sessionFile);
-                if (file.exists())
-                {
-                    CustomSettings::askForSessionRestore(devName, qobject_cast<QWidget*>(this->parent()));
-                }
-                else
-                {
-                    CustomSettings::setNoSessionfound();
-                }
-            }
-
-            // Emit loadLayoutUponOpen BEFORE setComms so MainWindow can load the session
-            // data (pendingSessionData) before modules start showing their controls
-            if (CustomSettings::isSessionRestoreRequest() && deviceIndex >= 0 && deviceIndex < deviceList.size()) {
-                emit loadLayoutUponOpen(deviceList.at(deviceIndex).deviceName);
+                
+                // Delay SYST:TIME to allow SYST:MAIL (Flash Hash Check) to complete
+                QTimer::singleShot(50, [this, deviceIndex, devName]() {
+                    communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+                    
+                    // Delay sending the token to allow MCU to process SYST:TIME (Flash Erase/Write)
+                    QTimer::singleShot(100, [this, deviceIndex, devName]() {
+                         QByteArray token = CustomSettings::getLoginToken();
+                         // If token is hex string (256 chars), convert to bytes. 
+                         // If it's already bytes (128 chars from @ByteArray), use as is.
+                         if (token.size() == 256) {
+                             token = QByteArray::fromHex(token);
+                         }
+                         
+                         communication->write("TKN_:DATA:" + token + ";");
+                         
+                         finalizeDeviceOpen(deviceIndex, devName);
+                    });
+                });
             } else {
-                // No session to restore, load default layout instead
-                emit loadLayoutUponOpen("layoutOnly");
-            }
-
-            // Now attach modules to comms - they will call showModuleControl which triggers
-            // deferred configuration restoration from the already-loaded session data
-            for (const QSharedPointer<AbstractModule> &mod : modules)
-            {
-                mod->setComms(communication);
+                finalizeDeviceOpen(deviceIndex, devName);
             }
         });
     }
@@ -308,6 +290,45 @@ void DeviceMediator::parseData(QByteArray data)
         {
             qDebug() << "ERROR: this data was not passed to any module" << data.left(15) << " ... " << data.right(10);
         }       
+    }
+}
+
+void DeviceMediator::finalizeDeviceOpen(int deviceIndex, QString devName)
+{
+    // Check for session file before setting comms, so layout can be loaded
+    // and modules can access JSON data when they show their controls
+    if (devName.isEmpty())
+    {
+        CustomSettings::setNoSessionfound();
+    }
+    else
+    {
+        QString sessionFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".json";
+        QFile file(sessionFile);
+        if (file.exists())
+        {
+            CustomSettings::askForSessionRestore(devName, qobject_cast<QWidget*>(this->parent()));
+        }
+        else
+        {
+            CustomSettings::setNoSessionfound();
+        }
+    }
+
+    // Emit loadLayoutUponOpen BEFORE setComms so MainWindow can load the session
+    // data (pendingSessionData) before modules start showing their controls
+    if (CustomSettings::isSessionRestoreRequest() && deviceIndex >= 0 && deviceIndex < deviceList.size()) {
+        emit loadLayoutUponOpen(deviceList.at(deviceIndex).deviceName);
+    } else {
+        // No session to restore, load default layout instead
+        emit loadLayoutUponOpen("layoutOnly");
+    }
+
+    // Now attach modules to comms - they will call showModuleControl which triggers
+    // deferred configuration restoration from the already-loaded session data
+    for (const QSharedPointer<AbstractModule> &mod : modules)
+    {
+        mod->setComms(communication);
     }
 }
 
