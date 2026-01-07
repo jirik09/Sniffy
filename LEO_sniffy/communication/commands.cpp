@@ -37,6 +37,7 @@ const QByteArray Commands::NEXT = "NEXT";
 const QByteArray Commands::DEINIT =	"DINI";
 const QByteArray Commands::CONFIG = "CFG_";
 const QByteArray Commands::ACK = "ACK_";
+const QByteArray Commands::INACTIVE = "IACT";
 
 const QByteArray Commands::GET_REAL_SMP_FREQ = "FRQ?";
 const QByteArray Commands::GET_SCOPE_INPUTS = "INP?";

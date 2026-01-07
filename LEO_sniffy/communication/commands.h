@@ -41,6 +41,7 @@ public:
     static const QByteArray NEXT;
     static const QByteArray CONFIG;
     static const QByteArray ACK;
+    static const QByteArray INACTIVE;
 
     static const QByteArray GET_REAL_SMP_FREQ;
     static const QByteArray GET_SCOPE_INPUTS;
