@@ -57,6 +57,7 @@ public:
     void moduleRestoredHidden();
     void setModuleStatus(ModuleStatus stat);
     ModuleStatus getModuleStatus();
+    void setModuleConfigured();
 
     void showModuleControl();
     void showModuleDescription(QString name, QList<QString> labels, QList<QString> values);
@@ -64,6 +65,7 @@ public:
     void closeModule();
     void disableModule();
     bool isActive();
+    bool isAvailable() const { return isConfigured; }
 
     void setIcon (QString ImageURI);
 
@@ -102,6 +104,7 @@ private:
     bool moduleDescriptionShown = false;
     bool dockWinCreated = false;
     bool moduleRestored = false;
+    bool isConfigured = false;
 
 public slots:
     void widgetControlClicked(ModuleStatus status);

@@ -483,13 +483,11 @@ void MainWindow::onSettingsLoadSessionRequested()
     if(!loadSessionJSONFile(fileName)) return;
     
     // If smart session is enabled, don't move the main window when user loads a session
-    {
-        const bool smart = CustomSettings::getSmartSessionLayoutGeometry();
-        loadLayoutSessionFromFile(!smart ? true : false);
-        if (smart) {
-            // Keep position, update size only (symmetrically, clamped to screen)
-            applySmartSessionSizeOnly();
-        }
+    const bool smart = CustomSettings::getSmartSessionLayoutGeometry();
+    loadLayoutSessionFromFile(!smart ? true : false);
+    if (smart) {
+        // Keep position, update size only (symmetrically, clamped to screen)
+        applySmartSessionSizeOnly();
     }
     for (const QSharedPointer<AbstractModule>& module : modulesList) {
         loadModulesSessionFromFile(module->getModuleName());
@@ -543,7 +541,7 @@ void MainWindow::loadLayoutSessionFromFile(bool restoreMainGeometry)
     // Restore geometry and window state
     if(restoreMainGeometry && sessionRestoreData.contains("geometry")){
         QByteArray geom = QByteArray::fromBase64(sessionRestoreData.value("geometry").toString().toUtf8());
-    restoreGeometry(geom);
+        restoreGeometry(geom);
     }
     if(sessionRestoreData.contains("windowState")){
         QByteArray ws = QByteArray::fromBase64(sessionRestoreData.value("windowState").toString().toUtf8());

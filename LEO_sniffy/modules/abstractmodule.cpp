@@ -226,6 +226,10 @@ ModuleStatus AbstractModule::getModuleStatus()
     return moduleControlWidget->getStatus();
 }
 
+void AbstractModule::setModuleConfigured(){
+    isConfigured = true;
+}
+
 void AbstractModule::showModuleControl(){
     emit moduleControlShown(moduleName);
     moduleControlWidget->show();
@@ -258,6 +262,7 @@ void AbstractModule::disableModule(){
     moduleControlWidget->hide();
     moduleRestored = false;
     moduleDescriptionShown = false;
+    isConfigured = false;
     closeModule();
 }
 

@@ -281,9 +281,9 @@ void Authenticator::onFinished(QNetworkReply *reply)
     // Only force reconnect if this was a manual authentication (not a background renewal)
     bool forceReconnect = authenticationSentManual && !isRenewalRequest;
     if (forceReconnect) {
-        qDebug() << "[Auth] New Token generated (manual login) - forcing device reconnection";
+        qDebug() << "[Auth] New Token generated: valid till" << validity << "(manual login) - forcing device reconnection";
     } else {
-        qDebug() << "[Auth] Token refreshed (background renewal) - no device reconnection";
+        qDebug() << "[Auth] Token refreshed: valid till" << validity << "(background renewal) - no device reconnection";
     }
     
     CustomSettings::setLoginToken(token);
@@ -291,8 +291,6 @@ void Authenticator::onFinished(QNetworkReply *reply)
     CustomSettings::setTokenGeneratedDate(QDate::currentDate());
     CustomSettings::setLastLoginFailure("");
     CustomSettings::saveSettings();
-
-    qDebug() << "[Auth] Token refreshed, valid till:" << validity;
     
     emit authenticationSucceeded(validity, token, forceReconnect); //if forceReconnect is true this reconnect the device. 
     if(!forceReconnect){
