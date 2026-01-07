@@ -127,8 +127,12 @@ void MainWindow::applySmartSessionSizeOnly()
     const QRect fr = frameGeometry();
     QPoint center = fr.center();
 
+    // Calculate frame overhead to convert target content size to frame size
+    const QSize frameToWidgetDelta = fr.size() - geometry().size();
+    const QSize targetFrameSize = target + frameToWidgetDelta;
+
     // Desired frame rect centered on current center
-    QRect desiredFR(QPoint(0,0), target);
+    QRect desiredFR(QPoint(0,0), targetFrameSize);
     desiredFR.moveCenter(center);
 
     // Clamp size if larger than available area
@@ -146,7 +150,7 @@ void MainWindow::applySmartSessionSizeOnly()
 
     // Convert frame rect to widget geometry rect
     const QPoint frameToWidgetOffset = fr.topLeft() - geometry().topLeft();
-    const QSize frameToWidgetDelta = fr.size() - geometry().size();
+    // frameToWidgetDelta is already defined above
     const QPoint widgetTopLeft = desiredFR.topLeft() - frameToWidgetOffset;
     const QSize widgetSize = desiredFR.size() - frameToWidgetDelta;
 
