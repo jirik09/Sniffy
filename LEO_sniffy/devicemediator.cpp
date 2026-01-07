@@ -256,14 +256,20 @@ void DeviceMediator::parseData(QByteArray data)
 
     for (const QSharedPointer<AbstractModule> &module : modules)
     {
-        if (dataHeader == module->getCommandPrefix() && (module->isActive() || dataToPass.left(4) == Commands::CONFIG || dataToPass.left(4) == Commands::ACK))
+        if (dataHeader == module->getCommandPrefix() && (module->isActive() || dataToPass.left(4) == Commands::CONFIG || dataToPass.left(4) == Commands::ACK || dataToPass.left(4) == Commands::INACTIVE))
         {
             module->parseData(dataToPass);
             isDataPassed = true;
+            if(dataToPass.left(4) == Commands::INACTIVE){
+                qDebug() << "Module" << module->getModuleName() << "is inactive.";
+                module->closeModule();
+            }
+            if(dataToPass.left(4) == Commands::CONFIG){
+                module->setModuleConfigured();
+            }
         }
     }
     if(dataHeader == Commands::TOKEN && dataToPass.left(4) == Commands::ACK){
-        qDebug() << "Authentication SUCCESS ";
         isDataPassed = true;
     }
     if(dataHeader == Commands::ERROR){
