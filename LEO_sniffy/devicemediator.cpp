@@ -75,6 +75,7 @@ void DeviceMediator::openDevice(int deviceIndex)
 void DeviceMediator::onConnectionOpened(bool success)
 {
     isConnected = success;
+    isDemoMode = false;
     if (!isConnected)
     {
         device->errorHandler("Device cannot be opened");
@@ -271,9 +272,16 @@ void DeviceMediator::parseData(QByteArray data)
     }
     if(dataHeader == Commands::TOKEN && dataToPass.left(4) == Commands::ACK){
         isDataPassed = true;
+        if (dataToPass.contains("DEMO")) {
+            emit popupMessageRequested("Running in demo mode");
+            isDemoMode = true;
+        } else {
+            isDemoMode = false;
+        }
     }
     if(dataHeader == Commands::ERROR){
         qDebug() << "ERROR " << dataToPass.toHex();
+        emit popupMessageRequested("Device Error: " + QString::fromUtf8(dataToPass));
         isDataPassed = true;
     }
     if(dataHeader == Commands::DEBUG){
@@ -344,6 +352,11 @@ bool DeviceMediator::getIsConnected() const
     return isConnected;
 }
 
+bool DeviceMediator::getIsDemoMode() const
+{
+    return isDemoMode;
+}
+
 QString DeviceMediator::getDeviceName()
 {
     return device->getName();
@@ -367,7 +380,13 @@ void DeviceMediator::setResourcesInUse(ResourceSet resources)
 void DeviceMediator::onDeviceSpecificationReady()
 {
     // Trigger async re-auth with Device_name and MCU_ID after device specifications are parsed
+    // Limit refresh rate to prevent reconnection loops in Demo mode (where refresh -> reconnect -> refresh)
     if (authenticator) {
-        authenticator->tokenRefresh(device->getName(), device->getMcuId());
+        if (lastTokenRefresh.isValid() && lastTokenRefresh.secsTo(QDateTime::currentDateTime()) < 30) {
+            qDebug() << "Skipping automatic token refresh (last refresh < 30s ago)";
+            return;
+        }
+        lastTokenRefresh = QDateTime::currentDateTime();
+        authenticator->tokenRefresh(device->getName(), device->getMcuId(), isDemoMode);
     }
 }

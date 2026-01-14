@@ -68,13 +68,15 @@ void Authenticator::stopPolling()
     qDebug() << "[Auth] Polling stopped";
 }
 
-void Authenticator::tokenRefresh(const QString &deviceName, const QString &mcuId)
+void Authenticator::tokenRefresh(const QString &deviceName, const QString &mcuId, bool isDemoMode)
 {
     if(currentReply) return; // Request already in progress
     const QString email = CustomSettings::getUserEmail();
     if (email.isEmpty() || email == "Unknown user") return;
     
-    qDebug() << "[Auth] Token refresh requested for" << email << "Device:" << deviceName << "MCU_ID:" << mcuId;
+    qDebug() << "[Auth] Token refresh requested for" << email << "Device:" << deviceName << "MCU_ID:" << mcuId << "Demo:" << isDemoMode;
+    // Store demo mode state
+    isDemoModeRequest = isDemoMode;
     // For refresh, use the renewal flow with device info
     startRequest(email, deviceName, mcuId, true);
 }
@@ -83,6 +85,10 @@ void Authenticator::startRequest(const QString &email, const QString &deviceName
 {
     // Store the renewal flag for this request
     isRenewalRequest = isRenewal;
+    if (!isRenewal) {
+        // Reset demo mode request flag for manual/polling requests
+        isDemoModeRequest = false;
+    }
     
     // Use auth_check for renewal or polling, auth_start is only used from browser
     QUrl authUrl(QStringLiteral("https://sniffy.cz/scripts/sniffy_auth_check.php"));
@@ -278,12 +284,25 @@ void Authenticator::onFinished(QNetworkReply *reply)
     }
 
     QDateTime previousValidity = CustomSettings::getTokenValidity();
-    // Only force reconnect if this was a manual authentication (not a background renewal)
-    bool forceReconnect = authenticationSentManual && !isRenewalRequest;
+
+    // Determine reconnection logic based on server context
+    QString context = jsonObj["context"].toString();
+    bool forceReconnect = false;
+    
+    if (context == "login") {
+        forceReconnect = true;
+    } else if (context == "demo") {
+        // If we are already in demo mode, staying in demo doesn't require reconnect
+        forceReconnect = !isDemoModeRequest;
+    } else if (context == "extension") {
+        // Reconnect if currently in demo mode (to upgrade to full)
+        forceReconnect = isDemoModeRequest;
+    }
+
     if (forceReconnect) {
-        qDebug() << "[Auth] New Token generated: valid till" << validity << "(manual login) - forcing device reconnection";
+        qDebug() << "[Auth] New Token generated: valid till" << validity << "(Context:" << context << ") - forcing device reconnection";
     } else {
-        qDebug() << "[Auth] Token refreshed: valid till" << validity << "(background renewal) - no device reconnection";
+        qDebug() << "[Auth] Token refreshed: valid till" << validity << "(Context:" << context << ") - no device reconnection";
     }
     
     CustomSettings::setLoginToken(token);

@@ -181,6 +181,8 @@ void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex, const QString 
 
     QNetworkRequest request(url);
     m_networkManager->get(request);
+
+    qDebug() << "[FirmwareManager] Downloading firmware from:" << url.toString();
 }
 
 void FirmwareManager::onDeviceUIDError(const QString &message)
