@@ -133,8 +133,15 @@ void LoginDialog::reportFailure(const QString &uiMessage, const QString &failure
     // Reset flags on failure
     isPolling = false;
 
+    // Report failure but don't clear token if it was a background renewal
+    if (auth && auth->isRenewal()) {
+        qDebug() << "[Login] Background renewal failed (" << failureCode << ") - keeping existing token";
+        return;
+    }
+
     // Clear token on authentication failure
     CustomSettings::setLoginToken("none");
+    qDebug() << "[Login] Clearing stored token due to failure:" << failureCode;
     CustomSettings::setTokenValidity(QDateTime());
     CustomSettings::setLastLoginFailure(failureCode);
     CustomSettings::saveSettings();

@@ -21,14 +21,17 @@ public slots:
     void startPolling(bool immediate = true);
     // Stop polling
     void stopPolling();
-    // Convenience token refresh using values from settings; optional device name and MCU ID
-    void tokenRefresh(const QString &deviceName = QString(), const QString &mcuId = QString());
+    // Convenience token refresh using values from settings; optional device name and MCU ID; optional demo mode flag
+    void tokenRefresh(const QString &deviceName = QString(), const QString &mcuId = QString(), bool isDemoMode = false);
 
     // Get the persistent session ID
     QString getSessionId() const { return currentSessionId; }
     
     // Check if authentication was initiated manually by user
     bool isManualAuth() const { return authenticationSentManual; }
+
+    // Check if current request is a background renewal
+    bool isRenewal() const { return isRenewalRequest; }
 
 signals:
     void requestStarted();
@@ -51,6 +54,7 @@ private:
     QPointer<QNetworkReply> currentReply;
     bool authenticationSentManual {false};
     bool isRenewalRequest {false}; // Track if current request is a background renewal
+    bool isDemoModeRequest {false}; // Track if device was in demo mode during request
     QTimer *timeoutTimer {nullptr};
     QTimer *pollTimer {nullptr}; // Timer for polling auth status
     QString currentSessionId; // Session ID for polling

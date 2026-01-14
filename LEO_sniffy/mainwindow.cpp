@@ -26,6 +26,8 @@ Right - area for dock widgets
 #include <QToolTip>
 #include <QScreen>
 #include <QGuiApplication>
+#include <QPointer>
+#include "GUI/toastwidget.h"
 
 
 MainWindow::MainWindow(QWidget *parent):
@@ -233,6 +235,7 @@ void MainWindow::setupMainWindowComponents(){
     connect(logindial,&LoginDialog::loginInfoChangedReopen,this,&MainWindow::onLoginInfoChanged);
     connect(authenticator, &Authenticator::authenticationSucceeded, this, &MainWindow::updateLoginInfo);
     connect(authenticator, &Authenticator::popupMessageRequested, this, &MainWindow::showBottomLeftPopup);
+    connect(deviceMediator, &DeviceMediator::popupMessageRequested, this, &MainWindow::showBottomLeftPopup);
 
     QVBoxLayout *horizontalLayout;
     horizontalLayout = new QVBoxLayout();
@@ -277,15 +280,19 @@ void MainWindow::openSettingDialog()
 
 void MainWindow::showBottomLeftPopup(const QString &text)
 {
+    static QPointer<ToastWidget> activePopup;
     QTimer::singleShot(0, this, [this, text] {
+        if (activePopup) {
+            activePopup->close();
+        }
+        activePopup = new ToastWidget(this);
+        activePopup->showMessage(text, 10000);
+
         const int margin = 14;   // distance from edges
-        const int lift   = 36;   // raise a bit so it doesn't clip at the bottom
+        const int lift   = 50;   // raise a bit so it doesn't clip at the bottom
         QPoint local(margin, this->height() - margin - lift);
         QPoint global = this->mapToGlobal(local);
-        QFont tipFont = QApplication::font();
-        tipFont.setPointSize(10);
-        QToolTip::setFont(tipFont);
-        QToolTip::showText(global, text, this, QRect(), 10000);
+        activePopup->move(global);
     });
 }
 

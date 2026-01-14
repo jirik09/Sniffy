@@ -29,6 +29,7 @@ public:
     QList<QSharedPointer<AbstractModule>> getModulesList();   
     void ShowDeviceModule();
     bool getIsConnected() const;
+    bool getIsDemoMode() const;
     QString getDeviceName();
     QString getMcuId();
 
@@ -40,6 +41,7 @@ public:
 signals:
     void loadLayoutUponOpen(QString Devicename);
     void saveLayoutUponExit(void);
+    void popupMessageRequested(const QString &message);
 
 private:
     QList<DeviceDescriptor> deviceList;
@@ -49,6 +51,7 @@ private:
     Comms *communication;
 
     bool isConnected = false;
+    bool isDemoMode = false;
     int currentDeviceIndex = -1;
 
     // Manager handling legacy resources + GPIO masks aggregation and conflicts
@@ -56,6 +59,8 @@ private:
 
     // Shared async authenticator (runs in GUI thread, non-blocking)
     Authenticator *authenticator = nullptr;
+
+    QDateTime lastTokenRefresh;
 
 private slots:
     void parseData(QByteArray data);
