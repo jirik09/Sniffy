@@ -14,9 +14,6 @@ QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {
     [] { return QSharedPointer<AbstractTheme>(new Light); },
     [] { return QSharedPointer<AbstractTheme>(new Dawn); },
     [] { return QSharedPointer<AbstractTheme>(new Aurora); },
-    [] { return QSharedPointer<AbstractTheme>(new Neomorph); },
-    [] { return QSharedPointer<AbstractTheme>(new TealAnalytics); },
-    [] { return QSharedPointer<AbstractTheme>(new HudCyan); },
     [] { return QSharedPointer<AbstractTheme>(new MSDos); },
 };
 
@@ -28,9 +25,6 @@ QList<QString> *initThemesList(){
         themeList->append(((QString)(typeid(Light).name())).remove(0,1));
         themeList->append(((QString)(typeid(Dawn).name())).remove(0,1));
         themeList->append(((QString)(typeid(Aurora).name())).remove(0,1));
-        themeList->append(((QString)(typeid(Neomorph).name())).remove(0,1));
-        themeList->append(((QString)(typeid(TealAnalytics).name())).remove(0,1));
-        themeList->append(((QString)(typeid(HudCyan).name())).remove(0,1));
         themeList->append(((QString)(typeid(MSDos).name())).remove(0,1));
     }
     return themeList;
@@ -111,10 +105,7 @@ QString applyPathFallback(const QString &base, const QString &testFileName){
     struct PatternFallback { const char* pattern; const char* replacement; };
     static const PatternFallback orderedFallbacks[] = {
         {"/msdos/", "/dark/"}, // MSDOS theme currently reuses dark assets if not provided
-        {"/aurora/", "/dawn/"},
-        {"/neomorph/", "/light/"},
-        {"/tealanalytics/", "/dark/"},
-        {"/hudcyan/", "/dark/"}
+        {"/aurora/", "/dawn/"}
     };
     for(const auto &pf : orderedFallbacks){
         if(base.contains(pf.pattern)){
