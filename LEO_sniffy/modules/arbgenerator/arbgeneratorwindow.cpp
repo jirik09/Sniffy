@@ -66,6 +66,7 @@ ArbGeneratorWindow::~ArbGeneratorWindow()
 void ArbGeneratorWindow::restoreGUIAfterStartup()
 {
     setting->restoreGUI();
+    createSignalCallback();
 }
 
 
@@ -241,7 +242,8 @@ void ArbGeneratorWindow::createSignalCallback()
                     MCUData.append(tmpDAC);
                 }
                 x = (qreal)(div)/spec->periphClockFrequency*length;
-                chartSignal.append(QPointF(x,chartSignal[0].y()));
+                if(!chartSignal.isEmpty())
+                    chartSignal.append(QPointF(x,chartSignal[0].y()));
                 if(maxX<x)maxX=x;
 
                 generatorChartData->append(chartSignal);
@@ -258,7 +260,8 @@ void ArbGeneratorWindow::createSignalCallback()
                     chartSignal.append(QPointF(x,y));
                 }
                 x = (qreal)(div)/spec->periphClockFrequency*length;
-                chartSignal.append(QPointF(x,chartSignal[0].y()));
+                if(!chartSignal.isEmpty())
+                    chartSignal.append(QPointF(x,chartSignal[0].y()));
                 if(maxX<x) maxX=x;
 
                 generatorChartData->append(chartSignal);
