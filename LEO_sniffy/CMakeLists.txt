@@ -59,9 +59,11 @@ file(GLOB_RECURSE CPP_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/flasher/*.cpp"
 )
+list(FILTER CPP_FILES EXCLUDE REGEX "/(build|build_ninja|cmake-build-debug|CMakeFiles)/")
 file(GLOB_RECURSE C_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.c"
 )
+list(FILTER C_FILES EXCLUDE REGEX "/(build|build_ninja|cmake-build-debug|CMakeFiles)/")
 file(GLOB_RECURSE UI_FILES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.ui"
 )
@@ -188,6 +190,25 @@ endif()
 
 if(COMMAND qt_finalize_executable)
     qt_finalize_executable(${PROJECT_NAME})
+endif()
+
+# Deploy Qt dependencies on Windows
+if(WIN32)
+    find_package(Qt6Core REQUIRED)
+    get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+    
+    if(WINDEPLOYQT_EXECUTABLE)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+            "$<TARGET_FILE:${PROJECT_NAME}>"
+            "--dir" "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+            "--no-translations"
+            "--compiler-runtime"
+            COMMENT "Deploying Qt dependencies using windeployqt..."
+        )
+    endif()
 endif()
 
 # MinGW (GNU) assembler may hit 'too many sections'; enable big-obj to raise limits
