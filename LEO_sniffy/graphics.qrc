@@ -23,6 +23,7 @@
         <file>graphics/themes/dark/Nucleo-F303RE.png</file>
         <file>graphics/themes/dark/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/dark/Nucleo-G474RE.png</file>
+        <file>graphics/themes/dark/Nucleo-G474RE-pinout.png</file>
         <file>graphics/themes/dark/unknown_device.png</file>
         <file>graphics/themes/dark/icon_counter.png</file>
         <file>graphics/themes/dark/icon_signal_generator.png</file>
@@ -100,6 +101,7 @@
         <file>graphics/themes/light/Nucleo-F303RE.png</file>
         <file>graphics/themes/light/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/light/Nucleo-G474RE.png</file>
+        <file>graphics/themes/light/Nucleo-G474RE-pinout.png</file>
         <file>graphics/themes/light/separator.png</file>
         <file>graphics/themes/light/settings_gear.png</file>
         <file>graphics/themes/light/settings_horizontal.png</file>
@@ -147,6 +149,7 @@
         <file>graphics/themes/dawn/Nucleo-F303RE.png</file>
         <file>graphics/themes/dawn/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/dawn/Nucleo-G474RE.png</file>
+        <file>graphics/themes/dawn/Nucleo-G474RE-pinout.png</file>
         <file>graphics/themes/dawn/unknown_device.png</file>
         <file>graphics/themes/dawn/icon_counter.png</file>
         <file>graphics/themes/dawn/icon_signal_generator.png</file>
