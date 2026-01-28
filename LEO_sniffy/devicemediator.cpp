@@ -281,7 +281,7 @@ void DeviceMediator::parseData(QByteArray data)
     }
     if(dataHeader == Commands::ERROR){
         qDebug() << "ERROR " << dataToPass.toHex();
-        emit popupMessageRequested("Device Error: " + QString::fromUtf8(dataToPass));
+        emit popupMessageRequested("Device Error: " + QString::fromUtf8(dataToPass.toHex()));
         isDataPassed = true;
     }
     if(dataHeader == Commands::DEBUG){
