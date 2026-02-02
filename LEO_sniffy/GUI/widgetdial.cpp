@@ -99,9 +99,10 @@ void WidgetDial::setSelectedIndex(int index, bool silent){
     ui->label_value->setText(options.at(index).shownValue);
     selectedIndex = index;
     if(!silent){
-        emit valueChanged(options.at(index).realValue,optionalEmitParam);
+        emit valueChanged(options.at(selectedIndex).realValue,optionalEmitParam);
     }
 }
+
 
 void WidgetDial::setColor(QString color){
     ui->widget_dial->setStyleSheet(StyleHelper::dialWithTextColor(Graphics::palette().styleDial, color));

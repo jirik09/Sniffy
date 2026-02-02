@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QList>
 #include <QString>
-
 #include "customdial.h"
 #include "../graphics/graphics.h"
 

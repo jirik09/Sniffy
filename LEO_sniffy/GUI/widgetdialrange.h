@@ -5,7 +5,6 @@
 #include <QList>
 #include <QString>
 #include <QtMath>
-
 #include "customdial.h"
 #include "../graphics/graphics.h"
 #include "../modules/numberparser.h"
