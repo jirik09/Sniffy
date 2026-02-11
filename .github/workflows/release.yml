@@ -15,8 +15,8 @@ jobs:
           - os: windows-latest
              # Updated for Qt 6.8+
             qt_arch: win64_mingw
-          - os: ubuntu-latest
-            qt_arch: gcc_64
+          # - os: ubuntu-latest
+          #   qt_arch: gcc_64
 
     steps:
       - name: Checkout repository
@@ -32,7 +32,7 @@ jobs:
           target: 'desktop'
           arch: ${{ matrix.qt_arch }}
           modules: 'qtcharts qtserialport'
-          tools: 'tools_mingw'
+          tools: ${{ runner.os == 'Windows' && 'tools_mingw' || '' }}
           
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
@@ -45,6 +45,9 @@ jobs:
         uses: ashutoshvarma/setup-ninja@master
 
       - name: Configure CMake
+        env:
+          CXX: g++
+          CC: gcc
         run: cmake -S LEO_sniffy -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
