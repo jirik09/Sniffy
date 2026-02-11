@@ -12,10 +12,10 @@ jobs:
     strategy:
       matrix:
         include:
-          #- os: windows-latest
-          #  qt_arch: win64_mingw
-           - os: ubuntu-latest
-             qt_arch: linux_gcc_64
+          - os: windows-latest
+            qt_arch: win64_mingw
+          - os: ubuntu-latest
+            qt_arch: linux_gcc_64
 
     steps:
       - name: Checkout repository
