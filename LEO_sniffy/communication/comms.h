@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMutex>
 #include "connectiontype.h"
-#include "serialline.h"
+#include "serialLine.h"
 #include "devicescanner.h"
 #include <memory>
 
