@@ -157,7 +157,17 @@ elseif(UNIX AND NOT APPLE)
         message(STATUS "Found libstlink: ${STLINK_LIB}")
     endif()
 
-    target_include_directories(${PROJECT_NAME} PRIVATE ${LIBUSB_INCLUDE_DIRS})
+    # Find stlink headers (typically in /usr/include/stlink/)
+    find_path(STLINK_INCLUDE_DIR stlink.h
+        PATH_SUFFIXES stlink
+    )
+    if(STLINK_INCLUDE_DIR)
+        message(STATUS "Found stlink headers: ${STLINK_INCLUDE_DIR}")
+    else()
+        message(WARNING "stlink.h not found. Please install libstlink-dev.")
+    endif()
+
+    target_include_directories(${PROJECT_NAME} PRIVATE ${LIBUSB_INCLUDE_DIRS} ${STLINK_INCLUDE_DIR})
     set(EXTRA_LIBS ${LIBUSB_LIBRARIES} ${STLINK_LIB})
 endif()
 
