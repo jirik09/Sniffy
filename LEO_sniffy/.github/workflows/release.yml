@@ -1,0 +1,64 @@
+name: Release Installer
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger on tags like v1.0, v2.3.4
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            qt_arch: win64_mingw81
+          - os: ubuntu-latest
+            qt_arch: gcc_64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.2.0'
+          host: ${{ runner.os == 'Windows' && 'windows' || 'linux' }}
+          target: 'desktop'
+          arch: ${{ matrix.qt_arch }}
+          
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libgl1-mesa-dev libusb-1.0-0-dev libstlink-dev ninja-build
+
+      - name: Setup Ninja (Windows)
+        if: runner.os == 'Windows'
+        uses: ashutoshvarma/setup-ninja@master
+
+      - name: Configure CMake
+        run: cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Create Installer (CPack)
+        run: |
+          cd build
+          cpack -C Release -V
+        shell: bash
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            build/*.exe
+            build/*.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
