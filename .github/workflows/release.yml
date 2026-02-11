@@ -44,6 +44,10 @@ jobs:
         if: runner.os == 'Windows'
         uses: ashutoshvarma/setup-ninja@master
 
+      - name: Install NSIS (Windows)
+        if: runner.os == 'Windows'
+        run: choco install nsis
+
       # Explicitly find and set the Qt MinGW compiler on Windows
       # to avoid picking up the broken system path C:/mingw64/bin/gcc.exe
       - name: Setup MinGW (Windows)
