@@ -42,7 +42,7 @@ jobs:
         uses: ashutoshvarma/setup-ninja@master
 
       - name: Configure CMake
-        run: cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S LEO_sniffy -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
         run: cmake --build build --config Release
