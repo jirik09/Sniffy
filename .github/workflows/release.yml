@@ -32,7 +32,7 @@ jobs:
           target: 'desktop'
           arch: ${{ matrix.qt_arch }}
           modules: 'qtcharts qtserialport'
-          tools: ${{ runner.os == 'Windows' && 'tools_mingw' || '' }}
+          # Removed explicit 'tools_mingw' to let aqt install the correct version for Qt 6.7
           
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
@@ -56,23 +56,36 @@ jobs:
           $mwDirs = Get-ChildItem -Path "$qtRoot/Tools" -Directory -Filter "mingw*_64" -ErrorAction SilentlyContinue
           
           if ($mwDirs) {
-              # Pick the first one found (usually only one installed by the action)
-              $picked = $mwDirs | Select-Object -First 1
-              $binDir = Join-Path $picked.FullName "bin"
-              $gcc = Join-Path $binDir "gcc.exe"
-              $gpp = Join-Path $binDir "g++.exe"
+              # Pick the newest version numerically (e.g. 1120 over 730)
+              $picked = $mwDirs | ForEach-Object {
+                  $m = [regex]::Match($_.Name, 'mingw(\d+)_64')
+                  if ($m.Success) {
+                      [pscustomobject]@{ Dir = $_; VersionNum = [int]$m.Groups[1].Value }
+                  }
+              } | Sort-Object VersionNum -Descending | Select-Object -First 1
               
-              if ((Test-Path $gcc) -and (Test-Path $gpp)) {
-                  echo "Found MinGW toolchain at: $($picked.FullName)"
+              if ($picked) {
+                  $targetDir = $picked.Dir
+                  $binDir = Join-Path $targetDir.FullName "bin"
+                  $gcc = Join-Path $binDir "gcc.exe"
+                  $gpp = Join-Path $binDir "g++.exe"
                   
-                  # Set CMake variables for compiler
-                  echo "CC=$gcc" >> $env:GITHUB_ENV
-                  echo "CXX=$gpp" >> $env:GITHUB_ENV
-                  
-                  # Add to PATH so runtime DLLs are found
-                  echo "$binDir" >> $env:GITHUB_PATH
+                  if ((Test-Path $gcc) -and (Test-Path $gpp)) {
+                      echo "Found MinGW toolchain at: $($targetDir.FullName)"
+                      
+                      # Set CMake variables for compiler
+                      echo "CC=$gcc" >> $env:GITHUB_ENV
+                      echo "CXX=$gpp" >> $env:GITHUB_ENV
+                      
+                      # Add to PATH so runtime DLLs are found
+                      echo "$binDir" >> $env:GITHUB_PATH
+                  } else {
+                      echo "Error: gcc/g++ not found in $($binDir)"
+                      exit 1
+                  }
               } else {
-                  echo "Error: gcc/g++ not found in $($binDir)"
+                  echo "Error: Could not parse version from MinGW directories"
+                  $mwDirs | Format-List
                   exit 1
               }
           } else {
