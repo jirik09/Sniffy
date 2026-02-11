@@ -20665,7 +20665,7 @@ void QCPColorScaleAxisRectPrivate::draw(QCPPainter *painter)
   }
   
   // Replace deprecated mirrored with flipped in Qt6
-#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
   {
     Qt::Orientations orient;
     if (mirrorHorz) orient |= Qt::Horizontal;
@@ -26703,7 +26703,7 @@ void QCPColorMap::updateLegendIcon(Qt::TransformationMode transformMode, const Q
   {
     bool mirrorX = (keyAxis()->orientation() == Qt::Horizontal ? keyAxis() : valueAxis())->rangeReversed();
     bool mirrorY = (valueAxis()->orientation() == Qt::Vertical ? valueAxis() : keyAxis())->rangeReversed();
-    #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    #if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
       Qt::Orientations orient;
       if (mirrorX) orient |= Qt::Horizontal;
       if (mirrorY) orient |= Qt::Vertical;
@@ -26938,7 +26938,7 @@ void QCPColorMap::draw(QCPPainter *painter)
                                   coordsToPixels(mMapData->keyRange().upper, mMapData->valueRange().upper)).normalized();
     localPainter->setClipRect(tightClipRect, Qt::IntersectClip);
   }
-  #if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+  #if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
     Qt::Orientations orient;
     if (mirrorX) orient |= Qt::Horizontal;
     if (mirrorY) orient |= Qt::Vertical;
@@ -30371,7 +30371,7 @@ void QCPItemPixmap::updateScaledPixmap(QRect finalRect, bool flipHorz, bool flip
       mScaledPixmap = mPixmap.scaled(finalRect.size()*devicePixelRatio, mAspectRatioMode, mTransformationMode);
       if (flipHorz || flipVert)
       {
-#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#if QT_VERSION >= QT_VERSION_CHECK(6,9,0)
   Qt::Orientations orient;
   if (flipHorz) orient |= Qt::Horizontal;
   if (flipVert) orient |= Qt::Vertical;
