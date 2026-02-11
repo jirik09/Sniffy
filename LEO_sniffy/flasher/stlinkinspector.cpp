@@ -70,6 +70,9 @@ QString StLinkInspector::getDetectedMcu(stlink_t* stlink)
         case 0x463:
             family = "G474";
             break; // G47x/G48x
+        case 0x469:
+            family = "G474";
+            break; // G47x/G48x
         default:
             family = QString("UnknownID_%1").arg(stlink->chip_id, 0, 16);
             break;
