@@ -110,23 +110,55 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 
 # --- ST-Link & LibUSB Integration ---
-set(LIBUSB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/libusb")
-set(STLINK_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/stlink")
+if(WIN32)
+    set(LIBUSB_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/libusb")
+    set(STLINK_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/stlink")
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-    "${LIBUSB_ROOT}/include"
-    "${LIBUSB_ROOT}/include/libusb-1.0"
-    "${STLINK_ROOT}/include"
-)
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        "${LIBUSB_ROOT}/include"
+        "${LIBUSB_ROOT}/include/libusb-1.0"
+        "${STLINK_ROOT}/include"
+    )
 
-# Link libraries
-if(MSVC)
-    set(LIBUSB_LIB "${LIBUSB_ROOT}/lib/libusb-1.0.lib")
-    set(STLINK_LIB "${STLINK_ROOT}/lib/libstlink.a") 
-else()
-    # MinGW: Link directly against the DLL if .a is missing or incompatible
-    set(LIBUSB_LIB "${LIBUSB_ROOT}/bin/libusb-1.0.dll") 
-    set(STLINK_LIB "${STLINK_ROOT}/lib/libstlink.a")
+    # Link libraries
+    if(MSVC)
+        set(LIBUSB_LIB "${LIBUSB_ROOT}/lib/libusb-1.0.lib")
+        set(STLINK_LIB "${STLINK_ROOT}/lib/libstlink.a") 
+    else()
+        # MinGW: Link directly against the DLL if .a is missing or incompatible
+        set(LIBUSB_LIB "${LIBUSB_ROOT}/bin/libusb-1.0.dll") 
+        set(STLINK_LIB "${STLINK_ROOT}/lib/libstlink.a")
+    endif()
+
+    set(EXTRA_LIBS ${LIBUSB_LIB} ${STLINK_LIB})
+
+    # Copy DLLs to output directory
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${LIBUSB_ROOT}/bin/libusb-1.0.dll"
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${STLINK_ROOT}/bin/libstlink.dll"
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${STLINK_ROOT}/config/chips"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/config/chips"
+    )
+
+elseif(UNIX AND NOT APPLE)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
+    
+    # Try to find stlink library
+    find_library(STLINK_LIB NAMES stlink stlink-static)
+    if(NOT STLINK_LIB)
+        message(WARNING "libstlink not found. Please install libstlink-dev.")
+    else()
+        message(STATUS "Found libstlink: ${STLINK_LIB}")
+    endif()
+
+    target_include_directories(${PROJECT_NAME} PRIVATE ${LIBUSB_INCLUDE_DIRS})
+    set(EXTRA_LIBS ${LIBUSB_LIBRARIES} ${STLINK_LIB})
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -138,21 +170,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Charts
     Qt6::OpenGLWidgets
     Qt6::Network
-    ${LIBUSB_LIB}
-    ${STLINK_LIB}
+    ${EXTRA_LIBS}
 )
-
-# Copy DLLs to output directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${LIBUSB_ROOT}/bin/libusb-1.0.dll"
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${STLINK_ROOT}/bin/libstlink.dll"
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${STLINK_ROOT}/config/chips"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/config/chips"
 )
 
 # Windows GUI app (no console window)
@@ -215,3 +234,69 @@ endif()
 if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_compile_options(${PROJECT_NAME} PRIVATE -Wa,-mbig-obj)
 endif()
+
+# --- Installation & Deployment ---
+include(GNUInstallDirs)
+
+# 1. Install the main executable
+install(TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION bin
+    BUNDLE DESTINATION bin
+)
+
+# 2. Install ST-Link & LibUSB DLLs and Configs
+if(WIN32)
+    # Install the required DLLs next to the executable
+    install(FILES "${LIBUSB_ROOT}/bin/libusb-1.0.dll" DESTINATION bin)
+    install(FILES "${STLINK_ROOT}/bin/libstlink.dll" DESTINATION bin)
+    
+    # Install ST-Link config folder structure (config/chips)
+    install(DIRECTORY "${STLINK_ROOT}/config/chips" DESTINATION bin/config)
+    
+    # 3. Use windeployqt to automatically copy Qt DLLs during packaging
+    # We re-find here to ensure variables are available in this scope/if block
+    find_package(Qt6 COMPONENTS Core REQUIRED)
+    get_target_property(QT_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+    get_filename_component(QT_BIN_DIR "${QT_QMAKE_EXECUTABLE}" DIRECTORY)
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QT_BIN_DIR}")
+
+    if(WINDEPLOYQT_EXECUTABLE)
+        install(CODE "
+            message(STATUS \"Running windeployqt...\")
+            execute_process(
+                COMMAND \"${WINDEPLOYQT_EXECUTABLE}\"
+                        --no-translations
+                        --compiler-runtime
+                        --no-opengl-sw
+                        --dir \"\${CMAKE_INSTALL_PREFIX}/bin\"
+                        \"\${CMAKE_INSTALL_PREFIX}/bin/${PROJECT_NAME}.exe\"
+            )
+        ")
+    endif()
+endif()
+
+# --- CPack Setup (Installer Generation) ---
+set(CPACK_PACKAGE_NAME "LEO_sniffy")
+set(CPACK_PACKAGE_VENDOR "Sniffy")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Sniffy LEO Interface for Nucleo Boards")
+set(CPACK_PACKAGE_CONTACT "support@sniffy.com")
+
+# Set version from CMake project or manual
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+
+if(WIN32)
+    # Use NSIS (Nullsoft Scriptable Install System) to create a .exe installer
+    set(CPACK_GENERATOR "NSIS")
+    set(CPACK_NSIS_DISPLAY_NAME "LEO Sniffy")
+    set(CPACK_NSIS_PACKAGE_NAME "LEO Sniffy Installer")
+    set(CPACK_NSIS_MODIFY_PATH ON) # Allow adding to PATH
+    set(CPACK_NSIS_MENU_LINKS "bin/${PROJECT_NAME}.exe" "LEO Sniffy") # Add Start Menu shortcut
+elseif(UNIX AND NOT APPLE)
+    set(CPACK_GENERATOR "DEB")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Sniffy Team")
+    set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON) # Auto-detect dependencies
+endif()
+
+include(CPack)
