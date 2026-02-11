@@ -30,6 +30,7 @@ jobs:
           host: ${{ runner.os == 'Windows' && 'windows' || 'linux' }}
           target: 'desktop'
           arch: ${{ matrix.qt_arch }}
+          modules: 'qtcharts qtserialport'
           
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
