@@ -1,4 +1,4 @@
-#include "serialline.h"
+#include "serialLine.h"
 
 SerialLine::SerialLine(QObject *parent) : QObject(parent)
 {
