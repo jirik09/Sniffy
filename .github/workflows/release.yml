@@ -44,10 +44,44 @@ jobs:
         if: runner.os == 'Windows'
         uses: ashutoshvarma/setup-ninja@master
 
+      # Explicitly find and set the Qt MinGW compiler on Windows
+      # to avoid picking up the broken system path C:/mingw64/bin/gcc.exe
+      - name: Setup MinGW (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # Only look inside the ../Qt directory which is where install-qt-action installs release
+          $qtRoot = Resolve-Path "../Qt"
+          
+          # Find the Qt toolchain directory (e.g. mingw_1310_64)
+          $mwDirs = Get-ChildItem -Path "$qtRoot/Tools" -Directory -Filter "mingw*_64" -ErrorAction SilentlyContinue
+          
+          if ($mwDirs) {
+              # Pick the first one found (usually only one installed by the action)
+              $picked = $mwDirs | Select-Object -First 1
+              $binDir = Join-Path $picked.FullName "bin"
+              $gcc = Join-Path $binDir "gcc.exe"
+              $gpp = Join-Path $binDir "g++.exe"
+              
+              if ((Test-Path $gcc) -and (Test-Path $gpp)) {
+                  echo "Found MinGW toolchain at: $($picked.FullName)"
+                  
+                  # Set CMake variables for compiler
+                  echo "CC=$gcc" >> $env:GITHUB_ENV
+                  echo "CXX=$gpp" >> $env:GITHUB_ENV
+                  
+                  # Add to PATH so runtime DLLs are found
+                  echo "$binDir" >> $env:GITHUB_PATH
+              } else {
+                  echo "Error: gcc/g++ not found in $($binDir)"
+                  exit 1
+              }
+          } else {
+              echo "Error: No MinGW toolchain directory found in $qtRoot/Tools" 
+              Get-ChildItem -Path "$qtRoot/Tools" -Recurse
+              exit 1
+          }
+
       - name: Configure CMake
-        env:
-          CXX: g++
-          CC: gcc
         run: cmake -S LEO_sniffy -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
