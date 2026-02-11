@@ -32,7 +32,7 @@ jobs:
           target: 'desktop'
           arch: ${{ matrix.qt_arch }}
           modules: 'qtcharts qtserialport'
-          # Removed explicit 'tools_mingw' to let aqt install the correct version for Qt 6.7
+          tools: ${{ runner.os == 'Windows' && 'tools_mingw1310' || '' }}
           
       - name: Install Linux Dependencies
         if: runner.os == 'Linux'
