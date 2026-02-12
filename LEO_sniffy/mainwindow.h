@@ -18,6 +18,8 @@
 #include "GUI/widgetlogininfo.h"
 #include "authenticator.h"
 
+class ToastWidget; // Forward declaration
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -78,6 +80,8 @@ private:
     // Smart session: keep position but update size from session, expanding symmetrically and fitting screen
     void applySmartSessionSizeOnly();
 
+    QList<ToastWidget*> m_toasts;
+
 private slots:
     void onSettingsSaveSessionRequested();
     void onExitSaveSessionRequested();
@@ -92,7 +96,10 @@ private slots:
     void showBottomLeftPopup(const QString &text);
     //void onModuleControlShown();
 
+    void repositionToasts();
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
 };
 #endif // MAINWINDOW_H

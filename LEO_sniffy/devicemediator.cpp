@@ -98,17 +98,17 @@ void DeviceMediator::onConnectionOpened(bool success)
     communication->write(Commands::RESET_DEVICE+";");
 
     // Delay subsequent setup (token handshake, module wiring, layout load)
-    QTimer::singleShot(250, [this, devName]() {
+    QTimer::singleShot(50, [this, devName]() {
         // send and validate token
         if (CustomSettings::getLoginToken() != "none"){
             communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
             
             // Delay SYST:TIME to allow SYST:MAIL (Flash Hash Check) to complete
-            QTimer::singleShot(50, [this, devName]() {
+            QTimer::singleShot(100, [this, devName]() {
                 communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
                 
                 // Delay sending the token to allow MCU to process SYST:TIME (Flash Erase/Write)
-                QTimer::singleShot(100, [this, devName]() {
+                QTimer::singleShot(250, [this, devName]() {
                         QByteArray token = CustomSettings::getLoginToken();
                         // If token is hex string (256 chars), convert to bytes. 
                         // If it's already bytes (128 chars from @ByteArray), use as is.
@@ -172,6 +172,7 @@ void DeviceMediator::disconnectDevice()
 {
     if (isConnected)
     {
+        if (authenticator) authenticator->setConnectedDevice(QString(), QString());
         emit saveLayoutUponExit();
         disableModules();
         communication->close();
@@ -383,6 +384,8 @@ void DeviceMediator::onDeviceSpecificationReady()
     // Trigger async re-auth with Device_name and MCU_ID after device specifications are parsed
     // Limit refresh rate to prevent reconnection loops in Demo mode (where refresh -> reconnect -> refresh)
     if (authenticator) {
+        authenticator->setConnectedDevice(device->getName(), device->getMcuId());
+        
         if (lastTokenRefresh.isValid() && lastTokenRefresh.secsTo(QDateTime::currentDateTime()) < 30) {
             qDebug() << "Skipping automatic token refresh (last refresh < 30s ago)";
             return;
