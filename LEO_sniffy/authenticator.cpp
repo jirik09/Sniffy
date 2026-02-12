@@ -314,7 +314,7 @@ void Authenticator::onFinished(QNetworkReply *reply)
     emit authenticationSucceeded(validity, token, forceReconnect); //if forceReconnect is true this reconnect the device. 
     if(!forceReconnect){
         // request small popup only on automatic prolongation
-        const QString tip = QObject::tr("Session extended. Valid till: %1")
+        const QString tip = QObject::tr("Login valid till %1")
                                 .arg(validity.date().toString("dd.MM.yyyy"));
         emit popupMessageRequested(tip);
     }
