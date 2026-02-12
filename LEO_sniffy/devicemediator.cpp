@@ -2,6 +2,7 @@
 #include "resourcemanager.h"
 #include <QTimer>
 #include <QThread>
+#include <QStandardPaths>
 #include "authenticator.h"
 
 DeviceMediator::DeviceMediator(Authenticator *auth, QObject *parent) 
@@ -311,7 +312,7 @@ void DeviceMediator::finalizeDeviceOpen(int deviceIndex, QString devName)
     }
     else
     {
-        QString sessionFile = QApplication::applicationDirPath() + "/sessions/" + devName + ".json";
+        QString sessionFile = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/sessions/" + devName + ".json";
         QFile file(sessionFile);
         if (file.exists())
         {

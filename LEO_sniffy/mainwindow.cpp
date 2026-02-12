@@ -18,6 +18,7 @@ Right - area for dock widgets
 #include "GUI/widgetbuttons.h"
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QStandardPaths>
 #include <QJsonArray>
 #include <QUuid>
 #include <QDir>
@@ -80,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent):
 
 void MainWindow::restoreInitialGeometryFromNewestSession()
 {
-    const QString sessionsPath = QApplication::applicationDirPath() + "/sessions";
+    const QString sessionsPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/sessions";
     QDir dir(sessionsPath);
     if (!dir.exists()) return;
 
@@ -395,7 +396,7 @@ void MainWindow::onExitSaveSessionRequested()
         if (!devName.isEmpty())
         {
             // Ensure sessions directory exists before attempting to save
-            const QString sessionsPath = QApplication::applicationDirPath() + "/sessions";
+            const QString sessionsPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/sessions";
             QDir sessionsDir(sessionsPath);
             if (!sessionsDir.exists()) {
                 // Try to create the sessions directory; if it fails, skip saving
@@ -518,7 +519,7 @@ void MainWindow::onOpenLoadSessionRequested(QString deviceName)
         fileName = ":/default_layout.json";
     } else {
         // Load device-specific session
-        fileName = QApplication::applicationDirPath() + "/sessions/" + deviceName + ".json";
+        fileName = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/sessions/" + deviceName + ".json";
     }
     
     QFile file(fileName);

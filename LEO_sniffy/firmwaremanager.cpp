@@ -5,6 +5,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QUrlQuery>
+#include <QStandardPaths>
+#include <QDir>
+#include <QCoreApplication>
 
 FirmwareManager::FirmwareManager(Authenticator *auth, QObject *parent) : QObject(parent),
                                                     m_flashInProgress(false)
@@ -148,7 +151,7 @@ void FirmwareManager::onDeviceUIDAvailable(const QString &uidHex, const QString 
     m_lastReadUidHex = uidHexUpper;
 
     // Check local
-    QString appDir = QCoreApplication::applicationDirPath();
+    QString appDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
     QString localBinPath = appDir + "/" + uidHexUpper + ".bin";
 
     if (QFile::exists(localBinPath))
@@ -286,7 +289,11 @@ void FirmwareManager::onFirmwareDownloadFinished(QNetworkReply *reply)
     }
 
     // Save to file with the ORIGINAL filename
-    QString appDir = QCoreApplication::applicationDirPath();
+    QString appDir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir dir(appDir);
+    if (!dir.exists()) {
+        dir.mkpath(appDir);
+    }
     QString filePath = appDir + "/" + filename;
 
     QFile file(filePath);

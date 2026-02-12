@@ -79,6 +79,12 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/graphics.qrc")
     list(APPEND QRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/graphics.qrc")
 endif()
 
+# Windows Icon Resource
+set(RC_FILES)
+if(WIN32 AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/leo_sniffy.rc")
+    list(APPEND RC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/leo_sniffy.rc")
+endif()
+
 # Create the application target
 if(COMMAND qt_add_executable)
     qt_add_executable(${PROJECT_NAME}
@@ -88,6 +94,7 @@ if(COMMAND qt_add_executable)
         ${UI_FILES}
         ${HDR_FILES}
         ${QRC_FILES}
+        ${RC_FILES}
     )
 else()
     add_executable(${PROJECT_NAME}
@@ -96,6 +103,7 @@ else()
         ${UI_FILES}
         ${HDR_FILES}
         ${QRC_FILES}
+        ${RC_FILES}
     )
 endif()
 
@@ -290,6 +298,9 @@ set(CPACK_PACKAGE_VENDOR "Sniffy")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Sniffy LEO Interface for Nucleo Boards")
 set(CPACK_PACKAGE_CONTACT "support@sniffy.com")
 
+# License File (GPLv3)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE")
+
 # Set version from CMake project or manual
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
@@ -300,6 +311,16 @@ if(WIN32)
     set(CPACK_GENERATOR "NSIS")
     set(CPACK_NSIS_DISPLAY_NAME "LEO Sniffy")
     set(CPACK_NSIS_PACKAGE_NAME "LEO Sniffy Installer")
+    
+    # Icons for Installer
+    set(WIN_ICON "${CMAKE_CURRENT_SOURCE_DIR}/graphics/logo.ico")
+    if(EXISTS "${WIN_ICON}")
+        set(CPACK_NSIS_MUI_ICON "${WIN_ICON}")
+        set(CPACK_NSIS_MUI_UNIICON "${WIN_ICON}")
+        # Add uninstall icon (optional, reuses same icon)
+        set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\${PROJECT_NAME}.exe")
+    endif()
+
     set(CPACK_NSIS_MODIFY_PATH ON) # Allow adding to PATH
     set(CPACK_NSIS_MENU_LINKS "bin/${PROJECT_NAME}.exe" "LEO Sniffy") # Add Start Menu shortcut
 elseif(UNIX AND NOT APPLE)
