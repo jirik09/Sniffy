@@ -53,7 +53,7 @@ void Comms::scanForDevices(){
 
 void Comms::close(){
     emit closeLine();
-    //devScanner.searchForDevices(true);
+    devScanner.searchForDevices(true);
 }
 
 void Comms::write(QByteArray module, QByteArray feature, QByteArray param){

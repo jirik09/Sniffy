@@ -21,7 +21,7 @@ public:
     QString getName();
     QString getMcuId();
 
-    void updateGUIDeviceList(QList<DeviceDescriptor> deviceList);
+    void updateGUIDeviceList(QList<DeviceDescriptor> deviceList, bool autoConnectSingle = false);
 
     void errorHandler(QByteArray error);
 

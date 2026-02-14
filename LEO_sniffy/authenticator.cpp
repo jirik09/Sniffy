@@ -289,14 +289,16 @@ void Authenticator::onFinished(QNetworkReply *reply)
     QString context = jsonObj["context"].toString();
     bool forceReconnect = false;
     
-    if (context == "login") {
-        forceReconnect = true;
-    } else if (context == "demo") {
-        // If we are already in demo mode, staying in demo doesn't require reconnect
-        forceReconnect = !isDemoModeRequest;
-    } else if (context == "extension") {
-        // Reconnect if currently in demo mode (to upgrade to full)
-        forceReconnect = isDemoModeRequest;
+    if (!isRenewalRequest) {
+        if (context == "login") {
+            forceReconnect = true;
+        } else if (context == "demo") {
+            // If we are already in demo mode, staying in demo doesn't require reconnect
+            forceReconnect = !isDemoModeRequest;
+        } else if (context == "extension") {
+            // Reconnect if currently in demo mode (to upgrade to full)
+            forceReconnect = isDemoModeRequest;
+        }
     }
 
     if (forceReconnect) {

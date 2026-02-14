@@ -34,7 +34,7 @@ void Device::deviceConnection(int buttonIndex){
     }
 }
 
-void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
+void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList, bool autoConnectSingle){
     QList<DeviceDescriptor> list = deviceList;
     DeviceDescriptor devStr;
     int i = 0;
@@ -47,12 +47,14 @@ void Device::updateGUIDeviceList(QList<DeviceDescriptor> deviceList){
     if(deviceWindow->deviceSelection->count()==0){
         deviceWindow->deviceSelection->addOption("No devices were found",0);
         deviceWindow->deviceConnectButton->setDisabledButton(false,1); //enable scan button
-    }else if(deviceWindow->deviceSelection->count()==1){
+    }else if(deviceWindow->deviceSelection->count()==1 && autoConnectSingle){
+        // Exactly one device and auto-connect is allowed (startup or explicit Scan)
         connectDevice(0);
         deviceWindow->deviceConnectButton->setText("Disconnect",0);
         deviceWindow->deviceConnectButton->setDisabledButton(false,0); //enable disconnect button
     }else{
-        deviceWindow->deviceConnectButton->setDisabledButton(false,0); //enable both
+        // Multiple devices or auto-connect suppressed — let the user choose.
+        deviceWindow->deviceConnectButton->setDisabledButton(false,0);
         deviceWindow->deviceConnectButton->setDisabledButton(false,1);
     }
 }
@@ -66,6 +68,7 @@ void Device::connectDevice(int index){
     emit openDevice(index);
     deviceWindow->deviceConnectButton->setText("Disconnect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(true,1);//disable scan
+    deviceWindow->deviceSelection->setEnabled(false); // lock dropdown while connected
 }
 
 void Device::disconnectDevice(){
@@ -73,6 +76,7 @@ void Device::disconnectDevice(){
     emit closeDevice();
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
+    deviceWindow->deviceSelection->setEnabled(true); // unlock dropdown
     setIcon(Graphics::getGraphicsPath()+"icon_not_connected.png");
     setModuleName("Device");
 }

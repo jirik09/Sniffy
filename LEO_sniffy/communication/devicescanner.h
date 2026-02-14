@@ -26,6 +26,7 @@ private:
     bool deviceListsEqual(QList<DeviceDescriptor> &listA, QList<DeviceDescriptor> &listB);
     std::atomic<bool> isSearchEnaled { false };
     std::atomic<bool> isRunning { true };
+    std::atomic<bool> shouldClearList { false };
     QList<DeviceDescriptor> currentDeviceList;
     SerialLine serLine;
 

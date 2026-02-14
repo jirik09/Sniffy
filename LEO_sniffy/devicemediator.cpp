@@ -19,6 +19,12 @@ DeviceMediator::DeviceMediator(Authenticator *auth, QObject *parent)
     connect(device, &Device::closeDevice, this, &DeviceMediator::close);
     connect(device, &Device::deviceSpecificationReady, this, &DeviceMediator::onDeviceSpecificationReady);
 
+    // Safety timer: if FW never sends TKN_ACK, proceed after timeout
+    tokenAckTimer = new QTimer(this);
+    tokenAckTimer->setSingleShot(true);
+    tokenAckTimer->setInterval(3000); // 3 seconds should be more than enough for flash operations
+    connect(tokenAckTimer, &QTimer::timeout, this, &DeviceMediator::onTokenAckTimeout);
+
     // initialize ResourceManager aggregates
     resourceManager.reset();
 }
@@ -56,14 +62,21 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::getModulesList()
 
 void DeviceMediator::ScanDevices()
 {
+    // Explicit Scan button press: never auto-connect.
+    // The user wants to see the list and choose. Auto-connect is only
+    // for the initial background scan at startup (default true).
+    autoConnectOnSingleDevice = false;
     communication->scanForDevices();
 }
 
 void DeviceMediator::newDeviceList(QList<DeviceDescriptor> deviceList)
 {
+    // Ignore scan results while a device is connected (or mid-auth handshake).
+    if (isConnected || waitingForTokenAck)
+        return;
+
     this->deviceList = deviceList;
-    // qDebug() << "scanned device list received in device.cpp";
-    device->updateGUIDeviceList(deviceList);
+    device->updateGUIDeviceList(deviceList, autoConnectOnSingleDevice);
 }
 
 void DeviceMediator::openDevice(int deviceIndex)
@@ -92,35 +105,33 @@ void DeviceMediator::onConnectionOpened(bool success)
     // Clear previous right-side specifications before we start receiving CFG_/ACK_ again
     device->clearAllModuleDescriptions();
 
-    // Immediately request MCU reset so it starts in known state. While we wait 250ms
-    // the layout/config files can be opened and processed. After 250ms send the
-    // login token (if present), attach modules to the comms and load the layout.
+    // Immediately request MCU reset so it starts in known state.
+    // USB-CDC re-enumeration takes ~100ms, give it 150ms total.
     communication->write(Commands::RESET_DEVICE+";");
 
     // Delay subsequent setup (token handshake, module wiring, layout load)
-    QTimer::singleShot(250, [this, devName]() {
+    QTimer::singleShot(150, [this, devName]() {
         // send and validate token
-        if (CustomSettings::getLoginToken() != "none"){
+        if (CustomSettings::getLoginToken() != "none")
+        {
             communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
-            
-            // Delay SYST:TIME to allow SYST:MAIL (Flash Hash Check) to complete
-            QTimer::singleShot(50, [this, devName]() {
-                communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
-                
-                // Delay sending the token to allow MCU to process SYST:TIME (Flash Erase/Write)
-                QTimer::singleShot(100, [this, devName]() {
-                        QByteArray token = CustomSettings::getLoginToken();
-                        // If token is hex string (256 chars), convert to bytes. 
-                        // If it's already bytes (128 chars from @ByteArray), use as is.
-                        if (token.size() == 256) {
-                            token = QByteArray::fromHex(token);
-                        }
-                        
-                        communication->write("TKN_:DATA:" + token + ";");
-                        
-                        finalizeDeviceOpen(currentDeviceIndex, devName);
-                });
-            });
+            communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+
+            QByteArray token = CustomSettings::getLoginToken();
+            // If token is hex string (256 chars), convert to bytes.
+            // If it's already bytes (128 chars from @ByteArray), use as is.
+            if (token.size() == 256) {
+                token = QByteArray::fromHex(token);
+            }
+
+            communication->write("TKN_:DATA:" + token + ";");
+
+            // Wait for the FW to send TKN_ACK (or DEMO) before wiring modules.
+            waitingForTokenAck = true;
+            pendingDevName = devName;
+            pendingDeviceIndex = currentDeviceIndex;
+            tokenAckTimer->start(); // safety timeout
+            qDebug() << "[Auth] Token sent, waiting for FW ACK before loading modules...";
         } else {
             finalizeDeviceOpen(currentDeviceIndex, devName);
         }
@@ -139,15 +150,14 @@ void DeviceMediator::reopenDeviceAfterLogin()
         return;
     }
     close();
-    if (currentDeviceIndex >= 0 && currentDeviceIndex < deviceList.size()) {
-            openDevice(currentDeviceIndex);
-        }
-
-    /*QTimer::singleShot(250, [this]() {
+    // Delay re-open so the serial thread has time to actually close the port.
+    // Without this delay, openDevice() would try to open the same COM port
+    // while the old handle is still being torn down in the serial thread.
+    QTimer::singleShot(300, this, [this]() {
         if (currentDeviceIndex >= 0 && currentDeviceIndex < deviceList.size()) {
             openDevice(currentDeviceIndex);
         }
-    });*/
+    });
 }
 
 void DeviceMediator::disableModules()
@@ -231,6 +241,14 @@ void DeviceMediator::releaseConflictingModulesCallback(QString moduleName, int r
 
 void DeviceMediator::close()
 {
+    // Cancel any pending token ACK wait
+    waitingForTokenAck = false;
+    tokenAckTimer->stop();
+
+    // Suppress auto-connect after manual disconnect so the background scanner
+    // doesn't immediately reconnect to the device the user just left.
+    autoConnectOnSingleDevice = false;
+
     disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
     disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
     disconnectDevice();
@@ -239,6 +257,9 @@ void DeviceMediator::close()
 
 void DeviceMediator::closeApp()
 {
+    waitingForTokenAck = false;
+    tokenAckTimer->stop();
+
     disconnect(communication, &Comms::newData, this, &DeviceMediator::parseData);
     disconnect(communication, &Comms::communicationError, this, &DeviceMediator::handleError);
     disconnectDevice();
@@ -279,11 +300,31 @@ void DeviceMediator::parseData(QByteArray data)
         } else {
             isDemoMode = false;
         }
+
+        // Deterministic auth: FW has finished all flash operations and verified
+        // the token. NOW it's safe to wire modules — they will get correct
+        // auth-required responses instead of IACT.
+        if (waitingForTokenAck) {
+            waitingForTokenAck = false;
+            tokenAckTimer->stop();
+            qDebug() << "[Auth] FW ACK received, proceeding to load modules (demo=" << isDemoMode << ")";
+            finalizeDeviceOpen(pendingDeviceIndex, pendingDevName);
+        }
     }
     if(dataHeader == Commands::ERROR){
         qDebug() << "ERROR " << dataToPass.toHex();
         emit popupMessageRequested("Device Error: " + QString::fromUtf8(dataToPass.toHex()));
         isDataPassed = true;
+
+        // If we were waiting for token ACK and got an error instead, the auth
+        // failed on the FW side. Proceed with module loading anyway — modules
+        // requiring auth will simply be inactive (demo/limited mode).
+        if (waitingForTokenAck) {
+            waitingForTokenAck = false;
+            tokenAckTimer->stop();
+            qWarning() << "[Auth] FW returned error during token verification — loading modules without auth";
+            finalizeDeviceOpen(pendingDeviceIndex, pendingDevName);
+        }
     }
     if(dataHeader == Commands::DEBUG){
         qDebug() << "DEVICE DEBUG " << dataToPass;
@@ -378,10 +419,21 @@ void DeviceMediator::setResourcesInUse(ResourceSet resources)
     resourceManager.reserve(resources);
 }
 
+void DeviceMediator::onTokenAckTimeout()
+{
+    if (!waitingForTokenAck) return; // already handled
+    waitingForTokenAck = false;
+    qWarning() << "[Auth] FW did not send TKN_ACK within timeout — proceeding with module load anyway";
+    finalizeDeviceOpen(pendingDeviceIndex, pendingDevName);
+}
+
 void DeviceMediator::onDeviceSpecificationReady()
 {
-    // Trigger async re-auth with Device_name and MCU_ID after device specifications are parsed
-    // Limit refresh rate to prevent reconnection loops in Demo mode (where refresh -> reconnect -> refresh)
+    // Trigger async token refresh with Device_name and MCU_ID.
+    // IMPORTANT: This refresh is automatic (background). It must NEVER force a
+    // device reconnection — only manual logins through LoginDialog should reopen.
+    // The refresh just extends the session silently; the new token will be used
+    // on the next device open.
     if (authenticator) {
         if (lastTokenRefresh.isValid() && lastTokenRefresh.secsTo(QDateTime::currentDateTime()) < 30) {
             qDebug() << "Skipping automatic token refresh (last refresh < 30s ago)";
