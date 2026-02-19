@@ -214,7 +214,7 @@ void FirmwareManager::onAuthSucceeded(const QDateTime &validity, const QByteArra
     Q_UNUSED(validity);
     Q_UNUSED(token);
 
-    emit statusMessage("Remote auth OK. (Placeholder flow)", Graphics::palette().running, MsgSuccess);
+    emit statusMessage("Remote auth OK", Graphics::palette().running, MsgSuccess);
 
     // End operation cleanly for now
     m_flashInProgress = false;

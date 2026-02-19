@@ -33,18 +33,31 @@ int SerialLine::getAvailableDevices(QList<DeviceDescriptor> *list, int setFirstI
         sPort->setStopBits(QSerialPort::StopBits::OneStop);
 
         if(sPort->open(QIODevice::ReadWrite)){
+            // Brief settle for USB-CDC link after open
+            QThread::msleep(20);
             sPort->clear();
+            sPort->readAll();   // discard any stale OS-driver buffer data
+
             sPort->write("IDN?;");
             sPort->waitForBytesWritten(100);
-            sPort->waitForReadyRead(150);
-            QThread::msleep(250);
 
-            received = sPort->readAll();
+            // Read in a loop until we see the full delimiter or time out.
+            // USB-CDC can fragment responses, so a single waitForReadyRead
+            // + readAll often returns an incomplete message.
+            received.clear();
+            int elapsed = 0;
+            const int timeoutMs = 300;
+            const int stepMs = 30;
+            while (elapsed < timeoutMs) {
+                if (sPort->waitForReadyRead(stepMs)) {
+                    received.append(sPort->readAll());
+                    if (received.size() > 4 && received.right(4) == delimiter)
+                        break; // full response received
+                }
+                elapsed += stepMs;
+            }
 
             if (received.length()>16 && received.left(4)=="SYST" && received.right(4)==delimiter){
-                sPort->write("RES!;");
-                sPort->waitForBytesWritten();
-
                 DeviceDescriptor desc;
                 desc.port = sPort->portName();
                 desc.speed = sPort->baudRate();
@@ -107,6 +120,11 @@ void SerialLine::closeLine(){
 }
 
 void SerialLine::handleError(QSerialPort::SerialPortError error){
+    // QSerialPort emits errorOccurred(NoError) when the error state clears.
+    // Treating that as a fatal error would trigger a spurious disconnect.
+    if (error == QSerialPort::NoError)
+        return;
+
     qDebug()<<"FATAL ERROR occured on serial line" << error;
     emit serialLineError("SerialLine Error");
 }

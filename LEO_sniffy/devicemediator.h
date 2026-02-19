@@ -62,6 +62,17 @@ private:
 
     QDateTime lastTokenRefresh;
 
+    // Deterministic authentication: wait for FW token ACK before wiring modules
+    bool waitingForTokenAck = false;
+    QTimer *tokenAckTimer = nullptr;
+    QString pendingDevName;      // device name saved while waiting for ACK
+    int     pendingDeviceIndex = -1; // device index saved while waiting for ACK
+
+    // Auto-connect when exactly one device is found.
+    // true at startup and after user clicks Scan; false after manual disconnect
+    // (so the user isn't immediately reconnected to the device they just left).
+    bool autoConnectOnSingleDevice = true;
+
 private slots:
     void parseData(QByteArray data);
     void newDeviceList(QList<DeviceDescriptor> deviceList);
@@ -74,6 +85,7 @@ private slots:
     void onDeviceSpecificationReady();
     void finalizeDeviceOpen(int deviceIndex, QString devName);
     void onConnectionOpened(bool success);
+    void onTokenAckTimeout();
 
 public slots:
     void close();
