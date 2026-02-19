@@ -295,13 +295,8 @@ void Authenticator::onFinished(QNetworkReply *reply)
 
     // Determine reconnection logic based on server context
     QString context = jsonObj["context"].toString();
+    qDebug() << "[Auth] New Token generated: valid till" << validity.toString("yyyy-MM-dd") << "(Context:" << context << ") " << (connectedInDemoMode ? "- forcing device reconnection" : "- no device reconnection");
 
-    //isDemoModeRequest
-
-
-        qDebug() << "[Auth] New Token generated: valid till" << validity.toString("yyyy-MM-dd") << "(Context:" << context << ") " << (connectedInDemoMode ? "- forcing device reconnection" : "- no device reconnection");
-
-    
     CustomSettings::setLoginToken(token);
     CustomSettings::setTokenValidity(validity);
     CustomSettings::setTokenGeneratedDate(QDate::currentDate());

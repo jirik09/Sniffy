@@ -7,8 +7,7 @@
 
 ToastWidget::ToastWidget(QWidget *parent) : QWidget(parent)
 {
-    // Qt::ToolTip makes it a top-level window but transient
-    setWindowFlags(Qt::FramelessWindowHint | Qt::ToolTip | Qt::WindowStaysOnTopHint);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
     setAttribute(Qt::WA_DeleteOnClose);
     setAttribute(Qt::WA_ShowWithoutActivating);
     setAttribute(Qt::WA_TranslucentBackground);
