@@ -14,6 +14,7 @@ public:
     explicit ToastWidget(QWidget *parent = nullptr);
 
     void showMessage(const QString &text, int durationMs = 10000);
+    QString text() const; // For deduplication
 
 protected:
     void paintEvent(QPaintEvent *event) override;

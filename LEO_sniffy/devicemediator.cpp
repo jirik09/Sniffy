@@ -110,11 +110,36 @@ void DeviceMediator::onConnectionOpened(bool success)
     communication->write(Commands::RESET_DEVICE+";");
 
     // Delay subsequent setup (token handshake, module wiring, layout load)
+<<<<<<< bug_fix_login_toastwidget
+    QTimer::singleShot(50, [this, devName]() {
+=======
     QTimer::singleShot(150, [this, devName]() {
+>>>>>>> master
         // send and validate token
         if (CustomSettings::getLoginToken() != "none")
         {
             communication->write("SYST:MAIL:" + CustomSettings::getUserEmail().toUtf8() + ";");
+<<<<<<< bug_fix_login_toastwidget
+            
+            // Delay SYST:TIME to allow SYST:MAIL (Flash Hash Check) to complete
+            QTimer::singleShot(100, [this, devName]() {
+                communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
+                
+                // Delay sending the token to allow MCU to process SYST:TIME (Flash Erase/Write)
+                QTimer::singleShot(250, [this, devName]() {
+                        QByteArray token = CustomSettings::getLoginToken();
+                        // If token is hex string (256 chars), convert to bytes. 
+                        // If it's already bytes (128 chars from @ByteArray), use as is.
+                        if (token.size() == 256) {
+                            token = QByteArray::fromHex(token);
+                        }
+                        
+                        communication->write("TKN_:DATA:" + token + ";");
+                        
+                        finalizeDeviceOpen(currentDeviceIndex, devName);
+                });
+            });
+=======
             communication->write("SYST:TIME:" + QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toUtf8() + ";");
 
             QByteArray token = CustomSettings::getLoginToken();
@@ -132,6 +157,7 @@ void DeviceMediator::onConnectionOpened(bool success)
             pendingDeviceIndex = currentDeviceIndex;
             tokenAckTimer->start(); // safety timeout
             qDebug() << "[Auth] Token sent, waiting for FW ACK before loading modules...";
+>>>>>>> master
         } else {
             finalizeDeviceOpen(currentDeviceIndex, devName);
         }
@@ -182,6 +208,7 @@ void DeviceMediator::disconnectDevice()
 {
     if (isConnected)
     {
+        if (authenticator) authenticator->setConnectedDevice(QString(), QString());
         emit saveLayoutUponExit();
         disableModules();
         communication->close();
@@ -435,6 +462,8 @@ void DeviceMediator::onDeviceSpecificationReady()
     // The refresh just extends the session silently; the new token will be used
     // on the next device open.
     if (authenticator) {
+        authenticator->setConnectedDevice(device->getName(), device->getMcuId());
+        
         if (lastTokenRefresh.isValid() && lastTokenRefresh.secsTo(QDateTime::currentDateTime()) < 30) {
             qDebug() << "Skipping automatic token refresh (last refresh < 30s ago)";
             return;

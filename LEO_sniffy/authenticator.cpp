@@ -46,6 +46,13 @@ void Authenticator::checkLogin(const QString &email)
     startRequest(email, QString(), QString(), false);
 }
 
+void Authenticator::setConnectedDevice(const QString &name, const QString &id)
+{
+    qDebug() << "[Auth] Device info updated:" << name << id;
+    currentDeviceName = name;
+    currentMcuId = id;
+}
+
 void Authenticator::startPolling(bool immediate)
 {
     qDebug() << "[Auth] Starting polling for session:" << currentSessionId << "Immediate:" << immediate;
@@ -89,6 +96,10 @@ void Authenticator::startRequest(const QString &email, const QString &deviceName
         // Reset demo mode request flag for manual/polling requests
         isDemoModeRequest = false;
     }
+    qCritical() << "[Auth] Starting" << (isRenewal ? "renewal" : "auth check") << "request for" << email 
+                << "Device:" << deviceName << "MCU_ID:" << mcuId 
+                << "Session:" << currentSessionId 
+                << "Demo mode request:" << isDemoModeRequest;
     
     // Use auth_check for renewal or polling, auth_start is only used from browser
     QUrl authUrl(QStringLiteral("https://sniffy.cz/scripts/sniffy_auth_check.php"));
@@ -136,7 +147,7 @@ void Authenticator::checkAuthStatus()
     
     const QString email = CustomSettings::getUserEmail();
     qDebug() << "[Auth] Polling auth status for session:" << currentSessionId;
-    startRequest(email, QString(), QString(), false);
+    startRequest(email, currentDeviceName, currentMcuId, false);
 }
 
 void Authenticator::onFinished(QNetworkReply *reply)
@@ -316,7 +327,7 @@ void Authenticator::onFinished(QNetworkReply *reply)
     emit authenticationSucceeded(validity, token, forceReconnect); //if forceReconnect is true this reconnect the device. 
     if(!forceReconnect){
         // request small popup only on automatic prolongation
-        const QString tip = QObject::tr("Session extended. Valid till: %1")
+        const QString tip = QObject::tr("Login valid till %1")
                                 .arg(validity.date().toString("dd.MM.yyyy"));
         emit popupMessageRequested(tip);
     }

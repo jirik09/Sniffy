@@ -60,6 +60,11 @@ void ToastWidget::showMessage(const QString &text, int durationMs)
         timer->start(durationMs);
 }
 
+QString ToastWidget::text() const
+{
+    return label->text();
+}
+
 void ToastWidget::fadeOut()
 {
     QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);

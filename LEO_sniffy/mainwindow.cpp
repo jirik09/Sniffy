@@ -281,20 +281,51 @@ void MainWindow::openSettingDialog()
 
 void MainWindow::showBottomLeftPopup(const QString &text)
 {
-    static QPointer<ToastWidget> activePopup;
-    QTimer::singleShot(0, this, [this, text] {
-        if (activePopup) {
-            activePopup->close();
-        }
-        activePopup = new ToastWidget(this);
-        activePopup->showMessage(text, 10000);
+    // Deduplicate: check existing messages
+    for (auto *t : m_toasts) {
+        if (t && t->text() == text)
+            return;
+    }
 
-        const int margin = 14;   // distance from edges
-        const int lift   = 50;   // raise a bit so it doesn't clip at the bottom
-        QPoint local(margin, this->height() - margin - lift);
-        QPoint global = this->mapToGlobal(local);
-        activePopup->move(global);
+    ToastWidget *toast = new ToastWidget(this);
+    m_toasts.append(toast);
+
+    connect(toast, &QObject::destroyed, this, [this, toast]() {
+        // If toast is destroyed, remove from list and update layout
+        m_toasts.removeAll(toast);
+        repositionToasts();
     });
+
+    toast->showMessage(text, 10000);
+    repositionToasts();
+}
+
+void MainWindow::repositionToasts()
+{
+    const int margin = 20;
+    const int lift = 85;
+    int currentY = this->height() - margin - lift;
+    const int spacing = 10;
+
+    // Stack from bottom (oldest) to top (newest)
+    for (auto *w : m_toasts) {
+        if (!w) continue;
+        // height is updated by showMessage -> adjustSize
+        int h = w->height(); 
+        
+        // The toast's top-left will be at (margin, currentY - h)
+        QPoint local(margin, currentY - h);
+        QPoint global = this->mapToGlobal(local);
+        w->move(global);
+
+        currentY -= (h + spacing);
+    }
+}
+
+void MainWindow::moveEvent(QMoveEvent *event)
+{
+    QMainWindow::moveEvent(event);
+    repositionToasts();
 }
 
 void MainWindow::setMenuWide(){
@@ -379,6 +410,7 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
     enforceLeftMenuWidth();
+    repositionToasts();
 }
 
 void MainWindow::onSettingsSaveSessionRequested()
