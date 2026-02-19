@@ -299,7 +299,7 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Sniffy LEO Interface for Nucleo Boards")
 set(CPACK_PACKAGE_CONTACT "support@sniffy.com")
 
 # License File (GPLv3)
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
 
 # Set version from CMake project or manual
 set(CPACK_PACKAGE_VERSION_MAJOR "1")
