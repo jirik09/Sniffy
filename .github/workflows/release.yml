@@ -115,6 +115,7 @@ jobs:
         with:
           files: |
             build/*.exe
+            build/*.msi
             build/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

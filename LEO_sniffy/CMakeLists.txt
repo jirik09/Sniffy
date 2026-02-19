@@ -308,7 +308,8 @@ set(CPACK_PACKAGE_VERSION_PATCH "0")
 
 if(WIN32)
     # Use NSIS (Nullsoft Scriptable Install System) to create a .exe installer
-    set(CPACK_GENERATOR "NSIS")
+    # AND WIX for .msi installer
+    set(CPACK_GENERATOR "NSIS;WIX")
     set(CPACK_NSIS_DISPLAY_NAME "LEO Sniffy")
     set(CPACK_NSIS_PACKAGE_NAME "LEO Sniffy Installer")
     
@@ -323,6 +324,13 @@ if(WIN32)
 
     set(CPACK_NSIS_MODIFY_PATH ON) # Allow adding to PATH
     set(CPACK_NSIS_MENU_LINKS "bin/${PROJECT_NAME}.exe" "LEO Sniffy") # Add Start Menu shortcut
+
+    # --- WiX (MSI) Specific Setup ---
+    # Generates a stable GUID for upgrades
+    set(CPACK_WIX_UPGRADE_GUID "53896075-B550-4E80-99E7-5324707D822E") 
+    set(CPACK_WIX_PRODUCT_ICON "${CMAKE_CURRENT_SOURCE_DIR}/graphics/logo.ico")
+    set(CPACK_WIX_PROGRAM_MENU_FOLDER "Sniffy")
+
 elseif(UNIX AND NOT APPLE)
     set(CPACK_GENERATOR "DEB")
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Sniffy Team")
