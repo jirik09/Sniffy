@@ -115,7 +115,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     QT_DEPRECATED_WARNINGS
     QT_NO_FOREACH
-    APP_VERSION="${GIT_TAG_VERSION}"
+    APP_VERSION=\"${GIT_TAG_VERSION}\"
 )
 
 # --- ST-Link & LibUSB Integration ---
