@@ -3,6 +3,31 @@ cmake_minimum_required(VERSION 3.21)
 
 project(LEO_sniffy LANGUAGES C CXX)
 
+# Get version from Git tags (e.g. v1.0.2 -> 1.0.2)
+find_package(Git)
+if(GIT_FOUND)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_TAG_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+
+    # Fallback if no tags found or error
+    if("${GIT_TAG_VERSION}" STREQUAL "")
+        message(WARNING "No git tags found, falling back to default version x.0.0")
+        set(GIT_TAG_VERSION "x.0.0")
+    endif()
+
+    # Remove leading 'v' if present
+    string(REGEX REPLACE "^v" "" GIT_TAG_VERSION "${GIT_TAG_VERSION}")
+else()
+    set(GIT_TAG_VERSION "x.0.0")
+endif()
+
+message(STATUS "Building version: ${GIT_TAG_VERSION}")
+
 # Use -O2 for release builds
 set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
@@ -302,31 +327,7 @@ set(CPACK_PACKAGE_CONTACT "support@sniffy.com")
 # License File (GPLv3)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
 
-# Get version from Git tags (e.g. v1.0.2 -> 1.0.2)
-find_package(Git)
-if(GIT_FOUND)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_TAG_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-    )
-    
-    # Fallback if no tags found or error
-    if("${GIT_TAG_VERSION}" STREQUAL "")
-        message(WARNING "No git tags found, falling back to default version 1.0.0")
-        set(GIT_TAG_VERSION "x.0.0")
-    endif()
-    
-    # Remove leading 'v' if present
-    string(REGEX REPLACE "^v" "" GIT_TAG_VERSION "${GIT_TAG_VERSION}")
-else()
-    set(GIT_TAG_VERSION "x.0.0")
-endif()
-
-message(STATUS "Building version: ${GIT_TAG_VERSION}")
-
+# Parse version components from GIT_TAG_VERSION (set near top of file)
 string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_MATCH "${GIT_TAG_VERSION}")
 
 if(VERSION_MATCH)
