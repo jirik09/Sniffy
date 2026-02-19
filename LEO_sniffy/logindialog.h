@@ -50,7 +50,7 @@ private:
     bool isPolling = false;
 
     // Helper methods to reduce duplication
-    void reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color = Graphics::palette().error);
+    void reportFailure(const QString &uiMessage, const QString &failureCode, bool clearToken, const QString &color = Graphics::palette().error);
     void checkLoginStatus(const QString &email);
     void openBrowserForAuth(const QString &email);
     void finalizeSuccess(const QDateTime &validity, const QByteArray &token, bool authenticationSentManual);

@@ -32,6 +32,11 @@ Authenticator::Authenticator(QObject *parent)
     qDebug() << "[Auth] Session ID generated:" << currentSessionId;
 }
 
+void Authenticator::setDemoMode(bool demo)
+{
+    connectedInDemoMode = demo;
+}
+
 void Authenticator::checkLogin(const QString &email)
 {
     authenticationSentManual = true;
@@ -43,7 +48,7 @@ void Authenticator::checkLogin(const QString &email)
     
     qDebug() << "[Auth] Checking login status for" << email << "Session:" << currentSessionId;
     emit requestStarted();
-    startRequest(email, QString(), QString(), false);
+    startRequest(email, currentDeviceName, currentMcuId);
 }
 
 void Authenticator::setConnectedDevice(const QString &name, const QString &id)
@@ -82,24 +87,16 @@ void Authenticator::tokenRefresh(const QString &deviceName, const QString &mcuId
     if (email.isEmpty() || email == "Unknown user") return;
     
     qDebug() << "[Auth] Token refresh requested for" << email << "Device:" << deviceName << "MCU_ID:" << mcuId << "Demo:" << isDemoMode;
-    // Store demo mode state
-    isDemoModeRequest = isDemoMode;
     // For refresh, use the renewal flow with device info
-    startRequest(email, deviceName, mcuId, true);
+    startRequest(email, deviceName, mcuId);
 }
 
-void Authenticator::startRequest(const QString &email, const QString &deviceName, const QString &mcuId, bool isRenewal)
+void Authenticator::startRequest(const QString &email, const QString &deviceName, const QString &mcuId)
 {
-    // Store the renewal flag for this request
-    isRenewalRequest = isRenewal;
-    if (!isRenewal) {
-        // Reset demo mode request flag for manual/polling requests
-        isDemoModeRequest = false;
-    }
-    qCritical() << "[Auth] Starting" << (isRenewal ? "renewal" : "auth check") << "request for" << email 
+
+    qDebug() << "[Auth] Starting" << "request for" << email 
                 << "Device:" << deviceName << "MCU_ID:" << mcuId 
-                << "Session:" << currentSessionId 
-                << "Demo mode request:" << isDemoModeRequest;
+                << "Session:" << currentSessionId;
     
     // Use auth_check for renewal or polling, auth_start is only used from browser
     QUrl authUrl(QStringLiteral("https://sniffy.cz/scripts/sniffy_auth_check.php"));
@@ -147,7 +144,7 @@ void Authenticator::checkAuthStatus()
     
     const QString email = CustomSettings::getUserEmail();
     qDebug() << "[Auth] Polling auth status for session:" << currentSessionId;
-    startRequest(email, currentDeviceName, currentMcuId, false);
+    startRequest(email, currentDeviceName, currentMcuId);
 }
 
 void Authenticator::onFinished(QNetworkReply *reply)
@@ -298,25 +295,12 @@ void Authenticator::onFinished(QNetworkReply *reply)
 
     // Determine reconnection logic based on server context
     QString context = jsonObj["context"].toString();
-    bool forceReconnect = false;
-    
-    if (!isRenewalRequest) {
-        if (context == "login") {
-            forceReconnect = true;
-        } else if (context == "demo") {
-            // If we are already in demo mode, staying in demo doesn't require reconnect
-            forceReconnect = !isDemoModeRequest;
-        } else if (context == "extension") {
-            // Reconnect if currently in demo mode (to upgrade to full)
-            forceReconnect = isDemoModeRequest;
-        }
-    }
 
-    if (forceReconnect) {
-        qDebug() << "[Auth] New Token generated: valid till" << validity << "(Context:" << context << ") - forcing device reconnection";
-    } else {
-        qDebug() << "[Auth] Token refreshed: valid till" << validity << "(Context:" << context << ") - no device reconnection";
-    }
+    //isDemoModeRequest
+
+
+        qDebug() << "[Auth] New Token generated: valid till" << validity.toString("yyyy-MM-dd") << "(Context:" << context << ") " << (connectedInDemoMode ? "- forcing device reconnection" : "- no device reconnection");
+
     
     CustomSettings::setLoginToken(token);
     CustomSettings::setTokenValidity(validity);
@@ -324,8 +308,8 @@ void Authenticator::onFinished(QNetworkReply *reply)
     CustomSettings::setLastLoginFailure("");
     CustomSettings::saveSettings();
     
-    emit authenticationSucceeded(validity, token, forceReconnect); //if forceReconnect is true this reconnect the device. 
-    if(!forceReconnect){
+    emit authenticationSucceeded(validity, token, connectedInDemoMode); //reconeect if connected in dmeo mode
+    if(!connectedInDemoMode){
         // request small popup only on automatic prolongation
         const QString tip = QObject::tr("Login valid till %1")
                                 .arg(validity.date().toString("dd.MM.yyyy"));

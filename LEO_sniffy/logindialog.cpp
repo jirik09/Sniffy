@@ -110,7 +110,7 @@ LoginDialog::LoginDialog(Authenticator *authenticator, QWidget *parent) :
                 qWarning() << "[Login] Auth failed but email is empty!";
             }
         }
-        reportFailure(uiMsg, code);
+        reportFailure(uiMsg, code, false);
     });
     connect(auth, &Authenticator::authenticationSucceeded, this, [this](const QDateTime &validity, const QByteArray &token, bool forceReconnect){
         finalizeSuccess(validity, token, forceReconnect);
@@ -125,7 +125,7 @@ LoginDialog::~LoginDialog()
     delete ui;
 }
 // Helper: central failure handling to eliminate repetitive code blocks
-void LoginDialog::reportFailure(const QString &uiMessage, const QString &failureCode, const QString &color){
+void LoginDialog::reportFailure(const QString &uiMessage, const QString &failureCode, bool clearToken, const QString &color){
     info->setName(uiMessage);
     info->setColor(color);
     emit loginFailed(failureCode);
@@ -134,7 +134,7 @@ void LoginDialog::reportFailure(const QString &uiMessage, const QString &failure
     isPolling = false;
 
     // Report failure but don't clear token if it was a background renewal
-    if (auth && auth->isRenewal()) {
+    if (!clearToken) {
         qDebug() << "[Login] Background renewal failed (" << failureCode << ") - keeping existing token";
         return;
     }
@@ -176,7 +176,7 @@ void LoginDialog::openBrowserForAuth(const QString &email){
 
     qInfo() << "[Login] Opening browser with URL:" << startUrl.toString();
     if (!QDesktopServices::openUrl(startUrl)) {
-        reportFailure("Failed to open browser", "browser-error");
+        reportFailure("Failed to open browser", "browser-error", false);
         return;
     }
 
@@ -239,7 +239,7 @@ void LoginDialog::buttonAction(int isCanceled)
 
     const QString email = userEmail->getText().trimmed();
     if(email.isEmpty()){
-        reportFailure("Email required","empty-email");
+        reportFailure("Email required","empty-email", true);
         return;
     }
 

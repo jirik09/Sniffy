@@ -14,6 +14,7 @@ class Authenticator : public QObject {
 public:
     explicit Authenticator(QObject *parent = nullptr);
 
+    void setDemoMode(bool demo);
 public slots:
     // Check login status once (no polling) - used for initial check
     void checkLogin(const QString &email);
@@ -33,9 +34,6 @@ public slots:
     // Check if authentication was initiated manually by user
     bool isManualAuth() const { return authenticationSentManual; }
 
-    // Check if current request is a background renewal
-    bool isRenewal() const { return isRenewalRequest; }
-
 signals:
     void requestStarted();
     void requestFinished();
@@ -51,13 +49,12 @@ private slots:
     void checkAuthStatus(); // Polling slot for checking auth status
 
 private:
-    void startRequest(const QString &email, const QString &deviceName, const QString &mcuId, bool isRenewal);
+    void startRequest(const QString &email, const QString &deviceName, const QString &mcuId);
 
     QNetworkAccessManager *networkManager {nullptr};
     QPointer<QNetworkReply> currentReply;
     bool authenticationSentManual {false};
-    bool isRenewalRequest {false}; // Track if current request is a background renewal
-    bool isDemoModeRequest {false}; // Track if device was in demo mode during request
+    bool connectedInDemoMode {true}; // Track if currently in demo mode based on last request
     QTimer *timeoutTimer {nullptr};
     QTimer *pollTimer {nullptr}; // Timer for polling auth status
     QString currentSessionId; // Session ID for polling
