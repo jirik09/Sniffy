@@ -319,7 +319,7 @@ void DeviceMediator::parseData(QByteArray data)
     }
     if(dataHeader == Commands::ERROR){
         qDebug() << "ERROR " << dataToPass.toHex();
-        emit popupMessageRequested("Device Error: " + QString::fromUtf8(dataToPass.toHex()));
+        //emit popupMessageRequested("Device Error: " + QString::fromUtf8(dataToPass.toHex()));
         isDataPassed = true;
 
         // If we were waiting for token ACK and got an error instead, the auth

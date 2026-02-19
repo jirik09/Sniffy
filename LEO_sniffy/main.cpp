@@ -13,7 +13,7 @@
 #include <QDateTime>
 #include <QMutex>
 
-#define LOG_OUTPUT
+//#define LOG_OUTPUT
 
 // Global log file path
 #ifdef LOG_OUTPUT

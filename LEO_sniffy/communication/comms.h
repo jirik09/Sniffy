@@ -14,7 +14,7 @@ class Comms : public QObject
 {
     Q_OBJECT
 
-#define DEBUG_COMMS
+//#define DEBUG_COMMS
 
 public:
     explicit Comms(QObject *parent = nullptr);
