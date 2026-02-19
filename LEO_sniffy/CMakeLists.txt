@@ -293,25 +293,58 @@ if(WIN32)
 endif()
 
 # --- CPack Setup (Installer Generation) ---
-set(CPACK_PACKAGE_NAME "LEO_sniffy")
+set(CPACK_PACKAGE_NAME "Sniffy")
 set(CPACK_PACKAGE_VENDOR "Sniffy")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Sniffy LEO Interface for Nucleo Boards")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Sniffy Interface for Nucleo Boards")
 set(CPACK_PACKAGE_CONTACT "support@sniffy.com")
 
 # License File (GPLv3)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
 
-# Set version from CMake project or manual
-set(CPACK_PACKAGE_VERSION_MAJOR "1")
-set(CPACK_PACKAGE_VERSION_MINOR "0")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
+# Get version from Git tags (e.g. v1.0.2 -> 1.0.2)
+find_package(Git)
+if(GIT_FOUND)
+    execute_process(
+        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_TAG_VERSION
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    
+    # Fallback if no tags found or error
+    if("${GIT_TAG_VERSION}" STREQUAL "")
+        message(WARNING "No git tags found, falling back to default version 1.0.0")
+        set(GIT_TAG_VERSION "x.0.0")
+    endif()
+    
+    # Remove leading 'v' if present
+    string(REGEX REPLACE "^v" "" GIT_TAG_VERSION "${GIT_TAG_VERSION}")
+else()
+    set(GIT_TAG_VERSION "x.0.0")
+endif()
+
+message(STATUS "Building version: ${GIT_TAG_VERSION}")
+
+string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_MATCH "${GIT_TAG_VERSION}")
+
+if(VERSION_MATCH)
+    set(CPACK_PACKAGE_VERSION_MAJOR "${CMAKE_MATCH_1}")
+    set(CPACK_PACKAGE_VERSION_MINOR "${CMAKE_MATCH_2}")
+    set(CPACK_PACKAGE_VERSION_PATCH "${CMAKE_MATCH_3}")
+else()
+    # Fallback for non-semver tags
+    set(CPACK_PACKAGE_VERSION_MAJOR "x")
+    set(CPACK_PACKAGE_VERSION_MINOR "0")
+    set(CPACK_PACKAGE_VERSION_PATCH "0")
+endif()
 
 if(WIN32)
     # Use NSIS (Nullsoft Scriptable Install System) to create a .exe installer
     # AND WIX for .msi installer
     set(CPACK_GENERATOR "NSIS;WIX")
-    set(CPACK_NSIS_DISPLAY_NAME "LEO Sniffy")
-    set(CPACK_NSIS_PACKAGE_NAME "LEO Sniffy Installer")
+    set(CPACK_NSIS_DISPLAY_NAME "Sniffy")
+    set(CPACK_NSIS_PACKAGE_NAME "Sniffy Installer")
     
     # Icons for Installer
     set(WIN_ICON "${CMAKE_CURRENT_SOURCE_DIR}/graphics/logo.ico")
@@ -323,7 +356,15 @@ if(WIN32)
     endif()
 
     set(CPACK_NSIS_MODIFY_PATH ON) # Allow adding to PATH
-    set(CPACK_NSIS_MENU_LINKS "bin/${PROJECT_NAME}.exe" "LEO Sniffy") # Add Start Menu shortcut
+    set(CPACK_NSIS_MENU_LINKS "bin/${PROJECT_NAME}.exe" "Sniffy") # Add Start Menu shortcut
+
+    # Add Desktop Shortcut (NSIS only)
+    set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+        CreateShortCut \\\"$DESKTOP\\\\Sniffy.lnk\\\" \\\"$INSTDIR\\\\bin\\\\${PROJECT_NAME}.exe\\\"
+    ")
+    set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+        Delete \\\"$DESKTOP\\\\Sniffy.lnk\\\"
+    ")
 
     # --- WiX (MSI) Specific Setup ---
     # Generates a stable GUID for upgrades
