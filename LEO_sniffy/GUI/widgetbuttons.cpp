@@ -135,12 +135,20 @@ void WidgetButtons::setColor(QString text, int index){
     QString tempStyleSheet = "";
     if (index>=0 && index<8){
         const auto &p = Graphics::palette();
+        const QString originalColor = text;
         if(p.styleTransparencyUsed)
             text = text.remove("#");
         if(type == ButtonTypes::CHECKABLE || type == ButtonTypes::RADIO){
             tempStyleSheet = QString(p.styleCheckButton).arg(text);
         }else{
             tempStyleSheet = QString(p.stylePushButton).arg(text);
+        }
+        QString tc = Graphics::channelTextColorForBg(originalColor);
+        if (!tc.isEmpty()) {
+            if (type == ButtonTypes::CHECKABLE || type == ButtonTypes::RADIO)
+                tempStyleSheet += QStringLiteral("QPushButton:checked{color:%1;}QPushButton:checked:hover{color:%1;}").arg(tc);
+            else
+                tempStyleSheet += QStringLiteral("QPushButton{color:%1;}").arg(tc);
         }
         pushButtonsList.at(index)->setStyleSheet(tempStyleSheet);
     }

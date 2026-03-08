@@ -10,7 +10,7 @@ PatternGenerator::PatternGenerator(QObject *parent)
 
     moduleCommandPrefix = cmd->PATTERN_GENERATOR;
     moduleName = "Pattern generator";
-    moduleIconURI = Graphics::getGraphicsPath() + "icon_pattern_generator.png";
+    moduleIconURI = Graphics::getCommonPath() + "icon_pattern_generator.png";
 
     connect(pattGenWindow, &PatternGeneratorWindow::runGenerator, this, &PatternGenerator::startGeneratorCallback);
     connect(pattGenWindow, &PatternGeneratorWindow::stopGenerator, this, &PatternGenerator::stopGeneratorCallback);

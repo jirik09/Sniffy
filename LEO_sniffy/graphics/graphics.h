@@ -7,11 +7,13 @@
 #include <QSharedPointer>
 #include <QMetaType>
 #include <QtGlobal>
+#include <QPixmap>
+#include <QIcon>
 
 #include "graphics/themes/dark.h"
 #include "graphics/themes/light.h"
 #include "graphics/themes/dawn.h"
-#include "graphics/themes/aurora.h"
+#include "graphics/themes/greenfield.h"
 #include "graphics/themes/msdos.h"
 #include "graphics/abstracttheme.h"
 
@@ -37,6 +39,7 @@ struct ThemePalette {
     QString error;
     QString running;
     QString unused;
+    QStringList channelTextColors; // per-channel text color overrides (empty entry = use default)
 
     QString stylePushButton;
     QString styleCheckButton;
@@ -57,9 +60,11 @@ struct ThemePalette {
 
 namespace Graphics {
     QString getGraphicsPath();
+    QString getCommonPath();
     QString getBoardImage(const QString &boardBaseName);
     QString getBoardPinoutImage(const QString &boardBaseName);
     QString getChannelColor(int channelIndex);
+    QString channelTextColorForBg(const QString &bgColor);
 
     QList<QString> *initThemesList();
     QSharedPointer<AbstractTheme> setTheme(int themeIndex);
@@ -67,6 +72,14 @@ namespace Graphics {
 
     // Lightweight accessor to a cached snapshot; refreshes when setTheme called.
     const ThemePalette &palette();
+
+    // Tint a common icon to the current theme's textAll color.
+    QPixmap tintedPixmap(const QString &path);
+    QIcon   tintedIcon(const QString &path);
+    // Return a file-system path to a tinted copy (for CSS image:url() usage).
+    QString tintedPath(const QString &path);
+    // Clear the tinted-file cache (called automatically on theme change).
+    void    clearTintCache();
 
     // Internal helper
     QString applyPathFallback(const QString &base, const QString &testFileName);

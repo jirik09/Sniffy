@@ -60,7 +60,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normalon>:/graphics/graphics/icon_not_connected.png</normalon>
+       <normalon>:/graphics/graphics/common/icon_not_connected.png</normalon>
       </iconset>
      </property>
      <property name="iconSize">

@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QtWidgets/QPushButton>
 #include <QGraphicsScene>
-#include <QMovie>
 #include <QSize>
 
 #include "GUI/clickablelabel.h"
@@ -32,8 +31,6 @@ signals:
 private:
     Ui::WidgetFooter *ui;
     bool isWide = true;
-    QMovie *animationForward;
-    QMovie *animationBackward;
 
 
 private slots:

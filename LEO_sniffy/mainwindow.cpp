@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent):
     // The left panel is the central widget; keep it from stretching horizontally
     ui->centralwidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
-    ui->widget_3->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"logo_gray_full.png);");
+    ui->widget_3->setStyleSheet("image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"logo_gray_full.png")+");");
     const auto &pal = Graphics::palette();
     ui->centralwidget->setStyleSheet("QWidget{background-color:"+pal.windowWidget+";}"
                                      "QWidget#centralwidget{border-right: 1px solid"+pal.textLabel+";}");

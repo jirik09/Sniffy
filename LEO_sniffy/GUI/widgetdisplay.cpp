@@ -46,21 +46,19 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
     style = "QObject{background-color:"+Graphics::palette().windowWidget+";}";
     ui->line->setStyleSheet(style);
 
-    style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
+    style = "QPushButton{border:none;}"
             "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
     ui->pushButton_history->setStyleSheet(style);
+    ui->pushButton_history->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"icon_history_off.png"));
 
-    style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
-            "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
     ui->pushButton_list->setStyleSheet(style);
+    ui->pushButton_list->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"icon_list.png"));
 
-    style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_clear_history.png);}"
-            "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
     ui->pushButton_clear->setStyleSheet(style);
+    ui->pushButton_clear->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"icon_clear_history.png"));
 
-    style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_save.png);}"
-            "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
     ui->pushButton_save->setStyleSheet(style);
+    ui->pushButton_save->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"icon_save.png"));
 
     connect(ui->pushButton_history, SIGNAL(clicked()),
             this, SLOT(historyButtonClickedCallback()));
@@ -561,43 +559,34 @@ void WidgetDisplay::clearHistoryButtonClickedCallback(){
 }
 
 void WidgetDisplay::historyButtonClickedCallback(){
-    QString style;
     QList<int> sizes = ui->splitter->sizes();
     int cmpltWidth = ui->splitter->width();
 
     if(historyView == DISABLED){
         sizes = {cmpltWidth / 3, cmpltWidth / 3 * 2};
-        style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_history_on.png);}"
-                "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
+        ui->pushButton_history->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"icon_history_on.png"));
         historyView = ENABLED;
     }else {
         sizes = {0, cmpltWidth};
-        style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_history_off.png);}"
-                "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
+        ui->pushButton_history->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"icon_history_off.png"));
         historyView = DISABLED;
     }
 
     ui->splitter->setSizes(sizes);
-    ui->pushButton_history->setStyleSheet(style);
 }
 
 void WidgetDisplay::listChartSwitchClickedCallback(){
-    QString style;
     if(listView == DISABLED){
-        style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_chart.png);}"
-                "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
+        ui->pushButton_list->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"icon_chart.png"));
         chart->hide();
         list->show();
         listView = ENABLED;
     }else {
-        style = "QPushButton{border:none;image: url("+Graphics::getGraphicsPath()+"icon_list.png);}"
-                "QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}";
+        ui->pushButton_list->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"icon_list.png"));
         chart->show();
         list->hide();
         listView = DISABLED;
     }
-
-    ui->pushButton_list->setStyleSheet(style);
 }
 
 void WidgetDisplay::saveListClickedCallback(){

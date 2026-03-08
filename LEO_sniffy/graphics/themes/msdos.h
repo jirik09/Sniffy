@@ -12,6 +12,7 @@
 // VGA palette subset
 #define MSDOS_COL_BLACK        "#000000"
 #define MSDOS_COL_BLUE         "#0000AA"
+#define MSDOS_COL_DARK_BLUE    "#000077"
 #define MSDOS_COL_LIGHT_BLUE   "#5555FF"
 #define MSDOS_COL_LIGHT_GREEN  "#55FF55"
 #define MSDOS_COL_LIGHT_CYAN   "#55FFFF"
@@ -24,7 +25,7 @@
 
 // Mapping
 #define MSDOS_WINDOW_APP          MSDOS_COL_BLUE
-#define MSDOS_WINDOW_WIDGET       MSDOS_COL_BLUE
+#define MSDOS_WINDOW_WIDGET       MSDOS_COL_DARK_BLUE
 #define MSDOS_WINDOW_DOCK_WIDGET  MSDOS_COL_BLUE
 #define MSDOS_BORDER_COLOR        MSDOS_COL_LIGHT_GREEN
 #define MSDOS_BACKGROUND_BUTTON   MSDOS_COL_BLACK
@@ -33,7 +34,7 @@
 #define MSDOS_TEXT_LABEL          MSDOS_COL_LIGHT_GREEN
 #define MSDOS_TEXT_COMPONENT      MSDOS_COL_WHITE
 #define MSDOS_CONTROLS            MSDOS_COL_LIGHT_GREEN
-#define MSDOS_COMPONENT_DISABLED  MSDOS_COL_DARK_GRAY
+#define MSDOS_COMPONENT_DISABLED  MSDOS_COL_LIGHT_GRAY
 #define MSDOS_WINDOW_CONTROL_HOVER MSDOS_COL_LIGHT_CYAN
 #define MSDOS_WINDOW_EXIT_HOVER   MSDOS_COL_LIGHT_RED
 #define MSDOS_ERROR               MSDOS_COL_LIGHT_RED
@@ -93,7 +94,7 @@
 "QLineEdit{border:1px solid " MSDOS_BORDER_COLOR ";background-color:" MSDOS_DATA_INPUT_AREA ";font:10pt " MSDOS_FONT ";padding:1px;margin:0;color:" MSDOS_TEXT_COMPONENT ";}"
 
 #define MSDOS_STYLE_MENU \
-"QMenu{border:1px solid " MSDOS_BORDER_COLOR ";background-color:" MSDOS_DATA_INPUT_AREA ";}QMenu::item{background-color:" MSDOS_DATA_INPUT_AREA ";color:" MSDOS_TEXT_COMPONENT ";}QMenu::item:selected{background-color:" MSDOS_WINDOW_CONTROL_HOVER ";}"
+"QMenu{border:1px solid " MSDOS_BORDER_COLOR ";background-color:" MSDOS_DATA_INPUT_AREA ";}QMenu::item{background-color:" MSDOS_DATA_INPUT_AREA ";color:" MSDOS_TEXT_COMPONENT ";}QMenu::item:selected{background-color:" MSDOS_WINDOW_CONTROL_HOVER ";color:" MSDOS_COL_BLACK ";}"
 
 #define MSDOS_STYLE_TAB \
 "QTabWidget::pane {border:1px solid " MSDOS_BORDER_COLOR "; top:-1px;} QTabWidget::tab-bar {}" \
@@ -109,7 +110,7 @@
 
 #define MSDOS_STYLE_COMBO_BOX \
 "QComboBox{background-color:" MSDOS_DATA_INPUT_AREA ";border:1px solid " MSDOS_BORDER_COLOR ";padding:2px;color:" MSDOS_TEXT_COMPONENT ";}" \
-"QComboBox QAbstractItemView{border:1px solid " MSDOS_BORDER_COLOR ";selection-background-color:" MSDOS_WINDOW_CONTROL_HOVER ";background-color:" MSDOS_DATA_INPUT_AREA ";}"
+"QComboBox QAbstractItemView{border:1px solid " MSDOS_BORDER_COLOR ";selection-background-color:" MSDOS_WINDOW_CONTROL_HOVER ";selection-color:" MSDOS_COL_BLACK ";background-color:" MSDOS_DATA_INPUT_AREA ";}"
 
 #define MSDOS_STYLE_PUSH_BUTTON \
 "QPushButton{padding:1px 5px;font:10pt " MSDOS_FONT ";background-color:" MSDOS_BACKGROUND_BUTTON ";color:" MSDOS_TEXT_COMPONENT ";border:1px solid " MSDOS_BORDER_COLOR ";}" \

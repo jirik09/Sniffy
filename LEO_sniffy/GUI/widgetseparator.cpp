@@ -10,7 +10,7 @@ WidgetSeparator::WidgetSeparator(QWidget *parent, QString name) :
     ui(new Ui::WidgetSeparator)
 {
     ui->setupUi(this);
-    ui->widget->setStyleSheet(StyleHelper::backgroundImage(Graphics::getGraphicsPath()+"separator.png"));
+    ui->widget->setStyleSheet(StyleHelper::backgroundImage(Graphics::tintedPath(Graphics::getCommonPath()+"separator.png")));
     ui->label_name->setStyleSheet(StyleHelper::separatorLabel(Graphics::palette().textLabel));
     ui->label_name->setText(name);           
 }

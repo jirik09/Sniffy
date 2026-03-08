@@ -91,16 +91,16 @@ void CounterWindow::createAllDisplays(void){
 }
 
 WidgetDisplay *CounterWindow::createHighFreqDisplay(void){
-    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
+    QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_hz.png")+"); border: none;";
     WidgetDisplay *display  = new WidgetDisplay("HighFreqCounter", LITERAL_FREQUENCY, styleSheet, true, 4, HISTORY_SIZE, this);
-    styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_avg.png); border: none;";
+    styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_avg.png")+"); border: none;";
     display->setAvgStyle(styleSheet);
     configureErrorStyles(display);
     return display;
 }
 
 WidgetDisplay *CounterWindow::createLowFreqDisplays(QString name){
-    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
+    QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_hz.png")+"); border: none;";
     WidgetDisplay *display = new WidgetDisplay(name, LITERAL_FREQUENCY, styleSheet, true, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
@@ -110,9 +110,9 @@ WidgetDisplay *CounterWindow::createLowFreqDisplays(QString name){
 WidgetDisplay *CounterWindow::createRatioDisplay(void){
     QString styleSheet = "";
     WidgetDisplay *display  = new WidgetDisplay("RatioCounter", LITERAL_RATIO, styleSheet, false, 1, HISTORY_SIZE, this);
-    styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
+    styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_err.png")+"); border: none;";
     display->setErrStyle(styleSheet);
-    styleSheet = "image: url("+Graphics::getGraphicsPath()+"sign_pm.png); border: none;";
+    styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"sign_pm.png")+"); border: none;";
     display->setTerrStyle(styleSheet);
     display->showAvgDisplay(false);
     display->showTerrStyle(false);
@@ -120,7 +120,7 @@ WidgetDisplay *CounterWindow::createRatioDisplay(void){
 }
 
 WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
-    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_sec.png); border: none;";
+    QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_sec.png")+"); border: none;";
     WidgetDisplay *display  = new WidgetDisplay("IntervalsCounter", LITERAL_INTERVAL, styleSheet, false, 3, HISTORY_SIZE, this);
     configureErrorStyles(display);
     display->showAvgDisplay(false);
@@ -129,10 +129,10 @@ WidgetDisplay *CounterWindow::createIntervalsDisplay(void){
 }
 
 void CounterWindow::configureErrorStyles(WidgetDisplay *display){
-    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
-    styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
+    QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_err.png")+"); border: none;";
+    styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_err.png")+"); border: none;";
     display->setErrStyle(styleSheet);
-    styleSheet = "image: url("+Graphics::getGraphicsPath()+"sign_pm.png); border: none;";
+    styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"sign_pm.png")+"); border: none;";
     display->setQerrStyle(styleSheet);
     display->setTerrStyle(styleSheet);
 }
@@ -275,10 +275,10 @@ void CounterWindow::switchQuantity(int index, WidgetDisplay *display){
     QString unitsStyleSheet;
     if(index == 0){
         display->setLabelText(LABELNUM_QUAN, LITERAL_FREQUENCY);
-        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
+        unitsStyleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_hz.png")+"); border: none;";
     }else if (index == 1) {
         display->setLabelText(LABELNUM_QUAN, LITERAL_PERIOD);
-        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_sec.png); border: none;";
+        unitsStyleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_sec.png")+"); border: none;";
     }
     display->setUnitsStyle(unitsStyleSheet);
 }
@@ -304,9 +304,9 @@ void CounterWindow::hfSwitchQuantityCallback(int index){
 void CounterWindow::hfSwitchErrorAvgCallback(int index){
     QString unitsStyleSheet;
     if(index == 0)
-        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
+        unitsStyleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_err.png")+"); border: none;";
     else
-        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_erravg.png); border: none;";
+        unitsStyleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_erravg.png")+"); border: none;";
 
     displayHF->setErrStyle(unitsStyleSheet);
 }
@@ -371,9 +371,9 @@ void CounterWindow::lfSetDutyCycle(WidgetDisplay *display, WidgetDisplay *unavai
     display->setLabelText(LABELNUM_QUAN, "PULSE WIDTH  |  DUTY CYCLE");
     display->setLabelText(LABELNUM_PINS, pin);
 
-    QString unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_sec.png); border: none;";
+    QString unitsStyleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_sec.png")+"); border: none;";
     display->setAvgStyle(unitsStyleSheet);
-    unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_perc.png); border: none;";
+    unitsStyleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_perc.png")+"); border: none;";
     display->setUnitsStyle(unitsStyleSheet);
     unitsStyleSheet = "";
     unavailDisplay->setUnitsStyle(unitsStyleSheet);
@@ -416,7 +416,7 @@ void CounterWindow::lfShowDutyCycleDisplays(WidgetDisplay *display, bool dutyEna
 void CounterWindow::lfShowErrorStyle(WidgetDisplay *display, bool show){
     QString unitsStyleSheet;
     if(show)
-        unitsStyleSheet = "image: url("+Graphics::getGraphicsPath()+"units_err.png); border: none;";
+        unitsStyleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_err.png")+"); border: none;";
     else
         unitsStyleSheet = "";
 
