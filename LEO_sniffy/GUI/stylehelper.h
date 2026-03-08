@@ -11,14 +11,22 @@ inline QString pushButton(const QString &baseColorHex) {
     const auto &p = Graphics::palette();
     QString color = baseColorHex;
     QString c = p.styleTransparencyUsed ? QString(color).remove("#") : color;
-    return QString(p.stylePushButton).arg(c);
+    QString result = QString(p.stylePushButton).arg(c);
+    QString tc = Graphics::channelTextColorForBg(baseColorHex);
+    if (!tc.isEmpty())
+        result += QStringLiteral("QPushButton{color:%1;}").arg(tc);
+    return result;
 }
 
 inline QString checkButton(const QString &baseColorHex) {
     const auto &p = Graphics::palette();
     QString color = baseColorHex;
     QString c = p.styleTransparencyUsed ? QString(color).remove("#") : color;
-    return QString(p.styleCheckButton).arg(c);
+    QString result = QString(p.styleCheckButton).arg(c);
+    QString tc = Graphics::channelTextColorForBg(baseColorHex);
+    if (!tc.isEmpty())
+        result += QStringLiteral("QPushButton:checked{color:%1;}QPushButton:checked:hover{color:%1;}").arg(tc);
+    return result;
 }
 
 inline QString dialWithTextColor(const QString &dialStyle, const QString &textColor){
@@ -43,7 +51,11 @@ inline QString textInputField(){
 inline QString switchSelected(const QString &baseColor){
     const auto &p = Graphics::palette();
     QString c = p.styleTransparencyUsed ? QString(baseColor).remove('#') : baseColor;
-    return QString(p.styleCheckButton).arg(c);
+    QString result = QString(p.styleCheckButton).arg(c);
+    QString tc = Graphics::channelTextColorForBg(baseColor);
+    if (!tc.isEmpty())
+        result += QStringLiteral("QPushButton:checked{color:%1;}QPushButton:checked:hover{color:%1;}").arg(tc);
+    return result;
 }
 
 inline QString switchNotSelected(const QString &selectedStyle){

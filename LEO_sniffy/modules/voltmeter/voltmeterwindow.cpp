@@ -8,7 +8,7 @@ VoltmeterWindow::VoltmeterWindow(VoltmeterConfig *config, QWidget *parent) :
 {
     ui->setupUi(this);
     //setup displays
-    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_v.png); border: none;";
+    QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_v.png")+"); border: none;";
     WidgetDisplay *display;
 
     for (int i =0;i<MAX_VOLTMETER_CHANNELS ;i++ ) {
@@ -157,18 +157,18 @@ void VoltmeterWindow::showData(ChannelData data[], int numChannels){
         if(buttonsCalc->getSelectedIndex()==0){
             displays.at(i)->displayQerrString(displays.at(i)->formatNumber(data[i].min,'f',4));
             displays.at(i)->displayTerrString(displays.at(i)->formatNumber(data[i].max,'f',4));
-            QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vmax.png); border: none;";
+            QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_Vmax.png")+"); border: none;";
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vmin.png); border: none;";
+            styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_Vmin.png")+"); border: none;";
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
         }else if(buttonsCalc->getSelectedIndex()==1){
             displays.at(i)->displayQerrString(displays.at(i)->formatNumber(data[i].frequency,'f',4));
             displays.at(i)->displayTerrString(displays.at(i)->formatNumber(data[i].ripple,'f',4));
-            QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vripple.png); border: none;";
+            QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_Vripple.png")+"); border: none;";
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
+            styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_hz.png")+"); border: none;";
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
@@ -189,18 +189,18 @@ void VoltmeterWindow::showEmptyCalcs(){
         if(buttonsCalc->getSelectedIndex()==0){
             displays.at(i)->displayQerrString("--");
             displays.at(i)->displayTerrString("--");
-            QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vmax.png); border: none;";
+            QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_Vmax.png")+"); border: none;";
             displays[i]->setErrStyle(styleSheet);
-            styleSheet =  "image: url("+Graphics::getGraphicsPath()+"units_Vmin.png); border: none;";
+            styleSheet =  "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_Vmin.png")+"); border: none;";
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);
         }else if(buttonsCalc->getSelectedIndex()==1){
             displays.at(i)->displayQerrString("--");
             displays.at(i)->displayTerrString("--");
-            QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_Vripple.png); border: none;";
+            QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_Vripple.png")+"); border: none;";
             displays[i]->setErrStyle(styleSheet);
-            styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_hz.png); border: none;";
+            styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_hz.png")+"); border: none;";
             displays[i]->setTerrStyle(styleSheet);
             displays[i]->showErrDisplay(true);
             displays[i]->showTerrStyle(true);

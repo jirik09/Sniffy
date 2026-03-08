@@ -9,7 +9,7 @@ VoltageSourceWindow::VoltageSourceWindow(VoltageSourceConfig *config, QWidget *p
 {
     ui->setupUi(this);
 
-    QString styleSheet = "image: url("+Graphics::getGraphicsPath()+"units_v.png); border: none;";
+    QString styleSheet = "image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"units_v.png")+"); border: none;";
     WidgetDisplay *display;
 
     for (int i = 0 ;i<MAX_VOLTAGE_SOURCE_CHANNELS ;i++ ) {

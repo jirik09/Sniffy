@@ -81,7 +81,7 @@ void DeviceWindow::hideSpecification(){
         (*it)->hide();
     }
     //ui->widget_device->setStyleSheet("image: none;");
-    ui->widget_device->setStyleSheet("image: url("+Graphics::getGraphicsPath()+"no_device.png);");
+    ui->widget_device->setStyleSheet("image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"no_device.png")+");");
 }
 
 void DeviceWindow::addModuleDescription(QString name, QList<QString> labels, QList<QString> values)

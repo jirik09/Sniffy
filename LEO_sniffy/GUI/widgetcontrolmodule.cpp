@@ -16,7 +16,7 @@ WidgetControlModule::WidgetControlModule(QWidget *parent, QString name) :
     ui->pushButton_name->setStyleSheet(Graphics::palette().styleModuleButton);
     ui->pushButton_name->setText(name);
 
-    ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_stop.png)");
+    ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"status_stop.png")+")");
     connect(ui->pushButton_name,SIGNAL(clicked()),this,SLOT(clickedInternal()));
 
     status = ModuleStatus::STOP;
@@ -30,24 +30,24 @@ WidgetControlModule::~WidgetControlModule()
 void WidgetControlModule::setStatus(ModuleStatus stat){
     if(stat==ModuleStatus::PLAY){
         ui->pushButton_name->setChecked(true);
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_play.png)");
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getCommonPath()+"status_play.png)");
     }
     if(stat==ModuleStatus::STOP){        
         ui->pushButton_name->setEnabled(true);
         ui->pushButton_name->setChecked(false);
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_stop.png)");        
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"status_stop.png")+")");        
     }
     if(stat==ModuleStatus::HIDDEN_PLAY){
         ui->pushButton_name->setChecked(true);
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_play_hidden.png)");        
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getCommonPath()+"status_play_hidden.png)");        
     }
     if(stat==ModuleStatus::PAUSE || stat==ModuleStatus::HIDDEN_PAUSE){
         ui->pushButton_name->setChecked(true);
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_pause.png)");        
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getCommonPath()+"status_pause.png)");        
     }
     if(stat==ModuleStatus::LOCKED){       
         ui->pushButton_name->setEnabled(false);
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::getGraphicsPath()+"status_locked.png)");                
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"status_locked.png")+")");                
     }
     status = stat;
 }

@@ -1,6 +1,10 @@
 #include "graphics.h"
 #include <functional>
 #include <QFileInfo>
+#include <QPainter>
+#include <QDir>
+#include <QStandardPaths>
+#include <QHash>
 
 namespace Graphics {
 
@@ -13,7 +17,7 @@ QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {
     [] { return QSharedPointer<AbstractTheme>(new Dark); },
     [] { return QSharedPointer<AbstractTheme>(new Light); },
     [] { return QSharedPointer<AbstractTheme>(new Dawn); },
-    [] { return QSharedPointer<AbstractTheme>(new Aurora); },
+    [] { return QSharedPointer<AbstractTheme>(new Greenfield); },
     [] { return QSharedPointer<AbstractTheme>(new MSDos); },
 };
 
@@ -24,7 +28,7 @@ QList<QString> *initThemesList(){
         themeList->append(((QString)(typeid(Dark).name())).remove(0,1));
         themeList->append(((QString)(typeid(Light).name())).remove(0,1));
         themeList->append(((QString)(typeid(Dawn).name())).remove(0,1));
-        themeList->append(((QString)(typeid(Aurora).name())).remove(0,1));
+        themeList->append(((QString)(typeid(Greenfield).name())).remove(0,1));
         themeList->append(((QString)(typeid(MSDos).name())).remove(0,1));
     }
     return themeList;
@@ -40,18 +44,22 @@ QString getGraphicsPath(){
     return applyPathFallback(base, "logo_sniffy.png");
 }
 
+QString getCommonPath(){
+    return QStringLiteral(":/graphics/graphics/common/");
+}
+
 QString getBoardImage(const QString &boardBaseName){
     const QString basePath = getGraphicsPath();
     if(basePath.isEmpty()) return QString();
     if(boardBaseName.isEmpty())
-        return basePath + "unknown_device.png";
+        return getCommonPath() + "unknown_device.png";
     const QString candidate = basePath + boardBaseName + ".png";
     if(QFileInfo::exists(candidate)) return candidate;
     // applyPathFallback already contains generic fallback; re-run with board asset
     const QString fallbackPath = applyPathFallback(basePath, boardBaseName + ".png");
     const QString fallbackCandidate = fallbackPath + boardBaseName + ".png";
     if(QFileInfo::exists(fallbackCandidate)) return fallbackCandidate;
-    return fallbackPath + "unknown_device.png";
+    return getCommonPath() + "unknown_device.png";
 }
 
 QString getBoardPinoutImage(const QString &boardBaseName){
@@ -78,6 +86,18 @@ QString getChannelColor(int channelIndex){
     return theme->getChannelColor(channelIndex);
 }
 
+QString channelTextColorForBg(const QString &bgColor){
+    if(cachedPalette.channelTextColors.isEmpty()) return QString();
+    QString norm = bgColor.startsWith('#') ? bgColor : ("#" + bgColor);
+    for(int ch = 0; ch < cachedPalette.channelTextColors.size(); ++ch){
+        if(!cachedPalette.channelTextColors.at(ch).isEmpty() &&
+           norm.compare(getChannelColor(ch), Qt::CaseInsensitive) == 0){
+            return cachedPalette.channelTextColors.at(ch);
+        }
+    }
+    return QString();
+}
+
 QSharedPointer<AbstractTheme> setTheme(int themeIndex){
     if(themeIndex < 0 || themeIndex >= createTheme.size()){
         return nullptr;
@@ -86,6 +106,7 @@ QSharedPointer<AbstractTheme> setTheme(int themeIndex){
     if(theme){
         cachedPalette = theme->buildPalette();
         paletteInitialized = true;
+        clearTintCache();
     }
     return theme;
 }
@@ -105,7 +126,7 @@ QString applyPathFallback(const QString &base, const QString &testFileName){
     struct PatternFallback { const char* pattern; const char* replacement; };
     static const PatternFallback orderedFallbacks[] = {
         {"/msdos/", "/dark/"}, // MSDOS theme currently reuses dark assets if not provided
-        {"/aurora/", "/dawn/"}
+        {"/greenfield/", "/dawn/"}
     };
     for(const auto &pf : orderedFallbacks){
         if(base.contains(pf.pattern)){
@@ -116,6 +137,62 @@ QString applyPathFallback(const QString &base, const QString &testFileName){
         }
     }
     return base; // last resort return original even if file missing
+}
+
+// ── Tinting utilities ──────────────────────────────────────────
+static QHash<QString, QString> tintFileCache;
+static QString tintCacheDir;
+
+static QString ensureTintCacheDir(){
+    if(tintCacheDir.isEmpty()){
+        tintCacheDir = QDir::tempPath() + "/sniffy_tinted";
+        QDir().mkpath(tintCacheDir);
+    }
+    return tintCacheDir;
+}
+
+static QPixmap tintPixmap(const QPixmap &base, const QColor &color){
+    QPixmap tinted(base.size());
+    tinted.fill(Qt::transparent);
+    QPainter p(&tinted);
+    p.drawPixmap(0, 0, base);
+    p.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    p.fillRect(tinted.rect(), color);
+    p.end();
+    return tinted;
+}
+
+QPixmap tintedPixmap(const QString &path){
+    QPixmap base(path);
+    if(base.isNull()) return base;
+    return tintPixmap(base, QColor(cachedPalette.textAll));
+}
+
+QIcon tintedIcon(const QString &path){
+    QPixmap base(path);
+    if(base.isNull()) return QIcon();
+    QIcon icon;
+    icon.addPixmap(tintPixmap(base, QColor(cachedPalette.textAll)), QIcon::Normal);
+    icon.addPixmap(tintPixmap(base, QColor(cachedPalette.componentDisabled)), QIcon::Disabled);
+    return icon;
+}
+
+QString tintedPath(const QString &path){
+    auto it = tintFileCache.find(path);
+    if(it != tintFileCache.end()) return *it;
+
+    QPixmap pm = tintedPixmap(path);
+    if(pm.isNull()) return path; // fallback to original
+
+    const QString dir = ensureTintCacheDir();
+    const QString outFile = dir + "/" + QFileInfo(path).fileName();
+    pm.save(outFile, "PNG");
+    tintFileCache.insert(path, outFile);
+    return outFile;
+}
+
+void clearTintCache(){
+    tintFileCache.clear();
 }
 
 // Legacy globals removed after palette migration.

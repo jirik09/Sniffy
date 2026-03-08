@@ -9,7 +9,7 @@ Device::Device(QObject *parent)
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SYSTEM;
     moduleName = "Device";
-    moduleIconURI = Graphics::getGraphicsPath()+"icon_not_connected.png";
+    moduleIconURI = Graphics::getCommonPath()+"icon_not_connected.png";
 
     connect(deviceWindow->deviceConnectButton,SIGNAL(clicked(int)),this,SLOT(deviceConnection(int)));
 }
@@ -77,7 +77,7 @@ void Device::disconnectDevice(){
     deviceWindow->deviceConnectButton->setText("Connect",0);
     deviceWindow->deviceConnectButton->setDisabledButton(false,1);//enable scan
     deviceWindow->deviceSelection->setEnabled(true); // unlock dropdown
-    setIcon(Graphics::getGraphicsPath()+"icon_not_connected.png");
+    setIcon(Graphics::getCommonPath()+"icon_not_connected.png");
     setModuleName("Device");
 }
 
@@ -124,7 +124,7 @@ void Device::parseData(QByteArray data){
         deviceSpec->parseSpecification(data);
         passSystemSpecificationToGUI();
         deviceWindow->showSpecification(deviceSpec);
-        setIcon(Graphics::getGraphicsPath()+"icon_connected.png");
+        setIcon(Graphics::getCommonPath()+"icon_connected.png");
         setModuleName(static_cast<DeviceSpec*>(moduleSpecification)->device);
         emit deviceSpecificationReady(); //try to refresh authentication
     }else if(feature==Commands::ACK){

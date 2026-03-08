@@ -38,21 +38,21 @@ ModuleDockWidget::ModuleDockWidget(QWidget *parent, QString title) : QDockWidget
     down->resize(10,10);
     down->setContentsMargins(5,0,5,0);
     down->setStyleSheet(Graphics::palette().styleControlButton+"QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}");
-    down->setIcon(QIcon(Graphics::getGraphicsPath()+"dock.png"));
+    down->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"dock.png"));
     titleBarLayout->addWidget(down);
 
     QPushButton *up = new QPushButton();
     up->resize(10,10);
     up->setContentsMargins(5,0,5,0);
     up->setStyleSheet(Graphics::palette().styleControlButton+"QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}");
-    up->setIcon(QIcon(Graphics::getGraphicsPath()+"unDock.png"));
+    up->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"unDock.png"));
     titleBarLayout->addWidget(up);
 
     QPushButton *exit = new QPushButton();
     exit->resize(10,10);
     exit->setContentsMargins(5,0,5,0);
     exit->setStyleSheet(Graphics::palette().styleControlButton+"QPushButton:hover{background-color:"+Graphics::palette().windowExitHover+";}");
-    exit->setIcon(QIcon(Graphics::getGraphicsPath()+"exit.png"));
+    exit->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"exit.png"));
     titleBarLayout->addWidget(exit);
 
     connect(up,SIGNAL(clicked()),this,SLOT(unDockOrMaximize()));

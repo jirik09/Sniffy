@@ -168,7 +168,7 @@ void ScopeWindow::paintEvent(QPaintEvent *event){
         lastBase = base;
     }
     ui->sliderSignal->setStyleSheet(
-        "QSlider::groove:horizontal {background: url("+Graphics::getGraphicsPath()+"signalBackground.png) center;"
+        "QSlider::groove:horizontal {background: url("+Graphics::getCommonPath()+"signalBackground.png) center;"
         "background-color: "+Graphics::palette().windowWidget+";border: 1px solid "+Graphics::palette().textLabel+";margin-top: 3px;margin-bottom: 3px;}"
         "QSlider::handle:horizontal {background: "+cachedHandleColor+";border: 2px solid "+Graphics::palette().textLabel+";margin-top: -3px;"
         "margin-bottom: -3px;border-radius: 4px;width:"+QString::number(handleW)+"px;}"

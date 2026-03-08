@@ -12,7 +12,7 @@ Counter::Counter(QObject *parent)
 
     moduleCommandPrefix = cmd->COUNTER;
     moduleName = "Counter";
-    moduleIconURI = Graphics::getGraphicsPath()+"icon_counter.png";
+    moduleIconURI = Graphics::getCommonPath()+"icon_counter.png";
 
     movAvg = new MovingAverage(2, cntWindow->tabHighFreq);       
 

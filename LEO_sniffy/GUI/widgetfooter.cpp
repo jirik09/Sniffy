@@ -15,18 +15,13 @@ WidgetFooter::WidgetFooter(QWidget *parent) :
     connect(ui->pushButton_settingsA,&QPushButton::clicked,this, &WidgetFooter::settingsCallback);
     connect(ui->pushButton_settingsB,&QPushButton::clicked,this, &WidgetFooter::settingsCallback);
 
-    ui->pushButton_settingsA->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_gear.png"));
-    ui->pushButton_settingsB->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_gear.png"));
+    ui->pushButton_settingsA->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"settings_gear.png"));
+    ui->pushButton_settingsB->setIcon(Graphics::tintedIcon(Graphics::getCommonPath()+"settings_gear.png"));
     ui->pushButton_settingsA->setStyleSheet("QPushButton{border:none;} QPushButton:hover{border:none;background-color:"+Graphics::palette().windowControlHover+";}");
     ui->pushButton_settingsB->setStyleSheet("QPushButton{border:none;} QPushButton:hover{border:none;background-color:"+Graphics::palette().windowControlHover+";}");
 
-    animationForward = new QMovie(Graphics::getGraphicsPath()+"menu_burger_button.gif");
-    animationBackward = new QMovie(Graphics::getGraphicsPath()+"menu_burger_button_backw.gif");
     ui->label_burgerAnim->setStyleSheet("QLabel:hover{background-color:"+Graphics::palette().windowControlHover+";}");
-
-    QSize *size = new QSize(30, 30);
-    animationForward->setScaledSize(*size);
-    animationBackward->setScaledSize(*size);    
+    ui->label_burgerAnim->setAlignment(Qt::AlignCenter);
 
     setAppearance(isWide);
 }
@@ -58,16 +53,14 @@ void WidgetFooter::setAppearance(bool wide){
         ui->label_settings->setText("");
         //ui->pushButton_setSize->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_horizontal.png"));
 
-        ui->label_burgerAnim->setMovie(animationBackward);
-        animationBackward->start();
+        ui->label_burgerAnim->setPixmap(Graphics::tintedPixmap(Graphics::getCommonPath()+"menu_burger_button_backw.png"));
     }else{
         ui->pushButton_settingsB->show();
         ui->pushButton_settingsA->hide();
         ui->label_settings->setText("Settings");
         //ui->pushButton_setSize->setIcon(QIcon(Graphics::getGraphicsPath()+"settings_vertical.png"));
 
-        ui->label_burgerAnim->setMovie(animationForward);
-        animationForward->start();
+        ui->label_burgerAnim->setPixmap(Graphics::tintedPixmap(Graphics::getCommonPath()+"menu_burger_button.png"));
     }
 }
 

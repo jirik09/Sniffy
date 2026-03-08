@@ -52,8 +52,8 @@ CounterTabIntervals::CounterTabIntervals(QVBoxLayout *destination, CounterConfig
 
     pixmapEventsSeq = new QPixmap();
     QString picPath = PATH_IMG_EVENT_AB_RR;
-    pixmapEventsSeq->load(picPath);
-    labelPicEventsSeq->setPixmap(pixmapEventsSeq->scaled(width, height, Qt::KeepAspectRatio));
+    *pixmapEventsSeq = Graphics::tintedPixmap(picPath);
+    labelPicEventsSeq->setPixmap(pixmapEventsSeq->scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     QSpacerItem *verticalSpacer;
     verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -113,8 +113,8 @@ void CounterTabIntervals::setSeqPicture()
         }
     }
 
-    pixmapEventsSeq->load(picPath);
-    labelPicEventsSeq->setPixmap(pixmapEventsSeq->scaled(width, height, Qt::KeepAspectRatio));
+    *pixmapEventsSeq = Graphics::tintedPixmap(picPath);
+    labelPicEventsSeq->setPixmap(pixmapEventsSeq->scaled(width, height, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 void CounterTabIntervals::setStartButton(bool start){

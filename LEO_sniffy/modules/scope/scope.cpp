@@ -14,7 +14,7 @@ Scope::Scope(QObject *parent) : AbstractModule(parent)
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->SCOPE;
     moduleName = "Oscilloscope";
-    moduleIconURI = Graphics::getGraphicsPath()+"icon_scope.png";
+    moduleIconURI = Graphics::getCommonPath()+"icon_scope.png";
 
     scopeData.clear();
     timeAndMemoryHandle = new TimeBaseAndMemory(config,this);

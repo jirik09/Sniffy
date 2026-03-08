@@ -12,7 +12,7 @@ VoltageSource::VoltageSource(QObject *parent)
     //module is not fully initialized - control widget and dock wodget cannot be modified
     moduleCommandPrefix = cmd->VOLTAGE_SOURCE;
     moduleName = "Voltage source";
-    moduleIconURI = Graphics::getGraphicsPath()+"icon_voltage_source.png";
+    moduleIconURI = Graphics::getCommonPath()+"icon_voltage_source.png";
 
     voltSourceWindow->setNumberOfChannels(2);
     connect(voltSourceWindow,&VoltageSourceWindow::voltageChanged,this,&VoltageSource::voltageChangedCallback);
