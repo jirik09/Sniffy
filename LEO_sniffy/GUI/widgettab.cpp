@@ -28,6 +28,12 @@ void widgetTab::setText(QString text, int index){
     ui->tabWidget->setTabText(index,text);
 }
 
+void widgetTab::setTabVisible(int index, bool visible){
+    if(index < 0 || index >= ui->tabWidget->count())
+        return;
+    ui->tabWidget->setTabVisible(index, visible);
+}
+
 QVBoxLayout * widgetTab::getLayout (int index){
     if(index < 0 || index >= ui->tabWidget->count())
         return nullptr;

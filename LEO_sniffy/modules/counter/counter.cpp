@@ -138,18 +138,25 @@ void Counter::buildModuleDescription(CounterSpec *spec)
     QString name = moduleName;
     QList<QString> labels ,values;
 
-    labels.append("Pins - High freq (<"+LabelFormator::formatOutout(spec->hf_max,"Hz",0)+")");
-    values.append(spec->pins.hf_ch1);
+    if (spec->hf_max > 0) {
+        labels.append("Pins - High freq (<"+LabelFormator::formatOutout(spec->hf_max,"Hz",0)+")");
+        values.append(spec->pins.hf_ch1);
+    }
 
-    labels.append("Pins - Low freq (<"+LabelFormator::formatOutout(spec->lf_max,"Hz",0)+")");
-    values.append(spec->pins.lf_ch1+", "+spec->pins.lf_ch2);
+    if (spec->lf_max > 0) {
+        labels.append("Pins - Low freq (<"+LabelFormator::formatOutout(spec->lf_max,"Hz",0)+")");
+        values.append(spec->pins.lf_ch1+", "+spec->pins.lf_ch2);
+    }
 
-    labels.append("Pins - Freq ratio");
-    values.append("Ref:" + spec->pins.rat_ref+"  In:"+spec->pins.rat_ch3);
+    if (spec->rat_max_chan > 0) {
+        labels.append("Pins - Freq ratio");
+        values.append("Ref:" + spec->pins.rat_ref+"  In:"+spec->pins.rat_ch3);
+    }
 
-    labels.append("Pins - Inervals");
-    values.append(spec->pins.int_ch1+", "+spec->pins.int_ch2);
-
+    if (spec->lf_max > 0) {
+        labels.append("Pins - Inervals");
+        values.append(spec->pins.int_ch1+", "+spec->pins.int_ch2);
+    }
 
     showModuleDescription(name, labels, values);
 }

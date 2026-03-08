@@ -158,6 +158,12 @@ void CounterWindow::configureDisplaysStaticAttr(WidgetDisplay *display, QString 
 void CounterWindow::setSpecification(CounterSpec *spec){
     this->spec = spec;
     configureDisplaysDynamicAttr();
+
+    // Hide tabs based on hardware support
+    tabs->setTabVisible(0, spec->hf_max > 0);
+    tabs->setTabVisible(1, spec->lf_max > 0);
+    tabs->setTabVisible(2, spec->rat_max_chan > 0);
+    tabs->setTabVisible(3, spec->lf_max > 0); // Intervals depend on LF capture (IC)
 }
 
 void CounterWindow::configureDisplaysDynamicAttr(){

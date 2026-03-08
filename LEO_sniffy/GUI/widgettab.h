@@ -19,6 +19,7 @@ public:
     void restoreGeometry(QByteArray geom);
 
     void setText(QString text, int index);
+    void setTabVisible(int index, bool visible);
     QVBoxLayout * getLayout (int index);
 
 private:
