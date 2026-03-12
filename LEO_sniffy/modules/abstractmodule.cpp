@@ -140,8 +140,8 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
     case ModuleStatus::STOP:
         emit blockConflictingModules(moduleName, moduleSpecification->getResources());
         dockWidgetWindow->show();
-        writeConfiguration();
         moduleControlWidget->setStatus(ModuleStatus::PLAY);
+        writeConfiguration();
         startModule();
         break;
     case ModuleStatus::PLAY:
@@ -159,6 +159,14 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
     case ModuleStatus::HIDDEN_PAUSE:
         dockWidgetWindow->show();
         moduleControlWidget->setStatus(ModuleStatus::PAUSE);
+        break;
+    case ModuleStatus::WAIT_EVENT:
+        dockWidgetWindow->hide();
+        moduleControlWidget->setStatus(ModuleStatus::HIDDEN_WAIT_EVENT);
+        break;
+    case ModuleStatus::HIDDEN_WAIT_EVENT:
+        dockWidgetWindow->show();
+        moduleControlWidget->setStatus(ModuleStatus::WAIT_EVENT);
         break;
     case ModuleStatus::LOCKED:
         //TODO decide whether to close used resources or not open

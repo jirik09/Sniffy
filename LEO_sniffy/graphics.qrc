@@ -44,10 +44,10 @@
         <file>graphics/common/sign_pm.png</file>
         <file>graphics/common/status_locked.png</file>
         <file>graphics/common/status_pause.png</file>
-        <file>graphics/common/status_pause_orange.png</file>
         <file>graphics/common/status_play.png</file>
         <file>graphics/common/status_play_hidden.png</file>        
         <file>graphics/common/status_stop.png</file>
+        <file>graphics/common/status_pause_hidden.png</file>
         <file>graphics/common/units_avg.png</file>
         <file>graphics/common/units_err.png</file>
         <file>graphics/common/units_erravg.png</file>

@@ -39,6 +39,7 @@ struct ThemePalette {
     QString error;
     QString running;
     QString unused;
+    QString moduleActiveText; // text color for checked/active module button
     QStringList channelTextColors; // per-channel text color overrides (empty entry = use default)
 
     QString stylePushButton;
@@ -75,9 +76,11 @@ namespace Graphics {
 
     // Tint a common icon to the current theme's textAll color.
     QPixmap tintedPixmap(const QString &path);
+    QPixmap tintedPixmap(const QString &path, const QColor &color);
     QIcon   tintedIcon(const QString &path);
     // Return a file-system path to a tinted copy (for CSS image:url() usage).
     QString tintedPath(const QString &path);
+    QString tintedPath(const QString &path, const QColor &color);
     // Clear the tinted-file cache (called automatically on theme change).
     void    clearTintCache();
 

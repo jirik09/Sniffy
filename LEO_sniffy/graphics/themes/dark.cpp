@@ -42,6 +42,7 @@ ThemePalette Dark::buildPalette(){
     p.error = DARK_ERROR;
     p.running = DARK_RUNNING;
     p.unused = DARK_UNUSED;
+    p.moduleActiveText = DARK_TEXT_ALL;
     p.stylePushButton = DARK_STYLE_PUSH_BUTTON;
     p.styleCheckButton = DARK_STYLE_CHECK_BUTTON;
     p.styleProgressBar = DARK_STYLE_PROGRESS_BAR;

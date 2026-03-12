@@ -641,10 +641,10 @@ void MainWindow::loadModulesSessionFromFile(const QString &moduleName)
                     module->setModuleStatus((ModuleStatus)status);
                     module->setModuleRestored(true);
                     // If module should be running, ensure it starts
-                    if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE || status == ModuleStatus::HIDDEN_PAUSE){
+                    if(status == ModuleStatus::PLAY || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::PAUSE || status == ModuleStatus::HIDDEN_PAUSE || status == ModuleStatus::WAIT_EVENT || status == ModuleStatus::HIDDEN_WAIT_EVENT){
                         module->writeConfiguration();
                         module->startModule();
-                        if(status == ModuleStatus::HIDDEN_PAUSE || status == ModuleStatus::HIDDEN_PLAY){
+                        if(status == ModuleStatus::HIDDEN_PAUSE || status == ModuleStatus::HIDDEN_PLAY || status == ModuleStatus::HIDDEN_WAIT_EVENT){
                             module->moduleRestoredHidden();
                         }
                         ResourceSet starterSet = ResourceSet::fromModule(module, module->getResources());

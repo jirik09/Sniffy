@@ -168,6 +168,12 @@ QPixmap tintedPixmap(const QString &path){
     return tintPixmap(base, QColor(cachedPalette.textAll));
 }
 
+QPixmap tintedPixmap(const QString &path, const QColor &color){
+    QPixmap base(path);
+    if(base.isNull()) return base;
+    return tintPixmap(base, color);
+}
+
 QIcon tintedIcon(const QString &path){
     QPixmap base(path);
     if(base.isNull()) return QIcon();
@@ -188,6 +194,21 @@ QString tintedPath(const QString &path){
     const QString outFile = dir + "/" + QFileInfo(path).fileName();
     pm.save(outFile, "PNG");
     tintFileCache.insert(path, outFile);
+    return outFile;
+}
+
+QString tintedPath(const QString &path, const QColor &color){
+    const QString key = path + "#" + color.name();
+    auto it = tintFileCache.find(key);
+    if(it != tintFileCache.end()) return *it;
+
+    QPixmap pm = tintedPixmap(path, color);
+    if(pm.isNull()) return path;
+
+    const QString dir = ensureTintCacheDir();
+    const QString outFile = dir + "/" + color.name().mid(1) + "_" + QFileInfo(path).fileName();
+    pm.save(outFile, "PNG");
+    tintFileCache.insert(key, outFile);
     return outFile;
 }
 

@@ -5,8 +5,24 @@
 #include <QMouseEvent>
 #include <QtWidgets/QPushButton>
 #include <QBitmap>
+#include <QTimer>
+#include <QPainter>
+#include <QConicalGradient>
 
 #include "../graphics/graphics.h"
+
+class SpinnerOverlay : public QWidget {
+    Q_OBJECT
+public:
+    explicit SpinnerOverlay(QWidget *parent = nullptr);
+    void start();
+    void stop();
+protected:
+    void paintEvent(QPaintEvent *event) override;
+private:
+    QTimer timer;
+    int angle = 0;
+};
 
 namespace Ui {
 class WidgetFeature;
@@ -19,7 +35,9 @@ enum class ModuleStatus
     PLAY = 2,
     HIDDEN_PAUSE = 3,
     HIDDEN_PLAY = 4,
-    LOCKED = 5
+    LOCKED = 5,
+    WAIT_EVENT = 6,
+    HIDDEN_WAIT_EVENT = 7
   };
 
 class WidgetControlModule : public QWidget
@@ -49,8 +67,12 @@ private slots:
 
 private:
     Ui::WidgetFeature *ui;
-    ModuleStatus status;    
-    QIcon icon; // store by value to avoid manual heap allocation
+    ModuleStatus status;
+    QIcon icon;
+    QString iconURI;
+    SpinnerOverlay *spinner = nullptr;
+
+    void updateIcon();
 };
 
 

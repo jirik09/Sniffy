@@ -41,6 +41,7 @@ ThemePalette Greenfield::buildPalette(){
     p.error = GREENFIELD_ERROR;
     p.running = GREENFIELD_RUNNING;
     p.unused = GREENFIELD_UNUSED;
+    p.moduleActiveText = GREENFIELD_GREEN;
     p.stylePushButton = GREENFIELD_STYLE_PUSH_BUTTON;
     p.styleCheckButton = GREENFIELD_STYLE_CHECK_BUTTON;
     p.styleProgressBar = GREENFIELD_STYLE_PROGRESS_BAR;

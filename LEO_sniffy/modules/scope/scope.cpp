@@ -373,7 +373,10 @@ void Scope::stopSampling(){
 
 void Scope::startSampling(){
     comm->write(cmd->SCOPE+":"+cmd->START+";");
-    setModuleStatus(ModuleStatus::PLAY);
+    if(config->triggerMode == ScopeTriggerMode::TRIG_SINGLE)
+        setModuleStatus(ModuleStatus::WAIT_EVENT);
+    else
+        setModuleStatus(ModuleStatus::PLAY);
 }
 
 // ******************* Private functions - not important and no logic inside *******
