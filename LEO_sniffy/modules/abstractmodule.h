@@ -21,6 +21,7 @@
 #include "../GUI/widgettab.h"
 #include "../GUI/widgetselection.h"
 #include "../GUI/widgettextinput.h"
+#include "../GUI/widgetchart.h"
 
 #include "abstractspecification.h"
 

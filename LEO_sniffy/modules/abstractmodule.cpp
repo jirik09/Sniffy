@@ -64,6 +64,10 @@ void AbstractModule::saveGeometry(QMap<QString, QByteArray> &layoutMap)
             qDebug () << "WARNING attempting to save layout of object without name: Tect input in "<<moduleName;
         }
     }
+    QList<widgetChart*> listChart = getWidget()->findChildren<widgetChart*>();
+    for (int i = 0; i < listChart.size(); i++){
+        layoutMap.insert(moduleName + "chart_" + QString::number(i), listChart[i]->saveGeometry());
+    }
 }
 
 void AbstractModule::restoreGeometry(const QMap<QString, QByteArray> &layoutMap)
@@ -130,6 +134,13 @@ void AbstractModule::restoreGeometry(const QMap<QString, QByteArray> &layoutMap)
             text->restoreGeometry(layoutMap.value(key));
         }else{
             qDebug () << "WARNING layout cannot be restored due to missing object name: textInput in "<<moduleName;
+        }
+    }
+    QList<widgetChart*> listChart = getWidget()->findChildren<widgetChart*>();
+    for (int i = 0; i < listChart.size(); i++){
+        QString key = moduleName + "chart_" + QString::number(i);
+        if (layoutMap.contains(key)){
+            listChart[i]->restoreGeometry(layoutMap.value(key));
         }
     }
 }
@@ -226,6 +237,15 @@ void AbstractModule::moduleRestoredHidden()
 }
 
 void AbstractModule::setModuleStatus(ModuleStatus stat){
+    ModuleStatus cur = moduleControlWidget->getStatus();
+    bool isHidden = (cur == ModuleStatus::HIDDEN_PLAY ||
+                     cur == ModuleStatus::HIDDEN_PAUSE ||
+                     cur == ModuleStatus::HIDDEN_WAIT_EVENT);
+    if (isHidden) {
+        if (stat == ModuleStatus::PLAY)       stat = ModuleStatus::HIDDEN_PLAY;
+        else if (stat == ModuleStatus::PAUSE) stat = ModuleStatus::HIDDEN_PAUSE;
+        else if (stat == ModuleStatus::WAIT_EVENT) stat = ModuleStatus::HIDDEN_WAIT_EVENT;
+    }
     moduleControlWidget->setStatus(stat);
 }
 

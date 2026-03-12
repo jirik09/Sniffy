@@ -29,7 +29,7 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     for (int i = 0; i < maxTraces; i++) {
         QLineSeries *series = new QLineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(Graphics::getChannelColor(i))), 2.0));
+        series->setPen(QPen(QBrush(QColor(Graphics::getChannelColor(i))), penWidths[0]));
         seriesList.append(series);
         createSeries(series);
     }
@@ -104,6 +104,16 @@ widgetChart::widgetChart(QWidget *parent, int maxTraces) :
     else QTimer::singleShot(0, this, [this](){ if (chart->scene() && gridAlphaDot && !gridAlphaDot->scene()) chart->scene()->addItem(gridAlphaDot); layoutGridAlphaDot(); });
     connect(chart, &QChart::plotAreaChanged, this, [this](const QRectF&){ layoutGridAlphaDot(); });
     layoutGridAlphaDot();
+
+    // Create clickable line-thickness icon in bottom-right corner of plot
+    lineThicknessIcon = new QGraphicsItemGroup();
+    lineThicknessIcon->setZValue(1000);
+    updateLineThicknessIcon();
+    if (chart->scene()) chart->scene()->addItem(lineThicknessIcon);
+    else QTimer::singleShot(0, this, [this](){ if (chart->scene() && lineThicknessIcon && !lineThicknessIcon->scene()) chart->scene()->addItem(lineThicknessIcon); layoutLineThicknessIcon(); });
+    connect(chart, &QChart::plotAreaChanged, this, [this](const QRectF&){ layoutLineThicknessIcon(); });
+    layoutLineThicknessIcon();
+
     initContextMenu();
     this->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)),
@@ -123,7 +133,7 @@ void widgetChart::switchToSplineSeriesCallback(){
     for (int i = 0; i < maxTraces; i++) {
         QSplineSeries *series = new QSplineSeries;
         //connect(series, &QSplineSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(Graphics::getChannelColor(i))), 2.0));
+        series->setPen(QPen(QBrush(QColor(Graphics::getChannelColor(i))), penWidths[seriesPenWidthIndex]));
         series->append(seriesList[i]->points());
         chart->removeSeries(seriesList[i]);
         seriesList[i]->clear();
@@ -147,7 +157,7 @@ void widgetChart::switchToLineSeriesSeamless()
     for (int i = 0; i < maxTraces; i++) {
         QLineSeries *series = new QLineSeries;
         //connect(series, &QLineSeries::hovered, this, &widgetChart::hovered);
-        series->setPen(QPen(QBrush(QColor(Graphics::getChannelColor(i))), 2.0));
+        series->setPen(QPen(QBrush(QColor(Graphics::getChannelColor(i))), penWidths[seriesPenWidthIndex]));
         series->append(seriesList[i]->points());
         chart->removeSeries(seriesList[i]);
         seriesList[i]->clear();
@@ -224,6 +234,10 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
                 stepGridTransparency();
                 return true; // consume the event
             }
+            if (isPointInLineThicknessIcon(ev->scenePos())) {
+                stepLineThickness();
+                return true;
+            }
             // Only reset zoom in ALL mode (oscilloscope/counter with dynamic redrawing)
             // In CLICKS_ONLY mode (generators), double-click would corrupt static signal display
             if (eventSel == EventSelection::ALL) {
@@ -260,7 +274,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
         QApplication::setOverrideCursor(QCursor(Qt::ClosedHandCursor));
         // For CLICKS_ONLY mode: emit click event for data editing
         if (eventSel == EventSelection::CLICKS_ONLY && ev->button() == Qt::LeftButton) {
-            if (!isPointInGridAlphaDot(ev->scenePos()))
+            if (!isPointInGridAlphaDot(ev->scenePos()) && !isPointInLineThicknessIcon(ev->scenePos()))
                 emit mouseLeftClickEvent(ev);
         }
     }
@@ -274,6 +288,11 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
             QApplication::restoreOverrideCursor();
             return true;
         }
+        if (isPointInLineThicknessIcon(ev->scenePos())) {
+            stepLineThickness();
+            QApplication::restoreOverrideCursor();
+            return true;
+        }
         // For CLICKS_ONLY mode: treat releases as clicks too
         if (eventSel == EventSelection::CLICKS_ONLY && ev->button() == Qt::LeftButton)
             emit mouseLeftClickEvent(ev);
@@ -284,7 +303,7 @@ bool widgetChart::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::GraphicsSceneMouseMove) {
         QGraphicsSceneMouseEvent *ev = (QGraphicsSceneMouseEvent*) event;
         if (eventSel == EventSelection::CLICKS_ONLY && mousePressed && (ev->buttons() & Qt::LeftButton)) {
-            if (!isPointInGridAlphaDot(ev->scenePos()))
+            if (!isPointInGridAlphaDot(ev->scenePos()) && !isPointInLineThicknessIcon(ev->scenePos()))
                 emit mouseLeftClickEvent(ev);
         }
     }
@@ -522,6 +541,9 @@ void widgetChart::applyGridTransparency()
 
     // Update the indicator dot to reflect current grid color
     if (gridAlphaDot) gridAlphaDot->setBrush(gridX);
+    // Update line thickness icon colors to match
+    updateLineThicknessIcon();
+    layoutLineThicknessIcon();
     // Trigger a repaint
     chart->update();
 }
@@ -535,6 +557,115 @@ void widgetChart::layoutGridAlphaDot()
     const qreal y = plot.top() + gridAlphaDotMargin;
     const QPointF scenePt = chart->mapToScene(QPointF(x, y));
     gridAlphaDot->setPos(scenePt);
+}
+
+void widgetChart::layoutLineThicknessIcon()
+{
+    if (!chart || !lineThicknessIcon) return;
+    const QRectF plot = chart->plotArea();
+    if (plot.isEmpty()) return;
+    const qreal x = plot.right() - lineThicknessMargin - lineThicknessIconSize;
+    const qreal y = plot.bottom() - lineThicknessMargin - lineThicknessIconSize;
+    const QPointF scenePt = chart->mapToScene(QPointF(x, y));
+    lineThicknessIcon->setPos(scenePt);
+}
+
+void widgetChart::updateLineThicknessIcon()
+{
+    if (!lineThicknessIcon) return;
+    // Remove old children
+    for (QGraphicsItem *child : lineThicknessIcon->childItems()) {
+        lineThicknessIcon->removeFromGroup(child);
+        delete child;
+    }
+    // Reset group origin so newly-added children keep their local coords
+    lineThicknessIcon->setPos(0, 0);
+
+    QColor color = QColor(Graphics::palette().chartGridlegLowContrast);
+    const int alpha = static_cast<int>(qRound(gridTransparencyPercent * 2.55));
+    color.setAlpha(alpha);
+
+    QColor activeColor = QColor(Graphics::palette().chartGridlegLowContrast);
+
+    // Draw 3 horizontal lines of increasing thickness from top to bottom
+    qreal sz = lineThicknessIconSize;
+    qreal lineWidths[] = {1.0, 2.0, 3.0};
+    qreal yPositions[] = {sz * 0.15, sz * 0.5, sz * 0.85};
+
+    for (int i = 0; i < 3; i++) {
+        QGraphicsLineItem *line = new QGraphicsLineItem(0, yPositions[i], sz, yPositions[i]);
+        QPen pen(color);
+        pen.setWidthF(lineWidths[i]);
+        pen.setCapStyle(Qt::RoundCap);
+        // Highlight the currently active thickness
+        if (i == seriesPenWidthIndex) {
+            pen.setColor(activeColor);
+        }
+        line->setPen(pen);
+        lineThicknessIcon->addToGroup(line);
+    }
+}
+
+bool widgetChart::isPointInLineThicknessIcon(const QPointF &scenePos) const
+{
+    if (!lineThicknessIcon) return false;
+    QPointF center = lineThicknessIcon->sceneBoundingRect().center();
+    const qreal halfSize = lineThicknessIconSize / 2.0;
+    const qreal effectiveRadius = halfSize * lineThicknessClickableFactor;
+    const qreal dist = QLineF(center, scenePos).length();
+    return dist <= effectiveRadius;
+}
+
+void widgetChart::stepLineThickness()
+{
+    seriesPenWidthIndex = (seriesPenWidthIndex + 1) % 3;
+    applySeriesPenWidth();
+    updateLineThicknessIcon();
+    layoutLineThicknessIcon();
+}
+
+void widgetChart::applySeriesPenWidth()
+{
+    qreal w = penWidths[seriesPenWidthIndex];
+    for (QXYSeries *s : seriesList) {
+        QPen p = s->pen();
+        p.setWidthF(w);
+        s->setPen(p);
+        // Toggle OpenGL to force the GL framebuffer to pick up the new pen
+        if (s->useOpenGL()) {
+            s->setUseOpenGL(false);
+            s->setUseOpenGL(true);
+        }
+    }
+    chart->update();
+}
+
+void widgetChart::setSeriesPenWidthIndex(int idx)
+{
+    if (idx < 0 || idx >= 3) idx = 0;
+    seriesPenWidthIndex = idx;
+    applySeriesPenWidth();
+    updateLineThicknessIcon();
+    layoutLineThicknessIcon();
+}
+
+QByteArray widgetChart::saveGeometry()
+{
+    // Format: "gridTransparency;penWidthIndex"
+    return QByteArray::number(gridTransparencyPercent) + ";" + QByteArray::number(seriesPenWidthIndex);
+}
+
+void widgetChart::restoreGeometry(QByteArray geom)
+{
+    QList<QByteArray> parts = geom.split(';');
+    if (parts.size() >= 1) {
+        int t = parts[0].toInt();
+        if (t >= 0 && t <= 100) setGridTransparencyPercent(t);
+    }
+    if (parts.size() >= 2) {
+        int idx = parts[1].toInt();
+        if (idx >= 0 && idx < 3) setSeriesPenWidthIndex(idx);
+    }
 }
 
 void widgetChart::setTraceColor(int index, QColor color){

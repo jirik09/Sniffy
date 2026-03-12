@@ -25,11 +25,11 @@ QList<QString> *initThemesList(){
     if(!themeList){
         themeList = new QList<QString>;
         themeList->reserve(createTheme.size());
-        themeList->append(((QString)(typeid(Dark).name())).remove(0,1));
-        themeList->append(((QString)(typeid(Light).name())).remove(0,1));
-        themeList->append(((QString)(typeid(Dawn).name())).remove(0,1));
-        themeList->append(((QString)(typeid(Greenfield).name())).remove(0,1));
-        themeList->append(((QString)(typeid(MSDos).name())).remove(0,1));
+        themeList->append("Dark");
+        themeList->append("Light");
+        themeList->append("Dawn");
+        themeList->append("Greenfield");
+        themeList->append("MS-DOS");
     }
     return themeList;
 }
