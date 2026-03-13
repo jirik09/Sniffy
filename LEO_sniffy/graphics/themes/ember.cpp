@@ -41,8 +41,8 @@ ThemePalette Ember::buildPalette(){
     p.error = EMBER_ERROR;
     p.running = EMBER_RUNNING;
     p.unused = EMBER_UNUSED;
-    p.moduleActiveText = "#ffffff";
-    p.moduleHoverText = "#ffffff";
+    p.moduleActiveText = EMBER_TEXT_ALL;
+    p.moduleHoverText = EMBER_TEXT_ALL;
     p.moduleDisabledTint = EMBER_WINDOW_CONTROL_HOVER;
 
     p.stylePushButton = EMBER_STYLE_PUSH_BUTTON;

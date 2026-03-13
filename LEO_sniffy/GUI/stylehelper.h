@@ -8,11 +8,11 @@
 
 namespace StyleHelper {
 
-static constexpr int GLOW_BLUR_RADIUS = 20;
-static constexpr int GLOW_BLUR_RADIUS_BUTTONS = 45;
-static constexpr int GLOW_BLUR_RADIUS_CONTROL_MODULE = 35;
-static constexpr int GLOW_BLUR_RADIUS_DIAL = 25;
-static constexpr int GLOW_BLUR_RADIUS_SWITCH = 35;
+static constexpr int GLOW_BLUR_RADIUS = 18;
+static constexpr int GLOW_BLUR_RADIUS_BUTTONS = 34;
+static constexpr int GLOW_BLUR_RADIUS_CONTROL_MODULE = 34;
+static constexpr int GLOW_BLUR_RADIUS_DIAL = 18;
+static constexpr int GLOW_BLUR_RADIUS_SWITCH = 25;
 
 inline void applyGlowEffect(QWidget* widget, const QString& baseColorHex, int blurRadius = GLOW_BLUR_RADIUS) {
     if (!widget) return;

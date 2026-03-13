@@ -117,12 +117,16 @@ void WidgetDial::setColor(QString color){
     ui->pushButton_plus->setStyleSheet(StyleHelper::pushButton(color));
     ui->pushButton_minus->setStyleSheet(StyleHelper::pushButton(color));
 
-    StyleHelper::applyGlowEffect(ui->pushButton_plus, color, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
-    StyleHelper::applyGlowEffect(ui->pushButton_minus, color, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
-
-    if (!isEnabled() && Graphics::palette().isEmberTheme) {
-        ui->pushButton_plus->setGraphicsEffect(nullptr);
-        ui->pushButton_minus->setGraphicsEffect(nullptr);
+    if (Graphics::palette().isEmberTheme) {
+        if (!isEnabled()) {
+            ui->pushButton_plus->setGraphicsEffect(nullptr);
+            ui->pushButton_minus->setGraphicsEffect(nullptr);
+            ui->label_name->setStyleSheet(QStringLiteral("QLabel{color:%1;}").arg(Graphics::palette().windowControlHover));
+        } else {
+            StyleHelper::applyGlowEffect(ui->pushButton_plus, color, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
+            StyleHelper::applyGlowEffect(ui->pushButton_minus, color, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
+            ui->label_name->setStyleSheet(QStringLiteral("QLabel{color:%1;}").arg(color));
+        }
     }
 }
 
@@ -173,9 +177,13 @@ void WidgetDial::changeEvent(QEvent *event)
         if (!isEnabled()) {
             ui->pushButton_plus->setGraphicsEffect(nullptr);
             ui->pushButton_minus->setGraphicsEffect(nullptr);
-        } else if (!dialColor.isEmpty()) {
-            StyleHelper::applyGlowEffect(ui->pushButton_plus, dialColor, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
-            StyleHelper::applyGlowEffect(ui->pushButton_minus, dialColor, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
+            ui->label_name->setStyleSheet(QStringLiteral("QLabel{color:%1;}").arg(Graphics::palette().windowControlHover));
+        } else {
+            if (!dialColor.isEmpty()) {
+                StyleHelper::applyGlowEffect(ui->pushButton_plus, dialColor, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
+                StyleHelper::applyGlowEffect(ui->pushButton_minus, dialColor, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
+                ui->label_name->setStyleSheet(QStringLiteral("QLabel{color:%1;}").arg(dialColor));
+            }
         }
     }
 }
