@@ -7,6 +7,7 @@
 #include <QtMath>
 #include <QString>
 #include <QDebug>
+#include <QEvent>
 
 #include "../graphics/graphics.h"
 
@@ -50,9 +51,14 @@ private:
     ButtonTypes type = ButtonTypes::NORMAL;
 
     QList<QPushButton*> pushButtonsList;
+    QList<QString> buttonColors;
     int optionalEmitParam = 0;
 
     void uncheckAll();
+    void updateGlowForDisabledState(bool disabled);
+
+protected:
+    void changeEvent(QEvent *event) override;
 
 private slots:
     void button_1_Clicked();

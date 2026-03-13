@@ -19,6 +19,7 @@ QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {
     [] { return QSharedPointer<AbstractTheme>(new Dawn); },
     [] { return QSharedPointer<AbstractTheme>(new Greenfield); },
     [] { return QSharedPointer<AbstractTheme>(new MSDos); },
+    [] { return QSharedPointer<AbstractTheme>(new Ember); },
 };
 
 QList<QString> *initThemesList(){
@@ -30,6 +31,7 @@ QList<QString> *initThemesList(){
         themeList->append("Dawn");
         themeList->append("Greenfield");
         themeList->append("MS-DOS");
+        themeList->append("Ember");
     }
     return themeList;
 }
@@ -126,7 +128,8 @@ QString applyPathFallback(const QString &base, const QString &testFileName){
     struct PatternFallback { const char* pattern; const char* replacement; };
     static const PatternFallback orderedFallbacks[] = {
         {"/msdos/", "/dark/"}, // MSDOS theme currently reuses dark assets if not provided
-        {"/greenfield/", "/dawn/"}
+        {"/greenfield/", "/dawn/"},
+        {"/ember/", "/dawn/"}
     };
     for(const auto &pf : orderedFallbacks){
         if(base.contains(pf.pattern)){
@@ -155,6 +158,7 @@ static QPixmap tintPixmap(const QPixmap &base, const QColor &color){
     QPixmap tinted(base.size());
     tinted.fill(Qt::transparent);
     QPainter p(&tinted);
+    p.setRenderHint(QPainter::SmoothPixmapTransform);
     p.drawPixmap(0, 0, base);
     p.setCompositionMode(QPainter::CompositionMode_SourceIn);
     p.fillRect(tinted.rect(), color);

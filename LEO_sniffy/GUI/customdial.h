@@ -20,6 +20,7 @@ public:
 
     void setCustomGraphics(bool enable);
     void drawMarker(bool draw);
+    void setHideIndicator(bool hide);
 
     // Override setValue to capture first value as default
     void setValue(int value);
@@ -52,6 +53,7 @@ private:
 
     bool customGraphics = false;
     bool drawMark = true;
+    bool hideIndicator = false;
     bool doubleClickInProgress = false;
 
 signals:

@@ -12,6 +12,7 @@ Class for widget with dial and controls with range
 #include "ui_widgetdialrange.h"
 #include <cmath>
 #include "stylehelper.h"
+// #include <QGridLayout>
 
 
 WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmitParam) :
@@ -23,6 +24,13 @@ WidgetDialRange::WidgetDialRange(QWidget *parent, QString name, int optionalEmit
     const auto &p = Graphics::palette();
     setStyleSheet(p.styleDial);
     ui->comboBox->setStyleSheet(p.styleComboBox);
+
+    if (Graphics::palette().isEmberTheme)
+    {
+        // hide the position indicator but keep thick arcs for this theme
+        ui->dial->setHideIndicator(true);
+        layout()->setContentsMargins(0, 2, 0, 2);
+    }    
 
     //    QString style = "QPushButton:pressed{border: 2px solid rgb(48,48,48);}"
     //                    "QPushButton{border: none;color: rgb(214,214,214);"
@@ -93,9 +101,18 @@ void WidgetDialRange::restoreGeometry(QByteArray geom)
 }
 
 void WidgetDialRange::setColor(QString color){
+    dialColor = color;
     ui->widget_dial->setStyleSheet(StyleHelper::dialWithTextColor(Graphics::palette().styleDial, color));
     ui->pushButton_plus->setStyleSheet(StyleHelper::pushButton(color));
     ui->pushButton_minus->setStyleSheet(StyleHelper::pushButton(color));
+
+    StyleHelper::applyGlowEffect(ui->pushButton_plus, color, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
+    StyleHelper::applyGlowEffect(ui->pushButton_minus, color, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
+
+    if (!isEnabled() && Graphics::palette().isEmberTheme) {
+        ui->pushButton_plus->setGraphicsEffect(nullptr);
+        ui->pushButton_minus->setGraphicsEffect(nullptr);
+    }
 }
 
 float WidgetDialRange::getDefaultRealValue() const{
@@ -412,6 +429,20 @@ int WidgetDialRange::getValueForDial(float real){
         return ret;
     }
 };
+
+void WidgetDialRange::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::EnabledChange && Graphics::palette().isEmberTheme) {
+        if (!isEnabled()) {
+            ui->pushButton_plus->setGraphicsEffect(nullptr);
+            ui->pushButton_minus->setGraphicsEffect(nullptr);
+        } else if (!dialColor.isEmpty()) {
+            StyleHelper::applyGlowEffect(ui->pushButton_plus, dialColor, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
+            StyleHelper::applyGlowEffect(ui->pushButton_minus, dialColor, StyleHelper::GLOW_BLUR_RADIUS_DIAL);
+        }
+    }
+}
 
 
 

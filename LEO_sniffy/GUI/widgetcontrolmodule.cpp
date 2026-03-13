@@ -6,6 +6,7 @@ Widget to be shown on the left selection in centralWidget
 */
 #include "widgetcontrolmodule.h"
 #include "ui_widgetmodule.h"
+#include "stylehelper.h"
 
 // ── SpinnerOverlay ──────────────────────────────────────────
 
@@ -59,6 +60,12 @@ WidgetControlModule::WidgetControlModule(QWidget *parent, QString name) :
 {
     ui->setupUi(this);
 
+    if (Graphics::palette().isEmberTheme) {
+        setMinimumHeight(40);
+        setMaximumHeight(40);
+        layout()->setContentsMargins(4, 2, 4, 2);
+    }
+
     ui->pushButton_name->setStyleSheet(Graphics::palette().styleModuleButton);
     ui->pushButton_name->setText(name);
 
@@ -100,7 +107,10 @@ void WidgetControlModule::setStatus(ModuleStatus stat){
     }
     if(stat==ModuleStatus::LOCKED){
         ui->pushButton_name->setEnabled(false);
-        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"status_locked.png", QColor(Graphics::palette().componentDisabled))+")");
+        QColor lockTint = Graphics::palette().moduleDisabledTint.isEmpty()
+                            ? QColor(Graphics::palette().componentDisabled)
+                            : QColor(Graphics::palette().moduleDisabledTint);
+        ui->widget_status->setStyleSheet("margin: 2px;image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"status_locked.png", lockTint)+")");
     }
     if(stat==ModuleStatus::WAIT_EVENT){
         ui->pushButton_name->setChecked(true);
@@ -151,12 +161,30 @@ void WidgetControlModule::updateIcon(){
 
     QColor normalColor = isActive ? QColor(Graphics::palette().moduleActiveText)
                                   : QColor(Graphics::palette().textAll);
-    QColor disabledColor(Graphics::palette().componentDisabled);
+    QColor disabledColor = Graphics::palette().moduleDisabledTint.isEmpty()
+                             ? QColor(Graphics::palette().componentDisabled)
+                             : QColor(Graphics::palette().moduleDisabledTint);
+
+    // Hover color: active modules keep moduleActiveText; inactive modules
+    // use moduleHoverText if the theme defines it, otherwise stay at normalColor.
+    QColor hoverColor = isActive ? QColor(Graphics::palette().moduleActiveText)
+                                 : (Graphics::palette().moduleHoverText.isEmpty()
+                                        ? normalColor
+                                        : QColor(Graphics::palette().moduleHoverText));
 
     icon = QIcon();
     icon.addPixmap(Graphics::tintedPixmap(iconURI, normalColor), QIcon::Normal);
     icon.addPixmap(Graphics::tintedPixmap(iconURI, disabledColor), QIcon::Disabled);
+    icon.addPixmap(Graphics::tintedPixmap(iconURI, hoverColor), QIcon::Active);
     ui->pushButton_name->setIcon(icon);
+
+    if (isActive) {
+        StyleHelper::applyGlowEffect(ui->pushButton_name, normalColor.name(), StyleHelper::GLOW_BLUR_RADIUS_CONTROL_MODULE);
+    } else {
+        if (ui->pushButton_name->graphicsEffect()) {
+            ui->pushButton_name->setGraphicsEffect(nullptr);
+        }
+    }
 }
 
 void WidgetControlModule::setName (QString name){

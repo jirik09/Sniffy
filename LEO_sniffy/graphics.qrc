@@ -119,6 +119,16 @@
         <file>graphics/themes/msdos/user_error.png</file>
         <file>graphics/themes/msdos/user_ok.png</file>
 
+        <!-- Per-theme: ember -->
+        <file>graphics/themes/ember/Nucleo-F303RE.png</file>
+        <file>graphics/themes/ember/Nucleo-F303RE-pinout.png</file>
+        <file>graphics/themes/ember/Nucleo-F446RE.png</file>
+        <file>graphics/themes/ember/Nucleo-F446RE-pinout.png</file>
+        <file>graphics/themes/ember/Nucleo-G474RE.png</file>
+        <file>graphics/themes/ember/user.png</file>
+        <file>graphics/themes/ember/user_error.png</file>
+        <file>graphics/themes/ember/user_ok.png</file>        
+
         <!-- Shared app icon -->
         <file>graphics/logo_color.png</file>
     </qresource>

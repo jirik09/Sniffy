@@ -51,6 +51,11 @@ void CustomDial::drawMarker(bool draw)
     drawMark = draw;
 }
 
+void CustomDial::setHideIndicator(bool hide)
+{
+    hideIndicator = hide;
+}
+
 void CustomDial::setValue(int value)
 {
     // If this is the first time setValue is called, store as default
@@ -209,6 +214,9 @@ void CustomDial::paintEvent(QPaintEvent *evt)
         return;
     }
     int margin = 16;
+    // Extra margin for Ember glow to avoid clipping
+    if (Graphics::palette().isEmberTheme && drawMark)
+        margin = 28;
 
     QPainter painter(this);
 
@@ -260,11 +268,31 @@ void CustomDial::paintEvent(QPaintEvent *evt)
 
     painter.drawArc(rect, 0, 360 * 16);
 
+    // Smooth neon glow on value arc (Ember only)
+    if (Graphics::palette().isEmberTheme) {
+        const qreal bsf = static_cast<qreal>(static_cast<int>(bs));
+        const int startAngle = 225 * 16;
+        const int spanAngle  = static_cast<int>(-ratio * 16 * 270) - 5 * 16;
+        // Many thin layers for a smooth gradient glow instead of discrete rings
+        const int numLayers = 14;
+        const qreal maxMult = 7.0;
+        const qreal minMult = 1.3;
+        for (int i = 0; i < numLayers; ++i) {
+            qreal t = static_cast<qreal>(i) / (numLayers - 1); // 0..1 outer→inner
+            qreal mult = maxMult - t * (maxMult - minMult);
+            int alpha = static_cast<int>(2 + t * t * 44); // quadratic ramp: 2→46
+            QColor gc = pointColor;
+            gc.setAlpha(alpha);
+            painter.setPen(QPen(QBrush(gc), bsf * mult, Qt::SolidLine, Qt::RoundCap));
+            painter.drawArc(rect, startAngle, spanAngle);
+        }
+    }
+
     // draw actual value
     painter.setPen(QPen(QBrush(pointColor), bs));
     painter.drawArc(rect, 225 * 16, -ratio * 16 * 270 - 5 * 16);
 
-    if (drawMark)
+    if (drawMark && !hideIndicator)
     {
         // draw marker
         painter.setPen(QPen(QBrush(QColor(Graphics::palette().textAll)), size / 15 + 4)); // 8 for static size

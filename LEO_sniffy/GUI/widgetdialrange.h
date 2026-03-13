@@ -74,9 +74,14 @@ private:
     float logOffset = 0;
     float logGain = 0;
 
+    QString dialColor;
+
     void updateControls(int except, bool silent = false);
     float getRealValueFromDial(int in);
     int getValueForDial(float real);
+
+protected:
+    void changeEvent(QEvent *event) override;
 
 private slots:
     void plusClicked();
