@@ -77,6 +77,10 @@ MainWindow::MainWindow(QWidget *parent):
     // Start in wide mode by default, then enforce the fixed width
     setMenuWide();
     enforceLeftMenuWidth();
+
+    // Start the IPC bridge for external AI agent connections
+    agentBridge = new AgentBridge(deviceMediator, this);
+    agentBridge->start();
 }
 
 void MainWindow::restoreInitialGeometryFromNewestSession()

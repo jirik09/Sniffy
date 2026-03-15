@@ -7,6 +7,7 @@ WidgetDisplay::WidgetDisplay(QString name, QString firstLabelText, QString &unit
                              QWidget *parent) :
     QWidget(parent), ui(new Ui::WidgetDisplay), historySize(historySize), name(name)
 {
+    setObjectName(name);
     ui->setupUi(this);
 
     loc = QLocale(QLocale::English);

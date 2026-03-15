@@ -11,7 +11,7 @@ ArbGenerator::ArbGenerator(QObject *parent, bool isPWMbased):
     if(isPWMbased){
         moduleCommandPrefix = cmd->PWM_GENERATOR;
         arbGenWindow->setObjectName("pwmGenWindow");
-        moduleName = "PWM genarator";
+        moduleName = "PWM generator";
         moduleIconURI = Graphics::getCommonPath()+"icon_pwm_gen.png";
     }else{
         moduleCommandPrefix = cmd->SIGNAL_GENERATOR;

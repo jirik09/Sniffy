@@ -37,6 +37,7 @@ public:
     void setResourcesInUse(ResourceSet res);
     void disableModules();
     void closeModules();
+    Comms *getComms() const { return communication; }
 
 signals:
     void loadLayoutUponOpen(QString Devicename);

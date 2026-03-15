@@ -101,6 +101,12 @@ public:
     void updateHistoryData(QVector<QPointF> *points, int index);
     void setTraceColor(QString color, int index);
 
+    /* Agent bridge helpers */
+    QString getDisplayName() const { return name; }
+    void saveHistory()   { saveListClickedCallback(); }
+    void clearHistory()  { clearHistoryButtonClickedCallback(); }
+    void setHistorySampleCount(int count) { recalcHistorySizeAndSetDial(count); }
+
 
 private:
     QLocale loc;

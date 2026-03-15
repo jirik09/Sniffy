@@ -17,6 +17,7 @@
 #include "logindialog.h"
 #include "GUI/widgetlogininfo.h"
 #include "authenticator.h"
+#include "agentbridge/agentbridge.h"
 
 class ToastWidget; // Forward declaration
 
@@ -46,6 +47,7 @@ private:
     SettingsDialog *sett;
     LoginDialog *logindial;
     Authenticator *authenticator; // Shared authenticator for login and token refresh
+    AgentBridge *agentBridge = nullptr; // IPC bridge for external AI agents
 
     bool isLeftMenuNarrow = false; // default to wide menu
     WidgetFooter *footer;
