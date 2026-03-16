@@ -19,6 +19,9 @@ class Voltmeter : public AbstractModule
 public:
     explicit Voltmeter(QObject *parent = nullptr);
     QWidget* getWidget();
+    const ChannelData& channelData(int ch) const { return data[ch]; }
+    double getVdd() const { return realVdd; }
+    int getNumChannelsEnabled() const { return numChannelsEnabled; }
 
 
 public slots:

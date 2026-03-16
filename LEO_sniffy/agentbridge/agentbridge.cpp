@@ -1,9 +1,17 @@
 #include "agentbridge.h"
 #include "devicemediator.h"
 #include "modules/abstractmodule.h"
+
+#include <cmath>
+#include <limits>
+
+#include "modules/device/device.h"
+#include "modules/device/devicewindow.h"
 #include "communication/comms.h"
 #include "communication/commands.h"
+#include "communication/serialLine.h"
 #include "GUI/widgetcontrolmodule.h"
+#include "GUI/widgetbuttons.h"
 #include "GUI/widgetdisplay.h"
 
 // GUI-synced RPCs — module-specific headers
@@ -16,13 +24,18 @@
 #include "modules/counter/countertabintervals.h"
 #include "modules/scope/scope.h"
 #include "modules/scope/scopewindow.h"
+#include "modules/scope/scopeconfig.h"
 #include "modules/scope/panelsettings.h"
+#include "modules/scope/panelmeasurement.h"
+#include "modules/scope/measurement.h"
+#include "GUI/widgettextinput.h"
 #include "modules/voltagesource/voltagesourcewindow.h"
 #include "modules/arbgenerator/arbgeneratorwindow.h"
 #include "modules/arbgenerator/arbgenpanelsettings.h"
 #include "modules/patterngenerator/patterngeneratorwindow.h"
 #include "modules/patterngenerator/patterngeneratorsettings.h"
 #include "modules/voltmeter/voltmeterwindow.h"
+#include "modules/voltmeter/voltmeter.h"
 #include "GUI/widgetselection.h"
 #include <QTabWidget>
 
@@ -37,7 +50,7 @@
 // Helper: build a JSON snapshot of module state
 // ──────────────────────────────────────────────────────────
 
-static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName)
+static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, AbstractModule *mod = nullptr)
 {
     QJsonObject st;
     st[QStringLiteral("module")] = moduleName;
@@ -87,18 +100,52 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName)
     }
 
     // ── Scope ──
-    if (qobject_cast<ScopeWindow *>(widget)) {
+    if (auto *sw = qobject_cast<ScopeWindow *>(widget)) {
         st[QStringLiteral("type")] = QStringLiteral("Oscilloscope");
-        auto *ps = widget->findChild<PanelSettings *>(QStringLiteral("panelSet"));
+        auto *ps = sw->findChild<PanelSettings *>(QStringLiteral("panelSet"));
         if (ps) {
             st[QStringLiteral("timebase")]        = ps->dialTimeBase->getRealValue();
             st[QStringLiteral("channels")]         = ps->buttonsChannelEnable->getStatus();
-            st[QStringLiteral("trigger_mode")]     = ps->buttonsTriggerMode->getSelectedIndex();
+            int tmIdx = ps->buttonsTriggerMode->getSelectedIndex();
+            st[QStringLiteral("trigger_mode")]     = tmIdx;
+            // Decode effective trigger mode name from button index + toggle text
+            QString tmName;
+            if (tmIdx == 2) tmName = QStringLiteral("auto");
+            else if (tmIdx == 1) tmName = QStringLiteral("normal");
+            else {
+                // Button 0 is Stop/Single toggle — check its current text
+                QString txt = ps->buttonsTriggerMode->getText(0);
+                tmName = (txt == QStringLiteral("Single")) ? QStringLiteral("stop") : QStringLiteral("single");
+            }
+            st[QStringLiteral("trigger_mode_name")] = tmName;
             st[QStringLiteral("trigger_edge")]     = ps->buttonsTriggerEdge->getSelectedIndex();
             st[QStringLiteral("trigger_channel")]  = ps->buttonsTriggerChannel->getSelectedIndex();
             st[QStringLiteral("pretrigger")]       = ps->dialPretrigger->getRealValue();
             st[QStringLiteral("trigger_level")]    = ps->dialTriggerValue->getRealValue();
             st[QStringLiteral("memory")]           = ps->buttonsMemorySet->getSelectedIndex();
+        }
+        auto *pa = sw->findChild<WidgetButtons *>(QStringLiteral("scoperesolution"));
+        if (pa)
+            st[QStringLiteral("resolution")]   = pa->getSelectedIndex() == 0 ? 8 : 12;
+        // Sampling rate + data length from ScopeConfig
+        if (mod) {
+            auto *scope = qobject_cast<Scope *>(mod);
+            auto *cfg = scope ? scope->getConfig() : nullptr;
+            if (cfg) {
+                st[QStringLiteral("real_sampling_rate")] = cfg->realSamplingRate;
+                st[QStringLiteral("data_length")]        = cfg->dataLength;
+                // Measurement results
+                QJsonArray measArr;
+                for (auto *m : cfg->scopeMeasList) {
+                    QJsonObject mObj;
+                    mObj[QStringLiteral("label")]   = m->getLabel();
+                    mObj[QStringLiteral("value")]   = m->getValue();
+                    mObj[QStringLiteral("value_str")] = m->getValueString();
+                    mObj[QStringLiteral("channel")] = m->getChannelIndex();
+                    measArr.append(mObj);
+                }
+                st[QStringLiteral("measurements")] = measArr;
+            }
         }
         return st;
     }
@@ -106,10 +153,13 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName)
     // ── Sync PWM ──
     if (auto *w = qobject_cast<SyncPwmWindow *>(widget)) {
         st[QStringLiteral("type")] = QStringLiteral("Sync PWM");
+        st[QStringLiteral("step_mode")]   = w->settings->switchStepMode->isCheckedLeft() ? false : true;
+        st[QStringLiteral("equidistant")] = w->settings->buttonEquidist->isChecked(0);
         QJsonArray chArr;
         for (int i = 0; i < CHANNELS_NUM; ++i) {
             QJsonObject ch;
             ch[QStringLiteral("enabled")]   = w->settings->onOffCh[i]->isCheckedLeft();
+            ch[QStringLiteral("inverted")]  = w->settings->inverCh[i]->isChecked(0);
             ch[QStringLiteral("frequency")] = w->settings->dialFreqCh[i]->getRealValue();
             ch[QStringLiteral("duty")]      = w->settings->dialDutyCh[i]->getRealValue();
             ch[QStringLiteral("phase")]     = w->settings->dialPhaseCh[i]->getRealValue();
@@ -176,15 +226,55 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName)
         auto *mode = widget->findChild<WidgetButtons *>(QStringLiteral("ChannelVoltmode"));
         auto *avg  = widget->findChild<WidgetDialRange *>(QStringLiteral("voltAvgSamples"));
         auto *calc = widget->findChild<WidgetButtons *>(QStringLiteral("buttonscalc"));
-        if (mode) st[QStringLiteral("mode")]      = mode->getSelectedIndex();
+        auto *chEn = widget->findChild<WidgetButtons *>(QStringLiteral("ChannelvoltmeterEnable"));
+        if (mode) {
+            int mi = mode->getSelectedIndex();
+            st[QStringLiteral("mode")] = mi;
+            st[QStringLiteral("mode_name")] = (mi == 1) ? QStringLiteral("fast") : QStringLiteral("normal");
+        }
         if (avg)  st[QStringLiteral("averaging")]  = avg->getRealValue();
-        if (calc) st[QStringLiteral("calc_mode")]  = calc->getSelectedIndex();
+        if (calc) {
+            int ci = calc->getSelectedIndex();
+            st[QStringLiteral("calc_mode")] = ci;
+            static const char *calcNames[] = {"min_max", "ripple", "none"};
+            st[QStringLiteral("calc_mode_name")] = QString::fromLatin1(calcNames[qBound(0, ci, 2)]);
+        }
+        if (chEn) st[QStringLiteral("channels")]   = chEn->getStatus();
+        // Data log status
+        auto *vw = qobject_cast<VoltmeterWindow *>(widget);
+        if (vw) st[QStringLiteral("datalog_running")] = vw->isLogging();
+        // Live readings from Voltmeter model
+        if (mod) {
+            auto *vm = qobject_cast<Voltmeter *>(mod);
+            if (vm) {
+                st[QStringLiteral("vdd")] = vm->getVdd();
+                st[QStringLiteral("num_channels_enabled")] = vm->getNumChannelsEnabled();
+                QJsonArray readings;
+                for (int i = 0; i < vm->getNumChannelsEnabled(); ++i) {
+                    const auto &ch = vm->channelData(i);
+                    QJsonObject chObj;
+                    chObj[QStringLiteral("voltage")]   = ch.voltage;
+                    chObj[QStringLiteral("min")]        = ch.min;
+                    chObj[QStringLiteral("max")]        = ch.max;
+                    chObj[QStringLiteral("ripple")]     = ch.ripple;
+                    chObj[QStringLiteral("frequency")]  = ch.frequency;
+                    chObj[QStringLiteral("percent")]    = ch.percent;
+                    readings.append(chObj);
+                }
+                st[QStringLiteral("readings")] = readings;
+            }
+        }
         return st;
     }
 
-    // ── Voltage Source ── (minimal — dials only exist when running)
+    // ── Voltage Source ──
     if (qobject_cast<VoltageSourceWindow *>(widget)) {
         st[QStringLiteral("type")] = QStringLiteral("Voltage source");
+        for (int i = 1; i <= 4; ++i) {
+            auto *dial = widget->findChild<WidgetDialRange *>(QStringLiteral("voltSourceDialCH") + QString::number(i));
+            if (dial && dial->isVisible())
+                st[QStringLiteral("voltage_ch") + QString::number(i)] = dial->getRealValue();
+        }
         return st;
     }
 
@@ -538,6 +628,98 @@ void AgentBridge::registerHandlers()
         return r;
     };
 
+    // ── Device management ────────────────────────────────────
+
+    // scan_devices — probe all COM ports for Sniffy-compatible boards
+    m_handlers[QStringLiteral("scan_devices")] = [this](const QJsonObject &) -> QJsonObject {
+        if (m_mediator->getIsConnected())
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Already connected — disconnect first")}, {QStringLiteral("code"), -32001}};
+        QList<DeviceDescriptor> list;
+        SerialLine::getAvailableDevices(&list, 0);
+        // Update the mediator's cached list and GUI dropdown
+        m_mediator->setDeviceList(list);
+        Device *dev = m_mediator->getDevice();
+        if (dev) dev->updateGUIDeviceList(list, false);
+        QJsonArray arr;
+        for (int i = 0; i < list.size(); ++i) {
+            QJsonObject d;
+            d[QStringLiteral("index")] = i;
+            d[QStringLiteral("name")]  = list.at(i).deviceName;
+            d[QStringLiteral("port")]  = list.at(i).port;
+            arr.append(d);
+        }
+        return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("devices"), arr}};
+    };
+
+    // list_devices — return the last scanned device list (no re-scan)
+    m_handlers[QStringLiteral("list_devices")] = [this](const QJsonObject &) -> QJsonObject {
+        auto list = m_mediator->getDeviceList();
+        QJsonArray arr;
+        for (int i = 0; i < list.size(); ++i) {
+            QJsonObject d;
+            d[QStringLiteral("index")] = i;
+            d[QStringLiteral("name")]  = list.at(i).deviceName;
+            d[QStringLiteral("port")]  = list.at(i).port;
+            arr.append(d);
+        }
+        return QJsonObject{{QStringLiteral("ok"), true},
+                           {QStringLiteral("connected"), m_mediator->getIsConnected()},
+                           {QStringLiteral("devices"), arr}};
+    };
+
+    // connect_device — connect to a device by index or name
+    m_handlers[QStringLiteral("connect_device")] = [this](const QJsonObject &p) -> QJsonObject {
+        if (m_mediator->getIsConnected())
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Already connected — disconnect first")}, {QStringLiteral("code"), -32001}};
+        auto list = m_mediator->getDeviceList();
+        if (list.isEmpty())
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("No devices in list — call scan_devices first")}, {QStringLiteral("code"), -32002}};
+        int idx = -1;
+        if (p.contains(QStringLiteral("index"))) {
+            idx = p.value(QStringLiteral("index")).toInt(-1);
+        } else if (p.contains(QStringLiteral("name"))) {
+            QString needle = p.value(QStringLiteral("name")).toString();
+            for (int i = 0; i < list.size(); ++i) {
+                if (list.at(i).deviceName.contains(needle, Qt::CaseInsensitive)) { idx = i; break; }
+            }
+        }
+        if (idx < 0 || idx >= list.size())
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Device not found in list")}, {QStringLiteral("code"), -32602}};
+        // Use the Device module's GUI path so buttons and dropdown update properly
+        Device *dev = m_mediator->getDevice();
+        if (dev) {
+            auto *win = qobject_cast<DeviceWindow *>(dev->getWidget());
+            if (win) {
+                win->deviceSelection->setSelected(idx, true);
+                win->deviceConnectButton->setText("Disconnect", 0);
+                win->deviceConnectButton->setDisabledButton(true, 1);
+                win->deviceSelection->setEnabled(false);
+            }
+        }
+        QMetaObject::invokeMethod(m_mediator, "openDevice", Q_ARG(int, idx));
+        return QJsonObject{{QStringLiteral("ok"), true},
+                           {QStringLiteral("device"), list.at(idx).deviceName},
+                           {QStringLiteral("port"), list.at(idx).port}};
+    };
+
+    // disconnect_device — close the current connection
+    m_handlers[QStringLiteral("disconnect_device")] = [this](const QJsonObject &) -> QJsonObject {
+        if (!m_mediator->getIsConnected())
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not connected")}, {QStringLiteral("code"), -32001}};
+        // Use the Device module's disconnection path to update GUI properly
+        Device *dev = m_mediator->getDevice();
+        if (dev) {
+            auto *win = qobject_cast<DeviceWindow *>(dev->getWidget());
+            if (win) {
+                win->deviceConnectButton->setText("Connect", 0);
+                win->deviceConnectButton->setDisabledButton(false, 1);
+                win->deviceSelection->setEnabled(true);
+            }
+        }
+        m_mediator->close();
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
     // ── list_modules ──
     m_handlers[QStringLiteral("list_modules")] = [this](const QJsonObject &) -> QJsonObject {
         return QJsonObject{{QStringLiteral("modules"), enumerateModules()}};
@@ -551,7 +733,7 @@ void AgentBridge::registerHandlers()
         if (mod->isActive()) {
             QJsonObject result{{QStringLiteral("ok"), true}, {QStringLiteral("note"), QStringLiteral("Already running")}};
             QWidget *w = mod->getWidget();
-            if (w) result[QStringLiteral("state")] = buildModuleState(w, p.value(QStringLiteral("module")).toString());
+            if (w) result[QStringLiteral("state")] = buildModuleState(w, p.value(QStringLiteral("module")).toString(), mod.data());
             return result;
         }
 
@@ -563,7 +745,7 @@ void AgentBridge::registerHandlers()
         QWidget *w = mod->getWidget();
         QJsonObject result{{QStringLiteral("ok"), true}};
         if (w) {
-            QJsonObject state = buildModuleState(w, p.value(QStringLiteral("module")).toString());
+            QJsonObject state = buildModuleState(w, p.value(QStringLiteral("module")).toString(), mod.data());
             result[QStringLiteral("state")] = state;
         }
         return result;
@@ -802,10 +984,64 @@ void AgentBridge::registerHandlers()
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         if (ch < 0 || ch >= CHANNELS_NUM)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel (0-3)")}, {QStringLiteral("code"), -32602}};
-        bool enable = p.value(QStringLiteral("enabled")).toBool(true);
+        // Accept bool true/false AND int 0/1 (CLI sends int, MCP sends bool)
+        QJsonValue ev = p.value(QStringLiteral("enabled"));
+        bool enable = ev.isBool() ? ev.toBool() : (ev.toInt(1) != 0);
         // Left = ON (index 0), Right = OFF (index 1); setLeft/setRight are private slots
         QMetaObject::invokeMethod(win->settings->onOffCh[ch],
                                   enable ? "setLeft" : "setRight", Q_ARG(bool, false));
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // spwm_set_step_mode — switch between Continuous (false) and Step (true)
+    m_handlers[QStringLiteral("spwm_set_step_mode")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
+        if (!win || !win->settings)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+        QJsonValue sv = p.value(QStringLiteral("step"));
+        bool step = sv.isBool() ? sv.toBool() : (sv.toInt(0) != 0);
+        // Left = Continuous (index 0), Right = Step (index 1)
+        QMetaObject::invokeMethod(win->settings->switchStepMode,
+                                  step ? "setRight" : "setLeft", Q_ARG(bool, false));
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // spwm_set_equidistant — toggle equidistant phase distribution
+    m_handlers[QStringLiteral("spwm_set_equidistant")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
+        if (!win || !win->settings)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+        QJsonValue ev = p.value(QStringLiteral("enabled"));
+        bool want = ev.isBool() ? ev.toBool() : (ev.toInt(0) != 0);
+        bool current = win->settings->buttonEquidist->isChecked(0);
+        if (want != current) {
+            win->settings->buttonEquidist->setChecked(want, 0);
+            win->settings->buttonEquidist->clickedInternal(0);
+        }
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // spwm_set_invert — toggle invert for a specific channel
+    m_handlers[QStringLiteral("spwm_set_invert")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
+        if (!win || !win->settings)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+        int ch = p.value(QStringLiteral("channel")).toInt(0);
+        if (ch < 0 || ch >= CHANNELS_NUM)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel (0-3)")}, {QStringLiteral("code"), -32602}};
+        QJsonValue iv = p.value(QStringLiteral("enabled"));
+        bool want = iv.isBool() ? iv.toBool() : (iv.toInt(0) != 0);
+        bool current = win->settings->inverCh[ch]->isChecked(0);
+        if (want != current) {
+            win->settings->inverCh[ch]->setChecked(want, 0);
+            win->settings->inverCh[ch]->clickedInternal(0);
+        }
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
@@ -847,92 +1083,121 @@ void AgentBridge::registerHandlers()
     };
 
     // ── Scope ────────────────────────────────────────────────
+    // All scope handlers drive PanelSettings widgets so the GUI stays in sync
+    // with the agent. The widget signals trigger ScopeWindow callbacks which
+    // call Scope::update*() → MCU commands automatically.
 
-    // scope_set_timebase — set time/div (seconds), MCU reconfigured
-    m_handlers[QStringLiteral("scope_set_timebase")] = [this](const QJsonObject &p) -> QJsonObject {
+    // Helper: find PanelSettings inside a module's widget tree
+    auto findScopePS = [this](const QJsonObject &p, PanelSettings *&ps) -> QJsonObject {
         auto mod = findModule(p.value(QStringLiteral("module")).toString());
         if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *scope = qobject_cast<Scope *>(mod.data());
-        if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
-        float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        scope->updateTimebase(val);
+        auto *win = qobject_cast<ScopeWindow *>(mod->getWidget());
+        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+        ps = win->findChild<PanelSettings *>(QStringLiteral("panelSet"));
+        if (!ps) return QJsonObject{{QStringLiteral("error"), QStringLiteral("PanelSettings not found")}, {QStringLiteral("code"), -32603}};
+        return QJsonObject{};
+    };
+
+    // scope_set_timebase — set time/div (seconds), MCU reconfigured
+    // WidgetDial is a discrete selector — find the closest matching index
+    m_handlers[QStringLiteral("scope_set_timebase")] = [this, findScopePS](const QJsonObject &p) -> QJsonObject {
+        PanelSettings *ps = nullptr;
+        auto err = findScopePS(p, ps);
+        if (!err.isEmpty()) return err;
+        float target = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
+        // Save current state, scan silently, pick closest, then set for real
+        int orig = ps->dialTimeBase->getSelectedIndex();
+        int bestIdx = orig;
+        float bestDist = std::numeric_limits<float>::max();
+        for (int i = 0; i < 30; ++i) {  // max 30 options (more than enough)
+            ps->dialTimeBase->setSelectedIndex(i, true);
+            if (ps->dialTimeBase->getSelectedIndex() != i) break; // past end
+            float dist = std::abs(static_cast<float>(ps->dialTimeBase->getRealValue()) - target);
+            if (dist < bestDist) { bestDist = dist; bestIdx = i; }
+        }
+        ps->dialTimeBase->setSelectedIndex(bestIdx, false); // non-silent → emits signal
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
-    // scope_set_trigger_mode — auto|auto_fast|normal|single|stop
-    m_handlers[QStringLiteral("scope_set_trigger_mode")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *scope = qobject_cast<Scope *>(mod.data());
-        if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+    // scope_set_trigger_mode — auto|normal|single|stop
+    // buttonsTriggerMode has 3 buttons: 0=Stop/Single(toggle), 1=Normal, 2=Auto
+    m_handlers[QStringLiteral("scope_set_trigger_mode")] = [this, findScopePS](const QJsonObject &p) -> QJsonObject {
+        PanelSettings *ps = nullptr;
+        auto err = findScopePS(p, ps);
+        if (!err.isEmpty()) return err;
         QString ms = p.value(QStringLiteral("mode")).toString().toLower();
-        ScopeTriggerMode mode;
-        if      (ms == QStringLiteral("auto"))      mode = ScopeTriggerMode::TRIG_AUTO;
-        else if (ms == QStringLiteral("auto_fast"))  mode = ScopeTriggerMode::TRIG_AUTO_FAST;
-        else if (ms == QStringLiteral("normal"))     mode = ScopeTriggerMode::TRIG_NORMAL;
-        else if (ms == QStringLiteral("single"))     mode = ScopeTriggerMode::TRIG_SINGLE;
-        else if (ms == QStringLiteral("stop"))       mode = ScopeTriggerMode::TRIG_STOP;
-        else return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid mode: auto|auto_fast|normal|single|stop")}, {QStringLiteral("code"), -32602}};
-        scope->updateTriggerMode(mode);
+        if (ms == QStringLiteral("auto")) {
+            ps->buttonsTriggerMode->clickedInternal(2);
+        } else if (ms == QStringLiteral("normal")) {
+            ps->buttonsTriggerMode->clickedInternal(1);
+        } else if (ms == QStringLiteral("stop")) {
+            // Ensure button 0 text reads "Stop" so triggerModeCallback sees TRIG_STOP
+            ps->buttonsTriggerMode->setText(QStringLiteral("Stop"), 0);
+            ps->buttonsTriggerMode->clickedInternal(0);
+        } else if (ms == QStringLiteral("single")) {
+            // Ensure button 0 text reads "Single" so triggerModeCallback sees TRIG_SINGLE
+            ps->buttonsTriggerMode->setText(QStringLiteral("Single"), 0);
+            ps->buttonsTriggerMode->clickedInternal(0);
+        } else {
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid mode: auto|normal|single|stop")}, {QStringLiteral("code"), -32602}};
+        }
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // scope_set_trigger_edge — rising|falling
-    m_handlers[QStringLiteral("scope_set_trigger_edge")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *scope = qobject_cast<Scope *>(mod.data());
-        if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("scope_set_trigger_edge")] = [this, findScopePS](const QJsonObject &p) -> QJsonObject {
+        PanelSettings *ps = nullptr;
+        auto err = findScopePS(p, ps);
+        if (!err.isEmpty()) return err;
         QString es = p.value(QStringLiteral("edge")).toString().toLower();
-        ScopeTriggerEdge edge;
-        if      (es == QStringLiteral("rising"))  edge = ScopeTriggerEdge::EDGE_RISING;
-        else if (es == QStringLiteral("falling")) edge = ScopeTriggerEdge::EDGE_FALLING;
+        int idx = -1;
+        if      (es == QStringLiteral("rising"))  idx = 0;
+        else if (es == QStringLiteral("falling")) idx = 1;
         else return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid edge: rising|falling")}, {QStringLiteral("code"), -32602}};
-        scope->updateTriggerEdge(edge);
+        ps->buttonsTriggerEdge->clickedInternal(idx);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // scope_set_trigger_channel — 0-based channel index
-    m_handlers[QStringLiteral("scope_set_trigger_channel")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *scope = qobject_cast<Scope *>(mod.data());
-        if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("scope_set_trigger_channel")] = [this, findScopePS](const QJsonObject &p) -> QJsonObject {
+        PanelSettings *ps = nullptr;
+        auto err = findScopePS(p, ps);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
-        scope->updateTriggerChannel(ch);
+        ps->buttonsTriggerChannel->clickedInternal(ch);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // scope_set_channels — enable channels by bitmask (bit 0 = CH1, etc.)
-    m_handlers[QStringLiteral("scope_set_channels")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *scope = qobject_cast<Scope *>(mod.data());
-        if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("scope_set_channels")] = [this, findScopePS](const QJsonObject &p) -> QJsonObject {
+        PanelSettings *ps = nullptr;
+        auto err = findScopePS(p, ps);
+        if (!err.isEmpty()) return err;
         int mask = p.value(QStringLiteral("channel_mask")).toInt(1);
-        scope->updateChannelsEnable(mask);
+        // Set individual CHECKABLE button states, then fire one clickedInternal to emit statusChanged
+        for (int i = 0; i < 4; ++i)
+            ps->buttonsChannelEnable->setChecked((mask >> i) & 1, i);
+        ps->buttonsChannelEnable->clickedInternal(0);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // scope_set_pretrigger — pretrigger percentage (0-100)
-    m_handlers[QStringLiteral("scope_set_pretrigger")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *scope = qobject_cast<Scope *>(mod.data());
-        if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("scope_set_pretrigger")] = [this, findScopePS](const QJsonObject &p) -> QJsonObject {
+        PanelSettings *ps = nullptr;
+        auto err = findScopePS(p, ps);
+        if (!err.isEmpty()) return err;
         float pct = static_cast<float>(p.value(QStringLiteral("percent")).toDouble(50.0));
-        scope->updatePretrigger(pct);
+        ps->dialPretrigger->setRealValue(pct, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // scope_set_trigger_level — trigger level percentage (0-100)
-    m_handlers[QStringLiteral("scope_set_trigger_level")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *scope = qobject_cast<Scope *>(mod.data());
-        if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("scope_set_trigger_level")] = [this, findScopePS](const QJsonObject &p) -> QJsonObject {
+        PanelSettings *ps = nullptr;
+        auto err = findScopePS(p, ps);
+        if (!err.isEmpty()) return err;
         float pct = static_cast<float>(p.value(QStringLiteral("percent")).toDouble(50.0));
-        scope->updateTriggerLevel(pct);
+        ps->dialTriggerValue->setRealValue(pct, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
@@ -940,11 +1205,110 @@ void AgentBridge::registerHandlers()
     m_handlers[QStringLiteral("scope_set_resolution")] = [this](const QJsonObject &p) -> QJsonObject {
         auto mod = findModule(p.value(QStringLiteral("module")).toString());
         if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<ScopeWindow *>(mod->getWidget());
+        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+        auto *resBtn = win->findChild<WidgetButtons *>(QStringLiteral("scoperesolution"));
+        if (!resBtn)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Resolution buttons not found")}, {QStringLiteral("code"), -32603}};
+        int bits = p.value(QStringLiteral("bits")).toInt(12);
+        // buttonIndex: 0=8-bit, 1=12-bit
+        resBtn->clickedInternal(bits == 8 ? 0 : 1);
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // scope_set_sampling_freq — set custom sampling frequency (Hz)
+    m_handlers[QStringLiteral("scope_set_sampling_freq")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<ScopeWindow *>(mod->getWidget());
+        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+        auto *input = win->findChild<WidgetTextInput *>(QStringLiteral("scopeSamplingFreq"));
+        if (!input) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Sampling frequency input not found")}, {QStringLiteral("code"), -32603}};
+        int freq = p.value(QStringLiteral("value")).toInt(100000);
+        input->setText(QString::number(freq));
+        input->processInput();
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // scope_set_data_length — set custom data length (samples)
+    m_handlers[QStringLiteral("scope_set_data_length")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<ScopeWindow *>(mod->getWidget());
+        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+        auto *input = win->findChild<WidgetTextInput *>(QStringLiteral("scopeDataLength"));
+        if (!input) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Data length input not found")}, {QStringLiteral("code"), -32603}};
+        int len = p.value(QStringLiteral("value")).toInt(1000);
+        input->setText(QString::number(len));
+        input->processInput();
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // scope_add_measurement — add a measurement (type + channel)
+    // Types: frequency, period, phase, duty, low, high, rms, rms_ac, mean, pkpk, max, min
+    m_handlers[QStringLiteral("scope_add_measurement")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
         auto *scope = qobject_cast<Scope *>(mod.data());
         if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
-        int bits = p.value(QStringLiteral("bits")).toInt(12);
-        scope->updateResolution(bits);
+        QString typeStr = p.value(QStringLiteral("type")).toString().toLower();
+        int channel = p.value(QStringLiteral("channel")).toInt(0);
+        // Map string to MeasurementType
+        static const QHash<QString, MeasurementType> typeMap = {
+            {QStringLiteral("frequency"), MeasurementType::FREQUENCY},
+            {QStringLiteral("period"),    MeasurementType::PERIOD},
+            {QStringLiteral("phase"),     MeasurementType::PHASE},
+            {QStringLiteral("duty"),      MeasurementType::DUTY},
+            {QStringLiteral("low"),       MeasurementType::LOW},
+            {QStringLiteral("high"),      MeasurementType::HIGH},
+            {QStringLiteral("rms"),       MeasurementType::RMS},
+            {QStringLiteral("rms_ac"),    MeasurementType::RMS_AC},
+            {QStringLiteral("mean"),      MeasurementType::MEAN},
+            {QStringLiteral("pkpk"),      MeasurementType::PKPK},
+            {QStringLiteral("max"),       MeasurementType::MAX},
+            {QStringLiteral("min"),       MeasurementType::MIN},
+        };
+        auto it = typeMap.find(typeStr);
+        if (it == typeMap.end())
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid type. Use: frequency|period|phase|duty|low|high|rms|rms_ac|mean|pkpk|max|min")}, {QStringLiteral("code"), -32602}};
+        // For phase measurement, channel encodes both channels as chA*10+chB
+        int chIdx = channel;
+        if (*it == MeasurementType::PHASE) {
+            int chB = p.value(QStringLiteral("channel_b")).toInt(1);
+            chIdx = channel * 10 + chB;
+        }
+        auto *m = new Measurement(*it, chIdx);
+        scope->addMeasurement(m);
         return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // scope_clear_measurements — remove all measurements
+    m_handlers[QStringLiteral("scope_clear_measurements")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *scope = qobject_cast<Scope *>(mod.data());
+        if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+        scope->clearMeasurement();
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // scope_get_measurements — read current measurement results
+    m_handlers[QStringLiteral("scope_get_measurements")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *scope = qobject_cast<Scope *>(mod.data());
+        if (!scope) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Scope module")}, {QStringLiteral("code"), -32602}};
+        auto *cfg = scope->getConfig();
+        QJsonArray arr;
+        for (auto *m : cfg->scopeMeasList) {
+            QJsonObject mObj;
+            mObj[QStringLiteral("label")]     = m->getLabel();
+            mObj[QStringLiteral("value")]     = m->getValue();
+            mObj[QStringLiteral("value_str")] = m->getValueString();
+            mObj[QStringLiteral("channel")]   = m->getChannelIndex();
+            arr.append(mObj);
+        }
+        return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("measurements"), arr}};
     };
 
     // ── Voltage Source ───────────────────────────────────────
@@ -958,10 +1322,10 @@ void AgentBridge::registerHandlers()
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Voltage Source module")}, {QStringLiteral("code"), -32602}};
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         qreal voltage = p.value(QStringLiteral("voltage")).toDouble();
-        // Invoke the window's internal callback — updates display, bar, and emits
-        // voltageChanged signal which triggers VoltageSource::voltageChangedCallback → MCU
-        QMetaObject::invokeMethod(win, "dialChangedCallback",
-                                  Q_ARG(qreal, voltage), Q_ARG(int, ch));
+        auto *dial = win->findChild<WidgetDialRange *>(QStringLiteral("voltSourceDialCH") + QString::number(ch + 1));
+        if (!dial)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Channel dial not found")}, {QStringLiteral("code"), -32603}};
+        dial->setRealValue(static_cast<float>(voltage), false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
@@ -1244,13 +1608,83 @@ void AgentBridge::registerHandlers()
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
+    // voltmeter_set_channels — enable channels by bitmask
+    m_handlers[QStringLiteral("voltmeter_set_channels")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        QWidget *w = mod->getWidget();
+        if (!w) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Voltmeter module")}, {QStringLiteral("code"), -32602}};
+        auto *btn = w->findChild<WidgetButtons *>(QStringLiteral("ChannelvoltmeterEnable"));
+        if (!btn) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Channel enable buttons not found")}, {QStringLiteral("code"), -32603}};
+        int mask = p.value(QStringLiteral("channel_mask")).toInt(1);
+        for (int i = 0; i < 4; ++i)
+            btn->setChecked((mask >> i) & 1, i);
+        btn->clickedInternal(0);
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // voltmeter_get_readings — read live voltage data
+    m_handlers[QStringLiteral("voltmeter_get_readings")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *vm = qobject_cast<Voltmeter *>(mod.data());
+        if (!vm) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Voltmeter module")}, {QStringLiteral("code"), -32602}};
+        QJsonArray readings;
+        for (int i = 0; i < vm->getNumChannelsEnabled(); ++i) {
+            const auto &ch = vm->channelData(i);
+            QJsonObject chObj;
+            chObj[QStringLiteral("voltage")]   = ch.voltage;
+            chObj[QStringLiteral("min")]        = ch.min;
+            chObj[QStringLiteral("max")]        = ch.max;
+            chObj[QStringLiteral("ripple")]     = ch.ripple;
+            chObj[QStringLiteral("frequency")]  = ch.frequency;
+            chObj[QStringLiteral("percent")]    = ch.percent;
+            readings.append(chObj);
+        }
+        return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("vdd"), vm->getVdd()}, {QStringLiteral("readings"), readings}};
+    };
+
+    // voltmeter_set_datalog_file — set data log file path (no GUI dialog)
+    m_handlers[QStringLiteral("voltmeter_set_datalog_file")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *vw = qobject_cast<VoltmeterWindow *>(mod->getWidget());
+        if (!vw) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Voltmeter module")}, {QStringLiteral("code"), -32602}};
+        QString path = p.value(QStringLiteral("path")).toString();
+        if (path.isEmpty()) return QJsonObject{{QStringLiteral("error"), QStringLiteral("path is required")}, {QStringLiteral("code"), -32602}};
+        vw->setDatalogFilePath(path);
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // voltmeter_start_datalog — start data logging
+    m_handlers[QStringLiteral("voltmeter_start_datalog")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *vw = qobject_cast<VoltmeterWindow *>(mod->getWidget());
+        if (!vw) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Voltmeter module")}, {QStringLiteral("code"), -32602}};
+        if (vw->isLogging()) return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("info"), QStringLiteral("already logging")}};
+        vw->startDatalog();
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // voltmeter_stop_datalog — stop data logging
+    m_handlers[QStringLiteral("voltmeter_stop_datalog")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *vw = qobject_cast<VoltmeterWindow *>(mod->getWidget());
+        if (!vw) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Voltmeter module")}, {QStringLiteral("code"), -32602}};
+        if (!vw->isLogging()) return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("info"), QStringLiteral("not logging")}};
+        vw->stopDatalog();
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
     // ── get_module_state — read current GUI state of a module ──
     m_handlers[QStringLiteral("get_module_state")] = [this](const QJsonObject &p) -> QJsonObject {
         auto mod = findModule(p.value(QStringLiteral("module")).toString());
         if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
         QWidget *w = mod->getWidget();
         if (!w) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module has no window (not started?)")}, {QStringLiteral("code"), -32603}};
-        QJsonObject state = buildModuleState(w, p.value(QStringLiteral("module")).toString());
+        QJsonObject state = buildModuleState(w, p.value(QStringLiteral("module")).toString(), mod.data());
         state[QStringLiteral("ok")] = true;
         return state;
     };

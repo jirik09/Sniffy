@@ -63,6 +63,51 @@ async def list_tools() -> list[Tool]:
             ),
             inputSchema={"type": "object", "properties": {}},
         ),
+        # ── Device management ──
+        Tool(
+            name="sniffy_scan_devices",
+            description=(
+                "Probe all COM ports for Sniffy-compatible boards. "
+                "Returns a list of found devices with index, name, and port. "
+                "Must be called before connect_device if no devices are in the list. "
+                "Fails if already connected — disconnect first."
+            ),
+            inputSchema={"type": "object", "properties": {}},
+        ),
+        Tool(
+            name="sniffy_list_devices",
+            description=(
+                "Return the cached device list from the last scan (no re-scan). "
+                "Also reports whether a device is currently connected."
+            ),
+            inputSchema={"type": "object", "properties": {}},
+        ),
+        Tool(
+            name="sniffy_connect_device",
+            description=(
+                "Connect to a device by its index in the scanned list OR by a name "
+                "substring (e.g. 'F303RE'). Call scan_devices first to populate the list."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "index": {
+                        "type": "integer",
+                        "description": "Device index from scan_devices result.",
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Substring match against device name (e.g. 'F303RE').",
+                    },
+                },
+            },
+        ),
+        Tool(
+            name="sniffy_disconnect_device",
+            description="Disconnect the currently connected device.",
+            inputSchema={"type": "object", "properties": {}},
+        ),
+        # ── Module lifecycle ──
         Tool(
             name="sniffy_list_modules",
             description="List all available instrument modules and their status.",
@@ -282,6 +327,43 @@ async def list_tools() -> list[Tool]:
             },
         ),
         Tool(
+            name="sniffy_spwm_set_step_mode",
+            description="Switch Sync PWM between Continuous (false) and Step (true) mode.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Sync PWM')."},
+                    "step": {"type": "boolean", "description": "false=Continuous, true=Step."},
+                },
+                "required": ["module", "step"],
+            },
+        ),
+        Tool(
+            name="sniffy_spwm_set_equidistant",
+            description="Enable or disable equidistant phase distribution across Sync PWM channels.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Sync PWM')."},
+                    "enabled": {"type": "boolean", "description": "true=enable, false=disable."},
+                },
+                "required": ["module", "enabled"],
+            },
+        ),
+        Tool(
+            name="sniffy_spwm_set_invert",
+            description="Enable or disable waveform inversion for a specific Sync PWM channel.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Sync PWM')."},
+                    "channel": {"type": "integer", "description": "Channel index 0-3."},
+                    "enabled": {"type": "boolean", "description": "true=inverted, false=normal."},
+                },
+                "required": ["module", "channel", "enabled"],
+            },
+        ),
+        Tool(
             name="sniffy_counter_set_mode",
             description=(
                 "Switch Counter measurement mode. Updates GUI tab + sends MCU command. "
@@ -325,12 +407,12 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="sniffy_scope_set_trigger_mode",
-            description="Set oscilloscope trigger mode: auto, auto_fast, normal, single, or stop.",
+            description="Set oscilloscope trigger mode: auto, normal, single, or stop.",
             inputSchema={
                 "type": "object",
                 "properties": {
                     "module": {"type": "string", "description": "Module name (e.g. 'Oscilloscope')."},
-                    "mode": {"type": "string", "description": "Trigger mode (auto|auto_fast|normal|single|stop)."},
+                    "mode": {"type": "string", "description": "Trigger mode (auto|normal|single|stop)."},
                 },
                 "required": ["module", "mode"],
             },
@@ -405,6 +487,70 @@ async def list_tools() -> list[Tool]:
                     "bits": {"type": "integer", "description": "ADC resolution (8 or 12)."},
                 },
                 "required": ["module", "bits"],
+            },
+        ),
+        Tool(
+            name="sniffy_scope_set_sampling_freq",
+            description="Set oscilloscope custom sampling frequency in Hz.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Oscilloscope')."},
+                    "value": {"type": "integer", "description": "Sampling frequency in Hz."},
+                },
+                "required": ["module", "value"],
+            },
+        ),
+        Tool(
+            name="sniffy_scope_set_data_length",
+            description="Set oscilloscope custom data length in samples.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Oscilloscope')."},
+                    "value": {"type": "integer", "description": "Data length in samples."},
+                },
+                "required": ["module", "value"],
+            },
+        ),
+        Tool(
+            name="sniffy_scope_add_measurement",
+            description=(
+                "Add an oscilloscope measurement. Types: frequency, period, phase, duty, "
+                "low, high, rms, rms_ac, mean, pkpk, max, min. "
+                "For phase, specify channel (1st) and channel_b (2nd)."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Oscilloscope')."},
+                    "type": {"type": "string", "description": "Measurement type."},
+                    "channel": {"type": "integer", "description": "Channel index (0-based, default 0)."},
+                    "channel_b": {"type": "integer", "description": "Second channel for phase (0-based, default 1)."},
+                },
+                "required": ["module", "type"],
+            },
+        ),
+        Tool(
+            name="sniffy_scope_clear_measurements",
+            description="Clear all oscilloscope measurements.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Oscilloscope')."},
+                },
+                "required": ["module"],
+            },
+        ),
+        Tool(
+            name="sniffy_scope_get_measurements",
+            description="Read current oscilloscope measurement results (label, value, channel for each).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Oscilloscope')."},
+                },
+                "required": ["module"],
             },
         ),
         Tool(
@@ -650,6 +796,63 @@ async def list_tools() -> list[Tool]:
                 "required": ["module", "mode"],
             },
         ),
+        Tool(
+            name="sniffy_voltmeter_set_channels",
+            description="Enable Voltmeter channels by bitmask (bit 0=CH1, bit 1=CH2, etc.).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Voltmeter')."},
+                    "channel_mask": {"type": "integer", "description": "Bitmask of enabled channels."},
+                },
+                "required": ["module", "channel_mask"],
+            },
+        ),
+        Tool(
+            name="sniffy_voltmeter_get_readings",
+            description="Read live Voltmeter readings: voltage, min, max, ripple, frequency, percent per channel, plus Vdd.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Voltmeter')."},
+                },
+                "required": ["module"],
+            },
+        ),
+        Tool(
+            name="sniffy_voltmeter_set_datalog_file",
+            description="Set data log output file path for the Voltmeter. The file will be created/overwritten when logging starts.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Voltmeter')."},
+                    "path":   {"type": "string", "description": "Absolute path to the .txt or .csv file."},
+                },
+                "required": ["module", "path"],
+            },
+        ),
+        Tool(
+            name="sniffy_voltmeter_start_datalog",
+            description="Start Voltmeter data logging to the previously set file.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Voltmeter')."},
+                },
+                "required": ["module"],
+            },
+        ),
+        Tool(
+            name="sniffy_voltmeter_stop_datalog",
+            description="Stop Voltmeter data logging.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name (e.g. 'Voltmeter')."},
+                },
+                "required": ["module"],
+            },
+        ),
     ]
 
 
@@ -660,6 +863,12 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     dispatch = {
         "sniffy_ping":              lambda: c.ping(),
         "sniffy_get_status":        lambda: c.get_status(),
+        "sniffy_scan_devices":      lambda: c.scan_devices(),
+        "sniffy_list_devices":      lambda: c.list_devices(),
+        "sniffy_connect_device":    lambda: c.connect_device(
+            index=arguments.get("index"), name=arguments.get("name"),
+        ),
+        "sniffy_disconnect_device": lambda: c.disconnect_device(),
         "sniffy_list_modules":      lambda: c.list_modules(),
         "sniffy_module_start":      lambda: c.module_start(arguments["module"]),
         "sniffy_module_stop":       lambda: c.module_stop(arguments["module"]),
@@ -693,6 +902,15 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         "sniffy_spwm_set_channel_enable": lambda: c.spwm_set_channel_enable(
             arguments["module"], arguments["channel"], arguments["enabled"],
         ),
+        "sniffy_spwm_set_step_mode": lambda: c.spwm_set_step_mode(
+            arguments["module"], arguments["step"],
+        ),
+        "sniffy_spwm_set_equidistant": lambda: c.spwm_set_equidistant(
+            arguments["module"], arguments["enabled"],
+        ),
+        "sniffy_spwm_set_invert": lambda: c.spwm_set_invert(
+            arguments["module"], arguments["channel"], arguments["enabled"],
+        ),
         "sniffy_counter_set_mode": lambda: c.counter_set_mode(
             arguments["module"], arguments["mode"],
         ),
@@ -722,6 +940,22 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         ),
         "sniffy_scope_set_resolution": lambda: c.scope_set_resolution(
             arguments["module"], arguments["bits"],
+        ),
+        "sniffy_scope_set_sampling_freq": lambda: c.scope_set_sampling_freq(
+            arguments["module"], arguments["value"],
+        ),
+        "sniffy_scope_set_data_length": lambda: c.scope_set_data_length(
+            arguments["module"], arguments["value"],
+        ),
+        "sniffy_scope_add_measurement": lambda: c.scope_add_measurement(
+            arguments["module"], arguments["type"],
+            arguments.get("channel", 0), arguments.get("channel_b", 1),
+        ),
+        "sniffy_scope_clear_measurements": lambda: c.scope_clear_measurements(
+            arguments["module"],
+        ),
+        "sniffy_scope_get_measurements": lambda: c.scope_get_measurements(
+            arguments["module"],
         ),
         "sniffy_vout_set_voltage": lambda: c.vout_set_voltage(
             arguments["module"], arguments["channel"], arguments["voltage"],
@@ -780,6 +1014,21 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         ),
         "sniffy_voltmeter_set_calc_mode": lambda: c.voltmeter_set_calc_mode(
             arguments["module"], arguments["mode"],
+        ),
+        "sniffy_voltmeter_set_channels": lambda: c.voltmeter_set_channels(
+            arguments["module"], arguments["channel_mask"],
+        ),
+        "sniffy_voltmeter_get_readings": lambda: c.voltmeter_get_readings(
+            arguments["module"],
+        ),
+        "sniffy_voltmeter_set_datalog_file": lambda: c.voltmeter_set_datalog_file(
+            arguments["module"], arguments["path"],
+        ),
+        "sniffy_voltmeter_start_datalog": lambda: c.voltmeter_start_datalog(
+            arguments["module"],
+        ),
+        "sniffy_voltmeter_stop_datalog": lambda: c.voltmeter_stop_datalog(
+            arguments["module"],
         ),
     }
 

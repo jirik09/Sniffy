@@ -196,6 +196,31 @@ class SniffyClient:
         """Device connection status and module list."""
         return self._call("get_status")
 
+    # ── Device management ──────────────────────────────────
+
+    def scan_devices(self) -> dict:
+        """Probe all COM ports for Sniffy-compatible boards. Returns list of found devices."""
+        return self._call("scan_devices")
+
+    def list_devices(self) -> dict:
+        """Return the last scanned device list (no re-scan)."""
+        return self._call("list_devices")
+
+    def connect_device(self, index: int | None = None, name: str | None = None) -> dict:
+        """Connect to a device by index or name substring (e.g. 'F303RE')."""
+        params: dict[str, Any] = {}
+        if index is not None:
+            params["index"] = index
+        elif name is not None:
+            params["name"] = name
+        return self._call("connect_device", params)
+
+    def disconnect_device(self) -> dict:
+        """Disconnect the current device."""
+        return self._call("disconnect_device")
+
+    # ── Module lifecycle ───────────────────────────────────
+
     def list_modules(self) -> list[dict]:
         """List all modules with their current state."""
         return self._call("list_modules").get("modules", [])
@@ -270,6 +295,18 @@ class SniffyClient:
         """Enable/disable a Sync PWM channel. Updates GUI + MCU."""
         return self._call("spwm_set_channel_enable", {"module": module, "channel": channel, "enabled": enabled})
 
+    def spwm_set_step_mode(self, module: str, step: bool = True) -> dict:
+        """Switch Sync PWM between Continuous (false) and Step (true) mode."""
+        return self._call("spwm_set_step_mode", {"module": module, "step": step})
+
+    def spwm_set_equidistant(self, module: str, enabled: bool = True) -> dict:
+        """Enable/disable equidistant phase distribution across channels."""
+        return self._call("spwm_set_equidistant", {"module": module, "enabled": enabled})
+
+    def spwm_set_invert(self, module: str, channel: int, enabled: bool = True) -> dict:
+        """Enable/disable inversion for a specific Sync PWM channel."""
+        return self._call("spwm_set_invert", {"module": module, "channel": channel, "enabled": enabled})
+
     # Counter
 
     def counter_set_mode(self, module: str, mode: int) -> dict:
@@ -287,7 +324,7 @@ class SniffyClient:
         return self._call("scope_set_timebase", {"module": module, "value": value})
 
     def scope_set_trigger_mode(self, module: str, mode: str) -> dict:
-        """Set scope trigger mode: auto|auto_fast|normal|single|stop."""
+        """Set scope trigger mode: auto|normal|single|stop."""
         return self._call("scope_set_trigger_mode", {"module": module, "mode": mode})
 
     def scope_set_trigger_edge(self, module: str, edge: str) -> dict:
@@ -313,6 +350,30 @@ class SniffyClient:
     def scope_set_resolution(self, module: str, bits: int) -> dict:
         """Set scope ADC resolution (8 or 12 bits)."""
         return self._call("scope_set_resolution", {"module": module, "bits": bits})
+
+    def scope_set_sampling_freq(self, module: str, value: int) -> dict:
+        """Set scope custom sampling frequency in Hz."""
+        return self._call("scope_set_sampling_freq", {"module": module, "value": value})
+
+    def scope_set_data_length(self, module: str, value: int) -> dict:
+        """Set scope custom data length in samples."""
+        return self._call("scope_set_data_length", {"module": module, "value": value})
+
+    def scope_add_measurement(self, module: str, type: str, channel: int = 0, channel_b: int = 1) -> dict:
+        """Add a scope measurement. Types: frequency|period|phase|duty|low|high|rms|rms_ac|mean|pkpk|max|min.
+        For phase, channel_b specifies the second channel."""
+        params: dict = {"module": module, "type": type, "channel": channel}
+        if type.lower() == "phase":
+            params["channel_b"] = channel_b
+        return self._call("scope_add_measurement", params)
+
+    def scope_clear_measurements(self, module: str) -> dict:
+        """Clear all scope measurements."""
+        return self._call("scope_clear_measurements", {"module": module})
+
+    def scope_get_measurements(self, module: str) -> dict:
+        """Get current scope measurement results."""
+        return self._call("scope_get_measurements", {"module": module})
 
     # Voltage Source
 
@@ -395,6 +456,26 @@ class SniffyClient:
     def voltmeter_set_calc_mode(self, module: str, mode: int) -> dict:
         """Set voltmeter calculation display: 0=Min/Max, 1=Ripple, 2=None."""
         return self._call("voltmeter_set_calc_mode", {"module": module, "mode": mode})
+
+    def voltmeter_set_channels(self, module: str, channel_mask: int) -> dict:
+        """Enable voltmeter channels by bitmask (bit 0 = CH1, etc.)."""
+        return self._call("voltmeter_set_channels", {"module": module, "channel_mask": channel_mask})
+
+    def voltmeter_get_readings(self, module: str) -> dict:
+        """Get live voltmeter readings (voltage, min, max, ripple, frequency per channel)."""
+        return self._call("voltmeter_get_readings", {"module": module})
+
+    def voltmeter_set_datalog_file(self, module: str, path: str) -> dict:
+        """Set the data log output file path (must exist or be creatable)."""
+        return self._call("voltmeter_set_datalog_file", {"module": module, "path": path})
+
+    def voltmeter_start_datalog(self, module: str) -> dict:
+        """Start data logging (file must be set first)."""
+        return self._call("voltmeter_start_datalog", {"module": module})
+
+    def voltmeter_stop_datalog(self, module: str) -> dict:
+        """Stop data logging."""
+        return self._call("voltmeter_stop_datalog", {"module": module})
 
     # ── convenience helpers ────────────────────────────────
 

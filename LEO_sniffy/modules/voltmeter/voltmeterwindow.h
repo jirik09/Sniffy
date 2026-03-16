@@ -48,6 +48,8 @@ public:
     void appendDatalog(ChannelData data[], int numChannels);
     void stopDatalog();
     void startDatalog();
+    void setDatalogFilePath(const QString &path);
+    bool isLogging() const { return isDataLogRunning; }
 
 private:
     Ui::VoltmeterWindow *ui;
