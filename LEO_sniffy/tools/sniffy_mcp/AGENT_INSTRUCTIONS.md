@@ -81,17 +81,33 @@ MCP tools are prefixed with `sniffy_` (e.g., `sniffy_get_status`).
 2. If `connected: false`:
    a. **`scan_devices`** — probe COM ports for Sniffy boards
    b. **`connect_device`** — pick the right board by index or name
-   c. **Wait ~3 seconds** — the device needs time to enumerate modules
-      and restore configuration after connection.
+   c. **Wait for device ready** — the device needs time to enumerate
+      modules and restore configuration after connection.
 3. If `connected: true` — proceed to module operations
 
 > **Important**: After `connect_device`, the MCU exchanges capability
 > and configuration packets with the PC app.  If you call `module_start`
-> immediately, the module may not be ready yet.  Always wait 2-3 seconds
+> immediately, the module may not be ready yet.  Always wait 2–3 seconds
 > between `connect_device` and the first `module_start`.
 >
-> In shell scripts use `Start-Sleep -Seconds 3` (PowerShell) or
-> `sleep 3` (bash) between connection and module start.
+> **Simple approach** — in shell scripts use `Start-Sleep -Seconds 3`
+> (PowerShell) or `sleep 3` (bash) between connection and module start.
+>
+> **Robust approach (recommended for automated test systems)** — use the
+> Python helper `wait_for_device()` which polls `get_status` until
+> `connected == true`:
+> ```python
+> s.connect_device(name="F303RE")
+> if not s.wait_for_device(timeout=15, poll=0.5):
+>     raise RuntimeError("Device did not become ready")
+> s.module_start("Oscilloscope")
+> ```
+> Or poll manually from the CLI:
+> ```bash
+> python -m sniffy_mcp call connect_device 0
+> # poll until connected
+> python -m sniffy_mcp call get_status   # repeat until connected=true
+> ```
 >
 > If only one board is attached and the app just launched, it may
 > auto-connect.  Check `connected` and `device` fields first.
@@ -141,13 +157,56 @@ Each module follows: **stopped → running → paused → stopped**.
 
 Modules that share hardware resources **cannot run simultaneously** — the
 app enforces this automatically.  If a module shows `locked`, stop the
-conflicting module first.
+conflicting module first.  Use `get_system_config` to discover which
+modules conflict **before** trying to start them.
 
 > **Session persistence**: The app restores the last-used configuration
 > (mode, dials, tabs) from a session file on launch.  **Always check the
 > `state` returned by `module_start`** (or call `get_module_state`) to
 > learn which mode/tab is active — do not assume defaults.  Then use the
 > appropriate setter to change any setting that differs from what you need.
+
+---
+
+## System Configuration
+
+Call `get_system_config` (or `sniffy_get_system_config` via MCP) after
+connecting to discover the full hardware configuration.  This returns:
+
+- **`device`** — MCU family, core clock, firmware version, buffer length,
+  UART speed, USB support
+- **`modules`** — array of available modules, each with:
+  - `name`, `status`
+  - Module-specific capabilities: channel count, max sampling rates,
+    memory sizes, pin names, voltage references, DAC resolution, etc.
+- **`conflicts`** — array of `[moduleA, moduleB]` pairs that **cannot**
+  run simultaneously (they share hardware resources)
+
+### Example response (abridged)
+
+```json
+{
+  "device": {
+    "name": "Nucleo-F303RE",
+    "mcu": "STM32F303xE",
+    "core_clock": 72000000,
+    "fw_version": "2.0.0"
+  },
+  "modules": [
+    {"name": "Oscilloscope", "channels": 2, "max_sampling_rate_12b": 5000000, "pins": ["PA0", "PA1"]},
+    {"name": "Arbitrary generator", "channels": 1, "max_sampling_rate": 1500000, "pins": ["PA4"]},
+    {"name": "PWM generator", "channels": 4, "timer_clock": 72000000, "pins": ["PA8","PA9","PA10","PA11"]}
+  ],
+  "conflicts": [
+    ["Oscilloscope", "Voltmeter"],
+    ["Arbitrary generator", "Voltage source"]
+  ]
+}
+```
+
+> **Best practice**: Call `get_system_config` once after connecting, then
+> use the `channels` field to know how many channels you can enable, and
+> check `conflicts` before starting multiple modules.
 
 ---
 
@@ -346,27 +405,61 @@ keeping the desktop app perfectly in sync with agent actions.
 ### Arbitrary / PWM Generator
 
 Both "Arbitrary generator" (DAC output) and "PWM generator" (modulated
-PWM) share the same controls.  Use the exact module name string.
+PWM) share the same signal-shaping controls.  Use the exact module name
+string.  The PWM generator has additional controls for the PWM carrier
+frequency per channel.
 
-| Tool | Parameters | Notes |
+#### Common tools (both Arb and PWM)
 |------|-----------|-------|
-| `sniffy_arbgen_set_frequency` | `module`, `channel` (0-3), `value` (Hz) | Per-channel frequency dial |
+| `sniffy_arbgen_set_frequency` | `module`, `channel` (0-3), `value` (Hz) | Per-channel signal frequency dial |
 | `sniffy_arbgen_set_shape` | `module`, `channel` (0-3), `index` | 0=Sine, 1=Saw, 2=Rect, 3=Arb |
 | `sniffy_arbgen_set_amplitude` | `module`, `channel` (0-3), `value` (V) | Signal amplitude |
 | `sniffy_arbgen_set_offset` | `module`, `channel` (0-3), `value` (V) | DC offset |
-| `sniffy_arbgen_set_duty` | `module`, `channel` (0-3), `value` (%) | Duty cycle (Rect/Saw) |
+| `sniffy_arbgen_set_duty` | `module`, `channel` (0-3), `value` (%) | Duty cycle (Rect/Saw only; hidden for Sine/Arb) |
 | `sniffy_arbgen_set_phase` | `module`, `channel` (0-3), `value` (°) | Phase 0-360 degrees |
 | `sniffy_arbgen_set_channels` | `module`, `count` (1-4) | Number of active output channels |
+| `sniffy_arbgen_set_memory` | `module`, `mode`, opt `length` | 0=Best fit, 1=Long, 2=Custom. For Custom supply `length` (samples). |
+| `sniffy_arbgen_set_sweep` | `module`, `enable` (bool), opt `min_freq`, `max_freq`, `sweep_time` | SW frequency sweep on CH1. Freq in Hz, time in seconds. |
+| `sniffy_arbgen_set_freq_sync` | `module`, `channel` (1-3), `enabled` (bool) | Sync CH2/3/4 signal frequency to CH1. Channel: 1=CH2, 2=CH3, 3=CH4. |
+
+#### PWM generator only
+
+| Tool | Parameters | Notes |
+|------|-----------|-------|
+| `sniffy_arbgen_set_pwm_frequency` | `module`, `channel` (0-3), `value` (Hz) | PWM carrier frequency per channel |
+| `sniffy_arbgen_set_pwm_freq_sync` | `module`, `channel` (1-3), `enabled` (bool) | Sync CH2-CH4 PWM carrier frequency to CH1 |
 
 > These set GUI widget values. The signal is uploaded to the MCU when the
 > module is started with `sniffy_module_start`.
+>
+> When CH1 Freq sync is On for a channel, that channel’s frequency dial
+> is disabled and locked to CH1's value.  The same applies to PWM Freq
+> sync for the PWM carrier frequency.
+
+**State readback** (`sniffy_get_module_state`):
+`num_channels`, `memory` (best_fit/long/custom), `custom_length` (if custom),
+`sweep_enabled`, `sweep_min_freq`, `sweep_max_freq`, `sweep_time`,
+per-channel: `shape`/`shape_name` (sine/saw/rect/arb), `frequency`,
+`amplitude`, `offset`, `duty`, `phase`, `freq_sync_ch1` (CH2+ only).
+PWM generator adds per-channel: `pwm_frequency`, `pwm_freq_sync_ch1` (CH2+ only).
 
 ### Pattern Generator
 
 | Tool | Parameters | Notes |
 |------|-----------|-------|
 | `sniffy_patgen_set_pattern` | `module`, `index` (0-14) | 0=User, 1=Counter, 2=Binary, 3=Gray, 4=Quadrature, 5=PRBS, 6=PWM, 7=Line code, 8=4B/5B, 9=Johnson, 10=PDM, 11=Parallel bus, 12=UART, 13=SPI, 14=I2C |
-| `sniffy_patgen_set_frequency` | `module`, `value` (Hz) | Frequency of the currently selected pattern |
+| `sniffy_patgen_set_frequency` | `module`, `value` (Hz) | Frequency of the currently selected pattern (patterns 0-11 have a freq dial; 12-14 use baud/clock combos) |
+| `sniffy_patgen_set_channels` | `module`, `value` | Channel count / data length. Only for patterns: 0=User (length), 1=Counter (length), 2=Binary (channels), 3=Gray (channels), 8=4B/5B (groups), 9=Johnson (phases), 11=Parallel bus (width) |
+| `sniffy_patgen_reset` | `module` | Reset the currently selected pattern to factory defaults |
+
+**Pattern Generator state readback** (`sniffy_get_module_state`):
+`pattern_index`, `pattern_name`, `frequency` (Hz, if applicable),
+`channels` (count/length, if applicable).
+Per-pattern extras: Quadrature → `sequence`, PRBS → `prbs_order`,
+PWM → `duty`, Line code → `line_code_type`, PDM → `pdm_level`,
+UART → `baud`/`data_bits`/`parity`/`stop_bits`/`bit_order`,
+SPI → `spi_mode`/`word_size`/`bit_order`/`cs_gating`/`pause_ticks`,
+I2C → `clock_freq`/`comm_type`/`addr_mode`/`address`.
 
 ### Voltmeter
 

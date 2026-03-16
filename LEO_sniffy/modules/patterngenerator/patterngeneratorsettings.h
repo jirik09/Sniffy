@@ -96,6 +96,7 @@ public:
     void enableGuiComponents(bool enable);
     void showComponents(int pattIndex, bool visible);
     bool isI2CPatternIndex(int index) const;
+    const QList<QString>& getPatternList() const { return pattList; }
 
 private:
     PatternGeneratorConfig *config;

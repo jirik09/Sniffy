@@ -196,6 +196,11 @@ class SniffyClient:
         """Device connection status and module list."""
         return self._call("get_status")
 
+    def get_system_config(self) -> dict:
+        """Full hardware configuration: device info, per-module capabilities,
+        channel counts, pins, and resource conflict matrix."""
+        return self._call("get_system_config")
+
     # ── Device management ──────────────────────────────────
 
     def scan_devices(self) -> dict:
@@ -433,6 +438,41 @@ class SniffyClient:
         """Set number of active channels (1-4)."""
         return self._call("arbgen_set_channels", {"module": module, "count": count})
 
+    def arbgen_set_memory(self, module: str, mode: int, length: int = 0) -> dict:
+        """Set memory mode: 0=Best fit, 1=Long, 2=Custom.
+        When mode=2 (Custom), length sets the sample count."""
+        params: dict = {"module": module, "mode": mode}
+        if mode == 2 and length > 0:
+            params["length"] = length
+        return self._call("arbgen_set_memory", params)
+
+    def arbgen_set_sweep(self, module: str, enable: bool,
+                         min_freq: float = 0, max_freq: float = 0,
+                         sweep_time: float = 0) -> dict:
+        """Enable/disable SW sweep on CH1.  When enabling, optionally set
+        min_freq (Hz), max_freq (Hz), sweep_time (s)."""
+        params: dict = {"module": module, "enable": enable}
+        if enable:
+            if min_freq > 0:
+                params["min_freq"] = min_freq
+            if max_freq > 0:
+                params["max_freq"] = max_freq
+            if sweep_time > 0:
+                params["sweep_time"] = sweep_time
+        return self._call("arbgen_set_sweep", params)
+
+    def arbgen_set_freq_sync(self, module: str, channel: int, enabled: bool) -> dict:
+        """Set CH1 freq sync on/off for channel (1-3 = CH2-CH4)."""
+        return self._call("arbgen_set_freq_sync", {"module": module, "channel": channel, "enabled": enabled})
+
+    def arbgen_set_pwm_frequency(self, module: str, channel: int, value: float) -> dict:
+        """Set PWM carrier frequency per channel (PWM generator only)."""
+        return self._call("arbgen_set_pwm_frequency", {"module": module, "channel": channel, "value": value})
+
+    def arbgen_set_pwm_freq_sync(self, module: str, channel: int, enabled: bool) -> dict:
+        """Set PWM freq sync with CH1 on/off for channel (1-3 = CH2-CH4). PWM generator only."""
+        return self._call("arbgen_set_pwm_freq_sync", {"module": module, "channel": channel, "enabled": enabled})
+
     # Pattern Generator
 
     def patgen_set_pattern(self, module: str, index: int) -> dict:
@@ -442,6 +482,14 @@ class SniffyClient:
     def patgen_set_frequency(self, module: str, value: float) -> dict:
         """Set frequency (Hz) of the currently selected pattern."""
         return self._call("patgen_set_frequency", {"module": module, "value": value})
+
+    def patgen_set_channels(self, module: str, value: float) -> dict:
+        """Set channel count / data length for the current pattern (patterns 0-3, 8, 9, 11 only)."""
+        return self._call("patgen_set_channels", {"module": module, "value": value})
+
+    def patgen_reset(self, module: str) -> dict:
+        """Reset the current pattern to factory defaults."""
+        return self._call("patgen_reset", {"module": module})
 
     # Voltmeter
 
@@ -489,6 +537,23 @@ class SniffyClient:
                 return True
             except (ConnectionError, OSError):
                 time.sleep(poll)
+        return False
+
+    def wait_for_device(self, timeout: float = 15.0, poll: float = 0.5) -> bool:
+        """Poll get_status until connected==true or timeout expires.
+
+        Use after connect_device to wait for the MCU to finish
+        enumerating modules before calling module_start.
+        """
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            try:
+                st = self.get_status()
+                if st.get("connected"):
+                    return True
+            except Exception:
+                pass
+            time.sleep(poll)
         return False
 
     def wait_for_scope_data(self, timeout: float = 5.0, poll: float = 0.1) -> dict:

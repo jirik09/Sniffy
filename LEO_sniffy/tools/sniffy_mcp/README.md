@@ -49,6 +49,14 @@ python -m sniffy_mcp call vout_set_voltage "Voltage source" 0 1.5
 > **Connection timing**: After `connect_device`, wait 2–3 seconds before
 > `module_start`.  The MCU needs time to enumerate modules.
 > In PowerShell: `Start-Sleep -Seconds 3`.
+>
+> For automated test systems, use `wait_for_device()` which polls
+> `get_status` until `connected == true`:
+> ```python
+> s.connect_device(name="F303RE")
+> s.wait_for_device(timeout=15)   # blocks until ready
+> s.module_start("Oscilloscope")
+> ```
 
 The CLI uses **SniffyClient method names** (e.g. `module_start`), not MCP
 tool names (e.g. `sniffy_module_start`).  Arguments are auto-coerced to

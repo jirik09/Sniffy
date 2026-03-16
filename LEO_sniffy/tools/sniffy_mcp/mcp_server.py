@@ -63,6 +63,15 @@ async def list_tools() -> list[Tool]:
             ),
             inputSchema={"type": "object", "properties": {}},
         ),
+        Tool(
+            name="sniffy_get_system_config",
+            description=(
+                "Get full hardware configuration: device info (MCU, clock, FW version), "
+                "per-module capabilities (channels, sampling rates, pins), "
+                "and resource conflict matrix showing which modules cannot run simultaneously."
+            ),
+            inputSchema={"type": "object", "properties": {}},
+        ),
         # ── Device management ──
         Tool(
             name="sniffy_scan_devices",
@@ -729,6 +738,73 @@ async def list_tools() -> list[Tool]:
                 "required": ["module", "count"],
             },
         ),
+        Tool(
+            name="sniffy_arbgen_set_memory",
+            description="Set memory mode: 0=Best fit, 1=Long, 2=Custom. When mode=2, optionally set 'length' (samples).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string"},
+                    "mode":   {"type": "integer", "description": "0=Best fit, 1=Long, 2=Custom."},
+                    "length": {"type": "integer", "description": "Custom sample count (only for mode=2)."},
+                },
+                "required": ["module", "mode"],
+            },
+        ),
+        Tool(
+            name="sniffy_arbgen_set_sweep",
+            description="Enable/disable SW frequency sweep on CH1.  When enabling, optionally set min_freq (Hz), max_freq (Hz), sweep_time (s).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module":     {"type": "string"},
+                    "enable":     {"type": "boolean"},
+                    "min_freq":   {"type": "number", "description": "Min sweep frequency (Hz)."},
+                    "max_freq":   {"type": "number", "description": "Max sweep frequency (Hz)."},
+                    "sweep_time": {"type": "number", "description": "Sweep time (seconds)."},
+                },
+                "required": ["module", "enable"],
+            },
+        ),
+        Tool(
+            name="sniffy_arbgen_set_freq_sync",
+            description="Set CH1 frequency sync on/off for a channel. Channel is 0-based index (1=CH2, 2=CH3, 3=CH4).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module":  {"type": "string"},
+                    "channel": {"type": "integer", "description": "Channel index 1-3 (CH2-CH4)."},
+                    "enabled": {"type": "boolean"},
+                },
+                "required": ["module", "channel", "enabled"],
+            },
+        ),
+        Tool(
+            name="sniffy_arbgen_set_pwm_frequency",
+            description="Set PWM carrier frequency per channel (PWM generator only).",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module":  {"type": "string", "description": "'PWM generator'."},
+                    "channel": {"type": "integer", "description": "Channel index (0-based)."},
+                    "value":   {"type": "number", "description": "PWM carrier frequency in Hz."},
+                },
+                "required": ["module", "channel", "value"],
+            },
+        ),
+        Tool(
+            name="sniffy_arbgen_set_pwm_freq_sync",
+            description="Set PWM frequency sync with CH1 on/off for a channel (PWM generator only). Channel 1=CH2, 2=CH3, 3=CH4.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module":  {"type": "string", "description": "'PWM generator'."},
+                    "channel": {"type": "integer", "description": "Channel index 1-3 (CH2-CH4)."},
+                    "enabled": {"type": "boolean"},
+                },
+                "required": ["module", "channel", "enabled"],
+            },
+        ),
         # Pattern Generator
         Tool(
             name="sniffy_patgen_set_pattern",
@@ -757,6 +833,33 @@ async def list_tools() -> list[Tool]:
                     "value": {"type": "number", "description": "Frequency in Hz."},
                 },
                 "required": ["module", "value"],
+            },
+        ),
+        Tool(
+            name="sniffy_patgen_set_channels",
+            description=(
+                "Set channel count / data length for the current pattern. "
+                "Only patterns with a count dial: 0=User defined, 1=Counter, "
+                "2=Binary, 3=Gray, 8=4B/5B, 9=Johnson, 11=Parallel bus."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "'Pattern generator'."},
+                    "value": {"type": "number", "description": "Channel count / data length."},
+                },
+                "required": ["module", "value"],
+            },
+        ),
+        Tool(
+            name="sniffy_patgen_reset",
+            description="Reset the currently selected pattern to factory defaults.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "'Pattern generator'."},
+                },
+                "required": ["module"],
             },
         ),
         # Voltmeter
@@ -863,6 +966,7 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
     dispatch = {
         "sniffy_ping":              lambda: c.ping(),
         "sniffy_get_status":        lambda: c.get_status(),
+        "sniffy_get_system_config": lambda: c.get_system_config(),
         "sniffy_scan_devices":      lambda: c.scan_devices(),
         "sniffy_list_devices":      lambda: c.list_devices(),
         "sniffy_connect_device":    lambda: c.connect_device(
@@ -998,12 +1102,37 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         "sniffy_arbgen_set_channels": lambda: c.arbgen_set_channels(
             arguments["module"], arguments["count"],
         ),
+        "sniffy_arbgen_set_memory": lambda: c.arbgen_set_memory(
+            arguments["module"], arguments["mode"],
+            arguments.get("length", 0),
+        ),
+        "sniffy_arbgen_set_sweep": lambda: c.arbgen_set_sweep(
+            arguments["module"], arguments["enable"],
+            arguments.get("min_freq", 0),
+            arguments.get("max_freq", 0),
+            arguments.get("sweep_time", 0),
+        ),
+        "sniffy_arbgen_set_freq_sync": lambda: c.arbgen_set_freq_sync(
+            arguments["module"], arguments["channel"], arguments["enabled"],
+        ),
+        "sniffy_arbgen_set_pwm_frequency": lambda: c.arbgen_set_pwm_frequency(
+            arguments["module"], arguments["channel"], arguments["value"],
+        ),
+        "sniffy_arbgen_set_pwm_freq_sync": lambda: c.arbgen_set_pwm_freq_sync(
+            arguments["module"], arguments["channel"], arguments["enabled"],
+        ),
         # Pattern Generator
         "sniffy_patgen_set_pattern": lambda: c.patgen_set_pattern(
             arguments["module"], arguments["index"],
         ),
         "sniffy_patgen_set_frequency": lambda: c.patgen_set_frequency(
             arguments["module"], arguments["value"],
+        ),
+        "sniffy_patgen_set_channels": lambda: c.patgen_set_channels(
+            arguments["module"], arguments["value"],
+        ),
+        "sniffy_patgen_reset": lambda: c.patgen_reset(
+            arguments["module"],
         ),
         # Voltmeter
         "sniffy_voltmeter_set_mode": lambda: c.voltmeter_set_mode(

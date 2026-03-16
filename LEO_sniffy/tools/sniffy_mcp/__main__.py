@@ -25,7 +25,9 @@ import sys
 
 
 def _coerce(a: str):
-    """Try int, then float, then keep as str."""
+    """Try bool, int, then float, then keep as str."""
+    if a.lower() in ("true", "false"):
+        return a.lower() == "true"
     try:
         return int(a)
     except ValueError:

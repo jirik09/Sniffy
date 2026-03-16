@@ -39,6 +39,17 @@
 #include "GUI/widgetselection.h"
 #include <QTabWidget>
 
+// Specification headers — needed by get_system_config
+#include "modules/device/devicespec.h"
+#include "modules/scope/scopespec.h"
+#include "modules/counter/counterspec.h"
+#include "modules/voltmeter/voltmeterspec.h"
+#include "modules/syncpwm/syncpwmspec.h"
+#include "modules/arbgenerator/arbgeneratorspec.h"
+#include "modules/patterngenerator/patterngeneratorspec.h"
+#include "modules/voltagesource/voltagesourcespec.h"
+#include "resourcemanager.h"
+
 #include <QDataStream>
 #include <QDateTime>
 #include <QJsonValue>
@@ -177,15 +188,38 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, 
                                          : QStringLiteral("Arbitrary generator");
         if (s) {
             st[QStringLiteral("num_channels")] = s->numChannelsEnabled;
+            // Memory mode
+            static const char *memNames[] = {"best_fit", "long", "custom"};
+            int memIdx = s->buttonsMemory->getSelectedIndex();
+            st[QStringLiteral("memory")] = QString::fromLatin1(memNames[qBound(0, memIdx, 2)]);
+            if (memIdx == 2)
+                st[QStringLiteral("custom_length")] = s->customLength;
+            // SW Sweep
+            st[QStringLiteral("sweep_enabled")] = s->isSweepEnabled;
+            if (s->isSweepEnabled) {
+                st[QStringLiteral("sweep_min_freq")] = s->dialFreqSweepMin->getRealValue();
+                st[QStringLiteral("sweep_max_freq")] = s->dialFreqSweepMax->getRealValue();
+                st[QStringLiteral("sweep_time")]     = s->dialSweepTime->getRealValue();
+            }
             QJsonArray chArr;
             for (int i = 0; i < MAX_ARB_CHANNELS_NUM; ++i) {
                 QJsonObject ch;
-                ch[QStringLiteral("shape")]     = s->buttonsShape[i]->getSelectedIndex();
-                ch[QStringLiteral("frequency")] = s->dialFreqCh[i]->getRealValue();
-                ch[QStringLiteral("amplitude")] = s->dialAmplitudeCh[i]->getRealValue();
-                ch[QStringLiteral("offset")]    = s->dialOffsetCh[i]->getRealValue();
-                ch[QStringLiteral("duty")]      = s->dialDutyCh[i]->getRealValue();
-                ch[QStringLiteral("phase")]     = s->dialPhaseCh[i]->getRealValue();
+                int si = s->buttonsShape[i]->getSelectedIndex();
+                ch[QStringLiteral("shape")]      = si;
+                ch[QStringLiteral("shape_name")] = s->buttonsShape[i]->getText(si).trimmed().toLower();
+                ch[QStringLiteral("frequency")]  = s->dialFreqCh[i]->getRealValue();
+                ch[QStringLiteral("amplitude")]  = s->dialAmplitudeCh[i]->getRealValue();
+                ch[QStringLiteral("offset")]     = s->dialOffsetCh[i]->getRealValue();
+                ch[QStringLiteral("duty")]       = s->dialDutyCh[i]->getRealValue();
+                ch[QStringLiteral("phase")]      = s->dialPhaseCh[i]->getRealValue();
+                if (i > 0)
+                    ch[QStringLiteral("freq_sync_ch1")] = s->channelSyncWithCH1[i];
+                // PWM-specific per-channel fields
+                if (s->isPWMbased) {
+                    ch[QStringLiteral("pwm_frequency")]       = s->dialPWMFreqCh[i]->getRealValue();
+                    if (i > 0)
+                        ch[QStringLiteral("pwm_freq_sync_ch1")] = s->channelSyncPWMWithCH1[i];
+                }
                 chArr.append(ch);
             }
             st[QStringLiteral("channels")] = chArr;
@@ -198,6 +232,10 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, 
         st[QStringLiteral("type")] = QStringLiteral("Pattern generator");
         int idx = w->settings->comboPatternSelection->getSelectedIndex();
         st[QStringLiteral("pattern_index")] = idx;
+
+        const auto &pattList = w->settings->getPatternList();
+        if (idx >= 0 && idx < pattList.size())
+            st[QStringLiteral("pattern_name")] = pattList.at(idx);
 
         WidgetDialRange *freqDial = nullptr;
         switch (idx) {
@@ -217,6 +255,84 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, 
         }
         if (freqDial)
             st[QStringLiteral("frequency")] = freqDial->getRealValue();
+
+        // Channel count / data length dial (not all patterns have one)
+        WidgetDialRange *chanDial = nullptr;
+        switch (idx) {
+        case 0:  chanDial = w->settings->dialUserDefLength;   break;
+        case 1:  chanDial = w->settings->dialCounterLength;   break;
+        case 2:  chanDial = w->settings->dialBinaryChanNum;   break;
+        case 3:  chanDial = w->settings->dialGrayCodeChanNum; break;
+        case 8:  chanDial = w->settings->dial4b5bGroups;      break;
+        case 9:  chanDial = w->settings->dialJohnsonPhases;   break;
+        case 11: chanDial = w->settings->dialParBusWidth;     break;
+        default: break;
+        }
+        if (chanDial)
+            st[QStringLiteral("channels")] = chanDial->getRealValue();
+
+        // Per-pattern extra settings
+        switch (idx) {
+        case 4: // Quadrature
+            if (w->settings->comboQuadratureSeqAbba)
+                st[QStringLiteral("sequence")] = w->settings->comboQuadratureSeqAbba->getSelectedIndex();
+            break;
+        case 5: // PRBS
+            if (w->settings->comboPrbsOrder)
+                st[QStringLiteral("prbs_order")] = w->settings->comboPrbsOrder->getSelectedIndex();
+            break;
+        case 6: // PWM
+            if (w->settings->dialPwmDuty)
+                st[QStringLiteral("duty")] = w->settings->dialPwmDuty->getRealValue();
+            break;
+        case 7: // Line code
+            if (w->settings->comboLineCodeType)
+                st[QStringLiteral("line_code_type")] = w->settings->comboLineCodeType->getSelectedIndex();
+            break;
+        case 10: // PDM
+            if (w->settings->dialPdmLevel)
+                st[QStringLiteral("pdm_level")] = w->settings->dialPdmLevel->getRealValue();
+            break;
+        case 12: { // UART
+            if (w->settings->comboUartBaud)
+                st[QStringLiteral("baud")] = w->settings->comboUartBaud->getSelectedValue();
+            if (w->settings->dialUartDataBits)
+                st[QStringLiteral("data_bits")] = w->settings->dialUartDataBits->getRealValue();
+            if (w->settings->comboUartParity)
+                st[QStringLiteral("parity")] = w->settings->comboUartParity->getSelectedIndex();
+            if (w->settings->comboUartStopBits)
+                st[QStringLiteral("stop_bits")] = w->settings->comboUartStopBits->getSelectedIndex();
+            if (w->settings->comboUartBitOrder)
+                st[QStringLiteral("bit_order")] = w->settings->comboUartBitOrder->getSelectedIndex();
+            break;
+        }
+        case 13: { // SPI
+            if (w->settings->comboSpiMode)
+                st[QStringLiteral("spi_mode")] = w->settings->comboSpiMode->getSelectedIndex();
+            if (w->settings->dialSpiWordSize)
+                st[QStringLiteral("word_size")] = w->settings->dialSpiWordSize->getRealValue();
+            if (w->settings->comboSpiBitOrder)
+                st[QStringLiteral("bit_order")] = w->settings->comboSpiBitOrder->getSelectedIndex();
+            if (w->settings->comboSpiCsGating)
+                st[QStringLiteral("cs_gating")] = w->settings->comboSpiCsGating->getSelectedIndex();
+            if (w->settings->dialSpiPauseTicks)
+                st[QStringLiteral("pause_ticks")] = w->settings->dialSpiPauseTicks->getRealValue();
+            break;
+        }
+        case 14: { // I2C
+            if (w->settings->comboI2cClockFreq)
+                st[QStringLiteral("clock_freq")] = w->settings->comboI2cClockFreq->getSelectedValue();
+            if (w->settings->comboI2cCommType)
+                st[QStringLiteral("comm_type")] = w->settings->comboI2cCommType->getSelectedIndex();
+            if (w->settings->comboI2cAddrMode)
+                st[QStringLiteral("addr_mode")] = w->settings->comboI2cAddrMode->getSelectedIndex();
+            if (w->settings->dialI2cAddress)
+                st[QStringLiteral("address")] = w->settings->dialI2cAddress->getRealValue();
+            break;
+        }
+        default: break;
+        }
+
         return st;
     }
 
@@ -626,6 +742,153 @@ void AgentBridge::registerHandlers()
         r[QStringLiteral("device")]     = m_mediator->getDeviceName();
         r[QStringLiteral("modules")]    = enumerateModules();
         return r;
+    };
+
+    // ── get_system_config — full hardware configuration + conflicts ──
+    m_handlers[QStringLiteral("get_system_config")] = [this](const QJsonObject &) -> QJsonObject {
+        if (!m_mediator->getIsConnected())
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not connected")}};
+
+        QJsonObject result;
+        auto modules = m_mediator->getModulesList();
+
+        // ── Device info ──
+        for (const auto &m : modules) {
+            if (qobject_cast<Device *>(m.data())) {
+                auto *spec = dynamic_cast<DeviceSpec *>(m->getSpecification());
+                if (spec && spec->isLoaded()) {
+                    QJsonObject dev;
+                    dev[QStringLiteral("name")]          = spec->device;
+                    dev[QStringLiteral("mcu")]           = spec->MCU;
+                    dev[QStringLiteral("core_clock")]    = static_cast<qint64>(spec->CoreClock);
+                    dev[QStringLiteral("mcu_id")]        = spec->MCU_ID;
+                    dev[QStringLiteral("fw_version")]    = spec->FW_Version;
+                    dev[QStringLiteral("buffer_length")] = static_cast<qint64>(spec->bufferLength);
+                    dev[QStringLiteral("uart_speed")]    = static_cast<qint64>(spec->uartSpeed);
+                    dev[QStringLiteral("use_usb")]       = spec->useUsb;
+                    result[QStringLiteral("device")] = dev;
+                }
+                break;
+            }
+        }
+
+        // ── Per-module configuration ──
+        QJsonArray modulesArr;
+        for (const auto &m : modules) {
+            if (!m->isAvailable()) continue;
+            if (qobject_cast<Device *>(m.data())) continue; // skip Device itself
+
+            auto *baseSpec = m->getSpecification();
+            QJsonObject obj;
+            obj[QStringLiteral("name")]   = m->getModuleName();
+            obj[QStringLiteral("status")] = statusToString(static_cast<int>(m->getModuleStatus()));
+
+            if (auto *s = dynamic_cast<ScopeSpec *>(baseSpec)) {
+                obj[QStringLiteral("channels")]                = s->maxADCChannels;
+                obj[QStringLiteral("max_sampling_rate_12b")]   = s->maxSamplingRate12B;
+                obj[QStringLiteral("max_sampling_rate_8b")]    = s->maxSamplingRate8BInterleaved;
+                obj[QStringLiteral("memory_size")]             = s->memorySize;
+                obj[QStringLiteral("vref")]                    = s->Vref;
+                QJsonArray pins;
+                for (int i = 0; i < s->maxADCChannels && i < MAX_SCOPE_CHANNELS; ++i)
+                    pins.append(s->channelPins[i]);
+                obj[QStringLiteral("pins")] = pins;
+            } else if (auto *s = dynamic_cast<CounterSpec *>(baseSpec)) {
+                obj[QStringLiteral("hf_max")]     = s->hf_max;
+                obj[QStringLiteral("lf_max")]     = s->lf_max;
+                obj[QStringLiteral("lf_min")]     = s->lf_min;
+                obj[QStringLiteral("rat_max_ref")] = s->rat_max_ref;
+                obj[QStringLiteral("rat_max_chan")] = s->rat_max_chan;
+                QJsonObject pins;
+                pins[QStringLiteral("hf_ch1")]  = s->pins.hf_ch1;
+                pins[QStringLiteral("lf_ch1")]  = s->pins.lf_ch1;
+                pins[QStringLiteral("lf_ch2")]  = s->pins.lf_ch2;
+                pins[QStringLiteral("rat_ref")] = s->pins.rat_ref;
+                pins[QStringLiteral("rat_ch3")] = s->pins.rat_ch3;
+                pins[QStringLiteral("int_ch1")] = s->pins.int_ch1;
+                pins[QStringLiteral("int_ch2")] = s->pins.int_ch2;
+                obj[QStringLiteral("pins")] = pins;
+            } else if (auto *s = dynamic_cast<VoltmeterSpec *>(baseSpec)) {
+                obj[QStringLiteral("channels")]                = s->maxADCChannels;
+                obj[QStringLiteral("max_sampling_rate_12b")]   = s->maxSamplingRate12B;
+                obj[QStringLiteral("max_sampling_rate_8b")]    = s->maxSamplingRate8BInterleaved;
+                obj[QStringLiteral("memory_size")]             = s->memorySize;
+                obj[QStringLiteral("vref")]                    = s->Vref;
+                QJsonArray pins;
+                for (int i = 0; i < s->maxADCChannels && i < MAX_VOLTMETER_CHANNELS; ++i)
+                    pins.append(s->channelPins[i]);
+                obj[QStringLiteral("pins")] = pins;
+            } else if (auto *s = dynamic_cast<SyncPwmSpec *>(baseSpec)) {
+                obj[QStringLiteral("channels")]      = s->chan_num;
+                obj[QStringLiteral("max_freq")]      = s->max_freq;
+                obj[QStringLiteral("chans_depend")]   = s->chans_depend;
+                QJsonArray pins;
+                pins.append(s->pins.chan1);
+                pins.append(s->pins.chan2);
+                pins.append(s->pins.chan3);
+                pins.append(s->pins.chan4);
+                obj[QStringLiteral("pins")] = pins;
+            } else if (auto *s = dynamic_cast<ArbGeneratorSpec *>(baseSpec)) {
+                bool isPWM = m->getModuleName().contains(QStringLiteral("PWM"), Qt::CaseInsensitive);
+                if (isPWM) {
+                    obj[QStringLiteral("channels")]          = s->maxPWMChannels;
+                    obj[QStringLiteral("timer_clock")]       = s->periphPWMClockFrequency;
+                } else {
+                    obj[QStringLiteral("channels")]          = s->maxDACChannels;
+                    obj[QStringLiteral("dac_resolution")]    = s->DACResolution;
+                }
+                obj[QStringLiteral("max_sampling_rate")]     = s->maxSamplingRate;
+                obj[QStringLiteral("buffer_size")]           = s->generatorBufferSize;
+                obj[QStringLiteral("range_min")]             = s->rangeMin;
+                obj[QStringLiteral("range_max")]             = s->rangeMax;
+                QJsonArray pins;
+                int nCh = isPWM ? s->maxPWMChannels : s->maxDACChannels;
+                for (int i = 0; i < nCh && i < MAX_ARB_CHANNELS_NUM; ++i)
+                    pins.append(isPWM ? s->channelPWMPins[i] : s->channelPins[i]);
+                obj[QStringLiteral("pins")] = pins;
+            } else if (auto *s = dynamic_cast<PatternGeneratorSpec *>(baseSpec)) {
+                obj[QStringLiteral("channels")]          = PATT_MAX_CHANNELS_NUM;
+                obj[QStringLiteral("max_sampling_rate")]  = s->maxSamplingRate;
+                QJsonArray pins;
+                for (int i = 0; i < PATT_MAX_CHANNELS_NUM; ++i)
+                    pins.append(s->chanPins[i]);
+                obj[QStringLiteral("pins")] = pins;
+            } else if (auto *s = dynamic_cast<VoltageSourceSpec *>(baseSpec)) {
+                obj[QStringLiteral("channels")]       = s->maxDACChannels;
+                obj[QStringLiteral("dac_resolution")] = s->DACResolution;
+                obj[QStringLiteral("range_min")]      = s->rangeMin;
+                obj[QStringLiteral("range_max")]      = s->rangeMax;
+                QJsonArray pins;
+                for (int i = 0; i < s->maxDACChannels && i < MAX_VOLTAGE_SOURCE_CHANNELS; ++i)
+                    pins.append(s->channelPins[i]);
+                obj[QStringLiteral("pins")] = pins;
+            }
+
+            modulesArr.append(obj);
+        }
+        result[QStringLiteral("modules")] = modulesArr;
+
+        // ── Resource conflicts — which modules cannot run simultaneously ──
+        QJsonArray conflicts;
+        for (int i = 0; i < modules.size(); ++i) {
+            if (!modules[i]->isAvailable()) continue;
+            if (qobject_cast<Device *>(modules[i].data())) continue;
+            ResourceSet rs_i = ResourceSet::fromModule(modules[i]);
+            for (int j = i + 1; j < modules.size(); ++j) {
+                if (!modules[j]->isAvailable()) continue;
+                if (qobject_cast<Device *>(modules[j].data())) continue;
+                ResourceSet rs_j = ResourceSet::fromModule(modules[j]);
+                if (ResourceSet::collide(rs_i, rs_j)) {
+                    QJsonArray pair;
+                    pair.append(modules[i]->getModuleName());
+                    pair.append(modules[j]->getModuleName());
+                    conflicts.append(pair);
+                }
+            }
+        }
+        result[QStringLiteral("conflicts")] = conflicts;
+
+        return result;
     };
 
     // ── Device management ────────────────────────────────────
@@ -1523,6 +1786,101 @@ void AgentBridge::registerHandlers()
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
+    // arbgen_set_memory — 0=Best fit, 1=Long, 2=Custom
+    m_handlers[QStringLiteral("arbgen_set_memory")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
+        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
+        auto *settings = win->findChild<ArbGenPanelSettings *>();
+        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+        int mode = p.value(QStringLiteral("mode")).toInt(0);
+        settings->buttonsMemory->clickedInternal(mode);
+        if (mode == 2) { // Custom — also set the length if provided
+            double len = p.value(QStringLiteral("length")).toDouble(0);
+            if (len > 0) {
+                settings->customLengthInput->setText(QString::number(static_cast<int>(len)));
+                settings->customLengthInput->processInput();
+            }
+        }
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // arbgen_set_sweep — enable/disable SW sweep and optionally set min/max freq + time
+    m_handlers[QStringLiteral("arbgen_set_sweep")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
+        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
+        auto *settings = win->findChild<ArbGenPanelSettings *>();
+        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+        bool enable = p.value(QStringLiteral("enable")).toBool(false);
+        settings->buttonSWSweepEnable->clickedInternal(enable ? 1 : 0);
+        if (enable) {
+            if (p.contains(QStringLiteral("min_freq")))
+                settings->dialFreqSweepMin->setRealValue(static_cast<float>(p.value(QStringLiteral("min_freq")).toDouble()), false);
+            if (p.contains(QStringLiteral("max_freq")))
+                settings->dialFreqSweepMax->setRealValue(static_cast<float>(p.value(QStringLiteral("max_freq")).toDouble()), false);
+            if (p.contains(QStringLiteral("sweep_time")))
+                settings->dialSweepTime->setRealValue(static_cast<float>(p.value(QStringLiteral("sweep_time")).toDouble()), false);
+        }
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // arbgen_set_freq_sync — set CH1 freq sync on/off for a channel (CH2-CH4)
+    m_handlers[QStringLiteral("arbgen_set_freq_sync")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
+        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
+        auto *settings = win->findChild<ArbGenPanelSettings *>();
+        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+        int ch = p.value(QStringLiteral("channel")).toInt(1);
+        if (ch < 1 || ch >= MAX_ARB_CHANNELS_NUM || !settings->swSyncWithCH1[ch])
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel for freq sync (must be 1-3, i.e. CH2-CH4)")}, {QStringLiteral("code"), -32602}};
+        bool on = p.value(QStringLiteral("enabled")).toBool(false);
+        QMetaObject::invokeMethod(settings->swSyncWithCH1[ch],
+                                  on ? "setRight" : "setLeft",
+                                  Qt::DirectConnection);
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // arbgen_set_pwm_frequency — set per-channel PWM carrier frequency (PWM generator only)
+    m_handlers[QStringLiteral("arbgen_set_pwm_frequency")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
+        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen/PWM module")}, {QStringLiteral("code"), -32602}};
+        auto *settings = win->findChild<ArbGenPanelSettings *>();
+        if (!settings || !settings->isPWMbased)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("PWM frequency only available on PWM generator")}, {QStringLiteral("code"), -32602}};
+        int ch = p.value(QStringLiteral("channel")).toInt(0);
+        if (ch < 0 || ch >= MAX_ARB_CHANNELS_NUM)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Channel out of range")}, {QStringLiteral("code"), -32602}};
+        double val = p.value(QStringLiteral("value")).toDouble();
+        settings->dialPWMFreqCh[ch]->setRealValue(static_cast<float>(val), false);
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // arbgen_set_pwm_freq_sync — sync PWM freq of CH2-CH4 with CH1 (PWM generator only)
+    m_handlers[QStringLiteral("arbgen_set_pwm_freq_sync")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
+        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen/PWM module")}, {QStringLiteral("code"), -32602}};
+        auto *settings = win->findChild<ArbGenPanelSettings *>();
+        if (!settings || !settings->isPWMbased)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("PWM freq sync only available on PWM generator")}, {QStringLiteral("code"), -32602}};
+        int ch = p.value(QStringLiteral("channel")).toInt(1);
+        if (ch < 1 || ch >= MAX_ARB_CHANNELS_NUM || !settings->swSyncPWMWithCH1[ch])
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel for PWM freq sync (must be 1-3, i.e. CH2-CH4)")}, {QStringLiteral("code"), -32602}};
+        bool on = p.value(QStringLiteral("enabled")).toBool(false);
+        QMetaObject::invokeMethod(settings->swSyncPWMWithCH1[ch],
+                                  on ? "setRight" : "setLeft",
+                                  Qt::DirectConnection);
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
     // ── Pattern Generator ────────────────────────────────
 
     // patgen_set_pattern — select pattern type (0-14)
@@ -1566,6 +1924,43 @@ void AgentBridge::registerHandlers()
         if (!freqDial)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("No frequency dial for this pattern")}, {QStringLiteral("code"), -32602}};
         freqDial->setRealValue(val, false);
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // patgen_set_channels — set channel count / data length dial for the current pattern
+    m_handlers[QStringLiteral("patgen_set_channels")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<PatternGeneratorWindow *>(mod->getWidget());
+        if (!win || !win->settings)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Pattern Generator module")}, {QStringLiteral("code"), -32602}};
+        float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
+        int pattern = win->settings->comboPatternSelection->getSelectedIndex();
+        WidgetDialRange *chanDial = nullptr;
+        switch (pattern) {
+        case 0:  chanDial = win->settings->dialUserDefLength;  break;
+        case 1:  chanDial = win->settings->dialCounterLength;  break;
+        case 2:  chanDial = win->settings->dialBinaryChanNum;  break;
+        case 3:  chanDial = win->settings->dialGrayCodeChanNum; break;
+        case 8:  chanDial = win->settings->dial4b5bGroups;     break;
+        case 9:  chanDial = win->settings->dialJohnsonPhases;  break;
+        case 11: chanDial = win->settings->dialParBusWidth;    break;
+        default: break;
+        }
+        if (!chanDial)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("No channel/length dial for this pattern")}, {QStringLiteral("code"), -32602}};
+        chanDial->setRealValue(val, false);
+        return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // patgen_reset — reset current pattern to defaults
+    m_handlers[QStringLiteral("patgen_reset")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        auto *win = qobject_cast<PatternGeneratorWindow *>(mod->getWidget());
+        if (!win || !win->settings || !win->settings->buttonSetDefault)
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Pattern Generator module")}, {QStringLiteral("code"), -32602}};
+        win->settings->buttonSetDefault->clickedInternal(0);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
