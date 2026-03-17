@@ -231,12 +231,20 @@ class SniffyClient:
         return self._call("list_modules").get("modules", [])
 
     def module_start(self, name: str) -> dict:
-        """Start a module (same as clicking its button in the GUI)."""
+        """Open and initialise a module (HW init, no signal output yet)."""
         return self._call("module_start", {"module": name})
 
     def module_stop(self, name: str) -> dict:
-        """Stop a module."""
+        """Stop and close a module."""
         return self._call("module_stop", {"module": name})
+
+    def module_run(self, name: str) -> dict:
+        """Start signal generation (Sync PWM / ArbGen / PatGen)."""
+        return self._call("module_run", {"module": name})
+
+    def module_halt(self, name: str) -> dict:
+        """Stop signal generation without closing the module."""
+        return self._call("module_halt", {"module": name})
 
     def get_module_state(self, name: str) -> dict:
         """Read current GUI state of a running module."""

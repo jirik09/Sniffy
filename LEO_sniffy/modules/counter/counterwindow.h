@@ -73,8 +73,6 @@ private:
     CounterConfig *conf;
     CounterSpec *spec;
 
-    bool isAfterStart = true;
-
     void createCounterTabs(void);
     void configureCounterTabs(void);
     void createAllDisplays(void);

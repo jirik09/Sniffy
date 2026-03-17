@@ -42,6 +42,8 @@ python -m sniffy_mcp call spwm_set_frequency "Sync PWM" 0 5000
 python -m sniffy_mcp call spwm_set_step_mode "Sync PWM" 1
 python -m sniffy_mcp call spwm_set_invert "Sync PWM" 0 1
 python -m sniffy_mcp call counter_hf_config Counter quantity=1 gate_time=2
+python -m sniffy_mcp call list_displays Counter
+python -m sniffy_mcp call display_save_history Counter LowFreqCh2Counter
 ```
 
 > The `connect_device` method accepts **either** an integer index as its
@@ -87,18 +89,15 @@ MCP tools are prefixed with `sniffy_` (e.g., `sniffy_get_status`).
 
 > **Important**: After `connect_device`, the MCU exchanges capability
 > and configuration packets with the PC app.  If you call `module_start`
-> immediately, the module may not be ready yet.  Always wait 2–3 seconds
-> between `connect_device` and the first `module_start`.
->
-> **Simple approach** — in shell scripts use `Start-Sleep -Seconds 3`
-> (PowerShell) or `sleep 3` (bash) between connection and module start.
+> immediately, the module may not be ready yet.  Therefore, use one
+> of the following two methods:
 >
 > **Robust approach (recommended for automated test systems)** — use the
 > Python helper `wait_for_device()` which polls `get_status` until
 > `connected == true`:
 > ```python
 > s.connect_device(name="F303RE")
-> if not s.wait_for_device(timeout=15, poll=0.5):
+> if not s.wait_for_device(timeout=15, poll=0.3):
 >     raise RuntimeError("Device did not become ready")
 > s.module_start("Oscilloscope")
 > ```
@@ -111,7 +110,9 @@ MCP tools are prefixed with `sniffy_` (e.g., `sniffy_get_status`).
 >
 > If only one board is attached and the app just launched, it may
 > auto-connect.  Check `connected` and `device` fields first.
-
+>
+> **Simple approach** — in shell scripts use `Start-Sleep -Seconds 3`
+> (PowerShell) or `sleep 3` (bash) between connection and module start.
 ---
 
 ## Device Management
@@ -146,19 +147,57 @@ argument is used: integer → index, string → name.
 
 ## Module Lifecycle
 
-Each module follows: **stopped → running → paused → stopped**.
+Each module follows: **stopped → active → generating → stopped**.
 
 | Action | Tool / Method | Notes |
 |--------|--------------|-------|
-| Open & start | `module_start` | Returns `state` object with session-restored config |
-| Stop & close | `module_stop` | Releases hardware resources |
+| Open & configure HW | `module_start` | Initialises hardware, returns `state` with session-restored config |
+| Start signal output | `module_run` | Clicks the internal Start/Generate button (Sync PWM, ArbGen, PatGen) |
+| Stop signal output | `module_halt` | Stops generation without closing the module |
+| Close & release HW | `module_stop` | Releases hardware resources |
 | Check state | `list_modules` | `status` field per module |
 | Read GUI state | `get_module_state` | Current mode, dials, buttons — use any time |
 
-Modules that share hardware resources **cannot run simultaneously** — the
-app enforces this automatically.  If a module shows `locked`, stop the
-conflicting module first.  Use `get_system_config` to discover which
-modules conflict **before** trying to start them.
+> **`module_start` ≠ signal generation.** For Sync PWM, Arbitrary/PWM
+> Generator, and Pattern Generator, `module_start` only opens the module
+> and initialises hardware.  You **must** call `module_run` afterwards to
+> actually start outputting a signal.  Counter and Scope start measuring
+> automatically on `module_start` — they do not need `module_run`.
+
+> **Correct ordering:** 1) `module_start` → 2) set parameters → 3) `module_run`.
+> Always configure parameters **before** calling `module_run`.
+> Changing parameters on a module that isn't started has no effect.
+
+### Uploading transition (Generators - ArbGen/PatGen/ModPwmGen)
+
+When `module_run` is called on the Arbitrary Generator, PWM Generator, or
+Pattern Generator, the signal data must first be uploaded to the MCU.  The
+response includes a **`generation_status`** field:
+
+| `generation_status` | Meaning |
+|--------------------|---------|
+| `"uploading"` | Data is being uploaded to the MCU — not generating yet |
+| `"running"` | Upload complete, signal is being generated |
+| `"stopped"` | Not generating |
+
+`get_module_state` also returns `generation_status` for these modules.
+**If you need to run a generator for a timed duration**, poll
+`get_module_state` until `generation_status` becomes `"running"` before
+starting your timer.  Otherwise you may call `module_halt` while data is
+still uploading and the signal never actually ran.
+
+Sync PWM starts instantly — `generation_status` is always `"running"`
+immediately after `module_run`.
+
+### Resource conflicts
+
+Modules that share hardware resources **cannot run simultaneously**.
+`module_start` **enforces** this — it will return an error with a list of
+conflicting module names if any are already active.  Stop the conflicting
+module(s) first.
+
+Use `get_system_config` to discover which modules conflict **before**
+trying to start them.
 
 > **Session persistence**: The app restores the last-used configuration
 > (mode, dials, tabs) from a session file on launch.  **Always check the
@@ -342,6 +381,13 @@ These tools update **both** the GUI widgets **and** send MCU commands,
 keeping the desktop app perfectly in sync with agent actions.
 **Prefer these over raw `write_command`** whenever available.
 
+> **CLI naming rule**: The tables below list **MCP tool names** (prefixed
+> with `sniffy_`).  When using the CLI (`python -m sniffy_mcp call ...`),
+> **strip the `sniffy_` prefix**.  For example:
+> - MCP tool: `sniffy_counter_set_mode` → CLI: `counter_set_mode`
+> - MCP tool: `sniffy_list_displays` → CLI: `list_displays`
+> - MCP tool: `sniffy_display_save_history` → CLI: `display_save_history`
+
 ### Sync PWM
 
 | Tool | Parameters | Notes |
@@ -366,7 +412,8 @@ keeping the desktop app perfectly in sync with agent actions.
 4. sniffy_spwm_set_invert(module="Sync PWM", channel=0, enabled=true)
 5. sniffy_spwm_set_step_mode(module="Sync PWM", step=true)
 6. sniffy_spwm_set_equidistant(module="Sync PWM", enabled=true)
-7. sniffy_get_module_state(module="Sync PWM")  → verify all settings
+7. sniffy_module_run(module="Sync PWM")       ← starts signal output
+8. sniffy_get_module_state(module="Sync PWM")  → verify all settings
 ```
 
 ### Counter
@@ -376,9 +423,23 @@ keeping the desktop app perfectly in sync with agent actions.
 | `sniffy_counter_set_mode` | `module`, `mode` (0-3) | 0=HF, 1=LF, 2=Ratio, 3=Intervals |
 | `sniffy_counter_set_gate_time` | `module`, `index` (0-4) | HF mode: 0=100ms, 1=500ms, 2=1s, 3=5s, 4=10s |
 | `sniffy_counter_hf_config` | `module`, optional: `quantity`, `error_mode`, `averaging`, `gate_time` | quantity: 0=Freq,1=Period; error_mode: 0=Err,1=ErrAVG; averaging: sample count dial; gate_time: 0-4 |
-| `sniffy_counter_lf_config` | `module`, optional: `channel`, `quantity`, `multiplier`, `duty_cycle`, `sample_count`, `sample_channel` | channel: 0=CH1,1=CH2; multiplier: 0=1x..3=8x; duty_cycle: 0=off,1=on; sample_channel selects which dial |
+| `sniffy_counter_lf_config` | `module`, optional: `channel`, `quantity`, `multiplier`, `duty_cycle`, `sample_count`, `sample_channel` | channel: 0=CH1,1=CH2; multiplier: 0=1x..3=8x; duty_cycle: 0=off,1=on; `sample_channel` defaults to `channel` if provided, else 0 |
 | `sniffy_counter_rat_set_sample_count` | `module`, `value` | Ratio mode reference sample count dial |
 | `sniffy_counter_int_config` | `module`, optional: `event_sequence`, `edge_a`, `edge_b`, `timeout` | event_sequence: 0=A→B,1=B→A; edge_a/b: "rising"/"falling"; timeout: seconds |
+
+**Counter state readback** (`sniffy_get_module_state` / `module_start` return):
+`mode` (0-3), `mode_name` (HF/LF/Ratio/Intervals).
+- **HF**: `hf.quantity` (0=Freq,1=Period), `hf.error_mode`, `hf.gate_time`, `hf.averaging`.
+- **LF**: `lf.channel` (0=CH1,1=CH2), `lf.quantity`, `lf.duty_cycle` (0=off,1=on),
+  `lf.multiplier`, `lf.sample_count_ch1`, `lf.sample_count_ch2`.
+- **Ratio**: `ratio.sample_count`.
+- **Intervals**: `intervals.event_sequence`, `intervals.edge_a`/`edge_b`, `intervals.timeout`.
+
+> **Important — `duty_cycle`**: When `lf.duty_cycle` is 1, the LF display shows
+> pulse width and duty cycle instead of frequency/period.  If you need a normal
+> frequency measurement, you **must** explicitly set `duty_cycle=0` via
+> `counter_lf_config`.  The app restores this from the previous session, so
+> always check the state after `module_start`.
 
 ### Oscilloscope
 
@@ -429,8 +490,9 @@ frequency per channel.
 | `sniffy_arbgen_set_pwm_frequency` | `module`, `channel` (0-3), `value` (Hz) | PWM carrier frequency per channel |
 | `sniffy_arbgen_set_pwm_freq_sync` | `module`, `channel` (1-3), `enabled` (bool) | Sync CH2-CH4 PWM carrier frequency to CH1 |
 
-> These set GUI widget values. The signal is uploaded to the MCU when the
-> module is started with `sniffy_module_start`.
+> These set GUI widget values. The signal is **not** uploaded to the MCU
+> until you call `sniffy_module_run`.  Sequence: `module_start` → set
+> params → `module_run`.  To stop generation without closing: `module_halt`.
 >
 > When CH1 Freq sync is On for a channel, that channel’s frequency dial
 > is disabled and locked to CH1's value.  The same applies to PWM Freq
@@ -451,6 +513,15 @@ PWM generator adds per-channel: `pwm_frequency`, `pwm_freq_sync_ch1` (CH2+ only)
 | `sniffy_patgen_set_frequency` | `module`, `value` (Hz) | Frequency of the currently selected pattern (patterns 0-11 have a freq dial; 12-14 use baud/clock combos) |
 | `sniffy_patgen_set_channels` | `module`, `value` | Channel count / data length. Only for patterns: 0=User (length), 1=Counter (length), 2=Binary (channels), 3=Gray (channels), 8=4B/5B (groups), 9=Johnson (phases), 11=Parallel bus (width) |
 | `sniffy_patgen_reset` | `module` | Reset the currently selected pattern to factory defaults |
+
+> **Frequency is per-pattern.** Each of the 15 patterns has its own
+> frequency setting.  If you change the pattern with `patgen_set_pattern`,
+> the frequency dial switches to that pattern's saved value.  **Always set
+> the pattern first, then the frequency.**
+>
+> **Starting generation:** After configuring, call `sniffy_module_run` to
+> upload pattern data and start generation.  Use `sniffy_module_halt` to
+> stop without closing the module.
 
 **Pattern Generator state readback** (`sniffy_get_module_state`):
 `pattern_index`, `pattern_name`, `frequency` (Hz, if applicable),
@@ -500,16 +571,24 @@ I2C → `clock_freq`/`comm_type`/`addr_mode`/`address`.
 ### Connect and start measuring
 
 ```
-1. get_status                  → check if connected
-2. scan_devices                → find attached boards
-3. connect_device("F303RE")   → connect by name substring
-4. (wait 2-3 seconds)         → let device enumerate modules
-5. get_status                  → verify connected=true
-6. module_start("Counter")    → start Counter, read restored state
-7. counter_set_mode("Counter", 0) → ensure HF mode
-8. ... do measurements ...
-9. module_stop("Counter")
-10. disconnect_device
+1. get_status                     → check if connected
+2. scan_devices                   → find attached boards
+3. connect_device("F303RE")      → connect by name substring
+4. (wait 2-3 s)                   → let device enumerate modules
+5. get_status                     → verify connected=true
+6. module_start("Counter")       → start Counter — returns state
+7. READ the returned state:
+   - mode may not be what you need → counter_set_mode to switch
+   - lf.duty_cycle may be 1       → counter_lf_config duty_cycle=0
+   - lf.channel may be wrong      → counter_lf_config channel=...
+   Any setting restored from the previous session must be
+   explicitly changed if it differs from what you need.
+8. counter_set_mode("Counter", 1) → switch to LF mode
+9. counter_lf_config Counter channel=1 duty_cycle=0
+                                  → CH2, normal frequency measurement
+10. ... do measurements ...
+11. module_stop("Counter")
+12. disconnect_device
 ```
 
 ### Black-box frequency response test
@@ -517,13 +596,17 @@ I2C → `clock_freq`/`comm_type`/`addr_mode`/`address`.
 ```
 1. get_status                    → confirm device connected
 2. module_start("Arbitrary generator")
-3. module_start("Oscilloscope")
-4. For each test frequency:
-   a. write_command_int("GENS", "FREQ", (freq << 8) | 1)
+3. arbgen_set_frequency(module="Arbitrary generator", channel=0, value=1000)
+4. arbgen_set_shape(module="Arbitrary generator", channel=0, index=0)
+5. module_run("Arbitrary generator")   ← starts signal output
+6. module_start("Oscilloscope")
+7. For each test frequency:
+   a. arbgen_set_frequency("Arbitrary generator", 0, freq)
    b. Wait ~100ms for signal to settle
    c. scope_read_data → measure output amplitude
-5. module_stop("Oscilloscope")
-6. module_stop("Arbitrary generator")
+8. module_halt("Arbitrary generator")
+9. module_stop("Oscilloscope")
+10. module_stop("Arbitrary generator")
 ```
 
 ### Voltage sweep with measurement

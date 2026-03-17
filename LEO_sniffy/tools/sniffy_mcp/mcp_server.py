@@ -125,8 +125,10 @@ async def list_tools() -> list[Tool]:
         Tool(
             name="sniffy_module_start",
             description=(
-                "Start (open) a module — same effect as clicking its button in the GUI. "
-                "The user will see the module window open and its configuration applied."
+                "Open and initialise a module — HW is configured but signal generation "
+                "does NOT start.  For Sync PWM, Arbitrary/PWM Generator and Pattern "
+                "Generator, call sniffy_module_run afterwards to begin output. "
+                "Returns an error if a conflicting module is already active (resource overlap)."
             ),
             inputSchema={
                 "type": "object",
@@ -141,7 +143,39 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="sniffy_module_stop",
-            description="Stop (close) a running module.",
+            description="Stop (close) a running module and release hardware resources.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name."}
+                },
+                "required": ["module"],
+            },
+        ),
+        Tool(
+            name="sniffy_module_run",
+            description=(
+                "Start signal generation — clicks the internal Start/Generate button. "
+                "Only needed for Sync PWM, Arbitrary/PWM Generator and Pattern Generator. "
+                "Counter and Scope start automatically on module_start. "
+                "Returns generation_status: 'running' (SPWM, instant) or 'uploading' (ArbGen/PatGen, "
+                "data being sent to MCU). Poll get_module_state until generation_status becomes 'running' "
+                "before starting any timed measurement."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "module": {"type": "string", "description": "Module name."}
+                },
+                "required": ["module"],
+            },
+        ),
+        Tool(
+            name="sniffy_module_halt",
+            description=(
+                "Stop signal generation without closing the module. "
+                "The module window stays open and parameters can be changed before calling module_run again."
+            ),
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -976,6 +1010,8 @@ async def call_tool(name: str, arguments: dict) -> list[TextContent]:
         "sniffy_list_modules":      lambda: c.list_modules(),
         "sniffy_module_start":      lambda: c.module_start(arguments["module"]),
         "sniffy_module_stop":       lambda: c.module_stop(arguments["module"]),
+        "sniffy_module_run":        lambda: c.module_run(arguments["module"]),
+        "sniffy_module_halt":       lambda: c.module_halt(arguments["module"]),
         "sniffy_get_module_state":  lambda: c.get_module_state(arguments["module"]),
         "sniffy_write_command":     lambda: c.write_command(arguments["command"]),
         "sniffy_write_command_int": lambda: c.write_command_int(

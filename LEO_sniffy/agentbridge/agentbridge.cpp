@@ -164,6 +164,10 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, 
     // ── Sync PWM ──
     if (auto *w = qobject_cast<SyncPwmWindow *>(widget)) {
         st[QStringLiteral("type")] = QStringLiteral("Sync PWM");
+        // Generation status from Start/Stop button text
+        QString spwmBtn = w->settings->buttonStart ? w->settings->buttonStart->getText(0) : QString();
+        st[QStringLiteral("generation_status")] = (spwmBtn == QStringLiteral("Stop"))
+            ? QStringLiteral("running") : QStringLiteral("stopped");
         st[QStringLiteral("step_mode")]   = w->settings->switchStepMode->isCheckedLeft() ? false : true;
         st[QStringLiteral("equidistant")] = w->settings->buttonEquidist->isChecked(0);
         QJsonArray chArr;
@@ -186,6 +190,16 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, 
         st[QStringLiteral("type")] = s && s->isPWMbased
                                          ? QStringLiteral("PWM generator")
                                          : QStringLiteral("Arbitrary generator");
+        // Generation status from Start/Stop/Uploading button text
+        if (s && s->buttonsGenerate) {
+            QString genBtn = s->buttonsGenerate->getText(0);
+            if (genBtn == QStringLiteral("Stop"))
+                st[QStringLiteral("generation_status")] = QStringLiteral("running");
+            else if (genBtn.startsWith(QStringLiteral("Uploading")))
+                st[QStringLiteral("generation_status")] = QStringLiteral("uploading");
+            else
+                st[QStringLiteral("generation_status")] = QStringLiteral("stopped");
+        }
         if (s) {
             st[QStringLiteral("num_channels")] = s->numChannelsEnabled;
             // Memory mode
@@ -230,6 +244,16 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, 
     // ── Pattern Generator ──
     if (auto *w = qobject_cast<PatternGeneratorWindow *>(widget)) {
         st[QStringLiteral("type")] = QStringLiteral("Pattern generator");
+        // Generation status from Start/Stop/Uploading button text
+        if (w->settings && w->settings->buttonStart) {
+            QString pgBtn = w->settings->buttonStart->getText(0);
+            if (pgBtn == QStringLiteral("Stop"))
+                st[QStringLiteral("generation_status")] = QStringLiteral("running");
+            else if (pgBtn.startsWith(QStringLiteral("Uploading")))
+                st[QStringLiteral("generation_status")] = QStringLiteral("uploading");
+            else
+                st[QStringLiteral("generation_status")] = QStringLiteral("stopped");
+        }
         int idx = w->settings->comboPatternSelection->getSelectedIndex();
         st[QStringLiteral("pattern_index")] = idx;
 
@@ -1000,6 +1024,24 @@ void AgentBridge::registerHandlers()
             return result;
         }
 
+        // Pre-check resource conflicts against currently active modules
+        ResourceSet candidate = ResourceSet::fromModule(mod);
+        ResourceSet inUse     = m_mediator->getResourcesInUse();
+        if (ResourceSet::collide(candidate, inUse)) {
+            // Build a list of conflicting module names for the error message
+            QStringList blockers;
+            for (const auto &other : m_mediator->getModulesList()) {
+                if (!other->isActive() || other == mod) continue;
+                if (ResourceSet::collide(candidate, ResourceSet::fromModule(other)))
+                    blockers << other->getModuleName();
+            }
+            return QJsonObject{
+                {QStringLiteral("error"),
+                 QStringLiteral("Resource conflict — stop conflicting module(s) first: ") + blockers.join(QStringLiteral(", "))},
+                {QStringLiteral("code"), -32004}
+            };
+        }
+
         // Trigger the same flow as clicking the module button in the GUI.
         // STOP = the current status → this arms, configures and starts the module.
         mod->widgetControlClicked(ModuleStatus::STOP);
@@ -1023,6 +1065,100 @@ void AgentBridge::registerHandlers()
         // Direct call is safe — bridge and modules share the main GUI thread.
         mod->closeModule();
         return QJsonObject{{QStringLiteral("ok"), true}};
+    };
+
+    // ── module_run — start signal generation (Sync PWM / Arb Gen / Pattern Gen) ──
+    m_handlers[QStringLiteral("module_run")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        if (!mod->isActive())
+            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not active — call module_start first")}, {QStringLiteral("code"), -32001}};
+
+        QWidget *w = mod->getWidget();
+
+        // Sync PWM
+        if (auto *win = qobject_cast<SyncPwmWindow *>(w)) {
+            if (!win->settings || !win->settings->buttonStart)
+                return QJsonObject{{QStringLiteral("error"), QStringLiteral("SPWM settings unavailable")}, {QStringLiteral("code"), -32603}};
+            if (win->settings->buttonStart->getText(0) == QStringLiteral("Stop"))
+                return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("generation_status"), QStringLiteral("running")}, {QStringLiteral("note"), QStringLiteral("Already running")}};
+            win->settings->buttonStart->clickedInternal(0);
+            return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("generation_status"), QStringLiteral("running")}};
+        }
+
+        // Arbitrary Generator / PWM Generator
+        if (auto *win = qobject_cast<ArbGeneratorWindow *>(w)) {
+            auto *settings = win->findChild<ArbGenPanelSettings *>();
+            if (!settings || !settings->buttonsGenerate)
+                return QJsonObject{{QStringLiteral("error"), QStringLiteral("ArbGen settings unavailable")}, {QStringLiteral("code"), -32603}};
+            QString btnTxt = settings->buttonsGenerate->getText(0);
+            if (btnTxt == QStringLiteral("Stop"))
+                return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("generation_status"), QStringLiteral("running")}, {QStringLiteral("note"), QStringLiteral("Already running")}};
+            if (btnTxt.startsWith(QStringLiteral("Uploading")))
+                return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("generation_status"), QStringLiteral("uploading")}, {QStringLiteral("note"), QStringLiteral("Data is being uploaded to MCU")}};
+            settings->buttonsGenerate->clickedInternal(0);
+            return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("generation_status"), QStringLiteral("uploading")}};
+        }
+
+        // Pattern Generator
+        if (auto *win = qobject_cast<PatternGeneratorWindow *>(w)) {
+            if (!win->settings || !win->settings->buttonStart)
+                return QJsonObject{{QStringLiteral("error"), QStringLiteral("PatGen settings unavailable")}, {QStringLiteral("code"), -32603}};
+            QString btnTxt = win->settings->buttonStart->getText(0);
+            if (btnTxt == QStringLiteral("Stop"))
+                return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("generation_status"), QStringLiteral("running")}, {QStringLiteral("note"), QStringLiteral("Already running")}};
+            if (btnTxt.startsWith(QStringLiteral("Uploading")))
+                return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("generation_status"), QStringLiteral("uploading")}, {QStringLiteral("note"), QStringLiteral("Data is being uploaded to MCU")}};
+            win->settings->buttonStart->clickedInternal(0);
+            return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("generation_status"), QStringLiteral("uploading")}};
+        }
+
+        return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module does not support run (no internal Start button)")}, {QStringLiteral("code"), -32601}};
+    };
+
+    // ── module_halt — stop signal generation without closing the module ──
+    m_handlers[QStringLiteral("module_halt")] = [this](const QJsonObject &p) -> QJsonObject {
+        auto mod = findModule(p.value(QStringLiteral("module")).toString());
+        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
+        if (!mod->isActive())
+            return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("note"), QStringLiteral("Module not active")}};
+
+        QWidget *w = mod->getWidget();
+
+        // Sync PWM
+        if (auto *win = qobject_cast<SyncPwmWindow *>(w)) {
+            if (!win->settings || !win->settings->buttonStart)
+                return QJsonObject{{QStringLiteral("error"), QStringLiteral("SPWM settings unavailable")}, {QStringLiteral("code"), -32603}};
+            if (win->settings->buttonStart->getText(0) == QStringLiteral("Start"))
+                return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("note"), QStringLiteral("Already stopped")}};
+            win->settings->buttonStart->clickedInternal(0);
+            return QJsonObject{{QStringLiteral("ok"), true}};
+        }
+
+        // Arbitrary Generator / PWM Generator
+        if (auto *win = qobject_cast<ArbGeneratorWindow *>(w)) {
+            auto *settings = win->findChild<ArbGenPanelSettings *>();
+            if (!settings || !settings->buttonsGenerate)
+                return QJsonObject{{QStringLiteral("error"), QStringLiteral("ArbGen settings unavailable")}, {QStringLiteral("code"), -32603}};
+            QString btnTxt = settings->buttonsGenerate->getText(0);
+            if (btnTxt == QStringLiteral("Start"))
+                return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("note"), QStringLiteral("Already stopped")}};
+            settings->buttonsGenerate->clickedInternal(0);
+            return QJsonObject{{QStringLiteral("ok"), true}};
+        }
+
+        // Pattern Generator
+        if (auto *win = qobject_cast<PatternGeneratorWindow *>(w)) {
+            if (!win->settings || !win->settings->buttonStart)
+                return QJsonObject{{QStringLiteral("error"), QStringLiteral("PatGen settings unavailable")}, {QStringLiteral("code"), -32603}};
+            QString btnTxt = win->settings->buttonStart->getText(0);
+            if (btnTxt == QStringLiteral("Start"))
+                return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("note"), QStringLiteral("Already stopped")}};
+            win->settings->buttonStart->clickedInternal(0);
+            return QJsonObject{{QStringLiteral("ok"), true}};
+        }
+
+        return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module does not support halt")}, {QStringLiteral("code"), -32601}};
     };
 
     // ── module_get_config ──
@@ -1635,10 +1771,11 @@ void AgentBridge::registerHandlers()
         // duty_cycle: 0 = Disable, 1 = Enable
         if (p.contains(QStringLiteral("duty_cycle")))
             win->tabLowFreq->buttonsDutyCycleSwitch->clickedInternal(p.value(QStringLiteral("duty_cycle")).toInt());
-        // sample_count + sample_channel (0=CH1, 1=CH2)
+        // sample_count + sample_channel (0=CH1, 1=CH2; defaults to channel if provided, else 0)
         if (p.contains(QStringLiteral("sample_count"))) {
             float sc = static_cast<float>(p.value(QStringLiteral("sample_count")).toDouble());
-            int sch = p.value(QStringLiteral("sample_channel")).toInt(0);
+            int defaultCh = p.contains(QStringLiteral("channel")) ? p.value(QStringLiteral("channel")).toInt() : 0;
+            int sch = p.value(QStringLiteral("sample_channel")).toInt(defaultCh);
             if (sch == 1)
                 win->tabLowFreq->dialSampleCountCh2->setRealValue(sc, false);
             else
