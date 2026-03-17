@@ -61,6 +61,60 @@
 // Helper: build a JSON snapshot of module state
 // ──────────────────────────────────────────────────────────
 
+// ── PatGen dial lookup helpers (shared by buildModuleState + patgen_set_*) ──
+
+static WidgetDialRange *patgenFreqDial(PatternGeneratorSettings *s, int idx)
+{
+    switch (idx) {
+    case 0:  return s->dialUserDefFreq;
+    case 1:  return s->dialCounterFreq;
+    case 2:  return s->dialBinaryCodeFreq;
+    case 3:  return s->dialGrayCodeFreq;
+    case 4:  return s->dialQuadratureFreq;
+    case 5:  return s->dialPrbsFreq;
+    case 6:  return s->dialPwmFreq;
+    case 7:  return s->dialLineCodeFreq;
+    case 8:  return s->dial4b5bFreq;
+    case 9:  return s->dialJohnsonFreq;
+    case 10: return s->dialPdmFreq;
+    case 11: return s->dialParBusFreq;
+    default: return nullptr;
+    }
+}
+
+static WidgetDialRange *patgenChanDial(PatternGeneratorSettings *s, int idx)
+{
+    switch (idx) {
+    case 0:  return s->dialUserDefLength;
+    case 1:  return s->dialCounterLength;
+    case 2:  return s->dialBinaryChanNum;
+    case 3:  return s->dialGrayCodeChanNum;
+    case 8:  return s->dial4b5bGroups;
+    case 9:  return s->dialJohnsonPhases;
+    case 11: return s->dialParBusWidth;
+    default: return nullptr;
+    }
+}
+
+// ── Voltmeter channel readings serialization (shared by buildModuleState + voltmeter_get_readings) ──
+
+static QJsonArray serializeVoltmeterReadings(Voltmeter *vm)
+{
+    QJsonArray readings;
+    for (int i = 0; i < vm->getNumChannelsEnabled(); ++i) {
+        const auto &ch = vm->channelData(i);
+        QJsonObject chObj;
+        chObj[QStringLiteral("voltage")]   = ch.voltage;
+        chObj[QStringLiteral("min")]        = ch.min;
+        chObj[QStringLiteral("max")]        = ch.max;
+        chObj[QStringLiteral("ripple")]     = ch.ripple;
+        chObj[QStringLiteral("frequency")]  = ch.frequency;
+        chObj[QStringLiteral("percent")]    = ch.percent;
+        readings.append(chObj);
+    }
+    return readings;
+}
+
 static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, AbstractModule *mod = nullptr)
 {
     QJsonObject st;
@@ -261,37 +315,12 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, 
         if (idx >= 0 && idx < pattList.size())
             st[QStringLiteral("pattern_name")] = pattList.at(idx);
 
-        WidgetDialRange *freqDial = nullptr;
-        switch (idx) {
-        case 0:  freqDial = w->settings->dialUserDefFreq;    break;
-        case 1:  freqDial = w->settings->dialCounterFreq;    break;
-        case 2:  freqDial = w->settings->dialBinaryCodeFreq; break;
-        case 3:  freqDial = w->settings->dialGrayCodeFreq;   break;
-        case 4:  freqDial = w->settings->dialQuadratureFreq; break;
-        case 5:  freqDial = w->settings->dialPrbsFreq;       break;
-        case 6:  freqDial = w->settings->dialPwmFreq;        break;
-        case 7:  freqDial = w->settings->dialLineCodeFreq;   break;
-        case 8:  freqDial = w->settings->dial4b5bFreq;       break;
-        case 9:  freqDial = w->settings->dialJohnsonFreq;    break;
-        case 10: freqDial = w->settings->dialPdmFreq;        break;
-        case 11: freqDial = w->settings->dialParBusFreq;     break;
-        default: break;
-        }
+        WidgetDialRange *freqDial = patgenFreqDial(w->settings, idx);
         if (freqDial)
             st[QStringLiteral("frequency")] = freqDial->getRealValue();
 
         // Channel count / data length dial (not all patterns have one)
-        WidgetDialRange *chanDial = nullptr;
-        switch (idx) {
-        case 0:  chanDial = w->settings->dialUserDefLength;   break;
-        case 1:  chanDial = w->settings->dialCounterLength;   break;
-        case 2:  chanDial = w->settings->dialBinaryChanNum;   break;
-        case 3:  chanDial = w->settings->dialGrayCodeChanNum; break;
-        case 8:  chanDial = w->settings->dial4b5bGroups;      break;
-        case 9:  chanDial = w->settings->dialJohnsonPhases;   break;
-        case 11: chanDial = w->settings->dialParBusWidth;     break;
-        default: break;
-        }
+        WidgetDialRange *chanDial = patgenChanDial(w->settings, idx);
         if (chanDial)
             st[QStringLiteral("channels")] = chanDial->getRealValue();
 
@@ -389,19 +418,7 @@ static QJsonObject buildModuleState(QWidget *widget, const QString &moduleName, 
             if (vm) {
                 st[QStringLiteral("vdd")] = vm->getVdd();
                 st[QStringLiteral("num_channels_enabled")] = vm->getNumChannelsEnabled();
-                QJsonArray readings;
-                for (int i = 0; i < vm->getNumChannelsEnabled(); ++i) {
-                    const auto &ch = vm->channelData(i);
-                    QJsonObject chObj;
-                    chObj[QStringLiteral("voltage")]   = ch.voltage;
-                    chObj[QStringLiteral("min")]        = ch.min;
-                    chObj[QStringLiteral("max")]        = ch.max;
-                    chObj[QStringLiteral("ripple")]     = ch.ripple;
-                    chObj[QStringLiteral("frequency")]  = ch.frequency;
-                    chObj[QStringLiteral("percent")]    = ch.percent;
-                    readings.append(chObj);
-                }
-                st[QStringLiteral("readings")] = readings;
+                st[QStringLiteral("readings")] = serializeVoltmeterReadings(vm);
             }
         }
         return st;
@@ -1328,58 +1345,61 @@ void AgentBridge::registerHandlers()
 
     // ── Sync PWM ─────────────────────────────────────────────
 
-    // spwm_set_frequency — set channel frequency (Hz), GUI + MCU
-    m_handlers[QStringLiteral("spwm_set_frequency")] = [this](const QJsonObject &p) -> QJsonObject {
+    // Helper: resolve SyncPwmSettings from a module param (mirrors findScopePS)
+    auto findSpwm = [this](const QJsonObject &p, SyncPwmSettings *&s) -> QJsonObject {
         auto mod = findModule(p.value(QStringLiteral("module")).toString());
         if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
         auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
         if (!win || !win->settings)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+        s = win->settings;
+        return QJsonObject{};
+    };
+
+    // spwm_set_frequency — set channel frequency (Hz), GUI + MCU
+    m_handlers[QStringLiteral("spwm_set_frequency")] = [this, findSpwm](const QJsonObject &p) -> QJsonObject {
+        SyncPwmSettings *s = nullptr;
+        auto err = findSpwm(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         if (ch < 0 || ch >= CHANNELS_NUM)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel (0-3)")}, {QStringLiteral("code"), -32602}};
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        win->settings->dialFreqCh[ch]->setRealValue(val, false);
+        s->dialFreqCh[ch]->setRealValue(val, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // spwm_set_duty — set channel duty cycle (%), GUI + MCU
-    m_handlers[QStringLiteral("spwm_set_duty")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
-        if (!win || !win->settings)
-            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("spwm_set_duty")] = [this, findSpwm](const QJsonObject &p) -> QJsonObject {
+        SyncPwmSettings *s = nullptr;
+        auto err = findSpwm(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         if (ch < 0 || ch >= CHANNELS_NUM)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel (0-3)")}, {QStringLiteral("code"), -32602}};
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        win->settings->dialDutyCh[ch]->setRealValue(val, false);
+        s->dialDutyCh[ch]->setRealValue(val, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // spwm_set_phase — set channel phase (degrees 0-360), GUI + MCU
-    m_handlers[QStringLiteral("spwm_set_phase")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
-        if (!win || !win->settings)
-            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("spwm_set_phase")] = [this, findSpwm](const QJsonObject &p) -> QJsonObject {
+        SyncPwmSettings *s = nullptr;
+        auto err = findSpwm(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         if (ch < 0 || ch >= CHANNELS_NUM)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel (0-3)")}, {QStringLiteral("code"), -32602}};
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        win->settings->dialPhaseCh[ch]->setRealValue(val, false);
+        s->dialPhaseCh[ch]->setRealValue(val, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // spwm_set_channel_enable — enable/disable a PWM channel, GUI + MCU
-    m_handlers[QStringLiteral("spwm_set_channel_enable")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
-        if (!win || !win->settings)
-            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("spwm_set_channel_enable")] = [this, findSpwm](const QJsonObject &p) -> QJsonObject {
+        SyncPwmSettings *s = nullptr;
+        auto err = findSpwm(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         if (ch < 0 || ch >= CHANNELS_NUM)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel (0-3)")}, {QStringLiteral("code"), -32602}};
@@ -1387,59 +1407,53 @@ void AgentBridge::registerHandlers()
         QJsonValue ev = p.value(QStringLiteral("enabled"));
         bool enable = ev.isBool() ? ev.toBool() : (ev.toInt(1) != 0);
         // Left = ON (index 0), Right = OFF (index 1); setLeft/setRight are private slots
-        QMetaObject::invokeMethod(win->settings->onOffCh[ch],
+        QMetaObject::invokeMethod(s->onOffCh[ch],
                                   enable ? "setLeft" : "setRight", Q_ARG(bool, false));
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // spwm_set_step_mode — switch between Continuous (false) and Step (true)
-    m_handlers[QStringLiteral("spwm_set_step_mode")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
-        if (!win || !win->settings)
-            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("spwm_set_step_mode")] = [this, findSpwm](const QJsonObject &p) -> QJsonObject {
+        SyncPwmSettings *s = nullptr;
+        auto err = findSpwm(p, s);
+        if (!err.isEmpty()) return err;
         QJsonValue sv = p.value(QStringLiteral("step"));
         bool step = sv.isBool() ? sv.toBool() : (sv.toInt(0) != 0);
         // Left = Continuous (index 0), Right = Step (index 1)
-        QMetaObject::invokeMethod(win->settings->switchStepMode,
+        QMetaObject::invokeMethod(s->switchStepMode,
                                   step ? "setRight" : "setLeft", Q_ARG(bool, false));
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // spwm_set_equidistant — toggle equidistant phase distribution
-    m_handlers[QStringLiteral("spwm_set_equidistant")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
-        if (!win || !win->settings)
-            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("spwm_set_equidistant")] = [this, findSpwm](const QJsonObject &p) -> QJsonObject {
+        SyncPwmSettings *s = nullptr;
+        auto err = findSpwm(p, s);
+        if (!err.isEmpty()) return err;
         QJsonValue ev = p.value(QStringLiteral("enabled"));
         bool want = ev.isBool() ? ev.toBool() : (ev.toInt(0) != 0);
-        bool current = win->settings->buttonEquidist->isChecked(0);
+        bool current = s->buttonEquidist->isChecked(0);
         if (want != current) {
-            win->settings->buttonEquidist->setChecked(want, 0);
-            win->settings->buttonEquidist->clickedInternal(0);
+            s->buttonEquidist->setChecked(want, 0);
+            s->buttonEquidist->clickedInternal(0);
         }
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // spwm_set_invert — toggle invert for a specific channel
-    m_handlers[QStringLiteral("spwm_set_invert")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<SyncPwmWindow *>(mod->getWidget());
-        if (!win || !win->settings)
-            return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Sync PWM module")}, {QStringLiteral("code"), -32602}};
+    m_handlers[QStringLiteral("spwm_set_invert")] = [this, findSpwm](const QJsonObject &p) -> QJsonObject {
+        SyncPwmSettings *s = nullptr;
+        auto err = findSpwm(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         if (ch < 0 || ch >= CHANNELS_NUM)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel (0-3)")}, {QStringLiteral("code"), -32602}};
         QJsonValue iv = p.value(QStringLiteral("enabled"));
         bool want = iv.isBool() ? iv.toBool() : (iv.toInt(0) != 0);
-        bool current = win->settings->inverCh[ch]->isChecked(0);
+        bool current = s->inverCh[ch]->isChecked(0);
         if (want != current) {
-            win->settings->inverCh[ch]->setChecked(want, 0);
-            win->settings->inverCh[ch]->clickedInternal(0);
+            s->inverCh[ch]->setChecked(want, 0);
+            s->inverCh[ch]->clickedInternal(0);
         }
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
@@ -1826,193 +1840,170 @@ void AgentBridge::registerHandlers()
 
     // ── Arbitrary / PWM Generator ────────────────────────
 
-    // arbgen_set_frequency — set signal frequency for a channel
-    m_handlers[QStringLiteral("arbgen_set_frequency")] = [this](const QJsonObject &p) -> QJsonObject {
+    // Helper: resolve ArbGenPanelSettings from a module param (mirrors findScopePS)
+    auto findArbGen = [this](const QJsonObject &p, ArbGenPanelSettings *&s) -> QJsonObject {
         auto mod = findModule(p.value(QStringLiteral("module")).toString());
         if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
         auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
         if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+        s = win->findChild<ArbGenPanelSettings *>();
+        if (!s) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+        return QJsonObject{};
+    };
+
+    // arbgen_set_frequency — set signal frequency for a channel
+    m_handlers[QStringLiteral("arbgen_set_frequency")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        settings->dialFreqCh[ch]->setRealValue(val, false);
+        s->dialFreqCh[ch]->setRealValue(val, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_shape — 0=Sine, 1=Saw, 2=Rect, 3=Arb
-    m_handlers[QStringLiteral("arbgen_set_shape")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+    m_handlers[QStringLiteral("arbgen_set_shape")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         int idx = p.value(QStringLiteral("index")).toInt(0);
-        settings->buttonsShape[ch]->clickedInternal(idx);
+        s->buttonsShape[ch]->clickedInternal(idx);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_amplitude — set signal amplitude (V) per channel
-    m_handlers[QStringLiteral("arbgen_set_amplitude")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+    m_handlers[QStringLiteral("arbgen_set_amplitude")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        settings->dialAmplitudeCh[ch]->setRealValue(val, false);
+        s->dialAmplitudeCh[ch]->setRealValue(val, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_offset — set signal offset (V) per channel
-    m_handlers[QStringLiteral("arbgen_set_offset")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+    m_handlers[QStringLiteral("arbgen_set_offset")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        settings->dialOffsetCh[ch]->setRealValue(val, false);
+        s->dialOffsetCh[ch]->setRealValue(val, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_duty — set duty cycle (%) per channel
-    m_handlers[QStringLiteral("arbgen_set_duty")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+    m_handlers[QStringLiteral("arbgen_set_duty")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        settings->dialDutyCh[ch]->setRealValue(val, false);
+        s->dialDutyCh[ch]->setRealValue(val, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_phase — set phase (degrees 0-360) per channel
-    m_handlers[QStringLiteral("arbgen_set_phase")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+    m_handlers[QStringLiteral("arbgen_set_phase")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        settings->dialPhaseCh[ch]->setRealValue(val, false);
+        s->dialPhaseCh[ch]->setRealValue(val, false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_channels — set number of active channels (1-4)
-    m_handlers[QStringLiteral("arbgen_set_channels")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+    m_handlers[QStringLiteral("arbgen_set_channels")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         int count = p.value(QStringLiteral("count")).toInt(1);
-        settings->buttonsEnable->clickedInternal(count - 1); // 0-based index
+        s->buttonsEnable->clickedInternal(count - 1); // 0-based index
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_memory — 0=Best fit, 1=Long, 2=Custom
-    m_handlers[QStringLiteral("arbgen_set_memory")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+    m_handlers[QStringLiteral("arbgen_set_memory")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         int mode = p.value(QStringLiteral("mode")).toInt(0);
-        settings->buttonsMemory->clickedInternal(mode);
+        s->buttonsMemory->clickedInternal(mode);
         if (mode == 2) { // Custom — also set the length if provided
             double len = p.value(QStringLiteral("length")).toDouble(0);
             if (len > 0) {
-                settings->customLengthInput->setText(QString::number(static_cast<int>(len)));
-                settings->customLengthInput->processInput();
+                s->customLengthInput->setText(QString::number(static_cast<int>(len)));
+                s->customLengthInput->processInput();
             }
         }
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_sweep — enable/disable SW sweep and optionally set min/max freq + time
-    m_handlers[QStringLiteral("arbgen_set_sweep")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+    m_handlers[QStringLiteral("arbgen_set_sweep")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         bool enable = p.value(QStringLiteral("enable")).toBool(false);
-        settings->buttonSWSweepEnable->clickedInternal(enable ? 1 : 0);
+        s->buttonSWSweepEnable->clickedInternal(enable ? 1 : 0);
         if (enable) {
             if (p.contains(QStringLiteral("min_freq")))
-                settings->dialFreqSweepMin->setRealValue(static_cast<float>(p.value(QStringLiteral("min_freq")).toDouble()), false);
+                s->dialFreqSweepMin->setRealValue(static_cast<float>(p.value(QStringLiteral("min_freq")).toDouble()), false);
             if (p.contains(QStringLiteral("max_freq")))
-                settings->dialFreqSweepMax->setRealValue(static_cast<float>(p.value(QStringLiteral("max_freq")).toDouble()), false);
+                s->dialFreqSweepMax->setRealValue(static_cast<float>(p.value(QStringLiteral("max_freq")).toDouble()), false);
             if (p.contains(QStringLiteral("sweep_time")))
-                settings->dialSweepTime->setRealValue(static_cast<float>(p.value(QStringLiteral("sweep_time")).toDouble()), false);
+                s->dialSweepTime->setRealValue(static_cast<float>(p.value(QStringLiteral("sweep_time")).toDouble()), false);
         }
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_freq_sync — set CH1 freq sync on/off for a channel (CH2-CH4)
-    m_handlers[QStringLiteral("arbgen_set_freq_sync")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Settings panel not found")}, {QStringLiteral("code"), -32603}};
+    m_handlers[QStringLiteral("arbgen_set_freq_sync")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
         int ch = p.value(QStringLiteral("channel")).toInt(1);
-        if (ch < 1 || ch >= MAX_ARB_CHANNELS_NUM || !settings->swSyncWithCH1[ch])
+        if (ch < 1 || ch >= MAX_ARB_CHANNELS_NUM || !s->swSyncWithCH1[ch])
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel for freq sync (must be 1-3, i.e. CH2-CH4)")}, {QStringLiteral("code"), -32602}};
         bool on = p.value(QStringLiteral("enabled")).toBool(false);
-        QMetaObject::invokeMethod(settings->swSyncWithCH1[ch],
+        QMetaObject::invokeMethod(s->swSyncWithCH1[ch],
                                   on ? "setRight" : "setLeft",
                                   Qt::DirectConnection);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_pwm_frequency — set per-channel PWM carrier frequency (PWM generator only)
-    m_handlers[QStringLiteral("arbgen_set_pwm_frequency")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen/PWM module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings || !settings->isPWMbased)
+    m_handlers[QStringLiteral("arbgen_set_pwm_frequency")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
+        if (!s->isPWMbased)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("PWM frequency only available on PWM generator")}, {QStringLiteral("code"), -32602}};
         int ch = p.value(QStringLiteral("channel")).toInt(0);
         if (ch < 0 || ch >= MAX_ARB_CHANNELS_NUM)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Channel out of range")}, {QStringLiteral("code"), -32602}};
         double val = p.value(QStringLiteral("value")).toDouble();
-        settings->dialPWMFreqCh[ch]->setRealValue(static_cast<float>(val), false);
+        s->dialPWMFreqCh[ch]->setRealValue(static_cast<float>(val), false);
         return QJsonObject{{QStringLiteral("ok"), true}};
     };
 
     // arbgen_set_pwm_freq_sync — sync PWM freq of CH2-CH4 with CH1 (PWM generator only)
-    m_handlers[QStringLiteral("arbgen_set_pwm_freq_sync")] = [this](const QJsonObject &p) -> QJsonObject {
-        auto mod = findModule(p.value(QStringLiteral("module")).toString());
-        if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
-        auto *win = qobject_cast<ArbGeneratorWindow *>(mod->getWidget());
-        if (!win) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not an ArbGen/PWM module")}, {QStringLiteral("code"), -32602}};
-        auto *settings = win->findChild<ArbGenPanelSettings *>();
-        if (!settings || !settings->isPWMbased)
+    m_handlers[QStringLiteral("arbgen_set_pwm_freq_sync")] = [this, findArbGen](const QJsonObject &p) -> QJsonObject {
+        ArbGenPanelSettings *s = nullptr;
+        auto err = findArbGen(p, s);
+        if (!err.isEmpty()) return err;
+        if (!s->isPWMbased)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("PWM freq sync only available on PWM generator")}, {QStringLiteral("code"), -32602}};
         int ch = p.value(QStringLiteral("channel")).toInt(1);
-        if (ch < 1 || ch >= MAX_ARB_CHANNELS_NUM || !settings->swSyncPWMWithCH1[ch])
+        if (ch < 1 || ch >= MAX_ARB_CHANNELS_NUM || !s->swSyncPWMWithCH1[ch])
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Invalid channel for PWM freq sync (must be 1-3, i.e. CH2-CH4)")}, {QStringLiteral("code"), -32602}};
         bool on = p.value(QStringLiteral("enabled")).toBool(false);
-        QMetaObject::invokeMethod(settings->swSyncPWMWithCH1[ch],
+        QMetaObject::invokeMethod(s->swSyncPWMWithCH1[ch],
                                   on ? "setRight" : "setLeft",
                                   Qt::DirectConnection);
         return QJsonObject{{QStringLiteral("ok"), true}};
@@ -2040,24 +2031,8 @@ void AgentBridge::registerHandlers()
         if (!win || !win->settings)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Pattern Generator module")}, {QStringLiteral("code"), -32602}};
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
-        // Find the visible frequency dial for the current pattern selection
         int pattern = win->settings->comboPatternSelection->getSelectedIndex();
-        WidgetDialRange *freqDial = nullptr;
-        switch (pattern) {
-        case 0:  freqDial = win->settings->dialUserDefFreq;   break;
-        case 1:  freqDial = win->settings->dialCounterFreq;   break;
-        case 2:  freqDial = win->settings->dialBinaryCodeFreq; break;
-        case 3:  freqDial = win->settings->dialGrayCodeFreq;  break;
-        case 4:  freqDial = win->settings->dialQuadratureFreq; break;
-        case 5:  freqDial = win->settings->dialPrbsFreq;      break;
-        case 6:  freqDial = win->settings->dialPwmFreq;       break;
-        case 7:  freqDial = win->settings->dialLineCodeFreq;  break;
-        case 8:  freqDial = win->settings->dial4b5bFreq;      break;
-        case 9:  freqDial = win->settings->dialJohnsonFreq;   break;
-        case 10: freqDial = win->settings->dialPdmFreq;       break;
-        case 11: freqDial = win->settings->dialParBusFreq;    break;
-        default: break;
-        }
+        WidgetDialRange *freqDial = patgenFreqDial(win->settings, pattern);
         if (!freqDial)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("No frequency dial for this pattern")}, {QStringLiteral("code"), -32602}};
         freqDial->setRealValue(val, false);
@@ -2073,17 +2048,7 @@ void AgentBridge::registerHandlers()
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Pattern Generator module")}, {QStringLiteral("code"), -32602}};
         float val = static_cast<float>(p.value(QStringLiteral("value")).toDouble());
         int pattern = win->settings->comboPatternSelection->getSelectedIndex();
-        WidgetDialRange *chanDial = nullptr;
-        switch (pattern) {
-        case 0:  chanDial = win->settings->dialUserDefLength;  break;
-        case 1:  chanDial = win->settings->dialCounterLength;  break;
-        case 2:  chanDial = win->settings->dialBinaryChanNum;  break;
-        case 3:  chanDial = win->settings->dialGrayCodeChanNum; break;
-        case 8:  chanDial = win->settings->dial4b5bGroups;     break;
-        case 9:  chanDial = win->settings->dialJohnsonPhases;  break;
-        case 11: chanDial = win->settings->dialParBusWidth;    break;
-        default: break;
-        }
+        WidgetDialRange *chanDial = patgenChanDial(win->settings, pattern);
         if (!chanDial)
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("No channel/length dial for this pattern")}, {QStringLiteral("code"), -32602}};
         chanDial->setRealValue(val, false);
@@ -2161,19 +2126,7 @@ void AgentBridge::registerHandlers()
         if (!mod) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Module not found")}, {QStringLiteral("code"), -32602}};
         auto *vm = qobject_cast<Voltmeter *>(mod.data());
         if (!vm) return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not a Voltmeter module")}, {QStringLiteral("code"), -32602}};
-        QJsonArray readings;
-        for (int i = 0; i < vm->getNumChannelsEnabled(); ++i) {
-            const auto &ch = vm->channelData(i);
-            QJsonObject chObj;
-            chObj[QStringLiteral("voltage")]   = ch.voltage;
-            chObj[QStringLiteral("min")]        = ch.min;
-            chObj[QStringLiteral("max")]        = ch.max;
-            chObj[QStringLiteral("ripple")]     = ch.ripple;
-            chObj[QStringLiteral("frequency")]  = ch.frequency;
-            chObj[QStringLiteral("percent")]    = ch.percent;
-            readings.append(chObj);
-        }
-        return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("vdd"), vm->getVdd()}, {QStringLiteral("readings"), readings}};
+        return QJsonObject{{QStringLiteral("ok"), true}, {QStringLiteral("vdd"), vm->getVdd()}, {QStringLiteral("readings"), serializeVoltmeterReadings(vm)}};
     };
 
     // voltmeter_set_datalog_file — set data log file path (no GUI dialog)
