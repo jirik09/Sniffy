@@ -34,12 +34,14 @@ PanelAdvanced::PanelAdvanced(QVBoxLayout *destination, QWidget *parent)
     destination->addWidget(new WidgetSeparator(parent,"Sampling"));
 
     samplingFrequencyInput = new WidgetTextInput(parent,"Sampling","100k",InputTextType::NUMBER);
+    samplingFrequencyInput->setObjectName(QStringLiteral("scopeSamplingFreq"));
     destination->addWidget(samplingFrequencyInput);
 
     samplingFrequencyReal = new WidgetLabel(parent,"Real Sampling","--");
     destination->addWidget(samplingFrequencyReal);
 
     dataLengthInput = new WidgetTextInput(parent,"Length","1000",InputTextType::NUMBER);
+    dataLengthInput->setObjectName(QStringLiteral("scopeDataLength"));
     destination->addWidget(dataLengthInput);
 
     QSpacerItem *verticalSpacer;

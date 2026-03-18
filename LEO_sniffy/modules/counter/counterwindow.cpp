@@ -211,18 +211,15 @@ void CounterWindow::setNextCounterMode(int index){
         clearDisplay(displayHF, true);
 
     }else if(index == (int)CounterMode::LOW_FREQUENCY) {
-        if(isAfterStart == true)
-            lfSwitchChannelCallback((int)conf->lfState.activeChan);
+        lfSwitchChannelCallback((int)conf->lfState.activeChan);
         if(conf->lfState.chan1.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
-            if(isAfterStart == true)
-                lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
+            lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
             displayLFCh1->displayAvgString("");
             clearDisplay(displayLFCh1, true);
             displayLFCh2->setLabelText(LABELNUM_FLAG, LITERAL_NO_DATA);
             clearDisplay(displayLFCh2, false);
         }else if(conf->lfState.chan2.dutyCycle == LFState::Channel::DutyCycle::ENABLED){
-            if(isAfterStart == true)
-                lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
+            lfSwitchDutyCycleCallback((int)LFState::Channel::DutyCycle::ENABLED);
             displayLFCh2->displayAvgString("");
             clearDisplay(displayLFCh2, true);
             displayLFCh1->setLabelText(LABELNUM_FLAG, LITERAL_NO_DATA);
@@ -233,8 +230,6 @@ void CounterWindow::setNextCounterMode(int index){
             switchQuantity((int)conf->lfState.chan1.quantity, displayLFCh1);
             switchQuantity((int)conf->lfState.chan2.quantity, displayLFCh2);
         }
-        if(isAfterStart == true)
-            isAfterStart = false;
         displayLFCh1->show();
         displayLFCh2->show();
 

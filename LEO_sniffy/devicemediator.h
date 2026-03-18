@@ -37,6 +37,12 @@ public:
     void setResourcesInUse(ResourceSet res);
     void disableModules();
     void closeModules();
+    Comms *getComms() const { return communication; }
+
+    // Accessors used by AgentBridge for device selection RPCs
+    QList<DeviceDescriptor> getDeviceList() const { return deviceList; }
+    void setDeviceList(const QList<DeviceDescriptor> &list) { deviceList = list; }
+    Device *getDevice() const { return device; }
 
 signals:
     void loadLayoutUponOpen(QString Devicename);

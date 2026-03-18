@@ -33,6 +33,7 @@ public:
     Q_DISABLE_COPY(Scope)
 
     QWidget* getWidget();
+    ScopeConfig* getConfig() const { return config; }
 
 public slots:
     void parseData(QByteArray data);

@@ -324,6 +324,18 @@ void VoltmeterWindow::buttonsCalcsCallback(int clicked)
     }
 }
 
+void VoltmeterWindow::setDatalogFilePath(const QString &path)
+{
+    config->datalogFileName = path;
+    QString display = path;
+    if (display.length() >= 25)
+        display = display.left(8) + " ... " + display.right(12);
+    if (path.length() > 3) {
+        labelFile->setValue(display);
+        buttonStartLog->enableAll(true);
+    }
+}
+
 void VoltmeterWindow::selectFileCallback()
 {
     QString fileName;

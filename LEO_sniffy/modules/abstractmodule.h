@@ -77,6 +77,7 @@ public:
     void enableModuleHoldButton(bool enable);
 
     int getResources();
+    AbstractSpecification* getSpecification() const { return moduleSpecification; }
 
     // GPIO mask getters (delegated to specification)
     quint32 getGpioMaskA() const { return moduleSpecification ? moduleSpecification->getGpioMaskA() : 0u; }
