@@ -32,6 +32,10 @@ private:
 
     QString styleSelected;
     QString styleNotSelected;
+    QString currentColor;
+
+protected:
+    void changeEvent(QEvent *event) override;
 
 signals:
     void clicked(int index, int optionalEmitParam = 0);

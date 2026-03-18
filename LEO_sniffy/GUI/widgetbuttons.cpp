@@ -8,6 +8,7 @@ Class for buttons.
 */
 #include "widgetbuttons.h"
 #include "ui_widgetbuttons.h"
+#include "stylehelper.h"
 
 WidgetButtons::WidgetButtons(QWidget *parent, int buttonCount, ButtonTypes buttonType, QString labelName, int defaultSelectedIndex, int optionalEmitParam) :
     QWidget(parent),
@@ -32,6 +33,8 @@ WidgetButtons::WidgetButtons(QWidget *parent, int buttonCount, ButtonTypes butto
     pushButtonsList.append(ui->pushButton_6);
     pushButtonsList.append(ui->pushButton_7);
     pushButtonsList.append(ui->pushButton_8);
+
+    buttonColors.fill(QString(), pushButtonsList.size());
 
 
     if(buttonCount<=1)
@@ -133,7 +136,7 @@ QString WidgetButtons::getText(int index){
 
 void WidgetButtons::setColor(QString text, int index){
     QString tempStyleSheet = "";
-    if (index>=0 && index<8){
+    if (index>=0 && index<pushButtonsList.size()){
         const auto &p = Graphics::palette();
         const QString originalColor = text;
         if(p.styleTransparencyUsed)
@@ -151,6 +154,11 @@ void WidgetButtons::setColor(QString text, int index){
                 tempStyleSheet += QStringLiteral("QPushButton{color:%1;}").arg(tc);
         }
         pushButtonsList.at(index)->setStyleSheet(tempStyleSheet);
+        buttonColors[index] = originalColor;
+        if (!pushButtonsList.at(index)->isEnabled() && Graphics::palette().isEmberTheme)
+            pushButtonsList.at(index)->setGraphicsEffect(nullptr);
+        else
+            StyleHelper::applyGlowEffect(pushButtonsList.at(index), originalColor, StyleHelper::GLOW_BLUR_RADIUS_BUTTONS);
     }
 }
 
@@ -196,21 +204,35 @@ int WidgetButtons::getStatus(){
 }
 
 void WidgetButtons::setDisabledButton(bool disabled, int index){
-    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index))
+    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index)) {
         pushButtonsList.at(index)->setDisabled(disabled);
+        if (Graphics::palette().isEmberTheme) {
+            if (disabled)
+                pushButtonsList.at(index)->setGraphicsEffect(nullptr);
+            else if (index < buttonColors.size() && !buttonColors[index].isEmpty())
+                StyleHelper::applyGlowEffect(pushButtonsList.at(index), buttonColors[index], StyleHelper::GLOW_BLUR_RADIUS_BUTTONS);
+        }
+    }
 }
 void WidgetButtons::disableAll(){
-    for (int i=0;i<8;i++) {
+    for (int i=0;i<pushButtonsList.size();i++) {
         setDisabledButton(true, i);
     }
 }
 
 void WidgetButtons::setEnabledButton(bool enable, int index){
-    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index))
+    if(index >=0 && index < pushButtonsList.size() && pushButtonsList.at(index)) {
         pushButtonsList.at(index)->setEnabled(enable);
+        if (Graphics::palette().isEmberTheme) {
+            if (!enable)
+                pushButtonsList.at(index)->setGraphicsEffect(nullptr);
+            else if (index < buttonColors.size() && !buttonColors[index].isEmpty())
+                StyleHelper::applyGlowEffect(pushButtonsList.at(index), buttonColors[index], StyleHelper::GLOW_BLUR_RADIUS_BUTTONS);
+        }
+    }
 }
 void WidgetButtons::enableAll(bool enable){
-    for (int i=0;i<8;i++) {
+    for (int i=0;i<pushButtonsList.size();i++) {
         setEnabledButton(enable, i);
     }
 }
@@ -238,6 +260,35 @@ void WidgetButtons::button_7_Clicked(){
 }
 void WidgetButtons::button_8_Clicked(){
     clickedInternal(7);
+}
+
+void WidgetButtons::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::EnabledChange && Graphics::palette().isEmberTheme)
+    {
+        updateGlowForDisabledState(!isEnabled());
+    }
+}
+
+void WidgetButtons::updateGlowForDisabledState(bool disabled)
+{
+    for (int i = 0; i < pushButtonsList.size(); ++i)
+    {
+        if (!pushButtonsList.at(i))
+        {
+            continue;
+        }
+
+        if (disabled)
+        {
+            pushButtonsList.at(i)->setGraphicsEffect(nullptr);
+        }
+        else if (i < buttonColors.size() && !buttonColors[i].isEmpty())
+        {
+            StyleHelper::applyGlowEffect(pushButtonsList.at(i), buttonColors[i], StyleHelper::GLOW_BLUR_RADIUS_BUTTONS);
+        }
+    }
 }
 
 void WidgetButtons::uncheckAll(){

@@ -41,6 +41,7 @@ ThemePalette Dawn::buildPalette(){
     p.error = DAWN_ERROR;
     p.running = DAWN_RUNNING;
     p.unused = DAWN_UNUSED;
+    p.moduleActiveText = DAWN_YELLOW;
     p.stylePushButton = DAWN_STYLE_PUSH_BUTTON;
     p.styleCheckButton = DAWN_STYLE_CHECK_BUTTON;
     p.styleProgressBar = DAWN_STYLE_PROGRESS_BAR;

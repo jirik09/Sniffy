@@ -33,6 +33,7 @@ ThemePalette MSDos::buildPalette(){
     p.error = MSDOS_ERROR;
     p.running = MSDOS_RUNNING;
     p.unused = MSDOS_UNUSED;
+    p.moduleActiveText = MSDOS_TEXT_ALL;
     p.stylePushButton = MSDOS_STYLE_PUSH_BUTTON;
     p.styleCheckButton = MSDOS_STYLE_CHECK_BUTTON;
     p.styleProgressBar = MSDOS_STYLE_PROGRESS_BAR;

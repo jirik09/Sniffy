@@ -44,6 +44,10 @@ private:
     QList<params_dial> options; // value container (owned directly)
     int selectedIndex;
     int defaultIndex = 0;
+    QString dialColor;
+
+protected:
+    void changeEvent(QEvent *event) override;
 
 private slots:
     void plusClicked();

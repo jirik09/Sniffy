@@ -62,6 +62,15 @@ void WidgetSwitch::setLeft(bool silent){
     ui->pushButton_right->setStyleSheet(styleNotSelected);
     ui->pushButton_left->setChecked(true);
     ui->pushButton_right->setChecked(false);
+    if (!currentColor.isEmpty()) {
+        if (isEnabled()) {
+            StyleHelper::applyGlowEffect(ui->pushButton_left, currentColor, StyleHelper::GLOW_BLUR_RADIUS_SWITCH);
+            StyleHelper::applyGlowEffect(ui->pushButton_right, currentColor, StyleHelper::GLOW_BLUR_RADIUS_SWITCH);
+        } else {
+            ui->pushButton_left->setGraphicsEffect(nullptr);
+            ui->pushButton_right->setGraphicsEffect(nullptr);
+        }
+    }
     if (!silent)
         emit clicked(0,optionalEmitParam);
 }
@@ -71,6 +80,15 @@ void WidgetSwitch::setRight(bool silent){
     ui->pushButton_left->setStyleSheet(styleNotSelected);
     ui->pushButton_right->setChecked(true);
     ui->pushButton_left->setChecked(false);
+    if (!currentColor.isEmpty()) {
+        if (isEnabled()) {
+            StyleHelper::applyGlowEffect(ui->pushButton_right, currentColor, StyleHelper::GLOW_BLUR_RADIUS_SWITCH);
+            StyleHelper::applyGlowEffect(ui->pushButton_left, currentColor, StyleHelper::GLOW_BLUR_RADIUS_SWITCH);
+        } else {
+            ui->pushButton_right->setGraphicsEffect(nullptr);
+            ui->pushButton_left->setGraphicsEffect(nullptr);
+        }
+    }
     if(!silent)
         emit clicked(1,optionalEmitParam);
 }
@@ -83,8 +101,23 @@ bool WidgetSwitch::isCheckedRight(){
     return (ui->pushButton_right->isChecked());
 }
 
+void WidgetSwitch::changeEvent(QEvent *event)
+{
+    QWidget::changeEvent(event);
+    if (event->type() == QEvent::EnabledChange && Graphics::palette().isEmberTheme) {
+        if (!isEnabled()) {
+            ui->pushButton_left->setGraphicsEffect(nullptr);
+            ui->pushButton_right->setGraphicsEffect(nullptr);
+        } else if (!currentColor.isEmpty()) {
+            StyleHelper::applyGlowEffect(ui->pushButton_left, currentColor, StyleHelper::GLOW_BLUR_RADIUS_SWITCH);
+            StyleHelper::applyGlowEffect(ui->pushButton_right, currentColor, StyleHelper::GLOW_BLUR_RADIUS_SWITCH);
+        }
+    }
+}
+
 void WidgetSwitch::setColor(QString color)
 {
+    currentColor = color.startsWith('#') ? color : ('#' + color);
     if(Graphics::palette().styleTransparencyUsed)
         color = color.remove("#");
 

@@ -10,8 +10,8 @@ WidgetSeparator::WidgetSeparator(QWidget *parent, QString name) :
     ui(new Ui::WidgetSeparator)
 {
     ui->setupUi(this);
-    ui->widget->setStyleSheet(StyleHelper::backgroundImage(Graphics::tintedPath(Graphics::getCommonPath()+"separator.png")));
-    ui->label_name->setStyleSheet(StyleHelper::separatorLabel(Graphics::palette().textLabel));
+    ui->widget->setStyleSheet(StyleHelper::backgroundImage(Graphics::tintedPath(Graphics::getCommonPath()+"separator.png", QColor(Graphics::palette().chartGridlegLowContrast))));
+    ui->label_name->setStyleSheet(StyleHelper::separatorLabel(Graphics::palette().chartGridlegDefault));
     ui->label_name->setText(name);           
 }
 

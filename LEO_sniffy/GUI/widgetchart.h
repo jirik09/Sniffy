@@ -13,6 +13,7 @@
 #include <QGraphicsSceneWheelEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsEllipseItem>
+#include <QGraphicsItemGroup>
 
 #include <QMenu>
 #include <QtMath>
@@ -95,6 +96,12 @@ public:
     void setGridTransparencyPercent(int percent);
     int getGridTransparencyPercent() const { return gridTransparencyPercent; }
     void stepGridTransparency();
+
+    int getSeriesPenWidthIndex() const { return seriesPenWidthIndex; }
+    void setSeriesPenWidthIndex(int idx);
+
+    QByteArray saveGeometry();
+    void restoreGeometry(QByteArray geom);
 
     void formatAxisLabelsForScope();
     void formatLabels(QString axisXLabelForm, QString axisYLabelForm);
@@ -188,6 +195,19 @@ private:
     int gridAlphaDotMargin = 7; // px from top-right corner inside plot
     qreal gridAlphaDotClickableFactor = 4.0; // enlargement factor for clickable radius (vs. visual radius)
     bool isPointInGridAlphaDot(const QPointF &scenePos) const; // hit test with enlarged radius
+
+    // Line-thickness indicator (bottom-right corner)
+    QGraphicsItemGroup *lineThicknessIcon = nullptr;
+    int lineThicknessMargin = 7;
+    qreal lineThicknessIconSize = 12.0;
+    qreal lineThicknessClickableFactor = 4.0;
+    int seriesPenWidthIndex = 0; // index into penWidths[]
+    static constexpr qreal penWidths[] = {2.0, 4.0, 6.0};
+    void layoutLineThicknessIcon();
+    void updateLineThicknessIcon();
+    bool isPointInLineThicknessIcon(const QPointF &scenePos) const;
+    void stepLineThickness();
+    void applySeriesPenWidth();
 
     void createSeries(QAbstractSeries *series);
 

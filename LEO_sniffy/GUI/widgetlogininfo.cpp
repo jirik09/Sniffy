@@ -7,6 +7,7 @@ WidgetLoginInfo::WidgetLoginInfo(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->pushButton->setIcon(QIcon(Graphics::getGraphicsPath()+"user.png"));
+    ui->pushButton->setStyleSheet("QPushButton{border:none;border-radius:4px;} QPushButton:hover{background-color:"+Graphics::palette().windowControlHover+";}");
 
     connect(ui->pushButton,&QPushButton::clicked,this, &WidgetLoginInfo::loginCallback);
     connect(ui->label_email,&ClickableLabel::clicked,this, &WidgetLoginInfo::loginCallback);

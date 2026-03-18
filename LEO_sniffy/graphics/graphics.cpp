@@ -19,17 +19,19 @@ QVector<std::function<QSharedPointer<AbstractTheme>()>> createTheme = {
     [] { return QSharedPointer<AbstractTheme>(new Dawn); },
     [] { return QSharedPointer<AbstractTheme>(new Greenfield); },
     [] { return QSharedPointer<AbstractTheme>(new MSDos); },
+    [] { return QSharedPointer<AbstractTheme>(new Ember); },
 };
 
 QList<QString> *initThemesList(){
     if(!themeList){
         themeList = new QList<QString>;
         themeList->reserve(createTheme.size());
-        themeList->append(((QString)(typeid(Dark).name())).remove(0,1));
-        themeList->append(((QString)(typeid(Light).name())).remove(0,1));
-        themeList->append(((QString)(typeid(Dawn).name())).remove(0,1));
-        themeList->append(((QString)(typeid(Greenfield).name())).remove(0,1));
-        themeList->append(((QString)(typeid(MSDos).name())).remove(0,1));
+        themeList->append("Dark");
+        themeList->append("Light");
+        themeList->append("Dawn");
+        themeList->append("Greenfield");
+        themeList->append("MS-DOS");
+        themeList->append("Ember");
     }
     return themeList;
 }
@@ -126,7 +128,8 @@ QString applyPathFallback(const QString &base, const QString &testFileName){
     struct PatternFallback { const char* pattern; const char* replacement; };
     static const PatternFallback orderedFallbacks[] = {
         {"/msdos/", "/dark/"}, // MSDOS theme currently reuses dark assets if not provided
-        {"/greenfield/", "/dawn/"}
+        {"/greenfield/", "/dawn/"},
+        {"/ember/", "/dawn/"}
     };
     for(const auto &pf : orderedFallbacks){
         if(base.contains(pf.pattern)){
@@ -155,6 +158,7 @@ static QPixmap tintPixmap(const QPixmap &base, const QColor &color){
     QPixmap tinted(base.size());
     tinted.fill(Qt::transparent);
     QPainter p(&tinted);
+    p.setRenderHint(QPainter::SmoothPixmapTransform);
     p.drawPixmap(0, 0, base);
     p.setCompositionMode(QPainter::CompositionMode_SourceIn);
     p.fillRect(tinted.rect(), color);
@@ -166,6 +170,12 @@ QPixmap tintedPixmap(const QString &path){
     QPixmap base(path);
     if(base.isNull()) return base;
     return tintPixmap(base, QColor(cachedPalette.textAll));
+}
+
+QPixmap tintedPixmap(const QString &path, const QColor &color){
+    QPixmap base(path);
+    if(base.isNull()) return base;
+    return tintPixmap(base, color);
 }
 
 QIcon tintedIcon(const QString &path){
@@ -188,6 +198,21 @@ QString tintedPath(const QString &path){
     const QString outFile = dir + "/" + QFileInfo(path).fileName();
     pm.save(outFile, "PNG");
     tintFileCache.insert(path, outFile);
+    return outFile;
+}
+
+QString tintedPath(const QString &path, const QColor &color){
+    const QString key = path + "#" + color.name();
+    auto it = tintFileCache.find(key);
+    if(it != tintFileCache.end()) return *it;
+
+    QPixmap pm = tintedPixmap(path, color);
+    if(pm.isNull()) return path;
+
+    const QString dir = ensureTintCacheDir();
+    const QString outFile = dir + "/" + color.name().mid(1) + "_" + QFileInfo(path).fileName();
+    pm.save(outFile, "PNG");
+    tintFileCache.insert(key, outFile);
     return outFile;
 }
 

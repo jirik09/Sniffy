@@ -42,6 +42,7 @@ ThemePalette Light::buildPalette(){
     p.error = LIGHT_ERROR;
     p.running = LIGHT_RUNNING;
     p.unused = LIGHT_UNUSED;
+    p.moduleActiveText = LIGHT_TEXT_ALL;
     p.stylePushButton = LIGHT_STYLE_PUSH_BUTTON;
     p.styleCheckButton = LIGHT_STYLE_CHECK_BUTTON;
     p.styleProgressBar = LIGHT_STYLE_PROGRESS_BAR;

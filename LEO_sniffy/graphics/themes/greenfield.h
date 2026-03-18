@@ -24,10 +24,10 @@ struct ThemePalette; // forward declaration
 
 /* COMPONENTS */
 #define GREENFIELD_CONTROLS "#f7f4d5"                 // dusty rose – accent, CTA, highlights
-#define GREENFIELD_BACKGROUND_BUTTON "#1A3D31"        // forest – button and tab backgrounds
+#define GREENFIELD_BACKGROUND_BUTTON "#1c4134"        // forest – button and tab backgrounds
 #define GREENFIELD_BACKGROUND_BUTTON_DISABLED "#132B23" // dim forest – disabled button bg
-#define GREENFIELD_BACKGROUND_FOCUS_IN "#1A3D31"      // forest – focused input highlight
-#define GREENFIELD_DATA_INPUT_AREA "#1e4136"          // dark forest – text / number input background
+#define GREENFIELD_BACKGROUND_FOCUS_IN "rgb(30, 66, 55)"      // forest – focused input highlight
+#define GREENFIELD_DATA_INPUT_AREA "#214d39"          // dark forest – text / number input background
 
 /* SPECIAL PURPOSE */
 #define GREENFIELD_COMPONENT_DISABLED "#3D6B55"       // muted forest – disabled text

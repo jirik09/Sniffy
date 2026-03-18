@@ -70,7 +70,10 @@ void Counter::holdCounter(bool held){
 
 void Counter::startCounting(){
     comm->write(moduleCommandPrefix+":"+cmd->START+";");
-    setModuleStatus(ModuleStatus::PLAY);
+    if(config->mode == CounterMode::INTERVAL)
+        setModuleStatus(ModuleStatus::WAIT_EVENT);
+    else
+        setModuleStatus(ModuleStatus::PLAY);
 }
 
 void Counter::stopCounting(){
