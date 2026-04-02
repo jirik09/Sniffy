@@ -69,3 +69,19 @@ mkdir build && cd build
 cmake ..
 cmake --build .
 ```
+
+## License
+
+LEO Sniffy is licensed under the **GNU General Public License v3.0** — see [LICENSE.txt](../LICENSE.txt) for details.
+
+### Third-Party Libraries
+
+This project uses the following third-party libraries:
+
+| Library | License | Source |
+|---------|---------|--------|
+| [libusb](https://libusb.info) | LGPL-2.1 | [github.com/libusb/libusb](https://github.com/libusb/libusb) |
+| [stlink](https://github.com/stlink-org/stlink) | BSD-3-Clause (© 2020 stlink-org) | [github.com/stlink-org/stlink](https://github.com/stlink-org/stlink) |
+
+Full license texts are available in the [third-party-licenses](third-party-licenses/) folder.
+See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for complete attribution details.
