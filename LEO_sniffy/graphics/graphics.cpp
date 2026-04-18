@@ -50,18 +50,22 @@ QString getCommonPath(){
     return QStringLiteral(":/graphics/graphics/common/");
 }
 
+static QString getUnknownBoardImagePath(){
+    return tintedPath(getCommonPath() + "unknown_device.png");
+}
+
 QString getBoardImage(const QString &boardBaseName){
     const QString basePath = getGraphicsPath();
     if(basePath.isEmpty()) return QString();
     if(boardBaseName.isEmpty())
-        return getCommonPath() + "unknown_device.png";
+        return getUnknownBoardImagePath();
     const QString candidate = basePath + boardBaseName + ".png";
     if(QFileInfo::exists(candidate)) return candidate;
     // applyPathFallback already contains generic fallback; re-run with board asset
     const QString fallbackPath = applyPathFallback(basePath, boardBaseName + ".png");
     const QString fallbackCandidate = fallbackPath + boardBaseName + ".png";
     if(QFileInfo::exists(fallbackCandidate)) return fallbackCandidate;
-    return getCommonPath() + "unknown_device.png";
+    return getUnknownBoardImagePath();
 }
 
 QString getBoardPinoutImage(const QString &boardBaseName){
