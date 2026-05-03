@@ -96,14 +96,18 @@ void VoltageSource::sendDACVoltage()
     QByteArray tmpHeader;
     QDataStream dataStreamHeader(&tmpHeader, QIODevice::WriteOnly);
 
-    // Protocol expects one 32-bit value payload (two 16-bit DAC samples).
-    // Keep CH2 = 0 on single-DAC targets to avoid parser desync and spurious errors.
-    const int ch1 = DACData[0];
-    const int ch2 = (spec->maxDACChannels > 1) ? DACData[1] : 0;
-    qint16 sample = qFromBigEndian<qint16>(ch1);
-    dataStreamHeader << sample;
-    sample = qFromBigEndian<qint16>(ch2);
-    dataStreamHeader << sample;
+    // Current VOUT protocol frame carries exactly one 32-bit value = 2x uint16 DAC samples.
+    // If a board exposes fewer channels, pad with 0; if it exposes more, extra channels need
+    // a protocol extension on both GUI and firmware parser sides.
+    constexpr int kVoutProtocolChannels = 2;
+    const int activeChannels = qMin(spec->maxDACChannels, kVoutProtocolChannels);
+
+    for (int i = 0; i < kVoutProtocolChannels; ++i)
+    {
+        const int sampleValue = (i < activeChannels) ? DACData[i] : 0;
+        qint16 sample = qFromBigEndian<qint16>(sampleValue);
+        dataStreamHeader << sample;
+    }
 
     comm->write(tmpHeader+";");
 }
