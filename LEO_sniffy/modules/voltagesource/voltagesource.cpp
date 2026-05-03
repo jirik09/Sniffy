@@ -14,7 +14,8 @@ VoltageSource::VoltageSource(QObject *parent)
     moduleName = "Voltage source";
     moduleIconURI = Graphics::getCommonPath()+"icon_voltage_source.png";
 
-    voltSourceWindow->setNumberOfChannels(2);
+    /* Default to one visible channel until device config is parsed. */
+    voltSourceWindow->setNumberOfChannels(1);
     connect(voltSourceWindow,&VoltageSourceWindow::voltageChanged,this,&VoltageSource::voltageChangedCallback);
 }
 
@@ -31,6 +32,7 @@ void VoltageSource::parseData(QByteArray data)
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
         spec = static_cast<VoltageSourceSpec*>(moduleSpecification);
+        voltSourceWindow->setNumberOfChannels(spec->maxDACChannels);
         showModuleControl();
         //TODO parse message from MCU
     }else if(dataHeader=="xxxx"){
@@ -43,6 +45,7 @@ void VoltageSource::parseData(QByteArray data)
 void VoltageSource::writeConfiguration()
 {
     voltSourceStart();
+    voltSourceWindow->setNumberOfChannels(spec->maxDACChannels);
     voltSourceWindow->restoreGUIAfterStartup();
     voltSourceWindow->setPins(static_cast<VoltageSourceSpec*>(moduleSpecification)->channelPins,MAX_VOLTAGE_SOURCE_CHANNELS);
     voltSourceWindow->setRange(spec->rangeMin,spec->rangeMax);
@@ -93,10 +96,15 @@ void VoltageSource::sendDACVoltage()
     QByteArray tmpHeader;
     QDataStream dataStreamHeader(&tmpHeader, QIODevice::WriteOnly);
 
-    for(int i = 0;i<spec->maxDACChannels;i++){
-        qint16  sample = qFromBigEndian<qint16>(DACData[i]);
-        dataStreamHeader << sample;
-    }
+    // Protocol expects one 32-bit value payload (two 16-bit DAC samples).
+    // Keep CH2 = 0 on single-DAC targets to avoid parser desync and spurious errors.
+    const int ch1 = DACData[0];
+    const int ch2 = (spec->maxDACChannels > 1) ? DACData[1] : 0;
+    qint16 sample = qFromBigEndian<qint16>(ch1);
+    dataStreamHeader << sample;
+    sample = qFromBigEndian<qint16>(ch2);
+    dataStreamHeader << sample;
+
     comm->write(tmpHeader+";");
 }
 

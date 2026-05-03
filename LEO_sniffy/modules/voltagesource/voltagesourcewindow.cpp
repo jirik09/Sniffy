@@ -95,11 +95,17 @@ void VoltageSourceWindow::restoreGUIAfterStartup()
 
 void VoltageSourceWindow::setNumberOfChannels(int numChannels)
 {
-    if(numChannels>MAX_VOLTAGE_SOURCE_CHANNELS) numChannels = MAX_VOLTAGE_SOURCE_CHANNELS;
+    if (numChannels < 1) {
+        numChannels = 1;
+    }
+    if (numChannels > MAX_VOLTAGE_SOURCE_CHANNELS) {
+        numChannels = MAX_VOLTAGE_SOURCE_CHANNELS;
+    }
 
-    for (int i = 0; i<numChannels;i++ ) {
-        dials.at(i)->show();
-        displays.at(i)->show();
+    for (int i = 0; i < MAX_VOLTAGE_SOURCE_CHANNELS; i++) {
+        const bool enabled = (i < numChannels);
+        dials.at(i)->setVisible(enabled);
+        displays.at(i)->setVisible(enabled);
     }
 }
 
