@@ -69,6 +69,11 @@ void Device::addModulePinFunctions(const QString &modName, const QList<PinFuncti
     deviceWindow->addModulePinFunctions(modName, pins);
 }
 
+void Device::updateModuleActiveState(const QString &moduleName, bool active)
+{
+    deviceWindow->setModuleActive(moduleName, active);
+}
+
 void Device::connectDevice(int index){
     emit openDevice(index);
     deviceWindow->deviceConnectButton->setText("Disconnect",0);

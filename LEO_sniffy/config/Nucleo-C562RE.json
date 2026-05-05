@@ -84,7 +84,7 @@
     { "connector": "CN10", "row": 1, "index": 1,  "port": "PC7",   "arduino": "" },
     { "connector": "CN10", "row": 0, "index": 2,  "port": "PB7",   "arduino": "" },
     { "connector": "CN10", "row": 1, "index": 2,  "port": "PB5",   "arduino": "" },
-    { "connector": "CN10", "row": 0, "index": 3,  "port": "VREFP",  "arduino": "" },
+    { "connector": "CN10", "row": 0, "index": 3,  "port": "AVDD",  "arduino": "" },
     { "connector": "CN10", "row": 1, "index": 3,  "port": "U5V",   "arduino": "" },
     { "connector": "CN10", "row": 0, "index": 4,  "port": "GND",   "arduino": "" },
     { "connector": "CN10", "row": 1, "index": 4,  "port": "NC",    "arduino": "" },

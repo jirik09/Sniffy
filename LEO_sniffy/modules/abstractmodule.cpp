@@ -151,33 +151,33 @@ void AbstractModule::widgetControlClicked(ModuleStatus status){
     case ModuleStatus::STOP:
         emit blockConflictingModules(moduleName, moduleSpecification->getResources());
         dockWidgetWindow->show();
-        moduleControlWidget->setStatus(ModuleStatus::PLAY);
+        applyModuleStatus(ModuleStatus::PLAY);
         writeConfiguration();
         startModule();
         break;
     case ModuleStatus::PLAY:
         dockWidgetWindow->hide();
-        moduleControlWidget->setStatus(ModuleStatus::HIDDEN_PLAY);
+        applyModuleStatus(ModuleStatus::HIDDEN_PLAY);
         break;
     case ModuleStatus::PAUSE:
         dockWidgetWindow->hide();
-        moduleControlWidget->setStatus(ModuleStatus::HIDDEN_PAUSE);
+        applyModuleStatus(ModuleStatus::HIDDEN_PAUSE);
         break;
     case ModuleStatus::HIDDEN_PLAY:
         dockWidgetWindow->show();
-        moduleControlWidget->setStatus(ModuleStatus::PLAY);
+        applyModuleStatus(ModuleStatus::PLAY);
         break;
     case ModuleStatus::HIDDEN_PAUSE:
         dockWidgetWindow->show();
-        moduleControlWidget->setStatus(ModuleStatus::PAUSE);
+        applyModuleStatus(ModuleStatus::PAUSE);
         break;
     case ModuleStatus::WAIT_EVENT:
         dockWidgetWindow->hide();
-        moduleControlWidget->setStatus(ModuleStatus::HIDDEN_WAIT_EVENT);
+        applyModuleStatus(ModuleStatus::HIDDEN_WAIT_EVENT);
         break;
     case ModuleStatus::HIDDEN_WAIT_EVENT:
         dockWidgetWindow->show();
-        moduleControlWidget->setStatus(ModuleStatus::WAIT_EVENT);
+        applyModuleStatus(ModuleStatus::WAIT_EVENT);
         break;
     case ModuleStatus::LOCKED:
         //TODO decide whether to close used resources or not open
@@ -236,6 +236,16 @@ void AbstractModule::moduleRestoredHidden()
     widgetControlClicked(getModuleStatus()); //module was restored hidden and doesn't react corectly on first click.
 }
 
+void AbstractModule::applyModuleStatus(ModuleStatus stat)
+{
+    if(!moduleControlWidget)
+        return;
+
+    moduleControlWidget->setStatus(stat);
+    emit moduleActiveChanged(moduleName,
+                             stat != ModuleStatus::STOP && stat != ModuleStatus::LOCKED);
+}
+
 void AbstractModule::setModuleStatus(ModuleStatus stat){
     ModuleStatus cur = moduleControlWidget->getStatus();
     bool isHidden = (cur == ModuleStatus::HIDDEN_PLAY ||
@@ -246,7 +256,7 @@ void AbstractModule::setModuleStatus(ModuleStatus stat){
         else if (stat == ModuleStatus::PAUSE) stat = ModuleStatus::HIDDEN_PAUSE;
         else if (stat == ModuleStatus::WAIT_EVENT) stat = ModuleStatus::HIDDEN_WAIT_EVENT;
     }
-    moduleControlWidget->setStatus(stat);
+    applyModuleStatus(stat);
 }
 
 ModuleStatus AbstractModule::getModuleStatus()
@@ -287,7 +297,7 @@ void AbstractModule::closeModule(){
 
     if(moduleControlWidget->getStatus()!=ModuleStatus::STOP && moduleControlWidget->getStatus()!=ModuleStatus::LOCKED){
         stopModule();
-        moduleControlWidget->setStatus(ModuleStatus::STOP);
+        applyModuleStatus(ModuleStatus::STOP);
         if(moduleSpecification != nullptr)
             emit releaseConflictingModules(moduleName, moduleSpecification->getResources());
     }

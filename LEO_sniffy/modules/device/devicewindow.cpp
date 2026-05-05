@@ -76,8 +76,12 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
     currentDeviceBaseImage = baseName;
     showingPinout = false;
     allPinFunctions.clear();
+    pinFunctionModulesByDisplayName.clear();
+    activeDisplayModules.clear();
+    activePinFunctionModules.clear();
     pinoutWidget->setBoard(baseName);
     pinoutWidget->clearPinFunctions();
+    pinoutWidget->setActiveModules(activePinFunctionModules);
     pinoutWidget->hide();
 
     QList<WidgetDesciptionExpand *>::iterator it;
@@ -94,7 +98,14 @@ void DeviceWindow::hideSpecification(){
     //ui->widget_device->setStyleSheet("image: none;");
     ui->widget_device->setStyleSheet("image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"no_device.png")+");");
     allPinFunctions.clear();
-    if(pinoutWidget){ pinoutWidget->clearPinFunctions(); pinoutWidget->hide(); }
+    pinFunctionModulesByDisplayName.clear();
+    activeDisplayModules.clear();
+    activePinFunctionModules.clear();
+    if(pinoutWidget){
+        pinoutWidget->clearPinFunctions();
+        pinoutWidget->setActiveModules(activePinFunctionModules);
+        pinoutWidget->hide();
+    }
     showingPinout = false;
 }
 
@@ -111,12 +122,34 @@ void DeviceWindow::addModuleDescription(QString name, QList<QString> labels, QLi
 
 void DeviceWindow::addModulePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins)
 {
-    Q_UNUSED(moduleName)
     // Accumulate all functions; update pinout if already showing
     allPinFunctions.append(pins);
+
+    QSet<QString> functionModules;
+    for(const PinFunctionInfo &pin : pins){
+        if(!pin.moduleName.isEmpty())
+            functionModules.insert(pin.moduleName);
+    }
+    if(!functionModules.isEmpty())
+        pinFunctionModulesByDisplayName.insert(moduleName, functionModules);
+
+    rebuildActivePinFunctionModules();
     if(pinoutWidget){
         pinoutWidget->setPinFunctions(allPinFunctions);
+        pinoutWidget->setActiveModules(activePinFunctionModules);
     }
+}
+
+void DeviceWindow::setModuleActive(const QString &moduleName, bool active)
+{
+    if(active)
+        activeDisplayModules.insert(moduleName);
+    else
+        activeDisplayModules.remove(moduleName);
+
+    rebuildActivePinFunctionModules();
+    if(pinoutWidget)
+        pinoutWidget->setActiveModules(activePinFunctionModules);
 }
 
 void DeviceWindow::clearModuleDescriptions()
@@ -136,6 +169,15 @@ void DeviceWindow::clearModuleDescriptions()
     verticalLayoutSpecification->addItem(verticalSpacer);
 
     modulesDescriptions->clear();
+}
+
+void DeviceWindow::rebuildActivePinFunctionModules()
+{
+    activePinFunctionModules.clear();
+    for(auto it = pinFunctionModulesByDisplayName.constBegin(); it != pinFunctionModulesByDisplayName.constEnd(); ++it){
+        if(activeDisplayModules.contains(it.key()))
+            activePinFunctionModules.unite(it.value());
+    }
 }
 
 bool DeviceWindow::eventFilter(QObject *watched, QEvent *event){

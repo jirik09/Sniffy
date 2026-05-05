@@ -271,6 +271,13 @@ void PinoutWidget::setPinFunctions(const QList<PinFunctionInfo> &functions)
 }
 
 // --------------------------------------------------------------------------
+void PinoutWidget::setActiveModules(const QSet<QString> &activeModules)
+{
+    m_activeModules = activeModules;
+    update();
+}
+
+// --------------------------------------------------------------------------
 void PinoutWidget::clearPinFunctions()
 {
     m_functions.clear();
@@ -342,6 +349,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
     const QColor connBodyColor(pal.display);
     const QColor portLabelColor(pal.textAll);
     const QColor arduinoLabelColor(235, 0, 220); // Pink color for all Arduino-associated text
+    const QColor activeFunctionColor(50, 220, 50);
     const QColor pinFreeColor(pal.controls);
     const QColor pinPowerColor(pal.componentDisabled);
     const bool darkBg = bgColor.lightnessF() < 0.45;
@@ -624,6 +632,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
         const bool isRightMorpho = (pin.connectorId == "CN10");
 
         const PinFunctionInfo *func = pinFunction(pin.port, pin.arduino);
+        const bool hasActiveFunction = func && m_activeModules.contains(func->moduleName);
         const bool isPwr = isPowerPin(pin.port) || isPowerPin(pin.arduino);
 
         // Choose dot colour
@@ -706,7 +715,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
         }
 
         // Draw numbered rectangular pin pad.
-        const QColor padFill = connectorColor(pin.connectorId);
+        const QColor padFill = hasActiveFunction ? activeFunctionColor : connectorColor(pin.connectorId);
         const QRectF pinRect(pin.cx - padW / 2.0f, pin.cy - padH / 2.0f, padW, padH);
         p.setBrush(padFill);
         p.setPen(QPen(boxOutlineColor, 1.3f * invS));
@@ -754,7 +763,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
             const QString iconKey = func->moduleName;
             if(!m_iconCache.contains(iconKey)){
                 const QString iconPath = Graphics::getCommonPath() + "icon_" + iconKey + ".png";
-                QPixmap src = Graphics::tintedPixmap(iconPath, QColor(50, 220, 50));
+                QPixmap src = Graphics::tintedPixmap(iconPath, activeFunctionColor);
                 if(!src.isNull()){
                     m_iconCache.insert(iconKey, src);
                 } else {
@@ -792,7 +801,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
             // Channel label next to icon.
             if(showFunctionLabels){
                 p.setFont(overlayFont);
-                p.setPen(QColor(50, 220, 50)); // Distinctly green
+                p.setPen(activeFunctionColor);
                 QFontMetricsF smFm(overlayFont);
                 const float textBaseY = pin.cy + smFm.ascent() / 2.0f;
                 float iconW = ico.isNull() ? ICON_SIZE_V : ICON_SIZE_V * ((float)ico.width() / ico.height());

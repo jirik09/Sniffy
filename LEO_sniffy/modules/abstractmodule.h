@@ -121,6 +121,7 @@ signals:
     void holdClicked(bool held);
     void blockConflictingModules(QString moduleName, int resources);
     void releaseConflictingModules(QString moduleName, int resources);
+    void moduleActiveChanged(const QString &moduleName, bool active);
     void moduleDescription(QString name, QList<QString> labels, QList<QString> values);
     // Emitted once per module after spec parse; carries board-pin → function mappings for pinout overlay
     void modulePinFunctions(QString moduleName, QList<PinFunctionInfo> pins);
@@ -128,6 +129,9 @@ signals:
     void moduleNameChanged(const QString &name);
     // Emitted when showModuleControl is called, used to trigger delayed session restoration
     void moduleControlShown(const QString &name);
+
+private:
+    void applyModuleStatus(ModuleStatus stat);
 
 };
 

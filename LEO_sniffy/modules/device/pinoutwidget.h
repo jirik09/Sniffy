@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QSet>
 #include <functional>
 
 #include "../pinfunctioninfo.h"
@@ -25,6 +26,7 @@ public:
     void setBoard(const QString &boardId);
     // Update the module function overlay and repaint
     void setPinFunctions(const QList<PinFunctionInfo> &functions);
+    void setActiveModules(const QSet<QString> &activeModules);
     // Remove all function overlays and repaint
     void clearPinFunctions();
 
@@ -101,6 +103,7 @@ private:
     QList<PinFunctionInfo>     m_functions;
     QHash<QString,const PinFunctionInfo*> m_funcByPort;
     QHash<QString,const PinFunctionInfo*> m_funcByArduino;
+    QSet<QString>              m_activeModules;
 
     // Icon cache: moduleName → tinted pixmap (scaled to icon size)
     mutable QHash<QString,QPixmap> m_iconCache;

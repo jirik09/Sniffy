@@ -4,6 +4,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QFileInfo>
+#include <QSet>
 
 #include "../../GUI/widgetselection.h"
 #include "../../GUI/widgetbuttons.h"
@@ -31,6 +32,7 @@ public:
 
     void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);
     void addModulePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins);
+    void setModuleActive(const QString &moduleName, bool active);
     void clearModuleDescriptions();
 
     WidgetSelection *deviceSelection;
@@ -52,10 +54,14 @@ private:
 
     PinoutWidget *pinoutWidget = nullptr;  // vector pinout renderer (replaces static PNG)
     QList<PinFunctionInfo> allPinFunctions; // accumulated from all modules
+    QHash<QString, QSet<QString>> pinFunctionModulesByDisplayName;
+    QSet<QString> activeDisplayModules;
+    QSet<QString> activePinFunctionModules;
     QString currentDeviceBaseImage; // e.g. "Nucleo-F303RE"
     bool showingPinout = false;
 
     bool m_pins_empty() const;
+    void rebuildActivePinFunctionModules();
 };
 
 #endif // WINDOWSCAN_H
