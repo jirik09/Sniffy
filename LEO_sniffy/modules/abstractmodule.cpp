@@ -271,6 +271,13 @@ void AbstractModule::showModuleDescription(QString name, QList<QString> labels, 
     }
 }
 
+void AbstractModule::showModulePinFunctions(const QString &modName, const QList<PinFunctionInfo> &pins)
+{
+    if(!moduleControlWidget->isHidden() && !pins.isEmpty()){
+        emit modulePinFunctions(modName, pins);
+    }
+}
+
 void AbstractModule::showModuleWindow(){
     dockWidgetWindow->show();
 }

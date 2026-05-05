@@ -64,6 +64,11 @@ void Device::addModuleDescription(QString name, QList<QString> labels, QList<QSt
     deviceWindow->addModuleDescription(name,labels,values);
 }
 
+void Device::addModulePinFunctions(const QString &modName, const QList<PinFunctionInfo> &pins)
+{
+    deviceWindow->addModulePinFunctions(modName, pins);
+}
+
 void Device::connectDevice(int index){
     emit openDevice(index);
     deviceWindow->deviceConnectButton->setText("Disconnect",0);

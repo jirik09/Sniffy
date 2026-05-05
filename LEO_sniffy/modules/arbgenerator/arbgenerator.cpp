@@ -197,6 +197,23 @@ void ArbGenerator::buildModuleDescription(ArbGeneratorSpec *spec)
         values.append(pins.left(pins.length()-2));
     }
     showModuleDescription(name, labels, values);
+
+    // Pinout overlay
+    QList<PinFunctionInfo> pinFuncs;
+    if(!isPWMbased){
+        for(int i = 0; i < spec->maxDACChannels; i++){
+            if(!spec->channelPins[i].isEmpty() && spec->channelPins[i] != "-"){
+                pinFuncs.append({spec->channelPins[i], "CH" + QString::number(i + 1), "signal_generator"});
+            }
+        }
+    } else {
+        for(int i = 0; i < spec->maxPWMChannels; i++){
+            if(!spec->channelPWMPins[i].isEmpty() && spec->channelPWMPins[i] != "-"){
+                pinFuncs.append({spec->channelPWMPins[i], "PWM" + QString::number(i + 1), "pwm_gen"});
+            }
+        }
+    }
+    showModulePinFunctions(name, pinFuncs);
 }
 
 void ArbGenerator::startGenerator()

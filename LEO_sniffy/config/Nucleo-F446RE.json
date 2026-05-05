@@ -1,0 +1,42 @@
+{
+  "board_id": "Nucleo-F446RE",
+  "template": "NUCLEO-64",
+  "notes": "ST UM1724 NUCLEO-F446RE. Arduino header pins based on ST documentation.",
+  "pins": [
+    { "connector": "CN6", "row": 0, "index": 0, "port": "IOREF", "arduino": "IOREF" },
+    { "connector": "CN6", "row": 0, "index": 1, "port": "NRST",  "arduino": "RESET" },
+    { "connector": "CN6", "row": 0, "index": 2, "port": "3.3V",  "arduino": "3.3V"  },
+    { "connector": "CN6", "row": 0, "index": 3, "port": "5V",    "arduino": "5V"    },
+    { "connector": "CN6", "row": 0, "index": 4, "port": "GND",   "arduino": "GND"   },
+    { "connector": "CN6", "row": 0, "index": 5, "port": "GND",   "arduino": "GND"   },
+
+    { "connector": "CN8", "row": 0, "index": 0, "port": "PC0",  "arduino": "A5" },
+    { "connector": "CN8", "row": 0, "index": 1, "port": "PC1",  "arduino": "A4" },
+    { "connector": "CN8", "row": 0, "index": 2, "port": "PC2",  "arduino": "A3" },
+    { "connector": "CN8", "row": 0, "index": 3, "port": "PC3",  "arduino": "A2" },
+    { "connector": "CN8", "row": 0, "index": 4, "port": "PA1",  "arduino": "A1" },
+    { "connector": "CN8", "row": 0, "index": 5, "port": "PA0",  "arduino": "A0" },
+    { "connector": "CN8", "row": 0, "index": 6, "port": "GND",  "arduino": "GND" },
+    { "connector": "CN8", "row": 0, "index": 7, "port": "AVDD", "arduino": "AVDD" },
+
+    { "connector": "CN5", "row": 0, "index": 0, "port": "PA9",  "arduino": "D8" },
+    { "connector": "CN5", "row": 0, "index": 1, "port": "PC7",  "arduino": "D9" },
+    { "connector": "CN5", "row": 0, "index": 2, "port": "PB6",  "arduino": "D10" },
+    { "connector": "CN5", "row": 0, "index": 3, "port": "PA7",  "arduino": "D11" },
+    { "connector": "CN5", "row": 0, "index": 4, "port": "PA6",  "arduino": "D12" },
+    { "connector": "CN5", "row": 0, "index": 5, "port": "PA5",  "arduino": "D13" },
+    { "connector": "CN5", "row": 0, "index": 6, "port": "GND",  "arduino": "GND" },
+    { "connector": "CN5", "row": 0, "index": 7, "port": "5V",   "arduino": "5V" },
+    { "connector": "CN5", "row": 0, "index": 8, "port": "PB8",  "arduino": "D15" },
+    { "connector": "CN5", "row": 0, "index": 9, "port": "PB9",  "arduino": "D14" },
+
+    { "connector": "CN9", "row": 0, "index": 0, "port": "PA3",  "arduino": "D0" },
+    { "connector": "CN9", "row": 0, "index": 1, "port": "PA2",  "arduino": "D1" },
+    { "connector": "CN9", "row": 0, "index": 2, "port": "PA10", "arduino": "D2" },
+    { "connector": "CN9", "row": 0, "index": 3, "port": "PB3",  "arduino": "D3" },
+    { "connector": "CN9", "row": 0, "index": 4, "port": "PB5",  "arduino": "D4" },
+    { "connector": "CN9", "row": 0, "index": 5, "port": "PB4",  "arduino": "D5" },
+    { "connector": "CN9", "row": 0, "index": 6, "port": "PB10", "arduino": "D6" },
+    { "connector": "CN9", "row": 0, "index": 7, "port": "PA8",  "arduino": "D7" }
+  ]
+}

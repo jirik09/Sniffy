@@ -5,6 +5,7 @@
 
 #include "devicewindow.h"
 #include "devicespec.h"
+#include "../pinfunctioninfo.h"
 
 #include "../../GUI/widgetcontrolmodule.h"
 #include "../../GUI/moduledockwidget.h"
@@ -44,6 +45,7 @@ signals:
 
 public slots:
     void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);
+    void addModulePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins);
     void parseData(QByteArray);
     void writeConfiguration();
     void parseConfiguration(QByteArray config);

@@ -2,6 +2,7 @@
 #include "ui_devicewindow.h"
 #include <QEvent>
 #include <QMouseEvent>
+#include <QResizeEvent>
 
 DeviceWindow::DeviceWindow(QWidget *parent) :
     QWidget(parent),
@@ -52,6 +53,12 @@ DeviceWindow::DeviceWindow(QWidget *parent) :
 
     // *************************** end adding widgets to specification area *************************
 
+    // Create vector pinout widget, overlaid inside widget_device
+    pinoutWidget = new PinoutWidget(ui->widget_device);
+    pinoutWidget->hide();
+    // Initial size sync; kept in sync via Resize event in eventFilter
+    pinoutWidget->setGeometry(ui->widget_device->rect());
+
     hideSpecification();
     ui->widget_device->installEventFilter(this);
 }
@@ -68,6 +75,10 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
     ui->widget_device->setStyleSheet("image: url(" + boardImg + ");");
     currentDeviceBaseImage = baseName;
     showingPinout = false;
+    allPinFunctions.clear();
+    pinoutWidget->setBoard(baseName);
+    pinoutWidget->clearPinFunctions();
+    pinoutWidget->hide();
 
     QList<WidgetDesciptionExpand *>::iterator it;
     for (it = modulesDescriptions->begin(); it != modulesDescriptions->end(); ++it){
@@ -82,6 +93,9 @@ void DeviceWindow::hideSpecification(){
     }
     //ui->widget_device->setStyleSheet("image: none;");
     ui->widget_device->setStyleSheet("image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"no_device.png")+");");
+    allPinFunctions.clear();
+    if(pinoutWidget){ pinoutWidget->clearPinFunctions(); pinoutWidget->hide(); }
+    showingPinout = false;
 }
 
 void DeviceWindow::addModuleDescription(QString name, QList<QString> labels, QList<QString> values)
@@ -93,6 +107,16 @@ void DeviceWindow::addModuleDescription(QString name, QList<QString> labels, QLi
 
     modulesDescriptions->append(newDesc);
     descriptorsLayout->addWidget(newDesc);
+}
+
+void DeviceWindow::addModulePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins)
+{
+    Q_UNUSED(moduleName)
+    // Accumulate all functions; update pinout if already showing
+    allPinFunctions.append(pins);
+    if(pinoutWidget){
+        pinoutWidget->setPinFunctions(allPinFunctions);
+    }
 }
 
 void DeviceWindow::clearModuleDescriptions()
@@ -115,24 +139,53 @@ void DeviceWindow::clearModuleDescriptions()
 }
 
 bool DeviceWindow::eventFilter(QObject *watched, QEvent *event){
-    if(watched == ui->widget_device && event->type() == QEvent::MouseButtonRelease){
-        auto *me = static_cast<QMouseEvent*>(event);
-        if(me->button() == Qt::LeftButton && !currentDeviceBaseImage.isEmpty()){
-            const QString pinoutPath = Graphics::getBoardPinoutImage(currentDeviceBaseImage);
-            if(!pinoutPath.isEmpty()){
-                if(!showingPinout){
-                    ui->widget_device->setStyleSheet("image: url(" + pinoutPath + ");");
-                    showingPinout = true;
-                } else {
-                    const QString normalPath = Graphics::getBoardImage(currentDeviceBaseImage);
-                    ui->widget_device->setStyleSheet("image: url(" + normalPath + ");");
-                    showingPinout = false;
+    if(watched == ui->widget_device){
+        // Keep the vector pinout widget filling widget_device
+        if(event->type() == QEvent::Resize && pinoutWidget){
+            pinoutWidget->setGeometry(ui->widget_device->rect());
+        }
+
+        if(event->type() == QEvent::MouseButtonRelease){
+            auto *me = static_cast<QMouseEvent*>(event);
+            if(me->button() == Qt::LeftButton && !currentDeviceBaseImage.isEmpty()){
+                // If the vector pinout can be shown, use it; otherwise fall back to static PNG
+                const bool hasVectorPinout = !m_pins_empty();
+                const bool hasStaticPinout = !Graphics::getBoardPinoutImage(currentDeviceBaseImage).isEmpty();
+
+                if(hasVectorPinout || hasStaticPinout){
+                    if(!showingPinout){
+                        if(hasVectorPinout){
+                            // Show vector pinout overlay on top
+                            pinoutWidget->setGeometry(ui->widget_device->rect());
+                            pinoutWidget->show();
+                            pinoutWidget->raise();
+                        } else {
+                            // Fallback: old static PNG behaviour
+                            ui->widget_device->setStyleSheet(
+                                "image: url(" + Graphics::getBoardPinoutImage(currentDeviceBaseImage) + ");");
+                        }
+                        showingPinout = true;
+                    } else {
+                        if(hasVectorPinout){
+                            pinoutWidget->hide();
+                        } else {
+                            ui->widget_device->setStyleSheet(
+                                "image: url(" + Graphics::getBoardImage(currentDeviceBaseImage) + ");");
+                        }
+                        showingPinout = false;
+                    }
+                    return true;
                 }
-                return true;
             }
         }
     }
     return QWidget::eventFilter(watched, event);
+}
+
+// Returns true if the pinout widget has board data loaded
+bool DeviceWindow::m_pins_empty() const
+{
+    return pinoutWidget == nullptr || currentDeviceBaseImage.isEmpty();
 }
 
 

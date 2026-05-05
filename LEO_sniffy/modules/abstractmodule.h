@@ -18,6 +18,7 @@
 #include "../GUI/widgetdial.h"
 #include "../GUI/widgetdialrange.h"
 #include "../GUI/widgetswitch.h"
+#include "pinfunctioninfo.h"
 #include "../GUI/widgettab.h"
 #include "../GUI/widgetselection.h"
 #include "../GUI/widgettextinput.h"
@@ -62,6 +63,7 @@ public:
 
     void showModuleControl();
     void showModuleDescription(QString name, QList<QString> labels, QList<QString> values);
+    void showModulePinFunctions(const QString &modName, const QList<PinFunctionInfo> &pins);
     void showModuleWindow();
     void closeModule();
     void disableModule();
@@ -120,6 +122,8 @@ signals:
     void blockConflictingModules(QString moduleName, int resources);
     void releaseConflictingModules(QString moduleName, int resources);
     void moduleDescription(QString name, QList<QString> labels, QList<QString> values);
+    // Emitted once per module after spec parse; carries board-pin → function mappings for pinout overlay
+    void modulePinFunctions(QString moduleName, QList<PinFunctionInfo> pins);
     // Emitted when the module's display name changes (e.g., Device renamed after handshake)
     void moduleNameChanged(const QString &name);
     // Emitted when showModuleControl is called, used to trigger delayed session restoration

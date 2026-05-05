@@ -50,6 +50,7 @@ QList<QSharedPointer<AbstractModule>> DeviceMediator::createModulesList()
         connect(mod.data(), &AbstractModule::blockConflictingModules, this, &DeviceMediator::blockConflictingModulesCallback);
         connect(mod.data(), &AbstractModule::releaseConflictingModules, this, &DeviceMediator::releaseConflictingModulesCallback);
         connect(mod.data(), &AbstractModule::moduleDescription, device, &Device::addModuleDescription);
+        connect(mod.data(), &AbstractModule::modulePinFunctions, device, &Device::addModulePinFunctions);
     }
 
     return tmpModules;

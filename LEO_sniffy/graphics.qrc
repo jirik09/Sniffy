@@ -134,5 +134,12 @@
     </qresource>
     <qresource prefix="/">
         <file>default_layout.json</file>
+        <!-- Pinout vector rendering: layout templates and per-board pin configs -->
+        <file>config/nucleo64_template.json</file>
+        <file>config/Nucleo-F303RE.json</file>
+        <file>config/Nucleo-F446RE.json</file>
+        <file>config/Nucleo-G474RE.json</file>
+        <file>config/Nucleo-L476RG.json</file>
+        <file>config/Nucleo-C562RE.json</file>
     </qresource>
 </RCC>

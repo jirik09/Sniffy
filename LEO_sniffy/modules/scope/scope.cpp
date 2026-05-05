@@ -331,6 +331,15 @@ void Scope::buildModuleDescription(ScopeSpec *spec)
     values.append(pins.left(pins.length()-2));
 
     showModuleDescription(name, labels, values);
+
+    // Pinout overlay: emit one entry per active ADC channel
+    QList<PinFunctionInfo> pinFuncs;
+    for(int i = 0; i < spec->maxADCChannels; i++){
+        if(!spec->channelPins[i].isEmpty() && spec->channelPins[i] != "-"){
+            pinFuncs.append({spec->channelPins[i], "CH" + QString::number(i + 1), "scope"});
+        }
+    }
+    showModulePinFunctions(name, pinFuncs);
 }
 
 void Scope::updateMeasurement(QList<Measurement*> m){
