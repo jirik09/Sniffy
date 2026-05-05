@@ -67,63 +67,47 @@
 
         <!-- Per-theme: dark -->
         <file>graphics/themes/dark/Nucleo-F303RE.png</file>
-        <file>graphics/themes/dark/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/dark/Nucleo-F446RE.png</file>
-        <file>graphics/themes/dark/Nucleo-F446RE-pinout.png</file>
         <file>graphics/themes/dark/Nucleo-G474RE.png</file>
-        <file>graphics/themes/dark/Nucleo-G474RE-pinout.png</file>
         <file>graphics/themes/dark/user.png</file>
         <file>graphics/themes/dark/user_error.png</file>
         <file>graphics/themes/dark/user_ok.png</file>
 
         <!-- Per-theme: light -->
         <file>graphics/themes/light/Nucleo-F303RE.png</file>
-        <file>graphics/themes/light/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/light/Nucleo-F446RE.png</file>
-        <file>graphics/themes/light/Nucleo-F446RE-pinout.png</file>
         <file>graphics/themes/light/Nucleo-G474RE.png</file>
-        <file>graphics/themes/light/Nucleo-G474RE-pinout.png</file>
         <file>graphics/themes/light/user.png</file>
         <file>graphics/themes/light/user_error.png</file>
         <file>graphics/themes/light/user_ok.png</file>
 
         <!-- Per-theme: dawn -->
         <file>graphics/themes/dawn/Nucleo-F303RE.png</file>
-        <file>graphics/themes/dawn/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/dawn/Nucleo-F446RE.png</file>
-        <file>graphics/themes/dawn/Nucleo-F446RE-pinout.png</file>
         <file>graphics/themes/dawn/Nucleo-G474RE.png</file>
-        <file>graphics/themes/dawn/Nucleo-G474RE-pinout.png</file>
         <file>graphics/themes/dawn/user.png</file>
         <file>graphics/themes/dawn/user_error.png</file>
         <file>graphics/themes/dawn/user_ok.png</file>
 
         <!-- Per-theme: greenfield -->
         <file>graphics/themes/greenfield/Nucleo-F303RE.png</file>
-        <file>graphics/themes/greenfield/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/greenfield/Nucleo-F446RE.png</file>
-        <file>graphics/themes/greenfield/Nucleo-F446RE-pinout.png</file>
         <file>graphics/themes/greenfield/Nucleo-G474RE.png</file>
-        <file>graphics/themes/greenfield/Nucleo-G474RE-pinout.png</file>
         <file>graphics/themes/greenfield/user.png</file>
         <file>graphics/themes/greenfield/user_error.png</file>
         <file>graphics/themes/greenfield/user_ok.png</file>
 
         <!-- Per-theme: msdos -->
         <file>graphics/themes/msdos/Nucleo-F303RE.png</file>
-        <file>graphics/themes/msdos/Nucleo-F303RE-pinout.png</file>
         <file>graphics/themes/msdos/Nucleo-F446RE.png</file>
-        <file>graphics/themes/msdos/Nucleo-F446RE-pinout.png</file>
         <file>graphics/themes/msdos/Nucleo-G474RE.png</file>
         <file>graphics/themes/msdos/user.png</file>
         <file>graphics/themes/msdos/user_error.png</file>
         <file>graphics/themes/msdos/user_ok.png</file>
 
         <!-- Per-theme: ember -->
-        <file>graphics/themes/ember/Nucleo-F303RE.png</file>
-        <file>graphics/themes/ember/Nucleo-F303RE-pinout.png</file>
+        <file>graphics/themes/ember/Nucleo-F303RE.png</file>        
         <file>graphics/themes/ember/Nucleo-F446RE.png</file>
-        <file>graphics/themes/ember/Nucleo-F446RE-pinout.png</file>
         <file>graphics/themes/ember/Nucleo-G474RE.png</file>
         <file>graphics/themes/ember/user.png</file>
         <file>graphics/themes/ember/user_error.png</file>

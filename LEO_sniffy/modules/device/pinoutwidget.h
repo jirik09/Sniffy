@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <functional>
 
 #include "../pinfunctioninfo.h"
 
@@ -61,18 +62,28 @@ private:
         float   pin0Y;                      // y of first pin
     };
 
+    using PinLinkMap = QHash<const PinDesc*, const PinDesc*>;
+
     void parseTemplate(const QJsonObject &tmpl);
     void parsePins(const QJsonArray &pinsArr);
     void buildPinPositions();
     QPointF pinPos(const ConnectorDesc &c, int row, int index) const;
+    QString templatePathFor(const QString &templateId) const;
+
+    QHash<QString, int> buildConnectorIndex() const;
+    const ConnectorDesc *connectorById(const QString &connectorId,
+                                       const QHash<QString, int> &connectorIndexById) const;
+    float padSideFor(const ConnectorDesc &connector, float invScale) const;
+    QRectF bodyRectFor(const ConnectorDesc &connector, float invScale) const;
+    QRectF combinedBody(const QHash<QString, QRectF> &connectorBodies,
+                        const QString &first, const QString &second) const;
+    QList<const PinDesc*> collectPins(const std::function<bool(const PinDesc &)> &predicate) const;
+    PinLinkMap buildMorphoLinks(const QList<const PinDesc*> &morphoPins,
+                                const QList<const PinDesc*> &arduinoPins) const;
+    static qreal averageLinkDeltaY(const PinLinkMap &links);
+    QTransform fitTransform(const QRectF &contentBounds, qreal marginPx) const;
 
     // Helpers
-    void drawConnectorBody(QPainter &p, const ConnectorDesc &c) const;
-    void drawPin(QPainter &p, const PinDesc &pin,
-                 const QColor &dotColor, const QColor &portColor,
-                 const QColor &arduinoColor) const;
-
-    // Returns the function info for a given pin name, or nullptr
     const PinFunctionInfo *pinFunction(const QString &port, const QString &arduino) const;
 
     // Canvas virtualisation

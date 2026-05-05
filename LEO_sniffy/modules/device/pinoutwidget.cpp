@@ -39,11 +39,7 @@ void PinoutWidget::setBoard(const QString &boardId)
     const QString templateId = boardObj.value("template").toString("NUCLEO-64");
 
     // -- Load template -------------------------------------------------------
-    QString templateKey = templateId.toLower();
-    // Template files are named without separators, e.g. "nucleo64_template.json".
-    templateKey.remove('-');
-    templateKey.remove('_');
-    const QString tmplPath = ":/config/" + templateKey + "_template.json";
+    const QString tmplPath = templatePathFor(templateId);
     QFile tf(tmplPath);
     if(!tf.open(QIODevice::ReadOnly)){
         qWarning("PinoutWidget: template not found: %s", qPrintable(tmplPath));
@@ -110,12 +106,18 @@ QPointF PinoutWidget::pinPos(const ConnectorDesc &c, int row, int index) const
 }
 
 // --------------------------------------------------------------------------
+QString PinoutWidget::templatePathFor(const QString &templateId) const
+{
+    QString templateKey = templateId.toLower();
+    templateKey.remove('-');
+    templateKey.remove('_');
+    return ":/config/" + templateKey + "_template.json";
+}
+
+// --------------------------------------------------------------------------
 void PinoutWidget::buildPinPositions()
 {
-    // Build a quick lookup: connector id → index in m_connectors
-    QHash<QString,int> connIdx;
-    for(int i = 0; i < m_connectors.size(); ++i)
-        connIdx.insert(m_connectors[i].id, i);
+    const QHash<QString, int> connIdx = buildConnectorIndex();
 
     for(PinDesc &pin : m_pins){
         const int ci = connIdx.value(pin.connectorId, -1);
@@ -124,6 +126,132 @@ void PinoutWidget::buildPinPositions()
         pin.cx = (float)pos.x();
         pin.cy = (float)pos.y();
     }
+}
+
+// --------------------------------------------------------------------------
+QHash<QString, int> PinoutWidget::buildConnectorIndex() const
+{
+    QHash<QString, int> connectorIndexById;
+    connectorIndexById.reserve(m_connectors.size());
+    for(int i = 0; i < m_connectors.size(); ++i)
+        connectorIndexById.insert(m_connectors[i].id, i);
+    return connectorIndexById;
+}
+
+// --------------------------------------------------------------------------
+const PinoutWidget::ConnectorDesc *PinoutWidget::connectorById(
+    const QString &connectorId, const QHash<QString, int> &connectorIndexById) const
+{
+    const int idx = connectorIndexById.value(connectorId, -1);
+    return (idx >= 0) ? &m_connectors[idx] : nullptr;
+}
+
+// --------------------------------------------------------------------------
+float PinoutWidget::padSideFor(const ConnectorDesc &connector, float invScale) const
+{
+    const float grid = (connector.rows == 2)
+                       ? qMin(connector.pitch, connector.rowSpacing)
+                       : connector.pitch;
+    return grid + 1.0f * invScale;
+}
+
+// --------------------------------------------------------------------------
+QRectF PinoutWidget::bodyRectFor(const ConnectorDesc &connector, float invScale) const
+{
+    const float padW = padSideFor(connector, invScale);
+    const float padH = padSideFor(connector, invScale);
+    const float bodyX = connector.row0X - padW / 2.0f;
+    const float bodyY = connector.pin0Y - padH / 2.0f;
+    const float bodyW = (connector.rows == 2)
+                        ? (connector.row1X - connector.row0X + padW)
+                        : padW;
+    const float bodyH = (connector.pinCount - 1) * connector.pitch + padH;
+    return QRectF(bodyX, bodyY, bodyW, bodyH);
+}
+
+// --------------------------------------------------------------------------
+QRectF PinoutWidget::combinedBody(const QHash<QString, QRectF> &connectorBodies,
+                                  const QString &first,
+                                  const QString &second) const
+{
+    if(connectorBodies.contains(first) && connectorBodies.contains(second))
+        return connectorBodies.value(first).united(connectorBodies.value(second));
+    if(connectorBodies.contains(first))
+        return connectorBodies.value(first);
+    if(connectorBodies.contains(second))
+        return connectorBodies.value(second);
+    return QRectF();
+}
+
+// --------------------------------------------------------------------------
+QList<const PinoutWidget::PinDesc*> PinoutWidget::collectPins(
+    const std::function<bool(const PinDesc &)> &predicate) const
+{
+    QList<const PinDesc*> pins;
+    pins.reserve(m_pins.size());
+    for(const PinDesc &candidate : m_pins){
+        if(predicate(candidate))
+            pins.append(&candidate);
+    }
+    return pins;
+}
+
+// --------------------------------------------------------------------------
+PinoutWidget::PinLinkMap PinoutWidget::buildMorphoLinks(
+    const QList<const PinDesc*> &morphoPins,
+    const QList<const PinDesc*> &arduinoPins) const
+{
+    PinLinkMap links;
+    QList<const PinDesc*> usedArduinoPins;
+    for(const PinDesc *morphoPin : morphoPins){
+        const PinDesc *bestArduinoPin = nullptr;
+        qreal bestDistance = 1.0e9;
+        for(const PinDesc *arduinoPin : arduinoPins){
+            if(usedArduinoPins.contains(arduinoPin))
+                continue;
+            if(morphoPin->port.compare(arduinoPin->port, Qt::CaseInsensitive) != 0)
+                continue;
+
+            const qreal distance = qAbs(morphoPin->cy - arduinoPin->cy);
+            if(distance < bestDistance){
+                bestDistance = distance;
+                bestArduinoPin = arduinoPin;
+            }
+        }
+
+        if(bestArduinoPin && bestDistance <= 20.0){
+            links.insert(morphoPin, bestArduinoPin);
+            usedArduinoPins.append(bestArduinoPin);
+        }
+    }
+    return links;
+}
+
+// --------------------------------------------------------------------------
+qreal PinoutWidget::averageLinkDeltaY(const PinLinkMap &links)
+{
+    if(links.isEmpty())
+        return 0.0;
+
+    qreal totalDelta = 0.0;
+    for(auto it = links.constBegin(); it != links.constEnd(); ++it)
+        totalDelta += (it.value()->cy - it.key()->cy);
+    return totalDelta / links.size();
+}
+
+// --------------------------------------------------------------------------
+QTransform PinoutWidget::fitTransform(const QRectF &contentBounds, qreal marginPx) const
+{
+    const qreal availableW = qMax<qreal>(1.0, width() - 2.0 * marginPx);
+    const qreal availableH = qMax<qreal>(1.0, height() - 2.0 * marginPx);
+    const qreal fitScale = qMin(availableW / contentBounds.width(),
+                                availableH / contentBounds.height());
+
+    QTransform transform;
+    transform.translate(marginPx + (availableW - fitScale * contentBounds.width()) / 2.0 - fitScale * contentBounds.left(),
+                        marginPx + (availableH - fitScale * contentBounds.height()) / 2.0 - fitScale * contentBounds.top());
+    transform.scale(fitScale, fitScale);
+    return transform;
 }
 
 // --------------------------------------------------------------------------
@@ -212,7 +340,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
     const ThemePalette &pal = Graphics::palette();
     const QColor bgColor(pal.windowWidget);
     const QColor connBodyColor(pal.display);
-    const QColor portLabelColor(pal.textLabel);
+    const QColor portLabelColor(pal.textAll);
     const QColor arduinoLabelColor(235, 0, 220); // Pink color for all Arduino-associated text
     const QColor pinFreeColor(pal.controls);
     const QColor pinPowerColor(pal.componentDisabled);
@@ -264,41 +392,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
     pinNumberFont.setPixelSize(qMax(6, (int)qRound(18.0f * uiScale * invS)));
     QFontMetricsF pinNoFm(pinNumberFont);
 
-    QHash<QString, int> connectorIndexById;
-    for(int i = 0; i < m_connectors.size(); ++i)
-        connectorIndexById.insert(m_connectors[i].id, i);
-
-    auto connectorById = [&](const QString &connectorId) -> const ConnectorDesc * {
-        const int idx = connectorIndexById.value(connectorId, -1);
-        return (idx >= 0) ? &m_connectors[idx] : nullptr;
-    };
-
-    auto padSideFor = [&](const ConnectorDesc &connector) {
-        const float grid = (connector.rows == 2)
-                           ? qMin(connector.pitch, connector.rowSpacing)
-                           : connector.pitch;
-        return grid + 1.0f * invS;
-    };
-
-    auto padWidthFor = [&](const ConnectorDesc &connector) {
-        return padSideFor(connector);
-    };
-
-    auto padHeightFor = [&](const ConnectorDesc &connector) {
-        return padSideFor(connector);
-    };
-
-    auto bodyRectFor = [&](const ConnectorDesc &connector) {
-        const float padW = padWidthFor(connector);
-        const float padH = padHeightFor(connector);
-        const float bodyX = connector.row0X - padW / 2.0f;
-        const float bodyY = connector.pin0Y - padH / 2.0f;
-        const float bodyW = (connector.rows == 2)
-                            ? (connector.row1X - connector.row0X + padW)
-                            : padW;
-        const float bodyH = (connector.pinCount - 1) * connector.pitch + padH;
-        return QRectF(bodyX, bodyY, bodyW, bodyH);
-    };
+    const QHash<QString, int> connectorIndexById = buildConnectorIndex();
 
     auto connectorColor = [&](const QString &connId) {
         // Match official style: Morpho headers blue, Arduino headers magenta.
@@ -311,19 +405,9 @@ void PinoutWidget::paintEvent(QPaintEvent *)
 
     // ------ Draw connector bodies ------------------------------------------
     for(const ConnectorDesc &c : m_connectors){
-        const QRectF body = bodyRectFor(c);
+        const QRectF body = bodyRectFor(c, invS);
         connectorBodies.insert(c.id, body);
     }
-
-    auto combinedBody = [&](const QString &first, const QString &second) {
-        if(connectorBodies.contains(first) && connectorBodies.contains(second))
-            return connectorBodies.value(first).united(connectorBodies.value(second));
-        if(connectorBodies.contains(first))
-            return connectorBodies.value(first);
-        if(connectorBodies.contains(second))
-            return connectorBodies.value(second);
-        return QRectF();
-    };
 
     qreal leftMorphoWidth = 0.0;
     qreal rightMorphoWidth = 0.0;
@@ -347,8 +431,8 @@ void PinoutWidget::paintEvent(QPaintEvent *)
 
     const QRectF leftMorphoBody = connectorBodies.value("CN7");
     const QRectF rightMorphoBody = connectorBodies.value("CN10");
-    const QRectF leftArduinoBody = combinedBody("CN6", "CN8");
-    const QRectF rightArduinoBody = combinedBody("CN5", "CN9");
+    const QRectF leftArduinoBody = combinedBody(connectorBodies, "CN6", "CN8");
+    const QRectF rightArduinoBody = combinedBody(connectorBodies, "CN5", "CN9");
 
     const qreal leftMorphoTextRight = leftMorphoBody.left() - STUB_START_GAP - OUTER_STUB_LEN - OUTER_TEXT_GAP;
     const qreal leftPortTextX = leftArduinoBody.right() + GROUP_GAP;
@@ -369,47 +453,6 @@ void PinoutWidget::paintEvent(QPaintEvent *)
     const qreal LABEL_OFFSET_Y = 24.0f * uiScale * invS;
     const qreal topLabelY = qMin(leftMorphoBody.top(), rightMorphoBody.top()) - LABEL_OFFSET_Y;
     const qreal bottomLabelY = qMax(leftArduinoBody.bottom(), rightArduinoBody.bottom()) + connFm.ascent() + LABEL_OFFSET_Y;
-
-
-
-    auto collectPins = [&](auto predicate) {
-        QList<const PinDesc*> pins;
-        pins.reserve(m_pins.size());
-        for(const PinDesc &candidate : m_pins){
-            if(predicate(candidate))
-                pins.append(&candidate);
-        }
-        return pins;
-    };
-
-    auto buildMorphoLinks = [&](const QList<const PinDesc*> &morphoPins,
-                                const QList<const PinDesc*> &arduinoPins) {
-        QHash<const PinDesc*, const PinDesc*> links;
-        QList<const PinDesc*> usedArduinoPins;
-        for(const PinDesc *morphoPin : morphoPins){
-            const PinDesc *bestArduinoPin = nullptr;
-            qreal bestDistance = 1.0e9;
-            for(const PinDesc *arduinoPin : arduinoPins){
-                if(usedArduinoPins.contains(arduinoPin))
-                    continue;
-                if(morphoPin->port.compare(arduinoPin->port, Qt::CaseInsensitive) != 0)
-                    continue;
-
-                const qreal distance = qAbs(morphoPin->cy - arduinoPin->cy);
-                if(distance < bestDistance){
-                    bestDistance = distance;
-                    bestArduinoPin = arduinoPin;
-                }
-            }
-
-            if(bestArduinoPin && bestDistance <= 20.0){
-                links.insert(morphoPin, bestArduinoPin);
-                usedArduinoPins.append(bestArduinoPin);
-            }
-        }
-        return links;
-    };
-
     const QList<const PinDesc*> leftInnerMorphoPins = collectPins([&](const PinDesc &candidate) {
         return candidate.connectorId == "CN7" && candidate.row == 1;
     });
@@ -422,20 +465,10 @@ void PinoutWidget::paintEvent(QPaintEvent *)
     const QList<const PinDesc*> rightArduinoPins = collectPins([&](const PinDesc &candidate) {
         return candidate.connectorId == "CN5" || candidate.connectorId == "CN9";
     });
-    const QHash<const PinDesc*, const PinDesc*> leftInnerMorphoLinks =
+    const PinLinkMap leftInnerMorphoLinks =
         buildMorphoLinks(leftInnerMorphoPins, leftArduinoPins);
-    const QHash<const PinDesc*, const PinDesc*> rightInnerMorphoLinks =
+    const PinLinkMap rightInnerMorphoLinks =
         buildMorphoLinks(rightInnerMorphoPins, rightArduinoPins);
-
-    auto averageLinkDeltaY = [&](const QHash<const PinDesc*, const PinDesc*> &links) {
-        if(links.isEmpty())
-            return 0.0;
-
-        qreal totalDelta = 0.0;
-        for(auto it = links.constBegin(); it != links.constEnd(); ++it)
-            totalDelta += (it.value()->cy - it.key()->cy);
-        return totalDelta / links.size();
-    };
 
     const qreal leftInnerLineDeltaY = averageLinkDeltaY(leftInnerMorphoLinks);
     const qreal rightInnerLineDeltaY = averageLinkDeltaY(rightInnerMorphoLinks);
@@ -460,7 +493,8 @@ void PinoutWidget::paintEvent(QPaintEvent *)
 
     auto rightInnerUnlinkedCenterY = [&](const PinDesc &pin) {
         if(&pin == topRightUnlinkedPin && topRightArduinoPin){
-            const ConnectorDesc *arduinoConnector = connectorById(topRightArduinoPin->connectorId);
+            const ConnectorDesc *arduinoConnector = connectorById(topRightArduinoPin->connectorId,
+                                                                  connectorIndexById);
             if(arduinoConnector)
                 return (qreal)topRightArduinoPin->cy - arduinoConnector->pitch;
         }
@@ -542,7 +576,8 @@ void PinoutWidget::paintEvent(QPaintEvent *)
                                                     fm.height()));
     }
     if(topRightArduinoPin){
-        const ConnectorDesc *arduinoConnector = connectorById(topRightArduinoPin->connectorId);
+        const ConnectorDesc *arduinoConnector = connectorById(topRightArduinoPin->connectorId,
+                                                              connectorIndexById);
         if(arduinoConnector){
             const qreal virtualY = (qreal)topRightArduinoPin->cy - arduinoConnector->pitch;
             contentBounds = contentBounds.united(QRectF(rightArduinoBody.left(),
@@ -553,16 +588,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
     }
     contentBounds.adjust(0.0, 0.0, OUTER_TEXT_GAP, 0.0);
 
-    const qreal fitMarginPx = 8.0;
-    const qreal availableW = qMax<qreal>(1.0, width() - 2.0 * fitMarginPx);
-    const qreal availableH = qMax<qreal>(1.0, height() - 2.0 * fitMarginPx);
-    const qreal fitScale = qMin(availableW / contentBounds.width(),
-                                availableH / contentBounds.height());
-    QTransform fitTransform;
-    fitTransform.translate(fitMarginPx + (availableW - fitScale * contentBounds.width()) / 2.0 - fitScale * contentBounds.left(),
-                           fitMarginPx + (availableH - fitScale * contentBounds.height()) / 2.0 - fitScale * contentBounds.top());
-    fitTransform.scale(fitScale, fitScale);
-    p.setTransform(fitTransform);
+    p.setTransform(fitTransform(contentBounds, 8.0));
 
     auto drawLeftColumnText = [&](const QString &txt, qreal x, qreal baselineY, const QColor &col) {
         if(txt.isEmpty())
@@ -585,12 +611,12 @@ void PinoutWidget::paintEvent(QPaintEvent *)
     for(const PinDesc &pin : m_pins){
         if(pin.cx == 0.f && pin.cy == 0.f) continue;
 
-        const ConnectorDesc *connector = connectorById(pin.connectorId);
+        const ConnectorDesc *connector = connectorById(pin.connectorId, connectorIndexById);
         if(!connector)
             continue;
 
-        const float padW = padWidthFor(*connector);
-        const float padH = padHeightFor(*connector);
+        const float padW = padSideFor(*connector, invS);
+        const float padH = padW;
         const bool isSingleRow = (connector->rows == 1);
         const bool isLeftArduino = (pin.connectorId == "CN6" || pin.connectorId == "CN8");
         const bool isRightArduino = (pin.connectorId == "CN5" || pin.connectorId == "CN9");
@@ -636,8 +662,8 @@ void PinoutWidget::paintEvent(QPaintEvent *)
             } else if(isLeftMorpho){
                 const PinDesc *arduinoPin = leftInnerMorphoLinks.value(&pin, nullptr);
                 if(arduinoPin){
-                    const ConnectorDesc *arduinoConnector = connectorById(arduinoPin->connectorId);
-                    const float arduinoPadW = arduinoConnector ? padWidthFor(*arduinoConnector) : 24.0f * invS;
+                    const ConnectorDesc *arduinoConnector = connectorById(arduinoPin->connectorId, connectorIndexById);
+                    const float arduinoPadW = arduinoConnector ? padSideFor(*arduinoConnector, invS) : 24.0f * invS;
                     p.drawLine(QPointF(pin.cx + padW / 2.0f + STUB_START_GAP, pin.cy),
                                QPointF(arduinoPin->cx - arduinoPadW / 2.0f - STUB_START_GAP, arduinoPin->cy));
                 } else {
@@ -647,8 +673,8 @@ void PinoutWidget::paintEvent(QPaintEvent *)
             } else if(isRightMorpho){
                 const PinDesc *arduinoPin = rightInnerMorphoLinks.value(&pin, nullptr);
                 if(arduinoPin){
-                    const ConnectorDesc *arduinoConnector = connectorById(arduinoPin->connectorId);
-                    const float arduinoPadW = arduinoConnector ? padWidthFor(*arduinoConnector) : 24.0f * invS;
+                    const ConnectorDesc *arduinoConnector = connectorById(arduinoPin->connectorId, connectorIndexById);
+                    const float arduinoPadW = arduinoConnector ? padSideFor(*arduinoConnector, invS) : 24.0f * invS;
                     p.drawLine(QPointF(arduinoPin->cx + arduinoPadW / 2.0f + STUB_START_GAP, arduinoPin->cy),
                                QPointF(pin.cx - padW / 2.0f - STUB_START_GAP, pin.cy));
                 } else {
@@ -656,9 +682,9 @@ void PinoutWidget::paintEvent(QPaintEvent *)
                     const qreal targetY = rightInnerUnlinkedCenterY(pin);
                     const qreal lineEndX = rightInnerMorphoTextRight + OUTER_TEXT_GAP;
                     if(&pin == topRightUnlinkedPin && topRightArduinoPin){
-                        const ConnectorDesc *arduinoConnector = connectorById(topRightArduinoPin->connectorId);
+                        const ConnectorDesc *arduinoConnector = connectorById(topRightArduinoPin->connectorId, connectorIndexById);
                         if(arduinoConnector){
-                            const float arduinoPadW = padWidthFor(*arduinoConnector);
+                            const float arduinoPadW = padSideFor(*arduinoConnector, invS);
                             const QPointF bendPoint(topRightArduinoPin->cx + arduinoPadW / 2.0f + STUB_START_GAP,
                                                     targetY);
                             const QPointF textPoint(lineEndX, targetY);
