@@ -126,4 +126,9 @@
         <file>config/Nucleo-L476RG.json</file>
         <file>config/Nucleo-C562RE.json</file>
     </qresource>
+    <qresource prefix="/licenses">
+        <file>THIRD-PARTY-NOTICES.md</file>
+        <file>third-party-licenses/libusb-LGPL-2.1.txt</file>
+        <file>third-party-licenses/stlink-BSD-3-Clause.txt</file>
+    </qresource>
 </RCC>

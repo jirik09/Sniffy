@@ -1,28 +1,30 @@
 # Third-Party Notices
 
-LEO Sniffy uses the following third-party libraries:
+LEO Sniffy uses the following third-party libraries in its distributed desktop builds.
+Copies of the license texts listed below are included with the packaged application.
 
 ---
 
 ## libusb
 
-- **License**: GNU Lesser General Public License v2.1 (LGPL-2.1)
+- **Bundled version**: 1.0.29
+- **License**: GNU Lesser General Public License v2.1 or later (LGPL-2.1-or-later)
 - **Project**: https://libusb.info
-- **Source code**: https://github.com/libusb/libusb
-- **Copyright**: © 2001 Johannes Erdfelt, © 2007-2008 Daniel Drake, © 2012 Pete Batard, © 2012-2023 Nathan Hjelm, © 2014-2020 Chris Dickens
+- **Corresponding source code**: https://github.com/libusb/libusb/tree/v1.0.29
+- **Copyright**: Copyright © 2001 Johannes Erdfelt, Copyright © 2007-2008 Daniel Drake, Copyright © 2012 Pete Batard, Copyright © 2012-2023 Nathan Hjelm, Copyright © 2014-2020 Chris Dickens
 - **Full license text**: [third-party-licenses/libusb-LGPL-2.1.txt](third-party-licenses/libusb-LGPL-2.1.txt)
 
-This library is used unmodified. The original source code is available at
-https://github.com/libusb/libusb.
+This distribution uses the unmodified upstream libusb library as a separate dynamic library.
 
 ---
 
 ## stlink
 
+- **Bundled version**: 1.8.0
 - **License**: BSD 3-Clause License
 - **Project**: https://github.com/stlink-org/stlink
-- **Copyright**: © 2020, stlink-org
+- **Source code**: https://github.com/stlink-org/stlink/tree/v1.8.0
+- **Copyright**: Copyright (c) 2020, stlink-org
 - **Full license text**: [third-party-licenses/stlink-BSD-3-Clause.txt](third-party-licenses/stlink-BSD-3-Clause.txt)
 
-This library is used unmodified. The original source code is available at
-https://github.com/stlink-org/stlink.
+This distribution uses the unmodified upstream stlink library as a separate dynamic library.
