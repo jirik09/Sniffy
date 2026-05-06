@@ -162,6 +162,59 @@ void Counter::buildModuleDescription(CounterSpec *spec)
     }
 
     showModuleDescription(name, labels, values);
+
+    // Pinout overlay: emit all unique, valid pins
+    QList<PinFunctionInfo> pinFuncs;
+    auto addPin = [&](const QString &pin, const QString &label) {
+        if(!pin.isEmpty() && pin != "-"){
+            pinFuncs.append({pin, label, "counter"});
+        }
+    };
+    if(spec->hf_max > 0)  addPin(spec->pins.hf_ch1, "HF");
+    if(spec->lf_max > 0){ addPin(spec->pins.lf_ch1, "LF CH1"); addPin(spec->pins.lf_ch2, "LF CH2"); }
+    if(spec->rat_max_chan > 0){ addPin(spec->pins.rat_ref, "Ref"); addPin(spec->pins.rat_ch3, "In"); }
+    if(spec->lf_max > 0){ addPin(spec->pins.int_ch1, "Int1"); addPin(spec->pins.int_ch2, "Int2"); }
+    showModulePinFunctions(name, pinFuncs);
+}
+
+QList<PinFunctionInfo> Counter::activePinFunctions() const
+{
+    auto *spec = static_cast<CounterSpec*>(moduleSpecification);
+    if(!spec || !config)
+        return {};
+
+    QList<PinFunctionInfo> pinFuncs;
+    auto addPin = [&](const QString &pin, const QString &label) {
+        if(!pin.isEmpty() && pin != "-")
+            pinFuncs.append({pin, label, "counter"});
+    };
+
+    switch(config->mode){
+    case CounterMode::HIGH_FREQUENCY:
+        if(spec->hf_max > 0)
+            addPin(spec->pins.hf_ch1, "HF");
+        break;
+    case CounterMode::LOW_FREQUENCY:
+        if(spec->lf_max > 0){
+            addPin(spec->pins.lf_ch1, "LF CH1");
+            addPin(spec->pins.lf_ch2, "LF CH2");
+        }
+        break;
+    case CounterMode::RATIO:
+        if(spec->rat_max_chan > 0){
+            addPin(spec->pins.rat_ref, "Ref");
+            addPin(spec->pins.rat_ch3, "In");
+        }
+        break;
+    case CounterMode::INTERVAL:
+        if(spec->lf_max > 0){
+            addPin(spec->pins.int_ch1, "Int1");
+            addPin(spec->pins.int_ch2, "Int2");
+        }
+        break;
+    }
+
+    return pinFuncs;
 }
 
 /************************************** COMMON FUNCTIONS ****************************************/
@@ -233,6 +286,7 @@ void Counter::switchCounterModeCallback(int index){
     }
 
     discardHold();
+    notifyActivePinFunctionsChanged();
 }
 
 void Counter::discardHold(){

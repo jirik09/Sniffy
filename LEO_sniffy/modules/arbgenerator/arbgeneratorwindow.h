@@ -43,6 +43,7 @@ public:
     void setSpecification(ArbGeneratorSpec* spec);
 
     QList<QList<int> > *getGeneratorDACData() const;
+    int getNumChannelsEnabled() const;
     qreal getFrequency(int channel);
     qreal getPWMFrequency(int channel);
     void setProgress(int percent);
@@ -82,6 +83,7 @@ signals:
     void stopGenerator();
     void updateFrequency();
     void restartGenerating();
+    void activeChannelsChanged();
 };
 
 #endif // ARBGENERATORWINDOW_H

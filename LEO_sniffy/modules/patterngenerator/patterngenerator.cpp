@@ -82,6 +82,15 @@ void PatternGenerator::buildModuleDescription(PatternGeneratorSpec *spec)
     }
     values.append(pins.left(pins.length() - 2));
     showModuleDescription(name, labels, values);
+
+    // Pinout overlay
+    QList<PinFunctionInfo> pinFuncs;
+    for(int i = 0; i < PATT_MAX_CHANNELS_NUM; i++){
+        if(!spec->chanPins[i].isEmpty() && spec->chanPins[i] != "-"){
+            pinFuncs.append({spec->chanPins[i], "CH" + QString::number(i + 1), "pattern_generator"});
+        }
+    }
+    showModulePinFunctions(name, pinFuncs);
 }
 
 void PatternGenerator::writeConfiguration()

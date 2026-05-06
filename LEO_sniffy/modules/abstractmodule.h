@@ -18,6 +18,7 @@
 #include "../GUI/widgetdial.h"
 #include "../GUI/widgetdialrange.h"
 #include "../GUI/widgetswitch.h"
+#include "pinfunctioninfo.h"
 #include "../GUI/widgettab.h"
 #include "../GUI/widgetselection.h"
 #include "../GUI/widgettextinput.h"
@@ -62,6 +63,8 @@ public:
 
     void showModuleControl();
     void showModuleDescription(QString name, QList<QString> labels, QList<QString> values);
+    // Cache the module pin list and register it with the device layer.
+    void showModulePinFunctions(const QString &modName, const QList<PinFunctionInfo> &pins);
     void showModuleWindow();
     void closeModule();
     void disableModule();
@@ -99,6 +102,9 @@ protected:
     QByteArray moduleCommandPrefix;
 
     AbstractSpecification* moduleSpecification = nullptr;
+    void notifyActivePinFunctionsChanged();
+    virtual QList<PinFunctionInfo> activePinFunctions() const;
+    const QList<PinFunctionInfo> &reportedPinFunctions() const { return m_reportedPinFunctions; }
 
 private:
     ModuleDockWidget *dockWidgetWindow;
@@ -107,6 +113,7 @@ private:
     bool dockWinCreated = false;
     bool moduleRestored = false;
     bool isConfigured = false;
+    QList<PinFunctionInfo> m_reportedPinFunctions;
 
 public slots:
     void widgetControlClicked(ModuleStatus status);
@@ -119,11 +126,18 @@ signals:
     void holdClicked(bool held);
     void blockConflictingModules(QString moduleName, int resources);
     void releaseConflictingModules(QString moduleName, int resources);
+    void moduleActiveChanged(const QString &moduleName, bool active);
     void moduleDescription(QString name, QList<QString> labels, QList<QString> values);
+    // Emitted once per module after spec parse; carries board-pin metadata for stable overlay ordering.
+    void modulePinFunctions(QString moduleName, QList<PinFunctionInfo> pins);
+    void moduleActivePinFunctionsChanged(QString moduleName, QList<PinFunctionInfo> pins);
     // Emitted when the module's display name changes (e.g., Device renamed after handshake)
     void moduleNameChanged(const QString &name);
     // Emitted when showModuleControl is called, used to trigger delayed session restoration
     void moduleControlShown(const QString &name);
+
+private:
+    void applyModuleStatus(ModuleStatus stat);
 
 };
 

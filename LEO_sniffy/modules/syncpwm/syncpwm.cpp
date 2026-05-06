@@ -211,9 +211,17 @@ void SyncPwm::buildModuleDescription(SyncPwmSpec *spec)
     values.append(pins.left(pins.length()-2));
 
     showModuleDescription(name, labels, values);
-}
 
-/******************************** Callbacks *********************************/
+    // Pinout overlay
+    QList<PinFunctionInfo> pinFuncs;
+    for(int i = 0; i < spec->chan_num && i < spec->pinsList.size(); i++){
+        const QString &pin = spec->pinsList.at(i);
+        if(!pin.isEmpty() && pin != "-"){
+            pinFuncs.append({pin, "CH" + QString::number(i + 1), "syncpwm"});
+        }
+    }
+    showModulePinFunctions(name, pinFuncs);
+}
 
 void SyncPwm::buttonStartCallback(int index){
     Q_UNUSED(index);

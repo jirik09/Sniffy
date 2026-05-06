@@ -75,6 +75,7 @@ public:
     void triggerCaptured();
     void setRealSamplingRateAndLlength(int smpl, int len);
     void setNumChannels(int channels);
+    int enabledChannelMask() const;
 
     void updateMeasurement(QList<Measurement*> m);
     void updateMath(QVector<QPointF> mathTrace);

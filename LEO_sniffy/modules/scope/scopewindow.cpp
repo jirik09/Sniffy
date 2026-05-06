@@ -710,6 +710,11 @@ void ScopeWindow::restoreGUIAfterStartup()
     }
 }
 
+int ScopeWindow::enabledChannelMask() const
+{
+    return panelSet ? panelSet->buttonsChannelEnable->getStatus() : 0;
+}
+
 void ScopeWindow::singleSamplingDone(){
     panelSet->buttonsTriggerMode->setText("Single",0);
     panelSet->buttonsTriggerMode->setColor(Graphics::palette().warning,0);

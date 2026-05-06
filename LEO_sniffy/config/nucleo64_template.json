@@ -1,0 +1,90 @@
+{
+  "template_id": "NUCLEO-64",
+  "description": "STM32 NUCLEO-64 board layout template (ST Morpho + Arduino Uno R3 headers)",
+  "canvas_w": 1150,
+  "canvas_h": 780,
+  "connectors": [
+    {
+      "id": "CN7",
+      "label": "CN7",
+      "description": "ST Morpho left",
+      "anchor_x": 231,
+      "anchor_y": 70,
+      "orientation": "vertical",
+      "rows": 2,
+      "pin_count": 19,
+      "pitch": 32,
+      "row_spacing": 32,
+      "row0_x": 247,
+      "row1_x": 279,
+      "pin0_y": 102
+    },
+    {
+      "id": "CN10",
+      "label": "CN10",
+      "description": "ST Morpho right",
+      "anchor_x": 919,
+      "anchor_y": 70,
+      "orientation": "vertical",
+      "rows": 2,
+      "pin_count": 19,
+      "pitch": 32,
+      "row_spacing": 32,
+      "row0_x": 935,
+      "row1_x": 967,
+      "pin0_y": 102
+    },
+    {
+      "id": "CN6",
+      "label": "CN6",
+      "description": "Arduino power / reset header",
+      "anchor_x": 324,
+      "anchor_y": 198,
+      "orientation": "vertical",
+      "rows": 1,
+      "pin_count": 8,
+      "pitch": 32,
+      "row0_x": 340,
+      "pin0_y": 230
+    },
+    {
+      "id": "CN8",
+      "label": "CN8",
+      "description": "Arduino analog header (A0-A5)",
+      "anchor_x": 324,
+      "anchor_y": 486,
+      "orientation": "vertical",
+      "rows": 1,
+      "pin_count": 6,
+      "pitch": 32,
+      "row0_x": 340,
+      "pin0_y": 518
+    },
+    {
+      "id": "CN5",
+      "label": "CN5",
+      "description": "Arduino digital header D8-D15",
+      "anchor_x": 866,
+      "anchor_y": 86,
+      "orientation": "vertical",
+      "rows": 1,
+      "pin_count": 10,
+      "pitch": 32,
+      "row0_x": 872,
+      "pin0_y": 118
+    },
+    {
+      "id": "CN9",
+      "label": "CN9",
+      "description": "Arduino digital header D0-D7",
+      "anchor_x": 866,
+      "anchor_y": 422,
+      "orientation": "vertical",
+      "rows": 1,
+      "pin_count": 8,
+      "pitch": 32,
+      "row0_x": 872,
+      "pin0_y": 454
+    }
+  ]
+}

@@ -34,6 +34,13 @@ void VoltageSource::parseData(QByteArray data)
         spec = static_cast<VoltageSourceSpec*>(moduleSpecification);
         voltSourceWindow->setNumberOfChannels(spec->maxDACChannels);
         showModuleControl();
+        QList<PinFunctionInfo> pinFuncs;
+        for(int i = 0; i < spec->maxDACChannels; ++i){
+            const QString &pin = spec->channelPins[i];
+            if(!pin.isEmpty() && pin != "-")
+                pinFuncs.append({pin, "CH" + QString::number(i + 1), "voltage_source"});
+        }
+        showModulePinFunctions(moduleName, pinFuncs);
         //TODO parse message from MCU
     }else if(dataHeader=="xxxx"){
 

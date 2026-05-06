@@ -50,6 +50,7 @@ public:
     void startDatalog();
     void setDatalogFilePath(const QString &path);
     bool isLogging() const { return isDataLogRunning; }
+    int enabledChannelMask() const;
 
 private:
     Ui::VoltmeterWindow *ui;

@@ -71,6 +71,7 @@ private:
 
     /* Intervals Counter */
     void intReloadState();
+    QList<PinFunctionInfo> activePinFunctions() const override;
 
 private slots:
 

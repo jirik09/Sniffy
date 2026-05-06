@@ -145,6 +145,11 @@ void VoltmeterWindow::restoreGUIAfterStartup()
     //disabled/enabled buttons accordign to selected function
 }
 
+int VoltmeterWindow::enabledChannelMask() const
+{
+    return buttonsChannelEnable ? buttonsChannelEnable->getStatus() : 0;
+}
+
 void VoltmeterWindow::showData(ChannelData data[], int numChannels){
     for(int i = 0;i<numChannels;i++){
         displays.at(i)->displayString(displays.at(i)->formatNumber(data[i].voltage,'f',4));
