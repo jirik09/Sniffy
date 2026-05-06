@@ -24,6 +24,7 @@ ArbGenerator::ArbGenerator(QObject *parent, bool isPWMbased):
     connect(arbGenWindow, &ArbGeneratorWindow::stopGenerator, this,&ArbGenerator::stopCallback);
     connect(arbGenWindow, &ArbGeneratorWindow::updateFrequency, this,&ArbGenerator::updateFrequencyCallback);
     connect(arbGenWindow, &ArbGeneratorWindow::restartGenerating, this,&ArbGenerator::quickRestartCalback);
+    connect(arbGenWindow, &ArbGeneratorWindow::activeChannelsChanged, this, &ArbGenerator::updateActiveChannelSelection);
 }
 
 QWidget *ArbGenerator::getWidget()
@@ -158,6 +159,11 @@ void ArbGenerator::quickRestartCalback()
     startGenerator();
 }
 
+void ArbGenerator::updateActiveChannelSelection()
+{
+    notifyActivePinFunctionsChanged();
+}
+
 void ArbGenerator::buildModuleDescription(ArbGeneratorSpec *spec)
 {
     QString name = moduleName;
@@ -214,6 +220,14 @@ void ArbGenerator::buildModuleDescription(ArbGeneratorSpec *spec)
         }
     }
     showModulePinFunctions(name, pinFuncs);
+}
+
+QList<PinFunctionInfo> ArbGenerator::activePinFunctions() const
+{
+    const int activeChannelCount = qBound(0,
+                                          arbGenWindow ? arbGenWindow->getNumChannelsEnabled() : 0,
+                                          reportedPinFunctions().size());
+    return reportedPinFunctions().mid(0, activeChannelCount);
 }
 
 void ArbGenerator::startGenerator()

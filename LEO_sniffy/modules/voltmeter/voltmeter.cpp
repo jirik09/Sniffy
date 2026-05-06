@@ -55,7 +55,7 @@ void Voltmeter::parseData(QByteArray data)
         for(int i = 0; i < spec->maxADCChannels; ++i){
             const QString &pin = spec->channelPins[i];
             if(!pin.isEmpty() && pin != "-")
-                pinFuncs.append({pin, "CH" + QString::number(i + 1), "scope"});
+                pinFuncs.append({pin, "CH" + QString::number(i + 1), "voltmeter"});
         }
         showModulePinFunctions(moduleName, pinFuncs);
         //TODO parse message from MCU
@@ -285,6 +285,19 @@ void Voltmeter::setAveraging(int value)
 void Voltmeter::setNumChannelsEnabled(int value)
 {
     numChannelsEnabled = value;
+    notifyActivePinFunctionsChanged();
+}
+
+QList<PinFunctionInfo> Voltmeter::activePinFunctions() const
+{
+    QList<PinFunctionInfo> activeFunctions;
+    const int channelMask = voltWindow ? voltWindow->enabledChannelMask() : 0;
+    const QList<PinFunctionInfo> &functions = reportedPinFunctions();
+    for(int channelIndex = 0; channelIndex < functions.size() && channelIndex < MAX_VOLTMETER_CHANNELS; ++channelIndex){
+        if(channelMask & (1 << channelIndex))
+            activeFunctions.append(functions.at(channelIndex));
+    }
+    return activeFunctions;
 }
 
 void Voltmeter::resetMinMax()

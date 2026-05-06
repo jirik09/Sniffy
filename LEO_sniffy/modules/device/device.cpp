@@ -64,14 +64,15 @@ void Device::addModuleDescription(QString name, QList<QString> labels, QList<QSt
     deviceWindow->addModuleDescription(name,labels,values);
 }
 
-void Device::addModulePinFunctions(const QString &modName, const QList<PinFunctionInfo> &pins)
+void Device::registerModulePinFunctions(const QString &modName, const QList<PinFunctionInfo> &pins)
 {
-    deviceWindow->addModulePinFunctions(modName, pins);
+    deviceWindow->registerModulePinFunctions(modName, pins);
 }
 
-void Device::updateModuleActiveState(const QString &moduleName, bool active)
+void Device::setModuleActivePinFunctions(const QString &moduleName,
+                                         const QList<PinFunctionInfo> &pins)
 {
-    deviceWindow->setModuleActive(moduleName, active);
+    deviceWindow->setModuleActivePinFunctions(moduleName, pins);
 }
 
 void Device::connectDevice(int index){

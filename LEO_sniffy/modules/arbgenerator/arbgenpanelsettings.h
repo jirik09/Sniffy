@@ -57,7 +57,7 @@ public:
 
     QHBoxLayout *sweepControl;
 
-    int numChannelsEnabled = 0;
+    int numChannelsEnabled = 1;
     MemoryLength memorySet = MemoryLength::BEST_FIT;
     int customLength = 0;
 

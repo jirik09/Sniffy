@@ -38,7 +38,7 @@ void VoltageSource::parseData(QByteArray data)
         for(int i = 0; i < spec->maxDACChannels; ++i){
             const QString &pin = spec->channelPins[i];
             if(!pin.isEmpty() && pin != "-")
-                pinFuncs.append({pin, "CH" + QString::number(i + 1), "signal_generator"});
+                pinFuncs.append({pin, "CH" + QString::number(i + 1), "voltage_source"});
         }
         showModulePinFunctions(moduleName, pinFuncs);
         //TODO parse message from MCU

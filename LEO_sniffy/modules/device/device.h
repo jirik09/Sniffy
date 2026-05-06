@@ -45,8 +45,8 @@ signals:
 
 public slots:
     void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);
-    void addModulePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins);
-    void updateModuleActiveState(const QString &moduleName, bool active);
+    void registerModulePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins);
+    void setModuleActivePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins);
     void parseData(QByteArray);
     void writeConfiguration();
     void parseConfiguration(QByteArray config);

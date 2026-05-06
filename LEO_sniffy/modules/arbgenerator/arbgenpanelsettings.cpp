@@ -236,6 +236,7 @@ void ArbGenPanelSettings::setChannelShown(int index, bool isShown)
 void ArbGenPanelSettings::restoreGUI()
 {
     isSilentGUIUpdate = true;
+    numChannelsEnabled = qMax(1, buttonsEnable->getSelectedIndex() + 1);
     for(int i = 0;i<buttonsEnable->getSelectedIndex()+1;i++){
         setChannelShown(i,true);
         channelEnabled[i] = true;

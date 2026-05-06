@@ -82,6 +82,8 @@ private:
     FFTType FFTtype;
     int FFTChannelIndex = 0;
 
+    QList<PinFunctionInfo> activePinFunctions() const override;
+
     void buildModuleDescription(ScopeSpec *spec);
 
     //private functions - writing into device only - no logic

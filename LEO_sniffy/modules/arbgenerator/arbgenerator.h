@@ -36,6 +36,7 @@ private slots:
     void stopCallback();
     void updateFrequencyCallback();
     void quickRestartCalback();
+    void updateActiveChannelSelection();
 
 private:
     ArbGeneratorConfig *config;
@@ -45,6 +46,7 @@ private:
 
     int numChannelsUsed;
     bool dataBeingUploaded = false;
+    QList<PinFunctionInfo> activePinFunctions() const override;
 
     void buildModuleDescription(ArbGeneratorSpec *spec);
 

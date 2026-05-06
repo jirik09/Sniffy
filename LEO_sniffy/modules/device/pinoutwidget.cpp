@@ -51,6 +51,11 @@ void PinoutWidget::setBoard(const QString &boardId)
     parseTemplate(tmplObj);
     parsePins(boardObj.value("pins").toArray());
     buildPinPositions();
+    QList<PinoutBoardPin> boardPins;
+    boardPins.reserve(m_pins.size());
+    for(const PinDesc &pin : m_pins)
+        boardPins.append({pin.port, pin.arduino});
+    m_functionMap.setBoardPins(boardPins);
     update();
 }
 
@@ -255,26 +260,6 @@ QTransform PinoutWidget::fitTransform(const QRectF &contentBounds, qreal marginP
 }
 
 // --------------------------------------------------------------------------
-QString PinoutWidget::canonicalPinKey(const QString &pinName) const
-{
-    const QString normalizedPin = pinName.trimmed();
-    if(normalizedPin.isEmpty())
-        return QString();
-
-    for(const PinDesc &pin : m_pins){
-        if(pin.port.compare(normalizedPin, Qt::CaseInsensitive) == 0 ||
-           pin.arduino.compare(normalizedPin, Qt::CaseInsensitive) == 0){
-            if(!pin.port.isEmpty())
-                return pin.port;
-            if(!pin.arduino.isEmpty())
-                return pin.arduino;
-        }
-    }
-
-    return normalizedPin;
-}
-
-// --------------------------------------------------------------------------
 QString PinoutWidget::overlayLabelText(const QString &label) const
 {
     static const QRegularExpression channelSuffix(QStringLiteral("^(?:[A-Za-z]+\\s*)+(\\d+)\\s*$"),
@@ -289,79 +274,15 @@ QString PinoutWidget::overlayLabelText(const QString &label) const
 // --------------------------------------------------------------------------
 void PinoutWidget::setPinFunctions(const QList<PinFunctionInfo> &functions)
 {
-    m_functions.clear();
-    m_funcByPort.clear();
-    m_funcByArduino.clear();
-    m_modulesByPort.clear();
-    m_modulesByArduino.clear();
+    m_functionMap.setFunctions(functions);
     m_iconCache.clear();
-
-    QSet<QString> claimedPins;
-    QHash<QString, QSet<QString>> modulesByCanonicalPin;
-    m_functions.reserve(functions.size());
-    for(const PinFunctionInfo &f : functions){
-        const QString canonicalPin = canonicalPinKey(f.pin);
-        if(canonicalPin.isEmpty())
-            continue;
-
-        const QString claimKey = canonicalPin.toUpper();
-        if(!f.moduleName.isEmpty())
-            modulesByCanonicalPin[claimKey].insert(f.moduleName);
-
-        if(claimedPins.contains(claimKey))
-            continue;
-
-        claimedPins.insert(claimKey);
-        PinFunctionInfo canonicalFunc = f;
-        canonicalFunc.pin = canonicalPin;
-        m_functions.append(canonicalFunc);
-    }
-
-    for(const PinFunctionInfo &f : m_functions){
-        bool matchedBoardAlias = false;
-        const QSet<QString> modulesForPin = modulesByCanonicalPin.value(f.pin.toUpper());
-        for(const PinDesc &pin : m_pins){
-            if(pin.port.compare(f.pin, Qt::CaseInsensitive) != 0 &&
-               pin.arduino.compare(f.pin, Qt::CaseInsensitive) != 0)
-                continue;
-
-            matchedBoardAlias = true;
-            if(!pin.port.isEmpty()){
-                m_funcByPort.insert(pin.port, &f);
-                if(!modulesForPin.isEmpty())
-                    m_modulesByPort.insert(pin.port, modulesForPin);
-            }
-            if(!pin.arduino.isEmpty()){
-                m_funcByArduino.insert(pin.arduino, &f);
-                if(!modulesForPin.isEmpty())
-                    m_modulesByArduino.insert(pin.arduino, modulesForPin);
-            }
-        }
-
-        if(!matchedBoardAlias && !f.pin.isEmpty()){
-            m_funcByPort.insert(f.pin, &f);
-            if(!modulesForPin.isEmpty())
-                m_modulesByPort.insert(f.pin, modulesForPin);
-        }
-    }
-    update();
-}
-
-// --------------------------------------------------------------------------
-void PinoutWidget::setActiveModules(const QSet<QString> &activeModules)
-{
-    m_activeModules = activeModules;
     update();
 }
 
 // --------------------------------------------------------------------------
 void PinoutWidget::clearPinFunctions()
 {
-    m_functions.clear();
-    m_funcByPort.clear();
-    m_funcByArduino.clear();
-    m_modulesByPort.clear();
-    m_modulesByArduino.clear();
+    m_functionMap.clear();
     m_iconCache.clear();
     update();
 }
@@ -374,336 +295,425 @@ void PinoutWidget::onThemeChanged()
 }
 
 // --------------------------------------------------------------------------
-const PinFunctionInfo *PinoutWidget::pinFunction(const QString &port, const QString &arduino) const
+PinoutWidget::PaintColors PinoutWidget::buildPaintColors() const
 {
-    // Check by arduino label first (firmware sends arduino-style names like "A5", "D13")
-    if(!arduino.isEmpty()){
-        auto it = m_funcByArduino.find(arduino);
-        if(it != m_funcByArduino.end()) return it.value();
-    }
-    // Then by MCU port name
-    if(!port.isEmpty()){
-        auto it = m_funcByPort.find(port);
-        if(it != m_funcByPort.end()) return it.value();
-    }
-    return nullptr;
-}
-
-// --------------------------------------------------------------------------
-bool PinoutWidget::pinHasActiveModule(const QString &port, const QString &arduino) const
-{
-    auto intersectsActiveModules = [&](const QSet<QString> &modules) {
-        for(const QString &moduleName : modules){
-            if(m_activeModules.contains(moduleName))
-                return true;
-        }
-        return false;
-    };
-
-    if(!arduino.isEmpty()){
-        auto it = m_modulesByArduino.find(arduino);
-        if(it != m_modulesByArduino.end() && intersectsActiveModules(it.value()))
-            return true;
-    }
-
-    if(!port.isEmpty()){
-        auto it = m_modulesByPort.find(port);
-        if(it != m_modulesByPort.end() && intersectsActiveModules(it.value()))
-            return true;
-    }
-
-    return false;
-}
-
-// --------------------------------------------------------------------------
-bool PinoutWidget::isPowerPin(const QString &port)
-{
-    static const QStringList powerPins = {
-        "GND","AGND","5V","+5V","E5V","U5V","3.3V","+3V3","VDD","VBAT",
-        "AVDD","AREF","VIN","IOREF","NRST","RESET","NC","BOOT0"
-    };
-    return powerPins.contains(port, Qt::CaseInsensitive);
-}
-
-// --------------------------------------------------------------------------
-QTransform PinoutWidget::canvasTransform() const
-{
-    const float sw = width()  / (float)m_canvasW;
-    const float sh = height() / (float)m_canvasH;
-    const float s  = qMin(sw, sh);
-    // Centre the scaled canvas
-    const float ox = (width()  - s * m_canvasW) / 2.f;
-    const float oy = (height() - s * m_canvasH) / 2.f;
-    QTransform t;
-    t.translate(ox, oy);
-    t.scale(s, s);
-    return t;
-}
-
-// --------------------------------------------------------------------------
-void PinoutWidget::paintEvent(QPaintEvent *)
-{
-    if(m_connectors.isEmpty()){
-        QPainter p(this);
-        p.fillRect(rect(), QColor(Graphics::palette().windowWidget));
-        return;
-    }
-
     const ThemePalette &pal = Graphics::palette();
     const QColor bgColor(pal.windowWidget);
-    const QColor connBodyColor(pal.display);
-    const QColor portLabelColor(pal.textAll);
-    const QColor arduinoLabelColor(235, 0, 220); // Pink color for all Arduino-associated text
-    const QColor activeFunctionColor(50, 220, 50);
-    const QColor pinFreeColor(pal.controls);
-    const QColor pinPowerColor(pal.componentDisabled);
-    const bool darkBg = bgColor.lightnessF() < 0.45;
-    const QColor boxOutlineColor(245, 245, 245);
-    const QColor stubColor = darkBg ? QColor(196, 202, 214) : QColor(110, 116, 126);
-    const QColor overlayTextColor = darkBg ? QColor(226, 230, 238) : QColor(92, 96, 104);
 
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing);
-    p.setRenderHint(QPainter::TextAntialiasing);
+    PaintColors colors;
+    colors.bgColor = bgColor;
+    colors.portLabelColor = QColor(pal.textAll);
+    colors.arduinoLabelColor = QColor(235, 0, 220);
+    colors.activeFunctionColor = QColor(50, 220, 50);
+    colors.boxOutlineColor = QColor(245, 245, 245);
+    colors.stubColor = bgColor.lightnessF() < 0.45
+                       ? QColor(196, 202, 214)
+                       : QColor(110, 116, 126);
+    return colors;
+}
 
-    // Fill background
-    p.fillRect(rect(), bgColor);
+// --------------------------------------------------------------------------
+PinoutWidget::PaintMetrics PinoutWidget::buildPaintMetrics(const QFont &baseFont) const
+{
+    PaintMetrics metrics;
+    metrics.canvasScale = (float)qMin(width() / (float)m_canvasW,
+                                      height() / (float)m_canvasH);
+    if(metrics.canvasScale <= 0.0f)
+        return metrics;
 
-    const float canvasScale = (float)qMin(width() / (float)m_canvasW,
-                                          height() / (float)m_canvasH);
-    if(canvasScale <= 0.0f)
-        return;
+    metrics.uiScale = qBound(0.45f, metrics.canvasScale / 0.95f, 1.0f);
+    metrics.invS = 1.f / metrics.canvasScale;
+    metrics.iconSize = 22.0f * metrics.uiScale * metrics.invS;
+    metrics.outerStubLen = 18.0f * metrics.uiScale * metrics.invS;
+    metrics.stubStartGap = 0.9f * metrics.invS;
+    metrics.groupGap = 10.0f * metrics.uiScale * metrics.invS;
+    metrics.columnGap = 10.0f * metrics.uiScale * metrics.invS;
+    metrics.overlayGap = 8.0f * metrics.uiScale * metrics.invS;
+    metrics.outerTextGap = 7.0f * metrics.uiScale * metrics.invS;
+    metrics.innerTextGap = 7.0f * metrics.uiScale * metrics.invS;
+    metrics.showFunctionLabels = DISPLAY_PINOUT_CHANNEL && (metrics.uiScale >= 0.60f);
+    metrics.showFunctionIcons = (metrics.uiScale >= 0.52f);
 
-    // Keep key visual elements readable in actual screen pixels.
-    const float uiScale = qBound(0.45f, canvasScale / 0.95f, 1.0f);
-    const float invS = 1.f / canvasScale;
-    const float ICON_SIZE_V = 22.0f * uiScale * invS;
-    const float OUTER_STUB_LEN = 18.0f * uiScale * invS;
-    const float STUB_START_GAP = 0.9f * invS;
-    const float GROUP_GAP = 10.0f * uiScale * invS;
-    const float COLUMN_GAP = 10.0f * uiScale * invS;
-    const float OVERLAY_GAP = 8.0f * uiScale * invS;
-    const float CONNECTOR_LABEL_GAP = 4.0f * uiScale * invS;
-    const float OUTER_TEXT_GAP = 7.0f * uiScale * invS;
-    const float INNER_TEXT_GAP = 7.0f * uiScale * invS;
-    const bool showFunctionLabels = (uiScale >= 0.60f);
-    const bool showFunctionIcons = (uiScale >= 0.52f);
+    metrics.labelFont = baseFont;
+    metrics.labelFont.setPixelSize(qMax(7, (int)qRound(22.0f * metrics.uiScale * metrics.invS)));
+    metrics.labelFm = QFontMetricsF(metrics.labelFont);
 
-    // Convert desired screen px size into canvas coords (because painter is transformed).
-    QFont labelFont = p.font();
-    labelFont.setPixelSize(qMax(7, (int)qRound(22.0f * uiScale * invS)));
-    p.setFont(labelFont);
-    QFontMetricsF fm(labelFont);
+    metrics.connectorFont = metrics.labelFont;
+    metrics.connectorFont.setWeight(QFont::Normal);
+    metrics.connectorFont.setPixelSize(qMax(8, (int)qRound(28.0f * metrics.uiScale * metrics.invS)));
+    metrics.connectorFm = QFontMetricsF(metrics.connectorFont);
 
-    QFont connFont = labelFont;
-    connFont.setWeight(QFont::Normal);
-    connFont.setPixelSize(qMax(8, (int)qRound(28.0f * uiScale * invS)));
-    QFontMetricsF connFm(connFont);
+    metrics.pinNumberFont = metrics.labelFont;
+    metrics.pinNumberFont.setBold(true);
+    metrics.pinNumberFont.setPixelSize(qMax(6, (int)qRound(18.0f * metrics.uiScale * metrics.invS)));
+    metrics.pinNumberFm = QFontMetricsF(metrics.pinNumberFont);
 
-    QFont pinNumberFont = labelFont;
-    pinNumberFont.setBold(true);
-    pinNumberFont.setPixelSize(qMax(6, (int)qRound(18.0f * uiScale * invS)));
-    QFontMetricsF pinNoFm(pinNumberFont);
+    metrics.overlayFont = metrics.labelFont;
+    metrics.overlayFont.setPixelSize(qMax(7, (int)qRound(OVERLAY_LABEL_FONT_PX * metrics.uiScale * metrics.invS)));
+    metrics.overlayFm = QFontMetricsF(metrics.overlayFont);
+    return metrics;
+}
 
-    const QHash<QString, int> connectorIndexById = buildConnectorIndex();
-
-    auto connectorColor = [&](const QString &connId) {
-        // Match official style: Morpho headers blue, Arduino headers magenta.
-        if(connId == "CN7" || connId == "CN10")
-            return QColor(24, 32, 230);
-        return QColor(235, 0, 220);
-    };
-
+// --------------------------------------------------------------------------
+QHash<QString, QRectF> PinoutWidget::buildConnectorBodies(float invScale) const
+{
     QHash<QString, QRectF> connectorBodies;
+    connectorBodies.reserve(m_connectors.size());
+    for(const ConnectorDesc &connector : m_connectors)
+        connectorBodies.insert(connector.id, bodyRectFor(connector, invScale));
+    return connectorBodies;
+}
 
-    // ------ Draw connector bodies ------------------------------------------
-    for(const ConnectorDesc &c : m_connectors){
-        const QRectF body = bodyRectFor(c, invS);
-        connectorBodies.insert(c.id, body);
-    }
-
-    qreal leftMorphoWidth = 0.0;
-    qreal rightMorphoWidth = 0.0;
-    qreal leftPortWidth = 0.0;
-    qreal leftArduinoWidth = 0.0;
-    qreal rightPortWidth = 0.0;
-    qreal rightArduinoWidth = 0.0;
+// --------------------------------------------------------------------------
+PinoutWidget::ColumnWidths PinoutWidget::computeColumnWidths(const QFontMetricsF &fontMetrics) const
+{
+    ColumnWidths widths;
     for(const PinDesc &pin : m_pins){
         if(pin.connectorId == "CN7" && pin.row == 0)
-            leftMorphoWidth = qMax(leftMorphoWidth, fm.horizontalAdvance(pin.port));
+            widths.leftMorphoWidth = qMax(widths.leftMorphoWidth, fontMetrics.horizontalAdvance(pin.port));
         else if(pin.connectorId == "CN10" && pin.row == 1)
-            rightMorphoWidth = qMax(rightMorphoWidth, fm.horizontalAdvance(pin.port));
+            widths.rightMorphoWidth = qMax(widths.rightMorphoWidth, fontMetrics.horizontalAdvance(pin.port));
         else if(pin.connectorId == "CN6" || pin.connectorId == "CN8"){
-            leftPortWidth = qMax(leftPortWidth, fm.horizontalAdvance(pin.port));
-            leftArduinoWidth = qMax(leftArduinoWidth, fm.horizontalAdvance(pin.arduino));
+            widths.leftPortWidth = qMax(widths.leftPortWidth, fontMetrics.horizontalAdvance(pin.port));
+            widths.leftArduinoWidth = qMax(widths.leftArduinoWidth, fontMetrics.horizontalAdvance(pin.arduino));
         } else if(pin.connectorId == "CN5" || pin.connectorId == "CN9"){
-            rightPortWidth = qMax(rightPortWidth, fm.horizontalAdvance(pin.port));
-            rightArduinoWidth = qMax(rightArduinoWidth, fm.horizontalAdvance(pin.arduino));
+            widths.rightPortWidth = qMax(widths.rightPortWidth, fontMetrics.horizontalAdvance(pin.port));
+            widths.rightArduinoWidth = qMax(widths.rightArduinoWidth, fontMetrics.horizontalAdvance(pin.arduino));
         }
     }
+    return widths;
+}
 
-    const QRectF leftMorphoBody = connectorBodies.value("CN7");
-    const QRectF rightMorphoBody = connectorBodies.value("CN10");
-    const QRectF leftArduinoBody = combinedBody(connectorBodies, "CN6", "CN8");
-    const QRectF rightArduinoBody = combinedBody(connectorBodies, "CN5", "CN9");
+// --------------------------------------------------------------------------
+PinoutWidget::LayoutState PinoutWidget::buildLayoutState(
+    const PaintMetrics &metrics,
+    const QHash<QString, int> &connectorIndexById) const
+{
+    LayoutState layout;
+    layout.connectorBodies = buildConnectorBodies(metrics.invS);
+    layout.columnWidths = computeColumnWidths(metrics.labelFm);
 
-    const qreal leftMorphoTextRight = leftMorphoBody.left() - STUB_START_GAP - OUTER_STUB_LEN - OUTER_TEXT_GAP;
-    const qreal leftPortTextX = leftArduinoBody.right() + GROUP_GAP;
-    const qreal leftArduinoTextX = leftPortTextX + leftPortWidth + COLUMN_GAP;
-    const qreal rightPortTextRight = rightArduinoBody.left() - GROUP_GAP;
-    const qreal rightArduinoTextRight = rightPortTextRight - rightPortWidth - COLUMN_GAP;
-    const qreal rightMorphoTextX = rightMorphoBody.right() + STUB_START_GAP + OUTER_STUB_LEN + OUTER_TEXT_GAP;
+    layout.leftMorphoBody = layout.connectorBodies.value("CN7");
+    layout.rightMorphoBody = layout.connectorBodies.value("CN10");
+    layout.leftArduinoBody = combinedBody(layout.connectorBodies, "CN6", "CN8");
+    layout.rightArduinoBody = combinedBody(layout.connectorBodies, "CN5", "CN9");
 
-    const qreal leftOuterOverlayX = leftMorphoTextRight - leftMorphoWidth - OVERLAY_GAP - ICON_SIZE_V;
-    const qreal leftInnerOverlayX = leftArduinoTextX + leftArduinoWidth + OVERLAY_GAP;
-    const qreal rightInnerOverlayX = rightArduinoTextRight - rightArduinoWidth - OVERLAY_GAP - ICON_SIZE_V;
-    const qreal rightOuterOverlayX = rightMorphoTextX + rightMorphoWidth + OVERLAY_GAP;
-    const qreal rightInnerLineStartX = rightPortTextRight + INNER_TEXT_GAP;
-    const qreal leftInnerMorphoTextX = leftPortTextX;
-    const qreal rightInnerMorphoTextRight = rightPortTextRight;
+    layout.leftMorphoTextRight = layout.leftMorphoBody.left() - metrics.stubStartGap - metrics.outerStubLen - metrics.outerTextGap;
+    layout.leftPortTextX = layout.leftArduinoBody.right() + metrics.groupGap;
+    layout.leftArduinoTextX = layout.leftPortTextX + layout.columnWidths.leftPortWidth + metrics.columnGap;
+    layout.rightPortTextRight = layout.rightArduinoBody.left() - metrics.groupGap;
+    layout.rightArduinoTextRight = layout.rightPortTextRight - layout.columnWidths.rightPortWidth - metrics.columnGap;
+    layout.rightMorphoTextX = layout.rightMorphoBody.right() + metrics.stubStartGap + metrics.outerStubLen + metrics.outerTextGap;
 
-    // Use unified offset for connector labels from their own bounds
-    const qreal LABEL_OFFSET_Y = 24.0f * uiScale * invS;
-    const qreal topLabelY = qMin(leftMorphoBody.top(), rightMorphoBody.top()) - LABEL_OFFSET_Y;
-    const qreal bottomLabelY = qMax(leftArduinoBody.bottom(), rightArduinoBody.bottom()) + connFm.ascent() + LABEL_OFFSET_Y;
-    const QList<const PinDesc*> leftInnerMorphoPins = collectPins([&](const PinDesc &candidate) {
+    layout.leftOuterOverlayX = layout.leftMorphoTextRight - layout.columnWidths.leftMorphoWidth - metrics.overlayGap - metrics.iconSize;
+    layout.leftInnerOverlayX = layout.leftArduinoTextX + layout.columnWidths.leftArduinoWidth + metrics.overlayGap;
+    layout.rightInnerOverlayX = layout.rightArduinoTextRight - layout.columnWidths.rightArduinoWidth - metrics.overlayGap - metrics.iconSize;
+    layout.rightOuterOverlayX = layout.rightMorphoTextX + layout.columnWidths.rightMorphoWidth + metrics.overlayGap;
+    layout.leftInnerMorphoTextX = layout.leftPortTextX;
+    layout.rightInnerMorphoTextRight = layout.rightPortTextRight;
+
+    const qreal labelOffsetY = 24.0f * metrics.uiScale * metrics.invS;
+    layout.topLabelY = qMin(layout.leftMorphoBody.top(), layout.rightMorphoBody.top()) - labelOffsetY;
+    layout.bottomLabelY = qMax(layout.leftArduinoBody.bottom(), layout.rightArduinoBody.bottom())
+                          + metrics.connectorFm.ascent() + labelOffsetY;
+
+    layout.leftInnerMorphoPins = collectPins([&](const PinDesc &candidate) {
         return candidate.connectorId == "CN7" && candidate.row == 1;
     });
-    const QList<const PinDesc*> rightInnerMorphoPins = collectPins([&](const PinDesc &candidate) {
+    layout.rightInnerMorphoPins = collectPins([&](const PinDesc &candidate) {
         return candidate.connectorId == "CN10" && candidate.row == 0;
     });
-    const QList<const PinDesc*> leftArduinoPins = collectPins([&](const PinDesc &candidate) {
+    layout.leftArduinoPins = collectPins([&](const PinDesc &candidate) {
         return candidate.connectorId == "CN6" || candidate.connectorId == "CN8";
     });
-    const QList<const PinDesc*> rightArduinoPins = collectPins([&](const PinDesc &candidate) {
+    layout.rightArduinoPins = collectPins([&](const PinDesc &candidate) {
         return candidate.connectorId == "CN5" || candidate.connectorId == "CN9";
     });
-    const PinLinkMap leftInnerMorphoLinks =
-        buildMorphoLinks(leftInnerMorphoPins, leftArduinoPins);
-    const PinLinkMap rightInnerMorphoLinks =
-        buildMorphoLinks(rightInnerMorphoPins, rightArduinoPins);
 
-    const qreal leftInnerLineDeltaY = averageLinkDeltaY(leftInnerMorphoLinks);
-    const qreal rightInnerLineDeltaY = averageLinkDeltaY(rightInnerMorphoLinks);
+    layout.leftInnerMorphoLinks = buildMorphoLinks(layout.leftInnerMorphoPins, layout.leftArduinoPins);
+    layout.rightInnerMorphoLinks = buildMorphoLinks(layout.rightInnerMorphoPins, layout.rightArduinoPins);
+    layout.leftInnerLineDeltaY = averageLinkDeltaY(layout.leftInnerMorphoLinks);
+    layout.rightInnerLineDeltaY = averageLinkDeltaY(layout.rightInnerMorphoLinks);
 
-    const PinDesc *topRightUnlinkedPin = nullptr;
     for(const PinDesc &candidate : m_pins){
         if(candidate.connectorId != "CN10" || candidate.row != 0)
             continue;
-        if(rightInnerMorphoLinks.contains(&candidate))
+        if(layout.rightInnerMorphoLinks.contains(&candidate))
             continue;
-        if(!topRightUnlinkedPin || candidate.cy < topRightUnlinkedPin->cy)
-            topRightUnlinkedPin = &candidate;
+        if(!layout.topRightUnlinkedPin || candidate.cy < layout.topRightUnlinkedPin->cy)
+            layout.topRightUnlinkedPin = &candidate;
     }
 
-    const PinDesc *topRightArduinoPin = nullptr;
-    for(const PinDesc *candidate : rightArduinoPins){
+    for(const PinDesc *candidate : layout.rightArduinoPins){
         if(candidate->connectorId != "CN5")
             continue;
-        if(!topRightArduinoPin || candidate->cy < topRightArduinoPin->cy)
-            topRightArduinoPin = candidate;
+        if(!layout.topRightArduinoPin || candidate->cy < layout.topRightArduinoPin->cy)
+            layout.topRightArduinoPin = candidate;
     }
 
-    auto rightInnerUnlinkedCenterY = [&](const PinDesc &pin) {
-        if(&pin == topRightUnlinkedPin && topRightArduinoPin){
-            const ConnectorDesc *arduinoConnector = connectorById(topRightArduinoPin->connectorId,
-                                                                  connectorIndexById);
-            if(arduinoConnector)
-                return (qreal)topRightArduinoPin->cy - arduinoConnector->pitch;
-        }
-        return (qreal)pin.cy + rightInnerLineDeltaY;
-    };
-
-    auto rightInnerUnlinkedBaseline = [&](const PinDesc &pin) {
-        return rightInnerUnlinkedCenterY(pin) + (fm.ascent() - fm.descent()) / 2.0;
-    };
-
-    QFont overlayFont = labelFont;
-    overlayFont.setPixelSize(qMax(8, (int)qRound(19.0f * uiScale * invS)));
-    QFontMetricsF overlayFm(overlayFont);
-    qreal maxOverlayLabelWidth = 0.0;
-    for(const PinFunctionInfo &func : m_functions)
-        maxOverlayLabelWidth = qMax(maxOverlayLabelWidth,
-                                    overlayFm.horizontalAdvance(overlayLabelText(func.label)));
-    const qreal maxOverlayIconWidth = ICON_SIZE_V * 2.0f;
-    const qreal overlayTextGap = qMax<qreal>(3.0f * uiScale * invS,
-                                             overlayFm.horizontalAdvance(QStringLiteral("  ")));
-
-    QRectF contentBounds = leftMorphoBody.united(rightMorphoBody)
-                                       .united(leftArduinoBody)
-                                       .united(rightArduinoBody);
-    contentBounds = contentBounds.united(QRectF(leftMorphoTextRight - leftMorphoWidth,
-                                                leftMorphoBody.top() - fm.ascent(),
-                                                leftMorphoWidth,
-                                                leftMorphoBody.height() + fm.height()));
-    contentBounds = contentBounds.united(QRectF(leftPortTextX,
-                                                leftArduinoBody.top() - fm.ascent(),
-                                                leftPortWidth,
-                                                leftArduinoBody.height() + fm.height()));
-    contentBounds = contentBounds.united(QRectF(leftArduinoTextX,
-                                                leftArduinoBody.top() - fm.ascent(),
-                                                leftArduinoWidth,
-                                                leftArduinoBody.height() + fm.height()));
-    contentBounds = contentBounds.united(QRectF(rightMorphoTextX,
-                                                rightMorphoBody.top() - fm.ascent(),
-                                                rightMorphoWidth,
-                                                rightMorphoBody.height() + fm.height()));
-    contentBounds = contentBounds.united(QRectF(rightArduinoTextRight - rightArduinoWidth,
-                                                rightArduinoBody.top() - fm.ascent(),
-                                                rightArduinoWidth,
-                                                rightArduinoBody.height() + fm.height()));
-    contentBounds = contentBounds.united(QRectF(rightPortTextRight - rightPortWidth,
-                                                rightArduinoBody.top() - fm.ascent(),
-                                                rightPortWidth,
-                                                rightArduinoBody.height() + fm.height()));
-    contentBounds = contentBounds.united(QRectF(leftOuterOverlayX - maxOverlayLabelWidth - overlayTextGap,
-                                                leftMorphoBody.top() - overlayFm.ascent(),
-                                                maxOverlayLabelWidth + overlayTextGap + maxOverlayIconWidth,
-                                                leftMorphoBody.height() + overlayFm.height()));
-    contentBounds = contentBounds.united(QRectF(leftInnerOverlayX,
-                                                leftArduinoBody.top() - overlayFm.ascent(),
-                                                maxOverlayIconWidth + overlayTextGap + maxOverlayLabelWidth,
-                                                leftArduinoBody.height() + overlayFm.height()));
-    contentBounds = contentBounds.united(QRectF(rightInnerOverlayX - maxOverlayLabelWidth - overlayTextGap,
-                                                rightArduinoBody.top() - overlayFm.ascent(),
-                                                maxOverlayLabelWidth + overlayTextGap + maxOverlayIconWidth,
-                                                rightArduinoBody.height() + overlayFm.height()));
-    contentBounds = contentBounds.united(QRectF(rightOuterOverlayX,
-                                                rightMorphoBody.top() - overlayFm.ascent(),
-                                                maxOverlayIconWidth + overlayTextGap + maxOverlayLabelWidth,
-                                                rightMorphoBody.height() + overlayFm.height()));
-    for(const ConnectorDesc &c : m_connectors){
-        const QRectF body = connectorBodies.value(c.id);
-        const qreal tw = connFm.horizontalAdvance(c.label);
-        const qreal tx = body.center().x() - tw / 2.0;
-        const qreal ty = (c.id == "CN8" || c.id == "CN9") ? bottomLabelY : topLabelY;
-        contentBounds = contentBounds.united(QRectF(tx,
-                                                    ty - connFm.ascent(),
-                                                    tw,
-                                                    connFm.height()));
-    }
-    if(topRightUnlinkedPin){
-        const qreal topRightTextWidth = fm.horizontalAdvance(topRightUnlinkedPin->port);
-        const qreal topRightBaseline = rightInnerUnlinkedBaseline(*topRightUnlinkedPin);
-        contentBounds = contentBounds.united(QRectF(rightInnerMorphoTextRight - topRightTextWidth,
-                                                    topRightBaseline - fm.ascent(),
-                                                    topRightTextWidth,
-                                                    fm.height()));
-    }
-    if(topRightArduinoPin){
-        const ConnectorDesc *arduinoConnector = connectorById(topRightArduinoPin->connectorId,
+    if(layout.topRightUnlinkedPin && layout.topRightArduinoPin){
+        const ConnectorDesc *arduinoConnector = connectorById(layout.topRightArduinoPin->connectorId,
                                                               connectorIndexById);
         if(arduinoConnector){
-            const qreal virtualY = (qreal)topRightArduinoPin->cy - arduinoConnector->pitch;
-            contentBounds = contentBounds.united(QRectF(rightArduinoBody.left(),
-                                                        virtualY,
-                                                        rightArduinoBody.width(),
-                                                        rightArduinoBody.top() - virtualY));
+            layout.hasTopRightVirtualY = true;
+            layout.topRightVirtualY = (qreal)layout.topRightArduinoPin->cy - arduinoConnector->pitch;
         }
     }
-    contentBounds.adjust(0.0, 0.0, OUTER_TEXT_GAP, 0.0);
 
-    p.setTransform(fitTransform(contentBounds, 8.0));
+    qreal maxOverlayLabelWidth = 0.0;
+    if(DISPLAY_PINOUT_CHANNEL){
+        for(const PinFunctionInfo &function : m_functionMap.functions()){
+            maxOverlayLabelWidth = qMax(maxOverlayLabelWidth,
+                                        metrics.overlayFm.horizontalAdvance(overlayLabelText(function.label)));
+        }
+    }
+
+    const qreal minOverlayLabelWidth = metrics.overlayFm.horizontalAdvance(QStringLiteral("Ref"));
+    layout.maxOverlayIconWidth = metrics.iconSize * 2.0f;
+    layout.overlayTextGap = qMax<qreal>(OVERLAY_TEXT_GAP_MIN_PX * metrics.uiScale * metrics.invS,
+                                        metrics.overlayFm.horizontalAdvance(QString(OVERLAY_TEXT_GAP_SPACES,
+                                                                                     QLatin1Char(' '))));
+    layout.reservedOverlayLabelWidth = DISPLAY_PINOUT_CHANNEL
+                                       ? qMax(maxOverlayLabelWidth, minOverlayLabelWidth)
+                                       : 0.0;
+    layout.reservedOverlayTextGap = DISPLAY_PINOUT_CHANNEL ? layout.overlayTextGap : 0.0;
+
+    layout.contentBounds = layout.leftMorphoBody.united(layout.rightMorphoBody)
+                                            .united(layout.leftArduinoBody)
+                                            .united(layout.rightArduinoBody);
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.leftMorphoTextRight - layout.columnWidths.leftMorphoWidth,
+                                                              layout.leftMorphoBody.top() - metrics.labelFm.ascent(),
+                                                              layout.columnWidths.leftMorphoWidth,
+                                                              layout.leftMorphoBody.height() + metrics.labelFm.height()));
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.leftPortTextX,
+                                                              layout.leftArduinoBody.top() - metrics.labelFm.ascent(),
+                                                              layout.columnWidths.leftPortWidth,
+                                                              layout.leftArduinoBody.height() + metrics.labelFm.height()));
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.leftArduinoTextX,
+                                                              layout.leftArduinoBody.top() - metrics.labelFm.ascent(),
+                                                              layout.columnWidths.leftArduinoWidth,
+                                                              layout.leftArduinoBody.height() + metrics.labelFm.height()));
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.rightMorphoTextX,
+                                                              layout.rightMorphoBody.top() - metrics.labelFm.ascent(),
+                                                              layout.columnWidths.rightMorphoWidth,
+                                                              layout.rightMorphoBody.height() + metrics.labelFm.height()));
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.rightArduinoTextRight - layout.columnWidths.rightArduinoWidth,
+                                                              layout.rightArduinoBody.top() - metrics.labelFm.ascent(),
+                                                              layout.columnWidths.rightArduinoWidth,
+                                                              layout.rightArduinoBody.height() + metrics.labelFm.height()));
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.rightPortTextRight - layout.columnWidths.rightPortWidth,
+                                                              layout.rightArduinoBody.top() - metrics.labelFm.ascent(),
+                                                              layout.columnWidths.rightPortWidth,
+                                                              layout.rightArduinoBody.height() + metrics.labelFm.height()));
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.leftOuterOverlayX - layout.reservedOverlayLabelWidth - layout.reservedOverlayTextGap,
+                                                              layout.leftMorphoBody.top() - metrics.overlayFm.ascent(),
+                                                              layout.reservedOverlayLabelWidth + layout.reservedOverlayTextGap + layout.maxOverlayIconWidth,
+                                                              layout.leftMorphoBody.height() + metrics.overlayFm.height()));
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.leftInnerOverlayX,
+                                                              layout.leftArduinoBody.top() - metrics.overlayFm.ascent(),
+                                                              layout.maxOverlayIconWidth + layout.reservedOverlayTextGap + layout.reservedOverlayLabelWidth,
+                                                              layout.leftArduinoBody.height() + metrics.overlayFm.height()));
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.rightInnerOverlayX - layout.reservedOverlayLabelWidth - layout.reservedOverlayTextGap,
+                                                              layout.rightArduinoBody.top() - metrics.overlayFm.ascent(),
+                                                              layout.reservedOverlayLabelWidth + layout.reservedOverlayTextGap + layout.maxOverlayIconWidth,
+                                                              layout.rightArduinoBody.height() + metrics.overlayFm.height()));
+    layout.contentBounds = layout.contentBounds.united(QRectF(layout.rightOuterOverlayX,
+                                                              layout.rightMorphoBody.top() - metrics.overlayFm.ascent(),
+                                                              layout.maxOverlayIconWidth + layout.reservedOverlayTextGap + layout.reservedOverlayLabelWidth,
+                                                              layout.rightMorphoBody.height() + metrics.overlayFm.height()));
+
+    for(const ConnectorDesc &connector : m_connectors){
+        const QRectF body = layout.connectorBodies.value(connector.id);
+        const qreal textWidth = metrics.connectorFm.horizontalAdvance(connector.label);
+        const qreal textX = body.center().x() - textWidth / 2.0;
+        const qreal textY = (connector.id == "CN8" || connector.id == "CN9")
+                            ? layout.bottomLabelY
+                            : layout.topLabelY;
+        layout.contentBounds = layout.contentBounds.united(QRectF(textX,
+                                                                  textY - metrics.connectorFm.ascent(),
+                                                                  textWidth,
+                                                                  metrics.connectorFm.height()));
+    }
+
+    if(layout.topRightUnlinkedPin){
+        const qreal topRightTextWidth = metrics.labelFm.horizontalAdvance(layout.topRightUnlinkedPin->port);
+        const qreal topRightBaseline = rightInnerUnlinkedBaseline(layout,
+                                                                  metrics.labelFm,
+                                                                  *layout.topRightUnlinkedPin);
+        layout.contentBounds = layout.contentBounds.united(QRectF(layout.rightInnerMorphoTextRight - topRightTextWidth,
+                                                                  topRightBaseline - metrics.labelFm.ascent(),
+                                                                  topRightTextWidth,
+                                                                  metrics.labelFm.height()));
+    }
+
+    if(layout.hasTopRightVirtualY){
+        layout.contentBounds = layout.contentBounds.united(QRectF(layout.rightArduinoBody.left(),
+                                                                  layout.topRightVirtualY,
+                                                                  layout.rightArduinoBody.width(),
+                                                                  layout.rightArduinoBody.top() - layout.topRightVirtualY));
+    }
+
+    layout.contentBounds.adjust(0.0, 0.0, metrics.outerTextGap, 0.0);
+    return layout;
+}
+
+// --------------------------------------------------------------------------
+QColor PinoutWidget::connectorColor(const QString &connectorId) const
+{
+    if(connectorId == "CN7" || connectorId == "CN10")
+        return QColor(24, 32, 230);
+    return QColor(235, 0, 220);
+}
+
+// --------------------------------------------------------------------------
+qreal PinoutWidget::pinLabelBaseline(const QFontMetricsF &fontMetrics, qreal centerY) const
+{
+    return centerY + (fontMetrics.ascent() - fontMetrics.descent()) / 2.0;
+}
+
+// --------------------------------------------------------------------------
+qreal PinoutWidget::rightInnerUnlinkedCenterY(const LayoutState &layout, const PinDesc &pin) const
+{
+    if(&pin == layout.topRightUnlinkedPin && layout.hasTopRightVirtualY)
+        return layout.topRightVirtualY;
+    return (qreal)pin.cy + layout.rightInnerLineDeltaY;
+}
+
+// --------------------------------------------------------------------------
+qreal PinoutWidget::rightInnerUnlinkedBaseline(const LayoutState &layout,
+                                               const QFontMetricsF &fontMetrics,
+                                               const PinDesc &pin) const
+{
+    return pinLabelBaseline(fontMetrics, rightInnerUnlinkedCenterY(layout, pin));
+}
+
+// --------------------------------------------------------------------------
+void PinoutWidget::drawFunctionOverlay(QPainter &p,
+                                       const PaintColors &colors,
+                                       const PaintMetrics &metrics,
+                                       const LayoutState &layout,
+                                       const PinDesc &pin,
+                                       const PinFunctionInfo &function) const
+{
+    const bool isLeftMorpho = (pin.connectorId == "CN7");
+    const bool isRightMorpho = (pin.connectorId == "CN10");
+    const bool isLeftArduino = (pin.connectorId == "CN6" || pin.connectorId == "CN8");
+
+    const QString iconKey = function.moduleName;
+    const QString overlayLabel = DISPLAY_PINOUT_CHANNEL ? overlayLabelText(function.label)
+                                                        : QString();
+    if(!m_iconCache.contains(iconKey)){
+        const QString iconPath = Graphics::getCommonPath() + "icon_" + iconKey + ".png";
+        QPixmap src = Graphics::tintedPixmap(iconPath, colors.activeFunctionColor);
+        m_iconCache.insert(iconKey, src);
+    }
+
+    const QPixmap &icon = m_iconCache.value(iconKey);
+    qreal overlayCenterY = pin.cy;
+    if(isLeftMorpho && pin.row == 1 && !layout.leftInnerMorphoLinks.contains(&pin))
+        overlayCenterY += layout.leftInnerLineDeltaY;
+    else if(isRightMorpho && pin.row == 0 && !layout.rightInnerMorphoLinks.contains(&pin))
+        overlayCenterY = rightInnerUnlinkedCenterY(layout, pin);
+
+    bool overlayRight = true;
+    qreal iconX = 0.0;
+    if(isLeftMorpho){
+        if(pin.row == 0){
+            overlayRight = false;
+            iconX = layout.leftOuterOverlayX;
+        } else {
+            iconX = layout.leftInnerOverlayX;
+        }
+    } else if(isRightMorpho){
+        if(pin.row == 1){
+            iconX = layout.rightOuterOverlayX;
+        } else {
+            overlayRight = false;
+            iconX = layout.rightInnerOverlayX;
+        }
+    } else if(isLeftArduino){
+        iconX = layout.leftInnerOverlayX;
+    } else {
+        overlayRight = false;
+        iconX = layout.rightInnerOverlayX;
+    }
+
+    const qreal iconY = overlayCenterY - metrics.iconSize / 2.0f;
+    const qreal iconWidth = icon.isNull()
+                            ? metrics.iconSize
+                            : metrics.iconSize * ((qreal)icon.width() / icon.height());
+    if(metrics.showFunctionIcons && !icon.isNull()){
+        p.drawPixmap(QRectF(iconX, iconY, iconWidth, metrics.iconSize),
+                     icon,
+                     QRectF(0.0, 0.0, icon.width(), icon.height()));
+    }
+
+    if(metrics.showFunctionLabels){
+        p.setFont(metrics.overlayFont);
+        p.setPen(colors.activeFunctionColor);
+        const qreal textBaseY = pinLabelBaseline(metrics.overlayFm, overlayCenterY);
+        if(overlayRight){
+            p.drawText(QPointF(iconX + iconWidth + layout.overlayTextGap, textBaseY), overlayLabel);
+        } else {
+            const qreal labelWidth = metrics.overlayFm.horizontalAdvance(overlayLabel);
+            p.drawText(QPointF(iconX - layout.overlayTextGap - labelWidth, textBaseY), overlayLabel);
+        }
+        p.setFont(metrics.labelFont);
+    }
+}
+
+// --------------------------------------------------------------------------
+void PinoutWidget::drawConnectorLabels(QPainter &p,
+                                       const PaintColors &colors,
+                                       const PaintMetrics &metrics,
+                                       const LayoutState &layout) const
+{
+    p.setFont(metrics.connectorFont);
+    for(const ConnectorDesc &connector : m_connectors){
+        if(!layout.connectorBodies.contains(connector.id))
+            continue;
+
+        const QRectF body = layout.connectorBodies.value(connector.id);
+        const qreal textWidth = metrics.connectorFm.horizontalAdvance(connector.label);
+        const qreal textX = body.center().x() - textWidth / 2.0;
+        const bool isArduino = (connector.id == "CN6" || connector.id == "CN8"
+                                || connector.id == "CN5" || connector.id == "CN9");
+        const qreal textY = (connector.id == "CN8" || connector.id == "CN9")
+                            ? layout.bottomLabelY
+                            : layout.topLabelY;
+
+        p.setPen(isArduino ? colors.arduinoLabelColor : colors.portLabelColor.darker(120));
+        p.drawText(QPointF(textX, textY), connector.label);
+    }
+}
+
+void PinoutWidget::paintEvent(QPaintEvent *)
+{
+    const PaintColors colors = buildPaintColors();
+
+    QPainter p(this);
+    if(m_connectors.isEmpty()){
+        p.fillRect(rect(), colors.bgColor);
+        return;
+    }
+
+    p.setRenderHint(QPainter::Antialiasing);
+    p.setRenderHint(QPainter::TextAntialiasing);
+
+    p.fillRect(rect(), colors.bgColor);
+
+    const PaintMetrics metrics = buildPaintMetrics(p.font());
+    if(metrics.canvasScale <= 0.0f)
+        return;
+
+    p.setFont(metrics.labelFont);
+    const QFontMetricsF &fm = metrics.labelFm;
+    const QFontMetricsF &pinNoFm = metrics.pinNumberFm;
+
+    const QHash<QString, int> connectorIndexById = buildConnectorIndex();
+
+    const LayoutState layout = buildLayoutState(metrics, connectorIndexById);
+    p.setTransform(fitTransform(layout.contentBounds, 8.0));
 
     auto drawLeftColumnText = [&](const QString &txt, qreal x, qreal baselineY, const QColor &col) {
         if(txt.isEmpty())
@@ -730,7 +740,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
         if(!connector)
             continue;
 
-        const float padW = padSideFor(*connector, invS);
+        const float padW = padSideFor(*connector, metrics.invS);
         const float padH = padW;
         const bool isSingleRow = (connector->rows == 1);
         const bool isLeftArduino = (pin.connectorId == "CN6" || pin.connectorId == "CN8");
@@ -738,73 +748,51 @@ void PinoutWidget::paintEvent(QPaintEvent *)
         const bool isLeftMorpho = (pin.connectorId == "CN7");
         const bool isRightMorpho = (pin.connectorId == "CN10");
         const bool isLinkedMorphoDuplicate =
-            (isLeftMorpho && pin.row == 1 && leftInnerMorphoLinks.contains(&pin)) ||
-            (isRightMorpho && pin.row == 0 && rightInnerMorphoLinks.contains(&pin));
+            (isLeftMorpho && pin.row == 1 && layout.leftInnerMorphoLinks.contains(&pin)) ||
+            (isRightMorpho && pin.row == 0 && layout.rightInnerMorphoLinks.contains(&pin));
 
-        const PinFunctionInfo *func = pinFunction(pin.port, pin.arduino);
-    const bool hasActiveFunction = pinHasActiveModule(pin.port, pin.arduino);
-        const bool isPwr = isPowerPin(pin.port) || isPowerPin(pin.arduino);
-
-        // Choose dot colour
-        QColor dotColor;
-        if(func){
-            dotColor = QColor(Graphics::getChannelColor(0));  // will refine per-module below
-        } else if(isPwr){
-            dotColor = pinPowerColor;
-        } else {
-            dotColor = pinFreeColor;
-        }
-
-        // Per-module channel colour
-        if(func){
-            // Map module name to a channel index for colour variety
-            const QString &mn = func->moduleName;
-            int chIdx = 0;
-            if(mn == "scope")             chIdx = 0;
-            else if(mn == "counter")      chIdx = 1;
-            else if(mn == "signal_generator" || mn == "pwm_gen") chIdx = 2;
-            else if(mn == "pattern_generator") chIdx = 3;
-            else if(mn == "syncpwm")      chIdx = 4;
-            dotColor = QColor(Graphics::getChannelColor(chIdx));
-        }
+        const PinFunctionInfo *func = m_functionMap.pinFunction(pin.port, pin.arduino);
+        const bool hasActiveFunction = (func != nullptr);
 
         // Draw the official-style connector lines first so the pads can sit on top.
-        p.setPen(QPen(stubColor, 3.0f * uiScale * invS, Qt::SolidLine, Qt::RoundCap));
+        p.setPen(QPen(colors.stubColor, 3.0f * metrics.uiScale * metrics.invS, Qt::SolidLine, Qt::RoundCap));
 
         if(!isSingleRow){
             if(isLeftMorpho && pin.row == 0){
-                p.drawLine(QPointF(pin.cx - padW / 2.0f - STUB_START_GAP, pin.cy),
-                           QPointF(pin.cx - padW / 2.0f - STUB_START_GAP - OUTER_STUB_LEN, pin.cy));
+                p.drawLine(QPointF(pin.cx - padW / 2.0f - metrics.stubStartGap, pin.cy),
+                           QPointF(pin.cx - padW / 2.0f - metrics.stubStartGap - metrics.outerStubLen, pin.cy));
             } else if(isRightMorpho && pin.row == 1){
-                p.drawLine(QPointF(pin.cx + padW / 2.0f + STUB_START_GAP, pin.cy),
-                           QPointF(pin.cx + padW / 2.0f + STUB_START_GAP + OUTER_STUB_LEN, pin.cy));
+                p.drawLine(QPointF(pin.cx + padW / 2.0f + metrics.stubStartGap, pin.cy),
+                           QPointF(pin.cx + padW / 2.0f + metrics.stubStartGap + metrics.outerStubLen, pin.cy));
             } else if(isLeftMorpho){
-                const PinDesc *arduinoPin = leftInnerMorphoLinks.value(&pin, nullptr);
+                const PinDesc *arduinoPin = layout.leftInnerMorphoLinks.value(&pin, nullptr);
                 if(arduinoPin){
                     const ConnectorDesc *arduinoConnector = connectorById(arduinoPin->connectorId, connectorIndexById);
-                    const float arduinoPadW = arduinoConnector ? padSideFor(*arduinoConnector, invS) : 24.0f * invS;
-                    p.drawLine(QPointF(pin.cx + padW / 2.0f + STUB_START_GAP, pin.cy),
-                               QPointF(arduinoPin->cx - arduinoPadW / 2.0f - STUB_START_GAP, arduinoPin->cy));
+                    const float arduinoPadW = arduinoConnector ? padSideFor(*arduinoConnector, metrics.invS) : 24.0f * metrics.invS;
+                    p.drawLine(QPointF(pin.cx + padW / 2.0f + metrics.stubStartGap, pin.cy),
+                               QPointF(arduinoPin->cx - arduinoPadW / 2.0f - metrics.stubStartGap, arduinoPin->cy));
                 } else {
-                    p.drawLine(QPointF(pin.cx + padW / 2.0f + STUB_START_GAP, pin.cy),
-                               QPointF(leftPortTextX - INNER_TEXT_GAP, pin.cy + leftInnerLineDeltaY));
+                    p.drawLine(QPointF(pin.cx + padW / 2.0f + metrics.stubStartGap, pin.cy),
+                               QPointF(layout.leftPortTextX - metrics.innerTextGap,
+                                       pin.cy + layout.leftInnerLineDeltaY));
                 }
             } else if(isRightMorpho){
-                const PinDesc *arduinoPin = rightInnerMorphoLinks.value(&pin, nullptr);
+                const PinDesc *arduinoPin = layout.rightInnerMorphoLinks.value(&pin, nullptr);
                 if(arduinoPin){
                     const ConnectorDesc *arduinoConnector = connectorById(arduinoPin->connectorId, connectorIndexById);
-                    const float arduinoPadW = arduinoConnector ? padSideFor(*arduinoConnector, invS) : 24.0f * invS;
-                    p.drawLine(QPointF(arduinoPin->cx + arduinoPadW / 2.0f + STUB_START_GAP, arduinoPin->cy),
-                               QPointF(pin.cx - padW / 2.0f - STUB_START_GAP, pin.cy));
+                    const float arduinoPadW = arduinoConnector ? padSideFor(*arduinoConnector, metrics.invS) : 24.0f * metrics.invS;
+                    p.drawLine(QPointF(arduinoPin->cx + arduinoPadW / 2.0f + metrics.stubStartGap, arduinoPin->cy),
+                               QPointF(pin.cx - padW / 2.0f - metrics.stubStartGap, pin.cy));
                 } else {
-                    const QPointF pinPoint(pin.cx - padW / 2.0f - STUB_START_GAP, pin.cy);
-                    const qreal targetY = rightInnerUnlinkedCenterY(pin);
-                    const qreal lineEndX = rightInnerMorphoTextRight + OUTER_TEXT_GAP;
-                    if(&pin == topRightUnlinkedPin && topRightArduinoPin){
-                        const ConnectorDesc *arduinoConnector = connectorById(topRightArduinoPin->connectorId, connectorIndexById);
+                    const QPointF pinPoint(pin.cx - padW / 2.0f - metrics.stubStartGap, pin.cy);
+                    const qreal targetY = rightInnerUnlinkedCenterY(layout, pin);
+                    const qreal lineEndX = layout.rightInnerMorphoTextRight + metrics.outerTextGap;
+                    if(&pin == layout.topRightUnlinkedPin && layout.topRightArduinoPin && layout.hasTopRightVirtualY){
+                        const ConnectorDesc *arduinoConnector = connectorById(layout.topRightArduinoPin->connectorId,
+                                                                              connectorIndexById);
                         if(arduinoConnector){
-                            const float arduinoPadW = padSideFor(*arduinoConnector, invS);
-                            const QPointF bendPoint(topRightArduinoPin->cx + arduinoPadW / 2.0f + STUB_START_GAP,
+                            const float arduinoPadW = padSideFor(*arduinoConnector, metrics.invS);
+                            const QPointF bendPoint(layout.topRightArduinoPin->cx + arduinoPadW / 2.0f + metrics.stubStartGap,
                                                     targetY);
                             const QPointF textPoint(lineEndX, targetY);
                             p.drawLine(pinPoint, bendPoint);
@@ -825,10 +813,10 @@ void PinoutWidget::paintEvent(QPaintEvent *)
         }
 
         // Draw numbered rectangular pin pad.
-        const QColor padFill = hasActiveFunction ? activeFunctionColor : connectorColor(pin.connectorId);
+        const QColor padFill = hasActiveFunction ? colors.activeFunctionColor : connectorColor(pin.connectorId);
         const QRectF pinRect(pin.cx - padW / 2.0f, pin.cy - padH / 2.0f, padW, padH);
         p.setBrush(padFill);
-        p.setPen(QPen(boxOutlineColor, 1.3f * invS));
+        p.setPen(QPen(colors.boxOutlineColor, 1.3f * metrics.invS));
         p.drawRect(pinRect);
 
         int pinNo = 0;
@@ -839,130 +827,45 @@ void PinoutWidget::paintEvent(QPaintEvent *)
         else
             pinNo = pin.index + 1;
 
-        p.setFont(pinNumberFont);
+        p.setFont(metrics.pinNumberFont);
         p.setPen(QColor(245, 245, 245));
         const QString pinNoTxt = QString::number(pinNo);
         const qreal noW = pinNoFm.horizontalAdvance(pinNoTxt);
         const qreal noX = pin.cx - noW / 2.0;
-        const qreal noY = pin.cy + (pinNoFm.ascent() - pinNoFm.descent()) / 2.0;
+        const qreal noY = pinLabelBaseline(pinNoFm, pin.cy);
         p.drawText(QPointF(noX, noY), pinNoTxt);
-        p.setFont(labelFont);
+        p.setFont(metrics.labelFont);
 
         // --- Labels ---------------------------------------------------------
-        const float centerBaseline = pin.cy + (fm.ascent() - fm.descent()) / 2.0f;
+        const qreal centerBaseline = pinLabelBaseline(fm, pin.cy);
 
         if(!isSingleRow){
             if(isLeftMorpho && pin.row == 0)
-                drawRightColumnText(pin.port, leftMorphoTextRight, centerBaseline, portLabelColor);
-            else if(isLeftMorpho && !leftInnerMorphoLinks.contains(&pin))
-                drawLeftColumnText(pin.port, leftInnerMorphoTextX, centerBaseline + leftInnerLineDeltaY, portLabelColor);
+                drawRightColumnText(pin.port, layout.leftMorphoTextRight, centerBaseline, colors.portLabelColor);
+            else if(isLeftMorpho && !layout.leftInnerMorphoLinks.contains(&pin))
+                drawLeftColumnText(pin.port,
+                                   layout.leftInnerMorphoTextX,
+                                   centerBaseline + layout.leftInnerLineDeltaY,
+                                   colors.portLabelColor);
             else if(isRightMorpho && pin.row == 1)
-                drawLeftColumnText(pin.port, rightMorphoTextX, centerBaseline, portLabelColor);
-            else if(isRightMorpho && !rightInnerMorphoLinks.contains(&pin))
-                drawRightColumnText(pin.port, rightInnerMorphoTextRight, rightInnerUnlinkedBaseline(pin), portLabelColor);
+                drawLeftColumnText(pin.port, layout.rightMorphoTextX, centerBaseline, colors.portLabelColor);
+            else if(isRightMorpho && !layout.rightInnerMorphoLinks.contains(&pin))
+                drawRightColumnText(pin.port,
+                                    layout.rightInnerMorphoTextRight,
+                                    rightInnerUnlinkedBaseline(layout, fm, pin),
+                                    colors.portLabelColor);
         } else if(isLeftArduino){
-            drawLeftColumnText(pin.port, leftPortTextX, centerBaseline, portLabelColor);
-            drawLeftColumnText(pin.arduino, leftArduinoTextX, centerBaseline, arduinoLabelColor);
+            drawLeftColumnText(pin.port, layout.leftPortTextX, centerBaseline, colors.portLabelColor);
+            drawLeftColumnText(pin.arduino, layout.leftArduinoTextX, centerBaseline, colors.arduinoLabelColor);
         } else if(isRightArduino){
-            drawRightColumnText(pin.arduino, rightArduinoTextRight, centerBaseline, arduinoLabelColor);
-            drawRightColumnText(pin.port, rightPortTextRight, centerBaseline, portLabelColor);
+            drawRightColumnText(pin.arduino, layout.rightArduinoTextRight, centerBaseline, colors.arduinoLabelColor);
+            drawRightColumnText(pin.port, layout.rightPortTextRight, centerBaseline, colors.portLabelColor);
         }
 
         // --- Function overlay icon + channel label --------------------------
-        if(func && !isLinkedMorphoDuplicate){
-            const QString iconKey = func->moduleName;
-            const QString overlayLabel = overlayLabelText(func->label);
-            if(!m_iconCache.contains(iconKey)){
-                const QString iconPath = Graphics::getCommonPath() + "icon_" + iconKey + ".png";
-                QPixmap src = Graphics::tintedPixmap(iconPath, activeFunctionColor);
-                if(!src.isNull()){
-                    m_iconCache.insert(iconKey, src);
-                } else {
-                    m_iconCache.insert(iconKey, QPixmap());
-                }
-            }
-            const QPixmap &ico = m_iconCache.value(iconKey);
-            qreal overlayCenterY = pin.cy;
-            if(isLeftMorpho && pin.row == 1 && !leftInnerMorphoLinks.contains(&pin))
-                overlayCenterY += leftInnerLineDeltaY;
-            else if(isRightMorpho && pin.row == 0 && !rightInnerMorphoLinks.contains(&pin))
-                overlayCenterY = rightInnerUnlinkedCenterY(pin);
-
-            // Keep overlays on the same side as the visible label columns.
-            bool overlayRight = true;
-            float iconX = 0.0f;
-            if(isLeftMorpho){
-                if(pin.row == 0){
-                    overlayRight = false;
-                    iconX = leftOuterOverlayX;
-                } else {
-                    overlayRight = true;
-                    iconX = leftInnerOverlayX;
-                }
-            } else if(isRightMorpho){
-                if(pin.row == 1){
-                    overlayRight = true;
-                    iconX = rightOuterOverlayX;
-                } else {
-                    overlayRight = false;
-                    iconX = rightInnerOverlayX;
-                }
-            } else if(isLeftArduino){
-                overlayRight = true;
-                iconX = leftInnerOverlayX;
-            } else {
-                overlayRight = false;
-                iconX = rightInnerOverlayX;
-            }
-
-            const float iconY = overlayCenterY - ICON_SIZE_V / 2.0f;
-            if(showFunctionIcons && !ico.isNull()){
-                // Draw icon maintaining ratio
-                float iconW = ICON_SIZE_V * ((float)ico.width() / ico.height());
-                p.drawPixmap(QRectF(iconX, iconY, iconW, ICON_SIZE_V),
-                             ico,
-                             QRectF(0.0, 0.0, ico.width(), ico.height()));
-            }
-
-            // Channel label next to icon.
-            if(showFunctionLabels){
-                p.setFont(overlayFont);
-                p.setPen(activeFunctionColor);
-                QFontMetricsF smFm(overlayFont);
-                const float textBaseY = overlayCenterY + (smFm.ascent() - smFm.descent()) / 2.0f;
-                float iconW = ico.isNull() ? ICON_SIZE_V : ICON_SIZE_V * ((float)ico.width() / ico.height());
-                if(overlayRight){
-                    const float textX = iconX + iconW + overlayTextGap;
-                    p.drawText(QPointF(textX, textBaseY), overlayLabel);
-                } else {
-                    const qreal lw = smFm.horizontalAdvance(overlayLabel);
-                    const float textX = iconX - overlayTextGap - lw;
-                    p.drawText(QPointF(textX, textBaseY), overlayLabel);
-                }
-            }
-            p.setFont(labelFont);
-        }
+        if(func && !isLinkedMorphoDuplicate)
+            drawFunctionOverlay(p, colors, metrics, layout, pin, *func);
     }
 
-    // Draw connector labels as the top-most layer so they stay clear on resize.
-    p.setFont(connFont);
-    for(const ConnectorDesc &c : m_connectors){
-        if(!connectorBodies.contains(c.id))
-            continue;
-        const QRectF body = connectorBodies.value(c.id);
-        const qreal tw = connFm.horizontalAdvance(c.label);
-        const qreal tx = body.center().x() - tw / 2.0;
-
-        const bool isArduino = (c.id == "CN6" || c.id == "CN8" || c.id == "CN5" || c.id == "CN9");
-        p.setPen(isArduino ? arduinoLabelColor : portLabelColor.darker(120));
-        
-        qreal ty;
-        if(c.id == "CN8" || c.id == "CN9"){
-            ty = bottomLabelY;
-        } else {
-            ty = topLabelY;
-        }
-        
-        p.drawText(QPointF(tx, ty), c.label);
-    }
+    drawConnectorLabels(p, colors, metrics, layout);
 }

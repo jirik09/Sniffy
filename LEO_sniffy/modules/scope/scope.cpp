@@ -292,6 +292,7 @@ void Scope::updateResolution(int resolution)
 void Scope::updateChannelsEnable(int buttonStatus){
     scpWindow->showDataTraces(scopeData,config->timeBase,config->triggerChannelIndex);
     timeAndMemoryHandle->setNumOfChannels(fmax(log2(buttonStatus),0)+1);
+    notifyActivePinFunctionsChanged();
 }
 
 void Scope::addMeasurement(Measurement *m){
@@ -340,6 +341,18 @@ void Scope::buildModuleDescription(ScopeSpec *spec)
         }
     }
     showModulePinFunctions(name, pinFuncs);
+}
+
+QList<PinFunctionInfo> Scope::activePinFunctions() const
+{
+    QList<PinFunctionInfo> activeFunctions;
+    const int channelMask = scpWindow ? scpWindow->enabledChannelMask() : 0;
+    const QList<PinFunctionInfo> &functions = reportedPinFunctions();
+    for(int channelIndex = 0; channelIndex < functions.size() && channelIndex < MAX_SCOPE_CHANNELS; ++channelIndex){
+        if(channelMask & (1 << channelIndex))
+            activeFunctions.append(functions.at(channelIndex));
+    }
+    return activeFunctions;
 }
 
 void Scope::updateMeasurement(QList<Measurement*> m){

@@ -10,7 +10,8 @@
 // `label` is the channel label displayed on the pinout (e.g. "CH1", "PWM CH2").
 // `moduleName` must match the icon filename convention: icon_<moduleName>.png
 //   Known values: "scope", "counter", "signal_generator", "pwm_gen",
-//                 "pattern_generator", "syncpwm"
+//                 "pattern_generator", "syncpwm", "voltmeter",
+//                 "voltage_source"
 struct PinFunctionInfo {
     QString pin;
     QString label;

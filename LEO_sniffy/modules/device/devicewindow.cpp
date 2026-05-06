@@ -75,13 +75,10 @@ void DeviceWindow::showSpecification(DeviceSpec *spec){
     ui->widget_device->setStyleSheet("image: url(" + boardImg + ");");
     currentDeviceBaseImage = baseName;
     showingPinout = false;
-    allPinFunctions.clear();
-    pinFunctionModulesByDisplayName.clear();
-    activeDisplayModules.clear();
-    activePinFunctionModules.clear();
+    pinFunctionModuleOrder.clear();
+    activePinFunctionsByDisplayName.clear();
     pinoutWidget->setBoard(baseName);
     pinoutWidget->clearPinFunctions();
-    pinoutWidget->setActiveModules(activePinFunctionModules);
     pinoutWidget->hide();
 
     QList<WidgetDesciptionExpand *>::iterator it;
@@ -97,13 +94,10 @@ void DeviceWindow::hideSpecification(){
     }
     //ui->widget_device->setStyleSheet("image: none;");
     ui->widget_device->setStyleSheet("image: url("+Graphics::tintedPath(Graphics::getCommonPath()+"no_device.png")+");");
-    allPinFunctions.clear();
-    pinFunctionModulesByDisplayName.clear();
-    activeDisplayModules.clear();
-    activePinFunctionModules.clear();
+    pinFunctionModuleOrder.clear();
+    activePinFunctionsByDisplayName.clear();
     if(pinoutWidget){
         pinoutWidget->clearPinFunctions();
-        pinoutWidget->setActiveModules(activePinFunctionModules);
         pinoutWidget->hide();
     }
     showingPinout = false;
@@ -120,36 +114,26 @@ void DeviceWindow::addModuleDescription(QString name, QList<QString> labels, QLi
     descriptorsLayout->addWidget(newDesc);
 }
 
-void DeviceWindow::addModulePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins)
+void DeviceWindow::registerModulePinFunctions(const QString &moduleName,
+                                              const QList<PinFunctionInfo> &pins)
 {
-    // Accumulate all functions; update pinout if already showing
-    allPinFunctions.append(pins);
-
-    QSet<QString> functionModules;
-    for(const PinFunctionInfo &pin : pins){
-        if(!pin.moduleName.isEmpty())
-            functionModules.insert(pin.moduleName);
-    }
-    if(!functionModules.isEmpty())
-        pinFunctionModulesByDisplayName.insert(moduleName, functionModules);
-
-    rebuildActivePinFunctionModules();
-    if(pinoutWidget){
-        pinoutWidget->setPinFunctions(allPinFunctions);
-        pinoutWidget->setActiveModules(activePinFunctionModules);
-    }
+    Q_UNUSED(pins);
+    if(!pinFunctionModuleOrder.contains(moduleName))
+        pinFunctionModuleOrder.append(moduleName);
 }
 
-void DeviceWindow::setModuleActive(const QString &moduleName, bool active)
+void DeviceWindow::setModuleActivePinFunctions(const QString &moduleName,
+                                               const QList<PinFunctionInfo> &pins)
 {
-    if(active)
-        activeDisplayModules.insert(moduleName);
-    else
-        activeDisplayModules.remove(moduleName);
+    if(!pinFunctionModuleOrder.contains(moduleName))
+        pinFunctionModuleOrder.append(moduleName);
 
-    rebuildActivePinFunctionModules();
-    if(pinoutWidget)
-        pinoutWidget->setActiveModules(activePinFunctionModules);
+    if(pins.isEmpty())
+        activePinFunctionsByDisplayName.remove(moduleName);
+    else
+        activePinFunctionsByDisplayName.insert(moduleName, pins);
+
+    rebuildPinoutFunctions();
 }
 
 void DeviceWindow::clearModuleDescriptions()
@@ -171,13 +155,15 @@ void DeviceWindow::clearModuleDescriptions()
     modulesDescriptions->clear();
 }
 
-void DeviceWindow::rebuildActivePinFunctionModules()
+void DeviceWindow::rebuildPinoutFunctions()
 {
-    activePinFunctionModules.clear();
-    for(auto it = pinFunctionModulesByDisplayName.constBegin(); it != pinFunctionModulesByDisplayName.constEnd(); ++it){
-        if(activeDisplayModules.contains(it.key()))
-            activePinFunctionModules.unite(it.value());
+    QList<PinFunctionInfo> activeFunctions;
+    for(const QString &moduleName : pinFunctionModuleOrder){
+        activeFunctions.append(activePinFunctionsByDisplayName.value(moduleName));
     }
+
+    if(pinoutWidget)
+        pinoutWidget->setPinFunctions(activeFunctions);
 }
 
 bool DeviceWindow::eventFilter(QObject *watched, QEvent *event){

@@ -244,6 +244,7 @@ void AbstractModule::applyModuleStatus(ModuleStatus stat)
     moduleControlWidget->setStatus(stat);
     emit moduleActiveChanged(moduleName,
                              stat != ModuleStatus::STOP && stat != ModuleStatus::LOCKED);
+    notifyActivePinFunctionsChanged();
 }
 
 void AbstractModule::setModuleStatus(ModuleStatus stat){
@@ -283,9 +284,23 @@ void AbstractModule::showModuleDescription(QString name, QList<QString> labels, 
 
 void AbstractModule::showModulePinFunctions(const QString &modName, const QList<PinFunctionInfo> &pins)
 {
+    m_reportedPinFunctions = pins;
     if(!moduleControlWidget->isHidden() && !pins.isEmpty()){
         emit modulePinFunctions(modName, pins);
     }
+    notifyActivePinFunctionsChanged();
+}
+
+QList<PinFunctionInfo> AbstractModule::activePinFunctions() const
+{
+    return m_reportedPinFunctions;
+}
+
+void AbstractModule::notifyActivePinFunctionsChanged()
+{
+    emit moduleActivePinFunctionsChanged(moduleName,
+                                         isActive() ? activePinFunctions()
+                                                    : QList<PinFunctionInfo>());
 }
 
 void AbstractModule::showModuleWindow(){

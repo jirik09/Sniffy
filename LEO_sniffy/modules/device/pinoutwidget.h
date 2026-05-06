@@ -4,14 +4,21 @@
 #include <QWidget>
 #include <QList>
 #include <QHash>
+#include <QColor>
+#include <QFont>
+#include <QFontMetricsF>
 #include <QPixmap>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QRectF>
 #include <QRegularExpression>
-#include <QSet>
+#include <QTransform>
 #include <functional>
 
+#include "pinoutfunctionmap.h"
 #include "../pinfunctioninfo.h"
+
+class QPainter;
 
 // A data-driven vector pinout widget for STM32 NUCLEO boards.
 // Loads connector geometry from a template JSON and pin labels from a board JSON
@@ -23,11 +30,16 @@ class PinoutWidget : public QWidget
 public:
     explicit PinoutWidget(QWidget *parent = nullptr);
 
+    // Pinout overlay tuning.
+    static constexpr bool DISPLAY_PINOUT_CHANNEL = true;
+    static constexpr int OVERLAY_TEXT_GAP_SPACES = 2;
+    static constexpr float OVERLAY_TEXT_GAP_MIN_PX = 3.0f;
+    static constexpr float OVERLAY_LABEL_FONT_PX = 16.0f;
+
     // Load layout template + board pin data from QRC (e.g. "Nucleo-G474RE")
     void setBoard(const QString &boardId);
     // Update the module function overlay and repaint
     void setPinFunctions(const QList<PinFunctionInfo> &functions);
-    void setActiveModules(const QSet<QString> &activeModules);
     // Remove all function overlays and repaint
     void clearPinFunctions();
 
@@ -67,6 +79,96 @@ private:
 
     using PinLinkMap = QHash<const PinDesc*, const PinDesc*>;
 
+    struct PaintColors {
+        QColor bgColor;
+        QColor portLabelColor;
+        QColor arduinoLabelColor;
+        QColor activeFunctionColor;
+        QColor boxOutlineColor;
+        QColor stubColor;
+    };
+
+    struct PaintMetrics {
+        PaintMetrics()
+            : labelFm(QFont())
+            , connectorFm(QFont())
+            , pinNumberFm(QFont())
+            , overlayFm(QFont())
+        {
+        }
+
+        float canvasScale = 0.0f;
+        float uiScale = 1.0f;
+        float invS = 1.0f;
+        float iconSize = 0.0f;
+        float outerStubLen = 0.0f;
+        float stubStartGap = 0.0f;
+        float groupGap = 0.0f;
+        float columnGap = 0.0f;
+        float overlayGap = 0.0f;
+        float outerTextGap = 0.0f;
+        float innerTextGap = 0.0f;
+        bool showFunctionLabels = false;
+        bool showFunctionIcons = false;
+        QFont labelFont;
+        QFont connectorFont;
+        QFont pinNumberFont;
+        QFont overlayFont;
+        QFontMetricsF labelFm;
+        QFontMetricsF connectorFm;
+        QFontMetricsF pinNumberFm;
+        QFontMetricsF overlayFm;
+    };
+
+    struct ColumnWidths {
+        qreal leftMorphoWidth = 0.0;
+        qreal rightMorphoWidth = 0.0;
+        qreal leftPortWidth = 0.0;
+        qreal leftArduinoWidth = 0.0;
+        qreal rightPortWidth = 0.0;
+        qreal rightArduinoWidth = 0.0;
+    };
+
+    struct LayoutState {
+        QHash<QString, QRectF> connectorBodies;
+        ColumnWidths columnWidths;
+        QRectF leftMorphoBody;
+        QRectF rightMorphoBody;
+        QRectF leftArduinoBody;
+        QRectF rightArduinoBody;
+        qreal leftMorphoTextRight = 0.0;
+        qreal leftPortTextX = 0.0;
+        qreal leftArduinoTextX = 0.0;
+        qreal rightPortTextRight = 0.0;
+        qreal rightArduinoTextRight = 0.0;
+        qreal rightMorphoTextX = 0.0;
+        qreal leftOuterOverlayX = 0.0;
+        qreal leftInnerOverlayX = 0.0;
+        qreal rightInnerOverlayX = 0.0;
+        qreal rightOuterOverlayX = 0.0;
+        qreal leftInnerMorphoTextX = 0.0;
+        qreal rightInnerMorphoTextRight = 0.0;
+        qreal topLabelY = 0.0;
+        qreal bottomLabelY = 0.0;
+        QList<const PinDesc*> leftInnerMorphoPins;
+        QList<const PinDesc*> rightInnerMorphoPins;
+        QList<const PinDesc*> leftArduinoPins;
+        QList<const PinDesc*> rightArduinoPins;
+        PinLinkMap leftInnerMorphoLinks;
+        PinLinkMap rightInnerMorphoLinks;
+        qreal leftInnerLineDeltaY = 0.0;
+        qreal rightInnerLineDeltaY = 0.0;
+        const PinDesc *topRightUnlinkedPin = nullptr;
+        const PinDesc *topRightArduinoPin = nullptr;
+        bool hasTopRightVirtualY = false;
+        qreal topRightVirtualY = 0.0;
+        qreal maxOverlayIconWidth = 0.0;
+        qreal overlayTextGap = 0.0;
+        qreal reservedOverlayLabelWidth = 0.0;
+        qreal reservedOverlayTextGap = 0.0;
+        QRectF contentBounds;
+    };
+
     void parseTemplate(const QJsonObject &tmpl);
     void parsePins(const QJsonArray &pinsArr);
     void buildPinPositions();
@@ -85,38 +187,39 @@ private:
                                 const QList<const PinDesc*> &arduinoPins) const;
     static qreal averageLinkDeltaY(const PinLinkMap &links);
     QTransform fitTransform(const QRectF &contentBounds, qreal marginPx) const;
-    QString canonicalPinKey(const QString &pinName) const;
     QString overlayLabelText(const QString &label) const;
-
-    // Helpers
-    const PinFunctionInfo *pinFunction(const QString &port, const QString &arduino) const;
-    bool pinHasActiveModule(const QString &port, const QString &arduino) const;
-
-    // Canvas virtualisation
-    QTransform canvasTransform() const;
-    static constexpr float CANVAS_W = 1000.f;
-    static constexpr float CANVAS_H = 700.f;
+    PaintColors buildPaintColors() const;
+    PaintMetrics buildPaintMetrics(const QFont &baseFont) const;
+    QHash<QString, QRectF> buildConnectorBodies(float invScale) const;
+    ColumnWidths computeColumnWidths(const QFontMetricsF &fontMetrics) const;
+    LayoutState buildLayoutState(const PaintMetrics &metrics,
+                                 const QHash<QString, int> &connectorIndexById) const;
+    QColor connectorColor(const QString &connectorId) const;
+    qreal pinLabelBaseline(const QFontMetricsF &fontMetrics, qreal centerY) const;
+    qreal rightInnerUnlinkedCenterY(const LayoutState &layout, const PinDesc &pin) const;
+    qreal rightInnerUnlinkedBaseline(const LayoutState &layout,
+                                     const QFontMetricsF &fontMetrics,
+                                     const PinDesc &pin) const;
+    void drawFunctionOverlay(QPainter &p,
+                             const PaintColors &colors,
+                             const PaintMetrics &metrics,
+                             const LayoutState &layout,
+                             const PinDesc &pin,
+                             const PinFunctionInfo &function) const;
+    void drawConnectorLabels(QPainter &p,
+                             const PaintColors &colors,
+                             const PaintMetrics &metrics,
+                             const LayoutState &layout) const;
 
     // Data
     int                        m_canvasW = 1000;
     int                        m_canvasH = 700;
     QList<ConnectorDesc>       m_connectors;
     QList<PinDesc>             m_pins;
-
-    // Pin-function overlay: keyed by port name and Arduino name
-    QList<PinFunctionInfo>     m_functions;
-    QHash<QString,const PinFunctionInfo*> m_funcByPort;
-    QHash<QString,const PinFunctionInfo*> m_funcByArduino;
-    QHash<QString, QSet<QString>> m_modulesByPort;
-    QHash<QString, QSet<QString>> m_modulesByArduino;
-    QSet<QString>              m_activeModules;
+    PinoutFunctionMap          m_functionMap;
 
     // Icon cache: moduleName → tinted pixmap (scaled to icon size)
     mutable QHash<QString,QPixmap> m_iconCache;
-    static constexpr int ICON_SIZE = 14;
-
-    // Special colours for power/GND pins
-    static bool isPowerPin(const QString &port);
 };
 
 #endif // PINOUTWIDGET_H

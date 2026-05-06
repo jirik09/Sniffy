@@ -31,8 +31,8 @@ public:
     void hideSpecification();
 
     void addModuleDescription(QString name, QList<QString> labels, QList<QString> values);
-    void addModulePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins);
-    void setModuleActive(const QString &moduleName, bool active);
+    void registerModulePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins);
+    void setModuleActivePinFunctions(const QString &moduleName, const QList<PinFunctionInfo> &pins);
     void clearModuleDescriptions();
 
     WidgetSelection *deviceSelection;
@@ -53,15 +53,13 @@ private:
     Ui::DeviceWindow *ui;
 
     PinoutWidget *pinoutWidget = nullptr;  // vector pinout renderer (replaces static PNG)
-    QList<PinFunctionInfo> allPinFunctions; // accumulated from all modules
-    QHash<QString, QSet<QString>> pinFunctionModulesByDisplayName;
-    QSet<QString> activeDisplayModules;
-    QSet<QString> activePinFunctionModules;
+    QStringList pinFunctionModuleOrder;
+    QHash<QString, QList<PinFunctionInfo>> activePinFunctionsByDisplayName;
     QString currentDeviceBaseImage; // e.g. "Nucleo-F303RE"
     bool showingPinout = false;
 
     bool m_pins_empty() const;
-    void rebuildActivePinFunctionModules();
+    void rebuildPinoutFunctions();
 };
 
 #endif // WINDOWSCAN_H

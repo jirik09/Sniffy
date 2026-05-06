@@ -62,6 +62,7 @@ private:
     MeasCalculations *measCalc;
 
     QVector<QVector<QPointF>> *voltmeterData;
+    QList<PinFunctionInfo> activePinFunctions() const override;
 
     void stopSampling();
     void startSampling();

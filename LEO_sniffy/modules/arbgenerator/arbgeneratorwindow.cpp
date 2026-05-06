@@ -91,6 +91,11 @@ QList<QList<int>> *ArbGeneratorWindow::getGeneratorDACData() const
     return generatorDACData;
 }
 
+int ArbGeneratorWindow::getNumChannelsEnabled() const
+{
+    return qMax(1, setting->numChannelsEnabled);
+}
+
 qreal ArbGeneratorWindow::getFrequency(int channel)
 {
     return setting->dialFreqCh[channel]->getRealValue();
@@ -363,6 +368,8 @@ void ArbGeneratorWindow::createSignalCallback()
         }
         emit updateFrequency();
     }
+
+    emit activeChannelsChanged();
 }
 
 void ArbGeneratorWindow::openFileCallback()
