@@ -1,10 +1,63 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QFontDatabase>
 #include <QStandardPaths>
 #include <QScrollBar>
+#include <QTabWidget>
+#include <QTextBrowser>
+#include <QTextDocument>
+#include <QVBoxLayout>
+
+namespace
+{
+
+    QString readBundledDocument(const QString &resourcePath)
+    {
+        QFile file(resourcePath);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            return QString("Unable to load bundled document:\n%1").arg(resourcePath);
+        }
+
+        return QString::fromUtf8(file.readAll());
+    }
+
+    QTextBrowser *createBundledDocumentView(QWidget *parent, const QString &resourcePath, bool useMarkdown)
+    {
+        auto *view = new QTextBrowser(parent);
+        view->setReadOnly(true);
+        view->setOpenExternalLinks(true);
+        view->setStyleSheet(QString(
+                                "QTextBrowser {"
+                                "background-color: %1;"
+                                "color: %2;"
+                                "border: 1px solid %3;"
+                                "}")
+                                .arg(Graphics::palette().backgroundFocusIn,
+                                     Graphics::palette().textAll,
+                                     Graphics::palette().textLabel));
+
+        const QString content = readBundledDocument(resourcePath);
+        if (useMarkdown)
+        {
+            view->document()->setBaseUrl(QUrl("qrc:/licenses/"));
+            view->setMarkdown(content);
+        }
+        else
+        {
+            view->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+            view->setPlainText(content);
+        }
+
+        return view;
+    }
+
+} // namespace
 
 SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(parent),
-                                                  ui(new Ui::SettingsDialog)
+                                                                       ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
     this->setWindowTitle("Settings");
@@ -51,7 +104,7 @@ SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(p
 
     // Flash source selection (Local vs Remote)
     selFlashSource = new WidgetSelection(this, "Source");
-    selFlashSource->addOption("Local", 0);    
+    selFlashSource->addOption("Local", 0);
     selFlashSource->addOption("Remote", 1);
     selFlashSource->setSelected(0);
     selFlashSource->setVisible(false);
@@ -73,13 +126,14 @@ SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(p
     flashLogWindow->setMinimumHeight(150);
     flashLogWindow->setVisible(false);
     // set background of the log window
-    auto getFlashLogStyleSheet = []() -> QString {
+    auto getFlashLogStyleSheet = []() -> QString
+    {
         return QString(
-            "QPlainTextEdit {\n"
-            "    background-color: %1;\n"
-            "    color: %2;\n"
-            "}"
-        ).arg(Graphics::palette().backgroundFocusIn, Graphics::palette().textAll);
+                   "QPlainTextEdit {\n"
+                   "    background-color: %1;\n"
+                   "    color: %2;\n"
+                   "}")
+            .arg(Graphics::palette().backgroundFocusIn, Graphics::palette().textAll);
     };
     flashLogWindow->setStyleSheet(getFlashLogStyleSheet());
     buttons->addWidget(flashLogWindow);
@@ -89,17 +143,25 @@ SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(p
     buttons->addWidget(buttonsErase);
     connect(buttonsErase, &WidgetButtons::clicked, this, &SettingsDialog::onEraseButtonClicked);
 
+    WidgetSeparator *sepLegal = new WidgetSeparator(this, "Legal");
+    buttons->addWidget(sepLegal);
+
+    buttonsLicenses = new WidgetButtons(this, 1, ButtonTypes::NORMAL, "Open-source notices");
+    buttonsLicenses->setText("Third-party licenses", 0);
+    buttons->addWidget(buttonsLicenses);
+
     // Initialize Firmware Manager
     m_firmwareManager = new FirmwareManager(auth, this);
-    
+
     connect(buttonsFlash, &WidgetButtons::clicked, this, &SettingsDialog::onFlashButtonClicked);
-    
+
     connect(m_firmwareManager, &FirmwareManager::progressChanged, this, &SettingsDialog::onFirmwareProgress);
     connect(m_firmwareManager, &FirmwareManager::statusMessage, this, &SettingsDialog::onFirmwareStatusMessage);
     connect(m_firmwareManager, &FirmwareManager::logMessage, this, &SettingsDialog::onFirmwareLogMessage);
     connect(m_firmwareManager, &FirmwareManager::operationStarted, this, &SettingsDialog::onFirmwareOperationStarted);
     connect(m_firmwareManager, &FirmwareManager::operationFinished, this, &SettingsDialog::onFirmwareOperationFinished);
     connect(m_firmwareManager, &FirmwareManager::firmwareFlashed, this, &SettingsDialog::onFirmwareFlashed);
+    connect(buttonsLicenses, &WidgetButtons::clicked, this, &SettingsDialog::showThirdPartyLicenses);
 
     QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
     buttons->addItem(verticalSpacer);
@@ -136,7 +198,7 @@ void SettingsDialog::open()
 {
     infoLabel->setValue("");
     infoLabel->setColor(Graphics::palette().textAll);
-    
+
     // Clear flash status if it was a login error and we are now logged in
     if (m_lastStatusType == FirmwareManager::MsgLoginRequired && CustomSettings::hasValidLogin())
     {
@@ -144,7 +206,7 @@ void SettingsDialog::open()
         flashLogWindow->setVisible(false);
         m_lastStatusType = FirmwareManager::MsgInfo;
     }
-    
+
     this->show();
     this->raise();
     this->activateWindow();
@@ -196,16 +258,17 @@ void SettingsDialog::onFlashButtonClicked(int index, int optionalEmitParam)
     Q_UNUSED(index);
     Q_UNUSED(optionalEmitParam);
 
-    if (m_firmwareManager->isFlashInProgress()) {
+    if (m_firmwareManager->isFlashInProgress())
+    {
         flashLogWindow->setVisible(true);
         flashLogWindow->appendHtml(QString("<font color=\"%1\">%2</font>").arg(Graphics::palette().warning, "Flash already in progress..."));
         return;
     }
-    
+
     flashProgressBar->setVisible(true);
     flashLogWindow->setVisible(true);
     flashLogWindow->clear();
-    
+
     m_firmwareManager->startUpdateProcess();
 }
 
@@ -214,15 +277,39 @@ void SettingsDialog::onEraseButtonClicked(int index, int optionalEmitParam)
     Q_UNUSED(index);
     Q_UNUSED(optionalEmitParam);
 
-    if (m_firmwareManager->isFlashInProgress()) {
+    if (m_firmwareManager->isFlashInProgress())
+    {
         flashLogWindow->setVisible(true);
         flashLogWindow->appendHtml(QString("<font color=\"%1\">%2</font>").arg(Graphics::palette().warning, "Operation already in progress..."));
         return;
     }
     flashProgressBar->setVisible(true);
     flashLogWindow->setVisible(true);
-    flashLogWindow->clear(); 
+    flashLogWindow->clear();
     m_firmwareManager->startMassErase();
+}
+
+void SettingsDialog::showThirdPartyLicenses()
+{
+    QDialog dialog(this);
+    dialog.setWindowTitle("Third-party notices");
+    dialog.resize(900, 650);
+    dialog.setStyleSheet("QWidget{background-color:" + Graphics::palette().windowWidget + ";}");
+
+    auto *layout = new QVBoxLayout(&dialog);
+    auto *tabs = new QTabWidget(&dialog);
+
+    tabs->addTab(createBundledDocumentView(tabs, ":/licenses/THIRD-PARTY-NOTICES.md", true), "Overview");
+    tabs->addTab(createBundledDocumentView(tabs, ":/licenses/third-party-licenses/libusb-LGPL-2.1.txt", false), "libusb LGPL");
+    tabs->addTab(createBundledDocumentView(tabs, ":/licenses/third-party-licenses/stlink-BSD-3-Clause.txt", false), "stlink BSD");
+
+    layout->addWidget(tabs);
+
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
+    connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    layout->addWidget(buttons);
+
+    dialog.exec();
 }
 
 void SettingsDialog::onFirmwareProgress(int value, int total)

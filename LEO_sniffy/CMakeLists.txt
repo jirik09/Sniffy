@@ -281,6 +281,24 @@ endif()
 # --- Installation & Deployment ---
 include(GNUInstallDirs)
 
+if(WIN32)
+    set(SNIFFY_LEGAL_INSTALL_DIR "licenses")
+else()
+    set(SNIFFY_LEGAL_INSTALL_DIR "${CMAKE_INSTALL_DOCDIR}")
+endif()
+
+# Ship the application's own license and all third-party legal materials with binary distributions.
+install(FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt"
+    "${CMAKE_CURRENT_SOURCE_DIR}/THIRD-PARTY-NOTICES.md"
+    DESTINATION "${SNIFFY_LEGAL_INSTALL_DIR}"
+)
+
+install(DIRECTORY
+    "${CMAKE_CURRENT_SOURCE_DIR}/third-party-licenses"
+    DESTINATION "${SNIFFY_LEGAL_INSTALL_DIR}"
+)
+
 # 1. Install the main executable
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin
