@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QRegularExpression>
 #include <QSet>
 #include <functional>
 
@@ -84,9 +85,12 @@ private:
                                 const QList<const PinDesc*> &arduinoPins) const;
     static qreal averageLinkDeltaY(const PinLinkMap &links);
     QTransform fitTransform(const QRectF &contentBounds, qreal marginPx) const;
+    QString canonicalPinKey(const QString &pinName) const;
+    QString overlayLabelText(const QString &label) const;
 
     // Helpers
     const PinFunctionInfo *pinFunction(const QString &port, const QString &arduino) const;
+    bool pinHasActiveModule(const QString &port, const QString &arduino) const;
 
     // Canvas virtualisation
     QTransform canvasTransform() const;
@@ -103,6 +107,8 @@ private:
     QList<PinFunctionInfo>     m_functions;
     QHash<QString,const PinFunctionInfo*> m_funcByPort;
     QHash<QString,const PinFunctionInfo*> m_funcByArduino;
+    QHash<QString, QSet<QString>> m_modulesByPort;
+    QHash<QString, QSet<QString>> m_modulesByArduino;
     QSet<QString>              m_activeModules;
 
     // Icon cache: moduleName → tinted pixmap (scaled to icon size)

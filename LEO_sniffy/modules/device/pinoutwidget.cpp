@@ -90,7 +90,7 @@ void PinoutWidget::parsePins(const QJsonArray &pinsArr)
         p.connectorId = o.value("connector").toString();
         p.row         = o.value("row").toInt(0);
         p.index       = o.value("index").toInt(0);
-        p.port        = o.value("port").toString();
+        p.port        = o.value("morpho").toString();
         p.arduino     = o.value("arduino").toString();
         p.cx = p.cy = 0.f;  // filled by buildPinPositions
         m_pins.append(p);
@@ -255,16 +255,93 @@ QTransform PinoutWidget::fitTransform(const QRectF &contentBounds, qreal marginP
 }
 
 // --------------------------------------------------------------------------
+QString PinoutWidget::canonicalPinKey(const QString &pinName) const
+{
+    const QString normalizedPin = pinName.trimmed();
+    if(normalizedPin.isEmpty())
+        return QString();
+
+    for(const PinDesc &pin : m_pins){
+        if(pin.port.compare(normalizedPin, Qt::CaseInsensitive) == 0 ||
+           pin.arduino.compare(normalizedPin, Qt::CaseInsensitive) == 0){
+            if(!pin.port.isEmpty())
+                return pin.port;
+            if(!pin.arduino.isEmpty())
+                return pin.arduino;
+        }
+    }
+
+    return normalizedPin;
+}
+
+// --------------------------------------------------------------------------
+QString PinoutWidget::overlayLabelText(const QString &label) const
+{
+    static const QRegularExpression channelSuffix(QStringLiteral("^(?:[A-Za-z]+\\s*)+(\\d+)\\s*$"),
+                                                  QRegularExpression::CaseInsensitiveOption);
+    const QRegularExpressionMatch match = channelSuffix.match(label.trimmed());
+    if(match.hasMatch())
+        return match.captured(1);
+
+    return label;
+}
+
+// --------------------------------------------------------------------------
 void PinoutWidget::setPinFunctions(const QList<PinFunctionInfo> &functions)
 {
-    m_functions = functions;
+    m_functions.clear();
     m_funcByPort.clear();
     m_funcByArduino.clear();
+    m_modulesByPort.clear();
+    m_modulesByArduino.clear();
     m_iconCache.clear();
+
+    QSet<QString> claimedPins;
+    QHash<QString, QSet<QString>> modulesByCanonicalPin;
+    m_functions.reserve(functions.size());
+    for(const PinFunctionInfo &f : functions){
+        const QString canonicalPin = canonicalPinKey(f.pin);
+        if(canonicalPin.isEmpty())
+            continue;
+
+        const QString claimKey = canonicalPin.toUpper();
+        if(!f.moduleName.isEmpty())
+            modulesByCanonicalPin[claimKey].insert(f.moduleName);
+
+        if(claimedPins.contains(claimKey))
+            continue;
+
+        claimedPins.insert(claimKey);
+        PinFunctionInfo canonicalFunc = f;
+        canonicalFunc.pin = canonicalPin;
+        m_functions.append(canonicalFunc);
+    }
+
     for(const PinFunctionInfo &f : m_functions){
-        if(!f.pin.isEmpty()){
+        bool matchedBoardAlias = false;
+        const QSet<QString> modulesForPin = modulesByCanonicalPin.value(f.pin.toUpper());
+        for(const PinDesc &pin : m_pins){
+            if(pin.port.compare(f.pin, Qt::CaseInsensitive) != 0 &&
+               pin.arduino.compare(f.pin, Qt::CaseInsensitive) != 0)
+                continue;
+
+            matchedBoardAlias = true;
+            if(!pin.port.isEmpty()){
+                m_funcByPort.insert(pin.port, &f);
+                if(!modulesForPin.isEmpty())
+                    m_modulesByPort.insert(pin.port, modulesForPin);
+            }
+            if(!pin.arduino.isEmpty()){
+                m_funcByArduino.insert(pin.arduino, &f);
+                if(!modulesForPin.isEmpty())
+                    m_modulesByArduino.insert(pin.arduino, modulesForPin);
+            }
+        }
+
+        if(!matchedBoardAlias && !f.pin.isEmpty()){
             m_funcByPort.insert(f.pin, &f);
-            m_funcByArduino.insert(f.pin, &f);
+            if(!modulesForPin.isEmpty())
+                m_modulesByPort.insert(f.pin, modulesForPin);
         }
     }
     update();
@@ -283,6 +360,8 @@ void PinoutWidget::clearPinFunctions()
     m_functions.clear();
     m_funcByPort.clear();
     m_funcByArduino.clear();
+    m_modulesByPort.clear();
+    m_modulesByArduino.clear();
     m_iconCache.clear();
     update();
 }
@@ -308,6 +387,32 @@ const PinFunctionInfo *PinoutWidget::pinFunction(const QString &port, const QStr
         if(it != m_funcByPort.end()) return it.value();
     }
     return nullptr;
+}
+
+// --------------------------------------------------------------------------
+bool PinoutWidget::pinHasActiveModule(const QString &port, const QString &arduino) const
+{
+    auto intersectsActiveModules = [&](const QSet<QString> &modules) {
+        for(const QString &moduleName : modules){
+            if(m_activeModules.contains(moduleName))
+                return true;
+        }
+        return false;
+    };
+
+    if(!arduino.isEmpty()){
+        auto it = m_modulesByArduino.find(arduino);
+        if(it != m_modulesByArduino.end() && intersectsActiveModules(it.value()))
+            return true;
+    }
+
+    if(!port.isEmpty()){
+        auto it = m_modulesByPort.find(port);
+        if(it != m_modulesByPort.end() && intersectsActiveModules(it.value()))
+            return true;
+    }
+
+    return false;
 }
 
 // --------------------------------------------------------------------------
@@ -518,9 +623,11 @@ void PinoutWidget::paintEvent(QPaintEvent *)
     QFontMetricsF overlayFm(overlayFont);
     qreal maxOverlayLabelWidth = 0.0;
     for(const PinFunctionInfo &func : m_functions)
-        maxOverlayLabelWidth = qMax(maxOverlayLabelWidth, overlayFm.horizontalAdvance(func.label));
+        maxOverlayLabelWidth = qMax(maxOverlayLabelWidth,
+                                    overlayFm.horizontalAdvance(overlayLabelText(func.label)));
     const qreal maxOverlayIconWidth = ICON_SIZE_V * 2.0f;
-    const qreal overlayTextGap = 3.0f * uiScale * invS;
+    const qreal overlayTextGap = qMax<qreal>(3.0f * uiScale * invS,
+                                             overlayFm.horizontalAdvance(QStringLiteral("  ")));
 
     QRectF contentBounds = leftMorphoBody.united(rightMorphoBody)
                                        .united(leftArduinoBody)
@@ -630,9 +737,12 @@ void PinoutWidget::paintEvent(QPaintEvent *)
         const bool isRightArduino = (pin.connectorId == "CN5" || pin.connectorId == "CN9");
         const bool isLeftMorpho = (pin.connectorId == "CN7");
         const bool isRightMorpho = (pin.connectorId == "CN10");
+        const bool isLinkedMorphoDuplicate =
+            (isLeftMorpho && pin.row == 1 && leftInnerMorphoLinks.contains(&pin)) ||
+            (isRightMorpho && pin.row == 0 && rightInnerMorphoLinks.contains(&pin));
 
         const PinFunctionInfo *func = pinFunction(pin.port, pin.arduino);
-        const bool hasActiveFunction = func && m_activeModules.contains(func->moduleName);
+    const bool hasActiveFunction = pinHasActiveModule(pin.port, pin.arduino);
         const bool isPwr = isPowerPin(pin.port) || isPowerPin(pin.arduino);
 
         // Choose dot colour
@@ -759,8 +869,9 @@ void PinoutWidget::paintEvent(QPaintEvent *)
         }
 
         // --- Function overlay icon + channel label --------------------------
-        if(func){
+        if(func && !isLinkedMorphoDuplicate){
             const QString iconKey = func->moduleName;
+            const QString overlayLabel = overlayLabelText(func->label);
             if(!m_iconCache.contains(iconKey)){
                 const QString iconPath = Graphics::getCommonPath() + "icon_" + iconKey + ".png";
                 QPixmap src = Graphics::tintedPixmap(iconPath, activeFunctionColor);
@@ -771,16 +882,31 @@ void PinoutWidget::paintEvent(QPaintEvent *)
                 }
             }
             const QPixmap &ico = m_iconCache.value(iconKey);
+            qreal overlayCenterY = pin.cy;
+            if(isLeftMorpho && pin.row == 1 && !leftInnerMorphoLinks.contains(&pin))
+                overlayCenterY += leftInnerLineDeltaY;
+            else if(isRightMorpho && pin.row == 0 && !rightInnerMorphoLinks.contains(&pin))
+                overlayCenterY = rightInnerUnlinkedCenterY(pin);
 
             // Keep overlays on the same side as the visible label columns.
             bool overlayRight = true;
             float iconX = 0.0f;
             if(isLeftMorpho){
-                overlayRight = false;
-                iconX = leftOuterOverlayX;
+                if(pin.row == 0){
+                    overlayRight = false;
+                    iconX = leftOuterOverlayX;
+                } else {
+                    overlayRight = true;
+                    iconX = leftInnerOverlayX;
+                }
             } else if(isRightMorpho){
-                overlayRight = true;
-                iconX = rightOuterOverlayX;
+                if(pin.row == 1){
+                    overlayRight = true;
+                    iconX = rightOuterOverlayX;
+                } else {
+                    overlayRight = false;
+                    iconX = rightInnerOverlayX;
+                }
             } else if(isLeftArduino){
                 overlayRight = true;
                 iconX = leftInnerOverlayX;
@@ -789,7 +915,7 @@ void PinoutWidget::paintEvent(QPaintEvent *)
                 iconX = rightInnerOverlayX;
             }
 
-            const float iconY = pin.cy - ICON_SIZE_V / 2.0f;
+            const float iconY = overlayCenterY - ICON_SIZE_V / 2.0f;
             if(showFunctionIcons && !ico.isNull()){
                 // Draw icon maintaining ratio
                 float iconW = ICON_SIZE_V * ((float)ico.width() / ico.height());
@@ -803,15 +929,15 @@ void PinoutWidget::paintEvent(QPaintEvent *)
                 p.setFont(overlayFont);
                 p.setPen(activeFunctionColor);
                 QFontMetricsF smFm(overlayFont);
-                const float textBaseY = pin.cy + smFm.ascent() / 2.0f;
+                const float textBaseY = overlayCenterY + (smFm.ascent() - smFm.descent()) / 2.0f;
                 float iconW = ico.isNull() ? ICON_SIZE_V : ICON_SIZE_V * ((float)ico.width() / ico.height());
                 if(overlayRight){
-                    const float textX = iconX + iconW + 3.0f * uiScale * invS;
-                    p.drawText(QPointF(textX, textBaseY), func->label);
+                    const float textX = iconX + iconW + overlayTextGap;
+                    p.drawText(QPointF(textX, textBaseY), overlayLabel);
                 } else {
-                    const qreal lw = smFm.horizontalAdvance(func->label);
-                    const float textX = iconX - 3.0f * uiScale * invS - lw;
-                    p.drawText(QPointF(textX, textBaseY), func->label);
+                    const qreal lw = smFm.horizontalAdvance(overlayLabel);
+                    const float textX = iconX - overlayTextGap - lw;
+                    p.drawText(QPointF(textX, textBaseY), overlayLabel);
                 }
             }
             p.setFont(labelFont);

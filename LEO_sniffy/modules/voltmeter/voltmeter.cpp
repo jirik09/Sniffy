@@ -50,6 +50,14 @@ void Voltmeter::parseData(QByteArray data)
         data.remove(0,4);
         moduleSpecification->parseSpecification(data);
         showModuleControl();
+        VoltmeterSpec *spec = static_cast<VoltmeterSpec*>(moduleSpecification);
+        QList<PinFunctionInfo> pinFuncs;
+        for(int i = 0; i < spec->maxADCChannels; ++i){
+            const QString &pin = spec->channelPins[i];
+            if(!pin.isEmpty() && pin != "-")
+                pinFuncs.append({pin, "CH" + QString::number(i + 1), "scope"});
+        }
+        showModulePinFunctions(moduleName, pinFuncs);
         //TODO parse message from MCU
         
     }else if(dataHeader==Commands::SCOPE_INCOME){
