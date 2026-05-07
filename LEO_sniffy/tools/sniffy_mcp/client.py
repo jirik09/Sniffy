@@ -27,6 +27,20 @@ import time
 from pathlib import Path
 from typing import Any
 
+DEFAULT_MIN_BRIDGE_API_VERSION = 1
+
+
+def _parse_bridge_api_version(value: object) -> int | None:
+    if isinstance(value, int):
+        return value
+
+    if isinstance(value, str):
+        major = value.split(".", 1)[0].strip()
+        if major.isdigit():
+            return int(major)
+
+    return None
+
 # On Windows, named pipes require the win32file API or raw CreateFile.
 # QLocalServer creates \\.\pipe\<name> — we use Python's socket on
 # Unix and ctypes on Windows for zero-dependency connectivity.
@@ -195,6 +209,39 @@ class SniffyClient:
     def get_status(self) -> dict:
         """Device connection status and module list."""
         return self._call("get_status")
+
+    def get_bridge_info(self) -> dict:
+        """Desktop app and AgentBridge compatibility metadata."""
+        status = self.get_status()
+        bridge = status.get("bridge")
+        if not isinstance(bridge, dict):
+            raise RuntimeError(
+                "Connected Sniffy app does not expose AgentBridge metadata. "
+                "Update the desktop application."
+            )
+        return bridge
+
+    def assert_bridge_compatibility(
+        self, minimum_api_version: int = DEFAULT_MIN_BRIDGE_API_VERSION
+    ) -> dict:
+        """Validate the connected AgentBridge API contract before using tools."""
+        bridge = self.get_bridge_info()
+        api_version = _parse_bridge_api_version(bridge.get("bridge_api_version"))
+
+        if api_version is None:
+            raise RuntimeError(
+                "Connected Sniffy app returned invalid AgentBridge metadata. "
+                "Update the desktop application."
+            )
+
+        if api_version < minimum_api_version:
+            app_version = bridge.get("app_version", "unknown")
+            raise RuntimeError(
+                f"AgentBridge API >= {minimum_api_version} is required, "
+                f"but the app reports {api_version} (app {app_version})."
+            )
+
+        return bridge
 
     def get_system_config(self) -> dict:
         """Full hardware configuration: device info, per-module capabilities,

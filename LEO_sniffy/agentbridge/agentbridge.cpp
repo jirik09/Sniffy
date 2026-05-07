@@ -50,12 +50,26 @@
 #include "modules/voltagesource/voltagesourcespec.h"
 #include "resourcemanager.h"
 
+#include <algorithm>
 #include <QDataStream>
 #include <QDateTime>
 #include <QJsonValue>
 #include <QMutexLocker>
 #include <QtEndian>
 #include <cmath>
+
+namespace {
+
+constexpr int kBridgeApiVersion = 1;
+constexpr char kBridgeProtocol[] = "jsonrpc-2.0-length-prefixed";
+
+#ifdef APP_VERSION
+constexpr char kSniffyAppVersion[] = APP_VERSION;
+#else
+constexpr char kSniffyAppVersion[] = "x.0.0";
+#endif
+
+} // namespace
 
 // ──────────────────────────────────────────────────────────
 // Helper: build a JSON snapshot of module state
@@ -615,6 +629,23 @@ QJsonObject AgentBridge::makeError(const QJsonValue &id, int code, const QString
     };
 }
 
+QJsonObject AgentBridge::bridgeMetadata() const
+{
+    QJsonArray supportedMethods;
+    auto methodNames = m_handlers.keys();
+    std::sort(methodNames.begin(), methodNames.end());
+
+    for (const auto &methodName : methodNames)
+        supportedMethods.append(methodName);
+
+    return QJsonObject{
+        {QStringLiteral("app_version"), QString::fromLatin1(kSniffyAppVersion)},
+        {QStringLiteral("bridge_api_version"), kBridgeApiVersion},
+        {QStringLiteral("protocol"), QString::fromLatin1(kBridgeProtocol)},
+        {QStringLiteral("supported_methods"), supportedMethods}
+    };
+}
+
 // ──────────────────────────────────────────────────────────
 // Module helpers
 // ──────────────────────────────────────────────────────────
@@ -782,6 +813,7 @@ void AgentBridge::registerHandlers()
         r[QStringLiteral("demo_mode")]  = m_mediator->getIsDemoMode();
         r[QStringLiteral("device")]     = m_mediator->getDeviceName();
         r[QStringLiteral("modules")]    = enumerateModules();
+        r[QStringLiteral("bridge")]     = bridgeMetadata();
         return r;
     };
 
@@ -791,6 +823,7 @@ void AgentBridge::registerHandlers()
             return QJsonObject{{QStringLiteral("error"), QStringLiteral("Not connected")}};
 
         QJsonObject result;
+        result[QStringLiteral("bridge")] = bridgeMetadata();
         auto modules = m_mediator->getModulesList();
 
         // ── Device info ──

@@ -27,11 +27,24 @@ except ImportError:
     )
     raise
 
-from .client import SniffyClient
+from .client import DEFAULT_MIN_BRIDGE_API_VERSION, SniffyClient
+
+MIN_BRIDGE_API_VERSION = DEFAULT_MIN_BRIDGE_API_VERSION
 
 # ── Global Sniffy client (lazy connect) ──────────────────
 
 _client: SniffyClient | None = None
+_bridge_info: dict | None = None
+
+
+def _require_compatible_bridge(client: SniffyClient) -> dict:
+    global _bridge_info
+
+    if _bridge_info is not None:
+        return _bridge_info
+
+    _bridge_info = client.assert_bridge_compatibility(MIN_BRIDGE_API_VERSION)
+    return _bridge_info
 
 
 def _get_client() -> SniffyClient:
@@ -39,6 +52,7 @@ def _get_client() -> SniffyClient:
     if _client is None:
         _client = SniffyClient()
         _client.connect()
+    _require_compatible_bridge(_client)
     return _client
 
 
