@@ -291,7 +291,7 @@ jobs:
                 tag_name: tag,
                 target_commitish: context.sha,
                 name,
-                generate_release_notes: true,
+                body: '',
               });
             }
 
@@ -299,10 +299,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.mcp_plan.outputs.tag }}
+          name: sniffy-mcp ${{ needs.mcp_plan.outputs.version }}
+          body: ''
           files: |
             mcp_dist/*.whl
             mcp_dist/*.tar.gz
-          generate_release_notes: true
           overwrite_files: true
 
       - name: Upload MCP assets to app release

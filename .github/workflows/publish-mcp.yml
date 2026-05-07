@@ -123,7 +123,7 @@ jobs:
                 tag_name: tag,
                 target_commitish: context.sha,
                 name,
-                generate_release_notes: true,
+                body: '',
               });
             }
 
@@ -131,8 +131,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.metadata.outputs.tag }}
+          name: sniffy-mcp ${{ steps.metadata.outputs.version }}
+          body: ''
           files: |
             LEO_sniffy/tools/sniffy_mcp/dist/*.whl
             LEO_sniffy/tools/sniffy_mcp/dist/*.tar.gz
-          generate_release_notes: true
           overwrite_files: true
