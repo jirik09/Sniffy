@@ -233,10 +233,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install dist/*.whl
           python - <<'PY'
-import sniffy_mcp
+          import sniffy_mcp
 
-print(sniffy_mcp.__version__)
-PY
+          print(sniffy_mcp.__version__)
+          PY
 
       - name: Upload MCP package artifact
         uses: actions/upload-artifact@v4
