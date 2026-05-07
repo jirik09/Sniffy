@@ -15,12 +15,12 @@ in the GUI so the user can observe in real time.
 
 The automation package lives at `LEO_sniffy/tools/sniffy_mcp/`.
 
-> **Critical**: The CLI must be invoked from the `LEO_sniffy/tools/`
-> directory (the parent of the `sniffy_mcp` package), **not** from inside
-> `sniffy_mcp/` itself.
+> **Critical**: The CLI must be invoked from the `LEO_sniffy/tools/sniffy_mcp/`
+> directory. That directory is now the package root and contains the
+> `sniffy_mcp/` Python package subfolder.
 
 ```bash
-cd LEO_sniffy/tools
+cd LEO_sniffy/tools/sniffy_mcp
 python -m sniffy_mcp call <method> [args...]
 ```
 
@@ -66,7 +66,7 @@ with SniffyClient() as s:
 ### MCP server (for MCP-compatible hosts)
 
 ```bash
-cd LEO_sniffy/tools
+cd LEO_sniffy/tools/sniffy_mcp
 pip install -e ".[mcp]"
 python -m sniffy_mcp          # starts MCP stdio server
 ```

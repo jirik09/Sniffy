@@ -12,7 +12,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 PYPROJECT = ROOT / "pyproject.toml"
-PACKAGE_INIT = ROOT / "__init__.py"
+PACKAGE_DIR = ROOT / "sniffy_mcp"
+PACKAGE_INIT = PACKAGE_DIR / "__init__.py"
 TAG_PREFIX = "mcp-v"
 VERSION_PATTERN = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
 TAG_PATTERN = re.compile(rf"^{TAG_PREFIX}(\d+\.\d+\.\d+)$")
@@ -26,13 +27,13 @@ def read_declared_version() -> str:
     init_text = PACKAGE_INIT.read_text(encoding="utf-8")
     match = re.search(r'^__version__\s*=\s*"([^"]+)"', init_text, re.MULTILINE)
     if match is None:
-        raise SystemExit("__init__.py is missing __version__")
+        raise SystemExit("sniffy_mcp/__init__.py is missing __version__")
 
     init_version = match.group(1)
     if version != init_version:
         raise SystemExit(
             "Version mismatch between pyproject.toml "
-            f"({version}) and __init__.py ({init_version})"
+            f"({version}) and sniffy_mcp/__init__.py ({init_version})"
         )
 
     return version
@@ -144,7 +145,7 @@ def write_version(version: str) -> None:
         init_text,
         r'^__version__\s*=\s*"[^"]+"$',
         f'__version__ = "{version}"',
-        "__init__.py",
+        "sniffy_mcp/__init__.py",
     )
     PACKAGE_INIT.write_text(init_text, encoding="utf-8")
 
@@ -185,7 +186,7 @@ def main() -> None:
 
     write_parser = subparsers.add_parser(
         "write-version",
-        help="Write a resolved version into pyproject.toml and __init__.py",
+        help="Write a resolved version into pyproject.toml and sniffy_mcp/__init__.py",
     )
     version_group = write_parser.add_mutually_exclusive_group(required=True)
     version_group.add_argument(

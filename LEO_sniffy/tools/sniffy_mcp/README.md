@@ -24,6 +24,8 @@ pip install "sniffy-mcp[mcp] @ https://sniffy.cz/sniffy_mcp_latest.php?format=wh
 For local development or source checkouts:
 
 ```bash
+cd LEO_sniffy/tools/sniffy_mcp
+
 pip install -e .             # client only (zero dependencies)
 pip install -e ".[mcp]"      # with MCP server (needs 'mcp' package)
 ```
@@ -56,13 +58,13 @@ check guards older desktop app versions at runtime.
 
 ## Usage — Quick CLI
 
-> **Important**: Run from the `LEO_sniffy/tools/` directory (the parent of
-> the `sniffy_mcp` package), NOT from inside `sniffy_mcp/` itself.
+> **Important**: Run from the `LEO_sniffy/tools/sniffy_mcp/` directory,
+> which now contains the standard `sniffy_mcp/` Python package subfolder.
 
 Call any `SniffyClient` method from the command line (no MCP package needed):
 
 ```bash
-cd LEO_sniffy/tools
+cd LEO_sniffy/tools/sniffy_mcp
 
 # ── Core / Status ──────────────────────────────────────────────
 python -m sniffy_mcp call ping
