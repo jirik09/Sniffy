@@ -3,16 +3,27 @@ cmake_minimum_required(VERSION 3.21)
 
 project(LEO_sniffy LANGUAGES C CXX)
 
-# Get version from Git tags (e.g. v1.0.2 -> 1.0.2)
+# Get version from desktop Git tags (desktop-v1.0.2 -> 1.0.2).
+# Fall back to legacy v* tags until the first prefixed desktop release exists.
 find_package(Git)
 if(GIT_FOUND)
     execute_process(
-        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0
+        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0 --match desktop-v*
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         OUTPUT_VARIABLE GIT_TAG_VERSION
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
     )
+
+    if("${GIT_TAG_VERSION}" STREQUAL "")
+        execute_process(
+            COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0 --match v*
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            OUTPUT_VARIABLE GIT_TAG_VERSION
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+    endif()
 
     # Fallback if no tags found or error
     if("${GIT_TAG_VERSION}" STREQUAL "")
@@ -20,8 +31,8 @@ if(GIT_FOUND)
         set(GIT_TAG_VERSION "x.0.0")
     endif()
 
-    # Remove leading 'v' if present
-    string(REGEX REPLACE "^v" "" GIT_TAG_VERSION "${GIT_TAG_VERSION}")
+    # Remove the desktop tag prefix or the legacy v prefix.
+    string(REGEX REPLACE "^(desktop-v|v)" "" GIT_TAG_VERSION "${GIT_TAG_VERSION}")
 else()
     set(GIT_TAG_VERSION "x.0.0")
 endif()

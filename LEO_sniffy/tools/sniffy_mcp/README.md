@@ -39,19 +39,18 @@ expose bridge metadata yet.
 
 ## Release Flow
 
-- App release (`v*`) checks whether anything under `LEO_sniffy/tools/sniffy_mcp/`
+- App release (`desktop-v*`) checks whether anything under `LEO_sniffy/tools/sniffy_mcp/`
     changed since the last `mcp-v*` release.
 - If nothing changed, the app release skips MCP packaging entirely.
 - If MCP changed, the app release builds MCP, publishes a new standalone
-    `mcp-v*` release, and attaches the same MCP assets to the app release.
+    `mcp-v*` release.
 - For routine MCP changes, the workflows automatically choose the next
     available MCP patch version from the existing `mcp-v*` tags, so a manual
     version-file edit is not required before releasing.
 - Standalone MCP publishing is still supported via `.github/workflows/publish-mcp.yml`
     for MCP-only fixes between desktop app releases.
-- The website endpoint resolves the latest published `mcp-v*` release directly
-    from GitHub Releases, so the public repo does not need FTP credentials for
-    web updates.
+- The website keeps the stable MCP latest endpoint and also exposes dedicated
+    JSON catalog and download endpoints for the custom desktop/MCP dropdown UI.
 
 This keeps MCP independently releasable while the client-side compatibility
 check guards older desktop app versions at runtime.

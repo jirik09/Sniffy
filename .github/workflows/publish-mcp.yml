@@ -108,7 +108,7 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const tag = process.env.MCP_TAG;
-            const name = `sniffy-mcp ${process.env.MCP_VERSION}`;
+            const name = `Sniffy MCP ${process.env.MCP_VERSION}`;
 
             try {
               await github.rest.repos.getReleaseByTag({ owner, repo, tag });
@@ -131,7 +131,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.metadata.outputs.tag }}
-          name: sniffy-mcp ${{ steps.metadata.outputs.version }}
+          name: Sniffy MCP ${{ steps.metadata.outputs.version }}
           body: ''
           files: |
             LEO_sniffy/tools/sniffy_mcp/dist/*.whl

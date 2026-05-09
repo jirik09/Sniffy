@@ -3,7 +3,7 @@ name: Release Installer
 on:
   push:
     tags:
-      - 'v*' # Trigger on tags like v1.0, v2.3.4
+      - 'desktop-v*' # Trigger on tags like desktop-v1.0.0, desktop-v2.3.4
 
 permissions:
   contents: write
@@ -174,10 +174,16 @@ jobs:
           cpack -C Release -V
         shell: bash
 
+      - name: Derive desktop release version
+        shell: bash
+        run: echo "SNIFFY_DESKTOP_VERSION=${GITHUB_REF_NAME#desktop-v}" >> "$GITHUB_ENV"
+
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          tag_name: ${{ github.ref_name }}
+          name: Sniffy Desktop ${{ env.SNIFFY_DESKTOP_VERSION }}
           files: |
             build/Sniffy-*.exe
             build/*.msi
@@ -276,7 +282,7 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const tag = process.env.MCP_TAG;
-            const name = `sniffy-mcp ${process.env.MCP_VERSION}`;
+            const name = `Sniffy MCP ${process.env.MCP_VERSION}`;
 
             try {
               await github.rest.repos.getReleaseByTag({ owner, repo, tag });
@@ -299,16 +305,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.mcp_plan.outputs.tag }}
-          name: sniffy-mcp ${{ needs.mcp_plan.outputs.version }}
+          name: Sniffy MCP ${{ needs.mcp_plan.outputs.version }}
           body: ''
-          files: |
-            mcp_dist/*.whl
-            mcp_dist/*.tar.gz
-          overwrite_files: true
-
-      - name: Upload MCP assets to app release
-        uses: softprops/action-gh-release@v2
-        with:
           files: |
             mcp_dist/*.whl
             mcp_dist/*.tar.gz
