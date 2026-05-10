@@ -1,5 +1,27 @@
 #include "devicespec.h"
 
+namespace {
+
+QString normalizeVersionString(QString version)
+{
+    if (version.isEmpty()) {
+        return version;
+    }
+
+    if (version.startsWith(QLatin1Char('V'))) {
+        version[0] = QLatin1Char('v');
+        return version;
+    }
+
+    if (!version.startsWith(QLatin1Char('v'))) {
+        version.prepend(QLatin1Char('v'));
+    }
+
+    return version;
+}
+
+} // namespace
+
 DeviceSpec::DeviceSpec(QObject *parent)
 {
     Q_UNUSED(parent);
@@ -26,9 +48,9 @@ void DeviceSpec::parseSpecification(QByteArray spec){
 
         Build_Date = specParams[5];
 
-        FW_Version = specParams[7];
+        FW_Version = normalizeVersionString(QString::fromUtf8(specParams[7]));
         OS_Version = specParams[9];
-        HAL_Version = specParams[11];
+        HAL_Version = normalizeVersionString(QString::fromUtf8(specParams[11]));
 
         QDataStream streamBuffLeng(specParams[13]);
         streamBuffLeng>>bufferLength;
