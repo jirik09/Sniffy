@@ -1,10 +1,14 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
+#include <QButtonGroup>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QFontDatabase>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QStandardPaths>
 #include <QScrollBar>
+#include <QStackedWidget>
 #include <QTabWidget>
 #include <QTextBrowser>
 #include <QTextDocument>
@@ -12,6 +16,18 @@
 
 namespace
 {
+
+    constexpr int kSettingsMenuWidth = 114;
+    constexpr int kMinimumSettingsDialogHeight = 420;
+
+    QString applicationVersionText()
+    {
+#ifdef APP_VERSION
+        return QString::fromLatin1(APP_VERSION);
+#else
+        return QStringLiteral("x.0.0");
+#endif
+    }
 
     QString readBundledDocument(const QString &resourcePath)
     {
@@ -54,6 +70,24 @@ namespace
         return view;
     }
 
+    QVBoxLayout *createSettingsPageLayout(QWidget *parent)
+    {
+        auto *layout = new QVBoxLayout(parent);
+        layout->setSpacing(2);
+        layout->setContentsMargins(0, 0, 0, 0);
+        return layout;
+    }
+
+    QPushButton *createSettingsMenuButton(QWidget *parent, const QString &label)
+    {
+        auto *button = new QPushButton(label, parent);
+        button->setCheckable(true);
+        button->setCursor(Qt::PointingHandCursor);
+        button->setMinimumHeight(34);
+        button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        return button;
+    }
+
 } // namespace
 
 SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(parent),
@@ -64,64 +98,148 @@ SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(p
 
     setStyleSheet("QWidget{background-color:" + Graphics::palette().windowWidget + ";}");
 
-    QVBoxLayout *buttons = new QVBoxLayout();
-    buttons->setSpacing(2);
-    buttons->setContentsMargins(5, 5, 5, 5);
+    const int expandedWidth = width() + kSettingsMenuWidth + 20;
+    const int expandedHeight = qMax(height(), kMinimumSettingsDialogHeight);
+    resize(expandedWidth, expandedHeight);
+    setMinimumSize(expandedWidth, expandedHeight);
 
-    WidgetSeparator *sep1 = new WidgetSeparator(this, "General settings");
-    buttons->addWidget(sep1);
-    buttonsRestoreSession = new WidgetButtons(this, 3, ButtonTypes::RADIO, "Restore session after startup", 0);
+    auto *dialogLayout = new QVBoxLayout();
+    dialogLayout->setSpacing(2);
+    dialogLayout->setContentsMargins(5, 5, 5, 5);
+
+    auto *contentLayout = new QHBoxLayout();
+    contentLayout->setSpacing(10);
+    contentLayout->setContentsMargins(0, 0, 0, 0);
+
+    auto *navigationPanel = new QWidget(ui->widget);
+    navigationPanel->setObjectName("settingsNavigationPanel");
+    navigationPanel->setFixedWidth(kSettingsMenuWidth);
+    navigationPanel->setStyleSheet(QString(
+                                       "QWidget#settingsNavigationPanel {"
+                                       "background-color: %1;"
+                                       "border: 1px solid %2;"
+                                       "}"
+                                       "QPushButton {"
+                                       "background-color: transparent;"
+                                       "color: %3;"
+                                       "border: 1px solid transparent;"
+                                       "border-left: 3px solid transparent;"
+                                       "padding: 7px 10px;"
+                                       "text-align: left;"
+                                       "font-weight: 600;"
+                                       "}"
+                                       "QPushButton:hover {"
+                                       "background-color: %4;"
+                                       "border-color: %2;"
+                                       "}"
+                                       "QPushButton:checked {"
+                                       "background-color: %4;"
+                                       "color: %5;"
+                                       "border-color: %2;"
+                                       "border-left: 3px solid %6;"
+                                       "}")
+                                       .arg(Graphics::palette().windowWidget,
+                                            Graphics::palette().textLabel,
+                                            Graphics::palette().textLabel,
+                                            Graphics::palette().backgroundFocusIn,
+                                            Graphics::palette().textAll,
+                                            Graphics::palette().warning));
+
+    auto *navigationLayout = new QVBoxLayout(navigationPanel);
+    navigationLayout->setSpacing(2);
+    navigationLayout->setContentsMargins(0, 0, 0, 0);
+
+    auto *pages = new QStackedWidget(ui->widget);
+
+    auto *navigationGroup = new QButtonGroup(this);
+    navigationGroup->setExclusive(true);
+
+    auto *generalButton = createSettingsMenuButton(navigationPanel, "General");
+    auto *appearanceButton = createSettingsMenuButton(navigationPanel, "Appearance");
+    auto *fwUpdateButton = createSettingsMenuButton(navigationPanel, "Firmware");
+    auto *aboutButton = createSettingsMenuButton(navigationPanel, "About");
+
+    navigationGroup->addButton(generalButton, 0);
+    navigationGroup->addButton(appearanceButton, 1);
+    navigationGroup->addButton(fwUpdateButton, 2);
+    navigationGroup->addButton(aboutButton, 3);
+
+    navigationLayout->addWidget(generalButton);
+    navigationLayout->addWidget(appearanceButton);
+    navigationLayout->addWidget(fwUpdateButton);
+    navigationLayout->addWidget(aboutButton);
+    navigationLayout->addStretch();
+
+    auto *generalPage = new QWidget(pages);
+    auto *generalLayout = createSettingsPageLayout(generalPage);
+
+    WidgetSeparator *sepSession = new WidgetSeparator(generalPage, "Session");
+    generalLayout->addWidget(sepSession);
+
+    buttonsRestoreSession = new WidgetButtons(generalPage, 3, ButtonTypes::RADIO, "Restore session after startup", 0);
     buttonsRestoreSession->setText("   No   ", 0);
     buttonsRestoreSession->setText("Always ask", 1);
     buttonsRestoreSession->setText("   Yes   ", 2);
-    buttons->addWidget(buttonsRestoreSession);
+    generalLayout->addWidget(buttonsRestoreSession);
 
     // Smart session layout and geometry
-    buttonsSmartSessionGeometry = new WidgetButtons(this, 2, ButtonTypes::RADIO, "Smart session layout and geometry", 0);
+    buttonsSmartSessionGeometry = new WidgetButtons(generalPage, 2, ButtonTypes::RADIO, "Smart session layout and geometry", 0);
     buttonsSmartSessionGeometry->setText(" Off ", 0);
     buttonsSmartSessionGeometry->setText("  On ", 1);
-    buttons->addWidget(buttonsSmartSessionGeometry);
+    generalLayout->addWidget(buttonsSmartSessionGeometry);
 
-    selTheme = new WidgetSelection(this, "Color scheme");
+    buttonsSession = new WidgetButtons(generalPage, 2, ButtonTypes::NORMAL, "Session");
+    buttonsSession->setText("   Save   ", 0);
+    buttonsSession->setText("   Load   ", 1);
+    generalLayout->addWidget(buttonsSession);
+    generalLayout->addStretch();
+
+    pages->addWidget(generalPage);
+
+    auto *appearancePage = new QWidget(pages);
+    auto *appearanceLayout = createSettingsPageLayout(appearancePage);
+
+    WidgetSeparator *sepTheme = new WidgetSeparator(appearancePage, "App theme");
+    appearanceLayout->addWidget(sepTheme);
+
+    selTheme = new WidgetSelection(appearancePage, "Theme");
     QList<QString> *themesList = CustomSettings::getThemesList();
     for (int i = 0; i < themesList->length(); i++)
     {
         selTheme->addOption(themesList->at(i), i);
     }
-    buttons->addWidget(selTheme);
+    appearanceLayout->addWidget(selTheme);
+    appearanceLayout->addStretch();
 
-    // Session save/load buttons
-    WidgetSeparator *sepSession = new WidgetSeparator(this, "");
-    buttons->addWidget(sepSession);
-    buttonsSession = new WidgetButtons(this, 2, ButtonTypes::NORMAL, "Session");
-    buttonsSession->setText("   Save   ", 0);
-    buttonsSession->setText("   Load   ", 1);
-    buttons->addWidget(buttonsSession);
+    pages->addWidget(appearancePage);
+
+    auto *firmwarePage = new QWidget(pages);
+    auto *firmwareLayout = createSettingsPageLayout(firmwarePage);
 
     // --- Flasher Section ---
-    WidgetSeparator *sepFlash = new WidgetSeparator(this, "Firmware Update");
-    buttons->addWidget(sepFlash);
+    WidgetSeparator *sepFlash = new WidgetSeparator(firmwarePage, "Firmware Update");
+    firmwareLayout->addWidget(sepFlash);
 
     // Flash source selection (Local vs Remote)
-    selFlashSource = new WidgetSelection(this, "Source");
+    selFlashSource = new WidgetSelection(firmwarePage, "Source");
     selFlashSource->addOption("Local", 0);
     selFlashSource->addOption("Remote", 1);
     selFlashSource->setSelected(0);
     selFlashSource->setVisible(false);
-    buttons->addWidget(selFlashSource); // Hidden as per new requirements
+    firmwareLayout->addWidget(selFlashSource); // Hidden as per new requirements
 
-    buttonsFlash = new WidgetButtons(this, 1, ButtonTypes::NORMAL, "STM32 Firmware");
+    buttonsFlash = new WidgetButtons(firmwarePage, 1, ButtonTypes::NORMAL, "STM32 Firmware");
     buttonsFlash->setText("Install / Flash", 0);
-    buttons->addWidget(buttonsFlash);
+    firmwareLayout->addWidget(buttonsFlash);
 
-    flashProgressBar = new SimpleHProgressBar(this);
+    flashProgressBar = new SimpleHProgressBar(firmwarePage);
     flashProgressBar->setRange(0, 100);
     flashProgressBar->setValue(0);
     flashProgressBar->setShowPercent(true);
     flashProgressBar->setVisible(false); // Hide initially
-    buttons->addWidget(flashProgressBar);
+    firmwareLayout->addWidget(flashProgressBar);
 
-    flashLogWindow = new QPlainTextEdit(this);
+    flashLogWindow = new QPlainTextEdit(firmwarePage);
     flashLogWindow->setReadOnly(true);
     flashLogWindow->setMinimumHeight(150);
     flashLogWindow->setVisible(false);
@@ -136,19 +254,36 @@ SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(p
             .arg(Graphics::palette().backgroundFocusIn, Graphics::palette().textAll);
     };
     flashLogWindow->setStyleSheet(getFlashLogStyleSheet());
-    buttons->addWidget(flashLogWindow);
+    firmwareLayout->addWidget(flashLogWindow);
 
-    buttonsErase = new WidgetButtons(this, 1, ButtonTypes::NORMAL, "Erase firmware");
+    buttonsErase = new WidgetButtons(firmwarePage, 1, ButtonTypes::NORMAL, "Erase firmware");
     buttonsErase->setText("Mass Erase", 0);
-    buttons->addWidget(buttonsErase);
+    firmwareLayout->addWidget(buttonsErase);
     connect(buttonsErase, &WidgetButtons::clicked, this, &SettingsDialog::onEraseButtonClicked);
 
-    WidgetSeparator *sepLegal = new WidgetSeparator(this, "Legal");
-    buttons->addWidget(sepLegal);
+    firmwareLayout->addStretch();
 
-    buttonsLicenses = new WidgetButtons(this, 1, ButtonTypes::NORMAL, "Open-source notices");
+    pages->addWidget(firmwarePage);
+
+    auto *aboutPage = new QWidget(pages);
+    auto *aboutLayout = createSettingsPageLayout(aboutPage);
+
+    WidgetSeparator *sepAbout = new WidgetSeparator(aboutPage, "About");
+    aboutLayout->addWidget(sepAbout);
+
+    auto *labelAppVersion = new WidgetLabel(aboutPage, "Application version", applicationVersionText());
+    labelAppVersion->setValueAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    aboutLayout->addWidget(labelAppVersion);
+
+    WidgetSeparator *sepLegal = new WidgetSeparator(aboutPage, "Legal");
+    aboutLayout->addWidget(sepLegal);
+
+    buttonsLicenses = new WidgetButtons(aboutPage, 1, ButtonTypes::NORMAL, "Open-source notices");
     buttonsLicenses->setText("Third-party licenses", 0);
-    buttons->addWidget(buttonsLicenses);
+    aboutLayout->addWidget(buttonsLicenses);
+    aboutLayout->addStretch();
+
+    pages->addWidget(aboutPage);
 
     // Initialize Firmware Manager
     m_firmwareManager = new FirmwareManager(auth, this);
@@ -163,21 +298,28 @@ SettingsDialog::SettingsDialog(Authenticator *auth, QWidget *parent) : QDialog(p
     connect(m_firmwareManager, &FirmwareManager::firmwareFlashed, this, &SettingsDialog::onFirmwareFlashed);
     connect(buttonsLicenses, &WidgetButtons::clicked, this, &SettingsDialog::showThirdPartyLicenses);
 
-    QSpacerItem *verticalSpacer = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    buttons->addItem(verticalSpacer);
+    connect(navigationGroup, QOverload<int>::of(&QButtonGroup::idClicked), pages, &QStackedWidget::setCurrentIndex);
 
-    infoLabel = new WidgetLabel(this, "", "");
-    buttons->addWidget(infoLabel);
+    generalButton->setChecked(true);
+    pages->setCurrentIndex(0);
 
-    WidgetSeparator *sep2 = new WidgetSeparator(this);
-    buttons->addWidget(sep2);
+    contentLayout->addWidget(navigationPanel);
+    contentLayout->addWidget(pages, 1);
 
-    buttonsDone = new WidgetButtons(this, 2);
+    dialogLayout->addLayout(contentLayout, 1);
+
+    infoLabel = new WidgetLabel(ui->widget, "", "");
+    dialogLayout->addWidget(infoLabel);
+
+    WidgetSeparator *sep2 = new WidgetSeparator(ui->widget);
+    dialogLayout->addWidget(sep2);
+
+    buttonsDone = new WidgetButtons(ui->widget, 2);
     buttonsDone->setText("  Save  ", 0);
     buttonsDone->setText(" Cancel ", 1);
-    buttons->addWidget(buttonsDone);
+    dialogLayout->addWidget(buttonsDone);
 
-    ui->widget->setLayout(buttons);
+    ui->widget->setLayout(dialogLayout);
 
     buttonsRestoreSession->setChecked(true, CustomSettings::getRestoreSession());
     buttonsSmartSessionGeometry->setChecked(true, CustomSettings::getSmartSessionLayoutGeometry() ? 1 : 0);
@@ -302,6 +444,7 @@ void SettingsDialog::showThirdPartyLicenses()
     tabs->addTab(createBundledDocumentView(tabs, ":/licenses/THIRD-PARTY-NOTICES.md", true), "Overview");
     tabs->addTab(createBundledDocumentView(tabs, ":/licenses/third-party-licenses/libusb-LGPL-2.1.txt", false), "libusb LGPL");
     tabs->addTab(createBundledDocumentView(tabs, ":/licenses/third-party-licenses/stlink-BSD-3-Clause.txt", false), "stlink BSD");
+    tabs->addTab(createBundledDocumentView(tabs, ":/licenses/third-party-licenses/tinyexpr-zlib.txt", false), "tinyexpr zlib");
 
     layout->addWidget(tabs);
 
