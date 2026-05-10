@@ -57,6 +57,7 @@ private:
     QJsonObject dispatch(const QByteArray &raw);
     static QJsonObject makeResult(const QJsonValue &id, const QJsonValue &result);
     static QJsonObject makeError(const QJsonValue &id, int code, const QString &msg);
+    QJsonObject bridgeMetadata() const;
 
     void sendResponse(QLocalSocket *sock, const QJsonObject &response);
 

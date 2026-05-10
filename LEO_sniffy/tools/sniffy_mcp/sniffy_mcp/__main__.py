@@ -51,6 +51,8 @@ def _cli_call(args: list[str]) -> None:
     c = SniffyClient()
     c.connect()
     try:
+        c.assert_bridge_compatibility()
+
         fn = getattr(c, method_name, None)
         if fn is None or method_name.startswith("_"):
             print(f"Unknown method: {method_name}", file=sys.stderr)

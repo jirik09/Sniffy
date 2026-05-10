@@ -8,20 +8,62 @@ Zero setup. Just pass the AGENT_INSTRUCTIONS.md file as context to the agent (or
 
 ## Install
 
+Stable website entry points:
+
+- Release page: `https://sniffy.cz/sniffy_mcp_latest.php`
+- Wheel asset: `https://sniffy.cz/sniffy_mcp_latest.php?format=wheel`
+- Source archive: `https://sniffy.cz/sniffy_mcp_latest.php?format=sdist`
+- JSON metadata: `https://sniffy.cz/sniffy_mcp_latest.php?format=json`
+
+Install the published MCP package directly from the stable wheel URL:
+
 ```bash
+pip install "sniffy-mcp[mcp] @ https://sniffy.cz/sniffy_mcp_latest.php?format=wheel"
+```
+
+For local development or source checkouts:
+
+```bash
+cd LEO_sniffy/tools/sniffy_mcp
+
 pip install -e .             # client only (zero dependencies)
 pip install -e ".[mcp]"      # with MCP server (needs 'mcp' package)
 ```
 
+## Compatibility
+
+`sniffy-mcp` now requires AgentBridge compatibility metadata from the desktop
+app. On first connection it checks the app's `bridge_api_version` and fails
+early with a clear error if the installed desktop app is too old or does not
+expose bridge metadata yet.
+
+## Release Flow
+
+- App release (`desktop-v*`) checks whether anything under `LEO_sniffy/tools/sniffy_mcp/`
+    changed since the last `mcp-v*` release.
+- If nothing changed, the app release skips MCP packaging entirely.
+- If MCP changed, the app release builds MCP, publishes a new standalone
+    `mcp-v*` release.
+- For routine MCP changes, the workflows automatically choose the next
+    available MCP patch version from the existing `mcp-v*` tags, so a manual
+    version-file edit is not required before releasing.
+- Standalone MCP publishing is still supported via `.github/workflows/publish-mcp.yml`
+    for MCP-only fixes between desktop app releases.
+- The website keeps the stable MCP latest endpoint and also exposes dedicated
+    JSON catalog and download endpoints for the custom desktop/MCP dropdown UI.
+
+This keeps MCP independently releasable while the client-side compatibility
+check guards older desktop app versions at runtime.
+
 ## Usage — Quick CLI
 
-> **Important**: Run from the `LEO_sniffy/tools/` directory (the parent of
-> the `sniffy_mcp` package), NOT from inside `sniffy_mcp/` itself.
+> **Important**: Run from the `LEO_sniffy/tools/sniffy_mcp/` directory,
+> which now contains the standard `sniffy_mcp/` Python package subfolder.
 
 Call any `SniffyClient` method from the command line (no MCP package needed):
 
 ```bash
-cd LEO_sniffy/tools
+cd LEO_sniffy/tools/sniffy_mcp
 
 # ── Core / Status ──────────────────────────────────────────────
 python -m sniffy_mcp call ping

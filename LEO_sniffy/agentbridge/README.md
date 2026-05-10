@@ -94,8 +94,12 @@ Length-prefixed JSON-RPC 2.0 over named pipe (`sniffy-agent`):
 | Method | Params | Description |
 |--------|--------|-------------|
 | `ping` | — | Health check → `{pong: true}` |
-| `get_status` | — | Connection state, device info, module list |
-| `get_system_config` | — | Full HW config: device info, per-module capabilities, pins, resource conflicts |
+| `get_status` | — | Connection state, device info, module list, and `bridge` metadata (`app_version`, `bridge_api_version`, `supported_methods`) |
+| `get_system_config` | — | Full HW config: device info, per-module capabilities, pins, resource conflicts, and `bridge` metadata |
+
+`bridge_api_version` is the compatibility contract between the desktop app and
+`sniffy-mcp`. The MCP package uses it to fail early on older desktop app builds
+instead of advertising tools that would only fail later with `Unknown method`.
 
 #### Device Management
 
