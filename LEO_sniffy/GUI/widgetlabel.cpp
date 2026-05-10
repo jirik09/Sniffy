@@ -25,7 +25,7 @@ void WidgetLabel::setValue(QString value){
     ui->label_value->setText(value);
 }
 
-void WidgetLabel::setValueAlignment(Qt::AlignmentFlag align)
+void WidgetLabel::setValueAlignment(Qt::Alignment align)
 {
         ui->label_value->setAlignment(align);
 }

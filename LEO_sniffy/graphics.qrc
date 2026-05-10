@@ -130,5 +130,6 @@
         <file>THIRD-PARTY-NOTICES.md</file>
         <file>third-party-licenses/libusb-LGPL-2.1.txt</file>
         <file>third-party-licenses/stlink-BSD-3-Clause.txt</file>
+        <file>third-party-licenses/tinyexpr-zlib.txt</file>
     </qresource>
 </RCC>

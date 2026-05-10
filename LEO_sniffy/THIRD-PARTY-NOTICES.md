@@ -28,3 +28,15 @@ This distribution uses the unmodified upstream libusb library as a separate dyna
 - **Full license text**: [third-party-licenses/stlink-BSD-3-Clause.txt](third-party-licenses/stlink-BSD-3-Clause.txt)
 
 This distribution uses the unmodified upstream stlink library as a separate dynamic library.
+
+---
+
+## tinyexpr
+
+- **Bundled version**: Vendored snapshot (upstream version not declared in the bundled source files)
+- **License**: zlib License
+- **Project**: http://CodePlea.com
+- **Copyright**: Copyright (c) 2015-2020 Lewis Van Winkle
+- **Full license text**: [third-party-licenses/tinyexpr-zlib.txt](third-party-licenses/tinyexpr-zlib.txt)
+
+This distribution includes a vendored copy of tinyexpr compiled into the application for scope math expression evaluation.
