@@ -47,8 +47,8 @@ jobs:
             VERSION=$(python release_metadata.py show --field version --tag "${GITHUB_REF_NAME}")
             TAG=$(python release_metadata.py show --field tag --tag "${GITHUB_REF_NAME}")
           else
-            VERSION=$(python release_metadata.py show --field version --auto-bump)
-            TAG=$(python release_metadata.py show --field tag --auto-bump)
+            VERSION=$(python release_metadata.py show --field version)
+            TAG=$(python release_metadata.py show --field tag)
           fi
 
           python release_metadata.py write-version --version "$VERSION"
@@ -68,7 +68,7 @@ jobs:
               exit 1
             fi
           elif git rev-parse -q --verify "refs/tags/$EXPECTED_TAG" >/dev/null; then
-            echo "MCP release tag $EXPECTED_TAG already exists. Bump sniffy-mcp version before publishing again."
+            echo "MCP release tag $EXPECTED_TAG already exists. Bump tools/release/versions.toml before publishing again."
             exit 1
           fi
 
