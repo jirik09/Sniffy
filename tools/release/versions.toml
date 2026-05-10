@@ -1,0 +1,8 @@
+# Source of truth for release versions.
+# Developers update these values in their branch before merge.
+
+[desktop]
+version = "0.2.0"
+
+[mcp]
+version = "0.2.0"

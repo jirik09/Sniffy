@@ -3,41 +3,33 @@ cmake_minimum_required(VERSION 3.21)
 
 project(LEO_sniffy LANGUAGES C CXX)
 
-# Get version from desktop Git tags (desktop-v1.0.2 -> 1.0.2).
-# Fall back to legacy v* tags until the first prefixed desktop release exists.
-find_package(Git)
-if(GIT_FOUND)
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0 --match desktop-v*
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_TAG_VERSION
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-        ERROR_QUIET
-    )
-
-    if("${GIT_TAG_VERSION}" STREQUAL "")
-        execute_process(
-            COMMAND ${GIT_EXECUTABLE} describe --tags --abbrev=0 --match v*
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            OUTPUT_VARIABLE GIT_TAG_VERSION
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_QUIET
-        )
-    endif()
-
-    # Fallback if no tags found or error
-    if("${GIT_TAG_VERSION}" STREQUAL "")
-        message(WARNING "No git tags found, falling back to default version x.0.0")
-        set(GIT_TAG_VERSION "x.0.0")
-    endif()
-
-    # Remove the desktop tag prefix or the legacy v prefix.
-    string(REGEX REPLACE "^(desktop-v|v)" "" GIT_TAG_VERSION "${GIT_TAG_VERSION}")
-else()
-    set(GIT_TAG_VERSION "x.0.0")
+set(SNIFFY_RELEASE_VERSION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/../tools/release/versions.toml")
+if(NOT EXISTS "${SNIFFY_RELEASE_VERSION_FILE}")
+    message(FATAL_ERROR "Release version file not found: ${SNIFFY_RELEASE_VERSION_FILE}")
 endif()
 
-message(STATUS "Building version: ${GIT_TAG_VERSION}")
+file(READ "${SNIFFY_RELEASE_VERSION_FILE}" SNIFFY_RELEASE_VERSION_CONTENT)
+string(REGEX MATCH "\\[desktop\\][^[]*" SNIFFY_DESKTOP_SECTION "${SNIFFY_RELEASE_VERSION_CONTENT}")
+if(NOT SNIFFY_DESKTOP_SECTION)
+    message(FATAL_ERROR "Could not find [desktop] section in ${SNIFFY_RELEASE_VERSION_FILE}")
+endif()
+
+string(REGEX MATCH "version[ \t]*=[ \t]*\"([0-9]+\\.[0-9]+\\.[0-9]+)\"" SNIFFY_DESKTOP_VERSION_LINE "${SNIFFY_DESKTOP_SECTION}")
+if(NOT SNIFFY_DESKTOP_VERSION_LINE)
+    message(FATAL_ERROR "Could not read [desktop].version from ${SNIFFY_RELEASE_VERSION_FILE}")
+endif()
+
+set(SNIFFY_DESKTOP_VERSION "${CMAKE_MATCH_1}")
+string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)$" SNIFFY_DESKTOP_VERSION_MATCH "${SNIFFY_DESKTOP_VERSION}")
+if(NOT SNIFFY_DESKTOP_VERSION_MATCH)
+    message(FATAL_ERROR "Desktop version must use semantic versioning X.Y.Z. Got: ${SNIFFY_DESKTOP_VERSION}")
+endif()
+
+set(SNIFFY_VERSION_MAJOR "${CMAKE_MATCH_1}")
+set(SNIFFY_VERSION_MINOR "${CMAKE_MATCH_2}")
+set(SNIFFY_VERSION_PATCH "${CMAKE_MATCH_3}")
+
+message(STATUS "Building version: ${SNIFFY_DESKTOP_VERSION}")
 
 # Use -O2 for release builds
 set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
@@ -117,8 +109,17 @@ endif()
 
 # Windows Icon Resource
 set(RC_FILES)
+if(WIN32)
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/leo_sniffy_version.rc.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/leo_sniffy_version.rc"
+        @ONLY
+    )
+endif()
+
 if(WIN32 AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/leo_sniffy.rc")
     list(APPEND RC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/leo_sniffy.rc")
+    list(APPEND RC_FILES "${CMAKE_CURRENT_BINARY_DIR}/leo_sniffy_version.rc")
 endif()
 
 # Create the application target
@@ -151,7 +152,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     QT_DEPRECATED_WARNINGS
     QT_NO_FOREACH
-    APP_VERSION=\"${GIT_TAG_VERSION}\"
+    APP_VERSION=\"${SNIFFY_DESKTOP_VERSION}\"
 )
 
 # --- ST-Link & LibUSB Integration ---
@@ -356,19 +357,9 @@ set(CPACK_PACKAGE_CONTACT "support@sniffy.com")
 # License File (GPLv3)
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/../LICENSE.txt")
 
-# Parse version components from GIT_TAG_VERSION (set near top of file)
-string(REGEX MATCH "^([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_MATCH "${GIT_TAG_VERSION}")
-
-if(VERSION_MATCH)
-    set(CPACK_PACKAGE_VERSION_MAJOR "${CMAKE_MATCH_1}")
-    set(CPACK_PACKAGE_VERSION_MINOR "${CMAKE_MATCH_2}")
-    set(CPACK_PACKAGE_VERSION_PATCH "${CMAKE_MATCH_3}")
-else()
-    # Fallback for non-semver tags
-    set(CPACK_PACKAGE_VERSION_MAJOR "x")
-    set(CPACK_PACKAGE_VERSION_MINOR "0")
-    set(CPACK_PACKAGE_VERSION_PATCH "0")
-endif()
+set(CPACK_PACKAGE_VERSION_MAJOR "${SNIFFY_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${SNIFFY_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${SNIFFY_VERSION_PATCH}")
 
 if(WIN32)
     # Use NSIS (Nullsoft Scriptable Install System) to create a .exe installer

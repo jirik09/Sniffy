@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-LEO Sniffy uses the following third-party libraries in its distributed desktop builds.
+Sniffy uses the following third-party libraries in its distributed desktop builds.
 Copies of the license texts listed below are included with the packaged application.
 
 ---

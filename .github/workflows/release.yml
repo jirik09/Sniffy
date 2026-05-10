@@ -9,13 +9,15 @@ permissions:
   contents: write
 
 jobs:
-  mcp_plan:
-    name: Plan MCP publish
+  release_plan:
+    name: Plan desktop and MCP publish
     runs-on: ubuntu-latest
     outputs:
       changed: ${{ steps.diff.outputs.changed }}
-      version: ${{ steps.meta.outputs.version }}
-      tag: ${{ steps.meta.outputs.tag }}
+      mcp_version: ${{ steps.versions.outputs.mcp_version }}
+      mcp_tag: ${{ steps.versions.outputs.mcp_tag }}
+      desktop_version: ${{ steps.versions.outputs.desktop_version }}
+      desktop_tag: ${{ steps.versions.outputs.desktop_tag }}
       last_tag: ${{ steps.diff.outputs.last_tag }}
 
     steps:
@@ -34,17 +36,52 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Read MCP metadata
-        id: meta
+      - name: Read release versions
+        id: versions
         shell: bash
-        working-directory: LEO_sniffy/tools/sniffy_mcp
         run: |
           set -euo pipefail
-          VERSION=$(python release_metadata.py show --field version --auto-bump)
-          TAG=$(python release_metadata.py show --field tag --auto-bump)
-          python release_metadata.py validate --expected-tag "$TAG" --auto-bump
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          from pathlib import Path
+          import re
+
+          versions = {}
+          current_section = None
+          for raw_line in Path("tools/release/versions.toml").read_text(encoding="utf-8").splitlines():
+              line = raw_line.split("#", 1)[0].strip()
+              if not line:
+                  continue
+
+              section_match = re.fullmatch(r"\[([A-Za-z0-9_-]+)\]", line)
+              if section_match is not None:
+                  current_section = section_match.group(1)
+                  continue
+
+              version_match = re.fullmatch(r'version\s*=\s*"([^"]+)"', line)
+              if version_match is not None and current_section is not None:
+                  versions[current_section] = version_match.group(1)
+
+          desktop = versions["desktop"]
+          mcp = versions["mcp"]
+          print(f"desktop_version={desktop}")
+          print(f"desktop_tag=desktop-v{desktop}")
+          print(f"mcp_version={mcp}")
+          print(f"mcp_tag=mcp-v{mcp}")
+          PY
+
+      - name: Validate desktop release tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_NAME}" != "${{ steps.versions.outputs.desktop_tag }}" ]; then
+            echo "Triggered desktop tag ${GITHUB_REF_NAME} does not match tools/release/versions.toml (${{ steps.versions.outputs.desktop_tag }})"
+            exit 1
+          fi
+
+      - name: Validate MCP release metadata
+        shell: bash
+        working-directory: LEO_sniffy/tools/sniffy_mcp
+        run: python release_metadata.py validate --expected-tag "${{ steps.versions.outputs.mcp_tag }}"
 
       - name: Detect MCP changes since last MCP release
         id: diff
@@ -62,8 +99,8 @@ jobs:
             CHANGED=true
           fi
 
-          if [ "$CHANGED" = true ] && git rev-parse -q --verify "refs/tags/${{ steps.meta.outputs.tag }}" >/dev/null; then
-            echo "MCP changed since $LAST_TAG but tag ${{ steps.meta.outputs.tag }} already exists. Bump sniffy-mcp version before cutting the app release."
+          if [ "$CHANGED" = true ] && git rev-parse -q --verify "refs/tags/${{ steps.versions.outputs.mcp_tag }}" >/dev/null; then
+            echo "MCP changed since $LAST_TAG but tag ${{ steps.versions.outputs.mcp_tag }} already exists. Bump tools/release/versions.toml before cutting the app release."
             exit 1
           fi
 
@@ -73,7 +110,7 @@ jobs:
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    needs: mcp_plan
+    needs: release_plan
     strategy:
       matrix:
         include:
@@ -176,7 +213,7 @@ jobs:
 
       - name: Derive desktop release version
         shell: bash
-        run: echo "SNIFFY_DESKTOP_VERSION=${GITHUB_REF_NAME#desktop-v}" >> "$GITHUB_ENV"
+        run: echo "SNIFFY_DESKTOP_VERSION=${{ needs.release_plan.outputs.desktop_version }}" >> "$GITHUB_ENV"
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v2
@@ -195,8 +232,8 @@ jobs:
   mcp_package:
     name: Build MCP package
     runs-on: ubuntu-latest
-    needs: mcp_plan
-    if: needs.mcp_plan.outputs.changed == 'true'
+    needs: release_plan
+    if: needs.release_plan.outputs.changed == 'true'
     defaults:
       run:
         working-directory: LEO_sniffy/tools/sniffy_mcp
@@ -214,7 +251,7 @@ jobs:
           python-version: '3.12'
 
       - name: Prepare MCP package version
-        run: python release_metadata.py write-version --version "${{ needs.mcp_plan.outputs.version }}"
+        run: python release_metadata.py write-version --version "${{ needs.release_plan.outputs.mcp_version }}"
 
       - name: Install build tooling
         run: |
@@ -222,7 +259,7 @@ jobs:
           python -m pip install build twine
 
       - name: Validate MCP release metadata
-        run: python release_metadata.py validate --expected-tag "${{ needs.mcp_plan.outputs.tag }}"
+        run: python release_metadata.py validate --expected-tag "${{ needs.release_plan.outputs.mcp_tag }}"
 
       - name: Build wheel and sdist
         run: python -m build
@@ -254,10 +291,10 @@ jobs:
     name: Publish MCP with app release
     runs-on: ubuntu-latest
     needs:
-      - mcp_plan
+      - release_plan
       - mcp_package
       - build
-    if: needs.mcp_plan.outputs.changed == 'true'
+    if: needs.release_plan.outputs.changed == 'true'
 
     steps:
       - name: Checkout repository
@@ -275,8 +312,8 @@ jobs:
       - name: Ensure MCP release exists
         uses: actions/github-script@v7
         env:
-          MCP_TAG: ${{ needs.mcp_plan.outputs.tag }}
-          MCP_VERSION: ${{ needs.mcp_plan.outputs.version }}
+          MCP_TAG: ${{ needs.release_plan.outputs.mcp_tag }}
+          MCP_VERSION: ${{ needs.release_plan.outputs.mcp_version }}
         with:
           script: |
             const owner = context.repo.owner;
@@ -304,8 +341,8 @@ jobs:
       - name: Upload MCP assets to standalone MCP release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.mcp_plan.outputs.tag }}
-          name: Sniffy MCP ${{ needs.mcp_plan.outputs.version }}
+          tag_name: ${{ needs.release_plan.outputs.mcp_tag }}
+          name: Sniffy MCP ${{ needs.release_plan.outputs.mcp_version }}
           body: ''
           files: |
             mcp_dist/*.whl
