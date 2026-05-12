@@ -103,8 +103,6 @@ void Device::passSystemSpecificationToGUI()
     values.append(deviceSpec->FW_Version + " ("+deviceSpec->Build_Date+")");
     //labels.append("Free RTOS");
     //values.append(deviceSpec->OS_Version);
-    labels.append("HAL");
-    values.append(deviceSpec->HAL_Version);
     deviceWindow->addModuleDescription("System Info",labels,values);
 }
 

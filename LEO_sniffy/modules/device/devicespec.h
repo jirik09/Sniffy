@@ -20,7 +20,6 @@ public:
     QString Build_Date;
     QString FW_Version;
     QString OS_Version;
-    QString HAL_Version;
 
     bool isShield = false;
     QString shieldName;
