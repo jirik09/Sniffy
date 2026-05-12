@@ -30,7 +30,7 @@ DeviceSpec::DeviceSpec(QObject *parent)
 void DeviceSpec::parseSpecification(QByteArray spec){
     QList<QByteArray> specParams = spec.split(':');
 
-    if(specParams.length()>=16){
+    if(specParams.length()>=15){
         device = specParams[0];
         if(specParams[1] == "NACK"){
             isShield = false;
@@ -50,21 +50,20 @@ void DeviceSpec::parseSpecification(QByteArray spec){
 
         FW_Version = normalizeVersionString(QString::fromUtf8(specParams[7]));
         OS_Version = specParams[9];
-        HAL_Version = normalizeVersionString(QString::fromUtf8(specParams[11]));
 
-        QDataStream streamBuffLeng(specParams[13]);
+        QDataStream streamBuffLeng(specParams[11]);
         streamBuffLeng>>bufferLength;
 
-        QDataStream streamUARTSpeed(specParams[14]);
+        QDataStream streamUARTSpeed(specParams[12]);
         streamUARTSpeed>>uartSpeed;
 
-        TX_pin = specParams[15];
-        RX_pin = specParams[16];
+        TX_pin = specParams[13];
+        RX_pin = specParams[14];
 
-        if(specParams.length()>=19){
+        if(specParams.length()>=18 && specParams[15] == "USB_"){
             useUsb = true;
-            DP_pin = specParams[18];
-            DM_pin = specParams[19];
+            DP_pin = specParams[16];
+            DM_pin = specParams[17];
         }
         isSpecificationLoaded = true;
     }
